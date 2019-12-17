@@ -1,4 +1,4 @@
-unit Polarkar;
+ï»¿unit Polarkar;
 
 interface
 
@@ -265,7 +265,7 @@ begin
   mat.PreMultiply(tmat.mat);
 end;
 
-procedure TPolarKar2.FillMatrix; //für Absolutmodus
+procedure TPolarKar2.FillMatrix; //fï¿½r Absolutmodus
 begin
   mat.Identity;
   { 1. Rotation um globale y-Achse, gleichzeitig lokale y-Achse }

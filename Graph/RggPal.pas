@@ -1,4 +1,4 @@
-unit RggPal;
+ï»¿unit RggPal;
 
 interface
 
@@ -33,9 +33,9 @@ end;
 
 function CreateRggPal32: HPalette;
 const
-  NumColors = 32; //Anzahl der Stufen für Rot, Grün Blau und Grau
-  NumEntries = 4 * NumColors; //Anzahl der Paletteneinträge
-  n = 4; //Differenz für die RGB-Anteile
+  NumColors = 32; //Anzahl der Stufen fÃ¼r Rot, GrÃ¼n Blau und Grau
+  NumEntries = 4 * NumColors; //Anzahl der PaletteneintrÃ¤ge
+  n = 4; //Differenz fÃ¼r die RGB-Anteile
   base = 100; //Startwert {dunkelster Farbwert}
 var
   i: Integer;
@@ -101,7 +101,7 @@ begin
   Palette[12].rgbGreen := $FF;
   Palette[12].rgbBlue := 0;
 
-  Palette[13].rgbRed := 0; { Sterne grün }
+  Palette[13].rgbRed := 0; { Sterne grÃ¼n }
   Palette[13].rgbGreen := $FF;
   Palette[13].rgbBlue := 0;
 
@@ -109,7 +109,7 @@ begin
   Palette[245].rgbGreen := 0;
   Palette[245].rgbBlue := 0;
 
-  //Farben für Schattierung
+  //Farben fÃ¼r Schattierung
   for i := 0 to 31 do
   begin
     //32 Rotstufen {32 bis 63}

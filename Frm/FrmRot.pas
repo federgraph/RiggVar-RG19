@@ -523,7 +523,7 @@ end;
 
 procedure TRotationForm.InitRigg; {virtual}
 begin
-  Rigg := TRigg.Create(Self);
+  Rigg := TRigg.Create;
   with Rigg do
   begin
     Rigg.ControllerTyp := ctOhne;

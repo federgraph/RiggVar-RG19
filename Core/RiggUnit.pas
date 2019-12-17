@@ -331,7 +331,7 @@ begin
   YComboBox := OutputForm.YComboBox;
 
   {Rigg}
-  Rigg := TRigg.Create(Self);
+  Rigg := TRigg.Create;
 
   SetupGCtrls;
 

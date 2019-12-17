@@ -64,7 +64,7 @@ type
     limitA, limitB, TrySalingH: double;
     KurveF: TChartLine;
 
-    constructor Create(AOwner: TComponent); override;
+    constructor Create;
     destructor Destroy; override;
 
     procedure LoadFromIniFile(IniFile: TIniFile); override;
@@ -88,9 +88,9 @@ implementation
 uses
   RiggVar.App.Main;
 
-constructor TRiggFS.Create(AOwner: TComponent);
+constructor TRiggFS.Create;
 begin
-  inherited Create(AOwner);
+  inherited Create;
   FOnRegelGrafik := nil;
   GetDefaultChartData;
 
@@ -101,16 +101,16 @@ begin
   FProbe := True;
   FHullIsFlexible := True;
 
-  rEA[0] :=  EAgross;
-  rEA[1] :=  EARumpf;
-  rEA[2] :=  EARumpf;
-  rEA[3] :=  EARumpf;
-  rEA[4] :=  EARumpf;
-  rEA[5] :=  EARumpf;
-  rEA[6] :=  EARumpf;
-  rEA[7] :=  13 * EModulStahl;
-  rEA[8] :=  13 * EModulStahl;
-  rEA[9] :=  EAgross;
+  rEA[0] := EAgross;
+  rEA[1] := EARumpf;
+  rEA[2] := EARumpf;
+  rEA[3] := EARumpf;
+  rEA[4] := EARumpf;
+  rEA[5] := EARumpf;
+  rEA[6] := EARumpf;
+  rEA[7] := 13 * EModulStahl;
+  rEA[8] := 13 * EModulStahl;
+  rEA[9] := EAgross;
   rEA[10] := EAgross;
   rEA[11] := EASaling;
   rEA[12] := 13 * EModulStahl;
@@ -259,31 +259,31 @@ begin
   case SalingTyp of
     stFest:
       begin
-      Kraefte;
-      Split;
+        Kraefte;
+        Split;
         if FProbe then
           Probe;
-      Entlasten;
-      MakeKoord;
-    end;
+        Entlasten;
+        MakeKoord;
+      end;
     stDrehbar:
       begin
-      Kraefte;
-      Split;
+        Kraefte;
+        Split;
         if FProbe then
           Probe;
-      Entlasten;
-      MakeKoordDS;
-    end;
+        Entlasten;
+        MakeKoordDS;
+      end;
     stOhne, stOhne_2:
       begin
-      KraefteOS;
-      SplitOS;
+        KraefteOS;
+        SplitOS;
         if FProbe then
           Probe;
-      Entlasten;
-      MakeKoordOS;
-    end;
+        Entlasten;
+        MakeKoordOS;
+      end;
   end;
 
   with FTrimm do
@@ -295,8 +295,8 @@ begin
       Spannung := Round(rF[14]) { in N }
     else
     begin
-      if rF[14] >  32000 then
-        Spannung :=  32000;
+      if rF[14] > 32000 then
+        Spannung := 32000;
       if rF[14] < -32000 then
         Spannung := -32000;
     end;
@@ -329,11 +329,11 @@ begin
     FX := ClearVektorK;
     FY := ClearVektorK;
     FX[1] := -FEx; { Mastcontrollerkraft }
-    FY[1] :=  FEy;
+    FY[1] := FEy;
     FX[2] := -FDx; { Salingkraft }
-    FY[2] :=  FDy;
+    FY[2] := FDy;
     FX[3] := FCx; { FB vom Mast }
-    FY[3] :=  FCy;
+    FY[3] := FCy;
     FX[5] := FD0x; { FA vom Mast }
     FY[5] := -FD0y;
 
@@ -370,7 +370,7 @@ var
   P0P, PC, PD, P0C0, P0D0: double;
   j: Integer;
 begin
-   { Laengen bereitstellen }
+  { Laengen bereitstellen }
   P0C0 := Abstand(rP[ooP0], rP[ooC0]);
   PC := Abstand(rP[ooP], rP[ooC]);
   PD := Abstand(rP[ooP], rP[ooD]);
@@ -489,19 +489,19 @@ procedure TRiggFS.Probe;
       d3 := vsub(rP[c], rP[o]);
       d4 := vsub(rP[d], rP[o]);
 
-    l1 := rL[al];
-    l2 := rL[bl];
-    l3 := rL[cl];
-    l4 := rL[dl];
+      l1 := rL[al];
+      l2 := rL[bl];
+      l3 := rL[cl];
+      l4 := rL[dl];
 
-    F1 := rF[al];
-    F2 := rF[bl];
-    F3 := rF[cl];
-    F4 := rF[dl];
+      F1 := rF[al];
+      F2 := rF[bl];
+      F3 := rF[cl];
+      F4 := rF[dl];
 
       Result := Probe; { Aufruf von Probe in class TetraF }
     end;
- end;
+  end;
 
 var
   tempResult: double;
@@ -660,7 +660,7 @@ begin
     end;
   except
     on E: EMathError do
-    LogList.Add('TRiggFS.MakeRumpfKoord:  ' + E.Message);
+      LogList.Add('TRiggFS.MakeRumpfKoord:  ' + E.Message);
   end;
 end;
 
@@ -670,77 +670,77 @@ var
   S: String;
 begin
   MakeRumpfKoord;
-  rPe[ooE]  := rP[ooE];
+  rPe[ooE] := rP[ooE];
   try
     with SchnittKK do
     begin
-    SchnittEbene := seXZ;
-    { 1. Aufruf SchnittKK: Saling2d und WanteOben2d;
+      SchnittEbene := seXZ;
+      { 1. Aufruf SchnittKK: Saling2d und WanteOben2d;
         Schnittpunkt Temp wird im 2. Aufruf benötigt }
       Radius1 := sqrt(sqr(rLe[10]) - sqr(rLe[11] / 2));
       Radius2 := sqrt(sqr(rLe[13]) - sqr(rLe[11] / 2));
       Temp := Null;
       Temp[x] := rL[16];
-    MittelPunkt1 := Temp;
+      MittelPunkt1 := Temp;
       Temp := Null;
       Temp[x] := rL[16] + rL[15];
-    MittelPunkt2 := Temp;
-    Temp := SchnittPunkt1;
-    S := Bemerkung;
+      MittelPunkt2 := Temp;
+      Temp := SchnittPunkt1;
+      S := Bemerkung;
       S := Format('TRiggFS.MakeKoord, 1. Aufruf: %s', [S]);
-    LogList.Add(S);
+      LogList.Add(S);
 
       if Status = bmEntfernt then
       begin
-      FRiggOK := False;
-      Include(FRiggStatus, rsNichtEntspannbar);
-    end;
+        FRiggOK := False;
+        Include(FRiggStatus, rsNichtEntspannbar);
+      end;
 
-    { 2. Aufruf SchnittKK: WanteUnten2d und Abstand rPe[ooD0]..rPe[ooP];
-      ooA, ooB, ooP ermitteln }
+      { 2. Aufruf SchnittKK: WanteUnten2d und Abstand rPe[ooD0]..rPe[ooP];
+        ooA, ooB, ooP ermitteln }
       Radius1 := sqrt(sqr(rLe[8]) - sqr((rLe[6] - rLe[11]) / 2));
       Radius2 := Abstand(Temp, Null); { Temp unter 1. ermittelt }
-    MittelPunkt1 := rPe[ooA0];
-    MittelPunkt2 := rPe[ooD0];
+      MittelPunkt1 := rPe[ooA0];
+      MittelPunkt2 := rPe[ooD0];
       rPe[ooA] := SchnittPunkt1;
       rPe[ooA, y] := rLe[11] / 2;
-    S := Bemerkung;
+      S := Bemerkung;
       S := Format('TRiggFS.MakeKoord, 2. Aufruf: %s', [S]);
-    LogList.Add(S);
+      LogList.Add(S);
 
       if Status = bmK1inK2 then
       begin
-      FRiggOK := False;
-      Include(FRiggStatus, rsNichtEntspannbar);
-    end;
+        FRiggOK := False;
+        Include(FRiggStatus, rsNichtEntspannbar);
+      end;
 
       rPe[ooB] := rPe[ooA];
       rPe[ooB, y] := -rPe[ooA, y];
       rPe[ooP] := rPe[ooA];
       rPe[ooP, y] := 0;
 
-   { 3. Aufruf SchnittKK: Saling2d und MastUnten; ooD ermitteln }
+      { 3. Aufruf SchnittKK: Saling2d und MastUnten; ooD ermitteln }
       Radius1 := sqrt(sqr(rLe[10]) - sqr(rLe[11] / 2));
-    Radius2 := rLe[16];
-    MittelPunkt1 := rPe[ooA];
-    MittelPunkt2 := rPe[ooD0];
+      Radius2 := rLe[16];
+      MittelPunkt1 := rPe[ooA];
+      MittelPunkt2 := rPe[ooD0];
       rPe[ooD] := SchnittPunkt1;
       rPe[ooD, y] := 0;
-    S := Bemerkung;
+      S := Bemerkung;
       S := Format('TRiggFS.MakeKoord, 3. Aufruf: %s', [S]);
-    LogList.Add(S);
+      LogList.Add(S);
 
-    { 4. Aufruf SchnittKK: WanteOben2d und MastOben; ooC ermitteln }
+      { 4. Aufruf SchnittKK: WanteOben2d und MastOben; ooC ermitteln }
       Radius1 := sqrt(sqr(rLe[13]) - sqr(rLe[11] / 2));
-    Radius2 := rLe[15];
-    MittelPunkt1 := rPe[ooA];
-    MittelPunkt2 := rPe[ooD];
+      Radius2 := rLe[15];
+      MittelPunkt1 := rPe[ooA];
+      MittelPunkt2 := rPe[ooD];
       rPe[ooC] := SchnittPunkt1;
       rPe[ooC, y] := 0;
-    S := Bemerkung;
+      S := Bemerkung;
       S := Format('TRiggFS.MakeKoord, 4. Aufruf: %s', [S]);
-    LogList.Add(S);
-  end;
+      LogList.Add(S);
+    end;
 
     { Berechnung für Punkt ooF - Masttop }
     gammaE := pi / 2 - arctan2((rPe[ooC, x] - rPe[ooD0, x]), (rPe[ooC, z] - rPe[ooD0, z]));
@@ -750,7 +750,7 @@ begin
 
   except
     on E: EMathError do
-    LogList.Add('TRiggFS.MakeKoord:  ' + E.Message);
+      LogList.Add('TRiggFS.MakeKoord:  ' + E.Message);
   end;
 end;
 
@@ -761,7 +761,7 @@ var
   WStrich3d, WStrich2d, W1Strich, Saling1L, Skalar: double;
 begin
   MakeRumpfKoord;
-  rPe[ooE]  := rP[ooE];
+  rPe[ooE] := rP[ooE];
   try
     with SchnittKK do
     begin
@@ -862,7 +862,7 @@ begin
 
   except
     on E: EMathError do
-    LogList.Add('TRiggFS.MakeKoord:  ' + E.Message);
+      LogList.Add('TRiggFS.MakeKoord:  ' + E.Message);
   end;
 end;
 
@@ -888,11 +888,11 @@ begin
     FX := ClearVektorK;
     FY := ClearVektorK;
     FX[1] := -FEx; { Mastcontrollerkraft }
-    FY[1] :=  FEy;
+    FY[1] := FEy;
     FX[2] := 0; { Null gesetzt, da nicht relevant }
     FY[2] := 0; { Null gesetzt, da nicht relevant }
     FX[3] := FCx; { FB vom Mast }
-    FY[3] :=  FCy;
+    FY[3] := FCy;
     FX[5] := FD0x; { FA vom Mast }
     FY[5] := -FD0y;
 
@@ -929,7 +929,7 @@ procedure TRiggFS.SplitOS;
 var
   P0D0, P0C, P0C0: double;
 begin
-   { Laengen bereitstellen }
+  { Laengen bereitstellen }
   P0D0 := Abstand(rP[ooP0], rP[ooD0]);
   P0C0 := Abstand(rP[ooP0], rP[ooC0]);
   P0C := Abstand(rP[ooP0], rP[ooC]);
@@ -1009,7 +1009,7 @@ var
   S: String;
 begin
   MakeRumpfKoord;
-  rPe[ooE]  := rP[ooE];
+  rPe[ooE] := rP[ooE];
   try
     with SchnittKK do
     begin
@@ -1057,7 +1057,7 @@ begin
 
   except
     on E: EMathError do
-    LogList.Add('TRiggFS.MakeKoord:  ' + E.Message);
+      LogList.Add('TRiggFS.MakeKoord:  ' + E.Message);
   end;
 end;
 
@@ -1103,35 +1103,35 @@ begin
   case CalcTyp of
     ctBiegeKnicken:
       begin
-      case SalingTyp of
-        stFest:
-          begin
-            limitA := GSB.SalingH.Min; { in mm }
-            limitB := GSB.SalingH.Max; { in mm }
-          end;
-        stDrehbar:
-          begin
-            limitA := GSB.SalingL.Min; { in mm }
-            limitB := GSB.SalingL.Max; { in mm }
-          end;
+        case SalingTyp of
+          stFest:
+            begin
+              limitA := GSB.SalingH.Min; { in mm }
+              limitB := GSB.SalingH.Max; { in mm }
+            end;
+          stDrehbar:
+            begin
+              limitA := GSB.SalingL.Min; { in mm }
+              limitB := GSB.SalingL.Max; { in mm }
+            end;
+        end;
       end;
-    end;
     ctQuerKraftBiegung:
       begin
         { limitA := limitA; } { in mm, wird in BiegeUndNeigeF ermittelt }
         limitB := limitA + 400; { in mm }
-    end;
+      end;
     ctKraftGemessen:
       begin
-      { Hier nur Biegen und Neigen }
-      case SalingTyp of
-        stFest:
-          Berechnen(FiSalingH); { Saling wiederherstellen }
-        stDrehbar:
-          Berechnen(FiSalingL);
-      end;
+        { Hier nur Biegen und Neigen }
+        case SalingTyp of
+          stFest:
+            Berechnen(FiSalingH); { Saling wiederherstellen }
+          stDrehbar:
+            Berechnen(FiSalingL);
+        end;
         Exit; { weil Kraft schon bekannt }
-    end;
+      end;
   end;
 
   { Anfang und Ende bestimmen }
@@ -1173,8 +1173,8 @@ begin
   end;
 
   (*
-  if TrimmSoll.Spannung < KraftMin then TrimmSoll.Spannung := Round(KraftMin)+1;
-  if TrimmSoll.Spannung > KraftMax then TrimmSoll.Spannung := Round(KraftMax)-1;
+    if TrimmSoll.Spannung < KraftMin then TrimmSoll.Spannung := Round(KraftMin)+1;
+    if TrimmSoll.Spannung > KraftMax then TrimmSoll.Spannung := Round(KraftMax)-1;
   *)
   TrimmSollOut := False;
   if TrimmSoll.Spannung < KraftMin then

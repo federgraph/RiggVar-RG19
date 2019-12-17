@@ -1,4 +1,4 @@
-unit RggPBox;
+﻿unit RggPBox;
 
 interface
 
@@ -101,7 +101,7 @@ begin
     if PtInRect(ClientRect, SmallPointToPoint(message.Pos)) then
       Click;
   end;
-  message.Result := 1; //unterdr�ckt Popups
+  message.Result := 1; //unterdrückt Popups
   inherited;
 end;
 

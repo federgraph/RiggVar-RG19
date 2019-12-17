@@ -164,7 +164,7 @@ end;
 
 procedure TAniRotationForm.InitRigg; {overwritten virtual}
 begin
-  Rigg := TRigg.Create(Self);
+  Rigg := TRigg.Create;
   with RaumGrafik do
   begin
     Salingtyp := Rigg.Salingtyp;

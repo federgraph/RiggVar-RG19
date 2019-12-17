@@ -1,4 +1,4 @@
-unit FrmModel;
+﻿unit FrmModel;
 
 interface
 
@@ -19,9 +19,6 @@ type
     procedure HelpBtnClick(Sender: TObject);
     procedure OKBtnClick(Sender: TObject);
   private
-    { Private declarations }
-  public
-    { Public declarations }
     Rigg: TRigg;
   end;
 

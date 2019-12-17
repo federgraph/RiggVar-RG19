@@ -2,8 +2,6 @@
 
 interface
 
-{$SCOPEDENUMS ON}
-
 uses
   System.SysUtils,
   System.Classes,
@@ -24,7 +22,7 @@ type
   public
     UpdateGetriebeCounter: Integer;
 
-    constructor Create(AOwner: TComponent); override;
+    constructor Create;
 
     procedure ResetStatus;
     procedure UpdateGetriebe;
@@ -54,9 +52,9 @@ type
 
 implementation
 
-constructor TGetriebeFS.Create(AOwner: TComponent);
+constructor TGetriebeFS.Create;
 begin
-  inherited Create(AOwner);
+  inherited Create;
   BerechneWinkel;
 end;
 
@@ -80,11 +78,11 @@ begin
       UpdateGetriebeDS;
     stFest:
       begin
-      if ManipulatorMode then
-        UpdateGetriebeFS
-      else
-        BerechneWinkel;
-    end;
+        if ManipulatorMode then
+          UpdateGetriebeFS
+        else
+          BerechneWinkel;
+      end;
   end;
 end;
 
@@ -449,12 +447,12 @@ end;
 
   { 2. Berechnung Punkt F mit Mastfall}
   with SchnittKK do begin
-    SchnittEbene := seXZ;
+  SchnittEbene := seXZ;
     Radius1 := tempM + FiMastfallVorlauf;
-    Radius2 := k3;
-    MittelPunkt1 := rP[ooF0];
-    MittelPunkt2 := rP[ooD0];
-    rP[ooF] := SchnittPunkt1;
+  Radius2 := k3;
+  MittelPunkt1 := rP[ooF0];
+  MittelPunkt2 := rP[ooD0];
+  rP[ooF] := SchnittPunkt1;
   end;
 
   { 3. psi, D, und C ermitteln}
@@ -517,7 +515,7 @@ end;
 
 procedure TGetriebeFS.UpdateGetriebeDS;
 { gegeben: Woben3d, Wunten3d, Mastunten, Mastoben, SalingL,
-           Vorstag, Rumpfkoordinaten. }
+  Vorstag, Rumpfkoordinaten. }
 { gesucht: Riggkoordinaten ooA, ooB, ooC, ooD, ooP, ooF }
 var
   psiStart, psiEnde, psiEnde2, psiA, psiB: double;
@@ -528,7 +526,7 @@ var
 
   function WobenIstVonPsi(psi: double): double;
   begin
-      { Berechnungen im Vierelenk D0 D C C0 }
+    { Berechnungen im Vierelenk D0 D C C0 }
     { 1. Berechnung von ooD }
     rP[ooD, x] := rP[ooD0, x] + FrMastunten * cos(psi - FrAlpha);
     rP[ooD, y] := 0;
@@ -536,7 +534,7 @@ var
 
     { 2. Berechnung Punkt C }
     with SchnittKK do
-   begin
+    begin
       SchnittEbene := seXZ;
       Radius1 := FrMastoben;
       Radius2 := FrVorstag;
@@ -644,7 +642,7 @@ begin
     WobenIstVonPsi(psiEnde);
     FrPsi := psiEnde;
   end
-    { if GetriebeOK then : den richtigen Winkel FrPsi numerisch ermitteln }
+  { if GetriebeOK then : den richtigen Winkel FrPsi numerisch ermitteln }
   else
   begin
     FiZaehler := 0;
@@ -661,7 +659,7 @@ begin
       (abs(Diff) < 0.01) or (FiZaehler = 200);
   end;
 
-    { weiter im ebenen Trapez }
+  { weiter im ebenen Trapez }
   SchnittGG(Null, TempC, TempD, TempA, temp);
   { Temp enthält jetzt den Schnittpunkt der Diagonalen }
   W1Strich := Abstand(Null, temp);
@@ -726,12 +724,12 @@ begin
 
   { 2. Berechnung Punkt F mit Mastfall}
   with SchnittKK do begin
-    SchnittEbene := seXZ;
+  SchnittEbene := seXZ;
     Radius1 := tempM + FiMastfallVorlauf;
-    Radius2 := k3;
-    MittelPunkt1 := rP[ooF0];
-    MittelPunkt2 := rP[ooD0];
-    rP[ooF] := SchnittPunkt1;
+  Radius2 := k3;
+  MittelPunkt1 := rP[ooF0];
+  MittelPunkt2 := rP[ooD0];
+  rP[ooF] := SchnittPunkt1;
   end;
 
   { 3. psi, D, und C ermitteln}
@@ -921,8 +919,8 @@ begin
     rP[ooD] := vadd(rP[ooD0], temp);
     { Wantenlängen }
     (*
-    FrWoben2d := TempWoben2d;
-    FrWunten2d := Abstand(rP[ooP0],rP[ooC]) - FrWoben2d;
+      FrWoben2d := TempWoben2d;
+      FrWunten2d := Abstand(rP[ooP0],rP[ooC]) - FrWoben2d;
     *)
     FrWanteZulang := FrWunten3d + FrWoben3d - Abstand(rP[ooC], rP[ooA0]);
     FGetriebeOK := False;
@@ -945,8 +943,8 @@ begin
     end;
     { Wantenlängen }
     (*
-    FrWunten2d := TempWunten2d;
-    FrWoben2d := TempWoben2d;
+      FrWunten2d := TempWunten2d;
+      FrWoben2d := TempWoben2d;
     *)
   end;
 
@@ -1007,10 +1005,10 @@ begin
       case SalingTyp of
         stFest:
           begin
-          { 1. Aufruf SchnittKK: Saling2d und WanteOben2d;
+            { 1. Aufruf SchnittKK: Saling2d und WanteOben2d;
               Schnittpunkt Temp wird im 2. Aufruf benötigt }
-          Radius1 := FrSalingH;
-          Radius2 := FrWoben2d;
+            Radius1 := FrSalingH;
+            Radius2 := FrWoben2d;
           Temp := Null;
           Temp[x] := FrMastunten;
           MittelPunkt1 := Temp;
@@ -1018,108 +1016,108 @@ begin
           Temp[x] := FrMastunten + FrMastoben;
           MittelPunkt2 := Temp;
           Temp := SchnittPunkt1;
-          S := Bemerkung;
+            S := Bemerkung;
             S := Format('GetVorstagNull, stFest/1: %s', [S]);
-          LogList.Add(S);
+            LogList.Add(S);
 
-          { 2. Aufruf SchnittKK: TempP ermitteln }
-          Radius1 := FrWunten2d;
-          Radius2 := Abstand(Temp, Null); { Temp unter 1. ermittelt }
-          MittelPunkt1 := rP[ooP0];
-          MittelPunkt2 := rP[ooD0];
+            { 2. Aufruf SchnittKK: TempP ermitteln }
+            Radius1 := FrWunten2d;
+            Radius2 := Abstand(Temp, Null); { Temp unter 1. ermittelt }
+            MittelPunkt1 := rP[ooP0];
+            MittelPunkt2 := rP[ooD0];
             TempP := SchnittPunkt1;
             TempP[y] := 0;
-          S := Bemerkung;
+            S := Bemerkung;
             S := Format('GetVorstagNull, stFest/2: %s', [S]);
-          LogList.Add(S);
+            LogList.Add(S);
 
-         { 3. Aufruf SchnittKK: Saling2d und MastUnten; TempD ermitteln }
-          Radius1 := FrSalingH;
-          Radius2 := FrMastunten;
-          MittelPunkt1 := TempP;
-          MittelPunkt2 := rP[ooD0];
+            { 3. Aufruf SchnittKK: Saling2d und MastUnten; TempD ermitteln }
+            Radius1 := FrSalingH;
+            Radius2 := FrMastunten;
+            MittelPunkt1 := TempP;
+            MittelPunkt2 := rP[ooD0];
             TempD := SchnittPunkt1;
             TempD[y] := 0;
-          S := Bemerkung;
+            S := Bemerkung;
             S := Format('GetVorstagNull, stFest/3: %s', [S]);
-          LogList.Add(S);
+            LogList.Add(S);
 
-          { 4. Aufruf SchnittKK: WanteOben2d und MastOben; TempC ermitteln }
-          Radius1 := FrWoben2d;
-          Radius2 := FrMastoben;
-          MittelPunkt1 := TempP;
-          MittelPunkt2 := TempD;
+            { 4. Aufruf SchnittKK: WanteOben2d und MastOben; TempC ermitteln }
+            Radius1 := FrWoben2d;
+            Radius2 := FrMastoben;
+            MittelPunkt1 := TempP;
+            MittelPunkt2 := TempD;
             TempC := SchnittPunkt1;
             TempC[y] := 0;
-          S := Bemerkung;
+            S := Bemerkung;
             S := Format('GetVorstagNull, stFest/4: %s', [S]);
-          LogList.Add(S);
+            LogList.Add(S);
 
             result := Abstand(rP[ooC0], TempC);
-        end;
+          end;
 
         stDrehbar:
           begin
-          Radius1 := FrSalingL;
-          Radius2 := FrWoben3d;
-          TempD := Null;
-          TempD[x] := FrMastunten;
-          MittelPunkt1 := TempD;
-          TempC := Null;
-          TempC[x] := FrMastunten + FrMastoben;
-          MittelPunkt2 := TempC;
-          TempP := SchnittPunkt1;
-          TempP[y] := 0;
-          S := Bemerkung;
-          S := Format('GetVorstagNull, stDrehbar/1: %s', [S]);
-          LogList.Add(S);
+            Radius1 := FrSalingL;
+            Radius2 := FrWoben3d;
+            TempD := Null;
+            TempD[x] := FrMastunten;
+            MittelPunkt1 := TempD;
+            TempC := Null;
+            TempC[x] := FrMastunten + FrMastoben;
+            MittelPunkt2 := TempC;
+            TempP := SchnittPunkt1;
+            TempP[y] := 0;
+            S := Bemerkung;
+            S := Format('GetVorstagNull, stDrehbar/1: %s', [S]);
+            LogList.Add(S);
 
-          Radius1 := Abstand(rP[ooD0], rP[ooA0]);
-          Radius2 := FrWunten3d;
-          MittelPunkt1 := Null;
-          MittelPunkt2 := TempP;
+            Radius1 := Abstand(rP[ooD0], rP[ooA0]);
+            Radius2 := FrWunten3d;
+            MittelPunkt1 := Null;
+            MittelPunkt2 := TempP;
           Temp := SchnittPunkt1;
           Temp[y] := 0;
-          S := Bemerkung;
-          S := Format('GetVorstagNull, stDrehbar/2: %s', [S]);
-          LogList.Add(S);
+            S := Bemerkung;
+            S := Format('GetVorstagNull, stDrehbar/2: %s', [S]);
+            LogList.Add(S);
 
           WStrich := Abstand(Temp, TempC);
-          WStrich2d := sqrt(sqr(WStrich) - sqr(rP[ooA0, y]));
+            WStrich2d := sqrt(sqr(WStrich) - sqr(rP[ooA0, y]));
 
-          Radius1 := WStrich2d;
-          Radius2 := FrMastunten + FrMastoben;
-          MittelPunkt1 := rP[ooP0];
-          MittelPunkt2 := rP[ooD0];
-          TempC := SchnittPunkt1;
-          TempC[y] := 0;
-          S := Bemerkung;
-          S := Format('GetVorstagNull, stDrehbar/3: %s', [S]);
-          LogList.Add(S);
+            Radius1 := WStrich2d;
+            Radius2 := FrMastunten + FrMastoben;
+            MittelPunkt1 := rP[ooP0];
+            MittelPunkt2 := rP[ooD0];
+            TempC := SchnittPunkt1;
+            TempC[y] := 0;
+            S := Bemerkung;
+            S := Format('GetVorstagNull, stDrehbar/3: %s', [S]);
+            LogList.Add(S);
 
           result := Abstand(rP[ooC0], TempC);
-        end;
+          end;
 
         stOhne, stOhne_2:
           begin
-          { 1. Aufruf SchnittKK: Wante2d und Mast; TempC ermitteln }
-          Radius1 := FrWunten2d + FrWoben2d;
-          Radius2 := FrMastunten + FrMastoben;
-          MittelPunkt1 := rP[ooP0];
-          MittelPunkt2 := rP[ooD0];
-          TempC := SchnittPunkt1;
-          TempC[y] := 0;
-          S := Bemerkung;
-          S := Format('GetVorstagNull, stOhne/1: %s', [S]);
-          LogList.Add(S);
-          result := Abstand(rP[ooC0], TempC);
+            { 1. Aufruf SchnittKK: Wante2d und Mast; TempC ermitteln }
+            Radius1 := FrWunten2d + FrWoben2d;
+            Radius2 := FrMastunten + FrMastoben;
+            MittelPunkt1 := rP[ooP0];
+            MittelPunkt2 := rP[ooD0];
+            TempC := SchnittPunkt1;
+            TempC[y] := 0;
+            S := Bemerkung;
+            S := Format('GetVorstagNull, stOhne/1: %s', [S]);
+            LogList.Add(S);
+            result := Abstand(rP[ooC0], TempC);
           end;
       end;
     end;
 
   except
     on E: EMathError do
-    LogList.Add('TGetriebeFS.GetVorstagNull:  ' + E.Message);
+      LogList.Add('TGetriebeFS.GetVorstagNull:  ' + E.Message);
   end;
 end;
 

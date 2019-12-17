@@ -2,8 +2,6 @@
 
 interface
 
-{$SCOPEDENUMS ON}
-
 uses
   System.SysUtils,
   System.Classes,
@@ -18,7 +16,7 @@ uses
   TrimmTab;
 
 type
-  TGetriebe = class(TComponent)
+  TGetriebe = class(TPersistent)
   private
     FSalingTyp: TSalingTyp;
     FManipulatorMode: Boolean;
@@ -95,7 +93,7 @@ type
     iP: TIntRiggPoints;
     rP: TRealRiggPoints;
 
-    constructor Create(AOwner: TComponent); override;
+    constructor Create;
     destructor Destroy; override;
 
     procedure GetBuiltinData; { Integerwerte initialisieren }
@@ -131,9 +129,9 @@ implementation
 uses
   RiggVar.App.Main;
 
-constructor TGetriebe.Create(AOwner: TComponent);
+constructor TGetriebe.Create;
 begin
-  inherited Create(AOwner);
+  inherited Create;
   GSB := TRggFactArray.Create;
   WantLogoData := false;
   LogList := TStringList.Create;
@@ -186,7 +184,7 @@ end;
 procedure TGetriebe.SetMastL(Value: Integer);
 begin
   if Value <> FiMastL then
- begin
+  begin
     FiMastL := Value;
     FrMastEnde := Value - FiMastoben - FiMastunten;
   end;
@@ -323,7 +321,7 @@ end;
 procedure TGetriebe.IntGliederToReal;
 begin
   FrController := FiController;
-  FrWinkel := FiWinkel / 10 * pi / 180; { FrWinkel in Grad }
+  FrWinkel := FiWinkel * pi / 180; { FrWinkel in Grad }
   FrVorstag := FiVorstag;
   FrWunten3d := FiWunten3d;
   FrWoben3d := FiWoben3d;
@@ -339,7 +337,7 @@ end;
 procedure TGetriebe.RealGliederToInt;
 begin
   FiController := Round(FrController);
-  FiWinkel := Round(FrWinkel * 10 * 180 / pi); { FiWinkel in 10E-1 Grad }
+  FiWinkel := Round(FrWinkel * 180 / pi); { FiWinkel in Grad }
   FiVorstag := Round(FrVorstag);
   FiWunten3d := Round(FrWunten3d);
   FiWoben3d := Round(FrWoben3d);
@@ -440,7 +438,7 @@ begin
   FiSalingA := 850; { Abstand der Salingnocken }
   FiSalingL := Round(sqrt(sqr(FiSalingH) + sqr(FiSalingA / 2)));
   FiVorstag := 4500; { Vorstaglänge }
-  FiWinkel := 950; { Winkel der unteren Wantabschnitte Winkel in 10E-1 Grad }
+  FiWinkel := 95; { Winkel der unteren Wantabschnitte Winkel in Grad }
   FiWPowerOS := 1000; { angenommene Wantenspannung 3d }
 
   { RumpfKoordinaten in mm }
@@ -543,7 +541,7 @@ begin
   FiWPowerOS := 1000; { angenommene Wantenspannung 3d }
 
   { RumpfKoordinaten in mm }
-  iP[ooA0, x] := 30 * f + ox;  { Pütting Stbd }
+  iP[ooA0, x] := 30 * f + ox; { Pütting Stbd }
   iP[ooA0, y] := 40 * f;
   iP[ooA0, z] := 40 * f + oz;
 
@@ -825,7 +823,7 @@ var
 begin
   S.ReadBuffer(temp, SizeOf(Integer));
   SalingTyp := TSalingTyp(temp);
-    TrimmTab.LoadFromStream(S);
+  TrimmTab.LoadFromStream(S);
   { Mast }
   S.ReadBuffer(FiMastL, SizeOf(Integer));
   S.ReadBuffer(FiMastunten, SizeOf(Integer));
@@ -849,7 +847,7 @@ end;
 procedure TGetriebe.SaveToStream(S: TStream);
 begin
   S.WriteBuffer(SalingTyp, SizeOf(Integer));
-    TrimmTab.SaveToStream(S);
+  TrimmTab.SaveToStream(S);
   { Mast }
   S.WriteBuffer(FiMastL, SizeOf(Integer));
   S.WriteBuffer(FiMastunten, SizeOf(Integer));

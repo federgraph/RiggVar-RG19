@@ -1,4 +1,4 @@
-unit RggCtrls;
+ï»¿unit RggCtrls;
 
 interface
 
@@ -29,7 +29,7 @@ type
 
     SalingA,           { Abstand(iP[ooA ,x],iP[ooB ,x]) in mm }
     SalingH, { Abstand Verbindungslinie Salinge zu Hinterkante Mast in mm }
-    SalingL, { Salinglänge in mm - außerhalb berechnen }
+    SalingL, { SalinglÃ¤nge in mm - auÃŸerhalb berechnen }
     SalingHOffset: Integer; { Abstand Hinterkante Mast zur neutrale Faser in mm}
     SalingDetail: Boolean; {Umschalten zwischen den beiden SalingViews}
     constructor Create;
@@ -47,12 +47,12 @@ begin
   ControllerZoom := 1;
   SalingZoom := 5;
   ControllerTyp := ctDruck;
-  {Properties für ControllerGrafik in mm}
+  {Properties fÃ¼r ControllerGrafik in mm}
   EdgePos := 25;
   ControllerPos := 80;
   ParamXE := -20;
   ParamXE0 := 110;
-  {Properties für SalingGrafik in mm}
+  {Properties fÃ¼r SalingGrafik in mm}
   SalingHOffset := 37;
   SalingH := 80;
   SalingA := 800;
@@ -138,9 +138,9 @@ begin
   MetaLINE(   500,    0,   200,      0);
   MetaLINE(  2600, 3185,  2600,   4900);
 
-  MetaLINE(  -485, 1002, -1044,    520); {verändert}
+  MetaLINE(  -485, 1002, -1044,    520); {verÃ¤ndert}
   MetaLINE(     0, 1300,  -350,   1300);
-  MetaLINE(  -350, 1300, -1155,    604); {verändert}
+  MetaLINE(  -350, 1300, -1155,    604); {verÃ¤ndert}
   MetaLINE( -2850, 4350, -2850,   4070);
   MetaLINE(  -500,    0,  -200,      0);
   MetaLINE( -2600, 4900, -2600,   3185);
@@ -197,7 +197,7 @@ begin
   Canvas.LineTo( SalingX, 0);
     {SalingL}
   Canvas.Pen.Width := 20*100 div SalingZoom;
-  Canvas.Pen.Color := $00C0DCC0; { hellgrün }
+  Canvas.Pen.Color := $00C0DCC0; { hellgrÃ¼n }
   Canvas.LineTo( 0, SalingY);
   Canvas.LineTo(-SalingX, 0);
     {Wanten als Kreise}
@@ -257,7 +257,7 @@ begin
   Canvas.LineTo( SalingX, 0);
     {SalingL}
   Canvas.Pen.Width := 15*100 div SalingZoom;
-  Canvas.Pen.Color := $00C0DCC0; { hellgrün }
+  Canvas.Pen.Color := $00C0DCC0; { hellgrÃ¼n }
   Canvas.LineTo( 0, SalingY);
   Canvas.LineTo(-SalingX, 0);
     {Wanten als Kreise}
@@ -292,7 +292,7 @@ begin
   SetTextAlign(Canvas.Handle, TA_LEFT or TA_BOTTOM);
   PosX := -220*100 div SalingZoom;
   PosY :=   70*100 div SalingZoom;
-  S := Format('Salinglänge = %d mm',[SalingL]);
+  S := Format('SalinglÃ¤nge = %d mm',[SalingL]);
   Canvas.TextOut(PosX, PosY, S);
 
   Canvas.Font.Color := clBlack;
@@ -301,7 +301,7 @@ begin
   {SetTextAlign(Canvas.Handle, TA_LEFT or TA_BOTTOM);}
   PosX := 1000 div SalingZoom;
   PosY := 3000 div SalingZoom;
-  S := Format('Salinghöhe = %d mm',[SalingH]);
+  S := Format('SalinghÃ¶he = %d mm',[SalingH]);
   Canvas.TextOut(PosX, PosY, S);
 
   Canvas.Font.Color := clFuchsia;
@@ -310,7 +310,7 @@ begin
   SetTextAlign(Canvas.Handle, TA_RIGHT or TA_BOTTOM);
   PosX := -1500 div SalingZoom;
   PosY := 1000 div SalingZoom;
-  S := Format('Salinghöhe - Offset = %d mm',[SalingH - SalingHOffset]);
+  S := Format('SalinghÃ¶he - Offset = %d mm',[SalingH - SalingHOffset]);
   Canvas.TextOut(PosX, PosY, S);
 
   Canvas.Font.Color := clBlack;
@@ -345,7 +345,7 @@ begin
   PositionXE0 := 95; {Position der Ablesemarke, Konstante in der Grafik}
   PositionXE := PositionXE0-ControllerPos; {Position linke Kante Mastklotz}
   ProfilPosMastfuss := PositionXE0-ParamXE0-72; {Position Hinterkante Mastfuss}
-  ProfilPosXE := ProfilPosMastfuss+ParamXE; {Position Hinterkante Mast in Höhe Punkt E}
+  ProfilPosXE := ProfilPosMastfuss+ParamXE; {Position Hinterkante Mast in HÃ¶he Punkt E}
   EdgePosition := PositionXE0-EdgePos + 15; {Abstand Deckanschlag - E0 }
 
   OffsetX := 0;
@@ -357,7 +357,7 @@ begin
   SetViewPortExtEx(Canvas.Handle, PBSize.x, -PBSize.y, nil);
   SetViewPortOrgEx(Canvas.Handle, PBSize.x div 2, PBSize.y div 2, nil);
 
-  {Mastfuß angedeutet mit Mastquerschnitt}
+  {MastfuÃŸ angedeutet mit Mastquerschnitt}
   OffsetY := ProfilPosMastfuss * 100; {OffsetY entspricht OffsetX, da gedreht}
   Canvas.Pen.Color := clBlack;
   DrawProfile(Canvas);
@@ -391,12 +391,12 @@ begin
     Canvas.Brush.Color := clAqua;
     Canvas.Rectangle( KlotzX1, -4000, KlotzX2,  4000);
 
-    {Maßband Hintergrund}
+    {MaÃŸband Hintergrund}
     PosXE0 := PositionXE0 * 100;
     Canvas.Pen.Color := clRed;
     Canvas.Brush.Color := clMassband;
     Canvas.Rectangle( KlotzX1, -700, PosXE0 + 1000, 700);
-    {Maßband Beschriftung}
+    {MaÃŸband Beschriftung}
     Canvas.Pen.Color := clWhite;
     Canvas.Font.Color := clWhite;
     SetTextAlign(Canvas.Handle, TA_CENTER or TA_TOP);
@@ -428,9 +428,9 @@ begin
     *)
   end;
 
-  {Mastquerschnitt in Höhe E}
-  if ProfilPosXE > 250 then ProfilPosXE := 250; {Integerüberlauf vermeiden!}
-  if ProfilPosXE < -250 then ProfilPosXE := -250; {Integerüberlauf vermeiden!}
+  {Mastquerschnitt in HÃ¶he E}
+  if ProfilPosXE > 250 then ProfilPosXE := 250; {IntegerÃ¼berlauf vermeiden!}
+  if ProfilPosXE < -250 then ProfilPosXE := -250; {IntegerÃ¼berlauf vermeiden!}
   OffsetY := ProfilPosXE * 100;
   Canvas.Pen.Color := clBlue;
   Canvas.Pen.Width := 90;
@@ -440,7 +440,7 @@ begin
   {SetWindowOrgEx(Canvas.Handle, 0, 0, nil); war schon auf 0,0 }
   SetViewPortOrgEx(Canvas.Handle, 0, 0, nil);
   SetMapMode(Canvas.Handle, MM_TEXT);
-  (* Es Die origins werden von SetMapMode MM_TEXT nicht automatisch zurückgesetzt!
+  (* Es Die origins werden von SetMapMode MM_TEXT nicht automatisch zurÃ¼ckgesetzt!
    Alternative:
   SetWindowExtEx(Canvas.Handle, 1, 1, nil);
   SetWindowOrgEx(Canvas.Handle, 0, 0, nil);

@@ -1,4 +1,4 @@
-program RG19;
+﻿program RG19;
 
 uses
   Vcl.Forms,
@@ -69,7 +69,8 @@ uses
   RiggVar.App.Main1 in 'App\RiggVar.App.Main1.pas',
   RiggVar.Util.AppUtils in 'Util\RiggVar.Util.AppUtils.pas',
   RiggVar.RG.Main in 'RG\RiggVar.RG.Main.pas',
-  RiggVar.RG.Def in 'RG\RiggVar.RG.Def.pas';
+  RiggVar.RG.Def in 'RG\RiggVar.RG.Def.pas',
+  RggKraft in 'Graph\RggKraft.pas';
 
 {$R *.res}
 

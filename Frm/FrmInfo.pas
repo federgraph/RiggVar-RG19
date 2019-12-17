@@ -1,4 +1,4 @@
-unit FrmInfo;
+﻿unit FrmInfo;
 
 interface
 

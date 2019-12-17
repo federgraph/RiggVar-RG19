@@ -1,4 +1,4 @@
-unit FrmMemo;
+﻿unit FrmMemo;
 
 interface
 
@@ -11,9 +11,6 @@ type
     Panel: TPanel;
     Memo: TMemo;
   private
-    { Private-Deklarationen }
-  public
-    { Public-Deklarationen }
   end;
 
 var

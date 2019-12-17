@@ -1,4 +1,4 @@
-unit BootGraph;
+Ôªøunit BootGraph;
 
 interface
 
@@ -43,8 +43,8 @@ end;
 procedure TBootGraph.SetKoord(Value: TRealRiggPoints);
 begin
   rP := Value;
-  //Fixpunkt wird in TBootGraph nicht benˆtigt, aber er wird eventuell
-  //herauskopiert - z.Bsp. nach HullGraph - und muﬂ deshalb aktuell sein.
+  //Fixpunkt wird in TBootGraph nicht ben√∂tigt, aber er wird eventuell
+  //herauskopiert - z.Bsp. nach HullGraph - und mu√ü deshalb aktuell sein.
   FixPunkt := rP[FixName];
   GrafikOK := True;
   Updated := False;

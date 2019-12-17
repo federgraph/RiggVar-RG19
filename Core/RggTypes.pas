@@ -234,7 +234,7 @@ const
     Boot: 0;
     No: 0;
     Controller: 100;
-    Winkel: 950;
+    Winkel: 95;
     Vorstag: 4500;
     Wante: 4120;
     Woben: 2020;
@@ -328,7 +328,7 @@ const
 
   ParamLabels: TsbLabelArray = (
     { Controller: } 'Zustellung Mast-Controller [mm]',
-    { Winkel:     } 'Winkel [1E-1 Grad]',
+    { Winkel: } 'Winkel [Grad]',
     { Vorstag:    } 'Vorstaglänge [mm]',
     { Wante:      } 'Wantenlänge [mm]',
     { Woben:      } 'Länge des oberen Wantenabschnitts [mm]',
