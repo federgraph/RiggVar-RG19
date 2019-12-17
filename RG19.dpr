@@ -70,7 +70,11 @@ uses
   RiggVar.Util.AppUtils in 'Util\RiggVar.Util.AppUtils.pas',
   RiggVar.RG.Main in 'RG\RiggVar.RG.Main.pas',
   RiggVar.RG.Def in 'RG\RiggVar.RG.Def.pas',
-  RggKraft in 'Graph\RggKraft.pas';
+  RggKraft in 'Graph\RggKraft.pas',
+  RiggVar.RG.Track in 'RG\RiggVar.RG.Track.pas',
+  RiggVar.RG.Graph in 'RG\RiggVar.RG.Graph.pas',
+  FrmText in 'App\FrmText.pas' {TextForm},
+  RiggVar.RG.Report in 'RG\RiggVar.RG.Report.pas';
 
 {$R *.res}
 
@@ -87,5 +91,6 @@ begin
   Application.CreateForm(TPreviewGForm, PreviewGForm);
   Application.CreateForm(TYAuswahlDlg, YAuswahlDlg);
   Application.CreateForm(TConsoleForm, ConsoleForm);
+  Application.CreateForm(TTextForm, TextForm);
   Application.Run;
 end.

@@ -244,12 +244,14 @@ implementation
 
 uses
   RiggVar.App.Main,
+  RiggVar.RG.Main,
   RiggUnit,
   FrmInfo,
   FrmConsole,
   FrmInput,
   FrmOutput,
   FrmGrafic,
+  FrmText,
   FrmReport,
   FrmChart,
   FrmRot,
@@ -266,18 +268,9 @@ begin
 end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
+var
+  rggm: TRggMain;
 begin
-  Main := TMain.Create;
-  Main.Logger.Verbose := True;
-
-  InitRetina;
-
-  Left := 60;
-  Top := 105;
-  Width := 1024;
-  Height := 768;
-
-  Screen.OnActiveFormChange := UpdateMenuItems;
   FormMain := Self;
 
   { Auomatische Freigabe funktioniert hier nicht,
@@ -286,11 +279,30 @@ begin
   OutputForm := TOutputForm.Create(Application);
   GrafikForm := TGrafikForm.Create(Application);
 
+  RiggModul := TRiggModul.Create(Self);
+  rggm := TRggMain.Create(RiggModul.Rigg);
+
+  Main := TMain.Create(rggm);
+  Main.Logger.Verbose := True;
+
+  InitRetina;
+
+  Left := 60;
+  Top := 105;
+  Height := 768;
+  if Screen.Width > 1800 then
+    Width := 1500
+  else
+    Width := 1024;
+
+
+  Screen.OnActiveFormChange := UpdateMenuItems;
+
   Caption := 'Rigg';
   StatusBar.Panels[0].Text := '';
   Application.OnHint := ShowHint;
 
-  RiggModul := TRiggModul.Create(Self);
+  Main.IsUp := True;
 
   {
     ControllerItem.Checked := True;
@@ -858,6 +870,7 @@ end;
 
 procedure TFormMain.WindowTileItemClick(Sender: TObject);
 begin
+  TileMode := TTileMode.tbVertical;
   Tile;
 end;
 

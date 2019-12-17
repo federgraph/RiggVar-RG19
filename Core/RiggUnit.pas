@@ -177,12 +177,16 @@ type
     YComboSavedItemIndex: Integer;
 
     AutoSave: Boolean;
+    AllreadyUpdatedGetriebeFlag: Boolean;
 
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
+    procedure DoOnWheelScroll(fp: TFederParam; ScrollPos: Integer);
+
     procedure SetupGCtrl(a: TScrollBar; b: TsbName);
     procedure SetupGCtrls;
+    procedure UpdateGControls;
     procedure UpdateGCtrls(InputRec: TTrimmControls);
     procedure UpdateGCtrlLabels(InputRec: TTrimmControls);
     procedure UpdateGetriebe;
@@ -480,6 +484,11 @@ begin
   UpdateGCtrlLabels(Rigg.Glieder);
 end;
 
+procedure TRiggModul.UpdateGControls;
+begin
+  UpdateGCtrls(Rigg.Glieder);
+end;
+
 procedure TRiggModul.UpdateGCtrlLabels(InputRec: TTrimmControls);
 begin
   with InputRec, InputForm do
@@ -681,6 +690,7 @@ begin
     sbPuffer := InputRec;
     Rigg.Glieder := InputRec;
     UpdateGetriebe;
+    AllreadyUpdatedGetriebeFlag := True;
   end;
 end;
 
@@ -712,6 +722,7 @@ begin
       //  Modified := True;
       AniRotationForm.UpdateAll(Rigg);
       AniRotationForm.Draw;
+      AniRotationForm.Invalidate;
     end;
   end;
 
@@ -2658,6 +2669,199 @@ procedure TRiggModul.GetGBoxOffset;
 begin
   GetriebeGrafik.CalcOffset(GrafikForm.PaintBoxG.ClientRect);
   AdjustGbox(Self);
+end;
+
+procedure TRiggModul.DoOnWheelScroll(fp: TFederParam; ScrollPos: Integer);
+var
+  InputRec: TTrimmControls;
+  ls: string;
+  t: Integer;
+begin
+  t := -1;
+  Modified := True;
+  InputRec := Rigg.Glieder;
+
+  case fp of
+    fpController:
+    begin
+      InputRec.Controller := ScrollPos;
+      ls := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
+      case SalingTyp of
+        stFest:
+        begin
+          InputForm.sbController.Position := ScrollPos;
+          t := InputForm.sbController.Tag;
+          InputForm.lbValue1.Caption := ls;
+        end;
+        stDrehbar:
+        begin
+          InputForm.sbControllerD.Position := ScrollPos;
+          t := InputForm.sbControllerD.Tag;
+          InputForm.lbD1.Caption := ls;
+        end;
+        stOhne:
+        begin
+          InputForm.lbOhne1.Caption := ls;
+        end;
+      end;
+      if not ControllerBtnDown then
+        NeedPaint := False;
+    end;
+
+    fpVorstag, fpWinkel:
+    begin
+      ls := Format('%d mm', [ScrollPos - MemCtrl.Vorstag]);
+      case SalingTyp of
+        stFest:
+        begin
+          if WinkelBtnDown then
+          begin
+            InputRec.Winkel := ScrollPos;
+            InputForm.sbWinkel.Position := ScrollPos;
+            t := InputForm.sbWinkel.Tag;
+            InputForm.lbValue2.Caption := Format('%5.2f Grad', [(ScrollPos - MemCtrl.Winkel) / 10]);
+          end
+          else
+          begin
+            InputRec.Vorstag := ScrollPos;
+            InputForm.sbWinkel.Position := ScrollPos;
+            t := InputForm.sbWinkel.Tag;
+            InputForm.lbValue2.Caption := ls;
+          end;
+        end;
+        stDrehbar:
+        begin
+          InputRec.Vorstag := ScrollPos;
+          InputForm.sbVorstagD.Position := ScrollPos;
+          t := InputForm.sbVorstagD.Tag;
+          InputForm.lbD2.Caption := ls;
+        end;
+        stOhne:
+        begin
+          InputRec.Vorstag := ScrollPos;
+          InputForm.sbVorstagOhne.Position := ScrollPos;
+          t := InputForm.sbVorstagOhne.Tag;
+          InputForm.lbOhne1.Caption := ls;
+        end;
+        stOhne_2:
+        begin
+          InputForm.sbVorstagOS.Position := ScrollPos;
+          t := InputForm.sbVorstagOS.Tag;
+          InputForm.lbOhne2.Caption := ls;
+        end;
+      end;
+    end;
+
+    fpWante:
+    begin
+      InputRec.Wanten := ScrollPos;
+      ls := Format('%d mm', [ScrollPos - MemCtrl.Wanten]);
+      case SalingTyp of
+        stFest:
+        begin
+          InputForm.sbWante.Position := ScrollPos;
+          t := InputForm.sbWante.Tag;
+          InputForm.lbValue3.Caption := ls;
+        end;
+        stDrehbar:
+        begin
+          InputForm.sbWanteD.Position := ScrollPos;
+          t := InputForm.sbWanteD.Tag;
+          InputForm.lbD3.Caption := ls;
+        end;
+        stOhne:
+        begin
+          InputForm.sbWanteOhne.Position := ScrollPos;
+          t := InputForm.sbWanteOhne.Tag;
+          InputForm.lbOhne3.Caption := ls;
+        end;
+      end;
+    end;
+
+    fpWoben:
+    begin
+      ls := Format('%d mm', [ScrollPos - MemCtrl.Woben]);
+      case SalingTyp of
+        stFest:
+        begin
+          InputRec.Woben := ScrollPos;
+          InputForm.sbWoben.Position := ScrollPos;
+          t := InputForm.sbWoben.Tag;
+          InputForm.lbValue4.Caption := ls;
+        end;
+        stDrehbar:
+        begin
+          InputRec.Woben := ScrollPos;
+          InputForm.sbWobenD.Position := ScrollPos;
+          t := InputForm.sbWobenD.Tag;
+          InputForm.lbD4.Caption := ls;
+        end;
+      end;
+    end;
+
+    fpSalingH:
+    begin
+      ls := Format('%d mm', [ScrollPos - MemCtrl.SalingH]);
+      case SalingTyp of
+        stFest:
+        begin
+          InputRec.SalingH := ScrollPos;
+          InputForm.sbSalingH.Position := ScrollPos;
+          t := InputForm.sbSalingH.Tag;
+          InputForm.lbValue5.Caption := ls;
+        end;
+      end;
+    end;
+
+    fpSalingA:
+    begin
+      ls := Format('%d mm', [ScrollPos - MemCtrl.SalingA]);
+      InputRec.SalingA := ScrollPos;
+      InputForm.sbSalingA.Position := ScrollPos;
+      t := InputForm.sbSalingA.Tag;
+      InputForm.lbValue6.Caption := ls;
+    end;
+
+    fpSalingL:
+    begin
+      ls := Format('%d mm', [ScrollPos - MemCtrl.SalingL]);
+      InputRec.SalingL := ScrollPos;
+      InputForm.sbSalingLD.Position := ScrollPos;
+      t := InputForm.sbSalingLD.Tag;
+      InputForm.lbD5.Caption := ls;
+    end;
+
+  end;
+
+//  with InputRec, InputForm do
+//  begin
+//    else if Sender = sbVorstagOs then
+//    begin
+//      Vorstag := ScrollPos;
+//      lbValue7.Caption := Format('%d mm', [ScrollPos - MemCtrl.Vorstag])
+//    end
+//    else if Sender = sbWPowerOS then
+//    begin
+//      WPowerOS := ScrollPos;
+//      lbValue8.Caption := Format('%d N', [ScrollPos - MemCtrl.WPowerOS]);
+//      NeedPaint := False;
+//    end;
+//  end;
+
+  //if not SofortBerechnen then
+  begin
+    if t = SBMappingArray[CursorSB] then
+      ShowTriangle := True
+    else
+    begin
+      ShowTriangle := False;
+      KurveValid := False;
+    end;
+    sbPuffer := InputRec;
+    Rigg.Glieder := InputRec;
+    UpdateGetriebe;
+    AllreadyUpdatedGetriebeFlag := True;
+  end;
 end;
 
 end.

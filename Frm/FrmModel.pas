@@ -18,7 +18,7 @@ type
     procedure rgSalingTypClick(Sender: TObject);
     procedure HelpBtnClick(Sender: TObject);
     procedure OKBtnClick(Sender: TObject);
-  private
+  public
     Rigg: TRigg;
   end;
 

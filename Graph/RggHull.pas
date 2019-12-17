@@ -68,7 +68,7 @@ var
 implementation
 
 uses
-  StrBox;
+  RiggVar.FB.Classes; //StrBox;
 
 constructor THullGraph.Create;
 var
@@ -326,7 +326,7 @@ var
   procedure GetReal(var RealValue: real);
   begin
     Zeile := Trim(Zeile);
-    Wort := StripFirstWord(Zeile);
+    Wort := TUtils.StripFirstWord(Zeile);
     if Wort = '' then
       Wort := Zeile;
     Val(Wort, RealValue, Code);
@@ -338,7 +338,7 @@ var
   procedure GetInteger(var IntValue: Integer);
   begin
     Zeile := Trim(Zeile);
-    Wort := StripFirstWord(Zeile);
+    Wort := TUtils.StripFirstWord(Zeile);
     if Wort = '' then
       Wort := Zeile;
     Val(Wort, IntValue, Code);

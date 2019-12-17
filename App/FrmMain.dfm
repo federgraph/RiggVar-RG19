@@ -348,8 +348,8 @@ object FormMain: TFormMain
       end>
   end
   object MainMenu: TMainMenu
-    Left = 175
-    Top = 46
+    Left = 71
+    Top = 70
     object FileMenu: TMenuItem
       Caption = '&Datei'
       Hint = '  Dateibefehle'
@@ -779,8 +779,8 @@ object FormMain: TFormMain
     Filter = 'Alle Dateien (*.*)|*.*|Rigg Einstellungen (*.rgg)|*.rgg'
     FilterIndex = 2
     Options = [ofOverwritePrompt, ofPathMustExist, ofFileMustExist]
-    Left = 207
-    Top = 46
+    Left = 199
+    Top = 70
   end
   object SaveDialog: TSaveDialog
     DefaultExt = 'rgg'
@@ -788,7 +788,7 @@ object FormMain: TFormMain
       'Rigg Einstellungen (*.rgg)|*.rgg|Rigg IniFile (*.rgi)|*.rgi|Alle' +
       ' Dateien (*.*)|*.*'
     Options = [ofOverwritePrompt, ofPathMustExist]
-    Left = 240
-    Top = 46
+    Left = 336
+    Top = 70
   end
 end

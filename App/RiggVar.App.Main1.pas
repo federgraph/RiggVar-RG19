@@ -22,7 +22,7 @@ uses
   System.SysUtils,
   System.Classes,
   RiggVar.App.Main0,
-//  RiggVar.FB.ActionConst,
+  RiggVar.RG.Def,
   RiggVar.RG.Data,
   RiggVar.RG.Main;
 
@@ -62,14 +62,14 @@ type
 
     ReportCounter: Integer;
 
-    constructor Create;
+    constructor Create(rggm: TRggMain);
     destructor Destroy; override;
 
-//    procedure HandleAction(fa: TFederAction); override;
-//    function GetChecked(fa: TFederAction): Boolean; override;
+    procedure HandleAction(fa: TFederAction);
+    function GetChecked(fa: TFederAction): Boolean;
 
-    procedure DoBigWheel(Delta: single); //override;
-    procedure DoSmallWheel(Delta: single); //override;
+    procedure DoBigWheel(Delta: single);
+    procedure DoSmallWheel(Delta: single);
 
     function GetTrimmItem(i: Integer): TRggData;
     function GetTrimmItemReport: string;
@@ -114,6 +114,7 @@ implementation
 uses
   FrmMain,
   RggTypes,
+  RiggUnit,
   System.Rtti,
   Clipbrd,
   RiggVar.FB.Classes,
@@ -122,11 +123,11 @@ uses
 
 { TMain1 }
 
-constructor TMain1.Create;
+constructor TMain1.Create(rggm: TRggMain);
 begin
   Main := self;
   MainVar.RG := True;
-  inherited;
+  inherited Create;
 
   RggData := TRggData.Create;
   RggData.Name := 'fd';
@@ -147,7 +148,7 @@ begin
 
   InitTrimmData;
 
-  RggMain := TRggMain.Create;
+  RggMain := rggm; //TRggMain.Create;
 end;
 
 destructor TMain1.Destroy;
@@ -604,6 +605,7 @@ begin
   Logger.Info('SetTrimm: ' + IntToStr(Value));
   FTrimm := Value;
   RggMain.LoadTrimm(CurrentTrimm);
+  RiggModul.UpdateGControls;
 end;
 
 function TMain1.GetIsRggParam: Boolean;
@@ -611,7 +613,6 @@ begin
   result := True;
 end;
 
-(*
 procedure TMain1.HandleAction(fa: TFederAction);
 begin
   case fa of
@@ -762,15 +763,14 @@ begin
     faHull: result := RggMain.HullVisible;
     faDemo: result := RggMain.Demo;
 
-    faToggleDataText: result := Main.FederText.DataVisible;
-    faToggleDiffText: result := Main.FederText.DiffVisible;
-    faToggleTrimmText: result := Main.FederText.TrimmVisible;
+//    faToggleDataText: result := Main.FederText.DataVisible;
+//    faToggleDiffText: result := Main.FederText.DiffVisible;
+//    faToggleTrimmText: result := Main.FederText.TrimmVisible;
 
     else
       inherited;
   end;
 end;
-*)
 
 procedure TMain1.DropTargetDropped(fn: string);
 var

@@ -32,13 +32,21 @@ type
   protected
     FL: TStringList;
     procedure CopyText;
+    procedure Viewpoint3;
+    procedure ViewpointA;
+    procedure ViewpointS;
+    procedure ViewpointT;
   public
     Logger: TLogger;
     IsRetina: Boolean;
     RetinaScale: single;
+    IsUp: Boolean;
+    IsOrthoProjection: Boolean;
     constructor Create;
     destructor Destroy; override;
-    procedure Init;
+
+    procedure DoMouseWheel(Shift: TShiftState; WheelDelta: Integer);
+
     procedure DropTargetDropped(fn: string); virtual;
   end;
 
@@ -46,6 +54,8 @@ implementation
 
 uses
   Clipbrd,
+  RggTypes,
+  RiggUnit,
   RiggVar.App.Main;
 
 { TMain0 }
@@ -69,14 +79,42 @@ begin
 
 end;
 
-procedure TMain0.Init;
-begin
-end;
-
 procedure TMain0.CopyText;
 begin
   Clipboard.AsText := FL.Text;
   Logger.Info('in CopyText ( check clipboard )');
+end;
+
+procedure TMain0.ViewpointS;
+begin
+  RiggModul.ViewPoint := TViewpoint.vpSeite;
+end;
+
+procedure TMain0.ViewpointA;
+begin
+  RiggModul.ViewPoint := TViewpoint.vpAchtern;
+end;
+
+procedure TMain0.ViewpointT;
+begin
+  RiggModul.ViewPoint := TViewpoint.vpTop;
+end;
+
+procedure TMain0.Viewpoint3;
+begin
+  RiggModul.ViewPoint := TViewpoint.vp3D;
+end;
+
+procedure TMain0.DoMouseWheel(Shift: TShiftState; WheelDelta: Integer);
+begin
+  if ssCtrl in Shift then
+  begin
+    Main.DoBigWheel(WheelDelta);
+  end
+  else if ssShift in Shift then
+  begin
+    Main.DoSmallWheel(WheelDelta);
+  end
 end;
 
 end.

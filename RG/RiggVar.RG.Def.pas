@@ -6,19 +6,6 @@ uses
   Vcl.Graphics;
 
 type
-  TRggReport = (
-    rgLog,
-    rgJson,
-    rgData,
-    rgTrimmText,
-    rgDataText,
-    rgDiffText,
-    rgAusgabeRL,
-    rgAusgabeRP,
-    rgXML,
-    rgDebugReport
-  );
-
   TFederParam = (
     fpController,
     fpWinkel,
@@ -132,8 +119,6 @@ const
 
   cFaktor = 'Faktor';
   cName = 'Name';
-//  cOffsetX = 'OffsetX'; //schon in FC
-//  cOffsetZ = 'OffsetY'; //schon in FC
 
   cA0X = 'A0X';
   cA0Y = 'A0Y';
