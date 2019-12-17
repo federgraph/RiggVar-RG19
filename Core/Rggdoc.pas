@@ -56,8 +56,9 @@ uses
   System.Classes,
   System.Inifiles,
   System.Math,
-  RiggVar.RG.Def,
-  Dialogs,
+  Xml.XmlDoc,
+  Xml.XmlIntf,
+  RggScroll,
   RggTypes;
 
 const
@@ -90,9 +91,15 @@ type
     rEA: TRiggLvektor; { N }
     EI: double; { Nmm^2 }
     { Grenzwerte und Istwerte }
-    GSB: TsbArray;
+    GSB: TRggFactArray;
     { Trimmtabelle }
     TrimmTabDaten: TTrimmTabDaten;
+
+    WantFestigkeitsWerteInXml: Boolean;
+    WantTrimmTabInXml: Boolean;
+
+    constructor Create;
+    destructor Destroy; override;
 
     procedure TestStream;
 
@@ -109,7 +116,8 @@ type
     procedure WriteToDFM(Memo: TStrings);
     function SaveToString: string;
     procedure LoadFromString(s: string);
-    function SaveToXML: string;
+    procedure WriteXML(ML: TStrings);
+    function SaveToXML(d: IXMLNode): string;
     procedure LoadFromXML(s: string);
     function SaveToXMLBase64: string;
     function LoadFromXMLBase64(s: string): string;
@@ -119,8 +127,20 @@ implementation
 
 uses
   RiggVar.App.Main,
-  StrBox,
-  IdCoderMime;
+  RiggVar.RG.Def,
+  RiggVar.FB.Classes;
+
+constructor TRggDocument.Create;
+begin
+  inherited Create;
+  GSB := TRggFactArray.Create;
+end;
+
+destructor TRggDocument.Destroy;
+begin
+  GSB.Free;
+  inherited;
+end;
 
 procedure TRggDocument.LoadFromFile(FileName: String);
 var
@@ -217,7 +237,7 @@ begin
   strm.ReadBuffer(rEA, SizeOf(TRiggLvektor));
   strm.ReadBuffer(EI, SizeOf(double));
   { Grenzwerte }
-  strm.ReadBuffer(GSB, SizeOf(TsbArray));
+  GSB.LoadFromStream(strm);
   { Trimmtabelle }
   strm.ReadBuffer(TrimmTabDaten, SizeOf(TTrimmTabDaten));
 end;
@@ -244,7 +264,7 @@ begin
   strm.WriteBuffer(rEA, SizeOf(TRiggLvektor));
   strm.WriteBuffer(EI, SizeOf(double));
   { Grenzwerte }
-  strm.WriteBuffer(GSB, SizeOf(TsbArray));
+  GSB.SaveToStream(strm);
   { Trimmtabelle }
   strm.WriteBuffer(TrimmTabDaten, SizeOf(TTrimmTabDaten));
 end;
@@ -261,16 +281,16 @@ begin
   try
     with IniFile do
     begin
-    S := 'Rigg';
+      S := 'Rigg';
       SalingTyp := TSalingTyp(ReadInteger(S, 'SalingTyp', Ord(stFest)));
       ControllerTyp := TControllerTyp(ReadInteger(S, 'ControllerTyp', Ord(ctDruck)));
       CalcTyp := TCalcTyp(ReadInteger(S, 'CalcTyp', Ord(ctBiegeKnicken)));
 
-    S := 'Trimmtabelle';
-    T := DefaultTrimmTabDaten;
-    with TrimmTabDaten do
-    begin
-      try
+      S := 'Trimmtabelle';
+      T := DefaultTrimmTabDaten;
+      with TrimmTabDaten do
+      begin
+        try
           T.TabellenTyp := TTabellenTyp(ReadInteger(S, 'TabellenTyp', Ord(itParabel)));
           S1 := ReadString(S, 'a0', FloatToStrF(T.a0, ffGeneral, 8, 2));
           T.a0 := StrToFloat(S1);
@@ -287,102 +307,102 @@ begin
         except
           on EConvertError do
             T := DefaultTrimmTabDaten;
+        end;
       end;
-    end;
-    TrimmTabDaten := T;
+      TrimmTabDaten := T;
 
-    S := 'Mast';
+      S := 'Mast';
       FiMastL := ReadInteger(S, 'MastL', FiMastL);
       FiMastunten := ReadInteger(S, 'Mastunten', FiMastunten);
       FiMastoben := ReadInteger(S, 'Mastoben', FiMastoben);
       FiMastfallVorlauf := ReadInteger(S, 'MastfallVorlauf', FiMastfallVorlauf);
       FiControllerAnschlag := ReadInteger(S, 'ControllerAnschlag', FiControllerAnschlag);
-    EI := ReadInteger(S, 'EI', 14700) * 1E6;
+      EI := ReadInteger(S, 'EI', 14700) * 1E6;
 
-    S := 'Ist';
-    GSB[fpController,Ist] := ReadInteger(S, 'Controller', GSB[fpController,Ist]);
-    GSB[fpWinkel,Ist] := ReadInteger(S, 'Winkel', GSB[fpWinkel,Ist]);
-    GSB[fpVorstag,Ist] := ReadInteger(S, 'Vorstag', GSB[fpVorstag,Ist]);
-    GSB[fpWante,Ist] := ReadInteger(S, 'Wante', GSB[fpWante,Ist]);
-    GSB[fpWoben,Ist] := ReadInteger(S, 'Woben', GSB[fpWoben,Ist]);
-    GSB[fpSalingH,Ist] := ReadInteger(S, 'SalingH', GSB[fpSalingH,Ist]);
-    GSB[fpSalingA,Ist] := ReadInteger(S, 'SalingA', GSB[fpSalingA,Ist]);
-    GSB[fpSalingL,Ist] := ReadInteger(S, 'SalingL', GSB[fpSalingL,Ist]);
-    GSB[fpVorstagOS,Ist] := ReadInteger(S, 'VorstagOS', GSB[fpVorstagOS,Ist]);
-    GSB[fpWPowerOS,Ist] := ReadInteger(S, 'WPowerOS', GSB[fpWPowerOS,Ist]);
+      S := 'Ist';
+      GSB.Controller.Ist := ReadInteger(S, 'Controller', Round(GSB.Controller.Ist));
+      GSB.Winkel.Ist := ReadInteger(S, 'Winkel', Round(GSB.Winkel.Ist));
+      GSB.Vorstag.Ist := ReadInteger(S, 'Vorstag', Round(GSB.Vorstag.Ist));
+      GSB.Wante.Ist := ReadInteger(S, 'Wante', Round(GSB.Wante.Ist));
+      GSB.Woben.Ist := ReadInteger(S, 'Woben', Round(GSB.Woben.Ist));
+      GSB.SalingH.Ist := ReadInteger(S, 'SalingH', Round(GSB.SalingH.Ist));
+      GSB.SalingA.Ist := ReadInteger(S, 'SalingA', Round(GSB.SalingA.Ist));
+      GSB.SalingL.Ist := ReadInteger(S, 'SalingL', Round(GSB.SalingL.Ist));
+      GSB.VorstagOS.Ist := ReadInteger(S, 'VorstagOS', Round(GSB.VorstagOS.Ist));
+      GSB.WPowerOS.Ist := ReadInteger(S, 'WPowerOS', Round(GSB.WPowerOS.Ist));
 
-    S := 'Min';
-    GSB[fpController,Min] := ReadInteger(S,'Controller',GSB[fpController,Min]);
-    GSB[fpWinkel,Min] := ReadInteger(S,'Winkel',GSB[fpWinkel,Min]);
-    GSB[fpVorstag,Min] := ReadInteger(S,'Vorstag',GSB[fpVorstag,Min]);
-    GSB[fpWante,Min] := ReadInteger(S,'Wante',GSB[fpWante,Min]);
-    GSB[fpWoben,Min] := ReadInteger(S,'Woben',GSB[fpWoben,Min]);
-    GSB[fpSalingH,Min] := ReadInteger(S,'SalingH',GSB[fpSalingH,Min]);
-    GSB[fpSalingA,Min] := ReadInteger(S,'SalingA',GSB[fpSalingA,Min]);
-    GSB[fpSalingL,Min] := ReadInteger(S,'SalingL',GSB[fpSalingL,Min]);
-    GSB[fpVorstagOS,Min] := ReadInteger(S,'VorstagOS',GSB[fpVorstagOS,Min]);
-    GSB[fpWPowerOS,Min] := ReadInteger(S,'WPowerOS',GSB[fpWPowerOS,Min]);
+      S := 'Min';
+      GSB.Controller. Min := ReadInteger(S, 'Controller', Round(GSB.Controller. Min));
+      GSB.Winkel.Min := ReadInteger(S, 'Winkel', Round(GSB.Winkel. Min));
+      GSB.Vorstag.Min := ReadInteger(S, 'Vorstag', Round(GSB.Vorstag.Min));
+      GSB.Wante.Min := ReadInteger(S, 'Wante', Round(GSB.Wante.Min));
+      GSB.Woben.Min := ReadInteger(S, 'Woben', Round(GSB.Woben.Min));
+      GSB.SalingH.Min := ReadInteger(S, 'SalingH', Round(GSB.SalingH.Min));
+      GSB.SalingA.Min := ReadInteger(S, 'SalingA', Round(GSB.SalingA.Min));
+      GSB.SalingL.Min := ReadInteger(S, 'SalingL', Round(GSB.SalingL.Min));
+      GSB.VorstagOS.Min := ReadInteger(S, 'VorstagOS', Round(GSB.VorstagOS.Min));
+      GSB.WPowerOS.Min := ReadInteger(S, 'WPowerOS', Round(GSB.WPowerOS.Min));
 
-    S := 'Max';
-    GSB[fpController,Max] := ReadInteger(S,'Controller',GSB[fpController,Max]);
-    GSB[fpWinkel,Max] := ReadInteger(S,'Winkel',GSB[fpWinkel,Max]);
-    GSB[fpVorstag,Max] := ReadInteger(S,'Vorstag',GSB[fpVorstag,Max]);
-    GSB[fpWante,Max] := ReadInteger(S,'Wante',GSB[fpWante,Max]);
-    GSB[fpWoben,Max] := ReadInteger(S,'Woben',GSB[fpWoben,Max]);
-    GSB[fpSalingH,Max] := ReadInteger(S,'SalingH',GSB[fpSalingH,Max]);
-    GSB[fpSalingA,Max] := ReadInteger(S,'SalingA',GSB[fpSalingA,Max]);
-    GSB[fpSalingL,Max] := ReadInteger(S,'SalingL',GSB[fpSalingL,Max]);
-    GSB[fpVorstagOS,Max] := ReadInteger(S,'VorstagOS',GSB[fpVorstagOS,Max]);
-    GSB[fpWPowerOS,Max] := ReadInteger(S,'WPowerOS',GSB[fpWPowerOS,Max]);
+      S := 'Max';
+      GSB.Controller.Max := ReadInteger(S, 'Controller', Round(GSB.Controller.Max));
+      GSB.Winkel.Max := ReadInteger(S, 'Winkel', Round(GSB.Winkel.Max));
+      GSB.Vorstag.Max := ReadInteger(S, 'Vorstag', Round(GSB.Vorstag.Max));
+      GSB.Wante.Max := ReadInteger(S, 'Wante', Round(GSB.Wante.Max));
+      GSB.Woben.Max := ReadInteger(S, 'Woben', Round(GSB.Woben.Max));
+      GSB.SalingH.Max := ReadInteger(S, 'SalingH', Round(GSB.SalingH.Max));
+      GSB.SalingA.Max := ReadInteger(S, 'SalingA', Round(GSB.SalingA.Max));
+      GSB.SalingL.Max := ReadInteger(S, 'SalingL', Round(GSB.SalingL.Max));
+      GSB.VorstagOS.Max := ReadInteger(S, 'VorstagOS', Round(GSB.VorstagOS.Max));
+      GSB.WPowerOS.Max := ReadInteger(S, 'WPowerOS', Round(GSB.WPowerOS.Max));
 
-    S := 'Koordinaten Rumpf';
-    iP[ooA0,x] := ReadInteger(S,'A0x',iP[ooA0,x]);
-    iP[ooA0,y] := ReadInteger(S,'A0y',iP[ooA0,y]);
-    iP[ooA0,z] := ReadInteger(S,'A0z',iP[ooA0,z]);
-    iP[ooB0,x] := ReadInteger(S,'B0x',iP[ooB0,x]);
-    iP[ooB0,y] := ReadInteger(S,'B0y',iP[ooB0,y]);
-    iP[ooB0,z] := ReadInteger(S,'B0z',iP[ooB0,z]);
-    iP[ooC0,x] := ReadInteger(S,'C0x',iP[ooC0,x]);
-    iP[ooC0,y] := ReadInteger(S,'C0y',iP[ooC0,y]);
-    iP[ooC0,z] := ReadInteger(S,'C0z',iP[ooC0,z]);
-    iP[ooD0,x] := ReadInteger(S,'D0x',iP[ooD0,x]);
-    iP[ooD0,y] := ReadInteger(S,'D0y',iP[ooD0,y]);
-    iP[ooD0,z] := ReadInteger(S,'D0z',iP[ooD0,z]);
-    iP[ooE0,x] := ReadInteger(S,'E0x',iP[ooE0,x]);
-    iP[ooE0,y] := ReadInteger(S,'E0y',iP[ooE0,y]);
-    iP[ooE0,z] := ReadInteger(S,'E0z',iP[ooE0,z]);
-    iP[ooF0,x] := ReadInteger(S,'F0x',iP[ooF0,x]);
-    iP[ooF0,y] := ReadInteger(S,'F0y',iP[ooF0,y]);
-    iP[ooF0,z] := ReadInteger(S,'F0z',iP[ooF0,z]);
+      S := 'Koordinaten Rumpf';
+      iP[ooA0, x] := ReadInteger(S, 'A0x', Round(iP[ooA0, x]));
+      iP[ooA0, y] := ReadInteger(S, 'A0y', Round(iP[ooA0, y]));
+      iP[ooA0, z] := ReadInteger(S, 'A0z', Round(iP[ooA0, z]));
+      iP[ooB0, x] := ReadInteger(S, 'B0x', Round(iP[ooB0, x]));
+      iP[ooB0, y] := ReadInteger(S, 'B0y', Round(iP[ooB0, y]));
+      iP[ooB0, z] := ReadInteger(S, 'B0z', Round(iP[ooB0, z]));
+      iP[ooC0, x] := ReadInteger(S, 'C0x', Round(iP[ooC0, x]));
+      iP[ooC0, y] := ReadInteger(S, 'C0y', Round(iP[ooC0, y]));
+      iP[ooC0, z] := ReadInteger(S, 'C0z', Round(iP[ooC0, z]));
+      iP[ooD0, x] := ReadInteger(S, 'D0x', Round(iP[ooD0, x]));
+      iP[ooD0, y] := ReadInteger(S, 'D0y', Round(iP[ooD0, y]));
+      iP[ooD0, z] := ReadInteger(S, 'D0z', Round(iP[ooD0, z]));
+      iP[ooE0, x] := ReadInteger(S, 'E0x', Round(iP[ooE0, x]));
+      iP[ooE0, y] := ReadInteger(S, 'E0y', Round(iP[ooE0, y]));
+      iP[ooE0, z] := ReadInteger(S, 'E0z', Round(iP[ooE0, z]));
+      iP[ooF0, x] := ReadInteger(S, 'F0x', Round(iP[ooF0, x]));
+      iP[ooF0, y] := ReadInteger(S, 'F0y', Round(iP[ooF0, y]));
+      iP[ooF0, z] := ReadInteger(S, 'F0z', Round(iP[ooF0, z]));
 
-    S := 'Koordinaten Rigg';
-    iP[ooA,x] := ReadInteger(S,'Ax',iP[ooA,x]);
-    iP[ooA,y] := ReadInteger(S,'Ay',iP[ooA,y]);
-    iP[ooA,z] := ReadInteger(S,'Az',iP[ooA,z]);
-    iP[ooB,x] := ReadInteger(S,'Bx',iP[ooB,x]);
-    iP[ooB,y] := ReadInteger(S,'By',iP[ooB,y]);
-    iP[ooB,z] := ReadInteger(S,'Bz',iP[ooB,z]);
-    iP[ooC,x] := ReadInteger(S,'Cx',iP[ooC,x]);
-    iP[ooC,y] := ReadInteger(S,'Cy',iP[ooC,y]);
-    iP[ooC,z] := ReadInteger(S,'Cz',iP[ooC,z]);
-    iP[ooD,x] := ReadInteger(S,'Dx',iP[ooD,x]);
-    iP[ooD,y] := ReadInteger(S,'Dy',iP[ooD,y]);
-    iP[ooD,z] := ReadInteger(S,'Dz',iP[ooD,z]);
-    iP[ooE,x] := ReadInteger(S,'Ex',iP[ooE,x]);
-    iP[ooE,y] := ReadInteger(S,'Ey',iP[ooE,y]);
-    iP[ooE,z] := ReadInteger(S,'Ez',iP[ooE,z]);
-    iP[ooF,x] := ReadInteger(S,'Fx',iP[ooF,x]);
-    iP[ooF,y] := ReadInteger(S,'Fy',iP[ooF,y]);
-    iP[ooF,z] := ReadInteger(S,'Fz',iP[ooF,z]);
+      S := 'Koordinaten Rigg';
+      iP[ooA, x] := ReadInteger(S, 'Ax', Round(iP[ooA, x]));
+      iP[ooA, y] := ReadInteger(S, 'Ay', Round(iP[ooA, y]));
+      iP[ooA, z] := ReadInteger(S, 'Az', Round(iP[ooA, z]));
+      iP[ooB, x] := ReadInteger(S, 'Bx', Round(iP[ooB, x]));
+      iP[ooB, y] := ReadInteger(S, 'By', Round(iP[ooB, y]));
+      iP[ooB, z] := ReadInteger(S, 'Bz', Round(iP[ooB, z]));
+      iP[ooC, x] := ReadInteger(S, 'Cx', Round(iP[ooC, x]));
+      iP[ooC, y] := ReadInteger(S, 'Cy', Round(iP[ooC, y]));
+      iP[ooC, z] := ReadInteger(S, 'Cz', Round(iP[ooC, z]));
+      iP[ooD, x] := ReadInteger(S, 'Dx', Round(iP[ooD, x]));
+      iP[ooD, y] := ReadInteger(S, 'Dy', Round(iP[ooD, y]));
+      iP[ooD, z] := ReadInteger(S, 'Dz', Round(iP[ooD, z]));
+      iP[ooE, x] := ReadInteger(S, 'Ex', Round(iP[ooE, x]));
+      iP[ooE, y] := ReadInteger(S, 'Ey', Round(iP[ooE, y]));
+      iP[ooE, z] := ReadInteger(S, 'Ez', Round(iP[ooE, z]));
+      iP[ooF, x] := ReadInteger(S, 'Fx', Round(iP[ooF, x]));
+      iP[ooF, y] := ReadInteger(S, 'Fy', Round(iP[ooF, y]));
+      iP[ooF, z] := ReadInteger(S, 'Fz', Round(iP[ooF, z]));
 
-    S := 'EA';
-    for i := 0 to 19 do
-    begin
-      S1 := IntToStr(i);
-      S2 := ReadString(S, S1, '100000');
-      rEA[i] := StrToFloat(S2);
+      S := 'EA';
+      for i := 0 to 19 do
+      begin
+        S1 := IntToStr(i);
+        S2 := ReadString(S, S1, '100000');
+        rEA[i] := StrToFloat(S2);
+      end;
     end;
-  end;
   finally
     IniFile.Free;
   end;
@@ -396,14 +416,14 @@ var
 begin
   IniFile := TIniFile.Create(FileName);
   try
-  with IniFile do
-  begin
-    S := 'Rigg';
+    with IniFile do
+    begin
+      S := 'Rigg';
       WriteInteger(S, 'SalingTyp', Ord(SalingTyp));
       WriteInteger(S, 'ControllerTyp', Ord(ControllerTyp));
       WriteInteger(S, 'CalcTyp', Ord(CalcTyp));
 
-    S := 'Trimmtabelle';
+      S := 'Trimmtabelle';
       with TrimmTabDaten do
       begin
         WriteInteger(S, 'TabellenTyp', Ord(TabellenTyp));
@@ -419,100 +439,100 @@ begin
         WriteString(S, 'x1', S1);
         S1 := Format('%10.5f', [x2]);
         WriteString(S, 'x2', S1);
-    end;
+      end;
 
-    S := 'Mast';
+      S := 'Mast';
       WriteInteger(S, 'MastL', FiMastL);
       WriteInteger(S, 'Mastunten', FiMastunten);
       WriteInteger(S, 'Mastoben', FiMastoben);
       WriteInteger(S, 'MastfallVorlauf', FiMastfallVorlauf);
       tempEI := Round(EI / 1E6);
-    WriteInteger(S, 'EI', tempEI);
+      WriteInteger(S, 'EI', tempEI);
 
-    S := 'Ist';
-    WriteInteger(S,'Controller',GSB[fpController,Ist]);
-    WriteInteger(S,'Winkel',GSB[fpWinkel,Ist]);
-    WriteInteger(S,'Vorstag',GSB[fpVorstag,Ist]);
-    WriteInteger(S,'Wante',GSB[fpWante,Ist]);
-    WriteInteger(S,'Woben',GSB[fpWoben,Ist]);
-    WriteInteger(S,'SalingH',GSB[fpSalingH,Ist]);
-    WriteInteger(S,'SalingA',GSB[fpSalingA,Ist]);
-    WriteInteger(S,'SalingL',GSB[fpSalingL,Ist]);
-    WriteInteger(S,'VorstagOS',GSB[fpVorstagOS,Ist]);
-    WriteInteger(S,'WPowerOS',GSB[fpWPowerOS,Ist]);
+      S := 'Ist';
+      WriteInteger(S, 'Controller', Round(GSB.Controller.Ist));
+      WriteInteger(S, 'Winkel', Round(GSB.Winkel.Ist));
+      WriteInteger(S, 'Vorstag', Round(GSB.Vorstag.Ist));
+      WriteInteger(S, 'Wante', Round(GSB.Wante.Ist));
+      WriteInteger(S, 'Woben', Round(GSB.Woben.Ist));
+      WriteInteger(S, 'SalingH', Round(GSB.SalingH.Ist));
+      WriteInteger(S, 'SalingA', Round(GSB.SalingA.Ist));
+      WriteInteger(S, 'SalingL', Round(GSB.SalingL.Ist));
+      WriteInteger(S, 'VorstagOS', Round(GSB.VorstagOS.Ist));
+      WriteInteger(S, 'WPowerOS', Round(GSB.WPowerOS.Ist));
 
-    S := 'Min';
-    WriteInteger(S,'Controller',GSB[fpController,Min]);
-    WriteInteger(S,'Winkel',GSB[fpWinkel,Min]);
-    WriteInteger(S,'Vorstag',GSB[fpVorstag,Min]);
-    WriteInteger(S,'Wante',GSB[fpWante,Min]);
-    WriteInteger(S,'Woben',GSB[fpWoben,Min]);
-    WriteInteger(S,'SalingH',GSB[fpSalingH,Min]);
-    WriteInteger(S,'SalingA',GSB[fpSalingA,Min]);
-    WriteInteger(S,'SalingL',GSB[fpSalingL,Min]);
-    WriteInteger(S,'VorstagOS',GSB[fpVorstagOS,Min]);
-    WriteInteger(S,'WPowerOS',GSB[fpWPowerOS,Min]);
+      S := 'Min';
+      WriteInteger(S, 'Controller', Round(GSB.Controller.Min));
+      WriteInteger(S, 'Winkel', Round(GSB.Winkel.Min));
+      WriteInteger(S, 'Vorstag', Round(GSB.Vorstag.Min));
+      WriteInteger(S, 'Wante', Round(GSB.Wante.Min));
+      WriteInteger(S, 'Woben', Round(GSB.Woben.Min));
+      WriteInteger(S, 'SalingH', Round(GSB.SalingH.Min));
+      WriteInteger(S, 'SalingA', Round(GSB.SalingA.Min));
+      WriteInteger(S, 'SalingL', Round(GSB.SalingL.Min));
+      WriteInteger(S, 'VorstagOS', Round(GSB.VorstagOS.Min));
+      WriteInteger(S, 'WPowerOS', Round(GSB.WPowerOS.Min));
 
-    S := 'Max';
-    WriteInteger(S,'Controller',GSB[fpController,Max]);
-    WriteInteger(S,'Winkel',GSB[fpWinkel,Max]);
-    WriteInteger(S,'Vorstag',GSB[fpVorstag,Max]);
-    WriteInteger(S,'Wante',GSB[fpWante,Max]);
-    WriteInteger(S,'Woben',GSB[fpWoben,Max]);
-    WriteInteger(S,'SalingH',GSB[fpSalingH,Max]);
-    WriteInteger(S,'SalingA',GSB[fpSalingA,Max]);
-    WriteInteger(S,'SalingL',GSB[fpSalingL,Max]);
-    WriteInteger(S,'VorstagOS',GSB[fpVorstagOS,Max]);
-    WriteInteger(S,'WPowerOS',GSB[fpWPowerOS,Max]);
+      S := 'Max';
+      WriteInteger(S, 'Controller', Round(GSB.Controller.Max));
+      WriteInteger(S, 'Winkel', Round(GSB.Winkel.Max));
+      WriteInteger(S, 'Vorstag', Round(GSB.Vorstag.Max));
+      WriteInteger(S, 'Wante', Round(GSB.Wante.Max));
+      WriteInteger(S, 'Woben', Round(GSB.Woben.Max));
+      WriteInteger(S, 'SalingH', Round(GSB.SalingH.Max));
+      WriteInteger(S, 'SalingA', Round(GSB.SalingA.Max));
+      WriteInteger(S, 'SalingL', Round(GSB.SalingL.Max));
+      WriteInteger(S, 'VorstagOS', Round(GSB.VorstagOS.Max));
+      WriteInteger(S, 'WPowerOS', Round(GSB.WPowerOS.Max));
 
-    S := 'Koordinaten Rumpf';
-    WriteInteger(S,'A0x',iP[ooA0,x]);
-    WriteInteger(S,'A0y',iP[ooA0,y]);
-    WriteInteger(S,'A0z',iP[ooA0,z]);
-    WriteInteger(S,'B0x',iP[ooB0,x]);
-    WriteInteger(S,'B0y',iP[ooB0,y]);
-    WriteInteger(S,'B0z',iP[ooB0,z]);
-    WriteInteger(S,'C0x',iP[ooC0,x]);
-    WriteInteger(S,'C0y',iP[ooC0,y]);
-    WriteInteger(S,'C0z',iP[ooC0,z]);
-    WriteInteger(S,'D0x',iP[ooD0,x]);
-    WriteInteger(S,'D0y',iP[ooD0,y]);
-    WriteInteger(S,'D0z',iP[ooD0,z]);
-    WriteInteger(S,'E0x',iP[ooE0,x]);
-    WriteInteger(S,'E0y',iP[ooE0,y]);
-    WriteInteger(S,'E0z',iP[ooE0,z]);
-    WriteInteger(S,'F0x',iP[ooF0,x]);
-    WriteInteger(S,'F0y',iP[ooF0,y]);
-    WriteInteger(S,'F0z',iP[ooF0,z]);
+      S := 'Koordinaten Rumpf';
+      WriteInteger(S, 'A0x', Round(iP[ooA0, x]));
+      WriteInteger(S, 'A0y', Round(iP[ooA0, y]));
+      WriteInteger(S, 'A0z', Round(iP[ooA0, z]));
+      WriteInteger(S, 'B0x', Round(iP[ooB0, x]));
+      WriteInteger(S, 'B0y', Round(iP[ooB0, y]));
+      WriteInteger(S, 'B0z', Round(iP[ooB0, z]));
+      WriteInteger(S, 'C0x', Round(iP[ooC0, x]));
+      WriteInteger(S, 'C0y', Round(iP[ooC0, y]));
+      WriteInteger(S, 'C0z', Round(iP[ooC0, z]));
+      WriteInteger(S, 'D0x', Round(iP[ooD0, x]));
+      WriteInteger(S, 'D0y', Round(iP[ooD0, y]));
+      WriteInteger(S, 'D0z', Round(iP[ooD0, z]));
+      WriteInteger(S, 'E0x', Round(iP[ooE0, x]));
+      WriteInteger(S, 'E0y', Round(iP[ooE0, y]));
+      WriteInteger(S, 'E0z', Round(iP[ooE0, z]));
+      WriteInteger(S, 'F0x', Round(iP[ooF0, x]));
+      WriteInteger(S, 'F0y', Round(iP[ooF0, y]));
+      WriteInteger(S, 'F0z', Round(iP[ooF0, z]));
 
-    S := 'Koordinaten Rigg';
-    WriteInteger(S,'Ax',iP[ooA,x]);
-    WriteInteger(S,'Ay',iP[ooA,y]);
-    WriteInteger(S,'Az',iP[ooA,z]);
-    WriteInteger(S,'Bx',iP[ooB,x]);
-    WriteInteger(S,'By',iP[ooB,y]);
-    WriteInteger(S,'Bz',iP[ooB,z]);
-    WriteInteger(S,'Cx',iP[ooC,x]);
-    WriteInteger(S,'Cy',iP[ooC,y]);
-    WriteInteger(S,'Cz',iP[ooC,z]);
-    WriteInteger(S,'Dx',iP[ooD,x]);
-    WriteInteger(S,'Dy',iP[ooD,y]);
-    WriteInteger(S,'Dz',iP[ooD,z]);
-    WriteInteger(S,'Ex',iP[ooE,x]);
-    WriteInteger(S,'Ey',iP[ooE,y]);
-    WriteInteger(S,'Ez',iP[ooE,z]);
-    WriteInteger(S,'Fx',iP[ooF,x]);
-    WriteInteger(S,'Fy',iP[ooF,y]);
-    WriteInteger(S,'Fz',iP[ooF,z]);
+      S := 'Koordinaten Rigg';
+      WriteInteger(S, 'Ax', Round(iP[ooA, x]));
+      WriteInteger(S, 'Ay', Round(iP[ooA, y]));
+      WriteInteger(S, 'Az', Round(iP[ooA, z]));
+      WriteInteger(S, 'Bx', Round(iP[ooB, x]));
+      WriteInteger(S, 'By', Round(iP[ooB, y]));
+      WriteInteger(S, 'Bz', Round(iP[ooB, z]));
+      WriteInteger(S, 'Cx', Round(iP[ooC, x]));
+      WriteInteger(S, 'Cy', Round(iP[ooC, y]));
+      WriteInteger(S, 'Cz', Round(iP[ooC, z]));
+      WriteInteger(S, 'Dx', Round(iP[ooD, x]));
+      WriteInteger(S, 'Dy', Round(iP[ooD, y]));
+      WriteInteger(S, 'Dz', Round(iP[ooD, z]));
+      WriteInteger(S, 'Ex', Round(iP[ooE, x]));
+      WriteInteger(S, 'Ey', Round(iP[ooE, y]));
+      WriteInteger(S, 'Ez', Round(iP[ooE, z]));
+      WriteInteger(S, 'Fx', Round(iP[ooF, x]));
+      WriteInteger(S, 'Fy', Round(iP[ooF, y]));
+      WriteInteger(S, 'Fz', Round(iP[ooF, z]));
 
-    S := 'EA';
-    for i := 0 to 19 do
-    begin
-      S1 := IntToStr(i);
-      S2 := Format('%.6g', [rEA[i]]);
-      WriteString(S, S1, S2);
+      S := 'EA';
+      for i := 0 to 19 do
+      begin
+        S1 := IntToStr(i);
+        S2 := Format('%.6g', [rEA[i]]);
+        WriteString(S, S1, S2);
+      end;
     end;
-  end;
   finally
     IniFile.Free;
   end;
@@ -533,8 +553,6 @@ const
   EAgross = 100E6; { N }
   EARumpf = 10E6; { N }
   EASaling = 1E6; { N }
-var
-  i: TsbName;
 begin
   // see (update) similar code (duplication) in TGetriebe.GetDefaultData
 
@@ -585,16 +603,16 @@ begin
   { iP[ooA]..iP[ooF] werden hier nicht gefüllt! }
 
   { Festigkeitswerte }
-  rEA[0] :=  EAgross;
-  rEA[1] :=  EARumpf;
-  rEA[2] :=  EARumpf;
-  rEA[3] :=  EARumpf;
-  rEA[4] :=  EARumpf;
-  rEA[5] :=  EARumpf;
-  rEA[6] :=  EARumpf;
-  rEA[7] :=  13 * EModulStahl;
-  rEA[8] :=  13 * EModulStahl;
-  rEA[9] :=  EAgross;
+  rEA[0] := EAgross;
+  rEA[1] := EARumpf;
+  rEA[2] := EARumpf;
+  rEA[3] := EARumpf;
+  rEA[4] := EARumpf;
+  rEA[5] := EARumpf;
+  rEA[6] := EARumpf;
+  rEA[7] := 13 * EModulStahl;
+  rEA[8] := 13 * EModulStahl;
+  rEA[9] := EAgross;
   rEA[10] := EAgross;
   rEA[11] := EASaling;
   rEA[12] := 13 * EModulStahl;
@@ -608,47 +626,49 @@ begin
 
   EI := 14.7E9; { Nmm^2 }
 
-  {Grenzwerte und Istwerte}
-  GSB[fpController,Ist] := 100; { Controllerposition bzw. Abstand E0-E }
-  GSB[fpWinkel,Ist] := 950; { Winkel der unteren Wantabschnitte Winkel in 10E-1 Grad }
-  GSB[fpVorstag,Ist] := 4500;
-  GSB[fpWante,Ist] := 4120;
-  GSB[fpWoben,Ist] := 2020;
-  GSB[fpSalingH,Ist] := 220;
-  GSB[fpSalingA,Ist] := 850;
-  GSB[fpSalingL,Ist] := Round(sqrt(sqr(GSB[fpSalingH,Ist])+sqr(GSB[fpSalingA,Ist]/2)));
-  GSB[fpVorstagOS,Ist] := GSB[fpVorstag,Ist];
-  GSB[fpWPowerOS,Ist] := 1000; { angenommene Wantenspannung 3d }
+  { Grenzwerte und Istwerte }
+  GSB.Controller.Ist := 100; { Controllerposition bzw. Abstand E0-E }
+  GSB.Winkel.Ist := 95; { Winkel der unteren Wantabschnitte Winkel in Grad }
+  GSB.Vorstag.Ist := 4500;
+  GSB.Wante.Ist := 4120;
+  GSB.Woben.Ist := 2020;
+  GSB.SalingH.Ist := 220;
+  GSB.SalingA.Ist := 850;
+  GSB.SalingL.Ist := Round(sqrt(sqr(GSB.SalingH.Ist) + sqr(GSB.SalingA.Ist / 2)));
+  GSB.VorstagOS.Ist := GSB.Vorstag.Ist;
+  GSB.WPowerOS.Ist := 1000; { angenommene Wantenspannung 3d }
+  GSB.T1.Ist := 650;
+  GSB.T2.Ist := 150;
 
-  for i := fpController to fpWPowerOS do
-  begin
-    GSB[i, TinyStep] := 1;
-    GSB[i, BigStep] := 10;
-  end;
+  GSB.InitStepDefault;
 
   { Bereichsgrenzen einstellen:
     Woben2d.Min + SalingH.Min > Mastoben
     Mastunten + SalingH.Min > Abstand D0-P, daraus Winkel.Max }
-  GSB[fpController,Min] :=  50;
-  GSB[fpController,Max] := 200;
-  GSB[fpWinkel,Min] :=  850;
-  GSB[fpWinkel,Max] := 1050;
-  GSB[fpVorstag,Min] := 4400;
-  GSB[fpVorstag,Max] := 4600;
-  GSB[fpWante,Min] := 4050;
-  GSB[fpWante,Max] := 4200;
-  GSB[fpWoben,Min] := 2000;
-  GSB[fpWoben,Max] := 2070;
-  GSB[fpSalingH,Min] := 140;
-  GSB[fpSalingH,Max] := 300;
-  GSB[fpSalingA,Min] :=  780;
-  GSB[fpSalingA,Max] := 1000;
-  GSB[fpSalingL,Min] := 450;
-  GSB[fpSalingL,Max] := 600;
-  GSB[fpVorstagOS,Min] := 4200;
-  GSB[fpVorstagOS,Max] := 4700;
-  GSB[fpWPowerOS,Min] := 100;
-  GSB[fpWPowerOS,Max] := 3000;
+  GSB.Controller.Min := 50;
+  GSB.Controller.Max := 200;
+  GSB.Winkel.Min := 85;
+  GSB.Winkel.Max := 105;
+  GSB.Vorstag.Min := 4400;
+  GSB.Vorstag.Max := 5000; //4600;
+  GSB.Wante.Min := 4050;
+  GSB.Wante.Max := 4200;
+  GSB.Woben.Min := 2000;
+  GSB.Woben.Max := 2070;
+  GSB.SalingH.Min := 140;
+  GSB.SalingH.Max := 300;
+  GSB.SalingA.Min := 780;
+  GSB.SalingA.Max := 1000;
+  GSB.SalingL.Min := 450;
+  GSB.SalingL.Max := 600;
+  GSB.VorstagOS.Min := 4200;
+  GSB.VorstagOS.Max := 4700;
+  GSB.WPowerOS.Min := 100;
+  GSB.WPowerOS.Max := 3000;
+  GSB.T1.Min := 0;
+  GSB.T1.Max := 800;
+  GSB.T2.Min := 1;
+  GSB.T2.Max := 800;
 
   { TrimmTab.TrimmTabDaten := DefaultTrimmTabDaten; } { siehe RggTypes }
   with TrimmTabDaten do
@@ -672,7 +692,6 @@ const
   EASaling = 1E6; { N }
 
 var
-  i: TsbName;
   f, ox, oz: Integer;
 begin
   // see similar code (duplication) in TGetriebe.GetLogoData
@@ -729,16 +748,16 @@ begin
   { iP[ooA]..iP[ooF] werden hier nicht gefüllt! }
 
   { Festigkeitswerte }
-  rEA[0] :=  EAgross;
-  rEA[1] :=  EARumpf;
-  rEA[2] :=  EARumpf;
-  rEA[3] :=  EARumpf;
-  rEA[4] :=  EARumpf;
-  rEA[5] :=  EARumpf;
-  rEA[6] :=  EARumpf;
-  rEA[7] :=  13 * EModulStahl;
-  rEA[8] :=  13 * EModulStahl;
-  rEA[9] :=  EAgross;
+  rEA[0] := EAgross;
+  rEA[1] := EARumpf;
+  rEA[2] := EARumpf;
+  rEA[3] := EARumpf;
+  rEA[4] := EARumpf;
+  rEA[5] := EARumpf;
+  rEA[6] := EARumpf;
+  rEA[7] := 13 * EModulStahl;
+  rEA[8] := 13 * EModulStahl;
+  rEA[9] := EAgross;
   rEA[10] := EAgross;
   rEA[11] := EASaling;
   rEA[12] := 13 * EModulStahl;
@@ -754,47 +773,52 @@ begin
 
   { Grenzwerte und Istwerte }
 
-  GSB[fpController,Ist] := 100; {Controllerposition bzw. Abstand E0-E}
-  GSB[fpWinkel,Ist] := Round((90 + arctan2(1,3) * 180 / pi) * 10);
-  { Winkel der unteren Wantabschnitte Winkel in 10E-1 Grad }
-  GSB[fpVorstag,Ist] := Round(sqrt(288) * 10 * f);
-  GSB[fpWante,Ist] := Round((sqrt(40) + sqrt(56)) * 10 * f);
-  GSB[fpWoben,Ist] := Round(sqrt(56) * 10 * f);
-  GSB[fpSalingH,Ist] := 40 * f;
-  GSB[fpSalingA,Ist] := 80 * f;
-  GSB[fpSalingL,Ist] := Round(sqrt(sqr(GSB[fpSalingH,Ist])+sqr(GSB[fpSalingA,Ist]/2)));
-  GSB[fpVorstagOS,Ist] := GSB[fpVorstag,Ist];
-  GSB[fpWPowerOS,Ist] := 1000; {angenommene Wantenspannung 3d}
+  GSB.Controller.Ist := 100; { Controllerposition bzw. Abstand E0-E }
+  GSB.Winkel.Ist := Round(90 + arctan2(1, 3) * 180 / pi);
+  { Winkel der unteren Wantabschnitte Winkel in Grad }
+  GSB.Vorstag.Ist := Round(sqrt(288) * 10 * f);
+  GSB.Wante.Ist := Round((sqrt(40) + sqrt(56)) * 10 * f);
+  GSB.Woben.Ist := Round(sqrt(56) * 10 * f);
+  GSB.SalingH.Ist := 40 * f;
+  GSB.SalingA.Ist := 80 * f;
+  GSB.SalingL.Ist := Round(sqrt(sqr(GSB.SalingH.Ist) + sqr(GSB.SalingA.Ist / 2)));
+  GSB.VorstagOS.Ist := GSB.Vorstag.Ist;
+  GSB.WPowerOS.Ist := 1000; { angenommene Wantenspannung 3d }
+  GSB.T1.Ist := 500;
+  GSB.T2.Ist := 100;
+  GSB.MastfallVorlauf.Ist := FiMastfallVorlauf;
 
-  for i := fpController to fpWPowerOS do
-  begin
-    GSB[i,TinyStep] := 1;
-    GSB[i,BigStep] := 10;
-  end;
+  GSB.InitStepDefault;
 
   { Bereichsgrenzen einstellen:
     Woben2d.Min + SalingH.Min > Mastoben
     Mastunten + SalingH.Min > Abstand D0-P, daraus Winkel.Max }
-  GSB[fpController,Min] :=  50;
-  GSB[fpController,Max] := 200;
-  GSB[fpWinkel,Min] :=  700;
-  GSB[fpWinkel,Max] := 1200;
-  GSB[fpVorstag,Min] := GSB[fpVorstag,Ist] - 10 * f;
-  GSB[fpVorstag,Max] := GSB[fpVorstag,Ist] + 10 * f;
-  GSB[fpWante,Min] := GSB[fpWante,Ist] - 10 * f;
-  GSB[fpWante,Max] := GSB[fpWante,Ist] + 10 * f;
-  GSB[fpWoben,Min] := GSB[fpWoben,Ist] - 10 * f;
-  GSB[fpWoben,Max] := GSB[fpWoben,Ist] + 10 * f;
-  GSB[fpSalingH,Min] := GSB[fpSalingH,Ist] - 10 * f;
-  GSB[fpSalingH,Max] := GSB[fpSalingH,Ist] + 10 * f;
-  GSB[fpSalingA,Min] :=  GSB[fpSalingA,Ist] - 10 * f;
-  GSB[fpSalingA,Max] := GSB[fpSalingA,Ist] + 10 * f;
-  GSB[fpSalingL,Min] := GSB[fpSalingL,Ist] - 10 * f;
-  GSB[fpSalingL,Max] := GSB[fpSalingL,Ist] + 10 * f;
-  GSB[fpVorstagOS,Min] := GSB[fpVorstagOS,Ist] - 10 * f;
-  GSB[fpVorstagOS,Max] := GSB[fpVorstagOS,Ist] + 10 * f;
-  GSB[fpWPowerOS,Min] := 100;
-  GSB[fpWPowerOS,Max] := 3000;
+  GSB.Controller.Min := 50;
+  GSB.Controller.Max := 200;
+  GSB.Winkel.Min := 70;
+  GSB.Winkel.Max := 120;
+  GSB.Vorstag.Min := GSB.Vorstag.Ist - 10 * f;
+  GSB.Vorstag.Max := GSB.Vorstag.Ist + 10 * f;
+  GSB.Wante.Min := GSB.Wante.Ist - 10 * f;
+  GSB.Wante.Max := GSB.Wante.Ist + 10 * f;
+  GSB.Woben.Min := GSB.Woben.Ist - 10 * f;
+  GSB.Woben.Max := GSB.Woben.Ist + 10 * f;
+  GSB.SalingH.Min := GSB.SalingH.Ist - 10 * f;
+  GSB.SalingH.Max := GSB.SalingH.Ist + 10 * f;
+  GSB.SalingA.Min := GSB.SalingA.Ist - 10 * f;
+  GSB.SalingA.Max := GSB.SalingA.Ist + 10 * f;
+  GSB.SalingL.Min := GSB.SalingL.Ist - 10 * f;
+  GSB.SalingL.Max := GSB.SalingL.Ist + 10 * f;
+  GSB.VorstagOS.Min := GSB.VorstagOS.Ist - 10 * f;
+  GSB.VorstagOS.Max := GSB.VorstagOS.Ist + 10 * f;
+  GSB.WPowerOS.Min := 100;
+  GSB.WPowerOS.Max := 3000;
+  GSB.T1.Min := 0;
+  GSB.T1.Max := 800;
+  GSB.T2.Min := 1;
+  GSB.T2.Max := 800;
+  GSB.MastfallVorlauf.Min := GSB.MastfallVorlauf.Ist - 10 * f;
+  GSB.MastfallVorlauf.Max := GSB.MastfallVorlauf.Ist + 10 * f;
 
   { TrimmTab.TrimmTabDaten := DefaultTrimmTabDaten; } { siehe RggTypes }
   with TrimmTabDaten do
@@ -871,84 +895,84 @@ begin
     Add('');
 
     Add('[Ist]');
-    Add(Format('Controller=%d',[GSB[fpController,Ist]]));
-    Add(Format('Winkel=%d',[GSB[fpWinkel,Ist]]));
-    Add(Format('Vorstag=%d',[GSB[fpVorstag,Ist]]));
-    Add(Format('Wante=%d',[GSB[fpWante,Ist]]));
-    Add(Format('Woben=%d',[GSB[fpWoben,Ist]]));
-    Add(Format('SalingH=%d',[GSB[fpSalingH,Ist]]));
-    Add(Format('SalingA=%d',[GSB[fpSalingA,Ist]]));
-    Add(Format('SalingL=%d',[GSB[fpSalingL,Ist]]));
-    Add(Format('VorstagOS=%d',[GSB[fpVorstagOS,Ist]]));
-    Add(Format('WPowerOS=%d',[GSB[fpWPowerOS,Ist]]));
+    Add(Format('Controller=%d', [GSB.Controller.Ist]));
+    Add(Format('Winkel=%d', [GSB.Winkel.Ist]));
+    Add(Format('Vorstag=%d', [GSB.Vorstag.Ist]));
+    Add(Format('Wante=%d', [GSB.Wante.Ist]));
+    Add(Format('Woben=%d', [GSB.Woben.Ist]));
+    Add(Format('SalingH=%d', [GSB.SalingH.Ist]));
+    Add(Format('SalingA=%d', [GSB.SalingA.Ist]));
+    Add(Format('SalingL=%d', [GSB.SalingL.Ist]));
+    Add(Format('VorstagOS=%d', [GSB.VorstagOS.Ist]));
+    Add(Format('WPowerOS=%d', [GSB.WPowerOS.Ist]));
     Add('');
 
     Add('[Min]');
-    Add(Format('Controller=%d',[GSB[fpController,Min]]));
-    Add(Format('Winkel=%d',[GSB[fpWinkel,Min]]));
-    Add(Format('Vorstag=%d',[GSB[fpVorstag,Min]]));
-    Add(Format('Wante=%d',[GSB[fpWante,Min]]));
-    Add(Format('Woben=%d',[GSB[fpWoben,Min]]));
-    Add(Format('SalingH=%d',[GSB[fpSalingH,Min]]));
-    Add(Format('SalingA=%d',[GSB[fpSalingA,Min]]));
-    Add(Format('SalingL=%d',[GSB[fpSalingL,Min]]));
-    Add(Format('VorstagOS=%d',[GSB[fpVorstagOS,Min]]));
-    Add(Format('WPowerOS=%d',[GSB[fpWPowerOS,Min]]));
+    Add(Format('Controller=%d', [GSB.Controller.Min]));
+    Add(Format('Winkel=%d', [GSB.Winkel.Min]));
+    Add(Format('Vorstag=%d', [GSB.Vorstag.Min]));
+    Add(Format('Wante=%d', [GSB.Wante.Min]));
+    Add(Format('Woben=%d', [GSB.Woben.Min]));
+    Add(Format('SalingH=%d', [GSB.SalingH.Min]));
+    Add(Format('SalingA=%d', [GSB.SalingA.Min]));
+    Add(Format('SalingL=%d', [GSB.SalingL.Min]));
+    Add(Format('VorstagOS=%d', [GSB.VorstagOS.Min]));
+    Add(Format('WPowerOS=%d', [GSB.WPowerOS.Min]));
     Add('');
 
     Add('[Max]');
-    Add(Format('Controller=%d',[GSB[fpController,Max]]));
-    Add(Format('Winkel=%d',[GSB[fpWinkel,Max]]));
-    Add(Format('Vorstag=%d',[GSB[fpVorstag,Max]]));
-    Add(Format('Wante=%d',[GSB[fpWante,Max]]));
-    Add(Format('Woben=%d',[GSB[fpWoben,Max]]));
-    Add(Format('SalingH=%d',[GSB[fpSalingH,Max]]));
-    Add(Format('SalingA=%d',[GSB[fpSalingA,Max]]));
-    Add(Format('SalingL=%d',[GSB[fpSalingL,Max]]));
-    Add(Format('VorstagOS=%d',[GSB[fpVorstagOS,Max]]));
-    Add(Format('WPowerOS=%d',[GSB[fpWPowerOS,Max]]));
+    Add(Format('Controller=%d', [GSB.Controller.Max]));
+    Add(Format('Winkel=%d', [GSB.Winkel.Max]));
+    Add(Format('Vorstag=%d', [GSB.Vorstag.Max]));
+    Add(Format('Wante=%d', [GSB.Wante.Max]));
+    Add(Format('Woben=%d', [GSB.Woben.Max]));
+    Add(Format('SalingH=%d', [GSB.SalingH.Max]));
+    Add(Format('SalingA=%d', [GSB.SalingA.Max]));
+    Add(Format('SalingL=%d', [GSB.SalingL.Max]));
+    Add(Format('VorstagOS=%d', [GSB.VorstagOS.Max]));
+    Add(Format('WPowerOS=%d', [GSB.WPowerOS.Max]));
     Add('');
 
     Add('[Koordinaten Rumpf]');
-    Add(Format('A0x=%d',[iP[ooA0,x]]));
-    Add(Format('A0y=%d',[iP[ooA0,y]]));
-    Add(Format('A0z=%d',[iP[ooA0,z]]));
-    Add(Format('B0x=%d',[iP[ooB0,x]]));
-    Add(Format('B0y=%d',[iP[ooB0,y]]));
-    Add(Format('B0z=%d',[iP[ooB0,z]]));
-    Add(Format('C0x=%d',[iP[ooC0,x]]));
-    Add(Format('C0y=%d',[iP[ooC0,y]]));
-    Add(Format('C0z=%d',[iP[ooC0,z]]));
-    Add(Format('D0x=%d',[iP[ooD0,x]]));
-    Add(Format('D0y=%d',[iP[ooD0,y]]));
-    Add(Format('D0z=%d',[iP[ooD0,z]]));
-    Add(Format('E0x=%d',[iP[ooE0,x]]));
-    Add(Format('E0y=%d',[iP[ooE0,y]]));
-    Add(Format('E0z=%d',[iP[ooE0,z]]));
-    Add(Format('F0x=%d',[iP[ooF0,x]]));
-    Add(Format('F0y=%d',[iP[ooF0,y]]));
-    Add(Format('F0z=%d',[iP[ooF0,z]]));
+    Add(Format('A0x=%d', [iP[ooA0, x]]));
+    Add(Format('A0y=%d', [iP[ooA0, y]]));
+    Add(Format('A0z=%d', [iP[ooA0, z]]));
+    Add(Format('B0x=%d', [iP[ooB0, x]]));
+    Add(Format('B0y=%d', [iP[ooB0, y]]));
+    Add(Format('B0z=%d', [iP[ooB0, z]]));
+    Add(Format('C0x=%d', [iP[ooC0, x]]));
+    Add(Format('C0y=%d', [iP[ooC0, y]]));
+    Add(Format('C0z=%d', [iP[ooC0, z]]));
+    Add(Format('D0x=%d', [iP[ooD0, x]]));
+    Add(Format('D0y=%d', [iP[ooD0, y]]));
+    Add(Format('D0z=%d', [iP[ooD0, z]]));
+    Add(Format('E0x=%d', [iP[ooE0, x]]));
+    Add(Format('E0y=%d', [iP[ooE0, y]]));
+    Add(Format('E0z=%d', [iP[ooE0, z]]));
+    Add(Format('F0x=%d', [iP[ooF0, x]]));
+    Add(Format('F0y=%d', [iP[ooF0, y]]));
+    Add(Format('F0z=%d', [iP[ooF0, z]]));
     Add('');
 
     Add('[Koordinaten Rigg]');
-    Add(Format('Ax=%d',[iP[ooA,x]]));
-    Add(Format('Ay=%d',[iP[ooA,y]]));
-    Add(Format('Az=%d',[iP[ooA,z]]));
-    Add(Format('Bx=%d',[iP[ooB,x]]));
-    Add(Format('By=%d',[iP[ooB,y]]));
-    Add(Format('Bz=%d',[iP[ooB,z]]));
-    Add(Format('Cx=%d',[iP[ooC,x]]));
-    Add(Format('Cy=%d',[iP[ooC,y]]));
-    Add(Format('Cz=%d',[iP[ooC,z]]));
-    Add(Format('Dx=%d',[iP[ooD,x]]));
-    Add(Format('Dy=%d',[iP[ooD,y]]));
-    Add(Format('Dz=%d',[iP[ooD,z]]));
-    Add(Format('Ex=%d',[iP[ooE,x]]));
-    Add(Format('Ey=%d',[iP[ooE,y]]));
-    Add(Format('Ez=%d',[iP[ooE,z]]));
-    Add(Format('Fx=%d',[iP[ooF,x]]));
-    Add(Format('Fy=%d',[iP[ooF,y]]));
-    Add(Format('Fz=%d',[iP[ooF,z]]));
+    Add(Format('Ax=%d', [iP[ooA, x]]));
+    Add(Format('Ay=%d', [iP[ooA, y]]));
+    Add(Format('Az=%d', [iP[ooA, z]]));
+    Add(Format('Bx=%d', [iP[ooB, x]]));
+    Add(Format('By=%d', [iP[ooB, y]]));
+    Add(Format('Bz=%d', [iP[ooB, z]]));
+    Add(Format('Cx=%d', [iP[ooC, x]]));
+    Add(Format('Cy=%d', [iP[ooC, y]]));
+    Add(Format('Cz=%d', [iP[ooC, z]]));
+    Add(Format('Dx=%d', [iP[ooD, x]]));
+    Add(Format('Dy=%d', [iP[ooD, y]]));
+    Add(Format('Dz=%d', [iP[ooD, z]]));
+    Add(Format('Ex=%d', [iP[ooE, x]]));
+    Add(Format('Ey=%d', [iP[ooE, y]]));
+    Add(Format('Ez=%d', [iP[ooE, z]]));
+    Add(Format('Fx=%d', [iP[ooF, x]]));
+    Add(Format('Fy=%d', [iP[ooF, y]]));
+    Add(Format('Fz=%d', [iP[ooF, z]]));
     Add('');
 
     Add('[EA]');
@@ -967,7 +991,7 @@ var
   i, tempEI: Integer;
 begin
   with Memo do
-   begin
+  begin
     // Rigg - diese Properties werden im Objektinspektor gesetzt
     // Add(Format('SalingTyp=%d',[Ord(SalingTyp)]));
     // Add(Format('ControllerTyp=%d',[Ord(ControllerTyp)]));
@@ -993,35 +1017,35 @@ begin
     tempEI := Round(EI / 1E6);
     Add(Format('EI= %d', [tempEI]));
 
-    //GSB
-    Add(Format('%s= %6d %6d %6d', ['Controller',GSB[fpController,Min],GSB[fpController,Ist],GSB[fpController,Max]]));
-    Add(Format('%s= %6d %6d %6d', ['Winkel',GSB[fpWinkel,Min],GSB[fpWinkel,Ist],GSB[fpWinkel,Max]]));
-    Add(Format('%s= %6d %6d %6d', ['Vorstag',GSB[fpVorstag,Min],GSB[fpVorstag,Ist],GSB[fpVorstag,Max]]));
-    Add(Format('%s= %6d %6d %6d', ['Wante',GSB[fpWante,Min],GSB[fpWante,Ist],GSB[fpWante,Max]]));
-    Add(Format('%s= %6d %6d %6d', ['Woben',GSB[fpWoben,Min],GSB[fpWoben,Ist],GSB[fpWoben,Max]]));
-    Add(Format('%s= %6d %6d %6d', ['SalingH',GSB[fpSalingH,Min],GSB[fpSalingH,Ist],GSB[fpSalingH,Max]]));
-    Add(Format('%s= %6d %6d %6d', ['SalingA',GSB[fpSalingA,Min],GSB[fpSalingA,Ist],GSB[fpSalingA,Max]]));
-    Add(Format('%s= %6d %6d %6d', ['SalingL',GSB[fpSalingL,Min],GSB[fpSalingL,Ist],GSB[fpSalingL,Max]]));
-    Add(Format('%s= %6d %6d %6d', ['VorstagOS',GSB[fpVorstagOS,Min],GSB[fpVorstagOS,Ist],GSB[fpVorstagOS,Max]]));
-    Add(Format('%s= %6d %6d %6d', ['WPowerOS',GSB[fpWPowerOS,Min],GSB[fpWPowerOS,Ist],GSB[fpWPowerOS,Max]]));
+    // GSB
+    Add(Format('%s= %6d %6d %6d', ['Controller', GSB.Controller.Min, GSB.Controller.Ist, GSB.Controller.Max]));
+    Add(Format('%s= %6d %6d %6d', ['Winkel', GSB.Winkel.Min, GSB.Winkel.Ist, GSB.Winkel.Max]));
+    Add(Format('%s= %6d %6d %6d', ['Vorstag', GSB.Vorstag.Min, GSB.Vorstag.Ist, GSB.Vorstag.Max]));
+    Add(Format('%s= %6d %6d %6d', ['Wante', GSB.Wante.Min, GSB.Wante.Ist, GSB.Wante.Max]));
+    Add(Format('%s= %6d %6d %6d', ['Woben', GSB.Woben.Min, GSB.Woben.Ist, GSB.Woben.Max]));
+    Add(Format('%s= %6d %6d %6d', ['SalingH', GSB.SalingH.Min, GSB.SalingH.Ist, GSB.SalingH.Max]));
+    Add(Format('%s= %6d %6d %6d', ['SalingA', GSB.SalingA.Min, GSB.SalingA.Ist, GSB.SalingA.Max]));
+    Add(Format('%s= %6d %6d %6d', ['SalingL', GSB.SalingL.Min, GSB.SalingL.Ist, GSB.SalingL.Max]));
+    Add(Format('%s= %6d %6d %6d', ['VorstagOS', GSB.VorstagOS.Min, GSB.VorstagOS.Ist, GSB.VorstagOS.Max]));
+    Add(Format('%s= %6d %6d %6d', ['WPowerOS', GSB.WPowerOS.Min, GSB.WPowerOS.Ist, GSB.WPowerOS.Max]));
 
-    //Koordinaten
-    Add(Format('%s= %6d %6d %6d',['A0',iP[ooA0,x],iP[ooA0,y],iP[ooA0,z]]));
-    Add(Format('%s= %6d %6d %6d',['B0',iP[ooB0,x],iP[ooB0,y],iP[ooB0,z]]));
-    Add(Format('%s= %6d %6d %6d',['C0',iP[ooC0,x],iP[ooC0,y],iP[ooC0,z]]));
-    Add(Format('%s= %6d %6d %6d',['D0',iP[ooD0,x],iP[ooD0,y],iP[ooD0,z]]));
-    Add(Format('%s= %6d %6d %6d',['E0',iP[ooE0,x],iP[ooE0,y],iP[ooE0,z]]));
-    Add(Format('%s= %6d %6d %6d',['F0',iP[ooF0,x],iP[ooF0,y],iP[ooF0,z]]));
-    Add(Format('%s= %6d %6d %6d',['A', iP[ooA,x], iP[ooA,y], iP[ooA,z]]));
-    Add(Format('%s= %6d %6d %6d',['B', iP[ooB,x], iP[ooB,y], iP[ooB,z]]));
-    Add(Format('%s= %6d %6d %6d',['C', iP[ooC,x], iP[ooC,y], iP[ooC,z]]));
-    Add(Format('%s= %6d %6d %6d',['D', iP[ooD,x], iP[ooD,y], iP[ooD,z]]));
-    Add(Format('%s= %6d %6d %6d',['E', iP[ooE,x], iP[ooE,y], iP[ooE,z]]));
-    Add(Format('%s= %6d %6d %6d',['F', iP[ooF,x], iP[ooF,y], iP[ooF,z]]));
+    // Koordinaten
+    Add(Format('%s= %6d %6d %6d', ['A0', iP[ooA0, x], iP[ooA0, y], iP[ooA0, z]]));
+    Add(Format('%s= %6d %6d %6d', ['B0', iP[ooB0, x], iP[ooB0, y], iP[ooB0, z]]));
+    Add(Format('%s= %6d %6d %6d', ['C0', iP[ooC0, x], iP[ooC0, y], iP[ooC0, z]]));
+    Add(Format('%s= %6d %6d %6d', ['D0', iP[ooD0, x], iP[ooD0, y], iP[ooD0, z]]));
+    Add(Format('%s= %6d %6d %6d', ['E0', iP[ooE0, x], iP[ooE0, y], iP[ooE0, z]]));
+    Add(Format('%s= %6d %6d %6d', ['F0', iP[ooF0, x], iP[ooF0, y], iP[ooF0, z]]));
+    Add(Format('%s= %6d %6d %6d', ['A', iP[ooA, x], iP[ooA, y], iP[ooA, z]]));
+    Add(Format('%s= %6d %6d %6d', ['B', iP[ooB, x], iP[ooB, y], iP[ooB, z]]));
+    Add(Format('%s= %6d %6d %6d', ['C', iP[ooC, x], iP[ooC, y], iP[ooC, z]]));
+    Add(Format('%s= %6d %6d %6d', ['D', iP[ooD, x], iP[ooD, y], iP[ooD, z]]));
+    Add(Format('%s= %6d %6d %6d', ['E', iP[ooE, x], iP[ooE, y], iP[ooE, z]]));
+    Add(Format('%s= %6d %6d %6d', ['F', iP[ooF, x], iP[ooF, y], iP[ooF, z]]));
 
-    //EA
+    // EA
     for i := 0 to 19 do
-      Add(Format('EA%d= %.6g',[i,rEA[i]]));
+      Add(Format('EA%d= %.6g', [i, rEA[i]]));
   end;
 end;
 
@@ -1029,16 +1053,20 @@ procedure TRggDocument.ReadFromDFM(Memo: TStrings);
   procedure ReadGSB(c: TsbName; S: String);
   var
     S1: String;
+    sb: TRggSB;
   begin
     if S = '' then
       Exit;
+    sb := GSB.GetSB(c);
+    if not Assigned(sb) then
+      Exit;
     S := Trim(S);
-    S1 := StripFirstWord(S);
-    GSB[c, Min] := StrToInt(S1);
+    S1 := TUtils.StripFirstWord(S);
+    sb.Min := StrToInt(S1);
     S := Trim(S);
-    S1 := StripFirstWord(S);
-    GSB[c, Ist] := StrToInt(S1);
-    GSB[c, Max] := StrToInt(S);
+    S1 := TUtils.StripFirstWord(S);
+    sb.Ist := StrToInt(S1);
+    sb.Max := StrToInt(S);
   end;
   procedure ReadKoord(k: TRiggPoints; S: String);
   var
@@ -1047,24 +1075,24 @@ procedure TRggDocument.ReadFromDFM(Memo: TStrings);
     if S = '' then
       Exit;
     S := Trim(S);
-    S1 := StripFirstWord(S);
-    iP[k,x] := StrToInt(S1);
+    S1 := TUtils.StripFirstWord(S);
+    iP[k, x] := StrToInt(S1);
     S := Trim(S);
-    S1 := StripFirstWord(S);
-    iP[k,y] := StrToInt(S1);
-    iP[k,z] := StrToInt(S);
+    S1 := TUtils.StripFirstWord(S);
+    iP[k, y] := StrToInt(S1);
+    iP[k, z] := StrToInt(S);
   end;
   procedure ReadInteger(S: String; var a: Integer);
   begin
     if S = '' then
       Exit;
-    a :=  StrToInt(S);
+    a := StrToInt(S);
   end;
   procedure ReadFloat(S: String; var a: double);
   begin
     if S = '' then
       Exit;
-    a :=  StrToFloat(S);
+    a := StrToFloat(S);
   end;
 
 var
@@ -1178,231 +1206,224 @@ begin
   end;
 end;
 
-procedure TRggDocument.LoadFromString(s: string);
-var
-  Decoder: TIdDecoderMime;
-  sDecoded: string;
-  Stream: TStringStream;
-  //Stream: TStream;
-begin
-  Decoder := TIdDecoderMime.Create(nil);
-  sDecoded := Decoder.DecodeString(s);;
-  Stream := TStringStream.Create(sDecoded);
-  Stream.Seek(0, soFromBeginning);
-  LoadFromStream(Stream);
-  Stream.Free;
-  Decoder.Free;
-  {
-  Stream := TMemoryStream.Create;
-  Decoder := TIdDecoderMime.Create(nil);
-  Decoder.DecodeToStream(s, Stream);
-  Stream.Seek(0, soFromBeginning);
-  LoadFromStream(Stream);
-  Stream.Free;
-  Decoder.Free;
-  }
-end;
+ procedure TRggDocument.LoadFromString(s: string);
+// var
+// Decoder: TIdDecoderMime;
+// sDecoded: string;
+// Stream: TStringStream;
+ begin
+// Decoder := TIdDecoderMime.Create(nil);
+// sDecoded := Decoder.DecodeString(s);;
+// Stream := TStringStream.Create(sDecoded);
+// Stream.Seek(0, soFromBeginning);
+// LoadFromStream(Stream);
+// Stream.Free;
+// Decoder.Free;
+ end;
+
+// procedure TRggDocument.LoadFromStream(s: string);
+// var
+// Stream: TStream;
+// begin
+// Stream := TMemoryStream.Create;
+// Decoder := TIdDecoderMime.Create(nil);
+// Decoder.DecodeToStream(s, Stream);
+// Stream.Seek(0, soFromBeginning);
+// LoadFromStream(Stream);
+// Stream.Free;
+// Decoder.Free;
+// end;
 
 function TRggDocument.SaveToString: string;
-var
-  Encoder: TIdEncoderMime;
-  Stream: TStream;
+// var
+// Encoder: TIdEncoderMime;
+// Stream: TStream;
 begin
-  Stream := TMemoryStream.Create;
-  Encoder := TIdEncoderMime.Create(nil);
-  SaveToStream(Stream);
-  Stream.Seek(0, soFromBeginning);
-  result := Encoder.Encode(Stream, Stream.Size);
-  Stream.Free;
-  Encoder.Free;
+// Stream := TMemoryStream.Create;
+// Encoder := TIdEncoderMime.Create(nil);
+// SaveToStream(Stream);
+// Stream.Seek(0, soFromBeginning);
+// result := Encoder.Encode(Stream, Stream.Size);
+// Stream.Free;
+// Encoder.Free;
 end;
 
 function TRggDocument.SaveToXMLBase64: string;
-var
-  Encoder: TIdEncoderMime;
+// var
+//   Encoder: TIdEncoderMime;
 begin
-  Encoder := TIdEncoderMime.Create(nil);
-  result := Encoder.Encode(SaveToXML);
-  Encoder.Free;
+//   Encoder := TIdEncoderMime.Create(nil);
+//   result := Encoder.Encode(SaveToXML);
+//   Encoder.Free;
 end;
 
 function TRggDocument.LoadFromXMLBase64(s: string): string;
-var
-  Decoder: TIdDecoderMime;
+// var
+//   Decoder: TIdDecoderMime;
 begin
-  Decoder := TIdDecoderMime.Create(nil);
-  result := Decoder.DecodeString(s);
-  Decoder.Free;
+//   Decoder := TIdDecoderMime.Create(nil);
+//   result := Decoder.DecodeString(s);
+//   Decoder.Free;
 end;
 
 procedure TRggDocument.LoadFromXML(s: string);
 begin
 end;
 
-function TRggDocument.SaveToXML: string;
-//var
-//  i: Integer;
-//  rp: TRiggPoints;
-//  tempEI: double;
-//  SBParam: TsbParam; // = (Ist, Min, Max, TinyStep, BigStep);
-//  SBName: TsbName;
-//  g: TXMLGenerator;
-//  OldDecimalSeparator: Char;
+procedure TRggDocument.WriteXML(ML: TStrings);
+var
+  doc: IXMLDocument;
+  root: IXMLNode;
 begin
-//  OldDecimalSeparator := DecimalSeparator;
-//  g := TXMLGenerator.CreateWithEncoding(8 * 1024, encUTF_8);
-//  try
-//    g.StartTag('RggDoc');
-//
-//      { RiggType }
-//      g.SetAttribute('SalingTyp', IntToStr(Ord(SalingTyp)));
-//      g.SetAttribute('ControllerTyp', IntToStr(Ord(ControllerTyp)));
-//      g.SetAttribute('CalcTyp', IntToStr(Ord(CalcTyp)));
-//
-//      { Koord }
-//      g.StartTag('Koordinaten');
-//        g.StartTag('Rumpf');
-//          for rp := ooA0 to ooP0 do
-//          begin
-//          g.StartTag('Koord');
-//          g.SetAttribute('ID', KoordTexteXML[rp]);
-//          g.SetAttribute('Label', XMLKoordLabels[rp]);
-//          g.SetAttribute('x', IntToStr(iP[rp][x]));
-//          g.SetAttribute('y', IntToStr(iP[rp][y]));
-//          g.SetAttribute('z', IntToStr(iP[rp][z]));
-//          g.StopTag;
-//          end;
-//        g.StopTag;
-//        g.StartTag('Rigg');
-//          for rp := ooA to ooP do
-//          begin
-//          g.StartTag('Koord');
-//          g.SetAttribute('ID', KoordTexteXML[rp]);
-//          g.SetAttribute('Label', XMLKoordLabels[rp]);
-//          g.SetAttribute('x', IntToStr(iP[rp][x]));
-//          g.SetAttribute('y', IntToStr(iP[rp][y]));
-//          g.SetAttribute('z', IntToStr(iP[rp][z]));
-//          g.StopTag;
-//          end;
-//        g.StopTag;
-//      g.StopTag;
-//
-//      { Mast: Abmessungen in mm }
-//      g.StartTag('Mast');
-//        g.StartTag('L');
-//        g.SetAttribute('ID', 'D0F');
-//        g.SetAttribute('Label', 'Mastfuss-Top');
-//        g.AddData(IntToStr(FiMastL));
-//        g.StopTag;
-//
-//        g.StartTag('L');
-//        g.SetAttribute('ID', 'D0D');
-//        g.SetAttribute('Label', 'Mastfuss-Saling');
-//        g.AddData(IntToStr(FiMastunten));
-//        g.StopTag;
-//
-//        g.StartTag('L');
-//        g.SetAttribute('ID', 'DC');
-//        g.SetAttribute('Label', 'Saling-Vorstag');
-//        g.AddData(IntToStr(FiMastoben));
-//        g.StopTag;
-//
-//        g.StartTag('Zusaetzlich');
-//          g.StartTag('L');
-//          g.SetAttribute('ID', 'FX');
-//          g.SetAttribute('Label', 'MastfallVorlauf');
-//          g.AddData(IntToStr(FiMastfallVorlauf));
-//          g.StopTag;
-//
-//          g.StartTag('L');
-//          g.SetAttribute('ID', 'C0X');
-//          g.SetAttribute('Label', 'ControllerAnschlag');
-//          g.AddData(IntToStr(FiControllerAnschlag));
-//          g.StopTag;
-//
-//          //g.StartTag('L');
-//          //g.SetAttribute('ID', 'Reserved');
-//          //g.SetAttribute('Label', 'Reserved');
-//          //g.AddData(IntToStr(FiReserved));
-//          //g.StopTag;
-//        g.StopTag;
-//      g.StopTag;
-//
-//      { GSB - Grenzwerte und Istwerte }
-//      g.StartTag('Scrollbar');
-//        for SBName := Low(TsbName) to SalingL do
-//        begin
-//        g.StartTag('Param');
-//        g.SetAttribute('ID', XMLSBName[SBName]);
-//        g.SetAttribute('Label', XMLSBNameLabels[SBName]);
-//        for SBParam := Low(TSBParam) to High(TSBParam) do
-//        begin
-//        g.SetAttribute(XMLSBParamLabels[SBParam], IntToStr(GSB[SBName, SBParam]));
-//        end;
-//        g.StopTag;
-//        end;
-//      g.StopTag;
-//
-//      DecimalSeparator := '.';
-//
-//      { Festigkeitswerte }
-//      g.StartTag('Festigkeit');
-//        g.StartTag('ZugDruck');
-//          for i := 0 to 19 do
-//          begin
-//          g.StartTag('EA');
-//          g.SetAttribute('Stab', IntToStr(i));
-//          g.SetAttribute('Value', Format('%.6g', [rEA[i]]));
-//          g.StopTag;
-//          end;
-//        g.StopTag;
-//        g.StartTag('Biegung');
-//          g.StartTag('EI');
-//          tempEI := Round(EI/1E6);
-//          g.SetAttribute('Label', 'Mast');
-//          g.SetAttribute('Value', Format('%.6g', [tempEI]));
-//          g.StopTag;
-//        g.StopTag;
-//      g.StopTag;
-//
-//      { Trimmtabelle }
-//      g.StartTag('Trimmtabelle');
-//      with TrimmTabDaten do
-//        begin
-//        g.SetAttribute('KurvenTyp', IntToStr(Ord(TabellenTyp)));
-//        g.StartTag('T');
-//        g.SetAttribute('ID', 'a0');
-//        g.AddData(Format('%.6g',[a0]));
-//        g.StopTag;
-//        g.StartTag('T');
-//        g.SetAttribute('ID', 'a1');
-//        g.AddData(Format('%.6g',[a1]));
-//        g.StopTag;
-//        g.StartTag('T');
-//        g.SetAttribute('ID', 'a2');
-//        g.AddData(Format('%.6g',[a2]));
-//        g.StopTag;
-//        g.StartTag('T');
-//        g.SetAttribute('ID', 'x0');
-//        g.AddData(Format('%.6g',[x0]));
-//        g.StopTag;
-//        g.StartTag('T');
-//        g.SetAttribute('ID', 'x1');
-//        g.AddData(Format('%.6g',[x1]));
-//        g.StopTag;
-//        g.StartTag('T');
-//        g.SetAttribute('ID', 'x2');
-//        g.AddData(Format('%.6g',[x2]));
-//        g.StopTag;
-//      end;
-//      g.StopTag;
-//
-//    g.StopTag;
-//    result := g.AsUTF8;
-//  finally
-//    g.Free;
-//    DecimalSeparator := OldDecimalSeparator;
-//  end;
+  doc := NewXMLDocument();
+  doc.Options := doc.Options + [doNodeAutoIndent];
+  doc.Active := True;
+
+  root := doc.AddChild('RG');
+  SaveToXML(root);
+  ML.Text := doc.XML.Text;
+  doc.Active := false;
+end;
+
+function TRggDocument.SaveToXML(d: IXMLNode): string;
+var
+  OldDecimalSeparator: Char;
+  i: Integer;
+  rp: TRiggPoints;
+  tempEI: double;
+  SBParam: TsbParam; // = (Ist, Min, Max, TinyStep, BigStep);
+  SBName: TsbName;
+  a, b, c: IXMLNode;
+begin
+  OldDecimalSeparator := FormatSettings.DecimalSeparator;
+  try
+    { RiggType }
+    d.SetAttribute('SalingTyp', IntToStr(Ord(SalingTyp)));
+    d.SetAttribute('ControllerTyp', IntToStr(Ord(ControllerTyp)));
+    d.SetAttribute('CalcTyp', IntToStr(Ord(CalcTyp)));
+
+    { GSB - Grenzwerte und Istwerte }
+    a := d.AddChild('Scrollbar');
+    for SBName := Low(TsbName) to fpSalingL do
+    begin
+      b := a.AddChild('Param');
+      b.SetAttribute('ID', XMLSBName[SBName]);
+      b.SetAttribute('Label', XMLSBNameLabels[SBName]);
+      for SBParam := Low(TSBParam) to High(TSBParam) do
+      begin
+        b.SetAttribute(XMLSBParamLabels[SBParam], IntToStr(Round(GSB.GetSB(SBName).GetValue(SBParam))));
+      end;
+    end;
+
+    { Koord }
+    a := d.AddChild('Koordinaten');
+
+    b := a.AddChild('Rigg');
+    for rp := ooA to ooP do
+    begin
+      c := b.AddChild('Koord');
+      c.SetAttribute('ID', KoordTexteXML[rp]);
+      c.SetAttribute('Label', XMLKoordLabels[rp]);
+      c.SetAttribute('x', IntToStr(Round(iP[rp][x])));
+      c.SetAttribute('y', IntToStr(Round(iP[rp][y])));
+      c.SetAttribute('z', IntToStr(Round(iP[rp][z])));
+    end;
+
+    b := a.AddChild('Rumpf');
+    for rp := ooA0 to ooP0 do
+    begin
+      c := b.AddChild('Koord');
+      c.SetAttribute('ID', KoordTexteXML[rp]);
+      c.SetAttribute('Label', XMLKoordLabels[rp]);
+      c.SetAttribute('x', IntToStr(Round(iP[rp][x])));
+      c.SetAttribute('y', IntToStr(Round(iP[rp][y])));
+      c.SetAttribute('z', IntToStr(Round(iP[rp][z])));
+    end;
+
+    { Mast: Abmessungen in mm }
+    a := d.AddChild('Mast');
+
+    b := a.AddChild('L');
+    b.SetAttribute('ID', 'D0F');
+    b.SetAttribute('Label', 'Mastfuss-Top');
+    b.Text := IntToStr(FiMastL);
+
+    b := a.AddChild('L');
+    b.SetAttribute('ID', 'D0D');
+    b.SetAttribute('Label', 'Mastfuss-Saling');
+    b.Text :=IntToStr(FiMastunten);
+
+    b := a.AddChild('L');
+    b.SetAttribute('ID', 'DC');
+    b.SetAttribute('Label', 'Saling-Vorstag');
+    b.Text := IntToStr(FiMastoben);
+
+    b := a.AddChild('L');
+    b.SetAttribute('ID', 'FX');
+    b.SetAttribute('Label', 'MastfallVorlauf');
+    b.Text := IntToStr(FiMastfallVorlauf);
+
+    b := a.AddChild('L');
+    b.SetAttribute('ID', 'C0X');
+    b.SetAttribute('Label', 'ControllerAnschlag');
+    b.Text := IntToStr(FiControllerAnschlag);
+
+    FormatSettings.DecimalSeparator := '.';
+
+    if WantFestigkeitsWerteInXml then
+    begin
+      { Festigkeitswerte }
+      a := d.AddChild('Festigkeit');
+      b := a.AddChild('ZugDruck');
+      for i := 0 to 19 do
+      begin
+        c := b.AddChild('EA');
+        c.SetAttribute('Stab', IntToStr(i));
+        c.SetAttribute('Value', Format('%.6g', [rEA[i]]));
+      end;
+      b := a.AddChild('Biegung');
+      c := b.AddChild('EI');
+      tempEI := Round(EI/1E6);
+      c.SetAttribute('Label', 'Mast');
+      c.SetAttribute('Value', Format('%.6g', [tempEI]));
+    end;
+
+    if WantTrimmTabInXml then
+    begin
+      { Trimmtabelle }
+      a := d.AddChild('Trimmtabelle');
+      with TrimmTabDaten do
+      begin
+        a.SetAttribute('KurvenTyp', IntToStr(Ord(TabellenTyp)));
+        b := a.AddChild('T');
+        b.SetAttribute('ID', 'a0');
+        b.Text := Format('%.6g',[a0]);
+
+        b := a.AddChild('T');
+        b.SetAttribute('ID', 'a1');
+        b.Text := Format('%.6g',[a1]);
+
+        b := a.AddChild('T');
+        b.SetAttribute('ID', 'a2');
+        b.Text := Format('%.6g',[a2]);
+
+        b := a.AddChild('T');
+        b.SetAttribute('ID', 'x0');
+        b.Text := Format('%.6g',[x0]);
+
+        b := a.AddChild('T');
+        b.SetAttribute('ID', 'x1');
+        b.Text := Format('%.6g',[x1]);
+
+        b := a.AddChild('T');
+        b.SetAttribute('ID', 'x2');
+        b.Text := Format('%.6g',[x2]);
+      end;
+    end;
+
+  finally
+    FormatSettings.DecimalSeparator := OldDecimalSeparator;
+  end;
   result := '';
 end;
 

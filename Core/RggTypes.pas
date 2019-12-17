@@ -58,20 +58,20 @@ type
   TsbName = TFederParam.fpController .. TFederParam.fpWPowerOS;
 
 //  TsbName = (
-//    fpController,
-//    fpWinkel,
-//    fpVorstag,
-//    fpWante,
-//    fpWoben,
-//    fpSalingH,
-//    fpSalingA,
-//    fpSalingL,
-//    fpVorstagOS,
-//    fpWPowerOS
+//    Controller,
+//    Winkel,
+//    Vorstag,
+//    Wante,
+//    Woben,
+//    SalingH,
+//    SalingA,
+//    SalingL,
+//    VorstagOS,
+//    WPowerOS
 //    );
 
   TsbParam = (Ist, Min, Max, TinyStep, BigStep);
-  TsbArray = array [TsbName, TsbParam] of Integer;
+//  TsbArray = array [TsbName, TsbParam] of Integer;
   TsbLabelArray = array [TsbName] of string;
   TTabellenTyp = (itKonstante, itGerade, itParabel, itBezier);
   TViewPoint = (vpSeite, vpAchtern, vpTop, vp3D);
@@ -105,6 +105,7 @@ type
   TIntPoint = array [TKoord] of Integer;
 
   TRiggPoints = (
+    ooN0,
     ooA0,
     ooB0,
     ooC0,
@@ -118,7 +119,8 @@ type
     ooD,
     ooE,
     ooF,
-    ooP
+    ooP,
+    ooM
     );
 
   TIntRiggPoints = array [TRiggPoints] of TIntPoint;
@@ -239,12 +241,12 @@ const
     SalingH: 242;
     SalingA: 850;
     SalingL: 489;
-    SalingTyp: stFest;
-    ControllerTyp: ctOhne
+    SalingTyp: TSalingTyp.stFest;
+    ControllerTyp: TControllerTyp.ctOhne
     );
 
   DefaultTrimmTabDaten: TTrimmTabDaten = (
-    TabellenTyp: itGerade;
+    TabellenTyp: TTabellenTyp.itGerade;
     a0: 0; {zur Zeit nicht verwendet}
     a1: 0.1;
     a2: 0;
@@ -254,6 +256,7 @@ const
     );
 
   KoordLabels: TKoordLabels = (
+    'Basispunkt',
     'Pütting Stb',
     'Pütting Bb',
     'Vorstag Boot',
@@ -267,10 +270,12 @@ const
     'Saling Mast',
     'Controller',
     'Masttop',
-    'Punkt P'
+    'Punkt P',
+    'Punkt M'
     );
 
   XMLKoordLabels: TKoordLabels = (
+    'Basispunkt',
     'Puetting Stb',
     'Puetting Bb',
     'Vorstag Boot',
@@ -284,17 +289,18 @@ const
     'Saling Mast',
     'Controller',
     'Masttop',
-    'Punkt P'
+    'Punkt P',
+    'Punkt M'
     );
 
-  KoordTexte: TKoordLabels = (
+  KoordTexte: TKoordLabels = ('N0',
     'A0', 'B0', 'C0', 'D0', 'E0', 'F0', 'P0',
-    'A ', 'B ', 'C ', 'D ', 'E ', 'F ', 'P '
+    'A ', 'B ', 'C ', 'D ', 'E ', 'F ', 'P ', 'M '
     );
 
-  KoordTexteXML: TKoordLabels = (
+  KoordTexteXML: TKoordLabels = ('N0',
     'A0', 'B0', 'C0', 'D0', 'E0', 'F0', 'P0',
-    'A', 'B', 'C', 'D', 'E', 'F', 'P'
+    'A', 'B', 'C', 'D', 'E', 'F', 'P', 'M'
     );
 
   AbstandLabels: array[0..19] of string = (

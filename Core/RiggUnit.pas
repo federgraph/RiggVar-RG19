@@ -29,7 +29,8 @@ uses
   Rggdoc,
   Printers,
   uRggPrinter,
-  Polarkar;
+  Polarkar,
+  RiggVar.RG.Def;
 
 type
   TSBMappingArray = array[TsbName] of Integer;
@@ -270,10 +271,10 @@ var
 implementation
 
 uses
-  RiggVar.RG.Def,
   Clipbrd,
   FWUnit,
   FrmMain,
+  RggScroll,
   Rggmat01,
   FrmConsole,
   FrmInput,
@@ -436,13 +437,13 @@ begin
 end;
 
 procedure TRiggModul.SetupGCtrl(a: TScrollBar; b: TsbName);
+var
+  cr: TRggSB;
 begin
-  with Rigg do
-  begin
-    a.SetParams(GSB[b, Ist], GSB[b, RggTypes.Min], GSB[b, RggTypes.Max]);
-    a.LargeChange := GSB[b, BigStep];
-    a.SmallChange := GSB[b, TinyStep];
-  end;
+  cr := Rigg.GSB.Find(b);
+  a.SetParams(cr.Ist, cr.Min, cr.Max);
+  a.LargeChange := cr.BigStep;
+  a.SmallChange := cr.TinyStep;
 end;
 
 procedure TRiggModul.SetupGCtrls;
@@ -473,7 +474,7 @@ begin
     SetupGCtrl(sbSalingLD, fpSalingL);
     {Ohne Saling starr}
     SetupGCtrl(sbVorstagOS, fpVorstagOS);
-    sbVorstagOS.Position := Rigg.GSB[fpVorstag, Ist];
+    sbVorstagOS.Position := Rigg.GSB.Find(fpVorstag).Ist;
     SetupGCtrl(sbWPowerOS, fpWPowerOS);
   end;
   UpdateGCtrlLabels(Rigg.Glieder);
@@ -729,7 +730,7 @@ begin
       { Abstand(iP[ooD0,x],iP[ooE0,x]) in mm }
       ParamXE0 := Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x];
       { Abstand von E0 zur Anschlagkante Deck + Klotzdicke }
-      EdgePos := Rigg.GSB[fpController, RggTypes.Min];
+      EdgePos := Rigg.GSB.Find(fpController).Min;
       if Assigned(ControllerPaintBox) then
         DrawPaintBoxC(ControllerPaintBox.Canvas);
     end;
@@ -1692,7 +1693,7 @@ end;
 procedure TRiggModul.OptionItemClick;
 begin
   Rigg.UpdateGSB;
-    { Istwerte in GSB aktualisieren für aktuelle Werte in Optionform! }
+  { Istwerte in GSB aktualisieren für aktuelle Werte in Optionform! }
   OptionForm.ShowModal;
   if OptionForm.ModalResult = mrOK then
   begin
@@ -1986,8 +1987,8 @@ begin
     Rigg.ProofRequired := False;
 
     { Definitionsbereich bestimmen und Berechnungsschleife starten }
-    Anfang := Rigg.GSB[SBname, RggTypes.Min];
-    Ende := Rigg.GSB[SBname, RggTypes.Max];
+    Anfang := Rigg.GSB.Find(SBname).Min;
+    Ende := Rigg.GSB.Find(SBName).Max;
     for i := 0 to CPMax do
     begin
       Antrieb := Anfang + (Ende - Anfang) * i / CPMax;
@@ -2490,10 +2491,13 @@ begin
 end;
 
 procedure TRiggModul.KurveBtnClick;
+var
+  cr: TRggSB;
 begin
   BottomTitel := GetXText(SBname);
-  Xmin := Rigg.GSB[SBname, RggTypes.Min];
-  Xmax := Rigg.GSB[SBname, RggTypes.Max];
+  cr := Rigg.GSB.Find(SBname);
+  Xmin := cr.Min;
+  Xmax := cr.Max;
   if SBname = fpWinkel then
   begin
     Xmin := Xmin / 10;
@@ -2580,7 +2584,7 @@ begin
           ControllerPos := TrimmRec.Controller;
           ParamXE := Rigg.MastPositionE;
           ParamXE0 := Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x];
-          EdgePos := Rigg.GSB[fpController, RggTypes.Min];
+          EdgePos := Rigg.GSB.Find(fpController).Min;
         end;
       end;
     3: { Saling }

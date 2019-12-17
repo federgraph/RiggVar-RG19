@@ -134,6 +134,7 @@ uses
   Math,
   RggGBox,
   FrmModel,
+  RggScroll,
   Rggdoc,
   RiggUnit;
 
@@ -282,26 +283,29 @@ end;
 
 function TAniRotationForm.GetParamMin(Index: TsbName): Integer;
 begin
-  result := Rigg.GSB[Index,RggTypes.Min];
+  result := Rigg.GSB.Find(Index).Min;
 end;
 
 function TAniRotationForm.GetParamMax(Index: TsbName): Integer;
 begin
-  result := Rigg.GSB[Index,RggTypes.Max];
+  result := Rigg.GSB.Find(Index).Max;
 end;
 
 function TAniRotationForm.GetParamPos(Index: TsbName): Integer;
 begin
-  result := Rigg.GSB[Index,Ist];
+  result := Rigg.GSB.Find(Index).Ist;
 end;
 
 procedure TAniRotationForm.SetParamProp(Index: TsbName; Value: double);
+var
+  cr: TRggSB;
 begin
   if Value = ParamProp[Index] then
+   Exit;
+  cr := Rigg.GSB.Find(Index);
+  if Value > cr.Max then
     Exit;
-  if Value > Rigg.GSB[Index,RggTypes.Max] then
-    Exit;
-  if Value < Rigg.GSB[Index,RggTypes.Min] then 
+  if Value < cr.Min then
     Exit;
   if Index = fpWinkel then
     Rigg.RealGlied[Index] := Value*pi/1800
@@ -341,29 +345,31 @@ end;
 procedure TAniRotationForm.SetupTrackBar;
 var
   temp: double;
+  cr: TRggSB;
 begin
   { Round(ParamProp[Parameter]) kann sich außerhalb der Grenzen befinden.
   TrackBar.Position wird aber automatisch auf TrackBar.Min bzw. TrackBar.Max
   gezogen. lbIstVal.Caption muß deshalb mit Round(ParamProp[Parameter])
   bestimmt werden! }
   temp := ParamProp[Parameter];
+  cr := Rigg.GSB.Find(Parameter);
   with TrackBar do
   begin
     Min := 0;
-    Max := Rigg.GSB[Parameter,RggTypes.Max];
+    Max := cr.Max;
     TrackBar.Position := Round(temp);
-    Min := Rigg.GSB[Parameter,RggTypes.Min];
-    LineSize := Rigg.GSB[Parameter,TinyStep];
-    PageSize := Rigg.GSB[Parameter,BigStep];
+    Min := cr.Min;
+    LineSize := cr.TinyStep;
+    PageSize := cr.BigStep;
     //Frequency := (Max-Min) div 10;
   end;
   if Parameter = fpWinkel then begin
-    lbMinVal.Caption := Format('%6.1f Grad',[Rigg.GSB[Parameter,RggTypes.Min]/10]);
-    lbMaxVal.Caption := Format('%6.1f Grad',[Rigg.GSB[Parameter,RggTypes.Max]/10]);
-    lbIstVal.Caption := Format('%6.1f Grad',[temp/10]);
+    lbMinVal.Caption := Format('%6.1f Grad',[cr.Min / 10]);
+    lbMaxVal.Caption := Format('%6.1f Grad',[cr.Max / 10]);
+    lbIstVal.Caption := Format('%6.1f Grad',[temp / 10]);
   end else begin
-    lbMinVal.Caption := Format('%4d mm',[Rigg.GSB[Parameter,RggTypes.Min]]);
-    lbMaxVal.Caption := Format('%4d mm',[Rigg.GSB[Parameter,RggTypes.Max]]);
+    lbMinVal.Caption := Format('%4d mm',[cr.Min]);
+    lbMaxVal.Caption := Format('%4d mm',[cr.Max]);
     lbIstVal.Caption := Format('%4d mm',[Round(temp)]);
   end;
   lbParam.Caption := Param2Text(Parameter);

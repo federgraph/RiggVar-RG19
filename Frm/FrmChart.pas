@@ -236,6 +236,7 @@ uses
   RiggUnit,
   Vcalc116,
   Rggunit4,
+  RggScroll,
   FrmAuswahl,
   FrmMain,
   FrmMemo;
@@ -1608,6 +1609,7 @@ var
   S: String;
   name: TxpName;
   tempMin, tempMax, tempIst, Minimum, Maximum: Integer;
+  f: TRggSB;
 begin
   S := XComboBox.Text;
 
@@ -1636,9 +1638,10 @@ begin
   end
   else
   begin
-    tempMin := RiggModul.Rigg.GSB[TsbName(name),RggTypes. Min];
-    tempMax := RiggModul.Rigg.GSB[TsbName(name),RggTypes.Max];
-    tempIst := RiggModul.Rigg.GSB[TsbName(name),RggTypes.Ist];
+    f := RiggModul.Rigg.GSB.GetSB(TsbName(name));
+    tempMin := f.Min;
+    tempMax := f.Max;
+    tempIst := f.Ist;
   end;
 
   try
@@ -1684,6 +1687,7 @@ var
   S: String;
   name: TxpName;
   tempMin, tempMax, tempIst, Minimum, Maximum: Integer;
+  f: TRggSB;
 begin
   S := PComboBox.Text;
   if S = ('kein Parameter') then begin
@@ -1721,9 +1725,10 @@ begin
   end
   else
   begin
-    tempMin := RiggModul.Rigg.GSB[TsbName(name),RggTypes.Min];
-    tempMax := RiggModul.Rigg.GSB[TsbName(name),RggTypes.Max];
-    tempIst := RiggModul.Rigg.GSB[TsbName(name),RggTypes.Ist];
+    f := RiggModul.Rigg.GSB.GetSB(TsbName(name));
+    tempMin := f.Min;
+    tempMax := f.Max;
+    tempIst := f.Ist;
   end;
 
   try

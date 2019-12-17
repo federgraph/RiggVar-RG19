@@ -49,21 +49,86 @@ const
   faSalingH = 6;
   faSalingA = 7;
   faSalingL = 8;
-  faSalingW = 9;
-  faMastfallF0C = 10;
-  faMastfallF0F = 11;
-  faMastfallVorlauf = 12;
-  faBiegung= 13;
-  faMastfussD0X = 14;
-  faParamT1 = 15;
-  faParamT2 = 16;
-  faHull = 17;
-  faDemo = 18;
-  faWantRenderH = 19;
-  faWantRenderP = 20;
-  faWantRenderF = 21;
-  faWantRenderE = 22;
-  faWantRenderS = 23;
+  faVorstagOS = 9;
+  faWPowerOS = 10;
+  faSalingW = 11;
+  faMastfallF0C = 12;
+  faMastfallF0F = 13;
+  faMastfallVorlauf = 14;
+  faBiegung= 15;
+  faMastfussD0X = 16;
+  faParamT1 = 17;
+  faParamT2 = 18;
+
+  faSalingTypOhne = 19;
+  faSalingTypDrehbar = 20;
+  faSalingTypFest = 21;
+
+  faFixpointA0 = 22;
+  faFixpointA = 23;
+  faFixpointB0 = 24;
+  faFixpointB = 25;
+  faFixpointC0 = 26;
+  faFixpointC = 27;
+  faFixpointD0 = 28;
+  faFixpointD = 29;
+  faFixpointE0 = 30;
+  faFixpointE = 31;
+  faFixpointF0 = 32;
+  faFixpointF = 33;
+
+  faViewpointS = 34;
+  faViewpointA = 35;
+  faViewpointT = 36;
+  faViewpoint3 = 37;
+
+  faWantRenderH = 38;
+  faWantRenderP = 39;
+  faWantRenderF = 40;
+  faWantRenderE = 41;
+  faWantRenderS = 42;
+
+  faHull = 43;
+  faDemo = 44;
+
+  faParamValueMinus1 = 45;
+  faParamValuePlus1 = 46;
+  faParamValuePlus10 = 47;
+  faParamValueMinus10 = 48;
+
+  faWheelLeft = 49;
+  faWheelRight = 50;
+  faWheelUp = 51;
+  faWheelDown = 52;
+
+  faTrimm0 = 53;
+  faTrimm1 = 54;
+  faTrimm2 = 55;
+  faTrimm3 = 56;
+  faTrimm4 = 57;
+  faTrimm5 = 58;
+  faTrimm6 = 59;
+  fa420 = 60;
+  faLogo = 61;
+
+  faUpdateTrimm0 = 62;
+  faCopyAndPaste = 63;
+  faCopyTrimmItem = 64;
+  faPasteTrimmItem = 65;
+
+  faReadTrimmFile = 66;
+  faCopyTrimmFile = 67;
+  faSaveTrimmFile = 68;
+
+  faToggleTrimmText = 69;
+  faToggleDiffText = 70;
+  faToggleDataText = 71;
+
+  faToggleViewType = 72;
+  faPan = 73;
+
+  faUpdateReportText = 74;
+  faToggleDebugText = 75;
 
   cFaktor = 'Faktor';
   cName = 'Name';

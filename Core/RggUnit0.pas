@@ -2,6 +2,8 @@
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   System.SysUtils,
   System.Classes,
@@ -9,6 +11,7 @@ uses
   System.IniFiles,
   System.Math,
   RiggVar.RG.Def,
+  RggScroll,
   RggTypes,
   Vcalc116,
   SchnttKK,
@@ -88,7 +91,7 @@ type
     LogList: TStringList;
     SchnittKK: TSchnittKK;
     TrimmTab: TTrimmTab;
-    GSB: TsbArray;
+    GSB: TRggFactArray;
     iP: TIntRiggPoints;
     rP: TRealRiggPoints;
 
@@ -131,6 +134,7 @@ uses
 constructor TGetriebe.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  GSB := TRggFactArray.Create;
   WantLogoData := false;
   LogList := TStringList.Create;
   SchnittKK := TSchnittKK.Create;
@@ -147,6 +151,7 @@ begin
   LogList.Free;
   SchnittKK.Free;
   TrimmTab.Free;
+  GSB.Free;
   inherited Destroy;
 end;
 
@@ -350,29 +355,29 @@ end;
 procedure TGetriebe.UpdateGSB;
 begin
   RealGliederToInt;
-  GSB[fpController, Ist] := FiController;
-  GSB[fpWinkel, Ist] := FiWinkel;
-  GSB[fpVorstag, Ist] := FiVorstag;
-  GSB[fpWante, Ist] := FiWunten3d + FiWoben3d;
-  GSB[fpWoben, Ist] := FiWoben3d;
-  GSB[fpSalingH, Ist] := FiSalingH;
-  GSB[fpSalingA, Ist] := FiSalingA;
-  GSB[fpSalingL, Ist] := FiSalingL;
-  GSB[fpVorstagOS, Ist] := FiVorstag;
-  GSB[fpWPowerOS, Ist] := FiWPowerOS;
+  GSB.Controller.Ist := FiController;
+  GSB.Winkel.Ist := FiWinkel;
+  GSB.Vorstag.Ist := FiVorstag;
+  GSB.Wante.Ist := FiWunten3d + FiWoben3d;
+  GSB.Woben.Ist := FiWoben3d;
+  GSB.SalingH.Ist := FiSalingH;
+  GSB.SalingA.Ist := FiSalingA;
+  GSB.SalingL.Ist := FiSalingL;
+  GSB.VorstagOS.Ist := FiVorstag;
+  GSB.WPowerOS.Ist := FiWPowerOS;
 end;
 
 procedure TGetriebe.UpdateGlieder;
 begin
-  FiController := GSB[fpController, Ist];
-  FiWinkel := GSB[fpWinkel, Ist];
-  FiVorstag := GSB[fpVorstag, Ist];
-  FiWunten3d := GSB[fpWante, Ist] - GSB[fpWoben, Ist];
-  FiWoben3d := GSB[fpWoben, Ist];
-  FiSalingH := GSB[fpSalingH, Ist];
-  FiSalingA := GSB[fpSalingA, Ist];
-  FiSalingL := GSB[fpSalingL, Ist];
-  FiWPowerOS := GSB[fpWPowerOS, Ist];
+  FiController := GSB.Controller.Ist;
+  FiWinkel := GSB.Winkel.Ist;
+  FiVorstag := GSB.Vorstag.Ist;
+  FiWunten3d := GSB.Wante.Ist - GSB.Woben.Ist;
+  FiWoben3d := GSB.Woben.Ist;
+  FiSalingH := GSB.SalingH.Ist;
+  FiSalingA := GSB.SalingA.Ist;
+  FiSalingL := GSB.SalingL.Ist;
+  FiWPowerOS := GSB.WPowerOS.Ist;
   IntGliederToReal;
 end;
 
@@ -419,8 +424,6 @@ procedure TGetriebe.GetDefaultData;
 { Initialisierung aller Integerwerte und der TrimmTabelle;
   nachfolgend muß IntGliederToReal und Reset aufgerufen werden, um die
   Gleitkommawerte zu initialiseieren. }
-var
-  i: TsbName;
 begin
   // see (update) similar code (duplication) in TRggDocument.GetDefaultDoc
 
@@ -468,46 +471,42 @@ begin
   iP[ooP0] := iP[ooA0];
   iP[ooP0, y] := 0;
 
-  GSB[fpController, Ist] := FiController;
-  GSB[fpWinkel, Ist] := FiWinkel;
-  GSB[fpVorstag, Ist] := FiVorstag;
-  GSB[fpWante, Ist] := FiWunten3d + FiWoben3d;
-  GSB[fpWoben, Ist] := FiWoben3d;
-  GSB[fpSalingH, Ist] := FiSalingH;
-  GSB[fpSalingA, Ist] := FiSalingA;
-  GSB[fpSalingL, Ist] := FiSalingL; {oben aus FiSalingH und FiSalingA errechnet}
-  GSB[fpVorstagOS, Ist] := FiVorstag;
-  GSB[fpWPowerOS, Ist] := FiWPowerOS;
+  GSB.Controller.Ist := FiController;
+  GSB.Winkel.Ist := FiWinkel;
+  GSB.Vorstag.Ist := FiVorstag;
+  GSB.Wante.Ist := FiWunten3d + FiWoben3d;
+  GSB.Woben.Ist := FiWoben3d;
+  GSB.SalingH.Ist := FiSalingH;
+  GSB.SalingA.Ist := FiSalingA;
+  GSB.SalingL.Ist := FiSalingL; { oben aus FiSalingH und FiSalingA errechnet }
+  GSB.VorstagOS.Ist := FiVorstag;
+  GSB.WPowerOS.Ist := FiWPowerOS;
 
-  for i := fpController to fpWPowerOS do begin
-    {GSB[i,Min] := GSB[i,Ist]-100;}{wird unten genau eingestellt}
-    {GSB[i,Max] := GSB[i,Ist]+100;}{wird unten genau eingestellt}
-    GSB[i, TinyStep] := 1;
-    GSB[i, BigStep] := 10;
-  end;
+  GSB.InitStepDefault;
+
   { Bereichsgrenzen einstellen:
     Woben2d.Min + SalingH.Min > Mastoben
     Mastunten + SalingH.Min > Abstand D0-P, daraus Winkel.Max }
-  GSB[fpController, Min] := 50;
-  GSB[fpController, Max] := 200;
-  GSB[fpWinkel, Min] := 850;
-  GSB[fpWinkel, Max] := 1050;
-  GSB[fpVorstag, Min] := 4400;
-  GSB[fpVorstag, Max] := 4600;
-  GSB[fpWante, Min] := 4050;
-  GSB[fpWante, Max] := 4200;
-  GSB[fpWoben, Min] := 2000;
-  GSB[fpWoben, Max] := 2070;
-  GSB[fpSalingH, Min] := 140;
-  GSB[fpSalingH, Max] := 300;
-  GSB[fpSalingA, Min] := 780;
-  GSB[fpSalingA, Max] := 1000;
-  GSB[fpSalingL, Min] := 450;
-  GSB[fpSalingL, Max] := 600;
-  GSB[fpVorstagOS, Min] := 4200;
-  GSB[fpVorstagOS, Max] := 4700;
-  GSB[fpWPowerOS, Min] := 100;
-  GSB[fpWPowerOS, Max] := 3000;
+  GSB.Controller.Min := 50;
+  GSB.Controller.Max := 200;
+  GSB.Winkel.Min := 85;
+  GSB.Winkel.Max := 105;
+  GSB.Vorstag.Min := 4400;
+  GSB.Vorstag.Max := 4600;
+  GSB.Wante.Min := 4050;
+  GSB.Wante.Max := 4200;
+  GSB.Woben.Min := 2000;
+  GSB.Woben.Max := 2070;
+  GSB.SalingH.Min := 140;
+  GSB.SalingH.Max := 300;
+  GSB.SalingA.Min := 780;
+  GSB.SalingA.Max := 1000;
+  GSB.SalingL.Min := 450;
+  GSB.SalingL.Max := 600;
+  GSB.VorstagOS.Min := 4200;
+  GSB.VorstagOS.Max := 4700;
+  GSB.WPowerOS.Min := 100;
+  GSB.WPowerOS.Max := 3000;
 
   TrimmTab.TrimmTabDaten := DefaultTrimmTabDaten;
 end;
@@ -517,7 +516,6 @@ procedure TGetriebe.GetLogoData;
   nachfolgend muß IntGliederToReal und Reset aufgerufen werden, um die
   Gleitkommawerte zu initialiseieren. }
 var
-  i: TsbName;
   f, ox, oz: Integer;
 begin
   // see similar code (duplication) in TRggDocument.GetLogoDoc
@@ -540,8 +538,8 @@ begin
   FiSalingA := 80 * f; { Abstand der Salingnocken }
   FiSalingL := Round(sqrt(sqr(FiSalingH) + sqr(FiSalingA / 2)));
   FiVorstag := Round(sqrt(288) * 10 * f); { Vorstaglänge }
-  FiWinkel := Round((90 + arctan2(1, 3) * 180 / pi) * 10);
-  { Winkel der unteren Wantabschnitte Winkel in 10E-1 Grad }
+  FiWinkel := Round(90 + arctan2(1, 3) * 180 / pi);
+  { Winkel der unteren Wantabschnitte Winkel in Grad }
   FiWPowerOS := 1000; { angenommene Wantenspannung 3d }
 
   { RumpfKoordinaten in mm }
@@ -572,48 +570,45 @@ begin
   iP[ooP0] := iP[ooA0];
   iP[ooP0, y] := 0;
 
-  GSB[fpController, Ist] := FiController;
-  GSB[fpWinkel, Ist] := FiWinkel;
-  GSB[fpVorstag, Ist] := FiVorstag;
-  GSB[fpWante, Ist] := FiWunten3d + FiWoben3d;
-  GSB[fpWoben, Ist] := FiWoben3d;
-  GSB[fpSalingH, Ist] := FiSalingH;
-  GSB[fpSalingA, Ist] := FiSalingA;
-  GSB[fpSalingL, Ist] := FiSalingL; {oben aus FiSalingH und FiSalingA errechnet}
-  GSB[fpVorstagOS, Ist] := FiVorstag;
-  GSB[fpWPowerOS, Ist] := FiWPowerOS;
+  GSB.Controller.Ist := FiController;
+  GSB.Winkel.Ist := FiWinkel;
+  GSB.Vorstag.Ist := FiVorstag;
+  GSB.Wante.Ist := FiWunten3d + FiWoben3d;
+  GSB.Woben.Ist := FiWoben3d;
+  GSB.SalingH.Ist := FiSalingH;
+  GSB.SalingA.Ist := FiSalingA;
+  GSB.SalingL.Ist := FiSalingL; { oben aus FiSalingH und FiSalingA errechnet }
+  GSB.VorstagOS.Ist := FiVorstag;
+  GSB.WPowerOS.Ist := FiWPowerOS;
+  GSB.MastfallVorlauf.Ist := FiMastfallVorlauf;
 
-  for i := fpController to fpWPowerOS do
-  begin
-    {GSB[i,Min] := GSB[i,Ist]-100;}{wird unten genau eingestellt}
-    {GSB[i,Max] := GSB[i,Ist]+100;}{wird unten genau eingestellt}
-    GSB[i, TinyStep] := 1;
-    GSB[i, BigStep] := 10;
-  end;
+  GSB.InitStepDefault;
 
   { Bereichsgrenzen einstellen:
     Woben2d.Min + SalingH.Min > Mastoben
     Mastunten + SalingH.Min > Abstand D0-P, daraus Winkel.Max }
-  GSB[fpController, Min] := 50;
-  GSB[fpController, Max] := 200;
-  GSB[fpWinkel, Min] := 700;
-  GSB[fpWinkel, Max] := 1200;
-  GSB[fpVorstag, Min] := FiVorstag - 20 * f;
-  GSB[fpVorstag, Max] := FiVorstag + 0 * f;
-  GSB[fpWante, Min] := FiWunten3D + FiWoben3D - 10 * f;
-  GSB[fpWante, Max] := FiWunten3D + FiWoben3D + 10 * f;
-  GSB[fpWoben, Min] := FiWoben3D - 10 * f;
-  GSB[fpWoben, Max] := FiWoben3D + 10 * f;
-  GSB[fpSalingH, Min] := FiSalingH - 10 * f;
-  GSB[fpSalingH, Max] := FiSalingH + 10 * f;
-  GSB[fpSalingA, Min] := FiSalingA - 10 * f;
-  GSB[fpSalingA, Max] := FiSalingA + 10 * f;
-  GSB[fpSalingL, Min] := FiSalingL - 10 * f;
-  GSB[fpSalingL, Max] := FiSalingL + 10 * f;
-  GSB[fpVorstagOS, Min] := FiVorstag - 10 * f;
-  GSB[fpVorstagOS, Max] := FiVorstag + 10 * f;
-  GSB[fpWPowerOS, Min] := 100;
-  GSB[fpWPowerOS, Max] := 3000;
+  GSB.Controller.Min := 50;
+  GSB.Controller.Max := 200;
+  GSB.Winkel.Min := 70;
+  GSB.Winkel.Max := 120;
+  GSB.Vorstag.Min := FiVorstag - 20 * f;
+  GSB.Vorstag.Max := FiVorstag + 0 * f;
+  GSB.Wante.Min := FiWunten3d + FiWoben3d - 10 * f;
+  GSB.Wante.Max := FiWunten3d + FiWoben3d + 10 * f;
+  GSB.Woben.Min := FiWoben3d - 10 * f;
+  GSB.Woben.Max := FiWoben3d + 10 * f;
+  GSB.SalingH.Min := FiSalingH - 10 * f;
+  GSB.SalingH.Max := FiSalingH + 10 * f;
+  GSB.SalingA.Min := FiSalingA - 10 * f;
+  GSB.SalingA.Max := FiSalingA + 10 * f;
+  GSB.SalingL.Min := FiSalingL - 10 * f;
+  GSB.SalingL.Max := FiSalingL + 10 * f;
+  GSB.VorstagOS.Min := FiVorstag - 10 * f;
+  GSB.VorstagOS.Max := FiVorstag + 10 * f;
+  GSB.WPowerOS.Min := 100;
+  GSB.WPowerOS.Max := 3000;
+  GSB.MastfallVorlauf.Min := GSB.MastfallVorlauf.Ist - 10 * f;
+  GSB.MastfallVorlauf.Max := GSB.MastfallVorlauf.Ist + 10 * f;
 
   TrimmTab.TrimmTabDaten := DefaultTrimmTabDaten;
 end;
@@ -649,17 +644,17 @@ procedure TGetriebe.WriteToIniFile(ini: TIniFile);
 var
   S: string;
 begin
-    S := 'Rigg';
+  S := 'Rigg';
   ini.WriteInteger(S, 'SalingTyp', Ord(FSalingTyp));
-    TrimmTab.WriteToIniFile(ini);
+  TrimmTab.WriteToIniFile(ini);
 
-    S := 'Mast';
+  S := 'Mast';
   ini.WriteInteger(S, 'MastL', FiMastL);
   ini.WriteInteger(S, 'Mastunten', FiMastunten);
   ini.WriteInteger(S, 'Mastoben', FiMastoben);
   ini.WriteInteger(S, 'MastfallVorlauf', FiMastfallVorlauf);
 
-    S := 'Ist';
+  S := 'Ist';
   ini.WriteInteger(S, 'Controller', FiController);
   ini.WriteInteger(S, 'Winkel', FiWinkel);
   ini.WriteInteger(S, 'Vorstag', FiVorstag);
@@ -670,28 +665,28 @@ begin
   ini.WriteInteger(S, 'WPowerOS', FiWPowerOS);
 
   S := 'Min';
-  ini.WriteInteger(S, 'Controller', GSB[fpController, Min]);
-  ini.WriteInteger(S, 'Winkel', GSB[fpWinkel, Min]);
-  ini.WriteInteger(S, 'Vorstag', GSB[fpVorstag, Min]);
-  ini.WriteInteger(S, 'Wante', GSB[fpWante, Min]);
-  ini.WriteInteger(S, 'Woben', GSB[fpWoben, Min]);
-  ini.WriteInteger(S, 'SalingH', GSB[fpSalingH, Min]);
-  ini.WriteInteger(S, 'SalingA', GSB[fpSalingA, Min]);
-  ini.WriteInteger(S, 'SalingL', GSB[fpSalingL, Min]);
-  ini.WriteInteger(S, 'VorstagOS', GSB[fpVorstagOS, Min]);
-  ini.WriteInteger(S, 'WPowerOS', GSB[fpWPowerOS, Min]);
+  ini.WriteInteger(S, 'Controller', GSB.Controller.Min);
+  ini.WriteInteger(S, 'Winkel', GSB.Winkel.Min);
+  ini.WriteInteger(S, 'Vorstag', GSB.Vorstag.Min);
+  ini.WriteInteger(S, 'Wante', GSB.Wante.Min);
+  ini.WriteInteger(S, 'Woben', GSB.Woben.Min);
+  ini.WriteInteger(S, 'SalingH', GSB.SalingH.Min);
+  ini.WriteInteger(S, 'SalingA', GSB.SalingA.Min);
+  ini.WriteInteger(S, 'SalingL', GSB.SalingL.Min);
+  ini.WriteInteger(S, 'VorstagOS', GSB.VorstagOS.Min);
+  ini.WriteInteger(S, 'WPowerOS', GSB.WPowerOS.Min);
 
   S := 'Max';
-  ini.WriteInteger(S, 'Controller', GSB[fpController, Max]);
-  ini.WriteInteger(S, 'Winkel', GSB[fpWinkel, Max]);
-  ini.WriteInteger(S, 'Vorstag', GSB[fpVorstag, Max]);
-  ini.WriteInteger(S, 'Wante', GSB[fpWante, Max]);
-  ini.WriteInteger(S, 'Woben', GSB[fpWoben, Max]);
-  ini.WriteInteger(S, 'SalingH', GSB[fpSalingH, Max]);
-  ini.WriteInteger(S, 'SalingA', GSB[fpSalingA, Max]);
-  ini.WriteInteger(S, 'SalingL', GSB[fpSalingL, Max]);
-  ini.WriteInteger(S, 'VorstagOS', GSB[fpVorstagOS, Max]);
-  ini.WriteInteger(S, 'WPowerOS', GSB[fpWPowerOS, Max]);
+  ini.WriteInteger(S, 'Controller', GSB.Controller.Max);
+  ini.WriteInteger(S, 'Winkel', GSB.Winkel.Max);
+  ini.WriteInteger(S, 'Vorstag', GSB.Vorstag.Max);
+  ini.WriteInteger(S, 'Wante', GSB.Wante.Max);
+  ini.WriteInteger(S, 'Woben', GSB.Woben.Max);
+  ini.WriteInteger(S, 'SalingH', GSB.SalingH.Max);
+  ini.WriteInteger(S, 'SalingA', GSB.SalingA.Max);
+  ini.WriteInteger(S, 'SalingL', GSB.SalingL.Max);
+  ini.WriteInteger(S, 'VorstagOS', GSB.VorstagOS.Max);
+  ini.WriteInteger(S, 'WPowerOS', GSB.WPowerOS.Max);
 
   S := 'Koordinaten Rumpf';
   ini.WriteInteger(S, 'A0x', iP[ooA0, x]);
@@ -738,18 +733,18 @@ procedure TGetriebe.LoadFromIniFile(ini: TIniFile);
 var
   S: string;
 begin
-    S := 'Rigg';
+  S := 'Rigg';
   SalingTyp := TSalingTyp(ini.ReadInteger(S, 'SalingTyp', Ord(stFest)));
 
-    TrimmTab.LoadFromIniFile(ini);
+  TrimmTab.LoadFromIniFile(ini);
 
-    S := 'Mast';
+  S := 'Mast';
   FiMastL := ini.ReadInteger(S, 'MastL', FiMastL);
   FiMastunten := ini.ReadInteger(S, 'Mastunten', FiMastunten);
   FiMastoben := ini.ReadInteger(S, 'Mastoben', FiMastoben);
   FiMastfallVorlauf := ini.ReadInteger(S, 'MastfallVorlauf', FiMastfallVorlauf);
 
-    S := 'Ist';
+  S := 'Ist';
   FiController := ini.ReadInteger(S, 'Controller', FiController);
   FiWinkel := ini.ReadInteger(S, 'Winkel', FiWinkel);
   FiVorstag := ini.ReadInteger(S, 'Vorstag', FiVorstag);
@@ -760,28 +755,28 @@ begin
   FiWPowerOS := ini.ReadInteger(S, 'WPowerOS', FiWPowerOS);
 
   S := 'Min';
-  GSB[fpController, Min] := ini.ReadInteger(S, 'Controller', GSB[fpController, Min]);
-  GSB[fpWinkel, Min] := ini.ReadInteger(S, 'Winkel', GSB[fpWinkel, Min]);
-  GSB[fpVorstag, Min] := ini.ReadInteger(S, 'Vorstag', GSB[fpVorstag, Min]);
-  GSB[fpWante, Min] := ini.ReadInteger(S, 'Wante', GSB[fpWante, Min]);
-  GSB[fpWoben, Min] := ini.ReadInteger(S, 'Woben', GSB[fpWoben, Min]);
-  GSB[fpSalingH, Min] := ini.ReadInteger(S, 'SalingH', GSB[fpSalingH, Min]);
-  GSB[fpSalingA, Min] := ini.ReadInteger(S, 'SalingA', GSB[fpSalingA, Min]);
-  GSB[fpSalingL, Min] := ini.ReadInteger(S, 'SalingL', GSB[fpSalingL, Min]);
-  GSB[fpVorstagOS, Min] := ini.ReadInteger(S, 'VorstagOS', GSB[fpVorstagOS, Min]);
-  GSB[fpWPowerOS, Min] := ini.ReadInteger(S, 'WPowerOS', GSB[fpWPowerOS, Min]);
+  GSB.Controller.Min := ini.ReadInteger(S, 'Controller', GSB.Controller.Min);
+  GSB.Winkel.Min := ini.ReadInteger(S, 'Winkel', GSB.Winkel.Min);
+  GSB.Vorstag.Min := ini.ReadInteger(S, 'Vorstag', GSB.Vorstag.Min);
+  GSB.Wante.Min := ini.ReadInteger(S, 'Wante', GSB.Wante.Min);
+  GSB.Woben.Min := ini.ReadInteger(S, 'Woben', GSB.Woben.Min);
+  GSB.SalingH.Min := ini.ReadInteger(S, 'SalingH', GSB.SalingH.Min);
+  GSB.SalingA.Min := ini.ReadInteger(S, 'SalingA', GSB.SalingA.Min);
+  GSB.SalingL.Min := ini.ReadInteger(S, 'SalingL', GSB.SalingL.Min);
+  GSB.VorstagOS.Min := ini.ReadInteger(S, 'VorstagOS', GSB.VorstagOS.Min);
+  GSB.WPowerOS.Min := ini.ReadInteger(S, 'WPowerOS', GSB.WPowerOS.Min);
 
   S := 'Max';
-  GSB[fpController, Max] := ini.ReadInteger(S, 'Controller', GSB[fpController, Max]);
-  GSB[fpWinkel, Max] := ini.ReadInteger(S, 'Winkel', GSB[fpWinkel, Max]);
-  GSB[fpVorstag, Max] := ini.ReadInteger(S, 'Vorstag', GSB[fpVorstag, Max]);
-  GSB[fpWante, Max] := ini.ReadInteger(S, 'Wante', GSB[fpWante, Max]);
-  GSB[fpWoben, Max] := ini.ReadInteger(S, 'Woben', GSB[fpWoben, Max]);
-  GSB[fpSalingH, Max] := ini.ReadInteger(S, 'SalingH', GSB[fpSalingH, Max]);
-  GSB[fpSalingA, Max] := ini.ReadInteger(S, 'SalingA', GSB[fpSalingA, Max]);
-  GSB[fpSalingL, Max] := ini.ReadInteger(S, 'SalingL', GSB[fpSalingL, Max]);
-  GSB[fpVorstagOS, Max] := ini.ReadInteger(S, 'VorstagOS', GSB[fpVorstagOS, Max]);
-  GSB[fpWPowerOS, Max] := ini.ReadInteger(S, 'WPowerOS', GSB[fpWPowerOS, Max]);
+  GSB.Controller.Max := ini.ReadInteger(S, 'Controller', GSB.Controller.Max);
+  GSB.Winkel.Max := ini.ReadInteger(S, 'Winkel', GSB.Winkel.Max);
+  GSB.Vorstag.Max := ini.ReadInteger(S, 'Vorstag', GSB.Vorstag.Max);
+  GSB.Wante.Max := ini.ReadInteger(S, 'Wante', GSB.Wante.Max);
+  GSB.Woben.Max := ini.ReadInteger(S, 'Woben', GSB.Woben.Max);
+  GSB.SalingH.Max := ini.ReadInteger(S, 'SalingH', GSB.SalingH.Max);
+  GSB.SalingA.Max := ini.ReadInteger(S, 'SalingA', GSB.SalingA.Max);
+  GSB.SalingL.Max := ini.ReadInteger(S, 'SalingL', GSB.SalingL.Max);
+  GSB.VorstagOS.Max := ini.ReadInteger(S, 'VorstagOS', GSB.VorstagOS.Max);
+  GSB.WPowerOS.Max := ini.ReadInteger(S, 'WPowerOS', GSB.WPowerOS.Max);
 
   S := 'Koordinaten Rumpf';
   iP[ooA0, x] := ini.ReadInteger(S, 'A0x', iP[ooA0, x]);
@@ -803,7 +798,7 @@ begin
   iP[ooF0, y] := ini.ReadInteger(S, 'F0y', iP[ooF0, y]);
   iP[ooF0, z] := ini.ReadInteger(S, 'F0z', iP[ooF0, z]);
 
-    S := 'Koordinaten Rigg';
+  S := 'Koordinaten Rigg';
   iP[ooA, x] := ini.ReadInteger(S, 'Ax', iP[ooA, x]);
   iP[ooA, y] := ini.ReadInteger(S, 'Ay', iP[ooA, y]);
   iP[ooA, z] := ini.ReadInteger(S, 'Az', iP[ooA, z]);
@@ -830,7 +825,7 @@ var
 begin
   S.ReadBuffer(temp, SizeOf(Integer));
   SalingTyp := TSalingTyp(temp);
-  TrimmTab.LoadFromStream(S);
+    TrimmTab.LoadFromStream(S);
   { Mast }
   S.ReadBuffer(FiMastL, SizeOf(Integer));
   S.ReadBuffer(FiMastunten, SizeOf(Integer));
@@ -846,7 +841,7 @@ begin
   S.ReadBuffer(FiSalingA, SizeOf(Integer));
   S.ReadBuffer(FiWPowerOS, SizeOf(Integer));
   { GSB }
-  S.ReadBuffer(GSB, SizeOf(TsbArray));
+  GSB.LoadFromStream(S);
   { Koordinaten }
   S.ReadBuffer(iP, SizeOf(TIntRiggPoints));
 end;
@@ -854,7 +849,7 @@ end;
 procedure TGetriebe.SaveToStream(S: TStream);
 begin
   S.WriteBuffer(SalingTyp, SizeOf(Integer));
-  TrimmTab.SaveToStream(S);
+    TrimmTab.SaveToStream(S);
   { Mast }
   S.WriteBuffer(FiMastL, SizeOf(Integer));
   S.WriteBuffer(FiMastunten, SizeOf(Integer));
@@ -870,7 +865,7 @@ begin
   S.WriteBuffer(FiSalingA, SizeOf(Integer));
   S.WriteBuffer(FiWPowerOS, SizeOf(Integer));
   { GSB }
-  S.WriteBuffer(GSB, SizeOf(TsbArray));
+  GSB.SaveToStream(S);
   { Koordinaten }
   S.WriteBuffer(iP, SizeOf(TIntRiggPoints));
 end;

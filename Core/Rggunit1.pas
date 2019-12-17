@@ -2,6 +2,8 @@
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   System.SysUtils,
   System.Classes,
@@ -18,8 +20,10 @@ type
     FrSpannungW: double;
   protected
     procedure BerechneF; virtual;
-    procedure KorrekturF(tempH, k1, k2: double; var k3, Beta, Gamma: double); virtual;
+    procedure KorrekturF(tempH, k1, k2: double; var k3, Beta, Gamma: double); virtual; //deprecated;
   public
+    UpdateGetriebeCounter: Integer;
+
     constructor Create(AOwner: TComponent); override;
 
     procedure ResetStatus;
@@ -33,6 +37,8 @@ type
     procedure BerechneM;
     function Koppelkurve: TKoordLine;
     procedure BiegeUndNeigeF(Mastfall, Biegung: double);
+    procedure BiegeUndNeigeF1(Mastfall, Biegung: double);
+    procedure BiegeUndNeigeF2(Mastfall, Biegung: double);
     procedure BiegeUndNeigeC(MastfallC, Biegung: double);
     procedure BiegeUndNeigeFS(TrimmSoll: TTrimm; var SalingHStart: double);
     procedure BiegeUndNeigeDS(TrimmSoll: TTrimm; var SalingLStart: double);
@@ -63,6 +69,7 @@ end;
 
 procedure TGetriebeFS.UpdateGetriebe;
 begin
+  Inc(UpdateGetriebeCounter);
   LogList.Clear;
   case SalingTyp of
     stOhne:
@@ -160,8 +167,7 @@ var
   temp: Integer;
 begin
   { Berechnung Punkt F - Masttop }
-  FrEpsilon := pi / 2 - arctan2((rP[ooC, x] - rP[ooD, x]),
-                                (rP[ooC, z] - rP[ooD, z]));
+  FrEpsilon := pi / 2 - arctan2((rP[ooC, x] - rP[ooD, x]), (rP[ooC, z] - rP[ooD, z]));
   temp := FiMastL - FiMastunten;
   rP[ooF, x] := rP[ooD, x] + temp * cos(FrEpsilon);
   rP[ooF, y] := 0;
@@ -169,15 +175,15 @@ begin
 end;
 
 procedure TGetriebeFS.BerechneM;
-//var
-//  ooTemp: TRealPoint;
-//  a, t: double;
+var
+  ooTemp: TRealPoint;
+  a, t: double;
 begin
-//  a := Abstand(rp[ooF0], rp[ooF]);
-//  t := (a - MastfallVorlauf) / a;
-//  ooTemp := vsub(rp[ooF], rp[ooF0]);
-//  ooTemp := vadd(rp[ooF0], skalarmult(ooTemp, t));
-//  rp[ooM] := ooTemp;
+  a := Abstand(rp[ooF0], rp[ooF]);
+  t := (a - MastfallVorlauf) / a;
+  ooTemp := vsub(rp[ooF], rp[ooF0]);
+  ooTemp := vadd(rp[ooF0], skalarmult(ooTemp, t));
+  rp[ooM] := ooTemp;
 end;
 
 (* **************************************************************** *)
@@ -657,16 +663,16 @@ begin
 
     { weiter im ebenen Trapez }
   SchnittGG(Null, TempC, TempD, TempA, temp);
-    { Temp enthält jetzt den Schnittpunkt der Diagonalen }
+  { Temp enthält jetzt den Schnittpunkt der Diagonalen }
   W1Strich := Abstand(Null, temp);
   Saling1L := Abstand(TempD, temp);
 
-    { weiter räumlich: }
+  { weiter räumlich: }
   Skalar := W1Strich / WStrich;
   temp := vsub(rP[ooC], rP[ooA0]);
   temp := skalarmult(temp, Skalar);
   temp := vadd(rP[ooA0], temp);
-    { Temp enthält jetzt den räumlichen Schnittpunkt der Diagonalen }
+  { Temp enthält jetzt den räumlichen Schnittpunkt der Diagonalen }
 
   { Berechnung Punkt ooA }
   Skalar := FrSalingL / Saling1L;
@@ -790,7 +796,7 @@ begin
   end;
 
   SchnittGG(Null, TempC, TempD, TempA, temp);
-    { Temp enthält jetzt den Schnittpunkt der Diagonalen }
+  { Temp enthält jetzt den Schnittpunkt der Diagonalen }
   W1Strich := Abstand(Null, temp);
   Saling1L := Abstand(TempD, temp);
 
@@ -799,7 +805,7 @@ begin
   temp := vsub(rP[ooC], rP[ooA0]);
   temp := skalarmult(temp, Skalar);
   temp := vadd(rP[ooA0], temp);
-    { Temp enthält jetzt den räumlichen Schnittpunkt der Diagonalen }
+  { Temp enthält jetzt den räumlichen Schnittpunkt der Diagonalen }
 
   { Berechnung Punkt ooA }
   Skalar := FrSalingL / Saling1L;
@@ -1002,7 +1008,7 @@ begin
         stFest:
           begin
           { 1. Aufruf SchnittKK: Saling2d und WanteOben2d;
-            Schnittpunkt Temp wird im 2. Aufruf benötigt }
+              Schnittpunkt Temp wird im 2. Aufruf benötigt }
           Radius1 := FrSalingH;
           Radius2 := FrWoben2d;
           Temp := Null;
@@ -1076,7 +1082,7 @@ begin
           Temp[y] := 0;
           S := Bemerkung;
           S := Format('GetVorstagNull, stDrehbar/2: %s', [S]);
-         LogList.Add(S);
+          LogList.Add(S);
 
           WStrich := Abstand(Temp, TempC);
           WStrich2d := sqrt(sqr(WStrich) - sqr(rP[ooA0, y]));
@@ -1118,6 +1124,91 @@ begin
 end;
 
 procedure TGetriebeFS.BiegeUndNeigeF(Mastfall, Biegung: double);
+begin
+  BiegeUndNeigeF2(Mastfall, Biegung);
+end;
+
+procedure TGetriebeFS.BiegeUndNeigeF2(Mastfall, Biegung: double);
+var
+  D0: TRealPoint;
+
+  oldF: TRealPoint;
+  oldC: TRealPoint;
+  oldD: TRealPoint;
+
+  newF: TRealPoint;
+  newC: TRealPoint;
+  newD: TRealPoint;
+
+  D0F: double; // k3
+  D0C: double; // k1 + k2
+  D0D: double; // l4 (FrMastUnten)
+
+  newF0F: double;
+
+  oldPsi: double;
+  newPsi: double;
+  delta: double;
+  w: double;
+begin
+  oldF := rp[ooF];
+  oldC := rp[ooC];
+  oldD := rp[ooD];
+  D0 := rp[ooD0];
+  D0F := Abstand(rp[ooD0], rp[ooF]);
+  D0C := Abstand(rp[ooD0], rp[ooC]);
+//D0D := Abstand(rp[ooD0], rp[ooD]);
+  D0D := FrMastUnten;
+
+  { compute new Point F }
+
+  newF0F := Mastfall + FiMastfallVorlauf;
+  with SchnittKK do
+  begin
+    SchnittEbene := seXZ;
+    Radius1 := newF0F;
+    Radius2 := D0F; // unchanged
+    MittelPunkt1 := rP[ooF0];
+    MittelPunkt2 := rP[ooD0];
+    rP[ooF] := SchnittPunkt1;
+  end;
+
+  { compute new Points C and D }
+
+  newF := rp[ooF];
+  oldPsi := Pi/2 - arctan2(oldF[x] - D0[x], oldF[z] - D0[z]);
+  newPsi := Pi/2 - arctan2(newF[x] - D0[x], newF[z] - D0[z]);
+  delta := newPsi - oldPsi;
+
+  w := Pi/2 - arctan2(oldC[x] - D0[x], oldC[z] - D0[z]);
+  w := w + delta;
+  newC[x] := D0[x] + D0C * cos(w);
+  newC[y] := 0;
+  newC[z] := D0[z] + D0C * sin(w);
+
+  w := Pi/2 - arctan2(oldD[x] - D0[x], oldD[z] - D0[z]);
+  w := w + delta;
+  newD[x] := D0[x] + D0D * cos(w);
+  newD[y] := 0;
+  newD[z] := D0[z] + D0D * sin(w);
+
+  rp[ooC] := newC;
+  rp[ooD] := newD;
+
+  { continue as in original BiegeUndNeigeF }
+
+  FrVorstag := Abstand(rP[ooC0], rP[ooC]);
+  case SalingTyp of
+    stFest:
+      MakeSalingHBiggerFS(FrSalingH);
+    stDrehbar:
+      MakeSalingLBiggerDS(FrSalingL);
+  end;
+
+  BerechneM;
+end;
+
+procedure TGetriebeFS.BiegeUndNeigeF1(Mastfall, Biegung: double);
 var
   k1, k2, k3, k4, k5, k6, k7: double;
   tempAlpha, tempBeta, tempGamma: double;
@@ -1175,6 +1266,8 @@ begin
     stDrehbar:
       MakeSalingLBiggerDS(FrSalingL);
   end;
+
+  BerechneM;
 end;
 
 procedure TGetriebeFS.BiegeUndNeigeFS(TrimmSoll: TTrimm; var SalingHStart: double);

@@ -21,6 +21,7 @@ uses
   Menus,
   Grids,
   ComCtrls,
+  RggScroll,
   RggTypes,
   TrimmTab;
 
@@ -163,7 +164,7 @@ type
     FTrimmIndex :Integer;
     *)
 
-    FGSB : TsbArray;
+    FGSB : TRggFactArray;
     FiP: TIntRiggPoints;
     FRumpfCell: TPoint;
     FTrimmTabDaten: TTrimmTabDaten;
@@ -430,9 +431,9 @@ begin
   {Trimm}
   TrimmCombo.Items := FTrimmListe;
   TrimmCombo.ItemIndex := Ord(fpWante);
-  MinEdit.Text := IntToStr(FGSB[fpWante,Min]);
-  PosEdit.Text := IntToStr(FGSB[fpWante,Ist]);
-  MaxEdit.Text := IntToStr(FGSB[fpWante,Max]);
+  MinEdit.Text := IntToStr(FGSB.Wante.Min);
+  PosEdit.Text := IntToStr(FGSB.Wante.Ist);
+  MaxEdit.Text := IntToStr(FGSB.Wante.Max);
   {Elemente}
   GetKeyList(FElementListe, FTempListe);
   ElementCombo.Items := FTempListe;
@@ -574,14 +575,18 @@ end;
 
 procedure TOptionForm.TrimmComboChange(Sender: TObject);
 var
-  i: TsbName;
+  i: TFederParam;
+  f: TRggSB;
 begin
-  i := TsbName(TrimmCombo.ItemIndex);
-  if i = fpWinkel then label15.Caption := 'Winkel in 10E-1 Grad'
-  else label15.Caption := 'Abmessungen in mm';
-  MinEdit.Text := IntToStr(FGSB[i,Min]);
-  PosEdit.Text := IntToStr(FGSB[i,Ist]);
-  MaxEdit.Text := IntToStr(FGSB[i,Max]);
+  i := TFederParam(TrimmCombo.ItemIndex);
+  if i = TFederParam.fpWinkel then
+    label15.Caption := 'Winkel in 10E-1 Grad'
+  else
+    label15.Caption := 'Abmessungen in mm';
+  f := FGSB.Find(i);
+  MinEdit.Text := IntToStr(f.Min);
+  PosEdit.Text := IntToStr(f.Ist);
+  MaxEdit.Text := IntToStr(f.Max);
 end;
 
 procedure TOptionForm.MinEditKeyDown(Sender: TObject; var Key: Word;
@@ -593,17 +598,19 @@ end;
 procedure TOptionForm.MinEditExit(Sender: TObject);
 var
   i, iMin, iIst, iMax, iVar: Integer;
+  f: TRggSB;
 begin
   iVar := GetInteger(TMaskEdit(Sender).Text);
   i := TrimmCombo.ItemIndex;
-  iMin := FGSB[TsbName(i),Min];
-  iIst := FGSB[TsbName(i),Ist];
-  iMax := FGSB[TsbName(i),Max];
+  f := FGSB.Find(TFederParam(i));
+  iMin := f.Min;
+  iIst := f.Ist;
+  iMax := f.Max;
   if Sender = MinEdit then
   begin
     if iVar > iIst then
       iVar := iIst;
-    FGSB[TsbName(i),Min] := iVar;
+    f.Min := iVar;
     MinEdit.Text := IntToStr(iVar);
   end;
   if Sender = PosEdit then
@@ -612,14 +619,14 @@ begin
       iVar := iMin;
     if iVar > iMax then
       iVar := iMax;
-    FGSB[TsbName(i),Ist] := iVar;
+    f.Ist := iVar;
     PosEdit.Text := IntToStr(iVar);
   end;
   if Sender = MaxEdit then
-   begin
+  begin
     if iVar < iIst then
       iVar := iIst;
-    FGSB[TsbName(i),Max] := iVar;
+    f.Max := iVar;
     MaxEdit.Text := IntToStr(iVar);
   end;
 end;

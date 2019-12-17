@@ -4,7 +4,6 @@ interface
 
 uses
   System.Math,
-  RiggVar.RG.Def,
   RggTypes,
   Vcalc116,
   Rggunit4;
@@ -149,12 +148,12 @@ end;
 
 procedure TSalingDreieck.CopyFromRigg(Rigg: TRigg);
 begin
-  FSalingHMin := Rigg.GSB[fpSalingH, RggTypes.Min];
-  FSalingHMax := Rigg.GSB[fpSalingH, RggTypes.Max];
-  FSalingH := Rigg.GSB[fpSalingH, RggTypes.Ist];
-  FSalingAMin := Rigg.GSB[fpSalingA, RggTypes.Min];
-  FSalingAMax := Rigg.GSB[fpSalingA, RggTypes.Max];
-  FSalingA := Rigg.GSB[fpSalingA, RggTypes.Ist];
+  FSalingHMin := Rigg.GSB.SalingH.Min;
+  FSalingHMax := Rigg.GSB.SalingH.Max;
+  FSalingH := Rigg.GSB.SalingH.Ist;
+  FSalingAMin := Rigg.GSB.SalingA.Min;
+  FSalingAMax := Rigg.GSB.SalingA.Max;
+  FSalingA := Rigg.GSB.SalingA.Ist;
 end;
 
 end.

@@ -62,6 +62,13 @@ uses
   FrmKreis in 'Frm\FrmKreis.pas',
   RiggVar.App.Main in 'App\RiggVar.App.Main.pas',
   RiggVar.Util.Logger in 'Util\RiggVar.Util.Logger.pas',
+  RggScroll in 'Core\RggScroll.pas',
+  RiggVar.FB.Classes in 'FB\RiggVar.FB.Classes.pas',
+  RiggVar.RG.Data in 'RG\RiggVar.RG.Data.pas',
+  RiggVar.App.Main0 in 'App\RiggVar.App.Main0.pas',
+  RiggVar.App.Main1 in 'App\RiggVar.App.Main1.pas',
+  RiggVar.Util.AppUtils in 'Util\RiggVar.Util.AppUtils.pas',
+  RiggVar.RG.Main in 'RG\RiggVar.RG.Main.pas',
   RiggVar.RG.Def in 'RG\RiggVar.RG.Def.pas';
 
 {$R *.res}

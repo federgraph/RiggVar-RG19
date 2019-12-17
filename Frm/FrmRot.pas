@@ -676,7 +676,8 @@ end;
 
 procedure TRotationForm.Draw;
 begin
-  if hPal <> 0 then begin
+  if hPal <> 0 then
+  begin
     hOldPal := SelectPalette(PaintBox3D.Canvas.Handle, hPal, False);
     RealizePalette(PaintBox3D.Canvas.Handle);
   end;
@@ -684,9 +685,12 @@ begin
   Painted := False;
 
   { Nach Änderung der Auflösung Probleme mit dem Grau-Überschreiben. Deshalb: }
-  if Screen.Width <> CreatedScreenWidth then ChangeResolution;
+  if Screen.Width <> CreatedScreenWidth then
+    ChangeResolution;
 
-  if not PaintBtn.Down or EraseBK then begin {für DrawToBitmap1}
+ {für DrawToBitmap1}
+  if not PaintBtn.Down or EraseBK then
+  begin
   //if EraseBK then begin {für DrawToBitmap2}
     PaintBackGround(Bitmap);
     EraseBK := False;
@@ -696,13 +700,15 @@ begin
   NullpunktOffset.y := -RaumGrafik.Offset.y + Bitmap.Height div 2 + FYpos;
   DrawToBitmap1; // bzw. DrawToBitmap2;
 
-  if MatrixItem.Checked then DrawMatrix(Bitmap.Canvas);
+  if MatrixItem.Checked then
+    DrawMatrix(Bitmap.Canvas);
 
   if PreviewItem.Checked then
     DrawPreviewBox;
 
   //Bitmap auf den Bildschirm kopieren
-  with PaintBox3D.Canvas do begin
+  with PaintBox3D.Canvas do
+  begin
     CopyMode := cmSrcCopy;
     Draw(0, 0, Bitmap);
   end;
@@ -712,7 +718,8 @@ end;
 
 procedure TRotationForm.DrawToBitmap1; //Variante 1
 begin
-  with Bitmap.Canvas do begin
+  with Bitmap.Canvas do
+  begin
     SetMapMode(Handle, MM_ANISOTROPIC);
     SetWindowExtEx(Handle, 1000, 1000, nil);
     SetWindowOrgEx(Handle, 0, 0, nil);
@@ -721,13 +728,14 @@ begin
   end;
   RaumGrafik.Coloriert := True;
   RaumGrafik.Draw(Bitmap.Canvas);
-  if FPaintRumpf and (not MouseDown or (MouseDown and FDrawAlways))
-  then begin
+  if FPaintRumpf and (not MouseDown or (MouseDown and FDrawAlways)) then
+  begin
     HullGraph.Coloriert := True;
     HullGraph.FixPunkt := RaumGrafik.FixPunkt;
     HullGraph.Draw(Bitmap.Canvas);
   end;
-  with Bitmap.Canvas do begin
+  with Bitmap.Canvas do
+  begin
     SetWindowOrgEx(Handle, 0, 0, nil);
     SetViewPortOrgEx(Handle, 0, 0, nil);
     SetMapMode(Canvas.Handle, MM_TEXT);

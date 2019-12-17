@@ -2,6 +2,8 @@
 
 interface
 
+{$SCOPEDENUMS ON}
+
 uses
   Winapi.Windows,
   Winapi.Messages,
@@ -37,8 +39,8 @@ type
     FControllerTyp: TControllerTyp;
     FCalcTyp: TCalcTyp;
     FMastStatus: TMastStatusSet;
-    FMastOK: Boolean;
     FKorrigiert: Boolean;
+    FMastOK: Boolean;
     FKraftGraph: TKraftGraph;
 
     procedure CalcW1W2;
@@ -624,28 +626,28 @@ begin
     end;
 
   { zutreffende Knickkurve bestimmen }
-  Kurve := KurveOhneController;
+  Kurve := TKurvenTyp.KurveOhneController;
   case FControllerTyp of
     ctOhne:
-      Kurve := KurveOhneController;
+      Kurve := TKurvenTyp.KurveOhneController;
     ctDruck:
       begin
-      Kurve := KurveOhneController;
+        Kurve := TKurvenTyp.KurveOhneController;
         if FSalingWegKnick < hd then
-          Kurve := KurveMitController;
+          Kurve := TKurvenTyp.KurveMitController;
     end;
     ctZugDruck:
-      Kurve := KurveMitController;
+      Kurve := TKurvenTyp.KurveMitController;
   end;
 
   { FwSchnittOffset für Knickkurve festlegen }
-  if Kurve = KurveOhneController then
+  if Kurve = TKurvenTyp.KurveOhneController then
     FwSchnittOffset := 0
-  else if Kurve = KurveMitController then
+  else if Kurve = TKurvenTyp.KurveMitController then
   begin
     FwSchnittOhne := FSalingWegKnick;
-    FSchnittPunktKraft := FvonW(FwSchnittOhne, KurveOhneController, FKorrigiert);
-    FwSchnittMit := WvonF(FSchnittPunktKraft, KurveMitController, False);
+    FSchnittPunktKraft := FvonW(FwSchnittOhne, TKurvenTyp.KurveOhneController, FKorrigiert);
+    FwSchnittMit := WvonF(FSchnittPunktKraft, TKurvenTyp.KurveMitController, False);
     FwSchnittOffset := FwSchnittOhne - FwSchnittMit;
   end;
 
@@ -656,13 +658,13 @@ begin
     FMastOK := False;
     Include(FMastStatus, msZugKraftimMast);
   end;
-  if Kurve = KurveOhneController then
+  if Kurve = TKurvenTyp.KurveOhneController then
     MastDruck := FvonW(WSoll, Kurve, FKorrigiert)
   else
     MastDruck := FvonW(WSoll, Kurve, False);
 
   { Controllerkraft ermitteln }
-  if Kurve = KurveOhneController then
+  if Kurve = TKurvenTyp.KurveOhneController then
     ControllerKraft := 0
   else
   begin
@@ -715,7 +717,7 @@ begin
   { Die Kraft numerisch ermitteln, da die Umkehrfunktion zu WvonF noch nicht
     explizit vorliegt. }
   Knicklaenge := FKnicklaenge;
-  if Kurve = KurveMitController then
+  if Kurve = TKurvenTyp.KurveMitController then
     Knicklaenge := FKorrekturFaktor * FKnicklaenge;
 
   Zaehler := 0;
@@ -742,7 +744,7 @@ var
   Knicklaenge: double;
 begin
   Knicklaenge := FKnicklaenge;
-  if Kurve = KurveMitController then
+  if Kurve = TKurvenTyp.KurveMitController then
     Knicklaenge := FKorrekturFaktor * FKnicklaenge;
 
   k := sqrt(f / EI); { k in mm^-1, F in N, EI in Nmm^2 }
@@ -1333,17 +1335,17 @@ begin
       { PunktKurveMitController - nur zeichnen, wenn Controller vorhanden }
       if ControllerTyp <> ctOhne then begin
         Pen.Color := clYellow;
-        {blaue Kurve verschoben in SP mit FKurveOhne}
+            {blaue Kurve verschoben in SP mit FKurveOhne}
         if not Korrigiert then DrawKurve(bmp.Canvas, FVerschoben);
-        {blaue Kurve verschoben in den SP mit FKurveOhneKorrigiert}
+            {blaue Kurve verschoben in den SP mit FKurveOhneKorrigiert}
         if Korrigiert then DrawKurve(bmp.Canvas, FVerschobenKorrigiert);
       end;
 
       {PunktKurveOhneController}
       Pen.Color := clFuchsia;
-      { überschreibe blaue Kurve mit Fuchsia }
+          { überschreibe blaue Kurve mit Fuchsia }
       if not Korrigiert then DrawKurve(bmp.Canvas, FKurveOhne);
-      { überschreibe graue Kurve mit Fuchsia }
+          { überschreibe graue Kurve mit Fuchsia }
       if Korrigiert then DrawKurveQuer(bmp.Canvas, FKurveOhneKorrigiert);
 
       SetMapMode(Handle, MM_TEXT);
@@ -1421,10 +1423,10 @@ begin
   {FKurveOhne und FKurveMit}
   for i := 0 to 150 do begin
     FwSchnittOhne := i; { in mm}
-    FSchnittPunktKraft := FvonW(FwSchnittOhne, KurveOhneController, False);
+    FSchnittPunktKraft := FvonW(FwSchnittOhne, TKurvenTyp.KurveOhneController, False);
     FKurveOhne[i] := FSchnittPunktKraft; {in N}
     FwSchnittMit := i; {in mm}
-    FSchnittPunktKraft := FvonW(FwSchnittMit, KurveMitController, False);
+    FSchnittPunktKraft := FvonW(FwSchnittMit, TKurvenTyp.KurveMitController, False);
     FKurveMit[i] := FSchnittPunktKraft; {in N}
   end;
   {FKurveOhneKorrigiert}
@@ -1436,7 +1438,7 @@ begin
     if Kraft > 0.9 * KnickLast then
       FKurveOhneKorrigiert[i] := 150
     else begin
-      Weg := WvonF(Kraft,KurveOhneController,True);
+      Weg := WvonF(Kraft, TKurvenTyp.KurveOhneController, True);
       if Weg < 150 then FKurveOhneKorrigiert[i] := Weg
       else FKurveOhneKorrigiert[i] := 150;
     end;
@@ -1450,7 +1452,7 @@ begin
     if Kraft > 0.9 * KnickLast then
       FKurveMitKorrigiert[i] := 150
     else begin
-      Weg := WvonF(Kraft,KurveMitController,True);
+      Weg := WvonF(Kraft, TKurvenTyp.KurveMitController,True);
       if Weg < 150 then FKurveMitKorrigiert[i] := Weg
       else FKurveMitKorrigiert[i] := 150;
     end;

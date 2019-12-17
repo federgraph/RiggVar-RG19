@@ -223,6 +223,12 @@ type
     procedure wmGetMinMaxInfo(var Msg: TMessage);
     message wm_GetMinMaxInfo;
   public
+    ResizeCounter: Integer;
+    OpenDialog1: TOpenDialog;
+    SaveDialog1: TSaveDialog;
+    procedure InitRetina;
+    function GetOpenFileName(dn, fn: string): string;
+    function GetSaveFileName(dn, fn: string): string;
     procedure SetControllerEnabled;
     procedure SetControllerChecked(Value: Boolean);
     procedure SetKoppelChecked(Value: Boolean);
@@ -262,6 +268,9 @@ end;
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
   Main := TMain.Create;
+  Main.Logger.Verbose := True;
+
+  InitRetina;
 
   Left := 60;
   Top := 105;
@@ -1007,6 +1016,67 @@ begin
       Sender := KraftGemessenItem;
   end;
   KnickenItemClick(Sender);
+end;
+
+procedure TFormMain.InitRetina;
+//var
+//  t: single;
+begin
+//  t := self.Handle.Scale; //Viewport1.Scene.GetSceneScale;
+//  if t > 1 then
+//  begin
+//    if Main <> nil then
+//    begin
+//      Main.IsRetina := True;
+//    end;
+//  end;
+//  if Main <> nil then
+//  begin
+//     Main.Logger.InfoVerbose('in TFormMain.InitRetina');
+//     Main.Logger.InfoVerbose('  Scale = ' + FloatToStr(t));
+//     Main.Logger.InfoVerbose('  Retina = ' + BoolStr[Main.IsRetina]);
+//  end;
+end;
+
+function TFormMain.GetOpenFileName(dn, fn: string): string;
+begin
+  if not Assigned(OpenDialog) then
+    OpenDialog := TOpenDialog.Create(self);
+
+  OpenDialog.Options := [
+    TOpenOption.ofPathMustExist,
+    TOpenOption.ofFileMustExist,
+    TOpenOption.ofNoNetworkButton,
+    TOpenOption.ofEnableSizing];
+  OpenDialog.Filter := 'Trimm-File|*.txt|Trimm-Datei|*.trm';
+  OpenDialog.InitialDir := ExcludeTrailingPathDelimiter(dn);
+  OpenDialog.FileName := fn;
+
+  if OpenDialog.Execute then
+    result := OpenDialog.FileName
+  else
+    result := '';
+end;
+
+function TFormMain.GetSaveFileName(dn, fn: string): string;
+begin
+  if not Assigned(SaveDialog) then
+    SaveDialog := TSaveDialog.Create(self);
+
+  SaveDialog.Options := [
+    TOpenOption.ofHideReadOnly,
+    TOpenOption.ofPathMustExist,
+    TOpenOption.ofNoReadOnlyReturn,
+    TOpenOption.ofNoNetworkButton,
+    TOpenOption.ofEnableSizing];
+  SaveDialog.Filter := 'Trimm-File|*.txt|Trimm-Datei|*.trm';
+  SaveDialog.InitialDir := ExcludeTrailingPathDelimiter(dn);
+  SaveDialog.FileName := fn;
+
+  if SaveDialog.Execute then
+    result := SaveDialog.FileName
+  else
+    result := '';
 end;
 
 end.

@@ -105,9 +105,10 @@ object YAuswahlDlg: TYAuswahlDlg
     Top = 220
     Width = 69
     Height = 27
+    DoubleBuffered = True
     Kind = bkOK
     Margin = 2
-    NumGlyphs = 2
+    ParentDoubleBuffered = False
     Spacing = -1
     TabOrder = 0
     IsControl = True
@@ -117,9 +118,10 @@ object YAuswahlDlg: TYAuswahlDlg
     Top = 220
     Width = 97
     Height = 27
+    DoubleBuffered = True
     Kind = bkCancel
     Margin = 2
-    NumGlyphs = 2
+    ParentDoubleBuffered = False
     Spacing = -1
     TabOrder = 1
     IsControl = True
@@ -130,9 +132,10 @@ object YAuswahlDlg: TYAuswahlDlg
     Width = 77
     Height = 27
     Caption = 'Hilfe'
+    DoubleBuffered = True
     Kind = bkHelp
     Margin = 2
-    NumGlyphs = 2
+    ParentDoubleBuffered = False
     Spacing = -1
     TabOrder = 2
     IsControl = True

@@ -7,7 +7,6 @@ uses
   System.Classes,
   System.IniFiles,
   System.Math,
-  RiggVar.RG.Def,
   RggTypes,
   Vcalc116,
   SchnttKK,
@@ -490,19 +489,19 @@ procedure TRiggFS.Probe;
       d3 := vsub(rP[c], rP[o]);
       d4 := vsub(rP[d], rP[o]);
 
-      l1 := rL[al];
-      l2 := rL[bl];
-      l3 := rL[cl];
-      l4 := rL[dl];
+    l1 := rL[al];
+    l2 := rL[bl];
+    l3 := rL[cl];
+    l4 := rL[dl];
 
-      F1 := rF[al];
-      F2 := rF[bl];
-      F3 := rF[cl];
-      F4 := rF[dl];
+    F1 := rF[al];
+    F2 := rF[bl];
+    F3 := rF[cl];
+    F4 := rF[dl];
 
       Result := Probe; { Aufruf von Probe in class TetraF }
     end;
-  end;
+ end;
 
 var
   tempResult: double;
@@ -721,25 +720,25 @@ begin
       rPe[ooP, y] := 0;
 
    { 3. Aufruf SchnittKK: Saling2d und MastUnten; ooD ermitteln }
-    Radius1 := sqrt(sqr(rLe[10]) - sqr(rLe[11] / 2));
+      Radius1 := sqrt(sqr(rLe[10]) - sqr(rLe[11] / 2));
     Radius2 := rLe[16];
     MittelPunkt1 := rPe[ooA];
     MittelPunkt2 := rPe[ooD0];
-    rPe[ooD] := SchnittPunkt1;
-    rPe[ooD, y] := 0;
+      rPe[ooD] := SchnittPunkt1;
+      rPe[ooD, y] := 0;
     S := Bemerkung;
-    S := Format('TRiggFS.MakeKoord, 3. Aufruf: %s', [S]);
+      S := Format('TRiggFS.MakeKoord, 3. Aufruf: %s', [S]);
     LogList.Add(S);
 
     { 4. Aufruf SchnittKK: WanteOben2d und MastOben; ooC ermitteln }
-    Radius1 := sqrt(sqr(rLe[13]) - sqr(rLe[11] / 2));
+      Radius1 := sqrt(sqr(rLe[13]) - sqr(rLe[11] / 2));
     Radius2 := rLe[15];
     MittelPunkt1 := rPe[ooA];
     MittelPunkt2 := rPe[ooD];
-    rPe[ooC] := SchnittPunkt1;
-    rPe[ooC, y] := 0;
+      rPe[ooC] := SchnittPunkt1;
+      rPe[ooC, y] := 0;
     S := Bemerkung;
-    S := Format('TRiggFS.MakeKoord, 4. Aufruf: %s', [S]);
+      S := Format('TRiggFS.MakeKoord, 4. Aufruf: %s', [S]);
     LogList.Add(S);
   end;
 
@@ -751,7 +750,7 @@ begin
 
   except
     on E: EMathError do
-      LogList.Add('TRiggFS.MakeKoord:  ' + E.Message);
+    LogList.Add('TRiggFS.MakeKoord:  ' + E.Message);
   end;
 end;
 
@@ -1105,16 +1104,16 @@ begin
     ctBiegeKnicken:
       begin
       case SalingTyp of
-          stFest:
-            begin
-              limitA := GSB[fpSalingH, Min]; { in mm }
-              limitB := GSB[fpSalingH, Max]; { in mm }
-            end;
-          stDrehbar:
-            begin
-              limitA := GSB[fpSalingL, Min]; { in mm }
-              limitB := GSB[fpSalingL, Max]; { in mm }
-            end;
+        stFest:
+          begin
+            limitA := GSB.SalingH.Min; { in mm }
+            limitB := GSB.SalingH.Max; { in mm }
+          end;
+        stDrehbar:
+          begin
+            limitA := GSB.SalingL.Min; { in mm }
+            limitB := GSB.SalingL.Max; { in mm }
+          end;
       end;
     end;
     ctQuerKraftBiegung:
@@ -1127,7 +1126,7 @@ begin
       { Hier nur Biegen und Neigen }
       case SalingTyp of
         stFest:
-            Berechnen(FiSalingH); { Saling wiederherstellen }
+          Berechnen(FiSalingH); { Saling wiederherstellen }
         stDrehbar:
           Berechnen(FiSalingL);
       end;

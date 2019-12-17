@@ -5,17 +5,20 @@ interface
 uses
   System.SysUtils,
   System.Classes,
-  RiggVar.RG.Def,
   RggTypes,
   Rggunit3,
   Rggdoc,
-  Vcalc116;
+  Vcalc116,
+  RiggVar.RG.Data;
 
 type
   TRigg = class(TRiggFS)
   private
     function GetRealTrimm(Index: TTrimmIndex): double;
   public
+    procedure WriteXml(ML: TStrings; AllTags: Boolean = False);
+    procedure SaveToFederData(fd: TRggData);
+    procedure LoadFromFederData(fd: TRggData);
     procedure WriteToDocFile(FileName: String);
     procedure LoadFromDocFile(FileName: String);
     procedure Assign(Source: TPersistent); override;
@@ -39,23 +42,38 @@ implementation
   IniFile := TIniFile.Create(FileName);
   try
     inherited WriteToIniFile(IniFile);
-  finally
-    IniFile.Free;
-  end;
+   finally
+      IniFile.Free;
+    end;
   end;
 
   procedure TRigg.LoadFromIniFile(FileName: String);
   var
-  IniFile: TIniFile;
+    IniFile: TIniFile;
   begin
-  IniFile := TIniFile.Create(FileName);
-  try
+    IniFile := TIniFile.Create(FileName);
+    try
     inherited LoadFromIniFile(IniFile);
-  finally
-    IniFile.Free;
-  end;
+    finally
+      IniFile.Free;
+    end;
   end;
 }
+
+procedure TRigg.WriteXml(ML: TStrings; AllTags: Boolean);
+var
+  Document: TRggDocument;
+begin
+  Document := TRggDocument.Create;
+  Document.WantFestigkeitsWerteInXml := AllTags;
+  Document.WantTrimmTabInXml := AllTags;
+  try
+    GetDocument(Document);
+    Document.WriteXML(ML);
+  finally
+    Document.Free;
+  end;
+end;
 
 procedure TRigg.WriteToDocFile(FileName: String);
 var
@@ -130,18 +148,18 @@ begin
   Doc.ControllerTyp := ControllerTyp;
   Doc.CalcTyp := CalcTyp;
   { Mast: Abmessungen }
-  Doc.FiMastL := FiMastL;
-  Doc.FiMastunten := FiMastunten;
-  Doc.FiMastoben := FiMastoben;
-  Doc.FiMastfallVorlauf := FiMastfallVorlauf;
-  Doc.FiControllerAnschlag := FiControllerAnschlag;
+  Doc.FiMastL := Round(FiMastL);
+  Doc.FiMastunten := Round(FiMastunten);
+  Doc.FiMastoben := Round(FiMastoben);
+  Doc.FiMastfallVorlauf := Round(FiMastfallVorlauf);
+  Doc.FiControllerAnschlag := Round(FiControllerAnschlag);
   { Rumpf: Koordinaten }
   Doc.iP := iP;
   { Festigkeitswerte }
   Doc.rEA := rEA;
   Doc.EI := EI;
   { Grenzwerte und Istwerte }
-  Doc.GSB := GSB;
+  Doc.GSB.Assign(GSB);
   { Trimmtabelle }
   Doc.TrimmTabDaten := TrimmTab.TrimmTabDaten;
 end;
@@ -163,21 +181,21 @@ begin
   rEA := Doc.rEA;
   EI := Doc.EI;
   { Grenzwerte }
-  GSB := Doc.GSB;
+  GSB.Assign(Doc.GSB);
   { Trimmtabelle }
   TrimmTab.TrimmTabDaten := Doc.TrimmTabDaten;
   { Istwerte }
-  InputRec.Controller := Doc.GSB[fpController,Ist];
-  InputRec.Winkel := Doc.GSB[fpWinkel,Ist];
-  InputRec.Vorstag := Doc.GSB[fpVorstag,Ist];
-  InputRec.Wanten := Doc.GSB[fpWante,Ist];
-  InputRec.Woben := Doc.GSB[fpWoben,Ist];
-  InputRec.Wunten := InputRec.Wanten - InputRec.Woben;
-  InputRec.SalingH := Doc.GSB[fpSalingH,Ist];
-  InputRec.SalingA := Doc.GSB[fpSalingA,Ist];
-  InputRec.SalingL := Doc.GSB[fpSalingL,Ist];
-  InputRec.Vorstag := Doc.GSB[fpVorstagOS,Ist];
-  InputRec.WPowerOS := Doc.GSB[fpWPowerOS,Ist];
+  InputRec.Controller := Round(Doc.GSB.Controller.Ist);
+  InputRec.Winkel := Round(Doc.GSB.Winkel.Ist);
+  InputRec.Vorstag := Round(Doc.GSB.Vorstag.Ist);
+  InputRec.Wanten := Round(Doc.GSB.Wante.Ist);
+  InputRec.Woben := Round(Doc.GSB.Woben.Ist);
+  InputRec.Wunten := Round(InputRec.Wanten - InputRec.Woben);
+  InputRec.SalingH := Round(Doc.GSB.SalingH.Ist);
+  InputRec.SalingA := Round(Doc.GSB.SalingA.Ist);
+  InputRec.SalingL := Round(Doc.GSB.SalingL.Ist);
+  InputRec.Vorstag := Round(Doc.GSB.VorstagOS.Ist);
+  InputRec.WPowerOS := Round(Doc.GSB.WPowerOS.Ist);
   Glieder := InputRec; { --> IntGliederToReal }
   Reset; { restliche Gleitkommawerte für Rumpf und Mast aktualisieren }
 
@@ -251,7 +269,7 @@ begin
     tiVorstagDiffE: temp := Abstand(rPe[ooC0], rPe[ooC]) - rL[14];
     tiSpannungW: temp := SpannungW;
     tiSpannungV:
-    begin
+      begin
         if abs(rF[14]) < 32000 then
           temp := rF[14] { in N }
         else
@@ -267,6 +285,179 @@ begin
     tiFlexWert: temp := Abstand(rP[ooC], rPe[ooC]); { in mm }
   end;
   result := temp;
+end;
+
+procedure TRigg.SaveToFederData(fd: TRggData);
+begin
+  fd.A0X := Round(iP[ooA0, X]);
+  fd.A0Y := Round(iP[ooA0, Y]);
+  fd.A0Z := Round(iP[ooA0, Z]);
+
+  fd.C0X := Round(iP[ooC0, X]);
+  fd.C0Y := Round(iP[ooC0, Y]);
+  fd.C0Z := Round(iP[ooC0, Z]);
+
+  fd.D0X := Round(iP[ooD0, X]);
+  fd.D0Y := Round(iP[ooD0, Y]);
+  fd.D0Z := Round(iP[ooD0, Z]);
+
+  fd.E0X := Round(iP[ooE0, X]);
+  fd.E0Y := Round(iP[ooE0, Y]);
+  fd.E0Z := Round(iP[ooE0, Z]);
+
+  fd.F0X := Round(iP[ooF0, X]);
+  fd.F0Y := Round(iP[ooF0, Y]);
+  fd.F0Z := Round(iP[ooF0, Z]);
+
+  fd.MU := Round(FiMastUnten);
+  fd.MO := Round(FiMastOben);
+  fd.ML := Round(FiMastL);
+  fd.MV := Round(MastfallVorlauf);
+  fd.CA := Round(FiControllerAnschlag);
+
+  fd.CPMin := Round(GSB.Controller.Min);
+  fd.CPPos := Round(GSB.Controller.Ist);
+  fd.CPMax := Round(GSB.Controller.Max);
+
+  fd.SHMin := Round(GSB.SalingH.Min);
+  fd.SHPos := Round(GSB.SalingH.Ist);
+  fd.SHMax := Round(GSB.SalingH.Max);
+
+  fd.SAMin := Round(GSB.SalingA.Min);
+  fd.SAPos := Round(GSB.SalingA.Ist);
+  fd.SaMax := Round(GSB.SalingA.Max);
+
+  fd.SLMin := Round(GSB.SalingL.Min);
+  fd.SLPos := Round(GSB.SalingL.Ist);
+  fd.SLMax := Round(GSB.SalingL.Max);
+
+  fd.VOMin := Round(GSB.Vorstag.Min);
+  fd.VOPos := Round(GSB.Vorstag.Ist);
+  fd.VOMax := Round(GSB.Vorstag.Max);
+
+  fd.WIMin := Round(GSB.Winkel.Min);
+  fd.WIPos := Round(GSB.Winkel.Ist);
+  fd.WIMax := Round(GSB.Winkel.Max);
+
+  fd.WLMin := Round(GSB.Wante.Min);
+  fd.WLPos := Round(GSB.Wante.Ist);
+  fd.WLMax := Round(GSB.Wante.Max);
+
+  fd.WOMin := Round(GSB.Woben.Min);
+  fd.WOPos := Round(GSB.Woben.Ist);
+  fd.WOMax := Round(GSB.Woben.Max);
+
+  fd.F0C := Round(RealTrimm[tiMastfallF0C]);
+  fd.F0F := Round(RealTrimm[tiMastfallF0F]);
+  fd.Bie := Round(RealTrimm[tiBiegungS]);
+end;
+
+procedure TRigg.LoadFromFederData(fd: TRggData);
+var
+  InputRec: TTrimmControls;
+  tempManipulatorMode: Boolean;
+begin
+  { Mast: Abmessungen }
+  FiMastL := fd.ML;
+  FiMastunten := fd.MU;
+  FiMastoben := fd.MO;
+  FiControllerAnschlag := fd.CA;
+  MastfallVorlauf := fd.MV;
+
+  { Rumpf: Koordinaten }
+
+  //iP := Doc.iP;
+  iP[ooA0, x] := fd.A0X;
+  iP[ooA0, y] := fd.A0Y;
+  iP[ooA0, z] := fd.A0Z;
+  iP[ooB0, x] := fd.A0X;
+  iP[ooB0, y] := -fd.A0Y;
+  iP[ooB0, z] := fd.A0Z;
+  iP[ooC0, x] := fd.C0X;
+  iP[ooC0, y] := fd.C0Y;
+  iP[ooC0, z] := fd.C0Z;
+  iP[ooD0, x] := fd.D0X;
+  iP[ooD0, y] := fd.D0Y;
+  iP[ooD0, z] := fd.D0Z;
+  iP[ooE0, x] := fd.E0X;
+  iP[ooE0, y] := fd.E0Y;
+  iP[ooE0, z] := fd.E0Z;
+  iP[ooF0, x] := fd.F0X;
+  iP[ooF0, y] := fd.F0Y;
+  iP[ooF0, z] := fd.F0Z;
+  iP[ooP0, x] := fd.A0X;
+  iP[ooP0, y] := 0;
+  iP[ooP0, z] := fd.A0Z;
+
+  iP[ooP, x] := fd.A0X;
+  iP[ooP, y] := 0;
+  iP[ooP, z] := fd.A0Z;
+
+  { Festigkeitswerte }
+//  rEA := Doc.rEA;
+//  EI := Doc.EI;
+
+  { Grenzwerte }
+  GSB.Controller.Min := fd.CPMin;
+  GSB.Controller.Ist := fd.CPPos;
+  GSB.Controller.Max := fd.CPMax;
+  GSB.Winkel.Min := fd.WIMin;
+  GSB.Winkel.Ist := fd.WIPos;
+  GSB.Winkel.Max := fd.WIMax;
+  GSB.Vorstag.Min := fd.VOMin;
+  GSB.Vorstag.Ist := fd.VOPos;
+  GSB.Vorstag.Max := fd.VOMax;
+  GSB.Wante.Min := fd.WLMin;
+  GSB.Wante.Ist := fd.WLPos;
+  GSB.Wante.Max := fd.WLMax;
+  GSB.Woben.Min := fd.WOMin;
+  GSB.Woben.Ist := fd.WOPos;
+  GSB.Woben.Max := fd.WOMax;
+  GSB.SalingH.Min := fd.SHMin;
+  GSB.SalingH.Ist := fd.SHPos;
+  GSB.SalingH.Max := fd.SHMax;
+  GSB.SalingA.Min := fd.SAMin;
+  GSB.SalingA.Ist := fd.SAPos;
+  GSB.SalingA.Max := fd.SAMax;
+  GSB.SalingL.Min := fd.SLMin;
+  GSB.SalingL.Ist := fd.SLPos;
+  GSB.SalingL.Max := fd.SLMax;
+  GSB.VorstagOS.Min := fd.VOMin;
+  GSB.VorstagOS.Ist := fd.VOPos;
+  GSB.VorstagOS.Max := fd.VOMax;
+//  GSB.WPowerOS.Min := 0;
+//  GSB.WPowerOS.Ist := 0;
+//  GSB.WPowerOS.Max := 0;
+
+  { Trimmtabelle }
+//  TrimmTab.TrimmTabDaten := Doc.TrimmTabDaten;
+  { Istwerte }
+  InputRec.Controller := fd.CPPos;
+  InputRec.Winkel := fd.WIPos;
+  InputRec.Vorstag := fd.VOPos;
+  InputRec.Wanten := fd.WLPos;
+  InputRec.Woben := fd.WOPos;
+  InputRec.Wunten := fd.WLPos - fd.WOPos;
+  InputRec.SalingH := fd.SHPos;
+  InputRec.SalingA := fd.SAPos;
+  InputRec.SalingL := fd.SLPos;
+  InputRec.Vorstag := fd.VOPos;
+  InputRec.WPowerOS := 0;
+  Glieder := InputRec; { --> IntGliederToReal }
+  Reset; { restliche Gleitkommawerte für Rumpf und Mast aktualisieren }
+
+  { Rigg: Typ }
+  SalingTyp := stFest;
+  ControllerTyp := ctOhne;
+  CalcTyp := ctKraftGemessen;
+
+  tempManipulatorMode := ManipulatorMode;
+  ManipulatorMode := false;
+  UpdateGetriebe;
+  UpdateRigg;
+  ManipulatorMode := tempManipulatorMode;
+
+  UpdateGSB;
 end;
 
 end.
