@@ -55,28 +55,28 @@ type
     FiZaehler: Integer;
     FiControllerAnschlag: Integer;
 
-    FiController: Integer;
-    FiWinkel: Integer;
-    FiVorstag: Integer;
-    FiWunten3d: Integer;
-    FiWoben3d: Integer;
-    FiSalingL: Integer;
-    FiSalingH: Integer;
-    FiSalingA: Integer;
-    FiWPowerOS: Integer;
+    FiController: double;
+    FiWinkel: double;
+    FiVorstag: double;
+    FiWunten3d: double;
+    FiWoben3d: double;
+    FiSalingL: double;
+    FiSalingH: double;
+    FiSalingA: double;
+    FiWPowerOS: double;
 
-    FiMastL: Integer;
-    FiMastUnten: Integer;
-    FiMastOben: Integer;
-    FiMastfallVorlauf: Integer;
+    FiMastL: double;
+    FiMastUnten: double;
+    FiMastOben: double;
+    FiMastfallVorlauf: double;
 
     procedure IntGliederToReal;
     procedure RealGliederToInt;
     procedure Wanten2dTo3d;
     procedure Wanten3dTo2d;
-    procedure SetMastL(Value: Integer);
-    procedure SetMastunten(Value: Integer);
-    procedure SetMastoben(Value: Integer);
+    procedure SetMastL(Value: double);
+    procedure SetMastunten(Value: double);
+    procedure SetMastoben(Value: double);
     function GetRealGlied(Index: TsbName): double;
     procedure SetRealGlied(Index: TsbName; Value: double);
     procedure SetSalingTyp(Value: TSalingTyp); virtual;
@@ -107,16 +107,16 @@ type
     property ManipulatorMode: Boolean read FManipulatorMode write FManipulatorMode;
     property GetriebeOK: Boolean read FGetriebeOK;
 
-    property MastLaenge: Integer read FiMastL write SetMastL;
-    property MastUnten: Integer read FiMastunten write SetMastunten;
-    property MastOben: Integer read FiMastoben write SetMastoben;
-    property MastfallVorlauf: Integer read FiMastfallVorlauf write FiMastfallVorlauf;
+    property MastLaenge: double read FiMastL write SetMastL;
+    property MastUnten: double read FiMastunten write SetMastunten;
+    property MastOben: double read FiMastoben write SetMastoben;
+    property MastfallVorlauf: double read FiMastfallVorlauf write FiMastfallVorlauf;
 
     property phi: double read FrPhi write FrPhi;
     property psi: double read FrPsi write FrPsi;
     property alpha: double read FrAlpha;
     property epsilon: double read FrEpsilon write FrEpsilon;
-    property WantenSpannung: Integer read FiWPowerOS write FiWPowerOS;
+    property WantenSpannung: double read FiWPowerOS write FiWPowerOS;
     property ControllerAnschlag: Integer read FiControllerAnschlag write FiControllerAnschlag;
 
     property SalingDaten: TSalingDaten read GetSalingDaten;
@@ -163,7 +163,7 @@ begin
   end;
 end;
 
-procedure TGetriebe.SetMastunten(Value: Integer);
+procedure TGetriebe.SetMastunten(Value: double);
 begin
   if Value <> FiMastunten then
   begin
@@ -172,7 +172,7 @@ begin
   end;
 end;
 
-procedure TGetriebe.SetMastoben(Value: Integer);
+procedure TGetriebe.SetMastoben(Value: double);
 begin
   if Value <> FiMastoben then
   begin
@@ -181,7 +181,7 @@ begin
   end;
 end;
 
-procedure TGetriebe.SetMastL(Value: Integer);
+procedure TGetriebe.SetMastL(Value: double);
 begin
   if Value <> FiMastL then
   begin
@@ -197,15 +197,15 @@ begin
   RealGliederToInt;
   with Trimm do
   begin
-    Controller := FiController;
-    Wanten := FiWunten3d + FiWoben3d;
-    Woben := FiWoben3d;
-    SalingH := FiSalingH;
-    SalingA := FiSalingA;
-    SalingL := FiSalingL;
-    Vorstag := FiVorstag;
-    Winkel := FiWinkel;
-    WPowerOS := FiWPowerOS;
+    Controller := Round(FiController);
+    Wanten := Round(FiWunten3d + FiWoben3d);
+    Woben := Round(FiWoben3d);
+    SalingH := Round(FiSalingH);
+    SalingA := Round(FiSalingA);
+    SalingL := Round(FiSalingL);
+    Vorstag := Round(FiVorstag);
+    Winkel := Round(FiWinkel);
+    WPowerOS := Round(FiWPowerOS);
   end;
   result := Trimm;
 end;
@@ -336,18 +336,18 @@ end;
 
 procedure TGetriebe.RealGliederToInt;
 begin
-  FiController := Round(FrController);
-  FiWinkel := Round(FrWinkel * 180 / pi); { FiWinkel in Grad }
-  FiVorstag := Round(FrVorstag);
-  FiWunten3d := Round(FrWunten3d);
-  FiWoben3d := Round(FrWoben3d);
-  FiSalingH := Round(FrSalingH);
-  FiSalingA := Round(FrSalingA);
-  FiSalingL := Round(FrSalingL);
+  FiController := FrController;
+  FiWinkel := FrWinkel * 180 / pi; { FiWinkel in Grad }
+  FiVorstag := FrVorstag;
+  FiWunten3d := FrWunten3d;
+  FiWoben3d := FrWoben3d;
+  FiSalingH := FrSalingH;
+  FiSalingA := FrSalingA;
+  FiSalingL := FrSalingL;
 
-  FiMastunten := Round(FrMastunten);
-  FiMastoben := Round(FrMastoben);
-  FiMastL := Round(FrMastunten + FrMastoben + FrMastEnde);
+  FiMastunten := FrMastunten;
+  FiMastoben := FrMastoben;
+  FiMastL := FrMastunten + FrMastoben + FrMastEnde;
 end;
 
 procedure TGetriebe.UpdateGSB;
@@ -381,8 +381,8 @@ end;
 
 procedure TGetriebe.Wanten2dTo3d;
 begin
-  FrWunten3d := Round(sqrt(sqr(FrWunten2d) + sqr((FrPuettingA - FrSalingA) / 2)));
-  FrWoben3d := Round(sqrt(sqr(FrWoben2d) + sqr(FrSalingA / 2)));
+  FrWunten3d := sqrt(sqr(FrWunten2d) + sqr((FrPuettingA - FrSalingA) / 2));
+  FrWoben3d := sqrt(sqr(FrWoben2d) + sqr(FrSalingA / 2));
 end;
 
 procedure TGetriebe.Wanten3dTo2d;
@@ -647,84 +647,84 @@ begin
   TrimmTab.WriteToIniFile(ini);
 
   S := 'Mast';
-  ini.WriteInteger(S, 'MastL', FiMastL);
-  ini.WriteInteger(S, 'Mastunten', FiMastunten);
-  ini.WriteInteger(S, 'Mastoben', FiMastoben);
-  ini.WriteInteger(S, 'MastfallVorlauf', FiMastfallVorlauf);
+  ini.WriteInteger(S, 'MastL', Round(FiMastL));
+  ini.WriteInteger(S, 'Mastunten', Round(FiMastunten));
+  ini.WriteInteger(S, 'Mastoben', Round(FiMastoben));
+  ini.WriteInteger(S, 'MastfallVorlauf', Round(FiMastfallVorlauf));
 
   S := 'Ist';
-  ini.WriteInteger(S, 'Controller', FiController);
-  ini.WriteInteger(S, 'Winkel', FiWinkel);
-  ini.WriteInteger(S, 'Vorstag', FiVorstag);
-  ini.WriteInteger(S, 'Wante', FiWunten3d + FiWoben3d);
-  ini.WriteInteger(S, 'Woben', FiWoben3d);
-  ini.WriteInteger(S, 'SalingH', FiSalingH);
-  ini.WriteInteger(S, 'SalingA', FiSalingA);
-  ini.WriteInteger(S, 'WPowerOS', FiWPowerOS);
+  ini.WriteInteger(S, 'Controller', Round(FiController));
+  ini.WriteInteger(S, 'Winkel', Round(FiWinkel));
+  ini.WriteInteger(S, 'Vorstag', Round(FiVorstag));
+  ini.WriteInteger(S, 'Wante', Round(FiWunten3d + FiWoben3d));
+  ini.WriteInteger(S, 'Woben', Round(FiWoben3d));
+  ini.WriteInteger(S, 'SalingH', Round(FiSalingH));
+  ini.WriteInteger(S, 'SalingA', Round(FiSalingA));
+  ini.WriteInteger(S, 'WPowerOS', Round(FiWPowerOS));
 
   S := 'Min';
-  ini.WriteInteger(S, 'Controller', GSB.Controller.Min);
-  ini.WriteInteger(S, 'Winkel', GSB.Winkel.Min);
-  ini.WriteInteger(S, 'Vorstag', GSB.Vorstag.Min);
-  ini.WriteInteger(S, 'Wante', GSB.Wante.Min);
-  ini.WriteInteger(S, 'Woben', GSB.Woben.Min);
-  ini.WriteInteger(S, 'SalingH', GSB.SalingH.Min);
-  ini.WriteInteger(S, 'SalingA', GSB.SalingA.Min);
-  ini.WriteInteger(S, 'SalingL', GSB.SalingL.Min);
-  ini.WriteInteger(S, 'VorstagOS', GSB.VorstagOS.Min);
-  ini.WriteInteger(S, 'WPowerOS', GSB.WPowerOS.Min);
+  ini.WriteInteger(S, 'Controller', Round(GSB.Controller.Min));
+  ini.WriteInteger(S, 'Winkel', Round(GSB.Winkel.Min));
+  ini.WriteInteger(S, 'Vorstag', Round(GSB.Vorstag.Min));
+  ini.WriteInteger(S, 'Wante', Round(GSB.Wante.Min));
+  ini.WriteInteger(S, 'Woben', Round(GSB.Woben.Min));
+  ini.WriteInteger(S, 'SalingH', Round(GSB.SalingH.Min));
+  ini.WriteInteger(S, 'SalingA', Round(GSB.SalingA.Min));
+  ini.WriteInteger(S, 'SalingL', Round(GSB.SalingL.Min));
+  ini.WriteInteger(S, 'VorstagOS', Round(GSB.VorstagOS.Min));
+  ini.WriteInteger(S, 'WPowerOS', Round(GSB.WPowerOS.Min));
 
   S := 'Max';
-  ini.WriteInteger(S, 'Controller', GSB.Controller.Max);
-  ini.WriteInteger(S, 'Winkel', GSB.Winkel.Max);
-  ini.WriteInteger(S, 'Vorstag', GSB.Vorstag.Max);
-  ini.WriteInteger(S, 'Wante', GSB.Wante.Max);
-  ini.WriteInteger(S, 'Woben', GSB.Woben.Max);
-  ini.WriteInteger(S, 'SalingH', GSB.SalingH.Max);
-  ini.WriteInteger(S, 'SalingA', GSB.SalingA.Max);
-  ini.WriteInteger(S, 'SalingL', GSB.SalingL.Max);
-  ini.WriteInteger(S, 'VorstagOS', GSB.VorstagOS.Max);
-  ini.WriteInteger(S, 'WPowerOS', GSB.WPowerOS.Max);
+  ini.WriteInteger(S, 'Controller', Round(GSB.Controller.Max));
+  ini.WriteInteger(S, 'Winkel', Round(GSB.Winkel.Max));
+  ini.WriteInteger(S, 'Vorstag', Round(GSB.Vorstag.Max));
+  ini.WriteInteger(S, 'Wante', Round(GSB.Wante.Max));
+  ini.WriteInteger(S, 'Woben', Round(GSB.Woben.Max));
+  ini.WriteInteger(S, 'SalingH', Round(GSB.SalingH.Max));
+  ini.WriteInteger(S, 'SalingA', Round(GSB.SalingA.Max));
+  ini.WriteInteger(S, 'SalingL', Round(GSB.SalingL.Max));
+  ini.WriteInteger(S, 'VorstagOS', Round(GSB.VorstagOS.Max));
+  ini.WriteInteger(S, 'WPowerOS', Round(GSB.WPowerOS.Max));
 
   S := 'Koordinaten Rumpf';
-  ini.WriteInteger(S, 'A0x', iP[ooA0, x]);
-  ini.WriteInteger(S, 'A0y', iP[ooA0, y]);
-  ini.WriteInteger(S, 'A0z', iP[ooA0, z]);
-  ini.WriteInteger(S, 'B0x', iP[ooB0, x]);
-  ini.WriteInteger(S, 'B0y', iP[ooB0, y]);
-  ini.WriteInteger(S, 'B0z', iP[ooB0, z]);
-  ini.WriteInteger(S, 'C0x', iP[ooC0, x]);
-  ini.WriteInteger(S, 'C0y', iP[ooC0, y]);
-  ini.WriteInteger(S, 'C0z', iP[ooC0, z]);
-  ini.WriteInteger(S, 'D0x', iP[ooD0, x]);
-  ini.WriteInteger(S, 'D0y', iP[ooD0, y]);
-  ini.WriteInteger(S, 'D0z', iP[ooD0, z]);
-  ini.WriteInteger(S, 'E0x', iP[ooE0, x]);
-  ini.WriteInteger(S, 'E0y', iP[ooE0, y]);
-  ini.WriteInteger(S, 'E0z', iP[ooE0, z]);
-  ini.WriteInteger(S, 'F0x', iP[ooF0, x]);
-  ini.WriteInteger(S, 'F0y', iP[ooF0, y]);
-  ini.WriteInteger(S, 'F0z', iP[ooF0, z]);
+  ini.WriteInteger(S, 'A0x', Round(iP[ooA0, x]));
+  ini.WriteInteger(S, 'A0y', Round(iP[ooA0, y]));
+  ini.WriteInteger(S, 'A0z', Round(iP[ooA0, z]));
+  ini.WriteInteger(S, 'B0x', Round(iP[ooB0, x]));
+  ini.WriteInteger(S, 'B0y', Round(iP[ooB0, y]));
+  ini.WriteInteger(S, 'B0z', Round(iP[ooB0, z]));
+  ini.WriteInteger(S, 'C0x', Round(iP[ooC0, x]));
+  ini.WriteInteger(S, 'C0y', Round(iP[ooC0, y]));
+  ini.WriteInteger(S, 'C0z', Round(iP[ooC0, z]));
+  ini.WriteInteger(S, 'D0x', Round(iP[ooD0, x]));
+  ini.WriteInteger(S, 'D0y', Round(iP[ooD0, y]));
+  ini.WriteInteger(S, 'D0z', Round(iP[ooD0, z]));
+  ini.WriteInteger(S, 'E0x', Round(iP[ooE0, x]));
+  ini.WriteInteger(S, 'E0y', Round(iP[ooE0, y]));
+  ini.WriteInteger(S, 'E0z', Round(iP[ooE0, z]));
+  ini.WriteInteger(S, 'F0x', Round(iP[ooF0, x]));
+  ini.WriteInteger(S, 'F0y', Round(iP[ooF0, y]));
+  ini.WriteInteger(S, 'F0z', Round(iP[ooF0, z]));
 
   S := 'Koordinaten Rigg';
-  ini.WriteInteger(S, 'Ax', iP[ooA, x]);
-  ini.WriteInteger(S, 'Ay', iP[ooA, y]);
-  ini.WriteInteger(S, 'Az', iP[ooA, z]);
-  ini.WriteInteger(S, 'Bx', iP[ooB, x]);
-  ini.WriteInteger(S, 'By', iP[ooB, y]);
-  ini.WriteInteger(S, 'Bz', iP[ooB, z]);
-  ini.WriteInteger(S, 'Cx', iP[ooC, x]);
-  ini.WriteInteger(S, 'Cy', iP[ooC, y]);
-  ini.WriteInteger(S, 'Cz', iP[ooC, z]);
-  ini.WriteInteger(S, 'Dx', iP[ooD, x]);
-  ini.WriteInteger(S, 'Dy', iP[ooD, y]);
-  ini.WriteInteger(S, 'Dz', iP[ooD, z]);
-  ini.WriteInteger(S, 'Ex', iP[ooE, x]);
-  ini.WriteInteger(S, 'Ey', iP[ooE, y]);
-  ini.WriteInteger(S, 'Ez', iP[ooE, z]);
-  ini.WriteInteger(S, 'Fx', iP[ooF, x]);
-  ini.WriteInteger(S, 'Fy', iP[ooF, y]);
-  ini.WriteInteger(S, 'Fz', iP[ooF, z]);
+  ini.WriteInteger(S, 'Ax', Round(iP[ooA, x]));
+  ini.WriteInteger(S, 'Ay', Round(iP[ooA, y]));
+  ini.WriteInteger(S, 'Az', Round(iP[ooA, z]));
+  ini.WriteInteger(S, 'Bx', Round(iP[ooB, x]));
+  ini.WriteInteger(S, 'By', Round(iP[ooB, y]));
+  ini.WriteInteger(S, 'Bz', Round(iP[ooB, z]));
+  ini.WriteInteger(S, 'Cx', Round(iP[ooC, x]));
+  ini.WriteInteger(S, 'Cy', Round(iP[ooC, y]));
+  ini.WriteInteger(S, 'Cz', Round(iP[ooC, z]));
+  ini.WriteInteger(S, 'Dx', Round(iP[ooD, x]));
+  ini.WriteInteger(S, 'Dy', Round(iP[ooD, y]));
+  ini.WriteInteger(S, 'Dz', Round(iP[ooD, z]));
+  ini.WriteInteger(S, 'Ex', Round(iP[ooE, x]));
+  ini.WriteInteger(S, 'Ey', Round(iP[ooE, y]));
+  ini.WriteInteger(S, 'Ez', Round(iP[ooE, z]));
+  ini.WriteInteger(S, 'Fx', Round(iP[ooF, x]));
+  ini.WriteInteger(S, 'Fy', Round(iP[ooF, y]));
+  ini.WriteInteger(S, 'Fz', Round(iP[ooF, z]));
 end;
 
 procedure TGetriebe.LoadFromIniFile(ini: TIniFile);
@@ -737,84 +737,84 @@ begin
   TrimmTab.LoadFromIniFile(ini);
 
   S := 'Mast';
-  FiMastL := ini.ReadInteger(S, 'MastL', FiMastL);
-  FiMastunten := ini.ReadInteger(S, 'Mastunten', FiMastunten);
-  FiMastoben := ini.ReadInteger(S, 'Mastoben', FiMastoben);
-  FiMastfallVorlauf := ini.ReadInteger(S, 'MastfallVorlauf', FiMastfallVorlauf);
+  FiMastL := ini.ReadInteger(S, 'MastL', Round(FiMastL));
+  FiMastunten := ini.ReadInteger(S, 'Mastunten', Round(FiMastunten));
+  FiMastoben := ini.ReadInteger(S, 'Mastoben', Round(FiMastoben));
+  FiMastfallVorlauf := ini.ReadInteger(S, 'MastfallVorlauf', Round(FiMastfallVorlauf));
 
   S := 'Ist';
-  FiController := ini.ReadInteger(S, 'Controller', FiController);
-  FiWinkel := ini.ReadInteger(S, 'Winkel', FiWinkel);
-  FiVorstag := ini.ReadInteger(S, 'Vorstag', FiVorstag);
-  FiWoben3d := ini.ReadInteger(S, 'Woben', FiWoben3d);
-  FiWunten3d := ini.ReadInteger(S, 'Wante', FiWunten3d + FiWoben3d) - FiWoben3d;
-  FiSalingH := ini.ReadInteger(S, 'SalingH', FiSalingH);
-  FiSalingA := ini.ReadInteger(S, 'SalingA', FiSalingA);
-  FiWPowerOS := ini.ReadInteger(S, 'WPowerOS', FiWPowerOS);
+  FiController := ini.ReadInteger(S, 'Controller', Round(FiController));
+  FiWinkel := ini.ReadInteger(S, 'Winkel', Round(FiWinkel));
+  FiVorstag := ini.ReadInteger(S, 'Vorstag', Round(FiVorstag));
+  FiWoben3d := ini.ReadInteger(S, 'Woben', Round(FiWoben3d));
+  FiWunten3d := ini.ReadInteger(S, 'Wante', Round(FiWunten3d + FiWoben3d - FiWoben3d));
+  FiSalingH := ini.ReadInteger(S, 'SalingH', Round(FiSalingH));
+  FiSalingA := ini.ReadInteger(S, 'SalingA', Round(FiSalingA));
+  FiWPowerOS := ini.ReadInteger(S, 'WPowerOS', Round(FiWPowerOS));
 
   S := 'Min';
-  GSB.Controller.Min := ini.ReadInteger(S, 'Controller', GSB.Controller.Min);
-  GSB.Winkel.Min := ini.ReadInteger(S, 'Winkel', GSB.Winkel.Min);
-  GSB.Vorstag.Min := ini.ReadInteger(S, 'Vorstag', GSB.Vorstag.Min);
-  GSB.Wante.Min := ini.ReadInteger(S, 'Wante', GSB.Wante.Min);
-  GSB.Woben.Min := ini.ReadInteger(S, 'Woben', GSB.Woben.Min);
-  GSB.SalingH.Min := ini.ReadInteger(S, 'SalingH', GSB.SalingH.Min);
-  GSB.SalingA.Min := ini.ReadInteger(S, 'SalingA', GSB.SalingA.Min);
-  GSB.SalingL.Min := ini.ReadInteger(S, 'SalingL', GSB.SalingL.Min);
-  GSB.VorstagOS.Min := ini.ReadInteger(S, 'VorstagOS', GSB.VorstagOS.Min);
-  GSB.WPowerOS.Min := ini.ReadInteger(S, 'WPowerOS', GSB.WPowerOS.Min);
+  GSB.Controller.Min := ini.ReadInteger(S, 'Controller', Round(GSB.Controller.Min));
+  GSB.Winkel.Min := ini.ReadInteger(S, 'Winkel', Round(GSB.Winkel.Min));
+  GSB.Vorstag.Min := ini.ReadInteger(S, 'Vorstag', Round(GSB.Vorstag.Min));
+  GSB.Wante.Min := ini.ReadInteger(S, 'Wante', Round(GSB.Wante.Min));
+  GSB.Woben.Min := ini.ReadInteger(S, 'Woben', Round(GSB.Woben.Min));
+  GSB.SalingH.Min := ini.ReadInteger(S, 'SalingH', Round(GSB.SalingH.Min));
+  GSB.SalingA.Min := ini.ReadInteger(S, 'SalingA', Round(GSB.SalingA.Min));
+  GSB.SalingL.Min := ini.ReadInteger(S, 'SalingL', Round(GSB.SalingL.Min));
+  GSB.VorstagOS.Min := ini.ReadInteger(S, 'VorstagOS', Round(GSB.VorstagOS.Min));
+  GSB.WPowerOS.Min := ini.ReadInteger(S, 'WPowerOS', Round(GSB.WPowerOS.Min));
 
   S := 'Max';
-  GSB.Controller.Max := ini.ReadInteger(S, 'Controller', GSB.Controller.Max);
-  GSB.Winkel.Max := ini.ReadInteger(S, 'Winkel', GSB.Winkel.Max);
-  GSB.Vorstag.Max := ini.ReadInteger(S, 'Vorstag', GSB.Vorstag.Max);
-  GSB.Wante.Max := ini.ReadInteger(S, 'Wante', GSB.Wante.Max);
-  GSB.Woben.Max := ini.ReadInteger(S, 'Woben', GSB.Woben.Max);
-  GSB.SalingH.Max := ini.ReadInteger(S, 'SalingH', GSB.SalingH.Max);
-  GSB.SalingA.Max := ini.ReadInteger(S, 'SalingA', GSB.SalingA.Max);
-  GSB.SalingL.Max := ini.ReadInteger(S, 'SalingL', GSB.SalingL.Max);
-  GSB.VorstagOS.Max := ini.ReadInteger(S, 'VorstagOS', GSB.VorstagOS.Max);
-  GSB.WPowerOS.Max := ini.ReadInteger(S, 'WPowerOS', GSB.WPowerOS.Max);
+  GSB.Controller.Max := ini.ReadInteger(S, 'Controller', Round(GSB.Controller.Max));
+  GSB.Winkel.Max := ini.ReadInteger(S, 'Winkel', Round(GSB.Winkel.Max));
+  GSB.Vorstag.Max := ini.ReadInteger(S, 'Vorstag', Round(GSB.Vorstag.Max));
+  GSB.Wante.Max := ini.ReadInteger(S, 'Wante', Round(GSB.Wante.Max));
+  GSB.Woben.Max := ini.ReadInteger(S, 'Woben', Round(GSB.Woben.Max));
+  GSB.SalingH.Max := ini.ReadInteger(S, 'SalingH', Round(GSB.SalingH.Max));
+  GSB.SalingA.Max := ini.ReadInteger(S, 'SalingA', Round(GSB.SalingA.Max));
+  GSB.SalingL.Max := ini.ReadInteger(S, 'SalingL', Round(GSB.SalingL.Max));
+  GSB.VorstagOS.Max := ini.ReadInteger(S, 'VorstagOS', Round(GSB.VorstagOS.Max));
+  GSB.WPowerOS.Max := ini.ReadInteger(S, 'WPowerOS', Round(GSB.WPowerOS.Max));
 
   S := 'Koordinaten Rumpf';
-  iP[ooA0, x] := ini.ReadInteger(S, 'A0x', iP[ooA0, x]);
-  iP[ooA0, y] := ini.ReadInteger(S, 'A0y', iP[ooA0, y]);
-  iP[ooA0, z] := ini.ReadInteger(S, 'A0z', iP[ooA0, z]);
-  iP[ooB0, x] := ini.ReadInteger(S, 'B0x', iP[ooB0, x]);
-  iP[ooB0, y] := ini.ReadInteger(S, 'B0y', iP[ooB0, y]);
-  iP[ooB0, z] := ini.ReadInteger(S, 'B0z', iP[ooB0, z]);
-  iP[ooC0, x] := ini.ReadInteger(S, 'C0x', iP[ooC0, x]);
-  iP[ooC0, y] := ini.ReadInteger(S, 'C0y', iP[ooC0, y]);
-  iP[ooC0, z] := ini.ReadInteger(S, 'C0z', iP[ooC0, z]);
-  iP[ooD0, x] := ini.ReadInteger(S, 'D0x', iP[ooD0, x]);
-  iP[ooD0, y] := ini.ReadInteger(S, 'D0y', iP[ooD0, y]);
-  iP[ooD0, z] := ini.ReadInteger(S, 'D0z', iP[ooD0, z]);
-  iP[ooE0, x] := ini.ReadInteger(S, 'E0x', iP[ooE0, x]);
-  iP[ooE0, y] := ini.ReadInteger(S, 'E0y', iP[ooE0, y]);
-  iP[ooE0, z] := ini.ReadInteger(S, 'E0z', iP[ooE0, z]);
-  iP[ooF0, x] := ini.ReadInteger(S, 'F0x', iP[ooF0, x]);
-  iP[ooF0, y] := ini.ReadInteger(S, 'F0y', iP[ooF0, y]);
-  iP[ooF0, z] := ini.ReadInteger(S, 'F0z', iP[ooF0, z]);
+  iP[ooA0, x] := ini.ReadInteger(S, 'A0x', Round(iP[ooA0, x]));
+  iP[ooA0, y] := ini.ReadInteger(S, 'A0y', Round(iP[ooA0, y]));
+  iP[ooA0, z] := ini.ReadInteger(S, 'A0z', Round(iP[ooA0, z]));
+  iP[ooB0, x] := ini.ReadInteger(S, 'B0x', Round(iP[ooB0, x]));
+  iP[ooB0, y] := ini.ReadInteger(S, 'B0y', Round(iP[ooB0, y]));
+  iP[ooB0, z] := ini.ReadInteger(S, 'B0z', Round(iP[ooB0, z]));
+  iP[ooC0, x] := ini.ReadInteger(S, 'C0x', Round(iP[ooC0, x]));
+  iP[ooC0, y] := ini.ReadInteger(S, 'C0y', Round(iP[ooC0, y]));
+  iP[ooC0, z] := ini.ReadInteger(S, 'C0z', Round(iP[ooC0, z]));
+  iP[ooD0, x] := ini.ReadInteger(S, 'D0x', Round(iP[ooD0, x]));
+  iP[ooD0, y] := ini.ReadInteger(S, 'D0y', Round(iP[ooD0, y]));
+  iP[ooD0, z] := ini.ReadInteger(S, 'D0z', Round(iP[ooD0, z]));
+  iP[ooE0, x] := ini.ReadInteger(S, 'E0x', Round(iP[ooE0, x]));
+  iP[ooE0, y] := ini.ReadInteger(S, 'E0y', Round(iP[ooE0, y]));
+  iP[ooE0, z] := ini.ReadInteger(S, 'E0z', Round(iP[ooE0, z]));
+  iP[ooF0, x] := ini.ReadInteger(S, 'F0x', Round(iP[ooF0, x]));
+  iP[ooF0, y] := ini.ReadInteger(S, 'F0y', Round(iP[ooF0, y]));
+  iP[ooF0, z] := ini.ReadInteger(S, 'F0z', Round(iP[ooF0, z]));
 
   S := 'Koordinaten Rigg';
-  iP[ooA, x] := ini.ReadInteger(S, 'Ax', iP[ooA, x]);
-  iP[ooA, y] := ini.ReadInteger(S, 'Ay', iP[ooA, y]);
-  iP[ooA, z] := ini.ReadInteger(S, 'Az', iP[ooA, z]);
-  iP[ooB, x] := ini.ReadInteger(S, 'Bx', iP[ooB, x]);
-  iP[ooB, y] := ini.ReadInteger(S, 'By', iP[ooB, y]);
-  iP[ooB, z] := ini.ReadInteger(S, 'Bz', iP[ooB, z]);
-  iP[ooC, x] := ini.ReadInteger(S, 'Cx', iP[ooC, x]);
-  iP[ooC, y] := ini.ReadInteger(S, 'Cy', iP[ooC, y]);
-  iP[ooC, z] := ini.ReadInteger(S, 'Cz', iP[ooC, z]);
-  iP[ooD, x] := ini.ReadInteger(S, 'Dx', iP[ooD, x]);
-  iP[ooD, y] := ini.ReadInteger(S, 'Dy', iP[ooD, y]);
-  iP[ooD, z] := ini.ReadInteger(S, 'Dz', iP[ooD, z]);
-  iP[ooE, x] := ini.ReadInteger(S, 'Ex', iP[ooE, x]);
-  iP[ooE, y] := ini.ReadInteger(S, 'Ey', iP[ooE, y]);
-  iP[ooE, z] := ini.ReadInteger(S, 'Ez', iP[ooE, z]);
-  iP[ooF, x] := ini.ReadInteger(S, 'Fx', iP[ooF, x]);
-  iP[ooF, y] := ini.ReadInteger(S, 'Fy', iP[ooF, y]);
-  iP[ooF, z] := ini.ReadInteger(S, 'Fz', iP[ooF, z]);
+  iP[ooA, x] := ini.ReadInteger(S, 'Ax', Round(iP[ooA, x]));
+  iP[ooA, y] := ini.ReadInteger(S, 'Ay', Round(iP[ooA, y]));
+  iP[ooA, z] := ini.ReadInteger(S, 'Az', Round(iP[ooA, z]));
+  iP[ooB, x] := ini.ReadInteger(S, 'Bx', Round(iP[ooB, x]));
+  iP[ooB, y] := ini.ReadInteger(S, 'By', Round(iP[ooB, y]));
+  iP[ooB, z] := ini.ReadInteger(S, 'Bz', Round(iP[ooB, z]));
+  iP[ooC, x] := ini.ReadInteger(S, 'Cx', Round(iP[ooC, x]));
+  iP[ooC, y] := ini.ReadInteger(S, 'Cy', Round(iP[ooC, y]));
+  iP[ooC, z] := ini.ReadInteger(S, 'Cz', Round(iP[ooC, z]));
+  iP[ooD, x] := ini.ReadInteger(S, 'Dx', Round(iP[ooD, x]));
+  iP[ooD, y] := ini.ReadInteger(S, 'Dy', Round(iP[ooD, y]));
+  iP[ooD, z] := ini.ReadInteger(S, 'Dz', Round(iP[ooD, z]));
+  iP[ooE, x] := ini.ReadInteger(S, 'Ex', Round(iP[ooE, x]));
+  iP[ooE, y] := ini.ReadInteger(S, 'Ey', Round(iP[ooE, y]));
+  iP[ooE, z] := ini.ReadInteger(S, 'Ez', Round(iP[ooE, z]));
+  iP[ooF, x] := ini.ReadInteger(S, 'Fx', Round(iP[ooF, x]));
+  iP[ooF, y] := ini.ReadInteger(S, 'Fy', Round(iP[ooF, y]));
+  iP[ooF, z] := ini.ReadInteger(S, 'Fz', Round(iP[ooF, z]));
 end;
 
 procedure TGetriebe.LoadFromStream(S: TStream);

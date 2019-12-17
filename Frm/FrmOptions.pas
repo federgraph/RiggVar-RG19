@@ -297,9 +297,9 @@ begin
   FGSB := RiggModul.Rigg.GSB;
   FEAarray := RiggModul.Rigg.EA; {EA in KN}
   FiEI := RiggModul.Rigg.MastEI;
-  FiMastSaling := RiggModul.Rigg.MastUnten;
-  FiMastWante := FiMastSaling + RiggModul.Rigg.MastOben;
-  FiMastTop := RiggModul.Rigg.MastLaenge;
+  FiMastSaling := Round(RiggModul.Rigg.MastUnten);
+  FiMastWante := FiMastSaling + Round(RiggModul.Rigg.MastOben);
+  FiMastTop := Round(RiggModul.Rigg.MastLaenge);
   FiP := RiggModul.Rigg.iP;
   FTrimmTabelle := RiggModul.Rigg.TrimmTab; { Zeiger speichern }
   FTrimmTabDaten := FTrimmTabelle.TrimmTabDaten; {zwischenspeichern}
@@ -431,9 +431,9 @@ begin
   {Trimm}
   TrimmCombo.Items := FTrimmListe;
   TrimmCombo.ItemIndex := Ord(fpWante);
-  MinEdit.Text := IntToStr(FGSB.Wante.Min);
-  PosEdit.Text := IntToStr(FGSB.Wante.Ist);
-  MaxEdit.Text := IntToStr(FGSB.Wante.Max);
+  MinEdit.Text := IntToStr(Round(FGSB.Wante.Min));
+  PosEdit.Text := IntToStr(Round(FGSB.Wante.Ist));
+  MaxEdit.Text := IntToStr(Round(FGSB.Wante.Max));
   {Elemente}
   GetKeyList(FElementListe, FTempListe);
   ElementCombo.Items := FTempListe;
@@ -448,7 +448,7 @@ begin
   { Werte in FiP im StringGrid anzeigen }
   for m := ooA0 to ooF0 do
     for n := x to z do
-      RumpfGrid.Cells[Ord(n)+1,Ord(m)+1] := Format(' %4d', [FiP[m,n]]);
+      RumpfGrid.Cells[Ord(n)+1,Ord(m)+1] := Format(' %4.0f', [FiP[m,n]]);
 end;
 
 procedure TOptionForm.LoadIniFileCombos;
@@ -584,9 +584,9 @@ begin
   else
     label15.Caption := 'Abmessungen in mm';
   f := FGSB.Find(i);
-  MinEdit.Text := IntToStr(f.Min);
-  PosEdit.Text := IntToStr(f.Ist);
-  MaxEdit.Text := IntToStr(f.Max);
+  MinEdit.Text := IntToStr(Round(f.Min));
+  PosEdit.Text := IntToStr(Round(f.Ist));
+  MaxEdit.Text := IntToStr(Round(f.Max));
 end;
 
 procedure TOptionForm.MinEditKeyDown(Sender: TObject; var Key: Word;
@@ -603,9 +603,9 @@ begin
   iVar := GetInteger(TMaskEdit(Sender).Text);
   i := TrimmCombo.ItemIndex;
   f := FGSB.Find(TFederParam(i));
-  iMin := f.Min;
-  iIst := f.Ist;
-  iMax := f.Max;
+  iMin := Round(f.Min);
+  iIst := Round(f.Ist);
+  iMax := Round(f.Max);
   if Sender = MinEdit then
   begin
     if iVar > iIst then

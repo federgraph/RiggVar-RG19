@@ -31,9 +31,9 @@ type
 
   TRggSB = class
   public
-    Ist: Integer;
-    Min: Integer;
-    Max: Integer;
+    Ist: double;
+    Min: double;
+    Max: double;
     TinyStep: Integer;
     BigStep: Integer;
 

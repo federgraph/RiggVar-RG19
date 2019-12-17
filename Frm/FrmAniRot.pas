@@ -283,17 +283,17 @@ end;
 
 function TAniRotationForm.GetParamMin(Index: TsbName): Integer;
 begin
-  result := Rigg.GSB.Find(Index).Min;
+  result := Round(Rigg.GSB.Find(Index).Min);
 end;
 
 function TAniRotationForm.GetParamMax(Index: TsbName): Integer;
 begin
-  result := Rigg.GSB.Find(Index).Max;
+  result := Round(Rigg.GSB.Find(Index).Max);
 end;
 
 function TAniRotationForm.GetParamPos(Index: TsbName): Integer;
 begin
-  result := Rigg.GSB.Find(Index).Ist;
+  result := Round(Rigg.GSB.Find(Index).Ist);
 end;
 
 procedure TAniRotationForm.SetParamProp(Index: TsbName; Value: double);
@@ -356,11 +356,11 @@ begin
   with TrackBar do
   begin
     Min := 0;
-    Max := cr.Max;
+    Max := Round(cr.Max);
     TrackBar.Position := Round(temp);
-    Min := cr.Min;
-    LineSize := cr.TinyStep;
-    PageSize := cr.BigStep;
+    Min := Round(cr.Min);
+    LineSize := Round(cr.TinyStep);
+    PageSize := Round(cr.BigStep);
     //Frequency := (Max-Min) div 10;
   end;
   if Parameter = fpWinkel then begin

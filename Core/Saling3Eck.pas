@@ -49,6 +49,7 @@ type
 
 implementation
 
+
 constructor TSalingDreieck.Create;
 begin
   FSalingHMin := 150;

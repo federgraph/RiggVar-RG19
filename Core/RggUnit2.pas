@@ -85,7 +85,7 @@ type
 
     ControllerFree: Boolean;
     BiegungE: double; { in mm }
-    MastPositionE: Integer;
+    MastPositionE: double;
     hd, he, lc, ld, le: double; { in mm }
     F1, F2, FA, FB, FC: double; { in N }
     EI: double; { in Nmm^2 }
@@ -1082,12 +1082,12 @@ procedure TMast.GetMastPositionE;
 var
   PositionEStrich: double;
 begin
-  MastPositionE := Round(rP[ooE, x] - rP[ooD0, x]);
+  MastPositionE := rP[ooE, x] - rP[ooD0, x];
   if not ControllerFree then
     Exit;
   PositionEStrich := -le * sin(Beta) + BiegungE * cos(Beta);
   PositionEStrich := PositionEStrich + BiegungE * tan(alpha1) * sin(Beta);
-  MastPositionE := Round(PositionEStrich);
+  MastPositionE := PositionEStrich;
 end;
 
 procedure TMast.GetTestKurven;

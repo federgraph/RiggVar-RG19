@@ -27,26 +27,26 @@ uses
 type
   TFederTrackbar = class
   private
-    FValueOld: Integer;
-    FValue: Integer;
-    procedure SetValue(const AValue: Integer);
+    FValueOld: single;
+    FValue: single;
+    procedure SetValue(const AValue: single);
   public
-    Min: Integer;
-    Max: Integer;
-    Frequency: Integer;
-    LineSize: Integer;
-    PageSize: Integer;
+    Min: single;
+    Max: single;
+    Frequency: single;
+    LineSize: single;
+    PageSize: single;
     OnChange: TNotifyEvent;
     Tracking: Boolean;
-    property Value: Integer read FValue write SetValue;
-    property ValueNoChange: Integer read FValue write FValue;
+    property Value: single read FValue write SetValue;
+    property ValueNoChange: single read FValue write FValue;
   end;
 
 implementation
 
 { TFederTrackbar }
 
-procedure TFederTrackbar.SetValue(const AValue: Integer);
+procedure TFederTrackbar.SetValue(const AValue: single);
 begin
   if (AValue <= Min) then
     FValue := Min

@@ -445,9 +445,9 @@ var
   cr: TRggSB;
 begin
   cr := Rigg.GSB.Find(b);
-  a.SetParams(cr.Ist, cr.Min, cr.Max);
-  a.LargeChange := cr.BigStep;
-  a.SmallChange := cr.TinyStep;
+  a.SetParams(Round(cr.Ist), Round(cr.Min), Round(cr.Max));
+  a.LargeChange := Round(cr.BigStep);
+  a.SmallChange := Round(cr.TinyStep);
 end;
 
 procedure TRiggModul.SetupGCtrls;
@@ -478,7 +478,7 @@ begin
     SetupGCtrl(sbSalingLD, fpSalingL);
     {Ohne Saling starr}
     SetupGCtrl(sbVorstagOS, fpVorstagOS);
-    sbVorstagOS.Position := Rigg.GSB.Find(fpVorstag).Ist;
+    sbVorstagOS.Position := Round(Rigg.GSB.Find(fpVorstag).Ist);
     SetupGCtrl(sbWPowerOS, fpWPowerOS);
   end;
   UpdateGCtrlLabels(Rigg.Glieder);
@@ -737,11 +737,11 @@ begin
       { Abstand(iP[ooE0,x],iP[ooE,x]) in mm}
       ControllerPos := TrimmRec.Controller;
       { Position des Mastes in Deckshöhe von D0 aus in mm }
-      ParamXE := Rigg.MastPositionE;
+      ParamXE := Round(Rigg.MastPositionE);
       { Abstand(iP[ooD0,x],iP[ooE0,x]) in mm }
-      ParamXE0 := Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x];
+      ParamXE0 := Round(Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x]);
       { Abstand von E0 zur Anschlagkante Deck + Klotzdicke }
-      EdgePos := Rigg.GSB.Find(fpController).Min;
+      EdgePos := Round(Rigg.GSB.Find(fpController).Min);
       if Assigned(ControllerPaintBox) then
         DrawPaintBoxC(ControllerPaintBox.Canvas);
     end;
@@ -2593,9 +2593,9 @@ begin
         begin
           { ControllerParameter }
           ControllerPos := TrimmRec.Controller;
-          ParamXE := Rigg.MastPositionE;
-          ParamXE0 := Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x];
-          EdgePos := Rigg.GSB.Find(fpController).Min;
+          ParamXE := Round(Rigg.MastPositionE);
+          ParamXE0 := Round(Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x]);
+          EdgePos := Round(Rigg.GSB.Find(fpController).Min);
         end;
       end;
     3: { Saling }
@@ -2624,7 +2624,7 @@ begin
   Getriebegrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
   with SalingCtrl do
   begin
-    ControllerPos := ParamXE0 - Rigg.MastPositionE;
+    ControllerPos := Round(ParamXE0 - Rigg.MastPositionE);
     TrimmRec.Controller := ControllerPos;
   end;
   UpdateGCtrls(TrimmRec);

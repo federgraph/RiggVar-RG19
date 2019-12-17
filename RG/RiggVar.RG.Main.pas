@@ -85,14 +85,14 @@ type
     function FormatValue(Value: single): string;
     procedure DoBiegungGF;
 
-    procedure ChangeRigg(Value: Integer);
+    procedure ChangeRigg(Value: single);
 
     procedure SetParam(Value: TFederParam);
-    procedure SetParamValue(idx: TFederParam; Value: Integer);
-    function GetParamValue(idx: TFederParam): Integer;
+    procedure SetParamValue(idx: TFederParam; Value: single);
+    function GetParamValue(idx: TFederParam): single;
     procedure SetFixName(const Value: TRiggPoints);
-    function GetCurrentValue: Integer;
-    procedure SetCurrentValue(const Value: Integer);
+    function GetCurrentValue: single;
+    procedure SetCurrentValue(const Value: single);
     function GetParamValueString(fp: TFederParam): string;
     function GetParamValueStringDiff(fp: TFederParam): string;
     function GetMastfall: string;
@@ -165,10 +165,10 @@ type
     property Action: TFederAction read FAction;
     property FixName: TRiggPoints read FFixName write SetFixName;
     property Param: TFederParam read FParam write SetParam;
-    property ParamValue[index: TFederParam]: Integer read GetParamValue write SetParamValue;
+    property ParamValue[index: TFederParam]: single read GetParamValue write SetParamValue;
     property ParamValueString[index: TFederParam]: string read GetParamValueString;
     property ParamValueStringDiff[index: TFederParam]: string read GetParamValueStringDiff;
-    property CurrentValue: Integer read GetCurrentValue write SetCurrentValue;
+    property CurrentValue: single read GetCurrentValue write SetCurrentValue;
     property Mastfall: string read GetMastfall;
 
     property Visible: Boolean read FVisible write SetVisible;
@@ -260,7 +260,7 @@ begin
   end;
 end;
 
-procedure TRggMain.SetCurrentValue(const Value: Integer);
+procedure TRggMain.SetCurrentValue(const Value: single);
 begin
   FactArray.Find(FParam).Ist := Value;
 end;
@@ -339,9 +339,9 @@ begin
   end;
 end;
 
-procedure TRggMain.ChangeRigg(Value: Integer);
+procedure TRggMain.ChangeRigg(Value: single);
 var
-  tempH, tempA, tempL, tempW: Integer;
+  tempH, tempA, tempL, tempW: double;
 begin
   case FParam of
     fpController: Rigg.RealGlied[fpController] := Value;
@@ -356,8 +356,8 @@ begin
     begin
       tempH := FactArray.SalingH.Ist;
       tempA := FactArray.SalingA.Ist;
-      tempL := Round(sqrt(sqr(tempA / 2) + sqr(tempH)));
-      tempW := Round(arctan2(tempH * 2, tempA) * 180 / pi);
+      tempL := sqrt(sqr(tempA / 2) + sqr(tempH));
+      tempW := arctan2(tempH * 2, tempA) * 180 / pi;
 
       Rigg.RealGlied[fpSalingH] := tempH;
       Rigg.RealGlied[fpSalingA] := tempA;
@@ -373,8 +373,8 @@ begin
     begin
       tempH := FactArray.SalingH.Ist;
       tempA := FactArray.SalingA.Ist;
-      tempL := Round(sqrt(sqr(tempA / 2) + sqr(tempH)));
-      tempW := Round(arctan2(tempH * 2, tempA) * 180 / pi);
+      tempL := sqrt(sqr(tempA / 2) + sqr(tempH));
+      tempW := arctan2(tempH * 2, tempA) * 180 / pi;
 
       Rigg.RealGlied[fpSalingH] := tempH;
       Rigg.RealGlied[fpSalingA] := tempA;
@@ -390,8 +390,8 @@ begin
     begin
       tempW := FactArray.SalingW.Ist;
       tempL := FactArray.SalingL.Ist;
-      tempH := Round(tempL * sin(tempW * pi / 180));
-      tempA := Round(2 * tempL * cos(tempW * pi / 180));
+      tempH := tempL * sin(tempW * pi / 180);
+      tempA := 2 * tempL * cos(tempW * pi / 180);
 
       Rigg.RealGlied[fpSalingH] := tempH;
       Rigg.RealGlied[fpSalingA] := tempA;
@@ -407,8 +407,8 @@ begin
     begin
       tempW := FactArray.SalingW.Ist;
       tempL := FactArray.SalingL.Ist;
-      tempH := Round(tempL * sin(tempW * pi / 180));
-      tempA := Round(2 * tempL * cos(tempW * pi / 180));
+      tempH := tempL * sin(tempW * pi / 180);
+      tempA := 2 * tempL * cos(tempW * pi / 180);
 
       Rigg.RealGlied[fpSalingH] := tempH;
       Rigg.RealGlied[fpSalingA] := tempA;
@@ -427,17 +427,17 @@ begin
       Rigg.BiegeUndNeigeC(Value, FactArray.Biegung.Ist);
 
     fpMastfallVorlauf:
-      Rigg.MastfallVorlauf := Round(Value);
+      Rigg.MastfallVorlauf := Value;
 
     fpBiegung:
       Rigg.BiegeUndNeigeC(FactArray.MastfallF0C.Ist, Value);
 
     fpD0X:
-      Rigg.iP[ooD0, X] := Value;
+      Rigg.iP[ooD0, X] := Round(Value);
   end;
 end;
 
-procedure TRggMain.SetParamValue(idx: TFederParam; Value: Integer);
+procedure TRggMain.SetParamValue(idx: TFederParam; Value: single);
 var
   sb: TRggSB;
 begin
@@ -454,29 +454,29 @@ begin
       sb.Ist := Value;
 
     RiggModul.AllreadyUpdatedGetriebeFlag := False;
-    RiggModul.DoOnWheelScroll(idx, Value);
+    RiggModul.DoOnWheelScroll(idx, Round(Value));
     UpdateGraph;
   end;
 end;
 
-function TRggMain.GetCurrentValue: Integer;
+function TRggMain.GetCurrentValue: single;
 begin
   result := FactArray.Find(FParam).Ist;
 end;
 
 function TRggMain.GetMastfall: string;
 begin
-  result := Format('%d', [FactArray.MastfallF0F.Ist - FactArray.MastfallVorlauf.Ist]);
+  result := Format('%.0f', [FactArray.MastfallF0F.Ist - FactArray.MastfallVorlauf.Ist]);
 end;
 
-function TRggMain.GetParamValue(idx: TFederParam): Integer;
+function TRggMain.GetParamValue(idx: TFederParam): single;
 begin
   result := FactArray.Find(idx).Ist;
 end;
 
 function TRggMain.GetParamValueString(fp: TFederParam): string;
 begin
-  result := Format('%d', [FactArray.Find(fp).Ist]);
+  result := Format('%.0f', [FactArray.Find(fp).Ist]);
 end;
 
 function TRggMain.GetParamValueStringDiff(fp: TFederParam): string;
@@ -630,7 +630,7 @@ end;
 
 procedure TRggMain.InitFactArray;
 var
-  temp, tempH, tempA: Integer;
+  temp, tempH, tempA: single;
   i: TFederParam;
   sb: TRggSB;
 begin
@@ -646,9 +646,9 @@ begin
 //  FactArray.SalingL.Ist := Rigg.GSB.SalingL.Ist;
   FactArray.SalingW.Ist := Round(180 / pi * arctan2(tempH * 2, tempA));
 
-  FactArray.MastfallF0C.Ist := Round(Rigg.RealTrimm[tiMastfallF0C]);
-  FactArray.MastfallF0F.Ist := Round(Rigg.RealTrimm[tiMastfallF0F]);
-  FactArray.Biegung.Ist := Round(Rigg.RealTrimm[tiBiegungS]);
+  FactArray.MastfallF0C.Ist := Rigg.RealTrimm[tiMastfallF0C];
+  FactArray.MastfallF0F.Ist := Rigg.RealTrimm[tiMastfallF0F];
+  FactArray.Biegung.Ist := Rigg.RealTrimm[tiBiegungS];
   FactArray.D0X.Ist := Rigg.iP[ooD0, X];
 
   FactArray.T1.Ist := 650;
@@ -743,31 +743,31 @@ begin
     sb := FactArray.Find(i);
     case i of
       fpController:
-        sb.Ist := Round(Rigg.RealGlied[fpController]);
+        sb.Ist := Rigg.RealGlied[fpController];
       fpWinkel:
-        sb.Ist := Round(Rigg.RealGlied[fpWinkel] * 180 / pi);
+        sb.Ist := Rigg.RealGlied[fpWinkel] * 180 / pi;
       fpVorstag:
-        sb.Ist := Round(Rigg.RealGlied[fpVorstag]);
+        sb.Ist := Rigg.RealGlied[fpVorstag];
       fpWante:
-        sb.Ist := Round(Rigg.RealGlied[fpWante]);
+        sb.Ist := Rigg.RealGlied[fpWante];
       fpWoben:
-        sb.Ist := Round(Rigg.RealGlied[fpWoben]);
+        sb.Ist := Rigg.RealGlied[fpWoben];
       fpSalingH:
-        sb.Ist := Round(Rigg.RealGlied[fpSalingH]);
+        sb.Ist := Rigg.RealGlied[fpSalingH];
       fpSalingA:
-        sb.Ist := Round(Rigg.RealGlied[fpSalingA]);
+        sb.Ist := Rigg.RealGlied[fpSalingA];
       fpSalingL:
-        sb.Ist := Round(Rigg.RealGlied[fpSalingL]);
+        sb.Ist := Rigg.RealGlied[fpSalingL];
       fpSalingW:
-        sb.Ist := Round(arctan2(Rigg.RealGlied[fpSalingH] * 2, Rigg.RealGlied[fpSalingA]) * 180 / pi);
+        sb.Ist := arctan2(Rigg.RealGlied[fpSalingH] * 2, Rigg.RealGlied[fpSalingA]) * 180 / pi;
       fpMastfallF0C:
-        sb.Ist := Round(Abstand(Rigg.rP[ooF0], Rigg.rP[ooC]));
+        sb.Ist := Abstand(Rigg.rP[ooF0], Rigg.rP[ooC]);
       fpMastfallF0F:
-        sb.Ist := Round(Abstand(Rigg.rP[ooF0], Rigg.rP[ooF]));
+        sb.Ist := Abstand(Rigg.rP[ooF0], Rigg.rP[ooF]);
       fpBiegung:
-        sb.Ist := Round(Rigg.hd);
+        sb.Ist := Rigg.hd;
       fpD0X:
-        sb.Ist := Round(Rigg.rP[ooD0][x]);
+        sb.Ist := Rigg.rP[ooD0][x];
     end;
   end;
 
@@ -800,7 +800,7 @@ end;
 
 procedure TRggMain.LoadTrimm(fd: TRggData);
 var
-  temp, tempH, tempA: Integer;
+  temp, tempH, tempA: single;
   i: TFederParam;
   sb: TRggSB;
 begin
@@ -819,9 +819,9 @@ begin
 //  FactArray.SalingL.Ist := Rigg.GSB.SalingL.Ist;
   FactArray.SalingW.Ist := Round(180 / pi * arctan2(tempH * 2, tempA));
 
-  FactArray.MastfallF0C.Ist := Round(Rigg.RealTrimm[tiMastfallF0C]);
-  FactArray.MastfallF0F.Ist := Round(Rigg.RealTrimm[tiMastfallF0F]);
-  FactArray.Biegung.Ist := Round(Rigg.RealTrimm[tiBiegungS]);
+  FactArray.MastfallF0C.Ist := Rigg.RealTrimm[tiMastfallF0C];
+  FactArray.MastfallF0F.Ist := Rigg.RealTrimm[tiMastfallF0F];
+  FactArray.Biegung.Ist := Rigg.RealTrimm[tiBiegungS];
   FactArray.D0X.Ist := Rigg.iP[ooD0, X];
 
   fd.F0C := Round(FactArray.MastfallF0C.Ist);
@@ -1071,7 +1071,7 @@ end;
 
 procedure TRggMain.SetupTrackbarForRgg;
 var
-  temp: Integer;
+  temp: single;
   S: string;
   sb: TRggSB;
   tb: TFederTrackbar;
@@ -1093,20 +1093,20 @@ begin
     S := 'Grad'
   else
     S := 'mm';
-  MinValCaption := Format('%d %s', [sb.Min, S]);
-  MaxValCaption := Format('%d %s', [sb.Max, S]);
-  IstValCaption := Format('%d %s', [temp, S]);
+  MinValCaption := Format('%.0f %s', [sb.Min, S]);
+  MaxValCaption := Format('%.0f %s', [sb.Max, S]);
+  IstValCaption := Format('%.0f %s', [temp, S]);
   ParamCaption := Param2Text(Param);
 end;
 
 procedure TRggMain.RggSpecialDoOnTrackBarChange;
 begin
   if FParam = fpWinkel then
-    IstValCaption := Format('%d Grad', [RggTrackbar.Value])
+    IstValCaption := Format('%.0f Grad', [RggTrackbar.Value])
   else if FParam = fpSalingW then
-    IstValCaption := Format('%d Grad', [RggTrackbar.Value])
+    IstValCaption := Format('%.0f Grad', [RggTrackbar.Value])
   else
-    IstValCaption := Format('%d mm', [RggTrackbar.Value]);
+    IstValCaption := Format('%.0f mm', [RggTrackbar.Value]);
 
   ParamValue[FParam] := Round(RggTrackbar.Value);
 end;
@@ -1197,7 +1197,7 @@ end;
 
 procedure TRggMain0.DoWheel(Delta: single);
 begin
-  RggTrackbar.Value := Round(RggTrackbar.Value + Delta); // --> UpdateGraph;
+  RggTrackbar.Value := RggTrackbar.Value + Delta; // --> UpdateGraph;
 end;
 
 procedure TRggMain0.DoRotation(Delta: single);
@@ -1519,7 +1519,7 @@ begin
     ML.Add('Modus = Pro');
 
   ML.Add('CounterG = ' + IntToStr(Rigg.UpdateGetriebeCounter));
-//  ML.Add('CounterT = ' + IntToStr(UpdateTextCounter));
+  ML.Add('CounterT = ' + IntToStr(UpdateTextCounter));
 end;
 
 procedure TRggMain.UpdateDataText(ML: TStrings);

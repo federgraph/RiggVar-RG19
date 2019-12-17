@@ -155,14 +155,14 @@ begin
   begin
     for j := x to z do
     begin
-      iP[i, j] := Round(rP[i, j]);
+      iP[i, j] := rP[i, j];
     end;
   end;
 end;
 
 procedure TGetriebeFS.BerechneF;
 var
-  temp: Integer;
+  temp: double;
 begin
   { Berechnung Punkt F - Masttop }
   FrEpsilon := pi / 2 - arctan2((rP[ooC, x] - rP[ooD, x]), (rP[ooC, z] - rP[ooD, z]));
@@ -981,7 +981,7 @@ begin
     FrSpannungW := 0
   else
     FrSpannungW := WantenKraftvonVorstag(VorstagDiff);
-  Wantenspannung := Round(SpannungW);
+  Wantenspannung := SpannungW;
 end;
 
 function TGetriebeFS.WantenKraftvonVorstag(WegSoll: double): double;

@@ -102,7 +102,7 @@ type
   TKoord = (x, y, z);
   TRealPoint = array [TKoord] of double;
   TKoordLine = array [0 .. 100] of TRealPoint;
-  TIntPoint = array [TKoord] of Integer;
+  TIntPoint = array [TKoord] of double;
 
   TRiggPoints = (
     ooN0,

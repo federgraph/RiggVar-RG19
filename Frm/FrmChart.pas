@@ -1639,9 +1639,9 @@ begin
   else
   begin
     f := RiggModul.Rigg.GSB.GetSB(TsbName(name));
-    tempMin := f.Min;
-    tempMax := f.Max;
-    tempIst := f.Ist;
+    tempMin := Round(f.Min);
+    tempMax := Round(f.Max);
+    tempIst := Round(f.Ist);
   end;
 
   try
@@ -1726,9 +1726,9 @@ begin
   else
   begin
     f := RiggModul.Rigg.GSB.GetSB(TsbName(name));
-    tempMin := f.Min;
-    tempMax := f.Max;
-    tempIst := f.Ist;
+    tempMin := Round(f.Min);
+    tempMax := Round(f.Max);
+    tempIst := Round(f.Ist);
   end;
 
   try
