@@ -2,7 +2,7 @@
 
 interface
 
-//{$define Rotator}
+{.$define Rotator}
 
 uses
   Windows,
@@ -58,8 +58,8 @@ type
     Zug3SalingFS: array[1..4] of TPoint;
     Zug3SalingDS: array[1..3] of TPoint;
 
-    //TPoint-arrays für 3D werden geerbt
-    //procedure FillZug3D wird geerbt
+    { TPoint-arrays für 3D werden vererbt }
+    { procedure FillZug3D wird vererbt }
 
     procedure FillZug2D;
     procedure SetZoom(Value: real); override;
@@ -101,13 +101,13 @@ uses
 constructor TGetriebeGraph.Create;
 begin
   inherited Create;
-  // Zoom
+  { Zoom }
   RelationZoom2D := 5.5/12;
-  FZoomFaktor := 1; {wird z.Bsp. für höhere Auflösung auf 10 umgeschaltet}
+  FZoomFaktor := 1; { wird z.Bsp. für höhere Auflösung auf 10 umgeschaltet }
   Zoom := 1/5.5; { als allgemeiner Skalierungsfaktor benutzt }
   FZoom2D := RelationZoom2D * Zoom;
 
-  // Offset
+  { Offset }
   cOffsetX1 := 130; cOffsetY1 := 410;
   cOffsetX2 := 130; cOffsetY2 := 410;
   cOffsetX3 := 130; cOffsetY3 := 150;
@@ -118,21 +118,21 @@ begin
   FColor := clEntspannt;
   FBogen := True;
 
-  {$ifdef Rotator}
+{$ifdef Rotator}
   Rotator := TPolarKar2.Create;
   with Rotator do begin
     DeltaPhi := 0;
     DeltaTheta := -90;
     Xrot := -87;
   end;
-  {$endif}
+{$endif}
 end;
 
 destructor TGetriebeGraph.Destroy;
 begin
-  {$ifdef Rotator}
-    Rotator.Free;
-  {$endif}
+{$ifdef Rotator}
+  Rotator.Free;
+{$endif}
   inherited Destroy;
 end;
 
@@ -143,15 +143,16 @@ begin
   FKoppelkurveNeedFill := True;
 end;
 
-// mit ZoomFaktor kann in die 'höhere Auflösung' umgeschaltet werden
+{ mit ZoomFaktor kann in die 'höhere Auflösung' umgeschaltet werden }
 procedure TGetriebeGraph.SetZoomFaktor(Value: Integer);
 begin
-  if Value <> FZoomFaktor then begin
-    //Zoom und! Zoom2D werden verändert in SetZoom()
+  if Value <> FZoomFaktor then
+  begin
+    { Zoom und! Zoom2D werden verändert in SetZoom() }
     Zoom := Zoom/ZoomFaktor*Value;
     FZoomFaktor := Value;
-    // Im Gegensatz zu Zoom wird mit Zoomfaktor auch der Offset verschoben!
-    // Dies ist für die Ausgabe nach Preview und auf Drucker notwendig.
+    { Im Gegensatz zu Zoom wird mit Zoomfaktor auch der Offset verschoben!
+      Dies ist für die Ausgabe nach Preview und auf Drucker notwendig. }
     UpdateOffset;
   end;
 end;
@@ -180,154 +181,230 @@ end;
 
 procedure TGetriebeGraph.Draw(Canvas: TCanvas);
 begin
-  if not GrafikOK then Exit;
-  if not Updated then Update;
-  with Canvas do begin
+  if not GrafikOK then
+    Exit;
+  if not Updated then
+    Update;
+  with Canvas do
+  begin
     case FAnsicht of
-    vpSeite: begin
-       if FKoppelBtnDown and Coloriert then begin
-         {Koppelkurve}
+    vpSeite:
+    begin
+       if FKoppelBtnDown and Coloriert then
+       begin
+         { Koppelkurve }
          Pen.Color := clKoppelKurve;
          Polyline(Zug1Koppelkurve);
-         {Kreisbogen mit Radius Vorstaglänge um C0}
+         { Kreisbogen mit Radius Vorstaglänge um C0 }
          Pen.Color := clBlack;
          Arc(MP.x-IntR, MP.y-IntR,
              MP.x+IntR, MP.y+IntR,
              MP.x     , MP.y-IntR,
              MP.x-IntR, MP.y-200*ZoomFaktor);
-      end;
-      {Rumpf}
-      if Coloriert then Pen.Color := clRumpf else Pen.Color := FColor;
-      PolyLine(Zug1Rumpf);
-      {Saling}
-      if Coloriert then Pen.Color := clSaling else Pen.Color := FColor;
-      if (SalingTyp = stFest) or (SalingTyp = stDrehbar) then
-        PolyLine(Zug1Saling);
-      {Mast}
-      if Coloriert then begin
-        Pen.Color := clMast;
-        if FBogen then PolyLine(Zug1MastKurve) else Polyline(Zug1Mast); end
-      else begin
-        Pen.Color := FColor;
-        PolyLine(Zug1Mast);
-      end;
-      {Controller}
-      if ControllerTyp <> ctOhne then begin
-        Pen.Color := clController;
-        Rectangle(Zug1Controller.Left,Zug1Controller.Top,
-        Zug1Controller.Right,Zug1Controller.Bottom);
-      end;
-      {Wanten}
-      if Coloriert then Pen.Color := clWanten else Pen.Color := FColor;
-      PolyLine(Zug1Wanten);
-      if FGestrichelt then
-      begin
-        Pen.Color := clBlue;
-        Pen.Style := psDot;
-        SetBkMode(Handle, TRANSPARENT);
+        end;
+        { Rumpf }
+        if Coloriert then
+          Pen.Color := clRumpf
+        else
+          Pen.Color := FColor;
+        PolyLine(Zug1Rumpf);
+        { Saling }
+        if Coloriert then
+          Pen.Color := clSaling
+        else
+          Pen.Color := FColor;
+        if (SalingTyp = stFest) or (SalingTyp = stDrehbar) then
+          PolyLine(Zug1Saling);
+        { Mast }
+        if Coloriert then
+        begin
+          Pen.Color := clMast;
+          if FBogen then
+            PolyLine(Zug1MastKurve)
+          else
+            Polyline(Zug1Mast);
+        end
+        else
+        begin
+          Pen.Color := FColor;
+          PolyLine(Zug1Mast);
+        end;
+        { Controller }
+        if ControllerTyp <> ctOhne then
+        begin
+          Pen.Color := clController;
+          Rectangle(Zug1Controller.Left,Zug1Controller.Top,
+          Zug1Controller.Right,Zug1Controller.Bottom);
+        end;
+        { Wanten }
+        if Coloriert then
+          Pen.Color := clWanten
+        else
+          Pen.Color := FColor;
         PolyLine(Zug1Wanten);
-        Pen.Style := psSolid;
-        SetBkMode(Handle, OPAQUE);
+        if FGestrichelt then
+        begin
+          Pen.Color := clBlue;
+          Pen.Style := psDot;
+          SetBkMode(Handle, TRANSPARENT);
+          PolyLine(Zug1Wanten);
+          Pen.Style := psSolid;
+          SetBkMode(Handle, OPAQUE);
+        end;
+        { Vorstag }
+        if Coloriert then
+          Pen.Color := clWanten
+        else
+          Pen.Color := FColor;
+        PolyLine(Zug1Vorstag);
       end;
-      {Vorstag}
-      if Coloriert then Pen.Color := clWanten else Pen.Color := FColor;
-      PolyLine(Zug1Vorstag);
-    end;
 
-    vpAchtern: begin
-      {Rumpf}
-      if Coloriert then Pen.Color := clRumpf else Pen.Color := FColor;
-      PolyLine(Zug2Rumpf);
-      {Mast}
-      if Coloriert then Pen.Color := clMast else Pen.Color := FColor;
-      PolyLine(Zug2Mast);
-      {Salinge}
-      if Coloriert then Pen.Color := clSaling else Pen.Color := FColor;
-      if SalingTyp = stFest then PolyLine(Zug2Saling)
-      else if SalingTyp = stDrehbar then PolyLine(Zug2SalingDS);
-      {Wanten}
-      if Coloriert then Pen.Color := clWanten else Pen.Color := FColor;
-      PolyLine(Zug2Wanten);
-      if FGestrichelt then
+      vpAchtern:
       begin
-        Pen.Color := clBlue;
-        Pen.Style := psDot;
-        SetBkMode(Handle, TRANSPARENT);
+        { Rumpf }
+        if Coloriert then
+          Pen.Color := clRumpf
+        else
+          Pen.Color := FColor;
+        PolyLine(Zug2Rumpf);
+        { Mast }
+        if Coloriert then
+          Pen.Color := clMast
+        else
+          Pen.Color := FColor;
+        PolyLine(Zug2Mast);
+        { Salinge }
+        if Coloriert then
+          Pen.Color := clSaling
+        else
+          Pen.Color := FColor;
+        if SalingTyp = stFest then
+          PolyLine(Zug2Saling)
+        else if SalingTyp = stDrehbar then
+          PolyLine(Zug2SalingDS);
+        { Wanten }
+        if Coloriert then
+          Pen.Color := clWanten
+        else
+          Pen.Color := FColor;
         PolyLine(Zug2Wanten);
-        Pen.Style := psSolid;
-        SetBkMode(Handle, OPAQUE);
+        if FGestrichelt then
+        begin
+          Pen.Color := clBlue;
+          Pen.Style := psDot;
+          SetBkMode(Handle, TRANSPARENT);
+          PolyLine(Zug2Wanten);
+          Pen.Style := psSolid;
+          SetBkMode(Handle, OPAQUE);
+        end;
       end;
-    end;
 
-    vpTop: begin
-      {Rumpf}
-      if Coloriert then Pen.Color := clRumpf else Pen.Color := FColor;
-      PolyLine(Zug3Rumpf);
-      {Salinge}
-      if Coloriert then Pen.Color := clSaling else Pen.Color := FColor;
-      if SalingTyp = stFest then PolyLine(Zug3SalingFS);
-      if SalingTyp = stDrehbar then PolyLine(Zug3SalingDS);
-      {Mast}
-      if Coloriert then Pen.Color := clMast else Pen.Color := FColor;
-      PolyLine(Zug3Mast);
-      {Wanten}
-      if Coloriert then Pen.Color := clWanten else Pen.Color := FColor;
-      PolyLine(Zug3Wanten);
-      if FGestrichelt then
+      vpTop:
       begin
-        Pen.Color := clBlue;
-        Pen.Style := psDot;
-        SetBkMode(Handle, TRANSPARENT);
+        { Rumpf }
+        if Coloriert then
+          Pen.Color := clRumpf
+        else
+          Pen.Color := FColor;
+        PolyLine(Zug3Rumpf);
+        { Salinge }
+        if Coloriert then
+          Pen.Color := clSaling
+        else
+          Pen.Color := FColor;
+        if SalingTyp = stFest then
+          PolyLine(Zug3SalingFS);
+        if SalingTyp = stDrehbar then
+          PolyLine(Zug3SalingDS);
+        { Mast }
+        if Coloriert then
+          Pen.Color := clMast
+        else
+          Pen.Color := FColor;
+        PolyLine(Zug3Mast);
+        { Wanten }
+        if Coloriert then
+          Pen.Color := clWanten
+        else
+          Pen.Color := FColor;
         PolyLine(Zug3Wanten);
-        Pen.Style := psSolid;
-        SetBkMode(Handle, OPAQUE);
+        if FGestrichelt then
+        begin
+          Pen.Color := clBlue;
+          Pen.Style := psDot;
+          SetBkMode(Handle, TRANSPARENT);
+          PolyLine(Zug3Wanten);
+          Pen.Style := psSolid;
+          SetBkMode(Handle, OPAQUE);
+        end;
       end;
-    end;
 
-    vp3D:
-    begin
-      { FixPunkt }
-      if Coloriert then Pen.Color := clYellow else Pen.Color := FColor;
-      Ellipse(Offset.x - 10, Offset.y - 10, Offset.x + 10, Offset.y + 10);
-      { Rumpf }
-      if Coloriert then Pen.Color := clRumpf else Pen.Color := FColor;
-      PolyLine(ZugRumpf);
-      { Salinge }
-      if Coloriert then Pen.Color := clSaling else Pen.Color := FColor;
-      if SalingTyp = stFest then PolyLine(ZugSalingFS);
-      if SalingTyp = stDrehbar then PolyLine(ZugSalingDS);
-      { Mast }
-      if Coloriert then
+      vp3D:
       begin
-        Pen.Color := clMast;
-        if FBogen then PolyLine(ZugMastKurve) else Polyline(ZugMast);
-      end
-      else
-      begin
-        Pen.Color := FColor;
-        PolyLine(ZugMast);
+        { FixPunkt }
+        if Coloriert then
+          Pen.Color := clYellow
+        else
+          Pen.Color := FColor;
+        Ellipse(Offset.x - 10, Offset.y - 10, Offset.x + 10, Offset.y + 10);
+        { Rumpf }
+        if Coloriert then Pen.Color := clRumpf else Pen.Color := FColor;
+        PolyLine(ZugRumpf);
+        { Salinge }
+        if Coloriert then
+          Pen.Color := clSaling
+        else
+          Pen.Color := FColor;
+        if SalingTyp = stFest then
+          PolyLine(ZugSalingFS);
+        if SalingTyp = stDrehbar then
+          PolyLine(ZugSalingDS);
+        { Mast }
+        if Coloriert then
+        begin
+          Pen.Color := clMast;
+          if FBogen then
+            PolyLine(ZugMastKurve)
+          else
+            Polyline(ZugMast);
+        end
+        else
+        begin
+          Pen.Color := FColor;
+          PolyLine(ZugMast);
+        end;
+        { Wanten }
+        if Coloriert then
+          Pen.Color := clWanten
+        else
+          Pen.Color := FColor;
+        PolyLine(ZugWanteBb);
+        PolyLine(ZugWanteStb);
+        if FGestrichelt then
+        begin
+          Pen.Color := clBlue;
+          Pen.Style := psDot;
+          SetBkMode(Handle, TRANSPARENT);
+          PolyLine(ZugWanteBb); PolyLine(ZugWanteStb);
+          Pen.Style := psSolid;
+          SetBkMode(Handle, OPAQUE);
+        end;
+        { Controller }
+        if ControllerTyp <> ctOhne then
+        begin
+          if Coloriert then
+            Pen.Color := clController
+          else
+            Pen.Color := FColor;
+          PolyLine(ZugController);
+        end;
+        { Vorstag }
+        if Coloriert then
+          Pen.Color := clVorstag
+        else
+          Pen.Color := FColor;
+        PolyLine(ZugVorstag);
       end;
-      {Wanten}
-      if Coloriert then Pen.Color := clWanten else Pen.Color := FColor;
-      PolyLine(ZugWanteBb); PolyLine(ZugWanteStb);
-      if FGestrichelt then
-      begin
-        Pen.Color := clBlue;
-        Pen.Style := psDot;
-        SetBkMode(Handle, TRANSPARENT);
-        PolyLine(ZugWanteBb); PolyLine(ZugWanteStb);
-        Pen.Style := psSolid;
-        SetBkMode(Handle, OPAQUE);
-      end;
-      { Controller }
-      if ControllerTyp <> ctOhne then
-      begin
-        if Coloriert then Pen.Color := clController else Pen.Color := FColor;
-        PolyLine(ZugController);
-      end;
-      { Vorstag }
-      if Coloriert then Pen.Color := clVorstag else Pen.Color := FColor;
-      PolyLine(ZugVorstag); end;
     end; {case}
   end; {with Canvas do begin}
 end; {draw}
@@ -336,150 +413,231 @@ procedure TGetriebeGraph.DrawToMeta(Canvas: TMetaFileCanvas);
 var
   SavedPenWidth: Integer;
 begin
-  if not GrafikOK then Exit;
-  if not Updated then Update;
-  with Canvas do begin
+  if not GrafikOK then
+    Exit;
+  if not Updated then
+    Update;
+  with Canvas do
+  begin
     case FAnsicht of
-    vpSeite: begin
-       { Koppelkurve und Kreisbogen mit Radius Vorstaglänge um C0 }
-       if FKoppelBtnDown and Coloriert then begin
-         SavedPenWidth := Pen.Width;
-         Pen.Width := 1;
-         Pen.Color := clBlack;
-         Polyline(Zug1Koppelkurve);
-         Arc(MP.x-IntR, MP.y-IntR,
-             MP.x+IntR, MP.y+IntR,
-             MP.x     , MP.y-IntR,
-             MP.x-IntR, MP.y-200*ZoomFaktor);
-         Pen.Width := SavedPenWidth;
-      end;
-      {Rumpf}
-      if Coloriert then Pen.Color := clRumpf else Pen.Color := FColor;
-      PolyLine(Zug1Rumpf);
-      {Saling}
-      if Coloriert then Pen.Color := clSaling else Pen.Color := FColor;
-      if (SalingTyp = stFest) or (SalingTyp = stDrehbar) then
-        PolyLine(Zug1Saling);
-      {Mast}
-      if Coloriert then begin
-        Pen.Color := clMast;
-        if FBogen then PolyLine(Zug1MastKurve) else Polyline(Zug1Mast); end
-      else begin
-        Pen.Color := FColor;
-        PolyLine(Zug1Mast);
-      end;
-      {Controller}
-      if ControllerTyp <> ctOhne then begin
-        Pen.Color := clController;
-        Rectangle(Zug1Controller.Left,Zug1Controller.Top,
-        Zug1Controller.Right,Zug1Controller.Bottom);
-      end;
-      {Wanten}
-      if Coloriert then Pen.Color := clWanten else Pen.Color := FColor;
-      PolyLine(Zug1Wanten);
-      if FGestrichelt then
+      vpSeite:
       begin
-        Pen.Color := clBlue;
-        Pen.Style := psDashDot;
-        SetBkMode(Handle, TRANSPARENT);
+        { Koppelkurve und Kreisbogen mit Radius Vorstaglänge um C0 }
+        if FKoppelBtnDown and Coloriert then
+        begin
+          SavedPenWidth := Pen.Width;
+          Pen.Width := 1;
+          Pen.Color := clBlack;
+          Polyline(Zug1Koppelkurve);
+          Arc(MP.x-IntR, MP.y-IntR,
+              MP.x+IntR, MP.y+IntR,
+              MP.x     , MP.y-IntR,
+              MP.x-IntR, MP.y-200*ZoomFaktor);
+          Pen.Width := SavedPenWidth;
+        end;
+        { Rumpf }
+        if Coloriert then
+          Pen.Color := clRumpf
+        else
+          Pen.Color := FColor;
+        PolyLine(Zug1Rumpf);
+        { Saling }
+        if Coloriert then
+          Pen.Color := clSaling
+        else
+          Pen.Color := FColor;
+        if (SalingTyp = stFest) or (SalingTyp = stDrehbar) then
+          PolyLine(Zug1Saling);
+        { Mast }
+        if Coloriert then
+        begin
+          Pen.Color := clMast;
+          if FBogen then
+            PolyLine(Zug1MastKurve)
+          else
+            Polyline(Zug1Mast); end
+        else
+        begin
+          Pen.Color := FColor;
+          PolyLine(Zug1Mast);
+        end;
+        { Controller }
+        if ControllerTyp <> ctOhne then
+        begin
+          Pen.Color := clController;
+          Rectangle(Zug1Controller.Left,Zug1Controller.Top,
+          Zug1Controller.Right,Zug1Controller.Bottom);
+        end;
+        { Wanten }
+        if Coloriert then
+          Pen.Color := clWanten
+        else
+          Pen.Color := FColor;
         PolyLine(Zug1Wanten);
-        Pen.Style := psSolid;
-        SetBkMode(Handle, OPAQUE);
+        if FGestrichelt then
+        begin
+          Pen.Color := clBlue;
+          Pen.Style := psDashDot;
+          SetBkMode(Handle, TRANSPARENT);
+          PolyLine(Zug1Wanten);
+          Pen.Style := psSolid;
+          SetBkMode(Handle, OPAQUE);
+        end;
+        { Vorstag }
+        if Coloriert then
+          Pen.Color := clWanten
+        else
+          Pen.Color := FColor;
+        PolyLine(Zug1Vorstag);
       end;
-      {Vorstag}
-      if Coloriert then Pen.Color := clWanten else Pen.Color := FColor;
-      PolyLine(Zug1Vorstag);
-    end;
 
-    vpAchtern: begin
-      {Rumpf}
-      if Coloriert then Pen.Color := clRumpf else Pen.Color := FColor;
-      PolyLine(Zug2Rumpf);
-      {Mast}
-      if Coloriert then Pen.Color := clMast else Pen.Color := FColor;
-      PolyLine(Zug2Mast);
-      {Salinge}
-      if Coloriert then Pen.Color := clSaling else Pen.Color := FColor;
-      if SalingTyp = stFest then PolyLine(Zug2Saling)
-      else if SalingTyp = stDrehbar then PolyLine(Zug2SalingDS);
-      {Wanten}
-      if Coloriert then Pen.Color := clWanten else Pen.Color := FColor;
-      PolyLine(Zug2Wanten);
-      if FGestrichelt then
+      vpAchtern:
       begin
-        Pen.Color := clBlue;
-        Pen.Style := psDashDot;
-        SetBkMode(Handle, TRANSPARENT);
+        { Rumpf }
+        if Coloriert then
+          Pen.Color := clRumpf
+        else
+          Pen.Color := FColor;
+        PolyLine(Zug2Rumpf);
+        { Mast }
+        if Coloriert then
+          Pen.Color := clMast
+        else
+          Pen.Color := FColor;
+        PolyLine(Zug2Mast);
+        { Salinge }
+        if Coloriert then
+          Pen.Color := clSaling
+        else
+          Pen.Color := FColor;
+        if SalingTyp = stFest then
+          PolyLine(Zug2Saling)
+        else if SalingTyp = stDrehbar then
+          PolyLine(Zug2SalingDS);
+        { Wanten }
+        if Coloriert then
+          Pen.Color := clWanten
+        else
+          Pen.Color := FColor;
         PolyLine(Zug2Wanten);
-        Pen.Style := psSolid;
-        SetBkMode(Handle, OPAQUE);
+        if FGestrichelt then
+        begin
+          Pen.Color := clBlue;
+          Pen.Style := psDashDot;
+          SetBkMode(Handle, TRANSPARENT);
+          PolyLine(Zug2Wanten);
+          Pen.Style := psSolid;
+          SetBkMode(Handle, OPAQUE);
+        end;
       end;
-    end;
 
-    vpTop: begin
-      {Rumpf}
-      if Coloriert then Pen.Color := clRumpf else Pen.Color := FColor;
-      PolyLine(Zug3Rumpf);
-      {Salinge}
-      if Coloriert then Pen.Color := clSaling else Pen.Color := FColor;
-      if SalingTyp = stFest then PolyLine(Zug3SalingFS);
-      if SalingTyp = stDrehbar then PolyLine(Zug3SalingDS);
-      {Mast}
-      if Coloriert then Pen.Color := clMast else Pen.Color := FColor;
-      PolyLine(Zug3Mast);
-      {Wanten}
-      if Coloriert then Pen.Color := clWanten else Pen.Color := FColor;
-      PolyLine(Zug3Wanten);
-      if FGestrichelt then
+      vpTop:
       begin
-        Pen.Color := clBlue;
-        Pen.Style := psDashDot;
-        SetBkMode(Handle, TRANSPARENT);
+        { Rumpf }
+        if Coloriert then
+          Pen.Color := clRumpf
+        else
+          Pen.Color := FColor;
+        PolyLine(Zug3Rumpf);
+        { Salinge }
+        if Coloriert then
+          Pen.Color := clSaling
+        else
+          Pen.Color := FColor;
+        if SalingTyp = stFest then
+          PolyLine(Zug3SalingFS);
+        if SalingTyp = stDrehbar then
+          PolyLine(Zug3SalingDS);
+        { Mast }
+        if Coloriert then
+          Pen.Color := clMast
+        else
+          Pen.Color := FColor;
+        PolyLine(Zug3Mast);
+        { Wanten }
+        if Coloriert then
+          Pen.Color := clWanten
+        else
+          Pen.Color := FColor;
         PolyLine(Zug3Wanten);
-        Pen.Style := psSolid;
-        SetBkMode(Handle, OPAQUE);
+        if FGestrichelt then
+        begin
+          Pen.Color := clBlue;
+          Pen.Style := psDashDot;
+          SetBkMode(Handle, TRANSPARENT);
+          PolyLine(Zug3Wanten);
+          Pen.Style := psSolid;
+          SetBkMode(Handle, OPAQUE);
+        end;
       end;
-    end;
 
-    vp3D: begin
-      { FixPunkt }
-        //if Coloriert then Pen.Color := clYellow;
-        //Ellipse(Offset.x - 10, Offset.y - 10, Offset.x + 10, Offset.y + 10);
-      {Rumpf}
-      if Coloriert then Pen.Color := clRumpf else Pen.Color := FColor;
-      PolyLine(ZugRumpf);
-      {Salinge}
-      if Coloriert then Pen.Color := clSaling else Pen.Color := FColor;
-      if SalingTyp = stFest then PolyLine(ZugSalingFS);
-      if SalingTyp = stDrehbar then PolyLine(ZugSalingDS);
-      {Mast}
-      if Coloriert then begin
-        Pen.Color := clMast;
-        if FBogen then PolyLine(ZugMastKurve) else Polyline(ZugMast); end
-      else begin
-        Pen.Color := FColor;
-        PolyLine(ZugMast);
-      end;
-      {Wanten}
-      if Coloriert then Pen.Color := clWanten else Pen.Color := FColor;
-      PolyLine(ZugWanteBb); PolyLine(ZugWanteStb);
-      if FGestrichelt then
+      vp3D:
       begin
-        Pen.Color := clBlue;
-        Pen.Style := psDashDot;
-        SetBkMode(Handle, TRANSPARENT);
-        PolyLine(ZugWanteBb); PolyLine(ZugWanteStb);
-        Pen.Style := psSolid;
-        SetBkMode(Handle, OPAQUE);
+        { FixPunkt }
+          // if Coloriert then
+          //   Pen.Color := clYellow;
+          // Ellipse(Offset.x - 10, Offset.y - 10, Offset.x + 10, Offset.y + 10);
+        { Rumpf }
+        if Coloriert then
+          Pen.Color := clRumpf
+        else
+          Pen.Color := FColor;
+        PolyLine(ZugRumpf);
+        { Salinge }
+        if Coloriert then
+          Pen.Color := clSaling
+        else
+          Pen.Color := FColor;
+        if SalingTyp = stFest then
+          PolyLine(ZugSalingFS);
+        if SalingTyp = stDrehbar then
+          PolyLine(ZugSalingDS);
+        { Mast }
+        if Coloriert then
+        begin
+          Pen.Color := clMast;
+          if FBogen then
+            PolyLine(ZugMastKurve)
+          else
+            Polyline(ZugMast);
+        end
+        else
+        begin
+          Pen.Color := FColor;
+          PolyLine(ZugMast);
+        end;
+        { Wanten }
+        if Coloriert then
+          Pen.Color := clWanten
+        else
+          Pen.Color := FColor;
+        PolyLine(ZugWanteBb);
+        PolyLine(ZugWanteStb);
+        if FGestrichelt then
+        begin
+          Pen.Color := clBlue;
+          Pen.Style := psDashDot;
+          SetBkMode(Handle, TRANSPARENT);
+          PolyLine(ZugWanteBb); PolyLine(ZugWanteStb);
+          Pen.Style := psSolid;
+          SetBkMode(Handle, OPAQUE);
+        end;
+        { Controller }
+        if ControllerTyp <> ctOhne then
+        begin
+          if Coloriert then
+            Pen.Color := clController
+          else
+            Pen.Color := FColor;
+          PolyLine(ZugController);
+        end;
+        { Vorstag }
+        if Coloriert then
+          Pen.Color := clVorstag
+        else
+          Pen.Color := FColor;
+        PolyLine(ZugVorstag);
       end;
-      {Controller}
-      if ControllerTyp <> ctOhne then begin
-        if Coloriert then Pen.Color := clController else Pen.Color := FColor;
-        PolyLine(ZugController);
-      end;
-      {Vorstag}
-      if Coloriert then Pen.Color := clVorstag else Pen.Color := FColor;
-      PolyLine(ZugVorstag); end;
     end; {case}
   end; {with Canvas do begin}
 end; {draw}
@@ -488,11 +646,11 @@ procedure TGetriebeGraph.FillZug2D;
 var
   i, j: Integer;
   FixPunkt2D: TRealPoint;
-  // temporäre Koordinaten real transformed
+  { temporäre Koordinaten real transformed }
   Temp: TRealPoint;
   A0, B0, C0, D0, E0, F0: TRealPoint;
   A,  B,  C,  D,  E,  F:  TRealPoint;
-  // temporäre Koordinaten Integer transformed
+  { temporäre Koordinaten Integer transformed }
   xTemp, zTemp: Integer;
   xA0,xB0,xC0,xD0,xE0,xF0,xA,xB,xC,xD,xE,xF: Integer;
   yA0,yB0,yC0,yD0,yE0,yF0,yA,yB,yC,yD,yE,yF: Integer;
@@ -507,7 +665,7 @@ begin
     aber immer der nicht gedrehte Fixpunkt benötigt! }
   FixPunkt2D := rP[FixName];
 
-  //*** Koppelkurve
+  {*** Koppelkurve }
   if FKoppelkurveNeedFill then begin
     for j := 0 to 100 do begin
       Temp := vsub(FKoppelKurve[j], FixPunkt2D);
@@ -519,7 +677,7 @@ begin
     FKoppelkurveNeedFill := False;
   end;
 
-  //*** Mastkurve
+  { *** Mastkurve }
   for j := 0 to BogenMax do begin
     Temp := vsub(Kurve[j], FixPunkt2D);
     xTemp := Round(Temp[x] * FZoom2D);
@@ -528,7 +686,7 @@ begin
     Zug1MastKurve[j+1].Y := -zTemp + OffsetY1;
   end;
 
-  //*** Radius für Kreisbogen um C0
+  { *** Radius für Kreisbogen um C0 }
   IntR := Round( Abstand(rP[ooC],rP[ooC0]) * FZoom2D );
 
   A0 := vsub(rP[ooA0],FixPunkt2D);
@@ -636,7 +794,8 @@ begin
   Zug1Saling[2].Y := -zD + OffsetY1;
 
   { Controller von der Seite }
-  with Zug1Controller do begin
+  with Zug1Controller do
+  begin
     Left :=  xE + OffsetX1;
     Top  := -zE - 2*ZoomFaktor + OffsetY1;
     Right :=  xE0 + OffsetX1;
@@ -679,7 +838,8 @@ begin
   Zug2Saling[4].X :=  yB + OffsetX2;
   Zug2Saling[4].Y := -zB + OffsetY2;
 
-  for i := 1 to 3 do begin
+  for i := 1 to 3 do
+  begin
     Zug2SalingDS[i].X := Zug2Saling[i+1].X;
     Zug2SalingDS[i].Y := Zug2Saling[i+1].Y;
   end;
@@ -690,7 +850,7 @@ begin
   Zug2Mast[2].X :=  yF + OffsetX2;
   Zug2Mast[2].Y := -zF + OffsetY2;
   
-  { Wanten in Draufsicht - rot}
+  { Wanten in Draufsicht - rot }
   Zug3Wanten[ 1].X :=  yB0 + OffsetX3;
   Zug3Wanten[ 1].Y := -xB0 + OffsetY3;
   Zug3Wanten[ 2].X :=  yB + OffsetX3;
@@ -702,7 +862,7 @@ begin
   Zug3Wanten[ 5].X :=  yA0 + OffsetX3;
   Zug3Wanten[ 5].Y := -xA0 + OffsetY3;
 
-  { Rumpftetraeder in Draufsicht - grün}
+  { Rumpftetraeder in Draufsicht - grün }
   Zug3Rumpf[1].X :=  yA0 + OffsetX3;
   Zug3Rumpf[1].Y := -xA0 + OffsetY3;
   Zug3Rumpf[2].X :=  yB0 + OffsetX3;
@@ -724,7 +884,7 @@ begin
   Zug3Rumpf[10].X :=  yA0 + OffsetX3;
   Zug3Rumpf[10].Y := -xA0 + OffsetY3;
 
-  { Salingdreieck in Draufsicht - lime, für stFest}
+  { Salingdreieck in Draufsicht - lime, für stFest }
   Zug3SalingFS[1].X :=  yB + OffsetX3;
   Zug3SalingFS[1].Y := -xB + OffsetY3;
   Zug3SalingFS[2].X :=  yA + OffsetX3;
@@ -734,7 +894,7 @@ begin
   Zug3SalingFS[4].X :=  yB + OffsetX3;
   Zug3SalingFS[4].Y := -xB + OffsetY3;
 
-  { Salingdreieck in Draufsicht - lime, für stDrehbar}
+  { Salingdreieck in Draufsicht - lime, für stDrehbar }
   Zug3SalingDS[1].X :=  yA + OffsetX3;
   Zug3SalingDS[1].Y := -xA + OffsetY3;
   Zug3SalingDS[2].X :=  yD + OffsetX3;
@@ -742,7 +902,7 @@ begin
   Zug3SalingDS[3].X :=  yB + OffsetX3;
   Zug3SalingDS[3].Y := -xB + OffsetY3;
 
-  { Mast in Draufsicht - blau}
+  { Mast in Draufsicht - blau }
   Zug3Mast[ 1].X :=  yD0 + OffsetX3;
   Zug3Mast[ 1].Y := -xD0 + OffsetY3;
   Zug3Mast[ 2].X :=  yD + OffsetX3;
@@ -762,8 +922,8 @@ var
   w, h: Integer;
   tempf1, tempf2: real;
 begin
-  //maximale Abmessungen ermitteln
-  Temp := rP[ooD0]; //beliebiger Eckpunkt
+  { maximale Abmessungen ermitteln }
+  Temp := rP[ooD0]; // beliebiger Eckpunkt
   xmin := Round(Temp[x]); xmax := xmin;
   ymin := Round(Temp[y]); ymax := ymin;
   zmin := Round(Temp[z]); zmax := zmin;
@@ -785,22 +945,24 @@ begin
   tempz := zmax-zmin;
 
   try
-  //Zoom festlegen
-  w := R.Right - R.Left; //293
-  h := R.Bottom - R.Top; //422
-  if tempx > tempy then tempx := tempy;
-  tempf1 := tempx/w;
-  tempf2 := tempz/h;
-  if tempf2 > tempf1 then tempf1 := tempf2;
-  tempf1 := tempf1*FZoom2D;
-  Zoom := 0.95*Zoom/tempf1;
+    { Zoom festlegen }
+    w := R.Right - R.Left; // 293
+    h := R.Bottom - R.Top; // 422
+    if tempx > tempy then
+      tempx := tempy;
+    tempf1 := tempx/w;
+    tempf2 := tempz/h;
+    if tempf2 > tempf1 then
+      tempf1 := tempf2;
+    tempf1 := tempf1*FZoom2D;
+    Zoom := 0.95 * Zoom / tempf1;
 
-  //Offset festlegen
-  cOffsetX1 := Round(0.44*w); cOffsetY1 := Round(0.98*h);
-  cOffsetX2 := cOffsetX1;     cOffsetY2 := cOffsetY1;
-  cOffsetX3 := cOffsetX1;     cOffsetY3 := Round(0.35*h);
-  cOffsetX4 := Round(0.52*w); cOffsetY4 := Round(0.59*h);
-  UpdateOffset;
+    { Offset festlegen }
+    cOffsetX1 := Round(0.44*w); cOffsetY1 := Round(0.98*h);
+    cOffsetX2 := cOffsetX1;     cOffsetY2 := cOffsetY1;
+    cOffsetX3 := cOffsetX1;     cOffsetY3 := Round(0.35*h);
+    cOffsetX4 := Round(0.52*w); cOffsetY4 := Round(0.59*h);
+    UpdateOffset;
   except
     ShowMessage('Offset kann nicht berechnet werden.');
   end;

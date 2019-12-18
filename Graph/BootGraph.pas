@@ -3,7 +3,7 @@
 interface
 
 uses
-  IniFiles,
+  System.IniFiles,
   RggTypes,
   RggGraph;
 
@@ -25,8 +25,7 @@ type
 
     property FixName: TRiggPoints read FFixName write SetFixName;
     property SalingTyp: TSalingTyp read FSalingTyp write FSalingTyp;
-    property ControllerTyp
-      : TControllerTyp read FControllerTyp write FControllerTyp;
+    property ControllerTyp: TControllerTyp read FControllerTyp write FControllerTyp;
     property Koordinaten: TRealRiggPoints read rP write SetKoord;
   end;
 
@@ -43,8 +42,8 @@ end;
 procedure TBootGraph.SetKoord(Value: TRealRiggPoints);
 begin
   rP := Value;
-  //Fixpunkt wird in TBootGraph nicht benötigt, aber er wird eventuell
-  //herauskopiert - z.Bsp. nach HullGraph - und muß deshalb aktuell sein.
+  { Fixpunkt wird in TBootGraph nicht benötigt, aber er wird eventuell herauskopiert
+    z.Bsp. nach HullGraph - und muß deshalb aktuell sein. }
   FixPunkt := rP[FixName];
   GrafikOK := True;
   Updated := False;

@@ -18,8 +18,8 @@ type
     FZoom: real;
     FColored: Boolean;
   protected
-    GrafikOK: Boolean; //loaded
-    Updated: Boolean; //transformed
+    GrafikOK: Boolean; // loaded
+    Updated: Boolean; // transformed
     procedure SetFixPunkt(Value: TRealPoint);
     procedure SetOffset(Value: TPoint); virtual;
     procedure SetZoom(Value: real); virtual;

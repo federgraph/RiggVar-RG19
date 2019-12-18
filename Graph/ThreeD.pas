@@ -38,7 +38,7 @@ type
     r, g, b: Byte;
   end;
 
-  //A three dimensional viewing class
+  { A three dimensional viewing class }
   TThreeD = class(TObject)
   public
     A, B, C, D, DVal: double;
@@ -55,7 +55,7 @@ type
     ObjMinz, ObjMaxz: double;
     Offsx, Offsy, Offsz: double; { Transform variables }
     Dist: VECTOR; { Distance between the from and at points }
-    //neue Felder:
+    { neue Felder: }
     ColorPal: array [0 .. NUMCOLORS] of RGBColor;
     NumColor: Integer;
     constructor Create;
@@ -69,10 +69,8 @@ type
     procedure SetFrom; virtual;
     procedure SetEye;
     procedure View(Canvas: TCanvas); virtual;
-    procedure TransformSeg(Canvas: TCanvas; v1, v2: VECTOR;
-      var pc1, pc2: TPoint);
-    procedure Clip3D(Canvas: TCanvas; x1, y1, z1, x2, y2, z2: double;
-      var pc1, pc2: TPoint); virtual;
+    procedure TransformSeg(Canvas: TCanvas; v1, v2: VECTOR; var pc1, pc2: TPoint);
+    procedure Clip3D(Canvas: TCanvas; x1, y1, z1, x2, y2, z2: double; var pc1, pc2: TPoint); virtual;
   end;
 
 procedure PaintBackGround(Image: TBitmap);
@@ -91,7 +89,7 @@ begin
   end;
 end;
 
-//Return the larger of two values
+{ Return the larger of two values }
 function MaxOf(val1, val2: double): double;
 begin
   if val1 > val2 then
@@ -100,7 +98,7 @@ begin
     Result := val2;
 end;
 
-//The constructor sets up various default values for the camera model
+{ The constructor sets up various default values for the camera model }
 constructor TThreeD.Create;
 begin
   Vb := VBB;
@@ -137,8 +135,7 @@ begin
   pc.y := Round(C * yw + D);
 end;
 
-//Return the minimum and maximum values in the Points array
-//for the X, Y, and Z axes.
+{ Return the minimum and maximum values in the Points array for the X, Y, and Z axes. }
 procedure TThreeD.MinMax;
 var
   i: Integer;
@@ -166,8 +163,8 @@ begin
   end;
 end;
 
-//Routine to provide a default value for the at point. It
-//is set to the midpoint of the extents of the object.
+{ Routine to provide a default value for the at point.
+  It is set to the midpoint of the extents of the object. }
 procedure TThreeD.SetAt;
 begin
   MinMax;
@@ -176,23 +173,23 @@ begin
   At.z := (ObjMinz + ObjMaxz) / 2.0;
 end;
 
-//Routine to provide a default value for the from point. It
-//is dependent on the at point and the view angle.
+{ Routine to provide a default value for the from point. It
+  is dependent on the at point and the view angle. }
 procedure TThreeD.SetFrom;
 const
   { Ratio used to determine from point. It is based on size of object. }
   Width: double = 1.7;
 begin
-  //hier geändert am 20.04.97
+  { hier geändert am 20.04.97 }
   From.x := At.x;
   From.y := At.y;
   From.z := At.z + (ObjMaxz - ObjMinz) / 2.0 + Width * MaxOf
     ((ObjMaxx - ObjMinx) / 2.0, (ObjMaxy - ObjMiny) / 2.0);
 end;
 
-//There must be a valid object in the Points array before calling this
-//function. It sets up the various variables used in transforming an
-//object from world to eye coordinates.
+{ There must be a valid object in the Points array before calling this
+  function. It sets up the various variables used in transforming an
+  object from world to eye coordinates. }
 procedure TThreeD.SetEye;
 var
   temp: VECTOR;
@@ -203,23 +200,23 @@ begin
 
   temp := Dist;
   tempmag := Mag(Dist);
-  A3 := Divide(temp, tempmag); //Einheitsvektor in Blickrichtung (z)
+  A3 := Divide(temp, tempmag); // Einheitsvektor in Blickrichtung (z)
 
   temp := Cross(Dist, Up);
   tempmag := Mag(temp);
-  A1 := Divide(temp, tempmag); //Einheitsvektor auf x-Achse des Bildes
+  A1 := Divide(temp, tempmag); // Einheitsvektor auf x-Achse des Bildes
 
   temp := Cross(A1, A3);
   tempmag := Mag(temp);
-  A2 := Divide(temp, tempmag); //Einheitsvektor auf y-Achse des Bildes (UP)
+  A2 := Divide(temp, tempmag); // Einheitsvektor auf y-Achse des Bildes (UP)
 
   Offsx := -(A1.x * From.x + A1.y * From.y + A1.z * From.z);
   Offsy := -(A2.x * From.x + A2.y * From.y + A2.z * From.z);
   Offsz := -(A3.x * From.x + A3.y * From.y + A3.z * From.z);
 end;
 
-//Return a code specifying which edge in the viewing pyramid was
-//crossed. There may be more than one.
+{ Return a code specifying which edge in the viewing pyramid was
+  crossed. There may be more than one. }
 function TThreeD.Code(x, y, z: double): Integer;
 var
   C: Integer;
@@ -236,9 +233,9 @@ begin
   Result := C;
 end;
 
-//Clip the line segment in 3D coordinates to the viewing pyramid.
-//The clipped coordinates are returned as screen coordinates
-//in the variables (pc1.x,pc1.y) and (pc2.x,pc2.y).
+{ Clip the line segment in 3D coordinates to the viewing pyramid.
+  The clipped coordinates are returned as screen coordinates
+  in the variables (pc1.x,pc1.y) and (pc2.x,pc2.y). }
 procedure TThreeD.Clip3D(Canvas: TCanvas; x1, y1, z1, x2, y2, z2: double;
   var pc1, pc2: TPoint);
 var
@@ -261,28 +258,32 @@ begin
     y := 0.0;
     z := 0.0;
     if ((C and LEFTEDGE) = LEFTEDGE) then
-    begin { Crosses left edge }
+    begin
+      { Crosses left edge }
       t := (z1 + x1) / ((x1 - x2) - (z2 - z1));
       z := t * (z2 - z1) + z1;
       x := -z;
       y := t * (y2 - y1) + y1;
     end
     else if ((C and RIGHTEDGE) = RIGHTEDGE) then
-    begin { Crosses right edge }
+    begin
+      { Crosses right edge }
       t := (z1 - x1) / ((x2 - x1) - (z2 - z1));
       z := t * (z2 - z1) + z1;
       x := z;
       y := t * (y2 - y1) + y1;
     end
     else if ((C and BOTTOMEDGE) = BOTTOMEDGE) then
-    begin { Crosses bottom edge }
+    begin
+      { Crosses bottom edge }
       t := (z1 + y1) / ((y1 - y2) - (z2 - z1));
       z := t * (z2 - z1) + z1;
       x := t * (x2 - x1) + x1;
       y := -z;
     end
     else if ((C and TOPEDGE) = TOPEDGE) then
-    begin { Crosses top edge }
+    begin
+      { Crosses top edge }
       t := (z1 - y1) / ((y2 - y1) - (z2 - z1));
       z := t * (z2 - z1) + z1;
       x := t * (x2 - x1) + x1;
@@ -318,10 +319,9 @@ begin
   Canvas.LineTo(pc2.x, pc2.y);
 end;
 
-//Transform the segment connecting the two vectors into
-//the viewing plane. Clip3D clips and draws the line if visible.
-procedure TThreeD.TransformSeg(Canvas: TCanvas; v1, v2: VECTOR;
-  var pc1, pc2: TPoint);
+{ Transform the segment connecting the two vectors into
+  the viewing plane. Clip3D clips and draws the line if visible. }
+procedure TThreeD.TransformSeg(Canvas: TCanvas; v1, v2: VECTOR; var pc1, pc2: TPoint);
 var
   x1, y1, z1, x2, y2, z2: double;
 begin
@@ -334,8 +334,8 @@ begin
   Clip3D(Canvas, x1, y1, z1, x2, y2, z2, pc1, pc2);
 end;
 
-//Increment through the Points array, which contains the vertices of the
-//object and display them as you go. This will draw out the object.
+{ Increment through the Points array, which contains the vertices of the
+  object and display them as you go. This will draw out the object. }
 procedure TThreeD.View(Canvas: TCanvas);
 var
   i, startOfSide: Integer;
@@ -369,22 +369,22 @@ begin
   AssignFile(infile, filename);
   Reset(infile);
   try
-    // Anzahl der Farben einlesen
+    { Anzahl der Farben einlesen }
     read(infile, NumColor);
     if NumColor >= NUMCOLORS then
       raise EInOutError.Create('EM_TOOMANYCOLORS in Read3DSolid');
-    // Farben einlesen
+    { Farben einlesen }
     if NumColor > 0 then // no color palette if 0 or negative
       for i := 1 to NumColor do
         read(infile, ColorPal[i].r, ColorPal[i].g, ColorPal[i].b);
-    // Anzahl der Koordinaten und Verbindungen einlesen
+    { Anzahl der Koordinaten und Verbindungen einlesen }
     read(infile, Vertices, Length);
     if ((Vertices >= NUMVERTICES) or (Length >= NUMCONNECTIONS)) then
       raise EInOutError.Create('EM_FILETOOBIG in Read3DSolid');
-    // Koordinaten einlesen
+    {  Koordinaten einlesen }
     for i := 1 to Vertices do
       read(infile, Points[i].x, Points[i].y, Points[i].z);
-    // Verbindungen einlesen
+    { Verbindungen einlesen }
     for i := 1 to Length do
       read(infile, Connect[i]);
     Result := 1;
@@ -414,12 +414,12 @@ function TThreeD.Read3DModel: Integer;
     Points[i].z := z;
   end;
 begin
-  //Anzahl der Farben einlesen
+  { Anzahl der Farben einlesen }
   NumColor := 8;
   if NumColor >= NUMCOLORS then
     raise EInOutError.Create('EM_TOOMANYCOLORS in Read3DSolid');
 
-  //Farben einlesen
+  { Farben einlesen }
   ReadColor(1, 0, 0, 0);
   ReadColor(2, 0, 0, 128);
   ReadColor(3, 0, 128, 0);
@@ -429,13 +429,13 @@ begin
   ReadColor(7, 0, 255, 0);
   ReadColor(8, 255, 0, 0);
 
-  //Anzahl der Koordinaten und Verbindungen einlesen
+  { Anzahl der Koordinaten und Verbindungen einlesen }
   Vertices := 10;
   Length := 48;
   if ((Vertices >= NUMVERTICES) or (Length >= NUMCONNECTIONS)) then
     raise EInOutError.Create('EM_FILETOOBIG in Read3DSolid');
 
-  //Koordinaten einlesen
+  { Koordinaten einlesen }
   ReadPoint(1, -1.5, -1.0, -1.0);
   ReadPoint(2, -1.5, 1.0, -1.0);
   ReadPoint(3, 1.5, 1.0, -1.0);
@@ -449,7 +449,7 @@ begin
   ReadPoint(9, -2.5, 0.0, 0.0);
   ReadPoint(10, 2.5, 0.0, 0.0);
 
-  //Verbindungen einlesen
+  { Verbindungen einlesen }
   ReadFace(1, 1, 2, 3, -1);
   ReadFace(5, 3, 4, 1, -1);
   ReadFace(9, 5, 8, 7, -2);

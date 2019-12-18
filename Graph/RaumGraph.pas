@@ -3,9 +3,9 @@
 interface
 
 uses
-  Windows,
-  SysUtils,
-  Classes,
+  Winapi.Windows,
+  System.SysUtils,
+  System.Classes,
   Graphics,
   VCalc116,
   RggTypes,
@@ -46,16 +46,16 @@ var
   FixPunkt3D: TRealPoint;
   i: TRiggPoints;
   j: Integer;
-  //temporäre Koordinaten Mastkurve real transformed
+  { temporäre Koordinaten Mastkurve real transformed }
   KurveRotiert: array [0 .. BogenMax] of TRealPoint;
-  //temporäre Koordinaten real transformed
+  { temporäre Koordinaten real transformed }
   A0, B0, C0, D0, E0, F0: TRealPoint;
   A,  B,  C,  D,  E,  F:  TRealPoint;
-  //temporäre Koordinaten Integer transformed
+   { temporäre Koordinaten Integer transformed }
   xA0, xB0, xC0, xD0, xE0, { xF0, } xA, xB, xC, xD, xE, xF: Integer;
   yA0, yB0, yC0, yD0, yE0, { yF0, } yA, yB, yC, yD, yE, yF: Integer;
 begin
-  //Graph drehen
+  { Graph drehen }
   if Assigned(Rotator) then
   begin
     for i := ooA0 to ooF0 do
@@ -66,7 +66,7 @@ begin
       KurveRotiert[j] := Rotator.Rotiere(Kurve[j]);
   end;
 
-  //den Fixpunkt des gedrehten Graphen in den Nullpunkt verschieben
+  { den Fixpunkt des gedrehten Graphen in den Nullpunkt verschieben }
   FixPunkt3D := tempRP[FixName];
   FixPunkt := FixPunkt3D;
   A0 := vsub(tempRP[ooA0], FixPunkt3D);
@@ -84,7 +84,7 @@ begin
   for j := 0 to BogenMax do
     KurveRotiert[j] := vsub(KurveRotiert[j], FixPunkt3D);
 
-  //Skalieren und um den Offset verschieben
+   { Skalieren und um den Offset verschieben }
   for j := 0 to BogenMax do
   begin
     xA0 := Round(KurveRotiert[j, x] * Zoom);

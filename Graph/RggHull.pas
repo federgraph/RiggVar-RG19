@@ -50,7 +50,7 @@ type
     procedure findBB;
     function GetColor(i: Integer): TColor;
   public
-    Factor: vec3; //FaktorX, FaktorY, FaktorZ: real;
+    Factor: vec3; // FaktorX, FaktorY, FaktorZ: real;
     ModelFactor: vec3;
     VertexFileName: string;
     VertexMemo: TStrings;
@@ -68,7 +68,7 @@ var
 implementation
 
 uses
-  RiggVar.FB.Classes; //StrBox;
+  RiggVar.FB.Classes;
 
 constructor THullGraph.Create;
 var
@@ -140,7 +140,8 @@ begin
   if (i >= maxcon) then
     Exit;
   if (p1 > p2) then
-  begin { vertauschen }
+  begin
+    { vertauschen }
     t := p1;
     p1 := p2;
     p2 := t;
@@ -156,7 +157,7 @@ begin
   mat.identity;
   mat.translate(-FixPunkt[x], -FixPunkt[y], -FixPunkt[z]);
   mat.Multiply(Rotator.Matrix);
-  //x und z werden abgebildet (siehe GBox3D)
+  { x und z werden abgebildet (siehe GBox3D) }
   mat.scaleXYZ(Zoom, 20 / zfac, Zoom);
   mat.translate(Offset.x, 4, -Offset.y);
   if nvert <= 0 then
@@ -191,12 +192,12 @@ begin
 
   for i := 0 to lim - 1 do
   begin
-    // Indizes in das Vertice-array bestimmen
-    t := c[i]; //T wie Temp
-    p1 := ((t shr 16) and $FFFF) * 3; //Index Punkt1
-    p2 := (t and $FFFF) * 3; //Index Punkt2
+    { Indizes in das Vertice-array bestimmen }
+    t := c[i]; // T wie Temp
+    p1 := ((t shr 16) and $FFFF) * 3; // Index Punkt1
+    p2 := (t and $FFFF) * 3; // Index Punkt2
 
-    // Farbe bestimmen Variante 1
+    { Farbe bestimmen Variante 1 }
     if Coloriert then
     begin
       grey := v[p1 + 1] + v[p2 + 1]; // Summe der z-Werte
@@ -209,14 +210,14 @@ begin
     else
       g.Pen.Color := clBtnFace;
 
-    { //Farbebestimmen, Varinate 2
-      if Coloriert then
-      g.Pen.Color := GetColor(i)
-      else g.Pen.Color := clBtnFace;
-      }
+    { Farbe bestimmen, Varinate 2 }
+    // if Coloriert then
+    //   g.Pen.Color := GetColor(i)
+    // else
+    //   g.Pen.Color := clBtnFace;
 
     g.Pen.Width := 1;
-    //Linie zeichnen
+    { Linie zeichnen }
     g.MoveTo(v[p1], -v[p1 + 2]);
     g.LineTo(v[p2], -v[p2 + 2]);
   end;
@@ -224,14 +225,14 @@ end;
 
 function THullGraph.GetColor(i: Integer): TColor;
 var
-  index: Word;
+  idx: Word;
   R, G, B: Byte;
 begin
   R := 0;
   G := 0;
   B := 1;
-  index := Round(R * 32 + G * 64 + B * 96 + i * 2);
-  result := PaletteIndex(index);
+  idx := Round(R * 32 + G * 64 + B * 96 + i * 2);
+  result := PaletteIndex(idx);
 end;
 
 { Find the bounding box of this model }
@@ -302,10 +303,10 @@ begin
   v := tvert;
   for i := 0 to ncon - 1 do
   begin
-    // Indizes in das Vertice-array bestimmen
+    { Indizes in das Vertice-array bestimmen }
     t := c[i]; //T wie Temp
-    p1 := ((t shr 16) and $FFFF) * 3; //Index Punkt1
-    p2 := (t and $FFFF) * 3; //Index Punkt2
+    p1 := ((t shr 16) and $FFFF) * 3; // Index Punkt1
+    p2 := (t and $FFFF) * 3; // Index Punkt2
     // g.MoveTo(v[p1], -v[p1 + 2]);
     S := Format('PU %d %d;', [v[p1], -v[p1 + 2]]);
     List.Add(S);
@@ -322,7 +323,7 @@ var
   Zeile, Wort: string;
   a, b, c: Integer;
 
-  //local procedure
+  { local procedure }
   procedure GetReal(var RealValue: real);
   begin
     Zeile := Trim(Zeile);
@@ -334,7 +335,7 @@ var
       MessageBeep(0);
   end;
 
-// local procedure
+  { local procedure }
   procedure GetInteger(var IntValue: Integer);
   begin
     Zeile := Trim(Zeile);
@@ -347,12 +348,12 @@ var
   end;
 
 begin
-  //in Zeile 0 stehen die Faktoren * 100
+  { in Zeile 0 stehen die Faktoren * 100 }
   for i := 0 to Memo.Count - 1 do
   begin
     Zeile := Memo[i];
     if Zeile = '' then
-      Continue;
+      continue;
     GetInteger(a);
     GetInteger(b);
     GetInteger(c);
@@ -362,14 +363,14 @@ begin
       y := b / 100;
       z := c / 100;
     end;
-    Break;
+    break;
   end;
 
   for i := 1 to Memo.Count - 1 do
   begin
     Zeile := Memo[i];
     if Zeile = '' then
-      Continue;
+      continue;
     GetInteger(a);
     GetInteger(b);
     GetInteger(c);
@@ -405,7 +406,7 @@ begin
     y := 1;
     z := 1;
   end;
-  addVert(4200, 0, 328); //Steven Spant 1, Koord 1..7
+  addVert(4200, 0, 328); // Steven Spant 1, Koord 1..7
   addVert(4194, 0, 260);
   addVert(4188, 0, 195);
   addVert(4178, 0, 128);
@@ -413,7 +414,7 @@ begin
   addVert(4151, 0, 26);
   addVert(4130, 0, 0);
 
-  addVert(4100, -157, 325); //Spant 2, Koord 8..20
+  addVert(4100, -157, 325); // Spant 2, Koord 8..20
   addVert(4100, -149, 268);
   addVert(4100, -126, 189);
   addVert(4100, -100, 131);
@@ -427,7 +428,7 @@ begin
   addVert(4100, 149, 268);
   addVert(4100, 157, 325);
 
-  addVert(4000, -244, 322); //Spant 3, Koord 21..33
+  addVert(4000, -244, 322); // Spant 3, Koord 21..33
   addVert(4000, -237, 263);
   addVert(4000, -219, 186);
   addVert(4000, -193, 115);
@@ -441,7 +442,7 @@ begin
   addVert(4000, 237, 263);
   addVert(4000, 244, 322);
 
-  addVert(3750, -402, 315); //Spant 4, Koord 34..46
+  addVert(3750, -402, 315); // pant 4, Koord 34..46
   addVert(3750, -387, 263);
   addVert(3750, -374, 176);
   addVert(3750, -345, 96);
@@ -455,7 +456,7 @@ begin
   addVert(3750, 387, 263);
   addVert(3750, 402, 315);
 
-  addVert(3400, -570, 308); //Spant 5, Koord 47..59
+  addVert(3400, -570, 308); // Spant 5, Koord 47..59
   addVert(3400, -541, 253);
   addVert(3400, -506, 166);
   addVert(3400, -445, 42);
@@ -469,7 +470,7 @@ begin
   addVert(3400, 541, 253);
   addVert(3400, 570, 308);
 
-  addVert(3000, -699, 302); //Spant 6, Koord 60..72
+  addVert(3000, -699, 302); // Spant 6, Koord 60..72
   addVert(3000, -661, 248);
   addVert(3000, -619, 163);
   addVert(3000, -539, 26);
@@ -483,7 +484,7 @@ begin
   addVert(3000, 661, 248);
   addVert(3000, 699, 302);
 
-  addVert(2400, -793, 297); //Spant 7, Koord 73..85
+  addVert(2400, -793, 297); // Spant 7, Koord 73..85
   addVert(2400, -749, 245);
   addVert(2400, -716, 167);
   addVert(2400, -634, 31);
@@ -497,7 +498,7 @@ begin
   addVert(2400, 749, 245);
   addVert(2400, 793, 297);
 
-  addVert(1800, -800, 290); //Spant 8, Koord 86..98
+  addVert(1800, -800, 290); // Spant 8, Koord 86..98
   addVert(1800, -755, 241);
   addVert(1800, -725, 173);
   addVert(1800, -634, 34);
@@ -511,7 +512,7 @@ begin
   addVert(1800, 755, 241);
   addVert(1800, 800, 290);
 
-  addVert(1000, -730, 275); //Spant 9, Koord 99..111
+  addVert(1000, -730, 275); // Spant 9, Koord 99..111
   addVert(1000, -696, 237);
   addVert(1000, -674, 185);
   addVert(1000, -585, 56);
@@ -525,7 +526,7 @@ begin
   addVert(1000, 696, 237);
   addVert(1000, 730, 275);
 
-  addVert(0, -580, 250); //Spant 10, Koord 112..124
+  addVert(0, -580, 250); // Spant 10, Koord 112..124
   addVert(0, -568, 226);
   addVert(0, -560, 187);
   addVert(0, -485, 89);
@@ -542,7 +543,7 @@ end;
 
 procedure THullGraph.ReadCons;
 begin
-  //ReadCons1;
+  // ReadCons1;
   ReadCons2(10, 7);
 end;
 
@@ -621,7 +622,7 @@ procedure THullGraph.ReadCons2(k, l: Integer);
     b = 2.Punkt
     c = Increment zwischen Punkten ab dem 2. Punkt
     n = Anzahl der Verbindungen
-    }
+  }
   var
     i: Integer;
   begin
@@ -640,13 +641,13 @@ var
   i, a, b, vs, vl: Integer;
 begin
   { Beispiel-Eingaben }
-  //k := 10; //Anzahl der Spanten einschließlich Steven
-  //l := 7; //Anzahl der Linien
+  // k := 10; //Anzahl der Spanten einschließlich Steven
+  // l := 7; //Anzahl der Linien
 
-  SpantenZahl := k - 1; //Anzahl Spanten = 9
-  LinienZahl := 2*l-1; //Anzahl Linien = 13
-  vs := l - 1; //Anzahl Verbindungen eines Spantes = 6
-  vl := k - 1; //Anzahl Verbindungen einer Linie = 9
+  SpantenZahl := k - 1; // Anzahl Spanten = 9
+  LinienZahl := 2*l-1; // Anzahl Linien = 13
+  vs := l - 1; // Anzahl Verbindungen eines Spantes = 6
+  vl := k - 1; // Anzahl Verbindungen einer Linie = 9
 
   a := 1;
   addSection(a, a + 1, 1, vs); { der Steven }

@@ -33,10 +33,10 @@ end;
 
 function CreateRggPal32: HPalette;
 const
-  NumColors = 32; //Anzahl der Stufen für Rot, Grün Blau und Grau
-  NumEntries = 4 * NumColors; //Anzahl der Paletteneinträge
-  n = 4; //Differenz für die RGB-Anteile
-  base = 100; //Startwert {dunkelster Farbwert}
+  NumColors = 32; // Anzahl der Stufen für Rot, Grün Blau und Grau
+  NumEntries = 4 * NumColors; // Anzahl der Paletteneinträge
+  n = 4; // Differenz für die RGB-Anteile
+  base = 100; // Startwert {dunkelster Farbwert}
 var
   i: Integer;
   pPal: PLogPalette;
@@ -92,7 +92,7 @@ var
   Palette: aRGBQuad;
 begin
   result := 0;
-  //Feste Farben
+  { Feste Farben }
   Palette[11].rgbRed := $0; { Fadenkreuz blau }
   Palette[11].rgbGreen := $0;
   Palette[11].rgbBlue := $FF;
@@ -109,20 +109,20 @@ begin
   Palette[245].rgbGreen := 0;
   Palette[245].rgbBlue := 0;
 
-  //Farben für Schattierung
+  { Farben für Schattierung }
   for i := 0 to 31 do
   begin
-    //32 Rotstufen {32 bis 63}
+    { 32 Rotstufen (32 bis 63) }
     Palette[i + 32].rgbRed := i shl 2 + 131; { i*4 + 131 }
     Palette[i + 32].rgbGreen := 0;
     Palette[i + 32].rgbBlue := 0;
-    //32 Graustufen {64 bis 95}
+    { 32 Graustufen (64 bis 95) }
     Palette[i + 64].rgbRed := i shl 2 + 131;
     Palette[i + 64].rgbGreen := i shl 2 + 131;
     Palette[i + 64].rgbBlue := i shl 2 + 131;
   end;
 
-  //Identity Palette erzeugen:
+  { Identity Palette erzeugen: }
   GetMem(Log_Pal, SizeOf(TLogPalette) + SizeOf(TPaletteEntry) * 255);
   tempDC := GetDC(0); { DC auf Bildschirm holen }
   try
@@ -132,7 +132,7 @@ begin
       begin
         palVersion := $300;
         palNumEntries := 256;
-        //Systemfarben kopieren
+        { Systemfarben kopieren }
         Start := 0;
         Anzahl := 10;
         GetSystemPaletteEntries(tempDC, Start, Anzahl, palPalEntry[Start]);
@@ -141,17 +141,16 @@ begin
         GetSystemPaletteEntries(tempDC, Start, Anzahl, palPalEntry[Start]);
       end;
 
-      //eigene Farben kopieren
+      { eigene Farben kopieren }
       for Farbe := 10 to 245 do
       begin
-        { with PalPalEntry[Farbe], Palette[Farbe] do begin }
         Log_Pal^.palPalEntry[Farbe].peRed := Palette[Farbe].rgbRed;
         Log_Pal^.palPalEntry[Farbe].peGreen := Palette[Farbe].rgbGreen;
         Log_Pal^.palPalEntry[Farbe].peBlue := Palette[Farbe].rgbBlue;
         Log_Pal^.palPalEntry[Farbe].peFlags := PC_NOCOLLAPSE;
       end;
 
-      //Systemfarben auch noch in der WinG-Palette vermerken:
+      { Systemfarben auch noch in der WinG-Palette vermerken: }
       with Log_Pal^ do
       begin
         for Farbe := 0 to 9 do
@@ -178,9 +177,8 @@ begin
   end;
 end;
 
-//vom WinG SDK:
-//Clear the System Palette so that we can ensure an identity palette
-//mapping for fast performance.
+{ vom WinG SDK:
+  Clear the System Palette so that we can ensure an identity palette mapping for fast performance. }
 procedure ClearSystemPalette;
 type
   TDummyPalette = record
@@ -198,7 +196,7 @@ begin
   Palette.Version := $300;
   Palette.NumberOfEntries := 256;
 
-  // *** Reset everything in the system palette to black
+  { Reset everything in the system palette to black }
   for Counter := 0 to 255 do
   begin
     Palette.aEntries[Counter].peRed := 0;
@@ -207,7 +205,7 @@ begin
     Palette.aEntries[Counter].peFlags := PC_NOCOLLAPSE;
   end;
 
-  // *** Create, select, realize, deselect, and delete the palette
+  { Create, select, realize, deselect, and delete the palette }
   ScreenDC := GetDC(0);
   pPal := @Palette;
   ScreenPalette := CreatePalette(pPal^);

@@ -11,9 +11,9 @@ uses
   Vector3D;
 
 const
-  //pi = 3.14159265;
-  maxvert = 400; //30;
-  maxcon = 1000; //30;
+  // pi = 3.14159265;
+  maxvert = 400; // 30;
+  maxcon = 1000; // 30;
 
 type
   TRotationAngle = (raPhi, raTheta, raGamma, raXrot, raYrot, raZrot);
@@ -46,10 +46,8 @@ type
     procedure zrot(Theta: double);
     procedure rotate(p1, p2: vec3; angle: real);
     procedure transformPoint(var point: vec3);
-    procedure transform(var v: TvertArrayF; var tv: TvertArrayI;
-      nvert: Integer);
-    procedure transformF(var v: TvertArrayF; var tv: TvertArrayF;
-      nvert: Integer);
+    procedure transform(var v: TvertArrayF; var tv: TvertArrayI; nvert: Integer);
+    procedure transformF(var v: TvertArrayF; var tv: TvertArrayF; nvert: Integer);
     procedure copyFrom(m: TMatrix4x4);
     property mat: Matrix4x4 read Fmat write Fmat;
   end;
@@ -89,7 +87,7 @@ begin
   Fmat := m.mat;
 end;
 
-// die Transponierte ist die Inverse der Rotationsmatrix!
+{ die Transponierte ist die Inverse der Rotationsmatrix! }
 procedure TMatrix4x4.transpose;
 var
   tmp: real;

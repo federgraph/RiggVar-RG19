@@ -3,8 +3,8 @@
 interface
 
 uses
-  SysUtils,
-  Math,
+  System.SysUtils,
+  System.Math,
   Vector3D,
   RggTypes,
   Rggmat01;

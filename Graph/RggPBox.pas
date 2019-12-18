@@ -17,12 +17,9 @@ uses
 type
   TRggPaintBox = class(TPaintBox)
   private
-    procedure WMRButtonDown(var message: TWMRButtonDown);
-    message WM_RBUTTONDOWN;
-    procedure WMRButtonDblClk(var message: TWMRButtonDblClk);
-    message WM_RBUTTONDBLCLK;
-    procedure WMRButtonUp(var message: TWMRButtonUp);
-    message WM_RBUTTONUP;
+    procedure WMRButtonDown(var message: TWMRButtonDown); message WM_RBUTTONDOWN;
+    procedure WMRButtonDblClk(var message: TWMRButtonDblClk); message WM_RBUTTONDBLCLK;
+    procedure WMRButtonUp(var message: TWMRButtonUp); message WM_RBUTTONUP;
   protected
     procedure WndProc(var message: TMessage); override;
   public
@@ -101,7 +98,7 @@ begin
     if PtInRect(ClientRect, SmallPointToPoint(message.Pos)) then
       Click;
   end;
-  message.Result := 1; //unterdrückt Popups
+  message.Result := 1; // unterdrückt Popups
   inherited;
 end;
 
