@@ -126,6 +126,7 @@ type
 
     AdjustFormItem: TMenuItem;
     CalcOffsetItem: TMenuItem;
+    LogoItem: TMenuItem;
 
     { Speedbar }
     SpeedPanel: TPanel;
@@ -154,7 +155,6 @@ type
 
     { StatusBar }
     StatusBar: TStatusBar;
-    LogoItem: TMenuItem;
 
     procedure UpdateMenuItems(Sender: TObject);
     procedure WindowCascadeItemClick(Sender: TObject);
@@ -220,8 +220,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LogoItemClick(Sender: TObject);
   private
-    procedure wmGetMinMaxInfo(var Msg: TMessage);
-    message wm_GetMinMaxInfo;
+    procedure wmGetMinMaxInfo(var Msg: TMessage); message wm_GetMinMaxInfo;
   public
     ResizeCounter: Integer;
     OpenDialog1: TOpenDialog;
@@ -295,7 +294,6 @@ begin
   else
     Width := 1024;
 
-
   Screen.OnActiveFormChange := UpdateMenuItems;
 
   Caption := 'Rigg';
@@ -327,7 +325,7 @@ procedure TFormMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Screen.OnActiveFormChange := nil;
   RiggModul.Free;
-  //Application.HelpCommand(HELP_QUIT,0);
+  // Application.HelpCommand(HELP_QUIT,0);
 end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
@@ -528,7 +526,7 @@ begin
     ViewPoint := vpTop;
     VonObenItem.Checked := True;
   end
-  else //if Sender = Von3DItem then
+  else // if Sender = Von3DItem then
   begin
     ViewPoint := vp3D;
     Von3DItem.Checked := True;
@@ -842,7 +840,7 @@ end;
 
 procedure TFormMain.AboutItemClick(Sender: TObject);
 begin
-  //RiggModul.About;
+  // RiggModul.About;
   FrmInfo.ShowInfo;
 end;
 
@@ -1014,11 +1012,13 @@ begin
       Sender := OSDlgItem;
   end;
   SalingTypChange(Sender);
-  (* automatisch erneut aufgerufen:
-    UpdateGetriebe; {redundant}
-    Rigg.UpdateGSB; {redundant}
-    SetupGCtrls; {notwendig}
-    *)
+
+  { automatisch erneut aufgerufen: }
+  {
+    UpdateGetriebe; // redundant
+    Rigg.UpdateGSB; // redundant
+    SetupGCtrls; // notwendig
+  }
 
   case RiggModul.CalcTyp of
     ctQuerKraftBiegung:

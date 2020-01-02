@@ -3,23 +3,25 @@
 interface
 
 uses
-  Windows,
-  Messages,
-  SysUtils,
-  Classes,
-  Types,
-  UITypes,
-  Math,
-  Graphics,
-  Forms,
-  Controls,
-  Menus,
-  Dialogs,
-  StdCtrls,
-  Buttons,
-  ExtCtrls,
-  Tabs,
-  ComCtrls,
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Classes,
+  System.Types,
+  System.UITypes,
+  System.Math,
+  Vcl.Graphics,
+  Vcl.Forms,
+  Vcl.Controls,
+  Vcl.Menus,
+  Vcl.Dialogs,
+  Vcl.StdCtrls,
+  Vcl.Buttons,
+  Vcl.ExtCtrls,
+  Vcl.Tabs,
+  Vcl.ComCtrls,
+  Vcl.Printers,
+  Vcl.Clipbrd,
   RggTypes,
   RggGBox,
   Rggunit4,
@@ -27,7 +29,6 @@ uses
   Vcalc116,
   RggCtrls,
   Rggdoc,
-  Printers,
   uRggPrinter,
   Polarkar,
   RiggVar.RG.Def;
@@ -118,7 +119,7 @@ type
     function GetXText(sbn: TsbName): string;
     function GetYText(Text: string): string;
     function GetPunktColor: TColor;
-    {Ende Diagramm}
+    { Ende Diagramm }
 
     { private Getters and Setters }
     function GetControllerEnabled: Boolean;
@@ -211,7 +212,7 @@ type
     procedure AdjustGBox(Sender: TObject);
     procedure GetGBoxOffset;
 
-    {frühere EventHandler}
+    { frühere EventHandler }
     procedure UpdateGUI;
     procedure Neu(Doc: TRggDocument);
     procedure Open(FileName: string);
@@ -242,8 +243,7 @@ type
     procedure WriteReportToMemo(Memo: TMemo);
     procedure SalingTypChange(Sender: TObject);
     procedure InputPagesChange(Sender: TObject);
-    procedure sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode;
-      var ScrollPos: Integer);
+    procedure sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
 
     { Properties }
     property KorrigiertItem: Boolean read FKorrigiertItem write SetKorrigiertItem;
@@ -275,7 +275,6 @@ var
 implementation
 
 uses
-  Clipbrd,
   FWUnit,
   FrmMain,
   RggScroll,
@@ -323,8 +322,8 @@ begin
   FSalingTyp := stFest;
   FControllerTyp := ctDruck;
 
-  {Grauzeichnen := False;}{ braucht nicht initialisiert werden }
-  {TextFlipFlop := False;}{ braucht nicht initialisiert werden }
+  { Grauzeichnen := False; } { braucht nicht initialisiert werden }
+  { TextFlipFlop := False; } { braucht nicht initialisiert werden }
   IniFileName := '';
 
   RiggModul := Self;
@@ -334,7 +333,7 @@ begin
   ChartPaintBox := OutputForm.ChartPaintBox;
   YComboBox := OutputForm.YComboBox;
 
-  {Rigg}
+  { Rigg }
   Rigg := TRigg.Create;
 
   SetupGCtrls;
@@ -347,54 +346,39 @@ begin
   { GetriebeGrafik }
   GetriebeGrafik := TGetriebeGraph.Create;
   GetriebeGrafik.Rotator := TPolarKar2.Create;
-  with GetriebeGrafik.Rotator do
-  begin
-    DeltaPhi := 0;
-    DeltaTheta := -90;
-    Xrot := -87;
-  end;
+  GetriebeGrafik.Rotator.DeltaPhi := 0;
+  GetriebeGrafik.Rotator.DeltaTheta := -90;
+  GetriebeGrafik.Rotator.Xrot := -87;
   GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
   GetriebeGrafik.Koordinaten := Rigg.rP;
   GetriebeGrafik.Koppelkurve := Rigg.Koppelkurve;
   GetriebeGrafik.Ansicht := vpSeite;
 
   BitmapG := TBitmap.Create;
-  with BitmapG do
-  begin
-    Width := 293; {PaintBoxG.Width;}
-    Height := 422; {PaintBoxG.Height;}
-    Canvas.Font.Name := 'Arial'; {'MS Sans Serif';}
-    Canvas.Font.Height := 14;
-  end;
+  BitmapG.Width := 293; { PaintBoxG.Width; }
+  BitmapG.Height := 422; { PaintBoxG.Height; }
+  BitmapG.Canvas.Font.Name := 'Arial';
+  BitmapG.Canvas.Font.Height := 14;
   PaintBackGround(BitmapG);
 
   MetaGMaxCount := 50;
   MetaFileG := TRiggMetaFile.Create;
-  with MetaFileG do
-  begin
-    Width := 293;
-    Height := 422;
-  end;
+  MetaFileG.Width := 293;
+  MetaFileG.Height := 422;
 
-  {SalingCtrls}
+  { SalingCtrls }
   SalingCtrl := TSalingCtrl.Create;
   SalingCtrl.PBSize := Point(453, 220);
-  {SalingCtrl.PBSize := SalingPaintBox.ClientRect.BottomRight;}
+  // SalingCtrl.PBSize := SalingPaintBox.ClientRect.BottomRight;
 
   BitmapS := TBitmap.Create;
-  with BitmapS do
-  begin
-    Width := 453; {SalingPaintBox.Width;}
-    Height := 220; {SalingPaintBox.Height;}
-  end;
+  BitmapS.Width := 453; { SalingPaintBox.Width; }
+  BitmapS.Height := 220; { SalingPaintBox.Height; }
   PaintBackGround(BitmapS);
 
   BitmapC := TBitmap.Create;
-  with BitmapC do
-  begin
-    Width := 453; {ControllerPaintBox.Width;}
-    Height := 220; {ControllerPaintBox.Height;}
-  end;
+  BitmapC.Width := 453; { ControllerPaintBox.Width; }
+  BitmapC.Height := 220; { ControllerPaintBox.Height; }
   PaintBackGround(BitmapC);
 
   { Berichte }
@@ -452,35 +436,32 @@ end;
 
 procedure TRiggModul.SetupGCtrls;
 begin
-  with InputForm do
-  begin
-    {Controller}
-    SetupGCtrl(sbController, fpController);
-    SetupGCtrl(sbControllerD, fpController);
-    SetupGCtrl(sbControllerOhne, fpController);
-    {Vorstag/Winkel}
-    if WinkelBtnDown then
-      SetupGCtrl(sbWinkel, fpWinkel)
-    else
-      SetupGCtrl(sbWinkel, fpVorstag);
-    SetupGCtrl(sbVorstagD, fpVorstag);
-    SetupGCtrl(sbVorstagOhne, fpVorstag);
-    {Wante}
-    SetupGCtrl(sbWante, fpWante);
-    SetupGCtrl(sbWanteD, fpWante);
-    SetupGCtrl(sbWanteOhne, fpWante);
-    {Woben}
-    SetupGCtrl(sbWoben, fpWoben);
-    SetupGCtrl(sbWobenD, fpWoben);
-    {Saling}
-    SetupGCtrl(sbSalingH, fpSalingH);
-    SetupGCtrl(sbSalingA, fpSalingA);
-    SetupGCtrl(sbSalingLD, fpSalingL);
-    {Ohne Saling starr}
-    SetupGCtrl(sbVorstagOS, fpVorstagOS);
-    sbVorstagOS.Position := Round(Rigg.GSB.Find(fpVorstag).Ist);
-    SetupGCtrl(sbWPowerOS, fpWPowerOS);
-  end;
+  { Controller }
+  SetupGCtrl(InputForm.sbController, fpController);
+  SetupGCtrl(InputForm.sbControllerD, fpController);
+  SetupGCtrl(InputForm.sbControllerOhne, fpController);
+  { Vorstag/Winkel }
+  if WinkelBtnDown then
+    SetupGCtrl(InputForm.sbWinkel, fpWinkel)
+  else
+    SetupGCtrl(InputForm.sbWinkel, fpVorstag);
+  SetupGCtrl(InputForm.sbVorstagD, fpVorstag);
+  SetupGCtrl(InputForm.sbVorstagOhne, fpVorstag);
+  {Wante}
+  SetupGCtrl(InputForm.sbWante, fpWante);
+  SetupGCtrl(InputForm.sbWanteD, fpWante);
+  SetupGCtrl(InputForm.sbWanteOhne, fpWante);
+  {Woben}
+  SetupGCtrl(InputForm.sbWoben, fpWoben);
+  SetupGCtrl(InputForm.sbWobenD, fpWoben);
+  {Saling}
+  SetupGCtrl(InputForm.sbSalingH, fpSalingH);
+  SetupGCtrl(InputForm.sbSalingA, fpSalingA);
+  SetupGCtrl(InputForm.sbSalingLD, fpSalingL);
+  {Ohne Saling starr}
+  SetupGCtrl(InputForm.sbVorstagOS, fpVorstagOS);
+  InputForm.sbVorstagOS.Position := Round(Rigg.GSB.Find(fpVorstag).Ist);
+  SetupGCtrl(InputForm.sbWPowerOS, fpWPowerOS);
   UpdateGCtrlLabels(Rigg.Glieder);
 end;
 
@@ -491,70 +472,64 @@ end;
 
 procedure TRiggModul.UpdateGCtrlLabels(InputRec: TTrimmControls);
 begin
-  with InputRec, InputForm do
+  InputForm.lbValue1.Caption := Format('%d mm', [InputRec.Controller - MemCtrl.Controller]);
+  if WinkelBtnDown then
   begin
-    lbValue1.Caption := Format('%d mm', [Controller - MemCtrl.Controller]);
-    if WinkelBtnDown then
-    begin
-      lbWinkel.Caption := 'Winkel';
-      lbValue2.Caption := Format('%5.2f Grad', [(Winkel - MemCtrl.Winkel) / 10]);
-    end
-    else
-    begin
-      lbWinkel.Caption := 'Vorstag';
-      lbValue2.Caption := Format('%d mm', [Vorstag - MemCtrl.Vorstag]);
-    end;
-    lbValue3.Caption := Format('%d mm', [Wanten - MemCtrl.Wanten]);
-    lbValue4.Caption := Format('%d mm', [Woben - MemCtrl.Woben]);
-    lbValue5.Caption := Format('%d mm', [SalingH - MemCtrl.SalingH]);
-    lbValue6.Caption := Format('%d mm', [SalingA - MemCtrl.SalingA]);
-    lbD5.Caption := Format('%d mm', [SalingL - MemCtrl.SalingL]);
-    lbValue7.Caption := Format('%d mm', [Vorstag - MemCtrl.Vorstag]);
-    lbValue8.Caption := Format('%d mm', [WPowerOS - MemCtrl.WPowerOS]);
-
-    lbD1.Caption := lbValue1.Caption;
-    lbD2.Caption := lbValue2.Caption;
-    lbD3.Caption := lbValue3.Caption;
-    lbD4.Caption := lbValue4.Caption;
-    {lbD5.Caption := lbValue5.Caption;}{ SalingL: oben schon gesetzt }
-
-    lbOhne1.Caption := lbValue1.Caption;
-    lbOhne2.Caption := lbValue2.Caption;
-    lbOhne3.Caption := lbValue3.Caption;
+    InputForm.lbWinkel.Caption := 'Winkel';
+    InputForm.lbValue2.Caption := Format('%5.2f Grad', [(InputRec.Winkel - MemCtrl.Winkel) / 10]);
+  end
+  else
+  begin
+    InputForm.lbWinkel.Caption := 'Vorstag';
+    InputForm.lbValue2.Caption := Format('%d mm', [InputRec.Vorstag - MemCtrl.Vorstag]);
   end;
+  InputForm.lbValue3.Caption := Format('%d mm', [InputRec.Wanten - MemCtrl.Wanten]);
+  InputForm.lbValue4.Caption := Format('%d mm', [InputRec.Woben - MemCtrl.Woben]);
+  InputForm.lbValue5.Caption := Format('%d mm', [InputRec.SalingH - MemCtrl.SalingH]);
+  InputForm.lbValue6.Caption := Format('%d mm', [InputRec.SalingA - MemCtrl.SalingA]);
+  InputForm.lbD5.Caption := Format('%d mm', [InputRec.SalingL - MemCtrl.SalingL]);
+  InputForm.lbValue7.Caption := Format('%d mm', [InputRec.Vorstag - MemCtrl.Vorstag]);
+  InputForm.lbValue8.Caption := Format('%d mm', [InputRec.WPowerOS - MemCtrl.WPowerOS]);
+
+  InputForm.lbD1.Caption := InputForm.lbValue1.Caption;
+  InputForm.lbD2.Caption := InputForm.lbValue2.Caption;
+  InputForm.lbD3.Caption := InputForm.lbValue3.Caption;
+  InputForm.lbD4.Caption := InputForm.lbValue4.Caption;
+//InputForm.lbD5.Caption := InputForm.lbValue5.Caption; { SalingL: oben schon gesetzt }
+
+  InputForm.lbOhne1.Caption := InputForm.lbValue1.Caption;
+  InputForm.lbOhne2.Caption := InputForm.lbValue2.Caption;
+  InputForm.lbOhne3.Caption := InputForm.lbValue3.Caption;
 end;
 
 procedure TRiggModul.UpdateGCtrls(InputRec: TTrimmControls);
 begin
   sbPuffer := InputRec;
 
-  with InputRec, InputForm do
-  begin
-    sbController.Position := Controller;
-    sbControllerD.Position := Controller;
-    sbControllerOhne.Position := Controller;
+  InputForm.sbController.Position := InputRec.Controller;
+  InputForm.sbControllerD.Position := InputRec.Controller;
+  InputForm.sbControllerOhne.Position := InputRec.Controller;
 
-    if WinkelBtnDown then
-      sbWinkel.Position := Winkel
-    else
-      sbWinkel.Position := Vorstag;
-    sbVorstagD.Position := Vorstag;
-    sbVorstagOhne.Position := Vorstag;
+  if WinkelBtnDown then
+    InputForm.sbWinkel.Position := InputRec.Winkel
+  else
+    InputForm.sbWinkel.Position := InputRec.Vorstag;
+  InputForm.sbVorstagD.Position := InputRec.Vorstag;
+  InputForm.sbVorstagOhne.Position := InputRec.Vorstag;
 
-    sbWante.Position := Wanten;
-    sbWanteD.Position := Wanten;
-    sbWanteOhne.Position := Wanten;
+  InputForm.sbWante.Position := InputRec.Wanten;
+  InputForm.sbWanteD.Position := InputRec.Wanten;
+  InputForm.sbWanteOhne.Position := InputRec.Wanten;
 
-    sbWoben.Position := Woben;
-    sbWobenD.Position := Woben;
+  InputForm.sbWoben.Position := InputRec.Woben;
+  InputForm.sbWobenD.Position := InputRec.Woben;
 
-    sbSalingH.Position := SalingH;
-    sbSalingA.Position := SalingA;
-    sbSalingLD.Position := SalingL;
+  InputForm.sbSalingH.Position := InputRec.SalingH;
+  InputForm.sbSalingA.Position := InputRec.SalingA;
+  InputForm.sbSalingLD.Position := InputRec.SalingL;
 
-    sbVorstagOS.Position := Vorstag;
-    sbWPowerOS.Position := WPowerOS;
-  end;
+  InputForm.sbVorstagOS.Position := InputRec.Vorstag;
+  InputForm.sbWPowerOS.Position := InputRec.WPowerOS;
 
   UpdateGCtrlLabels(InputRec);
   if RotaFormActive then
@@ -569,116 +544,104 @@ begin
   Modified := True;
   InputRec := Rigg.Glieder;
 
-  { resolution of with clause explained: }
-//  if Sender = InputForm.sbController then
-//  begin
-//    InputRec.Controller := ScrollPos;
-//    InputForm.lbValue1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
-//    if not ControllerBtnDown then
-//      NeedPaint := False;
-//  end;
-
-  with InputRec, InputForm do
+  if Sender = InputForm.sbController then
   begin
-    if Sender = sbController then
-    begin
-      Controller := ScrollPos;
-      lbValue1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
-      if not ControllerBtnDown then
-        NeedPaint := False;
-    end
-    else if Sender = sbControllerD then
-    begin
-      Controller := ScrollPos;
-      lbD1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
-      if not ControllerBtnDown then
-        NeedPaint := False;
-    end
-    else if Sender = sbControllerOhne then
-    begin
-      Controller := ScrollPos;
-      lbOhne1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
-      if not ControllerBtnDown then
-        NeedPaint := False;
-    end
-    else if Sender = sbWinkel then
-    begin
-      if WinkelBtnDown then
-      begin
-        Winkel := ScrollPos;
-        lbValue2.Caption := Format('%5.2f Grad', [(Winkel - MemCtrl.Winkel) /
-          10]);
-      end
-      else
-      begin
-        Vorstag := ScrollPos;
-        lbValue2.Caption := Format('%d mm', [Vorstag - MemCtrl.Vorstag]);
-      end
-    end
-    else if Sender = sbVorstagD then
-    begin
-      Vorstag := ScrollPos;
-      lbD2.Caption := Format('%d mm', [Vorstag - MemCtrl.Vorstag]);
-    end
-    else if Sender = sbVorstagOhne then
-    begin
-      Vorstag := ScrollPos;
-      lbOhne2.Caption := Format('%d mm', [Vorstag - MemCtrl.Vorstag]);
-    end
-    else if Sender = sbWante then
-    begin
-      Wanten := ScrollPos;
-      lbValue3.Caption := Format('%d mm', [ScrollPos - MemCtrl.Wanten]);
-    end
-    else if Sender = sbWanteD then
-    begin
-      Wanten := ScrollPos;
-      lbD3.Caption := Format('%d mm', [ScrollPos - MemCtrl.Wanten]);
-    end
-    else if Sender = sbWanteOhne then
-    begin
-      Wanten := ScrollPos;
-      lbOhne3.Caption := Format('%d mm', [ScrollPos - MemCtrl.Wanten]);
-    end
-    else if Sender = sbWoben then
-    begin
-      Woben := ScrollPos;
-      lbValue4.Caption := Format('%d mm', [ScrollPos - MemCtrl.Woben]);
-    end
-    else if Sender = sbWobenD then
-    begin
-      Woben := ScrollPos;
-      lbD4.Caption := Format('%d mm', [ScrollPos - MemCtrl.Woben]);
-    end
-    else if Sender = sbSalingH then
-    begin
-      SalingH := ScrollPos;
-      lbValue5.Caption := Format('%d mm', [ScrollPos - MemCtrl.SalingH]);
-    end
-    else if Sender = sbSalingA then
-    begin
-      SalingA := ScrollPos;
-      lbValue6.Caption := Format('%d mm', [ScrollPos - MemCtrl.SalingA]);
-    end
-    else if Sender = sbSalingLD then
-    begin
-      SalingL := ScrollPos;
-      lbD5.Caption := Format('%d mm', [ScrollPos - MemCtrl.SalingL]);
-    end
-    else if Sender = sbVorstagOs then
-    begin
-      Vorstag := ScrollPos;
-      lbValue7.Caption := Format('%d mm', [ScrollPos - MemCtrl.Vorstag])
-    end
-    else if Sender = sbWPowerOS then
-    begin
-      WPowerOS := ScrollPos;
-      lbValue8.Caption := Format('%d N', [ScrollPos - MemCtrl.WPowerOS]);
+    InputRec.Controller := ScrollPos;
+    InputForm.lbValue1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
+    if not ControllerBtnDown then
       NeedPaint := False;
-    end;
+  end
+  else if Sender = InputForm.sbControllerD then
+  begin
+    InputRec.Controller := ScrollPos;
+    InputForm.lbD1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
+    if not ControllerBtnDown then
+      NeedPaint := False;
+  end
+  else if Sender = InputForm.sbControllerOhne then
+  begin
+    InputRec.Controller := ScrollPos;
+    InputForm.lbOhne1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
+    if not ControllerBtnDown then
+      NeedPaint := False;
+  end
+  else if Sender = InputForm.sbWinkel then
+  begin
+    if WinkelBtnDown then
+    begin
+      InputRec.Winkel := ScrollPos;
+      InputForm.lbValue2.Caption := Format('%5.2f Grad', [(InputRec.Winkel - MemCtrl.Winkel) /
+        10]);
+    end
+    else
+    begin
+      InputRec.Vorstag := ScrollPos;
+      InputForm.lbValue2.Caption := Format('%d mm', [InputRec.Vorstag - MemCtrl.Vorstag]);
+    end
+  end
+  else if Sender = InputForm.sbVorstagD then
+  begin
+    InputRec.Vorstag := ScrollPos;
+    InputForm.lbD2.Caption := Format('%d mm', [InputRec.Vorstag - MemCtrl.Vorstag]);
+  end
+  else if Sender = InputForm.sbVorstagOhne then
+  begin
+    InputRec.Vorstag := ScrollPos;
+    InputForm.lbOhne2.Caption := Format('%d mm', [InputRec.Vorstag - MemCtrl.Vorstag]);
+  end
+  else if Sender = InputForm.sbWante then
+  begin
+    InputRec.Wanten := ScrollPos;
+    InputForm.lbValue3.Caption := Format('%d mm', [ScrollPos - MemCtrl.Wanten]);
+  end
+  else if Sender = InputForm.sbWanteD then
+  begin
+    InputRec.Wanten := ScrollPos;
+    InputForm.lbD3.Caption := Format('%d mm', [ScrollPos - MemCtrl.Wanten]);
+  end
+  else if Sender = InputForm.sbWanteOhne then
+  begin
+    InputRec.Wanten := ScrollPos;
+    InputForm.lbOhne3.Caption := Format('%d mm', [ScrollPos - MemCtrl.Wanten]);
+  end
+  else if Sender = InputForm.sbWoben then
+  begin
+    InputRec.Woben := ScrollPos;
+    InputForm.lbValue4.Caption := Format('%d mm', [ScrollPos - MemCtrl.Woben]);
+  end
+  else if Sender = InputForm.sbWobenD then
+  begin
+    InputRec.Woben := ScrollPos;
+    InputForm.lbD4.Caption := Format('%d mm', [ScrollPos - MemCtrl.Woben]);
+  end
+  else if Sender = InputForm.sbSalingH then
+  begin
+    InputRec.SalingH := ScrollPos;
+    InputForm.lbValue5.Caption := Format('%d mm', [ScrollPos - MemCtrl.SalingH]);
+  end
+  else if Sender = InputForm.sbSalingA then
+  begin
+    InputRec.SalingA := ScrollPos;
+    InputForm.lbValue6.Caption := Format('%d mm', [ScrollPos - MemCtrl.SalingA]);
+  end
+  else if Sender = InputForm.sbSalingLD then
+  begin
+    InputRec.SalingL := ScrollPos;
+    InputForm.lbD5.Caption := Format('%d mm', [ScrollPos - MemCtrl.SalingL]);
+  end
+  else if Sender = InputForm.sbVorstagOs then
+  begin
+    InputRec.Vorstag := ScrollPos;
+    InputForm.lbValue7.Caption := Format('%d mm', [ScrollPos - MemCtrl.Vorstag])
+  end
+  else if Sender = InputForm.sbWPowerOS then
+  begin
+    InputRec.WPowerOS := ScrollPos;
+    InputForm.lbValue8.Caption := Format('%d N', [ScrollPos - MemCtrl.WPowerOS]);
+    NeedPaint := False;
   end;
 
-  if (ScrollCode = scEndScroll) or not SofortBerechnen then
+  if (ScrollCode = TScrollCode.scEndScroll) or not SofortBerechnen then
   begin
     if (Sender as TScrollbar).Tag = SBMappingArray[CursorSB] then
       ShowTriangle := True
@@ -732,36 +695,30 @@ begin
   if OutputForm.OutputPages.ActivePage = OutputForm.ControllerSheet then
   begin
     TrimmRec := Rigg.Glieder;
-    with SalingCtrl do
-    begin
-      { Abstand(iP[ooE0,x],iP[ooE,x]) in mm}
-      ControllerPos := TrimmRec.Controller;
-      { Position des Mastes in Deckshöhe von D0 aus in mm }
-      ParamXE := Round(Rigg.MastPositionE);
-      { Abstand(iP[ooD0,x],iP[ooE0,x]) in mm }
-      ParamXE0 := Round(Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x]);
-      { Abstand von E0 zur Anschlagkante Deck + Klotzdicke }
-      EdgePos := Round(Rigg.GSB.Find(fpController).Min);
-      if Assigned(ControllerPaintBox) then
-        DrawPaintBoxC(ControllerPaintBox.Canvas);
-    end;
+    { Abstand(iP[ooE0,x],iP[ooE,x]) in mm}
+    SalingCtrl.ControllerPos := TrimmRec.Controller;
+    { Position des Mastes in Deckshöhe von D0 aus in mm }
+    SalingCtrl.ParamXE := Round(Rigg.MastPositionE);
+    { Abstand(iP[ooD0,x],iP[ooE0,x]) in mm }
+    SalingCtrl.ParamXE0 := Round(Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x]);
+    { Abstand von E0 zur Anschlagkante Deck + Klotzdicke }
+    SalingCtrl.EdgePos := Round(Rigg.GSB.Find(fpController).Min);
+    if Assigned(ControllerPaintBox) then
+      DrawPaintBoxC(ControllerPaintBox.Canvas);
   end;
 
   { SalingPaintBox }
   if OutputForm.OutputPages.ActivePage = OutputForm.SalingSheet then
   begin
     TrimmRec := Rigg.Glieder;
-    with SalingCtrl do
-    begin
-      { SalingAbstand }
-      SalingA := TrimmRec.SalingA;
-      { Abstand Verbindungslinie Salinge zu Hinterkante Mast in mm }
-      SalingH := TrimmRec.SalingH;
-      { Salinglänge in mm - außerhalb berechnen }
-      SalingL := TrimmRec.SalingL;
-      if Assigned(SalingPaintBox) then
-        DrawPaintBoxS(SalingPaintBox.Canvas);
-    end;
+    { SalingAbstand }
+    SalingCtrl.SalingA := TrimmRec.SalingA;
+    { Abstand Verbindungslinie Salinge zu Hinterkante Mast in mm }
+    SalingCtrl.SalingH := TrimmRec.SalingH;
+    { Salinglänge in mm - außerhalb berechnen }
+    SalingCtrl.SalingL := TrimmRec.SalingL;
+    if Assigned(SalingPaintBox) then
+      DrawPaintBoxS(SalingPaintBox.Canvas);
   end;
 
   { Diagramm aktuellen Punkt setzen }
@@ -816,26 +773,25 @@ end;
 procedure TRiggModul.Draw;
 var
   MetaCanvas: TMetaFileCanvas;
+  c: TCanvas;
+  g: TCanvas;
 begin
-  with BitmapG.Canvas do
+  c := BitmapG.Canvas;
+  if PaintBtnDown = False then
   begin
-    if PaintBtnDown = False then
-    begin
-      PaintBackGround(BitmapG);
-      Textout(180, 16, lbMastfall);
-      Textout(180, 32, lbSpannung);
-      Textout(180, 48, lbBiegung);
-    end
-    else if TextFlipFlop then
-      PaintBackGround(BitmapG);
-  end;
+    PaintBackGround(BitmapG);
+    c.Textout(180, 16, lbMastfall);
+    c.Textout(180, 32, lbSpannung);
+    c.Textout(180, 48, lbBiegung);
+  end
+  else if TextFlipFlop then
+    PaintBackGround(BitmapG);
 
-  DrawPaintBoxG(BitMapG.Canvas);
-  with GrafikForm.PaintBoxG.Canvas do
-  begin
-    CopyMode := cmSrcCopy;
-    Draw(0, 0, BitMapG);
-  end;
+  DrawPaintBoxG(c);
+
+  g := GrafikForm.PaintBoxG.Canvas;
+  g.CopyMode := cmSrcCopy;
+  g.Draw(0, 0, BitMapG);
 
   if PaintBtnDown = True and (MetaGPaintCount <= MetaGMaxCount) then
   begin
@@ -866,36 +822,29 @@ begin
   { entspanntes Rigg grau zeichnen }
   if Grauzeichnen and BtnGrauDown then
   begin
-    with GetriebeGrafik do
-    begin
-      Farbe := clEntspannt;
-      Coloriert := False;
-      WanteGestrichelt := not Rigg.GetriebeOK;
-      Koordinaten := Rigg.rPe;
-      Draw(Canvas);
-    end;
+    GetriebeGrafik.Farbe := clEntspannt;
+    GetriebeGrafik.Coloriert := False;
+    GetriebeGrafik.WanteGestrichelt := not Rigg.GetriebeOK;
+    GetriebeGrafik.Koordinaten := Rigg.rPe;
+    GetriebeGrafik.Draw(Canvas);
   end;
+
   { Nullstellung hellblau zeichnen }
   if BtnBlauDown then
   begin
-    with GetriebeGrafik do
-    begin
-      Farbe := clNull;
-      Coloriert := False;
-      WanteGestrichelt := False;
-      Koordinaten := RefPoints;
-      Draw(Canvas);
-    end;
+    GetriebeGrafik.Farbe := clNull;
+    GetriebeGrafik.Coloriert := False;
+    GetriebeGrafik.WanteGestrichelt := False;
+    GetriebeGrafik.Koordinaten := RefPoints;
+    GetriebeGrafik.Draw(Canvas);
   end;
+
   { gespanntes Rigg farbig zeichnen}
-  with Getriebegrafik do
-  begin
-    // SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta); // jetzt oben schon gesetzt
-    Coloriert := True;
-    WanteGestrichelt := not Rigg.GetriebeOK;
-    Koordinaten := Rigg.rP;
-    Draw(Canvas);
-  end;
+//  GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta); // jetzt oben schon gesetzt
+  GetriebeGrafik.Coloriert := True;
+  GetriebeGrafik.WanteGestrichelt := not Rigg.GetriebeOK;
+  GetriebeGrafik.Koordinaten := Rigg.rP;
+  GetriebeGrafik.Draw(Canvas);
 end;
 
 procedure TRiggModul.DrawToMetaG(Canvas: TMetaFileCanvas);
@@ -905,37 +854,30 @@ begin
   { entspanntes Rigg grau zeichnen }
   if Grauzeichnen and BtnGrauDown then
   begin
-    with GetriebeGrafik do
-    begin
-      Farbe := clBlack;
-      Coloriert := False;
-      WanteGestrichelt := not Rigg.GetriebeOK;
-      Koordinaten := Rigg.rPe;
-      DrawToMeta(Canvas);
-    end;
+    GetriebeGrafik.Farbe := clBlack;
+    GetriebeGrafik.Coloriert := False;
+    GetriebeGrafik.WanteGestrichelt := not Rigg.GetriebeOK;
+    GetriebeGrafik.Koordinaten := Rigg.rPe;
+    GetriebeGrafik.DrawToMeta(Canvas);
   end;
+
   { Nullstellung hellblau zeichnen }
   if BtnBlauDown then
   begin
-    with GetriebeGrafik do
-    begin
-      Farbe := clNull;
-      Coloriert := False;
-      WanteGestrichelt := False;
-      Koordinaten := RefPoints;
-      DrawToMeta(Canvas);
-    end;
+    GetriebeGrafik.Farbe := clNull;
+    GetriebeGrafik.Coloriert := False;
+    GetriebeGrafik.WanteGestrichelt := False;
+    GetriebeGrafik.Koordinaten := RefPoints;
+    GetriebeGrafik.DrawToMeta(Canvas);
   end;
+
   { gespanntes Rigg farbig zeichnen}
-  with Getriebegrafik do
-  begin
-    // SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta); // siehe oben
-    Coloriert := True;
-    WanteGestrichelt := not Rigg.GetriebeOK;
-    Koordinaten := Rigg.rP;
-    Canvas.Pen.Width := ThickPenWidth;
-    DrawToMeta(Canvas);
-  end;
+  // GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta); // siehe oben
+  GetriebeGrafik.Coloriert := True;
+  GetriebeGrafik.WanteGestrichelt := not Rigg.GetriebeOK;
+  GetriebeGrafik.Koordinaten := Rigg.rP;
+  Canvas.Pen.Width := ThickPenWidth;
+  GetriebeGrafik.DrawToMeta(Canvas);
 
   DataInMeta := True;
 end;
@@ -945,11 +887,8 @@ var
   R: TRect;
 begin
   R := Rect(0, 0, Image.Width, Image.Height);
-  with Image.Canvas do
-  begin
-    Brush.Color := clBtnFace;
-    FillRect(R);
-  end;
+  Image.Canvas.Brush.Color := clBtnFace;
+  Image.Canvas.FillRect(R);
 end;
 
 procedure TRiggModul.DrawPaintBoxM;
@@ -972,116 +911,111 @@ procedure TRiggModul.AusgabeText;
 var
   tempSalingDaten: TSalingDaten;
   MemoPosY: LongInt;
+  ML: TStrings;
 begin
   tempSalingDaten := Rigg.SalingDaten;
 
-  MemoPosY := SendMessage(OutputForm.DisplayMemo.Handle,
-    EM_GETFIRSTVISIBLELINE, 0, 0);
-  with Rigg, tempSalingDaten, OutputForm.DisplayMemo.Lines do
-  begin
-    BeginUpdate;
-    Clear;
+  MemoPosY := SendMessage(OutputForm.DisplayMemo.Handle, EM_GETFIRSTVISIBLELINE, 0, 0);
+  ML := OutputForm.DisplayMemo.Lines;
+  ML.BeginUpdate;
+  ML.Clear;
 
-    { Text setzen }
-    lbMastFall := Format('Mastfall = %5.1f cm', [Trimm.Mastfall / 10]);
-    lbSpannung := Format('Spannung = %5.0f N', [rF[14]]);
-    lbBiegung := Format('Biegung  = %5.1f cm', [hd / 10]);
+  { Text setzen }
+  lbMastFall := Format('Mastfall = %5.1f cm', [Rigg.Trimm.Mastfall / 10]);
+  lbSpannung := Format('Spannung = %5.0f N', [Rigg.rF[14]]);
+  lbBiegung := Format('Biegung  = %5.1f cm', [Rigg.hd / 10]);
 
-    Add('Trimm:');
-    Add(Format('  Mastfall F0F     = %8.1f cm', [Trimm.Mastfall / 10]));
-    Add(Format('  Vorstagspannung  = %8.1f N', [rF[14]]));
-    Add(Format('  Durchbiegung hd  = %8.1f cm', [hd / 10]));
+  ML.Add('Trimm:');
+  ML.Add(Format('  Mastfall F0F     = %8.1f cm', [Rigg.Trimm.Mastfall / 10]));
+  ML.Add(Format('  Vorstagspannung  = %8.1f N', [Rigg.rF[14]]));
+  ML.Add(Format('  Durchbiegung hd  = %8.1f cm', [Rigg.hd / 10]));
 
-    Add('');
-    Add('Saling:');
-    Add(Format('  Saling Länge   = %6.2f mm', [SalingL]));
-    Add(Format('  Saling Höhe    = %6.2f mm', [SalingH]));
-    Add(Format('  Saling Abstand = %6.2f mm', [SalingA]));
-    Add(Format('  Saling Winkel  = %6.2f Grad', [SalingW]));
-    Add(Format('  Wanten Winkel  = %6.2f Grad', [WantenWinkel]));
-    Add(Format('  Kraft Winkel   = %6.2f Grad', [KraftWinkel]));
+  ML.Add('');
+  ML.Add('Saling:');
+  ML.Add(Format('  Saling Länge   = %6.2f mm', [tempSalingDaten.SalingL]));
+  ML.Add(Format('  Saling Höhe    = %6.2f mm', [tempSalingDaten.SalingH]));
+  ML.Add(Format('  Saling Abstand = %6.2f mm', [tempSalingDaten.SalingA]));
+  ML.Add(Format('  Saling Winkel  = %6.2f Grad', [tempSalingDaten.SalingW]));
+  ML.Add(Format('  Wanten Winkel  = %6.2f Grad', [tempSalingDaten.WantenWinkel]));
+  ML.Add(Format('  Kraft Winkel   = %6.2f Grad', [tempSalingDaten.KraftWinkel]));
 
-    Add('');
-    Add('SchnittKräfte:');
-    Add(Format('  FC  = %8.2f N    (Mastdruckkraft)', [FC]));
-    Add(Format('  FB  = %8.2f N    (Wanten/Vorstag)', [FB]));
-    Add(Format('  F2  = %8.2f N    (Saling)', [F2]));
-    Add(Format('  F1  = %8.2f N    (Controller)', [F1]));
-    Add(Format('  FA  = %8.2f N    (Mastfuß)', [FA]));
-    Add(Format('  hd  = %8.2f mm   (Saling Durchbiegung)', [hd]));
-    Add(Format('  he  = %8.2f mm   (Controller Durchbiegung)', [he]));
-    Add(Format('  sd  = %8.2f mm   (hd-FSalingWegKnick)', [hd-FSalingWegKnick]));
+  ML.Add('');
+  ML.Add('SchnittKräfte:');
+  ML.Add(Format('  FC  = %8.2f N    (Mastdruckkraft)', [Rigg.FC]));
+  ML.Add(Format('  FB  = %8.2f N    (Wanten/Vorstag)', [Rigg.FB]));
+  ML.Add(Format('  F2  = %8.2f N    (Saling)', [Rigg.F2]));
+  ML.Add(Format('  F1  = %8.2f N    (Controller)', [Rigg.F1]));
+  ML.Add(Format('  FA  = %8.2f N    (Mastfuß)', [Rigg.FA]));
+  ML.Add(Format('  hd  = %8.2f mm   (Saling Durchbiegung)', [Rigg.hd]));
+  ML.Add(Format('  he  = %8.2f mm   (Controller Durchbiegung)', [Rigg.he]));
+  ML.Add(Format('  sd  = %8.2f mm   (hd-FSalingWegKnick)', [Rigg.hd-Rigg.FSalingWegKnick]));
 
-    Add('');
-    Add('BiegeKnicken:');
-    Add(Format('  KoppelFaktor       = %8.5f', [FKoppelFaktor]));
-    Add(Format('  SalingAlpha        = %8.5f mm/N', [FSalingAlpha]));
-    Add(Format('  ControllerAlpha    = %8.5f mm/N', [FControllerAlpha]));
-    Add(Format('  SalingWeg          = %8.2f mm', [FSalingWeg]));
-    Add(Format('  SalingWegKnick     = %8.2f mm', [FSalingWegKnick]));
-    Add(Format('  ControllerWeg      = %8.2f mm', [FControllerWeg]));
-    Add(Format('  FSchnittPunktKraft = %8.2f N', [FSchnittPunktKraft]));
-    Add(Format('  FwSchnittOhne      = %8.2f mm', [FwSchnittOhne]));
-    Add(Format('  FwSchnittMit       = %8.2f mm', [FwSchnittMit]));
-    Add(Format('  FwSchnittOffset    = %8.2f mm', [FwSchnittOffset]));
+  ML.Add('');
+  ML.Add('BiegeKnicken:');
+  ML.Add(Format('  KoppelFaktor       = %8.5f', [Rigg.FKoppelFaktor]));
+  ML.Add(Format('  SalingAlpha        = %8.5f mm/N', [Rigg.FSalingAlpha]));
+  ML.Add(Format('  ControllerAlpha    = %8.5f mm/N', [Rigg.FControllerAlpha]));
+  ML.Add(Format('  SalingWeg          = %8.2f mm', [Rigg.FSalingWeg]));
+  ML.Add(Format('  SalingWegKnick     = %8.2f mm', [Rigg.FSalingWegKnick]));
+  ML.Add(Format('  ControllerWeg      = %8.2f mm', [Rigg.FControllerWeg]));
+  ML.Add(Format('  FSchnittPunktKraft = %8.2f N', [Rigg.FSchnittPunktKraft]));
+  ML.Add(Format('  FwSchnittOhne      = %8.2f mm', [Rigg.FwSchnittOhne]));
+  ML.Add(Format('  FwSchnittMit       = %8.2f mm', [Rigg.FwSchnittMit]));
+  ML.Add(Format('  FwSchnittOffset    = %8.2f mm', [Rigg.FwSchnittOffset]));
 
-    Add('');
-    Add('SchnittWinkel:');
-    Add(Format('  alpha1 = %6.2f Grad', [alpha1 * 180 / pi]));
-    Add(Format('  alpha2 = %6.2f Grad', [alpha2 * 180 / pi]));
-    Add(Format('  delta1 = %6.2f Grad', [delta1 * 180 / pi]));
-    Add(Format('  delta2 = %6.2f Grad', [delta2 * 180 / pi]));
-    Add(Format('  gamma  = %6.2f Grad', [gamma * 180 / pi]));
-    Add(Format('  beta   = %6.2f Grad', [beta * 180 / pi]));
+  ML.Add('');
+  ML.Add('SchnittWinkel:');
+  ML.Add(Format('  alpha1 = %6.2f Grad', [Rigg.alpha1 * 180 / pi]));
+  ML.Add(Format('  alpha2 = %6.2f Grad', [Rigg.alpha2 * 180 / pi]));
+  ML.Add(Format('  delta1 = %6.2f Grad', [Rigg.delta1 * 180 / pi]));
+  ML.Add(Format('  delta2 = %6.2f Grad', [Rigg.delta2 * 180 / pi]));
+  ML.Add(Format('  gamma  = %6.2f Grad', [Rigg.gamma * 180 / pi]));
+  ML.Add(Format('  beta   = %6.2f Grad', [Rigg.beta * 180 / pi]));
 
-    Add('');
-    Add('Winkel:');
-    Add(Format('  phi       = %6.2f Grad', [phi * 180 / pi]));
-    Add(Format('  psi       = %6.2f Grad', [psi * 180 / pi]));
-    Add(Format('  alpha     = %6.2f Grad', [alpha * 180 / pi]));
-    Add(Format('  phi-alpha = %6.2f Grad (Mast-Neigung)', [(phi-alpha)*180/pi]));
-    Add(Format('  psi-alpha = %6.2f Grad (Wanten-Neigung)', [(psi-alpha)*180/pi]));
+  ML.Add('');
+  ML.Add('Winkel:');
+  ML.Add(Format('  phi       = %6.2f Grad', [Rigg.phi * 180 / pi]));
+  ML.Add(Format('  psi       = %6.2f Grad', [Rigg.psi * 180 / pi]));
+  ML.Add(Format('  alpha     = %6.2f Grad', [Rigg.alpha * 180 / pi]));
+  ML.Add(Format('  phi-alpha = %6.2f Grad (Mast-Neigung)', [(Rigg.phi-Rigg.alpha)*180/pi]));
+  ML.Add(Format('  psi-alpha = %6.2f Grad (Wanten-Neigung)', [(Rigg.psi-Rigg.alpha)*180/pi]));
 
-    Add('');
-    Add('MastWinkel:');
-    Add(Format('  epsB = %6.2f Grad', [epsB * 180 / pi]));
-    Add(Format('  eps2 = %6.2f Grad', [eps2 * 180 / pi]));
-    Add(Format('  eps1 = %6.2f Grad', [eps1 * 180 / pi]));
-    Add(Format('  epsA = %6.2f Grad', [epsA * 180 / pi]));
-    Add(Format('  Epsilon  = %6.2f Grad', [epsilon * 180 / pi]));
+  ML.Add('');
+  ML.Add('MastWinkel:');
+  ML.Add(Format('  epsB = %6.2f Grad', [Rigg.epsB * 180 / pi]));
+  ML.Add(Format('  eps2 = %6.2f Grad', [Rigg.eps2 * 180 / pi]));
+  ML.Add(Format('  eps1 = %6.2f Grad', [Rigg.eps1 * 180 / pi]));
+  ML.Add(Format('  epsA = %6.2f Grad', [Rigg.epsA * 180 / pi]));
+  ML.Add(Format('  Epsilon  = %6.2f Grad', [epsilon * 180 / pi]));
 
-    SendMessage(OutputForm.DisplayMemo.Handle, EM_LINESCROLL, 0, MemoPosY);
-    EndUpdate; {OutputForm.DisplayMemo.Lines.EndUpdate}
-  end;
+  SendMessage(OutputForm.DisplayMemo.Handle, EM_LINESCROLL, 0, MemoPosY);
+  ML.EndUpdate;
 end;
 
 procedure TRiggModul.AusgabeKommentar;
 var
-  tempSalingDaten: TSalingDaten;
   temp: real;
+  ML: TStrings;
 begin
-  tempSalingDaten := Rigg.SalingDaten;
-  with Rigg, tempSalingDaten, OutputForm.KommentarMemo.Lines do
-  begin
-    BeginUpdate;
-    Clear;
+  ML := OutputForm.KommentarMemo.Lines;
+  ML.BeginUpdate;
+  ML.Clear;
 
-    temp := hd / 10; { Biegung in cm }
-    if temp < 0 then
-      Add('Mastbiegung negativ!');
-    if temp < 2 then
-      Add('Mast hat fast keine Vorbiegung.');
-    if temp > 10 then
-      Add('Mastbiegung zu groß.');
+  temp := Rigg.hd / 10; { Biegung in cm }
+  if temp < 0 then
+    ML.Add('Mastbiegung negativ!');
+  if temp < 2 then
+    ML.Add('Mast hat fast keine Vorbiegung.');
+  if temp > 10 then
+    ML.Add('Mastbiegung zu groß.');
 
-    temp := rF[14]; { Vorstagspannung in N }
-    if temp < 800 then
-      Add('Vorstagspannung zu gering.');
-    if temp > 2000 then
-      Add('Vorstagspannung zu groß.');
+  temp := Rigg.rF[14]; { Vorstagspannung in N }
+  if temp < 800 then
+    ML.Add('Vorstagspannung zu gering.');
+  if temp > 2000 then
+    ML.Add('Vorstagspannung zu groß.');
 
-    EndUpdate;
-  end;
+  ML.EndUpdate;
 end;
 
 procedure TRiggModul.SetReportItem(Value: TReportItem);
@@ -1090,58 +1024,54 @@ begin
   begin
     FReportItem := Value;
     rLItemClick(Value);
-    with OutputForm do
-      OutputPages.ActivePage := MasterMemo;
+    OutputForm.OutputPages.ActivePage := OutputForm.MasterMemo;
   end;
 end;
 
 procedure TRiggModul.rLItemClick(Item: TReportItem);
+var
+  ML: TStrings;
 begin
   RiggReport.ML.Clear;
   RiggReport.ML.Add('');
-  with RiggReport, Rigg do
-  begin
-    if Item = rL_Item then
-      AusgabeRL(rL)
-    else if Item = rLe_Item then
-      AusgabeRLE(rLe)
-    else if Item = rP_Item then
-      AusgabeRP(rP)
-    else if Item = rPe_Item then
-      AusgabeRPE(rPe)
-    else if Item = rF_Item then
-      AusgabeRF(rF)
-    else if Item = DiffL_Item then
-      AusgabeDiffL(rL, rLe)
-    else if Item = DiffP_Item then
-      AusgabeDiffP(rP, rPe)
-    else if Item = Log_Item then
-      AusgabeLog(LogList);
-  end;
-  with RiggReport.ML do
-  begin
-    Add(' Angezeigt werden die zuletzt gültigen Werte.');
-    Add('');
-    Add(' Die Tabellenwerte sind aktuell und gültig, wenn');
-    Add(' - die LED Grün ist und');
-    Add(' - die Taste "=" gedrückt wurde bzw.');
-    Add(' - der Schalter "A" gedrückt ist.');
-    Add('');
-    Add(' Die Tabellenwerte können ungültig sein, wenn');
-    Add(' - die LED Rot ist und/oder');
-    Add(' - die Taste "=" nicht gedrückt wurde bzw.');
-    Add(' - der Schalter "A" nicht gedrückt ist');
-  end;
-  with OutputForm do
-  begin
-    Memo.Lines.BeginUpdate;
-    try
-      Memo.Clear;
-      Memo.Lines := RiggReport.ML;
-      Memo.SelStart := 0;
-    finally
-      Memo.Lines.EndUpdate;
-    end;
+
+  if Item = rL_Item then
+    RiggReport.AusgabeRL(Rigg.rL)
+  else if Item = rLe_Item then
+    RiggReport.AusgabeRLE(Rigg.rLe)
+  else if Item = rP_Item then
+    RiggReport.AusgabeRP(Rigg.rP)
+  else if Item = rPe_Item then
+    RiggReport.AusgabeRPE(Rigg.rPe)
+  else if Item = rF_Item then
+    RiggReport.AusgabeRF(Rigg.rF)
+  else if Item = DiffL_Item then
+    RiggReport.AusgabeDiffL(Rigg.rL, Rigg.rLe)
+  else if Item = DiffP_Item then
+    RiggReport.AusgabeDiffP(Rigg.rP, Rigg.rPe)
+  else if Item = Log_Item then
+    RiggReport.AusgabeLog(Rigg.LogList);
+
+  ML := RiggReport.ML;
+  ML.Add(' Angezeigt werden die zuletzt gültigen Werte.');
+  ML.Add('');
+  ML.Add(' Die Tabellenwerte sind aktuell und gültig, wenn');
+  ML.Add(' - die LED Grün ist und');
+  ML.Add(' - die Taste "=" gedrückt wurde bzw.');
+  ML.Add(' - der Schalter "A" gedrückt ist.');
+  ML.Add('');
+  ML.Add(' Die Tabellenwerte können ungültig sein, wenn');
+  ML.Add(' - die LED Rot ist und/oder');
+  ML.Add(' - die Taste "=" nicht gedrückt wurde bzw.');
+  ML.Add(' - der Schalter "A" nicht gedrückt ist');
+
+  OutputForm.Memo.Lines.BeginUpdate;
+  try
+    OutputForm.Memo.Clear;
+    OutputForm.Memo.Lines := RiggReport.ML;
+    OutputForm.Memo.SelStart := 0;
+  finally
+    OutputForm.Memo.Lines.EndUpdate;
   end;
   RiggReport.ML.Clear;
 end;
@@ -1160,32 +1090,38 @@ begin
   RiggReport.ML.Clear;
   RiggReport.ML.Add('{Ausgaben Rigg 3d:}');
   RiggReport.ML.Add('');
-  with RiggReport, Rigg do
+  for i := 0 to MemoDlg.DstList.Items.Count - 1 do
   begin
-    for i := 0 to MemoDlg.DstList.Items.Count - 1 do
-    begin
-      if MemoDlg.DstList.Items[i] = 'rP' then
-        AusgabeRP(rP);
-      if MemoDlg.DstList.Items[i] = 'rPe' then
-        AusgabeRPE(rPe);
-      if MemoDlg.DstList.Items[i] = 'DiffP' then
-        AusgabeDiffP(rP, rPe);
-      if MemoDlg.DstList.Items[i] = 'rL' then
-        AusgabeRL(rL);
-      if MemoDlg.DstList.Items[i] = 'rLe' then
-        AusgabeRLE(rLe);
-      if MemoDlg.DstList.Items[i] = 'DiffL' then
-        AusgabeDiffL(rL, rLe);
-      if MemoDlg.DstList.Items[i] = 'rF' then
-        AusgabeRF(rF);
-      if MemoDlg.DstList.Items[i] = 'Winkel' then
-        AusgabeWinkel(alpha,
-          alpha1, alpha2, beta, gamma, delta1, delta2, epsilon, phi, psi);
-      if MemoDlg.DstList.Items[i] = 'TrimmControls' then
-        AusgabeTrimmControls(Glieder);
-      if MemoDlg.DstList.Items[i] = 'SalingDaten' then
-        AusgabeSalingDaten(SalingDaten);
-    end;
+    if MemoDlg.DstList.Items[i] = 'rP' then
+      RiggReport.AusgabeRP(Rigg.rP);
+    if MemoDlg.DstList.Items[i] = 'rPe' then
+      RiggReport.AusgabeRPE(Rigg.rPe);
+    if MemoDlg.DstList.Items[i] = 'DiffP' then
+      RiggReport.AusgabeDiffP(Rigg.rP, Rigg.rPe);
+    if MemoDlg.DstList.Items[i] = 'rL' then
+      RiggReport.AusgabeRL(Rigg.rL);
+    if MemoDlg.DstList.Items[i] = 'rLe' then
+      RiggReport.AusgabeRLE(Rigg.rLe);
+    if MemoDlg.DstList.Items[i] = 'DiffL' then
+      RiggReport.AusgabeDiffL(Rigg.rL, Rigg.rLe);
+    if MemoDlg.DstList.Items[i] = 'rF' then
+      RiggReport.AusgabeRF(Rigg.rF);
+    if MemoDlg.DstList.Items[i] = 'Winkel' then
+      RiggReport.AusgabeWinkel(
+        Rigg.alpha,
+        Rigg.alpha1,
+        Rigg.alpha2,
+        Rigg.beta,
+        Rigg.gamma,
+        Rigg.delta1,
+        Rigg.delta2,
+        Rigg.epsilon,
+        Rigg.phi,
+        Rigg.psi);
+    if MemoDlg.DstList.Items[i] = 'TrimmControls' then
+      RiggReport.AusgabeTrimmControls(Rigg.Glieder);
+    if MemoDlg.DstList.Items[i] = 'SalingDaten' then
+      RiggReport.AusgabeSalingDaten(Rigg.SalingDaten);
   end;
   Memo.Lines := RiggReport.ML;
   RiggReport.ML.Clear;
@@ -1199,28 +1135,31 @@ begin
   FWReport.ML.Clear;
   FWReport.ML.Add('{Ausgaben Fachwerk 2d:}');
   FWReport.ML.Add('');
-  with FWReport, Rigg, Fachwerk do
+  for i := 0 to MemoDlg.DstList.Items.Count - 1 do
   begin
-    for i := 0 to MemoDlg.DstList.Items.Count - 1 do
-    begin
-      // FWReport.Ausgabe(Rigg.Fachwerk);
-      if MemoDlg.DstList.Items[i] = 'FW_Geometrie' then
-        AusgabeGeometrie(G, S);
-      if MemoDlg.DstList.Items[i] = 'FW_StabQuerschnitte' then
-        AusgabeStabQuerschnitte(vektorEA, S);
-      if MemoDlg.DstList.Items[i] = 'FW_Elastizitaeten' then
-        AusgabeElastizitaeten(Q, S);
-      if MemoDlg.DstList.Items[i] = 'FW_Koordinaten' then
-        AusgabeKoordinaten(KX, KY, K);
-      if MemoDlg.DstList.Items[i] = 'FW_Belastung' then
-        AusgabeBelastung(FXsaved, FYsaved, K);
-      if MemoDlg.DstList.Items[i] = 'FW_Auflagerkraefte' then
-        AusgabeAuflagerkraefte(Lager);
-      if MemoDlg.DstList.Items[i] = 'FW_Stabkraefte' then
-        AusgabeStabkraefte(FS, S);
-      if MemoDlg.DstList.Items[i] = 'FW_Verschiebungen' then
-        AusgabeVerschiebungen(FO1, FO2, FO, PO1, PO2, K);
-    end;
+    // FWReport.Ausgabe(Rigg.Fachwerk);
+    if MemoDlg.DstList.Items[i] = 'FW_Geometrie' then
+      FWReport.AusgabeGeometrie(Rigg.Fachwerk.G, Rigg.Fachwerk.S);
+    if MemoDlg.DstList.Items[i] = 'FW_StabQuerschnitte' then
+      FWReport.AusgabeStabQuerschnitte(Rigg.Fachwerk.vektorEA, Rigg.Fachwerk.S);
+    if MemoDlg.DstList.Items[i] = 'FW_Elastizitaeten' then
+      FWReport.AusgabeElastizitaeten(Rigg.Fachwerk.Q, Rigg.Fachwerk.S);
+    if MemoDlg.DstList.Items[i] = 'FW_Koordinaten' then
+      FWReport.AusgabeKoordinaten(Rigg.Fachwerk.KX, Rigg.Fachwerk.KY, Rigg.Fachwerk.K);
+    if MemoDlg.DstList.Items[i] = 'FW_Belastung' then
+      FWReport.AusgabeBelastung(Rigg.Fachwerk.FXsaved, Rigg.Fachwerk.FYsaved, Rigg.Fachwerk.K);
+    if MemoDlg.DstList.Items[i] = 'FW_Auflagerkraefte' then
+      FWReport.AusgabeAuflagerkraefte(Rigg.Fachwerk.Lager);
+    if MemoDlg.DstList.Items[i] = 'FW_Stabkraefte' then
+      FWReport.AusgabeStabkraefte(Rigg.Fachwerk.FS, Rigg.Fachwerk.S);
+    if MemoDlg.DstList.Items[i] = 'FW_Verschiebungen' then
+      FWReport.AusgabeVerschiebungen(
+        Rigg.Fachwerk.FO1,
+        Rigg.Fachwerk.FO2,
+        Rigg.Fachwerk.FO,
+        PO1,
+        PO2,
+        Rigg.Fachwerk.K);
   end;
   Memo.Lines.AddStrings(FWReport.ML);
   FWReport.ML.Clear;
@@ -1233,7 +1172,7 @@ begin
   Modified := False;
   SalingTyp := Rigg.SalingTyp;
   ControllerBtnDown := Rigg.ControllerTyp <> ctOhne;
-  // ControllerTyp := Rigg.ControllerTyp; //see SetControllerBtnDown
+  // ControllerTyp := Rigg.ControllerTyp; // see SetControllerBtnDown
   CalcTyp := Rigg.CalcTyp;
   FormMain.TakeOver;
   (* automatisch erneut aufgerufen:
@@ -1392,10 +1331,8 @@ begin
     Rigg.CalcTyp := Value;
     if Value <> ctBiegeKnicken then
     begin
-      with OutputForm do
-        if OutputPages.ActivePage = KraftSheet then
-          OutputPages.ActivePage := OutputPages.FindNextPage(KraftSheet, False,
-            False);
+      if OutputForm.OutputPages.ActivePage = OutputForm.KraftSheet then
+          OutputForm.OutputPages.ActivePage := OutputForm.OutputPages.FindNextPage(OutputForm.KraftSheet, False, False);
       OutputForm.Kraftsheet.TabVisible := False;
     end
     else
@@ -1485,18 +1422,15 @@ begin
   { Controller zurückfahren auf Rigg.ControllerAnschlag
     --> entspricht 50 in GUI }
   ControllerAnschlag := 50;
-  with InputForm do
+  if SalingTyp = stFest then
   begin
-    if SalingTyp = stFest then
-    begin
-      sbController.Position := ControllerAnschlag;
-      sbControllerScroll(sbController, scEndScroll, ControllerAnschlag);
-    end
-    else if SalingTyp = stDrehbar then
-    begin
-      sbControllerD.Position := ControllerAnschlag;
-      sbControllerScroll(sbControllerD, scEndScroll, ControllerAnschlag);
-    end;
+    InputForm.sbController.Position := ControllerAnschlag;
+    sbControllerScroll(InputForm.sbController, TScrollCode.scEndScroll, ControllerAnschlag);
+  end
+  else if SalingTyp = stDrehbar then
+  begin
+    InputForm.sbControllerD.Position := ControllerAnschlag;
+    sbControllerScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
   end;
   BiegeUndNeigeForm.ShowModal;
   UpdateGCtrls(Rigg.Glieder);
@@ -1511,20 +1445,17 @@ var
 begin
   { Controller zurückfahren auf Rigg.FiControllerAnschlag }
   ControllerAnschlag := 50;
-  with InputForm do
+  if SalingTyp = stFest then
   begin
-    if SalingTyp = stFest then
-    begin
-      sbController.Position := ControllerAnschlag;
-      sbControllerScroll(sbController, scEndScroll, ControllerAnschlag);
-    end
-    else if SalingTyp = stDrehbar then
-    begin
-      sbControllerD.Position := ControllerAnschlag;
-      sbControllerScroll(sbControllerD, scEndScroll, ControllerAnschlag);
-    end;
+    InputForm.sbController.Position := ControllerAnschlag;
+    sbControllerScroll(InputForm.sbController, TScrollCode.scEndScroll, ControllerAnschlag);
+  end
+  else if SalingTyp = stDrehbar then
+  begin
+    InputForm.sbControllerD.Position := ControllerAnschlag;
+    sbControllerScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
   end;
-  CtrlForm := CtrlDlg1; {CtrlForm := CtrlDlg oder CtrlDlg1;}
+  CtrlForm := CtrlDlg1; { CtrlForm := CtrlDlg oder CtrlDlg1; }
   if Rigg.CalcTyp = ctKraftGemessen then
     CtrlForm := BiegeUndNeigeForm;
 
@@ -1564,15 +1495,12 @@ begin
   SalingTyp := stOhne_2;
 
   KurveValid := False;
-  with InputForm do
-  begin
-    if rbControllerOhne.Checked then
-      SBName := fpController
-    else if rbVorstagOhne.Checked then
-      SBName := fpVorstag
-    else if rbWanteOhne.Checked then
-      SBName := fpWante;
-  end;
+  if InputForm.rbControllerOhne.Checked then
+    SBName := fpController
+  else if InputForm.rbVorstagOhne.Checked then
+    SBName := fpVorstag
+  else if InputForm.rbWanteOhne.Checked then
+    SBName := fpWante;
 
   UpdateGetriebe;
   Rigg.UpdateGSB;
@@ -1589,19 +1517,16 @@ begin
   SalingTyp := stDrehbar;
 
   KurveValid := False;
-  with InputForm do
-  begin
-    if rbControllerD.Checked then
-      SBName := fpController
-    else if rbVorstagD.Checked then
-      SBName := fpVorstag
-    else if rbWanteD.Checked then
-      SBName := fpWante
-    else if rbWobenD.Checked then
-      SBName := fpWoben
-    else if rbSalingLD.Checked then
-      SBName := fpSalingL;
-  end;
+  if InputForm.rbControllerD.Checked then
+    SBName := fpController
+  else if InputForm.rbVorstagD.Checked then
+    SBName := fpVorstag
+  else if InputForm.rbWanteD.Checked then
+    SBName := fpWante
+  else if InputForm.rbWobenD.Checked then
+    SBName := fpWoben
+  else if InputForm.rbSalingLD.Checked then
+    SBName := fpSalingL;
 
   UpdateGetriebe;
   Rigg.UpdateGSB;
@@ -1616,23 +1541,20 @@ begin
   SalingTyp := stFest;
 
   KurveValid := False;
-  with InputForm do
-  begin
-    if rbController.Checked then
-      SBName := fpController
-    else if rbWinkel.Checked and WinkelBtnDown then
-      SBName := fpWinkel
-    else if rbWinkel.Checked and not WinkelBtnDown then
-      SBName := fpVorstag
-    else if rbWante.Checked then
-      SBName := fpWante
-    else if rbWoben.Checked then
-      SBName := fpWoben
-    else if rbSalingH.Checked then
-      SBName := fpSalingH
-    else if rbSalingA.Checked then
-      SBName := fpSalingA;
-  end;
+  if InputForm.rbController.Checked then
+    SBName := fpController
+  else if InputForm.rbWinkel.Checked and WinkelBtnDown then
+    SBName := fpWinkel
+  else if InputForm.rbWinkel.Checked and not WinkelBtnDown then
+    SBName := fpVorstag
+  else if InputForm.rbWante.Checked then
+    SBName := fpWante
+  else if InputForm.rbWoben.Checked then
+    SBName := fpWoben
+  else if InputForm.rbSalingH.Checked then
+    SBName := fpSalingH
+  else if InputForm.rbSalingA.Checked then
+    SBName := fpSalingA;
 
   UpdateGetriebe;
   Rigg.UpdateGSB;
@@ -1661,33 +1583,27 @@ end;
 
 procedure TRiggModul.SalingTypChange(Sender: TObject);
 begin
-  with InputForm, FormMain do
-  begin
-    if Sender = FestItem then
-      InputPages.ActivePage := tsFest;
-    if Sender = DrehbarItem then
-      InputPages.ActivePage := tsDrehbar;
-    if Sender = OhneItem then
-      InputPages.ActivePage := tsOhne;
-    if Sender = OSDlgItem then
-      InputPages.ActivePage := tsOhneStarr;
-    if Sender = DatenItem then
-      InputPages.ActivePage := tsDatenbank;
-  end;
+  if Sender = FormMain.FestItem then
+    InputForm.InputPages.ActivePage := InputForm.tsFest;
+  if Sender = FormMain.DrehbarItem then
+    InputForm.InputPages.ActivePage := InputForm.tsDrehbar;
+  if Sender = FormMain.OhneItem then
+    InputForm.InputPages.ActivePage := InputForm.tsOhne;
+  if Sender = FormMain.OSDlgItem then
+    InputForm.InputPages.ActivePage := InputForm.tsOhneStarr;
+  if Sender = FormMain.DatenItem then
+    InputForm.InputPages.ActivePage := InputForm.tsDatenbank;
   InputPagesChange(Sender);
 end;
 
 procedure TRiggModul.InputPagesChange(Sender: TObject);
 begin
-  with FormMain do
-  begin
-    case InputForm.InputPages.ActivePage.Tag of
-      0: FestItemClick(Sender);
-      1: DrehbarItemClick(Sender);
-      2: OhneItemClick(Sender);
-      3: OSDlgItemClick(Sender);
-      4: DatenItemClick(Sender);
-    end;
+  case InputForm.InputPages.ActivePage.Tag of
+    0: FormMain.FestItemClick(Sender);
+    1: FormMain.DrehbarItemClick(Sender);
+    2: FormMain.OhneItemClick(Sender);
+    3: FormMain.OSDlgItemClick(Sender);
+    4: FormMain.DatenItemClick(Sender);
   end;
 end;
 
@@ -1818,6 +1734,8 @@ var
   EnvPos: TRect;
   SavedZoomFaktor, Zoom: Integer;
   MetaCanvas: TMetaFileCanvas;
+  h: HDC;
+  pb: TPaintBox;
 begin
   if not RggPrinter.OKToPrint then
   begin
@@ -1834,17 +1752,13 @@ begin
 
   Printer.BeginDoc;
 
-  with GrafikForm.PaintBoxG do
-  begin
-    SetMapMode(Printer.Canvas.Handle, MM_ISOTROPIC);
-    SetWindowExtEx(Printer.Canvas.Handle, Width * Zoom, Height * Zoom, nil);
-    SetWindowOrgEx(Printer.Canvas.Handle, (Width * Zoom) div 2, (Height * Zoom)
-      div 2, nil);
-    SetViewPortExtEx(Printer.Canvas.Handle, EnvSize.x, EnvSize.y, nil);
-    SetViewPortOrgEx(Printer.Canvas.Handle,
-      EnvPos.Left + EnvSize.x div 2,
-      EnvPos.Bottom - EnvSize.y div 2, nil);
-  end;
+  h := Printer.Canvas.Handle;
+  pb := GrafikForm.PaintBoxG;
+  SetMapMode(h, MM_ISOTROPIC);
+  SetWindowExtEx(h, pb.Width * Zoom, pb.Height * Zoom, nil);
+  SetWindowOrgEx(h, (pb.Width * Zoom) div 2, (pb.Height * Zoom) div 2, nil);
+  SetViewPortExtEx(h, EnvSize.x, EnvSize.y, nil);
+  SetViewPortOrgEx(h, EnvPos.Left + EnvSize.x div 2, EnvPos.Bottom - EnvSize.y div 2, nil);
 
   Rgn := CreateRectRgnIndirect(EnvPos);
   SelectClipRgn(Printer.Canvas.Handle, Rgn);
@@ -1884,6 +1798,8 @@ var
   WindowOrgX, WindowOrgY: Integer;
   ViewPortExtX, ViewPortExtY: Integer;
   ViewPortOrgX, ViewPortOrgY: Integer;
+  h: HDC;
+  pb: TPaintBox;
 begin
   ThickPenWidth := 1;
   Zoom := 10;
@@ -1905,67 +1821,64 @@ begin
     end;
   end;
 
-  WindowExtX := GrafikForm.PaintBoxG.Width * Zoom;
-  WindowExtY := GrafikForm.PaintBoxG.Height * Zoom;
+  pb := PreviewGForm.PreviewGBox;
+  h := pb.Canvas.Handle;
+
+  WindowExtX := pb.Width * Zoom;
+  WindowExtY := pb.Height * Zoom;
   WindowOrgX := WindowExtX div 2;
   WindowOrgY := WindowExtY div 2;
 
-  with PreviewGForm.PreviewGBox do
-  begin
-    Rand := 10;
-    OffsetY := 0;
-    ViewPortExtX := Width - Rand;
-    ViewPortExtY := Height - Rand;
-    ViewPortOrgX := Left + Rand div 2 + ViewPortExtX div 2;
-    ViewPortOrgY := Top + Rand div 2 + OffsetY + ViewPortExtY div 2;
+  Rand := 10;
+  OffsetY := 0;
+  ViewPortExtX := pb.Width - Rand;
+  ViewPortExtY := pb.Height - Rand;
+  ViewPortOrgX := pb.Left + Rand div 2 + ViewPortExtX div 2;
+  ViewPortOrgY := pb.Top + Rand div 2 + OffsetY + ViewPortExtY div 2;
 
-    SetMapMode(Canvas.Handle, MM_ISOTROPIC);
-    SetWindowExtEx(Canvas.Handle, WindowExtX, WindowExtY, nil);
-    SetWindowOrgEx(Canvas.Handle, WindowOrgX, WindowOrgY, nil);
-    SetViewPortExtEx(Canvas.Handle, ViewPortExtX, ViewPortExtY, nil);
-    SetViewPortOrgEx(Canvas.Handle, ViewPortOrgX, ViewPortOrgY, nil);
+  SetMapMode(h, MM_ISOTROPIC);
+  SetWindowExtEx(h, WindowExtX, WindowExtY, nil);
+  SetWindowOrgEx(h, WindowOrgX, WindowOrgY, nil);
+  SetViewPortExtEx(h, ViewPortExtX, ViewPortExtY, nil);
+  SetViewPortOrgEx(h, ViewPortOrgX, ViewPortOrgY, nil);
 
-    Canvas.Brush.Color := clSilver;
-    Canvas.Pen.Color := clBlue;
-    Canvas.Pen.Width := 1;
-    Canvas.Rectangle(0, 0, WindowExtX, WindowExtY);
+  pb.Canvas.Brush.Color := clSilver;
+  pb.Canvas.Pen.Color := clBlue;
+  pb.Canvas.Pen.Width := 1;
+  pb.Canvas.Rectangle(0, 0, WindowExtX, WindowExtY);
 
-    R := Rect(0, 0, WindowExtX, WindowExtY);
-    LPTODP(Canvas.Handle, R, 2);
-    Rgn := CreateRectRgnIndirect(R);
-    SelectClipRgn(Canvas.Handle, Rgn);
-    { SelectClipRgn() arbeitet mit Kopie von Rgn! }
-    DeleteObject(Rgn);
+  R := Rect(0, 0, WindowExtX, WindowExtY);
+  LPTODP(h, R, 2);
+  Rgn := CreateRectRgnIndirect(R);
+  SelectClipRgn(h, Rgn); { SelectClipRgn arbeitet mit Kopie von Rgn! }
+  DeleteObject(Rgn);
 
-    Canvas.Draw(0, 0, MetaFileG)
-  end;
+  pb.Canvas.Draw(0, 0, MetaFileG)
 end;
 
 procedure TRiggModul.CopyMetaFileG;
 var
   MetaFile: TMetaFile;
+  mfc: TMetafileCanvas;
+  h: HDC;
 begin
   MetaFile := TMetaFile.Create;
   MetaFile.Width := 293;
   MetaFile.Height := 422;
-  with TMetaFileCanvas.CreateWithComment(MetaFile, 0,
-    'Gustav Schubert', 'Rigg, Getriebegrafik') do
-  begin
-    try
-      SetMapMode(Handle, MM_ISOTROPIC);
-      SetWindowExtEx(Handle, 100, 100, nil);
-      SetWindowOrgEx(Handle, 0, 0, nil);
-      SetViewPortExtEx(Handle, 10, 10, nil);
-      SetViewPortOrgEx(Handle, 0, 0, nil);
-
-      Brush.Color := clSilver;
-      Pen.Color := clBlue;
-      Rectangle(0, 0, 2930, 4220);
-
-      Draw(0, 0, MetaFileG);
-    finally
-      Free;
-    end;
+  mfc := TMetaFileCanvas.CreateWithComment(MetaFile, 0, 'Gustav Schubert', 'Rigg, Getriebegrafik');
+  h := mfc.Handle;
+  try
+    SetMapMode(h, MM_ISOTROPIC);
+    SetWindowExtEx(h, 100, 100, nil);
+    SetWindowOrgEx(h, 0, 0, nil);
+    SetViewPortExtEx(h, 10, 10, nil);
+    SetViewPortOrgEx(h, 0, 0, nil);
+    mfc.Brush.Color := clSilver;
+    mfc.Pen.Color := clBlue;
+    mfc.Rectangle(0, 0, 2930, 4220);
+    mfc.Draw(0, 0, MetaFileG);
+  finally
+    Free;
   end;
   Clipboard.Assign(MetaFile);
   MetaFile.Free;
@@ -2061,7 +1974,7 @@ begin
       begin
         af[tempIndex, i] := Rigg.hd;
       end;
-    end; { i-Schleife }
+    end;
 
     FChartValid := True;
     KurveValid := True;
@@ -2083,7 +1996,7 @@ begin
     DrawPoint;
     Screen.Cursor := crDefault;
   end;
-end; { GetCurves }
+end;
 
 procedure TRiggModul.UpdateGetriebePunkt;
 var
@@ -2127,24 +2040,21 @@ procedure TRiggModul.UpdateRiggPunkt;
 var
   tempIndex: Integer;
 begin
-  with OutputForm do
+  { RiggPunkte bereits in UpdateGetriebePunkt genullt! }
+  if (Rigg.GetriebeOK and Rigg.MastOK and Rigg.RiggOK) then
   begin
-    { RiggPunkte bereits in UpdateGetriebePunkt genullt! }
-    if (Rigg.GetriebeOK and Rigg.MastOK and Rigg.RiggOK) then
-    begin
-      tempIndex := YComboBox.Items.IndexOf('Vorstag-Spannung');
-      if (tempIndex <> -1) and (tempIndex < ANr) then
-        bf[tempIndex] := Rigg.rF[14];
-      tempIndex := YComboBox.Items.IndexOf('Wanten-Spannung');
-      if (tempIndex <> -1) and (tempIndex < ANr) then
-        bf[tempIndex] := Rigg.rF[13];
-      tempIndex := YComboBox.Items.IndexOf('Elastizität Punkt C');
-      if (tempIndex <> -1) and (tempIndex < ANr) then
-        bf[tempIndex] := Abstand(Rigg.rP[ooC], Rigg.rPe[ooC]);
-    end;
-    if cbFollowPoint.Checked then
-      DrawPoint;
+    tempIndex := YComboBox.Items.IndexOf('Vorstag-Spannung');
+    if (tempIndex <> -1) and (tempIndex < ANr) then
+      bf[tempIndex] := Rigg.rF[14];
+    tempIndex := YComboBox.Items.IndexOf('Wanten-Spannung');
+    if (tempIndex <> -1) and (tempIndex < ANr) then
+      bf[tempIndex] := Rigg.rF[13];
+    tempIndex := YComboBox.Items.IndexOf('Elastizität Punkt C');
+    if (tempIndex <> -1) and (tempIndex < ANr) then
+      bf[tempIndex] := Abstand(Rigg.rP[ooC], Rigg.rPe[ooC]);
   end;
+  if OutputForm.cbFollowPoint.Checked then
+    DrawPoint;
 end;
 
 procedure TRiggModul.DrawChart;
@@ -2228,6 +2138,8 @@ var
   PlotExtX, PlotExtY: Integer;
   PlotOrgX, PlotOrgY: Integer;
   tempX, tempY: double;
+  c: TCanvas;
+  h: HDC;
 begin
   PlotWidth := Rect.Right - Rect.Left;
   PlotHeight := Rect.Bottom - Rect.Top;
@@ -2237,118 +2149,112 @@ begin
   PlotOrgY := 0;
 
   bmp := TBitmap.Create;
-  with bmp do
-  begin
-    Width := PlotWidth;
-    Height := PlotHeight;
-  end;
+  bmp.Width := PlotWidth;
+  bmp.Height := PlotHeight;
   try
     PaintBackGround(bmp);
+    c := bmp.Canvas;
+    h := c.Handle;
+    SetMapMode(h, MM_ANISOTROPIC);
+    SetWindowExtEx(h, PlotExtX, -PlotExtY, nil);
+    SetWindowOrgEx(h, PlotOrgX, PlotOrgY, nil);
+    SetViewPortExtEx(h, PlotWidth, PlotHeight, nil);
+    SetViewPortOrgEx(h, 0, PlotHeight, nil);
 
-    with bmp.Canvas do
+    {Kurve}
+    c.Pen.Color := clBlue;
+    c.MoveTo(0, 0);
+    for i := 0 to CPMax do
     begin
-      SetMapMode(Handle, MM_ANISOTROPIC);
-      SetWindowExtEx(Handle, PlotExtX, -PlotExtY, nil);
-      SetWindowOrgEx(Handle, PlotOrgX, PlotOrgY, nil);
-      SetViewPortExtEx(Handle, PlotWidth, PlotHeight, nil);
-      SetViewPortOrgEx(Handle, 0, PlotHeight, nil);
-
-      {Kurve}
-      Pen.Color := clBlue;
-      MoveTo(0, 0);
-      for i := 0 to CPMax do
-      begin
-        tempX := PlotExtX * (i / CPMax);
-        tempY := PlotExtY * (f[i] - Ymin) / (YMax - Ymin);
-        P.x := Round(Limit(tempX));
-        P.y := Round(Limit(tempY));
-        LineTo(P.x, P.y);
-      end;
-
-      { Aktueller Punkt bzw. X-Position }
-      R.Left := 0;
-      R.Top := 0;
-      R.Bottom := 5;
-      R.Right := 5;
-      DPTOLP(Handle, R, 2);
-      RadiusX := R.Right - R.Left;
-      RadiusY := R.Bottom - R.Top;
-
-      tempX := PlotExtX * (ChartPunktX - Xmin) / (XMax - Xmin);
-      tempY := PlotExtY * (ChartPunktY - Ymin) / (YMax - Ymin);
+      tempX := PlotExtX * (i / CPMax);
+      tempY := PlotExtY * (f[i] - Ymin) / (YMax - Ymin);
       P.x := Round(Limit(tempX));
       P.y := Round(Limit(tempY));
-      if (P.y <> 0) and KurveValid then
-      begin
-        { aktueller Punkt }
-        Brush.Color := PunktColor;
-        Brush.Style := bsSolid;
-        Ellipse(P.x - RadiusX, P.y - RadiusY,
-          P.x + RadiusX, P.y + RadiusY);
-      end
-      else if ShowTriangle then
-      begin
-        { Positionsdreieck X }
-        Pen.Color := clBlack;
-        P.y := 0;
-        RadiusX := RadiusX;
-        RadiusY := RadiusY * 2;
-        Polyline([Point(P.x, P.y),
-          Point(P.x - RadiusX, P.y - RadiusY),
-            Point(P.x + RadiusX, P.y - RadiusY),
-            Point(P.x, P.y)]);
-      end;
-
-      SetMapMode(Handle, MM_TEXT);
-      SetWindowOrgEx(Handle, 0, 0, nil);
-      SetViewPortOrgEx(Handle, 0, 0, nil);
-
-      { Rahmen zeichnen }
-      Pen.Width := 1;
-      Pen.Color := clBlack;
-      Brush.Style := bsClear;
-      Rectangle(0, 0, bmp.Width, bmp.Height);
+      c.LineTo(P.x, P.y);
     end;
 
-    with Canvas do
+    { Aktueller Punkt bzw. X-Position }
+    R.Left := 0;
+    R.Top := 0;
+    R.Bottom := 5;
+    R.Right := 5;
+    DPTOLP(h, R, 2);
+    RadiusX := R.Right - R.Left;
+    RadiusY := R.Bottom - R.Top;
+
+    tempX := PlotExtX * (ChartPunktX - Xmin) / (XMax - Xmin);
+    tempY := PlotExtY * (ChartPunktY - Ymin) / (YMax - Ymin);
+    P.x := Round(Limit(tempX));
+    P.y := Round(Limit(tempY));
+    if (P.y <> 0) and KurveValid then
     begin
-      CopyMode := cmSrcCopy;
-      Draw(0, 0, bmp);
+      { aktueller Punkt }
+      c.Brush.Color := PunktColor;
+      c.Brush.Style := bsSolid;
+      c.Ellipse(P.x - RadiusX, P.y - RadiusY, P.x + RadiusX, P.y + RadiusY);
+    end
+    else if ShowTriangle then
+    begin
+      { Positionsdreieck X }
+      c.Pen.Color := clBlack;
+      P.y := 0;
+      RadiusX := RadiusX;
+      RadiusY := RadiusY * 2;
+      c.Polyline(
+        [Point(P.x, P.y),
+         Point(P.x - RadiusX, P.y - RadiusY),
+         Point(P.x + RadiusX, P.y - RadiusY),
+         Point(P.x, P.y)]);
     end;
+
+    SetMapMode(h, MM_TEXT);
+    SetWindowOrgEx(h, 0, 0, nil);
+    SetViewPortOrgEx(h, 0, 0, nil);
+
+    { Rahmen zeichnen }
+    c.Pen.Width := 1;
+    c.Pen.Color := clBlack;
+    c.Brush.Style := bsClear;
+    c.Rectangle(0, 0, bmp.Width, bmp.Height);
+
+    Canvas.CopyMode := cmSrcCopy;
+    Canvas.Draw(0, 0, bmp);
 
   finally
     bmp.Free;
   end;
 
-  with OutputForm do
-  begin
-    lbAchseX.Caption := BottomTitel;
-    lbAchseY.Caption := Lefttitel;
-    lbXLeft.Caption := IntToStr(Round(Xmin));
-    lbXRight.Caption := IntToStr(Round(Xmax));
-    lbYBottom.Caption := IntToStr(Round(Ymin));
-    lbYTop.Caption := IntToStr(Round(Ymax));
-  end;
+  OutputForm.lbAchseX.Caption := BottomTitel;
+  OutputForm.lbAchseY.Caption := Lefttitel;
+  OutputForm.lbXLeft.Caption := IntToStr(Round(Xmin));
+  OutputForm.lbXRight.Caption := IntToStr(Round(Xmax));
+  OutputForm.lbYBottom.Caption := IntToStr(Round(Ymin));
+  OutputForm.lbYTop.Caption := IntToStr(Round(Ymax));
 end;
 
 function TRiggModul.GetPunktColor: TColor;
 var
   i: Integer;
+  ML: TStrings;
 begin
   result := clLime;
   i := YComboBox.ItemIndex;
-  with YComboBox.Items do
+  ML := YComboBox.Items;
+
+  if (i = ML.IndexOf('Vorstag-Spannung')) or
+     (i = ML.IndexOf('Wanten-Spannung')) or
+     (i = ML.IndexOf('Elastizität Punkt C')) then
   begin
-    if (i = IndexOf('Vorstag-Spannung')) or
-      (i = IndexOf('Wanten-Spannung')) or
-      (i = IndexOf('Elastizität Punkt C')) then
-      if not (Rigg.RiggOK and Rigg.GetriebeOK and Rigg.MastOK) then
-        result := clRed;
-    if (i = IndexOf('Mastfall F0F')) or
-      (i = IndexOf('Mastfall F0C')) or
-      (i = IndexOf('Durchbiegung hd')) then
-      if not (Rigg.GetriebeOK and Rigg.MastOK) then
-        result := clRed;
+    if not (Rigg.RiggOK and Rigg.GetriebeOK and Rigg.MastOK) then
+      result := clRed;
+  end;
+
+  if (i = ML.IndexOf('Mastfall F0F')) or
+     (i = ML.IndexOf('Mastfall F0C')) or
+     (i = ML.IndexOf('Durchbiegung hd')) then
+  begin
+    if not (Rigg.GetriebeOK and Rigg.MastOK) then
+      result := clRed;
   end;
 end;
 
@@ -2556,29 +2462,20 @@ end;
 procedure TRiggModul.DrawPaintBoxS(Canvas: TCanvas);
 begin
   PaintBackGround(BitmapS);
-  with SalingCtrl do
-  begin
-    if SalingDetail then
-      DrawSalingDetail(BitmapS.Canvas)
-    else
-      DrawSalingAll(BitmapS.Canvas);
-  end;
-  with Canvas do
-  begin
-    CopyMode := cmSrcCopy;
-    Draw(0, 0, BitMapS);
-  end;
+  if SalingCtrl.SalingDetail then
+    SalingCtrl.DrawSalingDetail(BitmapS.Canvas)
+  else
+    SalingCtrl.DrawSalingAll(BitmapS.Canvas);
+  Canvas.CopyMode := cmSrcCopy;
+  Canvas.Draw(0, 0, BitMapS);
 end;
 
 procedure TRiggModul.DrawPaintBoxC(Canvas: TCanvas);
 begin
   PaintBackGround(BitmapC);
   SalingCtrl.DrawController(BitmapC.Canvas);
-  with Canvas do
-  begin
-    CopyMode := cmSrcCopy;
-    Draw(0, 0, BitMapC);
-  end;
+  Canvas.CopyMode := cmSrcCopy;
+  Canvas.Draw(0, 0, BitMapC);
 end;
 
 procedure TRiggModul.OutputPagesChange(Seite: Integer);
@@ -2589,25 +2486,19 @@ begin
     1: { Controller }
       begin
         TrimmRec := Rigg.Glieder;
-        with SalingCtrl do
-        begin
-          { ControllerParameter }
-          ControllerPos := TrimmRec.Controller;
-          ParamXE := Round(Rigg.MastPositionE);
-          ParamXE0 := Round(Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x]);
-          EdgePos := Round(Rigg.GSB.Find(fpController).Min);
-        end;
+        { ControllerParameter }
+        SalingCtrl.ControllerPos := TrimmRec.Controller;
+        SalingCtrl.ParamXE := Round(Rigg.MastPositionE);
+        SalingCtrl.ParamXE0 := Round(Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x]);
+        SalingCtrl.EdgePos := Round(Rigg.GSB.Find(fpController).Min);
       end;
     3: { Saling }
       begin
         TrimmRec := Rigg.Glieder;
-        with SalingCtrl do
-        begin
-          { SalingParameter }
-          SalingA := TrimmRec.SalingA;
-          SalingH := TrimmRec.SalingH;
-          SalingL := TrimmRec.SalingL;
-        end;
+        { SalingParameter }
+        SalingCtrl.SalingA := TrimmRec.SalingA;
+        SalingCtrl.SalingH := TrimmRec.SalingH;
+        SalingCtrl.SalingL := TrimmRec.SalingL;
       end;
   end;
 end;
@@ -2622,11 +2513,8 @@ begin
   Rigg.UpdateGetriebe;
   GetriebeGrafik.Koordinaten := Rigg.rP;
   Getriebegrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  with SalingCtrl do
-  begin
-    ControllerPos := Round(ParamXE0 - Rigg.MastPositionE);
-    TrimmRec.Controller := ControllerPos;
-  end;
+  SalingCtrl.ControllerPos := Round(SalingCtrl.ParamXE0 - Rigg.MastPositionE);
+  TrimmRec.Controller := SalingCtrl.ControllerPos;
   UpdateGCtrls(TrimmRec);
   Rigg.Glieder := TrimmRec;
   UpdateGetriebe;
@@ -2832,21 +2720,6 @@ begin
     end;
 
   end;
-
-//  with InputRec, InputForm do
-//  begin
-//    else if Sender = sbVorstagOs then
-//    begin
-//      Vorstag := ScrollPos;
-//      lbValue7.Caption := Format('%d mm', [ScrollPos - MemCtrl.Vorstag])
-//    end
-//    else if Sender = sbWPowerOS then
-//    begin
-//      WPowerOS := ScrollPos;
-//      lbValue8.Caption := Format('%d N', [ScrollPos - MemCtrl.WPowerOS]);
-//      NeedPaint := False;
-//    end;
-//  end;
 
   //if not SofortBerechnen then
   begin
