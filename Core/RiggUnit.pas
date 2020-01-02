@@ -31,7 +31,8 @@ uses
   Rggdoc,
   uRggPrinter,
   Polarkar,
-  RiggVar.RG.Def;
+  RiggVar.RG.Def,
+  RiggVar.VM.FormMain;
 
 type
   TSBMappingArray = array[TsbName] of Integer;
@@ -56,6 +57,8 @@ type
 
   TRiggModul = class(TComponent)
   private
+    ViewModelMain: TViewModelMain;
+
     { Felder für Properties }
     FSofortBerechnen: Boolean;
     FKorrigiertItem: Boolean;
@@ -110,6 +113,7 @@ type
     af: ChartArray;
     bf: array[0..ANr - 1] of real;
     ShowTriangle: Boolean;
+
     procedure StraightLine;
     procedure GetCurves;
     procedure UpdateGetriebePunkt;
@@ -228,7 +232,6 @@ type
     procedure OhneItemClick;
     procedure OSDlgItemClick;
     procedure DrehbarItemClick;
-    procedure DatenItemClick;
     procedure ZustellBtnClick;
     procedure OutputPagesChange(Seite: Integer);
     procedure YComboBoxChange(ItemIndex: Integer);
@@ -241,8 +244,9 @@ type
     procedure RotaFormItemClick;
     procedure PrintGrafik;
     procedure WriteReportToMemo(Memo: TMemo);
-    procedure SalingTypChange(Sender: TObject);
-    procedure InputPagesChange(Sender: TObject);
+    procedure SalingTypChanged(st: TSalingTyp);
+    procedure CalcTypChanged(ct: TCalcTyp);
+    procedure InputPagesChanged(st: TSalingTyp);
     procedure sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
 
     { Properties }
@@ -276,7 +280,6 @@ implementation
 
 uses
   FWUnit,
-  FrmMain,
   RggScroll,
   Rggmat01,
   FrmConsole,
@@ -300,6 +303,8 @@ uses
 constructor TRiggModul.Create(AOwner: TComponent);
 begin
   inherited;
+  ViewModelMain := TViewModelMain.Create;
+
   FSofortBerechnen := True;
   FKorrigiertItem := True;
   FPaintBtnDown := False;
@@ -421,6 +426,7 @@ begin
   BitmapS.Free;
   BitmapC.Free;
 
+  ViewModelMain.Free;
   inherited;
 end;
 
@@ -734,21 +740,22 @@ begin
       LEDShape := True
     else
       LEDShape := False;
-    FormMain.Statusbar.Panels[1].Text := Rigg.GetriebeStatusText;
+    ViewModelMain.StatusPanelText1 := Rigg.GetriebeStatusText;
     DrawPaintBoxM;
     Draw;
     if Rigg.GetriebeOK and not Rigg.MastOK then
     begin
       LEDShape := False;
-      FormMain.Statusbar.Panels[1].Text := Rigg.MastStatusText;
+      ViewModelMain.StatusPanelText1 := Rigg.MastStatusText;
     end;
   end;
+  ViewModelMain.UpdateView;
 end;
 
 procedure TRiggModul.UpdateRigg;
 begin
   Rigg.UpdateRigg;
-  FormMain.Statusbar.Panels[1].Text := Rigg.RiggStatusText;
+  ViewModelMain.StatusPanelText1 := Rigg.RiggStatusText;
   if Rigg.RiggOK then
   begin
     Grauzeichnen := True;
@@ -766,6 +773,7 @@ begin
   DrawPaintBoxM;
   Draw;
   rLItemClick(ReportItem);
+  ViewModelMain.UpdateView;
 end;
 
 (***************************************************************************)
@@ -1170,16 +1178,17 @@ end;
 procedure TRiggModul.UpdateGUI;
 begin
   Modified := False;
+
   SalingTyp := Rigg.SalingTyp;
-  ControllerBtnDown := Rigg.ControllerTyp <> ctOhne;
   // ControllerTyp := Rigg.ControllerTyp; // see SetControllerBtnDown
   CalcTyp := Rigg.CalcTyp;
-  FormMain.TakeOver;
-  (* automatisch erneut aufgerufen:
-  UpdateGetriebe; { redundant }
-  Rigg.UpdateGSB; { redundant }
-  SetupGCtrls; { notwendig }
-  *)
+  ControllerBtnDown := Rigg.ControllerTyp <> ctOhne;
+
+  { 'TakeOver' }
+  ViewModelMain.ControllerDown := ControllerBtnDown;
+  RiggModul.SalingTypChanged(SalingTyp);
+  RiggModul.CalcTypChanged(CalcTyp);
+  ViewModelMain.UpdateView;
 end;
 
 procedure TRiggModul.Neu(Doc: TRggDocument);
@@ -1201,7 +1210,10 @@ begin
   except
     on EFileFormatError do { eat ecxeption }
       if IniFileName = '' then
-        FormMain.Caption := 'Rigg';
+      begin
+        ViewModelMain.Caption := 'Rigg';
+        ViewModelMain.UpdateView;
+      end;
   end;
 end;
 
@@ -1403,9 +1415,10 @@ begin
   begin
     FLEDShape := Value;
     if Value then
-      FormMain.LEDShape.Brush.Color := clLime
+      ViewModelMain.LEDColor := clLime
     else
-      FormMain.LEDShape.Brush.Color := clRed;
+      ViewModelMain.LEDColor := clRed;
+    ViewModelMain.UpdateView;
   end;
 end;
 
@@ -1505,6 +1518,11 @@ begin
   UpdateGetriebe;
   Rigg.UpdateGSB;
   SetupGCtrls;
+
+  ViewModelMain.OhneItemClick;
+  ViewModelMain.ControllerEnabled := ControllerEnabled;
+  ViewModelMain.WinkelDown := WinkelBtnDown;
+  ViewModelMain.UpdateView;
 end;
 
 procedure TRiggModul.DrehbarItemClick;
@@ -1531,6 +1549,11 @@ begin
   UpdateGetriebe;
   Rigg.UpdateGSB;
   SetupGCtrls;
+
+  ViewModelMain.DrehbarItemClick;
+  ViewModelMain.ControllerEnabled := ControllerEnabled;
+  ViewModelMain.WinkelDown := WinkelBtnDown;
+  ViewModelMain.UpdateView;
 end;
 
 procedure TRiggModul.FestItemClick;
@@ -1559,6 +1582,11 @@ begin
   UpdateGetriebe;
   Rigg.UpdateGSB;
   SetupGCtrls;
+
+  ViewModelMain.FestItemClick;
+  ViewModelMain.ControllerEnabled := ControllerEnabled;
+  ViewModelMain.WinkelDown := WinkelBtnDown;
+  ViewModelMain.UpdateView;
 end;
 
 procedure TRiggModul.OSDlgItemClick;
@@ -1574,37 +1602,42 @@ begin
   UpdateGetriebe;
   Rigg.UpdateGSB;
   SetupGCtrls;
+
+  ViewModelMain.OSDlgItemClick;
+  ViewModelMain.ControllerEnabled := ControllerEnabled;
+  ViewModelMain.UpdateView;
 end;
 
-procedure TRiggModul.DatenItemClick;
+procedure TRiggModul.SalingTypChanged(st: TSalingTyp);
 begin
-  InputForm.DoDatenItemClick;
+  case st of
+    stFest: InputForm.InputPages.ActivePage := InputForm.tsFest;
+    stDrehbar: InputForm.InputPages.ActivePage := InputForm.tsDrehbar;
+    stOhne: InputForm.InputPages.ActivePage := InputForm.tsOhne;
+    stOhne_2: InputForm.InputPages.ActivePage := InputForm.tsOhneStarr;
+  end;
+  InputPagesChanged(st);
 end;
 
-procedure TRiggModul.SalingTypChange(Sender: TObject);
-begin
-  if Sender = FormMain.FestItem then
-    InputForm.InputPages.ActivePage := InputForm.tsFest;
-  if Sender = FormMain.DrehbarItem then
-    InputForm.InputPages.ActivePage := InputForm.tsDrehbar;
-  if Sender = FormMain.OhneItem then
-    InputForm.InputPages.ActivePage := InputForm.tsOhne;
-  if Sender = FormMain.OSDlgItem then
-    InputForm.InputPages.ActivePage := InputForm.tsOhneStarr;
-  if Sender = FormMain.DatenItem then
-    InputForm.InputPages.ActivePage := InputForm.tsDatenbank;
-  InputPagesChange(Sender);
-end;
-
-procedure TRiggModul.InputPagesChange(Sender: TObject);
+procedure TRiggModul.InputPagesChanged(st: TSalingTyp);
 begin
   case InputForm.InputPages.ActivePage.Tag of
-    0: FormMain.FestItemClick(Sender);
-    1: FormMain.DrehbarItemClick(Sender);
-    2: FormMain.OhneItemClick(Sender);
-    3: FormMain.OSDlgItemClick(Sender);
-    4: FormMain.DatenItemClick(Sender);
+    0: ViewModelMain.FestItemClick;
+    1: ViewModelMain.DrehbarItemClick;
+    2: ViewModelMain.OhneItemClick;
+    3: ViewModelMain.OSDlgItemClick;
   end;
+end;
+
+procedure TRiggModul.CalcTypChanged(ct: TCalcTyp);
+begin
+  RiggModul.CalcTyp := ct;
+
+  ViewModelMain.KnickenItemClick(ct);
+  ViewModelMain.ControllerEnabled := ControllerEnabled;
+  ViewModelMain.ControllerDown := ControllerBtnDown;
+  ViewModelMain.WinkelDown := WinkelBtnDown;
+  ViewModelMain.UpdateView;
 end;
 
 procedure TRiggModul.ChartItemClick;
@@ -1614,7 +1647,7 @@ end;
 
 procedure TRiggModul.ReportItemClick;
 begin
-  ReportForm := TReportForm.Create(FormMain);
+  ReportForm := TReportForm.Create(Application.MainForm);
 end;
 
 procedure TRiggModul.OptionItemClick;
@@ -1636,7 +1669,7 @@ end;
 
 procedure TRiggModul.RotaFormItemClick;
 begin
-  AniRotationForm := TAniRotationForm.Create(FormMain);
+  AniRotationForm := TAniRotationForm.Create(Application.MainForm);
   AniRotationForm.UpdateAll(Rigg);
   (*
   { dies wird durch AniRotationForm.UpdateAll(Rigg) ersetzt

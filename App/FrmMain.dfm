@@ -648,12 +648,6 @@ object FormMain: TFormMain
         RadioItem = True
         OnClick = SalingTypChange
       end
-      object DatenItem: TMenuItem
-        Caption = 'Datenbankzugriff'
-        Hint = '  Daten von Datenbank einlesen oder dort speichern'
-        RadioItem = True
-        OnClick = SalingTypChange
-      end
       object N11: TMenuItem
         Caption = '-'
         GroupIndex = 1

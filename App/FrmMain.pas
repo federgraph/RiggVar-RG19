@@ -93,7 +93,6 @@ type
     DrehbarItem: TMenuItem;
     OhneItem: TMenuItem;
     OSDlgItem: TMenuItem;
-    DatenItem: TMenuItem;
     N11: TMenuItem;
     ControllerItem: TMenuItem;
     DifferenzItem: TMenuItem;
@@ -189,7 +188,6 @@ type
     procedure DrehbarItemClick(Sender: TObject);
     procedure OhneItemClick(Sender: TObject);
     procedure OSDlgItemClick(Sender: TObject);
-    procedure DatenItemClick(Sender: TObject);
     procedure WinkelItemClick(Sender: TObject);
     procedure SofortItemClick(Sender: TObject);
     procedure DifferenzItemClick(Sender: TObject);
@@ -225,13 +223,11 @@ type
     ResizeCounter: Integer;
     OpenDialog1: TOpenDialog;
     SaveDialog1: TSaveDialog;
-    procedure InitRetina;
     function GetOpenFileName(dn, fn: string): string;
     function GetSaveFileName(dn, fn: string): string;
     procedure SetControllerEnabled;
     procedure SetControllerChecked(Value: Boolean);
     procedure SetKoppelChecked(Value: Boolean);
-    procedure TakeOver;
   end;
 
 var
@@ -272,8 +268,6 @@ var
 begin
   FormMain := Self;
 
-  { Auomatische Freigabe funktioniert hier nicht,
-    wenn Self als Owner angegeben wird! }
   InputForm := TInputForm.Create(Application);
   OutputForm := TOutputForm.Create(Application);
   GrafikForm := TGrafikForm.Create(Application);
@@ -283,8 +277,6 @@ begin
 
   Main := TMain.Create(rggm);
   Main.Logger.Verbose := True;
-
-  InitRetina;
 
   Left := 60;
   Top := 105;
@@ -330,19 +322,20 @@ end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
 begin
-  { Freigabe der Formulare erforderlich, wenn Self als Owner angegeben wurde. }
-  (*
-    InputForm.Free;
-    OutputForm.Free;
-    GrafikForm.Free;
-    *)
   Main.Free;
   Main := nil;
 end;
 
 procedure TFormMain.SalingTypChange(Sender: TObject);
 begin
-  RiggModul.SalingTypChange(Sender);
+  if Sender = FestItem then
+    RiggModul.SalingTypChanged(stFest)
+  else if Sender = DrehbarItem then
+    RiggModul.SalingTypChanged(stDrehbar)
+  else if Sender = OhneItem then
+    RiggModul.SalingTypChanged(stOhne)
+  else if Sender = OSDlgItem then
+    RiggModul.SalingTypChanged(stOhne_2);
 end;
 
 procedure TFormMain.rLItemClick(Sender: TObject);
@@ -632,34 +625,12 @@ end;
 
 procedure TFormMain.KnickenItemClick(Sender: TObject);
 begin
-  KorrigiertItem.Enabled := False;
-  KnickenItem.Checked := False;
-  KraftGemessenItem.Checked := False;
-  QuerKraftItem.Checked := False;
   if Sender = QuerKraftItem then
-  begin
-    RiggModul.CalcTyp := ctQuerKraftBiegung;
-    QuerKraftItem.Checked := True;
-  end
+    RiggModul.CalcTypChanged(ctQuerKraftBiegung)
   else if Sender = KnickenItem then
-  begin
-    RiggModul.CalcTyp := ctBiegeKnicken;
-    KnickenItem.Checked := True;
-    KorrigiertItem.Enabled := True;
-  end
+    RiggModul.CalcTypChanged(ctBiegeKnicken)
   else if Sender = KraftGemessenItem then
-  begin
-    RiggModul.CalcTyp := ctKraftGemessen;
-    KraftGemessenItem.Checked := True;
-    if ControllerBtn.Down then
-    begin
-      ControllerBtn.Down := False;
-      ControllerItem.Checked := False;
-      { RiggModul.ControllerBtnDown := False;
-        wird in RiggModul.SetCalcTyp veranlaßt! }
-    end;
-  end;
-  SetControllerEnabled;
+    RiggModul.CalcTypChanged(ctKraftGemessen);
 end;
 
 procedure TFormMain.KorrigiertItemClick(Sender: TObject);
@@ -705,132 +676,21 @@ end;
 procedure TFormMain.OhneItemClick(Sender: TObject);
 begin
   RiggModul.OhneItemClick;
-
-  FestItem.Checked := False;
-  DrehbarItem.Checked := False;
-  OhneItem.Checked := True;
-  OSDlgItem.Checked := False;
-  DatenItem.Checked := False;
-
-  WinkelItem.Checked := False;
-  WinkelBtn.Down := False;
-  WinkelItem.Enabled := False;
-  WinkelBtn.Enabled := False;
-  RiggModul.WinkelBtnDown := False;
-
-  BiegeNeigeItem.Enabled := False;
-  ReglerItem.Enabled := False;
-  ReglerBtn.Enabled := False;
-
-  QuerKraftItem.Enabled := True;
-  KnickenItem.Enabled := True;
-  KraftGemessenItem.Enabled := True;
-  KorrigiertItem.Enabled := True;
-
-  SetKoppelChecked(False);
-  KoppelBtn.Enabled := False;
-  KoppelkurveItem.Enabled := False;
-
-  SetControllerEnabled;
 end;
 
 procedure TFormMain.DrehbarItemClick(Sender: TObject);
 begin
   RiggModul.DrehbarItemClick;
-
-  FestItem.Checked := False;
-  DrehbarItem.Checked := True;
-  OhneItem.Checked := False;
-  OSDlgItem.Checked := False;
-  DatenItem.Checked := False;
-
-  WinkelItem.Checked := False;
-  WinkelBtn.Down := False;
-  WinkelItem.Enabled := False;
-  WinkelBtn.Enabled := False;
-  RiggModul.WinkelBtnDown := False;
-
-  BiegeNeigeItem.Enabled := True;
-  ReglerItem.Enabled := True;
-  ReglerBtn.Enabled := True;
-
-  QuerKraftItem.Enabled := True;
-  KnickenItem.Enabled := True;
-  KraftGemessenItem.Enabled := True;
-  KorrigiertItem.Enabled := True;
-
-  SetKoppelChecked(False);
-  KoppelBtn.Enabled := False;
-  KoppelkurveItem.Enabled := False;
-
-  SetControllerEnabled;
 end;
 
 procedure TFormMain.FestItemClick(Sender: TObject);
 begin
   RiggModul.FestItemClick;
-
-  FestItem.Checked := True;
-  DrehbarItem.Checked := False;
-  OhneItem.Checked := False;
-  OSDlgItem.Checked := False;
-  DatenItem.Checked := False;
-
-  WinkelItem.Enabled := True;
-  WinkelBtn.Enabled := True;
-
-  BiegeNeigeItem.Enabled := True;
-  ReglerItem.Enabled := True;
-  ReglerBtn.Enabled := True;
-
-  QuerKraftItem.Enabled := True;
-  KnickenItem.Enabled := True;
-  KraftGemessenItem.Enabled := True;
-  KorrigiertItem.Enabled := True;
-
-  SetKoppelChecked(False);
-  KoppelBtn.Enabled := True;
-  KoppelkurveItem.Enabled := True;
-
-  SetControllerEnabled;
 end;
 
 procedure TFormMain.OSDlgItemClick(Sender: TObject);
 begin
   RiggModul.OSDlgItemClick;
-
-  FestItem.Checked := False;
-  DrehbarItem.Checked := False;
-  OhneItem.Checked := False;
-  OSDlgItem.Checked := True;
-  DatenItem.Checked := False;
-
-  WinkelItem.Checked := False;
-  WinkelBtn.Down := False;
-  WinkelItem.Enabled := False;
-  WinkelBtn.Enabled := False;
-  RiggModul.WinkelBtnDown := False;
-
-  BiegeNeigeItem.Enabled := False;
-  ReglerItem.Enabled := False;
-  ReglerBtn.Enabled := False;
-
-  SetKoppelChecked(False);
-  KoppelBtn.Enabled := False;
-  KoppelkurveItem.Enabled := False;
-
-  SetControllerChecked(False);
-  SetControllerEnabled;
-
-  QuerKraftItem.Enabled := False;
-  KnickenItem.Enabled := False;
-  KraftGemessenItem.Enabled := False;
-  KorrigiertItem.Enabled := False;
-end;
-
-procedure TFormMain.DatenItemClick(Sender: TObject);
-begin
-  RiggModul.DatenItemClick;
 end;
 
 procedure TFormMain.OptionItemClick(Sender: TObject);
@@ -840,7 +700,6 @@ end;
 
 procedure TFormMain.AboutItemClick(Sender: TObject);
 begin
-  // RiggModul.About;
   FrmInfo.ShowInfo;
 end;
 
@@ -858,8 +717,6 @@ procedure TFormMain.CalcOffsetItemClick(Sender: TObject);
 begin
   RiggModul.GetGBoxOffset;
 end;
-
-{ **************************************************************************** }
 
 procedure TFormMain.WindowCascadeItemClick(Sender: TObject);
 begin
@@ -893,8 +750,6 @@ begin
   WindowArrangeItem.Enabled := MDIChildCount > 0;
   WindowMinimizeItem.Enabled := MDIChildCount > 0;
 end;
-
-{ **************************************************************************** }
 
 procedure TFormMain.InputFormItemClick(Sender: TObject);
 begin
@@ -991,64 +846,6 @@ end;
 procedure TFormMain.AutoLoadItemClick(Sender: TObject);
 begin
   AutoLoadItem.Checked := not AutoLoadItem.Checked;
-end;
-
-procedure TFormMain.TakeOver;
-var
-  Sender: TObject;
-begin
-  Sender := nil;
-  ControllerItem.Checked := RiggModul.ControllerBtnDown;
-  ControllerBtn.Down := ControllerItem.Checked;
-
-  case RiggModul.SalingTyp of
-    stFest:
-      Sender := FestItem;
-    stDrehbar:
-      Sender := DrehbarItem;
-    stOhne_2:
-      Sender := OhneItem;
-    stOhne:
-      Sender := OSDlgItem;
-  end;
-  SalingTypChange(Sender);
-
-  { automatisch erneut aufgerufen: }
-  {
-    UpdateGetriebe; // redundant
-    Rigg.UpdateGSB; // redundant
-    SetupGCtrls; // notwendig
-  }
-
-  case RiggModul.CalcTyp of
-    ctQuerKraftBiegung:
-      Sender := QuerKraftItem;
-    ctBiegeKnicken:
-      Sender := KnickenItem;
-    ctKraftGemessen:
-      Sender := KraftGemessenItem;
-  end;
-  KnickenItemClick(Sender);
-end;
-
-procedure TFormMain.InitRetina;
-//var
-//  t: single;
-begin
-//  t := self.Handle.Scale; //Viewport1.Scene.GetSceneScale;
-//  if t > 1 then
-//  begin
-//    if Main <> nil then
-//    begin
-//      Main.IsRetina := True;
-//    end;
-//  end;
-//  if Main <> nil then
-//  begin
-//     Main.Logger.InfoVerbose('in TFormMain.InitRetina');
-//     Main.Logger.InfoVerbose('  Scale = ' + FloatToStr(t));
-//     Main.Logger.InfoVerbose('  Retina = ' + BoolStr[Main.IsRetina]);
-//  end;
 end;
 
 function TFormMain.GetOpenFileName(dn, fn: string): string;

@@ -28,10 +28,6 @@ object InputForm: TInputForm
     OnChange = InputPagesChange
     object tsFest: TTabSheet
       Caption = 'Salinge fest'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnFest: TPanel
         Left = 0
         Top = 0
@@ -631,7 +627,7 @@ object InputForm: TInputForm
         Left = 0
         Top = 0
         Width = 393
-        Height = 164
+        Height = 167
         Align = alLeft
         BevelOuter = bvNone
         BorderWidth = 2
@@ -784,7 +780,7 @@ object InputForm: TInputForm
         Left = 393
         Top = 0
         Width = 64
-        Height = 164
+        Height = 167
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsSingle
@@ -793,9 +789,10 @@ object InputForm: TInputForm
           Left = 0
           Top = 0
           Width = 60
-          Height = 160
+          Height = 163
           Align = alClient
           OnPaint = PaintBoxMPaint
+          ExplicitHeight = 160
         end
       end
     end
@@ -810,7 +807,7 @@ object InputForm: TInputForm
         Left = 0
         Top = 0
         Width = 457
-        Height = 164
+        Height = 167
         Align = alClient
         BevelOuter = bvNone
         BorderWidth = 2
@@ -884,14 +881,6 @@ object InputForm: TInputForm
           OnScroll = sbControllerScroll
         end
       end
-    end
-    object tsDatenbank: TTabSheet
-      Tag = 4
-      Caption = 'Datenbank'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
   end
 end

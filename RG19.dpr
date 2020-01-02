@@ -74,7 +74,8 @@ uses
   RiggVar.RG.Track in 'RG\RiggVar.RG.Track.pas',
   RiggVar.RG.Graph in 'RG\RiggVar.RG.Graph.pas',
   FrmText in 'App\FrmText.pas' {TextForm},
-  RiggVar.RG.Report in 'RG\RiggVar.RG.Report.pas';
+  RiggVar.RG.Report in 'RG\RiggVar.RG.Report.pas',
+  RiggVar.VM.FormMain in 'VM\RiggVar.VM.FormMain.pas';
 
 {$R *.res}
 

@@ -95,7 +95,6 @@ type
     rbVorstagOS: TRadioButton;
     sbVorstagOS: TScrollBar;
     sbWPowerOS: TScrollBar;
-    tsDatenbank: TTabSheet;
     procedure FormCreate(Sender: TObject);
     procedure rbWinkelClick(Sender: TObject);
     procedure rbWinkelMouseDown(Sender: TObject;
@@ -105,8 +104,6 @@ type
     procedure InputPagesChange(Sender: TObject);
     procedure PaintBoxMPaint(Sender: TObject);
     procedure FormHide(Sender: TObject);
-  public
-    procedure DoDatenItemClick; virtual;
   end;
 
 var
@@ -172,7 +169,14 @@ end;
 
 procedure TInputForm.InputPagesChange(Sender: TObject);
 begin
-  RiggModul.InputPagesChange(Sender);
+  if Sender = tsFest then
+    RiggModul.InputPagesChanged(stFest)
+  else if Sender = tsDrehbar then
+    RiggModul.InputPagesChanged(stDrehbar)
+  else if Sender = tsOhne then
+    RiggModul.InputPagesChanged(stOhne)
+  else if Sender = tsOhneStarr then
+    RiggModul.InputPagesChanged(stOhne_2)
 end;
 
 procedure TInputForm.sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode;
@@ -189,13 +193,6 @@ end;
 procedure TInputForm.FormHide(Sender: TObject);
 begin
   FormMain.InputFormItem.Checked := False;
-end;
-
-procedure TInputForm.DoDatenItemClick;
-begin
-  { Methode ist im Gegensatz zu RiggForm.DatenItemClick virtuell und wird in
-    InputFormNote überschrieben, um die ListBox zu focusieren, wenn das
-    Datenbanksheet die aktuelle Seite wird. }
 end;
 
 end.
