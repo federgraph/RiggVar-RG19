@@ -1,4 +1,4 @@
-unit FrmRG19;
+ï»¿unit FrmRG19;
 
 (*
 -
@@ -25,6 +25,9 @@ uses
   System.Classes,
   System.UITypes,
   RggTypes,
+  RiggVar.RG.Def,
+  RiggVar.RG.Report,
+  IoTypes,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -32,7 +35,8 @@ uses
   Vcl.ComCtrls,
   Vcl.Menus,
   Vcl.ExtCtrls,
-  Vcl.Buttons;
+  Vcl.Buttons,
+  Vcl.StdCtrls;
 
 type
   TForm1 = class(TForm)
@@ -134,10 +138,33 @@ type
     ZweischlagBtn: TSpeedButton;
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
+    Panel: TPanel;
+    ReportLabel: TLabel;
+    M10Btn: TSpeedButton;
+    M1Btn: TSpeedButton;
+    P1Btn: TSpeedButton;
+    P10Btn: TSpeedButton;
+    CopyAndPasteBtn: TSpeedButton;
+    CopyTrimmItemBtn: TSpeedButton;
+    MT0Btn: TSpeedButton;
+    PasteTrimmItemBtn: TSpeedButton;
+    ReadTrimmFileBtn: TSpeedButton;
+    SaveTrimmFileBtn: TSpeedButton;
+    ParamCombo: TComboBox;
+    TrimmMemo: TMemo;
+    TrimmCombo: TComboBox;
+    cbSandboxed: TCheckBox;
+    cbAllProps: TCheckBox;
+    ViewpointCombo: TComboBox;
+    cbAllTags: TCheckBox;
+    ListBox: TListBox;
+    ReportMemo: TMemo;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormResize(Sender: TObject);
 
     procedure UpdateMenuItems(Sender: TObject);
     procedure WindowCascadeItemClick(Sender: TObject);
@@ -195,10 +222,61 @@ type
     procedure ShowHint(Sender: TObject);
     procedure AdjustFormItemClick(Sender: TObject);
     procedure CalcOffsetItemClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure LogoItemClick(Sender: TObject);
+
+    procedure TestBtnClick(Sender: TObject);
+    procedure ListBoxClick(Sender: TObject);
+    procedure TrimmComboChange(Sender: TObject);
+    procedure ParamComboChange(Sender: TObject);
+    procedure M10BtnClick(Sender: TObject);
+    procedure M1BtnClick(Sender: TObject);
+    procedure P1BtnClick(Sender: TObject);
+    procedure P10BtnClick(Sender: TObject);
+    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure cbSandboxedClick(Sender: TObject);
+    procedure CopyAndPasteBtnClick(Sender: TObject);
+    procedure CopyTrimmFileBtnClick(Sender: TObject);
+    procedure CopyTrimmItemBtnClick(Sender: TObject);
+    procedure MT0BtnClick(Sender: TObject);
+    procedure PasteTrimmItemBtnClick(Sender: TObject);
+    procedure ReadTrimmFileBtnClick(Sender: TObject);
+    procedure SaveTrimmFileBtnClick(Sender: TObject);
+    procedure ViewpointComboChange(Sender: TObject);
+    procedure PaintBtn2Click(Sender: TObject);
+    procedure cbAllTagsClick(Sender: TObject);
+  private
+    TL: TStrings;
+    ML: TStrings;
+    ReportManager: TRggReportManager;
+
+    BtnTop: Integer;
+    BtnLeft: Integer;
+    BtnWidth: Integer;
+    BtnCounter: Integer;
+    BtnColor: TColor;
+
+    procedure InitRetina;
+    procedure SetupMemo(Memo: TMemo);
+    procedure InitListBox;
+    procedure InitTrimmCombo;
+    procedure InitParamCombo;
+    procedure SetupComboBox(CB: TComboBox);
+    procedure SetupListBox(LB: TListBox);
+    procedure SetupLabel(L: TLabel);
+    procedure AB(B: TSpeedButton);
+    procedure ShowTrimm;
+    procedure ShowCurrentReport;
+    procedure InitViewpointCombo;
+public
+    ResizeCounter: Integer;
+    function GetOpenFileName(dn, fn: string): string;
+    function GetSaveFileName(dn, fn: string): string;
+
   private
     procedure wmGetMinMaxInfo(var Msg: TMessage); message wm_GetMinMaxInfo;
+    procedure FormCreate1;
+    procedure FormCreate2;
   protected
     function AddSpeedBtn(N: string; L: Integer): TSpeedButton;
     procedure InitToolbar;
@@ -210,11 +288,6 @@ type
     procedure InitLED;
     procedure InitMenu;
   public
-    ResizeCounter: Integer;
-    OpenDialog1: TOpenDialog;
-    SaveDialog1: TSaveDialog;
-    function GetOpenFileName(dn, fn: string): string;
-    function GetSaveFileName(dn, fn: string): string;
     procedure SetControllerEnabled;
     procedure SetControllerChecked(Value: Boolean);
     procedure SetKoppelChecked(Value: Boolean);
@@ -243,7 +316,7 @@ uses
   FrmAniRot;
 
 const
-  SWarningText = 'Änderungen in %s sichern?';
+  SWarningText = 'Ã„nderungen in %s sichern?';
 
 procedure TForm1.wmGetMinMaxInfo(var Msg: TMessage);
 begin
@@ -253,11 +326,17 @@ begin
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
-var
-  rggm: TRggMain;
 begin
   Form1 := Self;
 
+  FormCreate1;
+  FormCreate2;
+end;
+
+procedure TForm1.FormCreate1;
+var
+  rggm: TRggMain;
+begin
   InputForm := TInputForm.Create(Application);
   OutputForm := TOutputForm.Create(Application);
   GrafikForm := TGrafikForm.Create(Application);
@@ -317,6 +396,8 @@ end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
+  ReportManager.Free;
+
   Main.Free;
   Main := nil;
 end;
@@ -786,8 +867,8 @@ begin
   end;
   RiggModul.ChartItemClick;
   RiggModul.ChartFormActive := True;
-  ChartFormItem.Caption := 'Diagramm schließen';
-  ChartFormItem.Hint := '  Diagramm schließen';
+  ChartFormItem.Caption := 'Diagramm schlieÃŸen';
+  ChartFormItem.Hint := '  Diagramm schlieÃŸen';
 end;
 
 procedure TForm1.ReportFormItemClick(Sender: TObject);
@@ -799,8 +880,8 @@ begin
   end;
   RiggModul.ReportItemClick;
   RiggModul.ReportFormActive := True;
-  ReportFormItem.Caption := 'Report schließen';
-  ReportFormItem.Hint := '  Report schließen';
+  ReportFormItem.Caption := 'Report schlieÃŸen';
+  ReportFormItem.Hint := '  Report schlieÃŸen';
 end;
 
 procedure TForm1.RotaFormItemClick(Sender: TObject);
@@ -812,8 +893,8 @@ begin
   end;
   RiggModul.RotaFormItemClick;
   RiggModul.RotaFormActive := True;
-  RotaFormItem.Caption := '3D Grafik schließen';
-  RotaFormItem.Hint := '  3D Grafik schließen';
+  RotaFormItem.Caption := '3D Grafik schlieÃŸen';
+  RotaFormItem.Hint := '  3D Grafik schlieÃŸen';
 end;
 
 procedure TForm1.ConsoleItemClick(Sender: TObject);
@@ -946,7 +1027,7 @@ var
   sb: TSpeedButton;
 begin
   sb := AddSpeedBtn('OpenBtn', 8);
-  sb.Hint := 'Öffnen|';
+  sb.Hint := 'Ã–ffnen|';
   sb.OnClick := OpenItemClick;
 
   sb := AddSpeedBtn('SaveBtn', 33);
@@ -1030,7 +1111,7 @@ begin
 
   sb := AddSpeedBtn('ControllerBtn', 404);
   sb.Caption := 'C';
-  sb.Hint := 'Umschalter für Controller-Modus|';
+  sb.Hint := 'Umschalter fÃ¼r Controller-Modus|';
   sb.AllowAllUp := True;
   sb.Down := True;
   sb.GroupIndex := 6;
@@ -1071,7 +1152,7 @@ begin
   mi.OnClick := NewItemClick;
 
   mi := OpenItem;
-  mi.Caption := '&Öffnen ...';
+  mi.Caption := '&Ã–ffnen ...';
   mi.Hint := '  Konfiguration aus Datei laden';
   mi.OnClick := OpenItemClick;
 
@@ -1118,7 +1199,7 @@ begin
 
   mi := MemoryRecallkItem;
   mi.Caption := 'Trimm &zur'#252'cksetzen ( MR )';
-  mi.Hint := '  Trimm aus dem Zwischenspeicher zurückholen';
+  mi.Hint := '  Trimm aus dem Zwischenspeicher zurÃ¼ckholen';
   mi.OnClick := MemoryRecallBtnClick;
 
   { Ansicht Menu }
@@ -1148,7 +1229,7 @@ begin
 
   mi := OptionItem;
   mi.Caption := '&Konfiguration ...';
-  mi.Hint := '  Konstanten und Parameter verändern';
+  mi.Hint := '  Konstanten und Parameter verÃ¤ndern';
   mi.ShortCut := 16459;
   mi.OnClick := OptionItemClick;
 
@@ -1194,25 +1275,25 @@ begin
   mi := MemoMenu;
   mi.Caption := '&Tabellen';
   mi.GroupIndex := 3;
-  mi.Hint := '  Tabelle für Anzeige im Memo auswählen';
+  mi.Hint := '  Tabelle fÃ¼r Anzeige im Memo auswÃ¤hlen';
 
   mi := rLItem;
   mi.Caption := 'rL';
-  mi.Hint := '  Längen (Rigg verformt) anzeigen';
+  mi.Hint := '  LÃ¤ngen (Rigg verformt) anzeigen';
   mi.RadioItem := True;
   mi.ShortCut := 16460;
   mi.OnClick := rLItemClick;
 
   mi := rLeItem;
   mi.Caption := 'rLe';
-  mi.Hint := '  Längen (Rigg entspannt) anzeigen';
+  mi.Hint := '  LÃ¤ngen (Rigg entspannt) anzeigen';
   mi.RadioItem := True;
   mi.OnClick := rLItemClick;
 
   mi := rFItem;
   mi.Caption := 'rF';
   mi.Checked := True;
-  mi.Hint := '  Kräfte anzeigen';
+  mi.Hint := '  KrÃ¤fte anzeigen';
   mi.RadioItem := True;
   mi.ShortCut := 16454;
   mi.OnClick := rLItemClick;
@@ -1232,7 +1313,7 @@ begin
 
   mi := DiffLItem;
   mi.Caption := 'Diff_L';
-  mi.Hint := '  Längendifferenzen (entlastet - belastet) anzeigen';
+  mi.Hint := '  LÃ¤ngendifferenzen (entlastet - belastet) anzeigen';
   mi.RadioItem := True;
   mi.OnClick := rLItemClick;
 
@@ -1304,7 +1385,7 @@ begin
   mi := PaintItem;
   mi.Caption := 'Alte Grafik stehenlassen';
   mi.GroupIndex := 1;
-  mi.Hint := '  Alte Grafik löschen oder stehenlassen';
+  mi.Hint := '  Alte Grafik lÃ¶schen oder stehenlassen';
   mi.OnClick := PaintBtnClick;
 
   mi := ReferenzItem;
@@ -1373,14 +1454,14 @@ begin
   mi.Caption := 'Controller ( C )';
   mi.Checked := True;
   mi.GroupIndex := 1;
-  mi.Hint := '  Mastcontroller berücksichtigen';
+  mi.Hint := '  Mastcontroller berÃ¼cksichtigen';
   mi.ShortCut := 16451;
   mi.OnClick := ControllerBtnClick;
 
   mi := DifferenzItem;
   mi.Caption := 'Differenzen ( D )';
   mi.GroupIndex := 1;
-  mi.Hint := '  Länge als Differenz oder Absolutwert anzeigen';
+  mi.Hint := '  LÃ¤nge als Differenz oder Absolutwert anzeigen';
   mi.ShortCut := 16452;
   mi.OnClick := DifferenzItemClick;
 
@@ -1394,7 +1475,7 @@ begin
   mi.Caption := 'Rigg automatisch berechnen ( A )';
   mi.Checked := True;
   mi.GroupIndex := 1;
-  mi.Hint := '  Rigg (Kräfte) automatisch berechnen';
+  mi.Hint := '  Rigg (KrÃ¤fte) automatisch berechnen';
   mi.OnClick := SofortItemClick;
 
   mi := N8;
@@ -1412,14 +1493,14 @@ begin
   mi.Caption := 'Biegeknicken';
   mi.Checked := True;
   mi.GroupIndex := 2;
-  mi.Hint := '  Biegeknicken bei der Kraftberechnung berücksichtigen';
+  mi.Hint := '  Biegeknicken bei der Kraftberechnung berÃ¼cksichtigen';
   mi.RadioItem := True;
   mi.OnClick := KnickenItemClick;
 
   mi := KraftGemessenItem;
   mi.Caption := 'gemessene Kraftwerte verwenden';
   mi.GroupIndex := 2;
-  mi.Hint := '  Kräfte aus der Trimmtabelle entnehmen';
+  mi.Hint := '  KrÃ¤fte aus der Trimmtabelle entnehmen';
   mi.RadioItem := True;
   mi.OnClick := KnickenItemClick;
 
@@ -1437,7 +1518,7 @@ begin
   mi := AutoLoadItem;
   mi.Caption := 'Datensatz automatisch laden';
   mi.GroupIndex := 3;
-  mi.Hint := '  Datensätze aus Datenbank einlesen, wenn selektiert';
+  mi.Hint := '  DatensÃ¤tze aus Datenbank einlesen, wenn selektiert';
   mi.OnClick := AutoLoadItemClick;
 
   { Window Menu }
@@ -1449,7 +1530,7 @@ begin
 
   mi := WindowCascadeItem;
   mi.Caption := '&'#220'berlappend';
-  mi.Hint := '  Fenster überlappend anordnen';
+  mi.Hint := '  Fenster Ã¼berlappend anordnen';
   mi.OnClick := WindowCascadeItemClick;
 
   mi := WindowTileItem;
@@ -1499,6 +1580,391 @@ begin
   sp := StatusBar.Panels.Add;
   sp.Text := 'RiggText';
   sp.Width := 50;
+end;
+
+procedure TForm1.FormCreate2;
+begin
+//  Left := 810;
+//  Height := 640;
+
+  TL := TrimmMemo.Lines;
+  ML := ReportMemo.Lines;
+
+  Panel.ShowCaption := False;
+
+  Panel.Align := alTop;
+  Listbox.Align := alLeft;
+  TrimmMemo.Align := alLeft;
+  ReportMemo.Align := alClient;
+
+  BtnCounter := 0;
+  BtnWidth := 50;
+  BtnTop := MT0Btn.Top;
+  BtnLeft := MT0Btn.Left;
+
+  BtnColor := clGreen;
+  AB(MT0Btn);
+
+  BtnColor := clFuchsia;
+  AB(ReadTrimmFileBtn);
+  AB(SaveTrimmFileBtn);
+
+  BtnColor := clBlue;
+  AB(CopyTrimmItemBtn);
+  AB(PasteTrimmItemBtn);
+
+  BtnColor := clBlack;
+  AB(CopyAndPasteBtn);
+
+  BtnCounter := 0;
+  BtnTop := M10Btn.Top;
+  BtnLeft := M10Btn.Left;
+
+  BtnColor := clTeal;
+  AB(M10Btn);
+  AB(M1Btn);
+  AB(P1Btn);
+  AB(P10Btn);
+
+  SetupComboBox(TrimmCombo);
+  SetupComboBox(ParamCombo);
+  SetupComboBox(ViewpointCombo);
+  SetupLabel(ReportLabel);
+  SetupListBox(ListBox);
+  SetupMemo(TrimmMemo);
+  SetupMemo(ReportMemo);
+
+  TrimmMemo.ScrollBars := ssNone;
+  TrimmMemo.Width := ListBox.Width;
+
+  ReportManager := TRggReportManager.Create(ReportMemo);
+
+  InitRetina;
+  InitListBox;
+  InitTrimmCombo;
+  InitParamCombo;
+  InitViewpointCombo;
+
+  TrimmCombo.ItemIndex := 0;
+  ParamCombo.ItemIndex := 0;
+  ViewpointCombo.ItemIndex := 0;
+  ListBox.ItemIndex := 0;
+
+  Main.Trimm := 1;
+  MT0BtnClick(nil);
+  ShowTrimm;
+end;
+
+procedure TForm1.FormResize(Sender: TObject);
+begin
+  Inc(ResizeCounter);
+end;
+
+procedure TForm1.AB(B: TSpeedButton);
+begin
+  B.Left := BtnLeft + BtnCounter * BtnWidth + 12;
+  B.Width := 45;
+  B.Height := 30;
+  B.Font.Name := 'Consolas';
+  B.Font.Size := 12;
+  B.Font.Color := BtnColor;
+  Inc(BtnCounter);
+end;
+
+procedure TForm1.SetupLabel(L: TLabel);
+begin
+  L.Font.Name := 'Consolas';
+  L.Font.Size := 11;
+  L.Font.Color := clPurple;
+end;
+
+procedure TForm1.SetupComboBox(CB: TComboBox);
+begin
+  CB.Style := csDropDownList;
+  CB.DropDownCount := Integer(High(TFederParam));
+  CB.Font.Name := 'Consolas';
+  CB.Font.Size := 11;
+  CB.Font.Color := clRed;
+end;
+
+procedure TForm1.SetupListBox(LB: TListBox);
+begin
+  LB.Font.Name := 'Consolas';
+  LB.Font.Size := 11;
+  LB.Font.Color := clBlue;
+end;
+
+procedure TForm1.SetupMemo(Memo: TMemo);
+begin
+{$ifdef FMX}
+  //Memo.Align := TAlignLayout.Client;
+  Memo.ControlType := TControlType.Styled;
+  Memo.StyledSettings := [];
+  Memo.ShowScrollBars := True;
+  Memo.TextSettings.Font.Family := 'Consolas';
+  Memo.TextSettings.Font.Size := 14;
+  Memo.TextSettings.FontColor := claBlack;
+{$endif}
+
+  //Memo.Align := alClient;
+  //Memo.Font.Name := 'Courier New';
+  Memo.Font.Name := 'Consolas';
+  Memo.Font.Size := 11;
+  Memo.Font.Color := clTeal;
+  Memo.ScrollBars := ssBoth;
+end;
+
+procedure TForm1.InitRetina;
+//var
+//  t: single;
+begin
+{$ifdef FMX}
+  t := self.Handle.Scale; //Viewport1.Scene.GetSceneScale;
+  if t > 1 then
+  begin
+    if Main <> nil then
+    begin
+      Main.IsRetina := True;
+    end;
+  end;
+  if Main <> nil then
+  begin
+     Main.Logger.InfoVerbose('in TFormMain.InitRetina');
+     Main.Logger.InfoVerbose('  Scale = ' + FloatToStr(t));
+     Main.Logger.InfoVerbose('  Retina = ' + BoolStr[Main.IsRetina]);
+  end;
+{$endif}
+
+end;
+
+procedure TForm1.CopyTrimmItemBtnClick(Sender: TObject);
+begin
+  Main.CopyTrimmItem;
+  ShowTrimm;
+end;
+
+procedure TForm1.PasteTrimmItemBtnClick(Sender: TObject);
+begin
+  Main.PasteTrimmItem;
+  ShowTrimm;
+end;
+
+procedure TForm1.CopyAndPasteBtnClick(Sender: TObject);
+begin
+  Main.CopyAndPaste;
+  ShowTrimm;
+end;
+
+procedure TForm1.CopyTrimmFileBtnClick(Sender: TObject);
+begin
+  Main.CopyTrimmFile;
+  ShowTrimm;
+end;
+
+procedure TForm1.ReadTrimmFileBtnClick(Sender: TObject);
+begin
+  Main.ReadTrimmFile;
+  ShowTrimm;
+end;
+
+procedure TForm1.SaveTrimmFileBtnClick(Sender: TObject);
+begin
+  Main.SaveTrimmFile;
+  ShowTrimm;
+end;
+
+procedure TForm1.MT0BtnClick(Sender: TObject);
+begin
+  Main.UpdateTrimm0;
+  //Main.FederText.UpdateText;
+  ShowTrimm;
+end;
+
+procedure TForm1.cbAllTagsClick(Sender: TObject);
+begin
+  ReportManager.XmlAllTags := cbAllTags.Checked;
+end;
+
+procedure TForm1.cbSandboxedClick(Sender: TObject);
+begin
+  IsSandboxed := cbSandboxed.Checked;
+end;
+
+procedure TForm1.InitListBox;
+begin
+  ReportManager.InitLB(ListBox.Items);
+end;
+
+procedure TForm1.ListBoxClick(Sender: TObject);
+var
+  ii: Integer;
+begin
+  ii := Listbox.ItemIndex;
+  if ii > -1 then
+  begin
+    ReportManager.CurrentIndex := ii;
+    ShowCurrentReport;
+  end;
+end;
+
+procedure TForm1.ShowCurrentReport;
+begin
+  ReportManager.ShowCurrentReport;
+  ReportLabel.Caption := ReportManager.GetCurrentCaption;
+end;
+
+procedure TForm1.TestBtnClick(Sender: TObject);
+begin
+  ReportMemo.Lines.Clear;
+  Main.RggData.WriteReport(ML);
+end;
+
+procedure TForm1.InitViewpointCombo;
+var
+  cl: TStrings;
+begin
+  cl := ViewpointCombo.Items;
+  cl.Add('Seite');
+  cl.Add('Achtern');
+  cl.Add('Top');
+  cl.Add('3D');
+end;
+
+procedure TForm1.InitParamCombo;
+  procedure ACI(fp: TFederParam);
+  var
+    s: string;
+  begin
+    s := Main.RggMain.Param2Text(fp);
+    ParamCombo.Items.AddObject(s, TObject(fp));
+  end;
+begin
+  ACI(fpVorstag);
+  ACI(fpWinkel);
+  ACI(fpController);
+  ACI(fpWante);
+  ACI(fpWoben);
+  ACI(fpSalingH);
+  ACI(fpSalingA);
+  ACI(fpSalingL);
+  ACI(fpSalingW);
+  ACI(fpMastfallF0C);
+  ACI(fpMastfallF0F);
+  ACI(fpMastfallVorlauf);
+  ACI(fpBiegung);
+  ACI(fpD0X);
+end;
+
+procedure TForm1.InitTrimmCombo;
+var
+  cl: TStrings;
+begin
+  cl := TrimmCombo.Items;
+  cl.AddObject('Trimm1', TObject(1));
+  cl.AddObject('Trimm2', TObject(2));
+  cl.AddObject('Trimm3', TObject(3));
+  cl.AddObject('Trimm4', TObject(4));
+  cl.AddObject('Trimm5', TObject(5));
+  cl.AddObject('Trimm6', TObject(6));
+  cl.AddObject('Trimm7 (420)', TObject(7));
+  cl.AddObject('Trimm8 (Logo)', TObject(8));
+end;
+
+procedure TForm1.TrimmComboChange(Sender: TObject);
+var
+  t: Integer;
+  ii: Integer;
+begin
+  ii := TrimmCombo.ItemIndex;
+  t := Integer(TrimmCombo.Items.Objects[ii]);
+  Main.Trimm := t;
+
+  ML.BeginUpdate;
+  try
+    ML.Clear;
+
+    //Main.CurrentTrimm.SaveTrimmFile(ML);
+
+    Main.CurrentTrimm.WantAll := cbAllProps.Checked;
+    Main.CurrentTrimm.SaveTrimmItem(ML);
+    Main.CurrentTrimm.WantAll := False;
+
+    //Main.CurrentTrimm.WriteReport(ML);
+
+    ReportLabel.Caption := 'Trimm' + IntToStr(t);
+  finally
+    ML.EndUpdate;
+  end;
+end;
+
+procedure TForm1.ParamComboChange(Sender: TObject);
+var
+  ii: Integer;
+  fp: TFederParam;
+begin
+  ii := ParamCombo.ItemIndex;
+  fp := TFederParam(ParamCombo.Items.Objects[ii]);
+  Main.RggMain.Param := fp;
+  ShowTrimm;
+end;
+
+procedure TForm1.M10BtnClick(Sender: TObject);
+begin
+  Main.HandleAction(faParamValueMinus10);
+  ShowTrimm;
+end;
+
+procedure TForm1.M1BtnClick(Sender: TObject);
+begin
+  Main.HandleAction(faParamValueMinus1);
+  ShowTrimm;
+end;
+
+procedure TForm1.P10BtnClick(Sender: TObject);
+begin
+  Main.HandleAction(faParamValuePlus10);
+  ShowTrimm;
+end;
+
+procedure TForm1.P1BtnClick(Sender: TObject);
+begin
+  Main.HandleAction(faParamValuePlus1);
+  ShowTrimm;
+end;
+
+procedure TForm1.ShowTrimm;
+begin
+  Main.RggMain.UpdateTrimmText(TL);
+  ShowCurrentReport;
+end;
+
+procedure TForm1.FormMouseWheel(Sender: TObject; Shift: TShiftState;
+  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+begin
+  if (ssShift in Shift) or (ssCtrl in Shift) then
+  begin
+    Main.DoMouseWheel(Shift, WheelDelta);
+    ShowTrimm;
+    Handled := True;
+  end;
+end;
+
+procedure TForm1.PaintBtn2Click(Sender: TObject);
+begin
+  Main.RggMain.UpdateGraph;
+end;
+
+procedure TForm1.ViewpointComboChange(Sender: TObject);
+var
+  ii: Integer;
+begin
+  ii := ViewpointCombo.ItemIndex;
+  case ii of
+    0: Main.HandleAction(faViewpointS);
+    1: Main.HandleAction(faViewpointA);
+    2: Main.HandleAction(faViewpointT);
+    3: Main.HandleAction(faViewpoint3);
+  end;
 end;
 
 end.

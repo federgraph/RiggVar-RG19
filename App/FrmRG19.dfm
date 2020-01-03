@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'RG19'
-  ClientHeight = 279
-  ClientWidth = 635
+  ClientHeight = 675
+  ClientWidth = 774
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,8 +18,8 @@ object Form1: TForm1
   TextHeight = 13
   object StatusBar: TStatusBar
     Left = 0
-    Top = 257
-    Width = 635
+    Top = 653
+    Width = 774
     Height = 22
     Panels = <
       item
@@ -34,7 +34,7 @@ object Form1: TForm1
   object SpeedPanel: TPanel
     Left = 0
     Top = 0
-    Width = 635
+    Width = 774
     Height = 32
     Align = alTop
     BevelOuter = bvNone
@@ -313,9 +313,168 @@ object Form1: TForm1
         777770000000}
     end
   end
+  object Panel: TPanel
+    Left = 8
+    Top = 38
+    Width = 625
+    Height = 185
+    TabOrder = 2
+    object ReportLabel: TLabel
+      Left = 337
+      Top = 151
+      Width = 58
+      Height = 13
+      Caption = 'ReportLabel'
+    end
+    object M10Btn: TSpeedButton
+      Left = 176
+      Top = 43
+      Width = 41
+      Height = 30
+      Caption = '-10'
+    end
+    object M1Btn: TSpeedButton
+      Left = 254
+      Top = 43
+      Width = 23
+      Height = 22
+      Caption = '-1'
+    end
+    object P1Btn: TSpeedButton
+      Left = 283
+      Top = 43
+      Width = 23
+      Height = 22
+      Caption = '+1'
+    end
+    object P10Btn: TSpeedButton
+      Left = 312
+      Top = 43
+      Width = 23
+      Height = 22
+      Caption = '+10'
+    end
+    object CopyAndPasteBtn: TSpeedButton
+      Left = 416
+      Top = 7
+      Width = 23
+      Height = 22
+      Caption = 'M'
+    end
+    object CopyTrimmItemBtn: TSpeedButton
+      Left = 343
+      Top = 7
+      Width = 23
+      Height = 22
+      Caption = 'cti'
+    end
+    object MT0Btn: TSpeedButton
+      Left = 176
+      Top = 7
+      Width = 45
+      Height = 30
+      Caption = 'MT0'
+    end
+    object PasteTrimmItemBtn: TSpeedButton
+      Left = 372
+      Top = 7
+      Width = 23
+      Height = 22
+      Caption = 'pti'
+    end
+    object ReadTrimmFileBtn: TSpeedButton
+      Left = 254
+      Top = 7
+      Width = 23
+      Height = 22
+      Caption = 'rtf'
+    end
+    object SaveTrimmFileBtn: TSpeedButton
+      Left = 283
+      Top = 7
+      Width = 23
+      Height = 22
+      Caption = 'stf'
+    end
+    object ParamCombo: TComboBox
+      Left = 176
+      Top = 121
+      Width = 217
+      Height = 21
+      TabOrder = 0
+      Text = 'ParamCombo'
+    end
+    object TrimmMemo: TMemo
+      Left = 1
+      Top = 1
+      Width = 169
+      Height = 183
+      Align = alLeft
+      Lines.Strings = (
+        'TrimmMemo')
+      TabOrder = 1
+    end
+    object TrimmCombo: TComboBox
+      Left = 176
+      Top = 94
+      Width = 177
+      Height = 21
+      TabOrder = 2
+      Text = 'TrimmCombo'
+    end
+    object cbSandboxed: TCheckBox
+      Left = 511
+      Top = 10
+      Width = 97
+      Height = 17
+      Caption = 'Sandboxed'
+      TabOrder = 3
+    end
+    object cbAllProps: TCheckBox
+      Left = 511
+      Top = 33
+      Width = 97
+      Height = 17
+      Caption = 'All Props ( TI )'
+      TabOrder = 4
+    end
+    object ViewpointCombo: TComboBox
+      Left = 176
+      Top = 148
+      Width = 129
+      Height = 21
+      TabOrder = 5
+      Text = 'ViewpointCombo'
+    end
+    object cbAllTags: TCheckBox
+      Left = 511
+      Top = 56
+      Width = 97
+      Height = 17
+      Caption = 'All Tags ( XML )'
+      TabOrder = 6
+    end
+  end
+  object ListBox: TListBox
+    Left = 8
+    Top = 229
+    Width = 161
+    Height = 257
+    ItemHeight = 13
+    TabOrder = 3
+  end
+  object ReportMemo: TMemo
+    Left = 175
+    Top = 229
+    Width = 430
+    Height = 257
+    Lines.Strings = (
+      'ReportMemo')
+    TabOrder = 4
+  end
   object MainMenu: TMainMenu
-    Left = 71
-    Top = 70
+    Left = 327
+    Top = 606
     object FileMenu: TMenuItem
       Caption = '&Datei'
       Hint = '  Dateibefehle'
@@ -680,8 +839,8 @@ object Form1: TForm1
     Filter = 'Alle Dateien (*.*)|*.*|Rigg Einstellungen (*.rgg)|*.rgg'
     FilterIndex = 2
     Options = [ofOverwritePrompt, ofPathMustExist, ofFileMustExist]
-    Left = 199
-    Top = 70
+    Left = 455
+    Top = 606
   end
   object SaveDialog: TSaveDialog
     DefaultExt = 'rgg'
@@ -689,7 +848,7 @@ object Form1: TForm1
       'Rigg Einstellungen (*.rgg)|*.rgg|Rigg IniFile (*.rgi)|*.rgi|Alle' +
       ' Dateien (*.*)|*.*'
     Options = [ofOverwritePrompt, ofPathMustExist]
-    Left = 336
-    Top = 70
+    Left = 592
+    Top = 606
   end
 end

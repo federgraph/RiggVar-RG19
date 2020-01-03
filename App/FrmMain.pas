@@ -221,8 +221,6 @@ type
     procedure wmGetMinMaxInfo(var Msg: TMessage); message wm_GetMinMaxInfo;
   public
     ResizeCounter: Integer;
-    OpenDialog1: TOpenDialog;
-    SaveDialog1: TSaveDialog;
     function GetOpenFileName(dn, fn: string): string;
     function GetSaveFileName(dn, fn: string): string;
     procedure SetControllerEnabled;
