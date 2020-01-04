@@ -177,7 +177,6 @@ type
 implementation
 
 uses
-  FrmMain,
   RggDoc,
   RiggUnit,
   RiggVar.App.Main;

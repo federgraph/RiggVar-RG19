@@ -8,6 +8,7 @@ uses
 
 type
   TViewModelMain = class
+  private
   public
     Caption: string;
     LEDColor: TColor;
@@ -39,6 +40,28 @@ type
     KraftGemessenItemChecked: Boolean;
     QuerKraftItemChecked: Boolean;
 
+    VonDerSeiteItemChecked: Boolean;
+    VonHintenItemChecked: Boolean;
+    VonObenItemChecked: Boolean;
+    Von3DItemChecked: Boolean;
+
+    GrafikFormItemChecked: Boolean;
+    OutputFormItemChecked: Boolean;
+    InputFormItemChecked: Boolean;
+
+    InputFormItemEnabled: Boolean;
+    OutputFormItemEnabled: Boolean;
+    GrafikFormItemEnabled: Boolean;
+
+    ConsoleItemCaption: string;
+    ConsoleItemHint: string;
+    ChartFormItemCaption: string;
+    ChartFormItemHint: string;
+    ReportFormItemCaption: string;
+    ReportFormItemHint: string;
+    RotaFormItemCaption: string;
+    RotaFormItemHint: string;
+
     procedure FestItemClick;
     procedure DrehbarItemClick;
     procedure OSDlgItemClick;
@@ -46,7 +69,18 @@ type
 
     procedure KnickenItemClick(ct: TCalcTyp);
 
+    procedure VonDerSeiteItemClick(vp: TViewPoint);
+
+    procedure ShowConsole;
+    procedure HideConsole;
+    procedure HideDiagramm;
+    procedure HideReport;
+    procedure HideGrafik;
+
     procedure UpdateView;
+
+    function GetOpenFileName(dn, fn: string): string;
+    function GetSaveFileName(dn, fn: string): string;
   end;
 
 implementation
@@ -92,6 +126,26 @@ begin
   FormMain.KnickenItem.Checked := KnickenItemChecked;
   FormMain.KorrigiertItem.Enabled := KorrigiertItemEnabled;
   FormMain.KraftGemessenItem.Checked := KraftGemessenItemChecked;
+
+  FormMain.VonDerSeiteItem.Checked := VonDerSeiteItemChecked;
+  FormMain.VonHintenItem.Checked := VonHintenItemChecked;
+  FormMain.VonObenItem.Checked := VonObenItemChecked;
+  FormMain.Von3DItem.Checked := Von3DItemChecked;
+
+  FormMain.GrafikFormItem.Checked := GrafikFormItemChecked;
+  FormMain.OutputFormItem.Checked := OutputFormItemChecked;
+  FormMain.InputFormItem.Checked := InputFormItemChecked;
+
+  FormMain.InputFormItem.Checked := InputFormItemChecked;
+  FormMain.OutputFormItem.Checked := OutputFormItemChecked;
+  FormMain.GrafikFormItem.Checked := GrafikFormItemChecked;
+
+  FormMain.InputFormItem.Enabled := InputFormItemEnabled;
+  FormMain.OutputFormItem.Enabled := OutputFormItemEnabled;
+  FormMain.GrafikFormItem.Enabled := GrafikFormItemEnabled;
+
+  FormMain.ConsoleItem.Caption := ConsoleItemCaption;
+  FormMain.ConsoleItem.Hint := ConsoleItemHint;
 end;
 
 procedure TViewModelMain.FestItemClick;
@@ -112,6 +166,16 @@ begin
   KorrigiertItemEnabled := True;
 
   KoppelKurveEnabled := True;
+end;
+
+function TViewModelMain.GetOpenFileName(dn, fn: string): string;
+begin
+  result := FormMain.GetOpenFileName(dn, fn);
+end;
+
+function TViewModelMain.GetSaveFileName(dn, fn: string): string;
+begin
+  result := FormMain.GetSaveFileName(dn, fn);
 end;
 
 procedure TViewModelMain.DrehbarItemClick;
@@ -208,6 +272,72 @@ begin
       ControllerDown := False;
     end;
   end;
+end;
+
+procedure TViewModelMain.VonDerSeiteItemClick(vp: TViewPoint);
+begin
+  VonDerSeiteItemChecked := False;
+  VonHintenItemChecked := False;
+  VonObenItemChecked := False;
+  Von3DItemChecked := False;
+  case vp of
+    vpSeite: VonDerSeiteItemChecked := True;
+    vpAchtern: VonHintenItemChecked := True;
+    vpTop: VonObenItemChecked := True;
+    vp3D: Von3DItemChecked := True;
+  end;
+end;
+
+procedure TViewModelMain.ShowConsole;
+begin
+  ConsoleItemCaption := 'Console schlieﬂen';
+  ConsoleItemHint := '  Anordnung der Dialoge aufheben';
+
+  InputFormItemEnabled := True;
+  OutputFormItemEnabled := True;
+  GrafikFormItemEnabled := True;
+
+  UpdateView;
+end;
+
+procedure TViewModelMain.HideConsole;
+begin
+  ConsoleItemCaption := 'Console ...';
+  ConsoleItemHint := '  Dialoge im Formular anordnen';
+
+  InputFormItemChecked := False;
+  OutputFormItemChecked := False;
+  GrafikFormItemChecked := False;
+
+  InputFormItemEnabled := False;
+  OutputFormItemEnabled := False;
+  GrafikFormItemEnabled := False;
+
+  UpdateView;
+end;
+
+procedure TViewModelMain.HideDiagramm;
+begin
+  ChartFormItemCaption := 'Diagramm ...';
+  ChartFormItemHint := '  Diagramm aktivieren';
+  FormMain.ChartFormItem.Caption := 'Diagramm ...';
+  FormMain.ChartFormItem.Hint := '  Diagramm aktivieren';
+end;
+
+procedure TViewModelMain.HideReport;
+begin
+  ReportFormItemCaption := 'Report ...';
+  ReportFormItemHint := '  Report anzeigen';
+  FormMain.ReportFormItem.Caption := 'Report ...';
+  FormMain.ReportFormItem.Hint := '  Report anzeigen';
+end;
+
+procedure TViewModelMain.HideGrafik;
+begin
+  RotaFormItemCaption := '3D Grafik ...';
+  RotaFormItemHint := '  3D Grafik anzeigen';
+  FormMain.RotaFormItem.Caption := '3D Grafik ...';
+  FormMain.RotaFormItem.Hint := '  3D Grafik anzeigen';
 end;
 
 end.

@@ -11,24 +11,15 @@
 interface
 
 uses
-  Windows,
-  Messages,
-  SysUtils,
-  Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  Menus;
+  System.SysUtils,
+  System.Classes,
+  Vcl.Forms;
 
 type
   TConsoleForm = class(TForm)
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
   private
-    { Private-Deklarationen }
-  public
-    { Public-Deklarationen }
   end;
 
 var
@@ -38,7 +29,6 @@ implementation
 
 uses
   Riggunit,
-  FrmMain,
   FrmInput,
   FrmOutput,
   FrmGrafic;
@@ -48,15 +38,6 @@ uses
 procedure TConsoleForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   RiggModul.ConsoleActive := False;
-
-  with FormMain do
-  begin
-    ConsoleItem.Caption := 'Console ...';
-    ConsoleItem.Hint := '  Dialoge im Formular anordnen';
-    InputFormItem.Enabled := True;
-    OutputFormItem.Enabled := True;
-    GrafikFormItem.Enabled := True;
-  end;
 
   with InputForm do
   begin
@@ -167,18 +148,6 @@ begin
 
     YComboBox.ItemIndex := temp;
     Visible := True;
-  end;
-
-  with FormMain do
-  begin
-    InputFormItem.Checked := False;
-    OutputFormItem.Checked := False;
-    GrafikFormItem.Checked := False;
-    InputFormItem.Enabled := False;
-    OutputFormItem.Enabled := False;
-    GrafikFormItem.Enabled := False;
-    ConsoleItem.Caption := 'Console schließen';
-    ConsoleItem.Hint := '  Anordnung der Dialoge aufheben';
   end;
 
   RiggModul.ConsoleActive := True;

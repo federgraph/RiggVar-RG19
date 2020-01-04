@@ -94,7 +94,6 @@ type
     BtnCounter: Integer;
     BtnColor: TColor;
 
-    procedure InitRetina;
     procedure SetupMemo(Memo: TMemo);
     procedure InitListBox;
     procedure InitTrimmCombo;
@@ -107,7 +106,6 @@ type
     procedure ShowCurrentReport;
     procedure InitViewpointCombo;
 public
-    ResizeCounter: Integer;
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
     function GetOpenFileName(dn, fn: string): string;
@@ -182,7 +180,6 @@ begin
 
   ReportManager := TRggReportManager.Create(ReportMemo);
 
-  InitRetina;
   InitListBox;
   InitTrimmCombo;
   InitParamCombo;
@@ -205,7 +202,7 @@ end;
 
 procedure TTextForm.FormResize(Sender: TObject);
 begin
-  Inc(ResizeCounter);
+  Inc(Main.ResizeCounter);
 end;
 
 procedure TTextForm.AB(B: TSpeedButton);
@@ -260,29 +257,6 @@ begin
   Memo.Font.Size := 11;
   Memo.Font.Color := clTeal;
   Memo.ScrollBars := ssBoth;
-end;
-
-procedure TTextForm.InitRetina;
-//var
-//  t: single;
-begin
-{$ifdef FMX}
-  t := self.Handle.Scale; //Viewport1.Scene.GetSceneScale;
-  if t > 1 then
-  begin
-    if Main <> nil then
-    begin
-      Main.IsRetina := True;
-    end;
-  end;
-  if Main <> nil then
-  begin
-     Main.Logger.InfoVerbose('in TFormMain.InitRetina');
-     Main.Logger.InfoVerbose('  Scale = ' + FloatToStr(t));
-     Main.Logger.InfoVerbose('  Retina = ' + BoolStr[Main.IsRetina]);
-  end;
-{$endif}
-
 end;
 
 function TTextForm.GetOpenFileName(dn, fn: string): string;

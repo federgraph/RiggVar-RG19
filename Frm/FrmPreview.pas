@@ -38,7 +38,6 @@ implementation
 {$R *.DFM}
 
 uses
-  FrmMain,
   RiggUnit;
 
 procedure TPreviewGForm.PreviewGBoxPaint(Sender: TObject);

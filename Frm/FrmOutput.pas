@@ -77,7 +77,6 @@ implementation
 {$R *.DFM}
 
 uses
-  FrmMain,
   RiggUnit;
 
 procedure TOutputForm.FormCreate(Sender: TObject);
@@ -124,8 +123,6 @@ begin
   RiggModul.DrawChartPaintBox(ChartPaintBox.Canvas,ChartPaintBox.BoundsRect);
 end;
 
-{****************************************************************************}
-
 procedure TOutputForm.SalingPaintBoxClick(Sender: TObject);
 begin
   RiggModul.SalingPaintBoxClick;
@@ -137,8 +134,6 @@ begin
   RiggModul.DrawPaintBoxS(SalingPaintBox.Canvas);
 end;
 
-{****************************************************************************}
-
 procedure TOutputForm.ControllerPaintBoxPaint(Sender: TObject);
 begin
   RiggModul.DrawPaintBoxC(ControllerPaintBox.Canvas);
@@ -149,8 +144,6 @@ begin
   RiggModul.ZustellBtnClick;
 end;
 
-{****************************************************************************}
-
 procedure TOutputForm.KraftPaintBoxPaint(Sender: TObject);
 begin
   RiggModul.Rigg.DrawPaintBoxK(KraftPaintBox.Canvas, KraftPaintBox.BoundsRect);
@@ -160,8 +153,6 @@ procedure TOutputForm.TestBtnClick(Sender: TObject);
 begin
   RiggModul.TestBtnClick;
 end;
-
-{****************************************************************************}
 
 procedure TOutputForm.OutputPagesChange(Sender: TObject);
 begin
@@ -178,7 +169,8 @@ end;
 
 procedure TOutputForm.FormHide(Sender: TObject);
 begin
-  FormMain.OutputFormItem.Checked := False;
+  RiggModul.ViewModelMain.OutputFormItemChecked := False;
+  RiggModul.ViewModelMain.UpdateView;
 end;
 
 end.

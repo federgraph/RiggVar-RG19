@@ -57,8 +57,6 @@ type
 
   TRiggModul = class(TComponent)
   private
-    ViewModelMain: TViewModelMain;
-
     { Felder für Properties }
     FSofortBerechnen: Boolean;
     FKorrigiertItem: Boolean;
@@ -113,6 +111,9 @@ type
     af: ChartArray;
     bf: array[0..ANr - 1] of real;
     ShowTriangle: Boolean;
+    FConsoleActive: Boolean;
+    FReportFormActive: Boolean;
+    FRotaFormActive: Boolean;
 
     procedure StraightLine;
     procedure GetCurves;
@@ -145,7 +146,12 @@ type
     procedure SetSalingTyp(Value: TSalingTyp);
     procedure SetControllerTyp(Value: TControllerTyp);
     procedure SetWinkelBtnDown(Value: Boolean);
+    procedure SetConsoleActive(const Value: Boolean);
+    procedure SetReportFormActive(const Value: Boolean);
+    procedure SetRotaFormActive(const Value: Boolean);
   public
+    ViewModelMain: TViewModelMain;
+
     Rigg: TRigg;
     RiggReport: TRiggReport;
     FWReport: TFWReport;
@@ -153,10 +159,7 @@ type
     RefCtrl: TTrimmControls;
     RefPoints: TRealRiggPoints;
 
-    ConsoleActive: Boolean;
     ChartFormActive: Boolean;
-    ReportFormActive: Boolean;
-    RotaFormActive: Boolean;
 
     IniFileName: string;
     lbMastfall, lbSpannung, lbBiegung: string;
@@ -271,6 +274,11 @@ type
     property SalingTyp: TSalingTyp read FSalingTyp write SetSalingTyp;
     property ControllerTyp: TControllerTyp read FControllerTyp write SetControllerTyp;
     property SofortBerechnen: Boolean read FSofortBerechnen write FSofortBerechnen;
+
+    property ConsoleActive: Boolean read FConsoleActive write SetConsoleActive;
+    property ReportFormActive: Boolean read FReportFormActive write SetReportFormActive;
+    property RotaFormActive: Boolean read FRotaFormActive write SetRotaFormActive;
+
   end;
 
 var
@@ -1026,6 +1034,13 @@ begin
   ML.EndUpdate;
 end;
 
+procedure TRiggModul.SetReportFormActive(const Value: Boolean);
+begin
+  FReportFormActive := Value;
+  if not Value then
+    ViewModelMain.HideReport;
+end;
+
 procedure TRiggModul.SetReportItem(Value: TReportItem);
 begin
   if FReportItem <> Value then
@@ -1034,6 +1049,13 @@ begin
     rLItemClick(Value);
     OutputForm.OutputPages.ActivePage := OutputForm.MasterMemo;
   end;
+end;
+
+procedure TRiggModul.SetRotaFormActive(const Value: Boolean);
+begin
+  FRotaFormActive := Value;
+  if not Value then
+    ViewModelMain.HideGrafik;
 end;
 
 procedure TRiggModul.rLItemClick(Item: TReportItem);
@@ -1233,6 +1255,8 @@ begin
     ResetPaintBoxG;
     GrafikForm.ViewTab.TabIndex := Ord(FViewPoint);
   end;
+  ViewModelMain.VonDerSeiteItemClick(Value);
+//  ViewModelMain.UpdateView;
 end;
 
 procedure TRiggModul.ResetPaintBoxG;
@@ -1317,6 +1341,15 @@ begin
   end;
 end;
 
+procedure TRiggModul.SetConsoleActive(const Value: Boolean);
+begin
+  FConsoleActive := Value;
+  if Value then
+    ViewModelMain.ShowConsole
+  else
+    ViewModelMain.HideConsole;
+end;
+
 procedure TRiggModul.SetControllerBtnDown(Value: Boolean);
 var
   CT: TControllerTyp;
@@ -1368,6 +1401,8 @@ begin
       SBName := fpVorstag;
     KurveValid := False;
     UpdateGetriebe;
+    ViewModelMain.WinkelDown := FWinkelBtnDown;
+    ViewModelMain.UpdateView;
   end;
 end;
 

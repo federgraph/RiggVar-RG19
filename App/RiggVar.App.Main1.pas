@@ -61,6 +61,7 @@ type
     Trimm8: TRggData; //Logo
 
     ReportCounter: Integer;
+    ResizeCounter: Integer;
 
     constructor Create(rggm: TRggMain);
     destructor Destroy; override;
@@ -112,7 +113,6 @@ type
 implementation
 
 uses
-  FrmMain,
   RggTypes,
   RiggUnit,
   System.Rtti,
@@ -466,7 +466,7 @@ begin
 
   s := fp + fn;
   if IsSandboxed then
-    s := FormMain.GetOpenFileName(fp, fn);
+    s := RiggModul.ViewModelMain.GetOpenFileName(fp, fn);
 
   if s <> '' then
   begin
@@ -552,7 +552,7 @@ begin
 
   s := fp + fn;
   if IsSandboxed then
-    s := FormMain.GetSaveFileName(fp, fn);
+    s := RiggModul.ViewModelMain.GetSaveFileName(fp, fn);
 
   if s <> '' then
   begin
@@ -804,8 +804,8 @@ begin
   ML.Add('  Retina = ' + BoolStr[IsRetina]);
   ML.Add('  Sandboxed = ' + BoolStr[IsSandboxed]);
   ML.Add('  WantOnResize = ' + BoolStr[MainVar.WantOnResize]);
-  ML.Add('  ResizeCounter = ' + IntToStr(FormMain.ResizeCounter));
-  ML.Add(Format('  (%d x %d)', [FormMain.ClientWidth, FormMain.ClientHeight]));
+  ML.Add('  ResizeCounter = ' + IntToStr(ResizeCounter));
+//  ML.Add(Format('  (%d x %d)', [ClientWidth, ClientHeight]));
   ML.Add('---');
   ShowDataText := true;
 end;

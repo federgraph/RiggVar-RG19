@@ -52,7 +52,6 @@ implementation
 
 uses
   RiggUnit,
-  FrmMain,
   FrmSelect;
 
 procedure TReportForm.GetReport;
@@ -122,8 +121,6 @@ end;
 
 procedure TReportForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  FormMain.ReportFormItem.Caption := 'Report ...';
-  FormMain.ReportFormItem.Hint := '  Report anzeigen';
   RiggModul.ReportFormActive := False;
   Action := caFree;
 end;

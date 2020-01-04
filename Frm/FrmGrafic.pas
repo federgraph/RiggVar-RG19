@@ -35,22 +35,19 @@ implementation
 {$R *.DFM}
 
 uses
-  FrmMain,
+  RggTypes,
   RiggUnit;
 
 procedure TGrafikForm.ViewTabChange(Sender: TObject);
 begin
-  with FormMain do
-  begin
-    if ViewTab.TabIndex = 0 then
-      VonDerSeiteItemClick(VonDerSeiteItem)
-    else if ViewTab.TabIndex = 1 then
-      VonDerSeiteItemClick(VonHintenItem)
-    else if ViewTab.TabIndex = 2 then
-      VonDerSeiteItemClick(VonObenItem)
-    else if ViewTab.TabIndex = 3 then
-      VonDerSeiteItemClick(Von3DItem);
-  end;
+  if ViewTab.TabIndex = 0 then
+    RiggModul.Viewpoint := vpSeite
+  else if ViewTab.TabIndex = 1 then
+    RiggModul.Viewpoint := vpAchtern
+  else if ViewTab.TabIndex = 2 then
+    RiggModul.Viewpoint := vpTop
+  else if ViewTab.TabIndex = 3 then
+    RiggModul.Viewpoint := vp3D
 end;
 
 procedure TGrafikForm.PaintBoxGClick(Sender: TObject);
@@ -65,7 +62,8 @@ end;
 
 procedure TGrafikForm.FormHide(Sender: TObject);
 begin
-  FormMain.GrafikFormItem.Checked := False;
+  RiggModul.ViewModelMain.GrafikFormItemChecked := False;
+  RiggModul.ViewModelMain.UpdateView;
 end;
 
 procedure TGrafikForm.FormShow(Sender: TObject);

@@ -26,7 +26,7 @@ object OptionForm: TOptionForm
     Top = 3
     Width = 521
     Height = 265
-    ActivePage = tsIniMemo
+    ActivePage = tsRumpf
     TabOrder = 0
     object tsTrimm: TTabSheet
       Caption = 'Trimm'
@@ -507,10 +507,6 @@ object OptionForm: TOptionForm
     end
     object tsRumpf: TTabSheet
       Caption = 'Rumpf'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object RumpfGroupBox: TGroupBox
         Left = 330
         Top = 65

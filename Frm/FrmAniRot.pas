@@ -16,23 +16,20 @@ interface
 {$define Rigg19}
 
 uses
-  Windows,
-  Messages,
-  SysUtils,
-  Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  Menus,
-  StdCtrls,
-  ExtCtrls,
-  ExtDlgs,
-  ComCtrls,
-  Buttons,
+  Winapi.Windows,
+  System.SysUtils,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Menus,
+  Vcl.StdCtrls,
+  Vcl.ExtCtrls,
+  Vcl.ComCtrls,
+  Vcl.Buttons,
   RggTypes,
   Rggunit4,
-  FrmRot;
+  FrmRot, Vcl.ExtDlgs, Vcl.Dialogs;
 
 const
   AniStepCountMax = 50;
@@ -128,7 +125,6 @@ implementation
 
 uses
   RiggVar.RG.Def,
-  FrmMain,
   FrmAni,
   FrmCmd,
   Math,
@@ -368,9 +364,9 @@ begin
     lbMaxVal.Caption := Format('%6.1f Grad',[cr.Max / 10]);
     lbIstVal.Caption := Format('%6.1f Grad',[temp / 10]);
   end else begin
-    lbMinVal.Caption := Format('%4d mm',[cr.Min]);
-    lbMaxVal.Caption := Format('%4d mm',[cr.Max]);
-    lbIstVal.Caption := Format('%4d mm',[Round(temp)]);
+    lbMinVal.Caption := Format('%4.0f mm',[cr.Min]);
+    lbMaxVal.Caption := Format('%4.0f mm',[cr.Max]);
+    lbIstVal.Caption := Format('%4.0f mm',[temp]);
   end;
   lbParam.Caption := Param2Text(Parameter);
 end;
@@ -499,8 +495,6 @@ procedure TAniRotationForm.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
 {$ifdef Rigg19}
-  FormMain.RotaFormItem.Caption := '3D Grafik ...';
-  FormMain.RotaFormItem.Hint := '  3D Grafik anzeigen';
   RiggModul.RotaFormActive := False;
   Action := caFree;
 {$endif}
@@ -542,7 +536,7 @@ begin
    Rigg.GetDocument(RggDocument);
    RiggModul.Neu(RggDocument);
    if Rigg.ManipulatorMode <> RiggModul.Rigg.ManipulatorMode then
-     FormMain.WinkelItemClick(Self);
+     RiggModul.WinkelBtnDown := not RiggModul.WinkelBtnDown;
   finally
     RggDocument.Free;
   end;
