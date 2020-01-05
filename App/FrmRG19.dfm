@@ -1,9 +1,9 @@
-object Form1: TForm1
+object FormRG19: TFormRG19
   Left = 0
   Top = 0
   Caption = 'RG19'
   ClientHeight = 675
-  ClientWidth = 774
+  ClientWidth = 1044
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,7 +19,7 @@ object Form1: TForm1
   object StatusBar: TStatusBar
     Left = 0
     Top = 653
-    Width = 774
+    Width = 1044
     Height = 22
     Panels = <
       item
@@ -34,7 +34,7 @@ object Form1: TForm1
   object SpeedPanel: TPanel
     Left = 0
     Top = 0
-    Width = 774
+    Width = 1044
     Height = 32
     Align = alTop
     BevelOuter = bvNone
@@ -473,8 +473,8 @@ object Form1: TForm1
     TabOrder = 4
   end
   object MainMenu: TMainMenu
-    Left = 327
-    Top = 606
+    Left = 207
+    Top = 550
     object FileMenu: TMenuItem
       Caption = '&Datei'
       Hint = '  Dateibefehle'
@@ -839,8 +839,8 @@ object Form1: TForm1
     Filter = 'Alle Dateien (*.*)|*.*|Rigg Einstellungen (*.rgg)|*.rgg'
     FilterIndex = 2
     Options = [ofOverwritePrompt, ofPathMustExist, ofFileMustExist]
-    Left = 455
-    Top = 606
+    Left = 287
+    Top = 550
   end
   object SaveDialog: TSaveDialog
     DefaultExt = 'rgg'
@@ -848,7 +848,7 @@ object Form1: TForm1
       'Rigg Einstellungen (*.rgg)|*.rgg|Rigg IniFile (*.rgi)|*.rgi|Alle' +
       ' Dateien (*.*)|*.*'
     Options = [ofOverwritePrompt, ofPathMustExist]
-    Left = 592
-    Top = 606
+    Left = 360
+    Top = 550
   end
 end

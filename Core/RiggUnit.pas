@@ -150,7 +150,7 @@ type
     procedure SetReportFormActive(const Value: Boolean);
     procedure SetRotaFormActive(const Value: Boolean);
   public
-    ViewModelMain: TViewModelMain;
+    ViewModelMain: TViewModelMain00;
 
     Rigg: TRigg;
     RiggReport: TRiggReport;
@@ -311,7 +311,10 @@ uses
 constructor TRiggModul.Create(AOwner: TComponent);
 begin
   inherited;
-  ViewModelMain := TViewModelMain.Create;
+  if Application.Title = 'RG19A' then
+    ViewModelMain := TViewModelMainA.Create
+  else
+    ViewModelMain := TViewModelMainB.Create;
 
   FSofortBerechnen := True;
   FKorrigiertItem := True;
