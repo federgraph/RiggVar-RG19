@@ -81,7 +81,8 @@ end;
 
 procedure TCommandForm.FormHide(Sender: TObject);
 begin
-  AniRotationForm.CommandLineItem.Checked := False;
+  if AniRotationForm.CommandLineItem <> nil then
+    AniRotationForm.CommandLineItem.Checked := False;
 end;
 
 procedure TCommandForm.InputEditKeyDown(Sender: TObject; var Key: Word;

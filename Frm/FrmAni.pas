@@ -133,7 +133,8 @@ end;
 
 procedure TAnimationForm.FormHide(Sender: TObject);
 begin
-  AniRotationForm.AniDlgItem.Checked := False;
+  if AniRotationForm.AniDlgItem <> nil then
+    AniRotationForm.AniDlgItem.Checked := False;
 end;
 
 procedure TAnimationForm.FormKeyDown(Sender: TObject; var Key: Word;

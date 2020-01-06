@@ -38,12 +38,6 @@ const
 
 type
   TAniRotationForm = class(TRotationForm)
-    OptionenMenu: TMenuItem;
-    AniDlgItem: TMenuItem;
-    ShowItem: TMenuItem;
-    N2: TMenuItem;
-    AnimationItem: TMenuItem;
-    CommandLineItem: TMenuItem;
     Timer: TTimer;
     RightPanel: TPanel;
     ScrollBarPanel: TPanel;
@@ -57,10 +51,6 @@ type
     lbParam: TLabel;
     ListPanel: TPanel;
     ListBox: TListBox;
-    RiggTypItem: TMenuItem;
-    N1: TMenuItem;
-    GlobalUpdateItem: TMenuItem;
-    LocalUpdateItem: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure AniDlgItemClick(Sender: TObject);
     procedure ShowItemClick(Sender: TObject);
@@ -115,6 +105,18 @@ type
     property ParamMax[Index: TsbName]: Integer read GetParamMax;
     property ParamPos[Index: TsbName]: Integer read GetParamPos;
     property AniStepCount: Integer read FAniStepCount write SetAniStepCount;
+  public
+    OptionenMenu: TMenuItem;
+    AniDlgItem: TMenuItem;
+    ShowItem: TMenuItem;
+    N2: TMenuItem;
+    AnimationItem: TMenuItem;
+    CommandLineItem: TMenuItem;
+    RiggTypItem: TMenuItem;
+    N1: TMenuItem;
+    GlobalUpdateItem: TMenuItem;
+    LocalUpdateItem: TMenuItem;
+    procedure InitMenu; override;
   end;
 
 var
@@ -142,8 +144,10 @@ begin
 {$ifdef Rigg19}
   MinTrackX := 380;
   MinTrackY := 230;
-  Formstyle := fsMDIChild;
 {$endif}
+
+  if Application.Title = 'RG19A' then
+    Formstyle := fsMDIChild;
 
   AniIncrement := 1;
   WinkelSelStart := ParamPos[fpWinkel]-60;
@@ -154,9 +158,11 @@ begin
   GetListBoxItems; { Parameter := Vorstag; --> SetupTrackBar }
 
   AniRotationForm := Self;
-  //RotationForm := AniRotationForm;
   AnimationForm := TAnimationForm.Create(Self);
   CommandForm := TCommandForm.Create(Self);
+
+  if Application.Title = 'RG19A' then
+    InitMenu;
 end;
 
 procedure TAniRotationForm.InitRigg; {overwritten virtual}
@@ -580,6 +586,90 @@ begin
   finally
     RiggDialog.Free;
   end;
+end;
+
+procedure TAniRotationForm.InitMenu;
+var
+  p, q: TMenuItem;
+  mi: TMenuItem;
+
+  function AddP(AName: string): TMenuItem;
+  begin
+    mi := TMenuItem.Create(MainMenu);
+    mi.Name := AName;
+    p := mi;
+    MainMenu.Items.Add(p);
+    result := mi;
+  end;
+
+  function AddI(AName: string): TMenuItem;
+  begin
+    mi := TMenuItem.Create(MainMenu);
+    mi.Name := AName;
+    p.Add(mi);
+    result := mi;
+    q := mi;
+  end;
+
+  function AddJ(AName: string): TMenuItem;
+  begin
+    mi := TMenuItem.Create(MainMenu);
+    mi.Name := AName;
+    q.Add(mi);
+    result := mi;
+  end;
+begin
+  inherited;
+
+  OptionenMenu := AddP('');
+  mi.Caption := '3D &Modell';
+  mi.GroupIndex := 8;
+  mi.Hint := '  3D Grafik manipulieren';
+  mi.OnClick := OptionenMenuClick;
+
+  RiggTypItem := AddI('');
+  mi.Caption := 'Rigg&Typ einstellen...';
+  mi.Hint := '  Einstellungen für lokales Riggobjekt';
+  mi.ShortCut := 16468;
+  mi.OnClick := RiggTypItemClick;
+
+  ShowItem := AddI('');
+  mi.Caption := '&Liste einblenden';
+  mi.Hint := '  Grafik manipulieren';
+  mi.OnClick := ShowItemClick;
+
+  CommandLineItem := AddI('');
+  mi.Caption := '&Kommandozeile...';
+  mi.Hint := '  Tastaturinterface einblenden';
+  mi.ShortCut := 16474;
+  mi.OnClick := CommandLineItemClick;
+
+  N2 := AddI('');
+  mi.Caption := '-';
+
+  AniDlgItem := AddI('');
+  mi.Caption := 'Animation &vorbereiten...';
+  mi.Hint := '  erfordert Winkelmodus';
+  mi.OnClick := AniDlgItemClick;
+
+  AnimationItem := AddI('');
+  mi.Caption := '&Animation Ein/Aus';
+  mi.Hint := '  Animation ein- bzw ausschalten';
+  mi.ShortCut := 16471;
+  mi.OnClick := AnimationItemClick;
+
+  N1 := AddI('');
+  mi.Caption := '-';
+
+  GlobalUpdateItem := AddI('');
+  mi.Caption := 'Änderungen übernehmen';
+  mi.Hint := '  Globales Riggobjekt aktualisieren';
+  mi.OnClick := GlobalUpdateItemClick;
+
+  LocalUpdateItem := AddI('');
+  mi.Caption := 'Grafik zurücksetzen';
+  mi.Hint := '  Lokales Riggobjekt aktualisieren';
+  mi.OnClick := LocalUpdateItemClick;
 end;
 
 end.

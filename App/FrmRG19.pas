@@ -282,6 +282,10 @@ type
     procedure InitMenuClick;
     procedure InitMenu;
   public
+    WindowCascadeItem: TMenuItem;
+    WindowTileItem: TMenuItem;
+    WindowArrangeItem: TMenuItem;
+    WindowMinimizeItem: TMenuItem;
     procedure SetControllerEnabled;
     procedure SetControllerChecked(Value: Boolean);
     procedure SetKoppelChecked(Value: Boolean);
@@ -2040,30 +2044,33 @@ begin
 
   { Window }
 
-//  WindowMenu := AddP('WindowMenu');
-//  mi.Caption := '&Fenster';
-//  mi.GroupIndex := 9;
-//  mi.Hint := '  MDI Fenster verwalten';
-//
-//  WindowCascadeItem := AddI('WindowCascadeItem');
-//  mi.Caption := '&'#220'berlappend';
-//  mi.Hint := '  Fenster überlappend anordnen';
-//  mi.OnClick := WindowCascadeItemClick;
-//
-//  WindowTileItem := AddI('WindowTileItem');
-//  mi.Caption := '&Nebeneinander';
-//  mi.Hint := '  Fenster nebeneinander anordnen';
-//  mi.OnClick := WindowTileItemClick;
-//
-//  WindowArrangeItem := AddI('WindowArrangeItem');
-//  mi.Caption := '&Symbole anordnen';
-//  mi.Hint := '  Fenstersymbole anordnen';
-//  mi.OnClick := WindowArrangeItemClick;
-//
-//  WindowMinimizeItem := AddI('WindowMinimizeItem');
-//  mi.Caption := '&Alle verkleinern';
-//  mi.Hint := '  Alle Fenster zum Symbol verkleinern';
-//  mi.OnClick := WindowMinimizeItemClick;
+  if Application.Title = 'RG10A' then
+  begin
+    WindowMenu := AddP('WindowMenu');
+    mi.Caption := '&Fenster';
+    mi.GroupIndex := 9;
+    mi.Hint := '  MDI Fenster verwalten';
+
+    WindowCascadeItem := AddI('WindowCascadeItem');
+    mi.Caption := '&'#220'berlappend';
+    mi.Hint := '  Fenster überlappend anordnen';
+    mi.OnClick := WindowCascadeItemClick;
+
+    WindowTileItem := AddI('WindowTileItem');
+    mi.Caption := '&Nebeneinander';
+    mi.Hint := '  Fenster nebeneinander anordnen';
+    mi.OnClick := WindowTileItemClick;
+
+    WindowArrangeItem := AddI('WindowArrangeItem');
+    mi.Caption := '&Symbole anordnen';
+    mi.Hint := '  Fenstersymbole anordnen';
+    mi.OnClick := WindowArrangeItemClick;
+
+    WindowMinimizeItem := AddI('WindowMinimizeItem');
+    mi.Caption := '&Alle verkleinern';
+    mi.Hint := '  Alle Fenster zum Symbol verkleinern';
+    mi.OnClick := WindowMinimizeItemClick;
+  end;
 
   { Help }
 

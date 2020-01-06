@@ -2,7 +2,6 @@ inherited AniRotationForm: TAniRotationForm
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
-  FormStyle = fsMDIChild
   OnActivate = FormActivate
   OnClose = FormClose
   PixelsPerInch = 96
@@ -30,11 +29,15 @@ inherited AniRotationForm: TAniRotationForm
       Left = 3
       Top = 3
       Width = 538
-      Height = 392
+      Height = 412
       ExplicitLeft = 3
       ExplicitTop = 3
       ExplicitWidth = 538
       ExplicitHeight = 392
+    end
+    inherited FocusEdit: TEdit
+      Height = 21
+      ExplicitHeight = 21
     end
   end
   inherited StatusBar: TStatusBar
@@ -84,7 +87,7 @@ inherited AniRotationForm: TAniRotationForm
     Left = 575
     Top = 37
     Width = 151
-    Height = 398
+    Height = 418
     Align = alRight
     BevelOuter = bvNone
     BorderWidth = 1
@@ -168,7 +171,7 @@ inherited AniRotationForm: TAniRotationForm
       Left = 1
       Top = 113
       Width = 149
-      Height = 284
+      Height = 304
       Align = alClient
       BevelOuter = bvNone
       BorderWidth = 1
@@ -178,7 +181,7 @@ inherited AniRotationForm: TAniRotationForm
         Left = 1
         Top = 1
         Width = 147
-        Height = 282
+        Height = 302
         Align = alClient
         ItemHeight = 13
         Items.Strings = (
@@ -192,58 +195,6 @@ inherited AniRotationForm: TAniRotationForm
           'Saling L'#228'nge')
         TabOrder = 0
         OnClick = ListBoxClick
-      end
-    end
-  end
-  inherited MainMenu: TMainMenu
-    object OptionenMenu: TMenuItem
-      Caption = '3D &Modell'
-      GroupIndex = 8
-      Hint = '  3D Grafik manipulieren'
-      OnClick = OptionenMenuClick
-      object RiggTypItem: TMenuItem
-        Caption = 'Rigg&Typ einstellen...'
-        Hint = '  Einstellungen f'#252'r lokales Riggobjekt'
-        ShortCut = 16468
-        OnClick = RiggTypItemClick
-      end
-      object ShowItem: TMenuItem
-        Caption = '&Liste einblenden'
-        Hint = '  Grafik manipulieren'
-        OnClick = ShowItemClick
-      end
-      object CommandLineItem: TMenuItem
-        Caption = '&Kommandozeile...'
-        Hint = '  Tastaturinterface einblenden'
-        ShortCut = 16474
-        OnClick = CommandLineItemClick
-      end
-      object N2: TMenuItem
-        Caption = '-'
-      end
-      object AniDlgItem: TMenuItem
-        Caption = 'Animation &vorbereiten...'
-        Hint = '  erfordert Winkelmodus'
-        OnClick = AniDlgItemClick
-      end
-      object AnimationItem: TMenuItem
-        Caption = '&Animation Ein/Aus'
-        Hint = '  Animation ein- bzw ausschalten'
-        ShortCut = 16471
-        OnClick = AnimationItemClick
-      end
-      object N1: TMenuItem
-        Caption = '-'
-      end
-      object GlobalUpdateItem: TMenuItem
-        Caption = #196'nderungen '#252'bernehmen'
-        Hint = '  Globales Riggobjekt aktualisieren'
-        OnClick = GlobalUpdateItemClick
-      end
-      object LocalUpdateItem: TMenuItem
-        Caption = 'Grafik zur'#252'cksetzen'
-        Hint = '  Lokales Riggobjekt aktualisieren'
-        OnClick = LocalUpdateItemClick
       end
     end
   end

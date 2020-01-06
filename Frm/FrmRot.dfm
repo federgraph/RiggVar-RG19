@@ -4,7 +4,7 @@ object RotationForm: TRotationForm
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   Caption = '3D Grafik'
-  ClientHeight = 454
+  ClientHeight = 474
   ClientWidth = 726
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -37,7 +37,6 @@ object RotationForm: TRotationForm
     0000000000000000000000000000000000000000000000000000000000000000
     0000000000000000000000000000000000000000000000000000000000000000
     000000000000000000000000000000000000000000000000000000000000}
-  Menu = MainMenu
   OldCreateOrder = True
   Position = poDefault
   Scaled = False
@@ -551,7 +550,7 @@ object RotationForm: TRotationForm
     Left = 31
     Top = 37
     Width = 695
-    Height = 398
+    Height = 418
     Align = alClient
     BevelInner = bvLowered
     BevelOuter = bvNone
@@ -562,7 +561,7 @@ object RotationForm: TRotationForm
       Left = 5
       Top = 5
       Width = 685
-      Height = 388
+      Height = 408
       Align = alClient
       Color = clBtnFace
       ParentColor = False
@@ -591,7 +590,7 @@ object RotationForm: TRotationForm
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 435
+    Top = 455
     Width = 726
     Height = 19
     Panels = <
@@ -640,7 +639,7 @@ object RotationForm: TRotationForm
     Left = 0
     Top = 37
     Width = 31
-    Height = 398
+    Height = 418
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 3
@@ -709,350 +708,18 @@ object RotationForm: TRotationForm
     DefaultExt = 'plt'
     Filter = 'Alle Dateien(*.*)|*.*|Plot Dateien(*.plt)|*.plt'
     FilterIndex = 2
-    Left = 81
-    Top = 58
-  end
-  object MainMenu: TMainMenu
-    Left = 152
-    Top = 58
-    object GrafikMenu: TMenuItem
-      Caption = '&3D Grafik'
-      GroupIndex = 8
-      Hint = '  Einstellungen f'#252'r 3D Grafik'
-      OnClick = GrafikMenuClick
-      object ZoomItem: TMenuItem
-        Caption = 'Skalieren'
-        Hint = '  Grafik skalieren'
-        object ZoomInItem: TMenuItem
-          Caption = 'Zoom In'
-          Hint = '  Grafik vergr'#246#223'ern'
-          ShortCut = 16457
-          OnClick = ZoomInBtnClick
-        end
-        object ZoomOutItem: TMenuItem
-          Caption = 'Zoom Out'
-          Hint = '  Grafik verkleinern'
-          ShortCut = 16463
-          OnClick = ZoomOutBtnClick
-        end
-      end
-      object DrehenItem: TMenuItem
-        Caption = 'Rotieren'
-        Hint = '  Grafik drehen'
-        object PhiDownItem: TMenuItem
-          Caption = 'Phi ( Pfeiltaste '#39'nach links'#39' )'
-          OnClick = PhiDownItemClick
-        end
-        object PhiUpItem: TMenuItem
-          Caption = 'Phi ( Pfeiltaste '#39'nach rechts'#39' )'
-          OnClick = PhiDownItemClick
-        end
-        object ThetaDownItem: TMenuItem
-          Caption = 'Theta ( Pfeiltaste '#39'nach unten'#39' )'
-          OnClick = PhiDownItemClick
-        end
-        object ThetaUpItem: TMenuItem
-          Caption = 'Theta ( Pfeiltaste '#39'nach oben'#39' )'
-          OnClick = PhiDownItemClick
-        end
-        object GammaDownItem: TMenuItem
-          Caption = 'Gamma ( Umsch + Pfeiltaste '#39'nach links'#39' )'
-          OnClick = PhiDownItemClick
-        end
-        object GammaUpItem: TMenuItem
-          Caption = 'Gamma ( Umsch + Pfeiltaste '#39'nach rechts'#39' )'
-          OnClick = PhiDownItemClick
-        end
-      end
-      object VerschiebenItem: TMenuItem
-        Caption = 'Verschieben'
-        Hint = '  Grafik verschieben'
-        object TransLeftItem: TMenuItem
-          Caption = 'nach links ( Ctrl + Pfeiltaste '#39'nach links'#39' )'
-          Hint = '  Grafik nach links verschieben'
-          OnClick = TransLeftItemClick
-        end
-        object TransRightItem: TMenuItem
-          Caption = 'nach rechts ( Ctrl + Pfeiltaste '#39'nach rechts'#39' )'
-          Hint = '  Grafik nach rechts verschieben'
-          OnClick = TransLeftItemClick
-        end
-        object TransUpItem: TMenuItem
-          Caption = 'nach oben ( Ctrl + Pfeiltaste '#39'nach oben'#39' )'
-          Hint = '  Grafik nach oben verschieben'
-          OnClick = TransLeftItemClick
-        end
-        object TransDownItem: TMenuItem
-          Caption = 'nach unten ( Ctrl + Pfeiltaste '#39'nach unten'#39' )'
-          Hint = '  Grafik nach unten verschieben'
-          OnClick = TransLeftItemClick
-        end
-      end
-      object MinusItem1: TMenuItem
-        Caption = '-'
-      end
-      object DrehpunktItem: TMenuItem
-        Caption = 'Drehpunkt'
-        Hint = '  Den festgehaltenen Punkt der Grafik bestimmen'
-        object A0_Item: TMenuItem
-          Caption = 'A0'
-          Hint = '  P'#252'tting Stb als Fixpunkt festlegen'
-          OnClick = A0_ItemClick
-        end
-        object B0_Item: TMenuItem
-          Caption = 'B0'
-          Hint = '  P'#252'tting Bb als Fixpunkt festlegen'
-          OnClick = A0_ItemClick
-        end
-        object C0_Item: TMenuItem
-          Caption = 'C0'
-          Hint = '  Vorstagbasis als Fixpunkt festlegen'
-          OnClick = A0_ItemClick
-        end
-        object D0_Item: TMenuItem
-          Caption = 'D0'
-          Hint = '  Mastfu'#223' als Fixpunkt festlegen'
-          OnClick = A0_ItemClick
-        end
-        object E0_Item: TMenuItem
-          Caption = 'E0'
-          Hint = '  Controllerbasis als Fixpunkt festlegen'
-          OnClick = A0_ItemClick
-        end
-        object F0_Item: TMenuItem
-          Caption = 'F0'
-          Hint = '  Me'#223'punkt Spiegel als Fixpunkt festlegen'
-          OnClick = A0_ItemClick
-        end
-        object MinusItem8: TMenuItem
-          Caption = '-'
-        end
-        object A_Item: TMenuItem
-          Caption = 'A'
-          Hint = '  Salingnocke Stb als Fixpunkt festlegen'
-          OnClick = A0_ItemClick
-        end
-        object B_Item: TMenuItem
-          Caption = 'B'
-          Hint = '  Salingnocke Bb als Fixpunkt festlegen'
-          OnClick = A0_ItemClick
-        end
-        object C_Item: TMenuItem
-          Caption = 'C'
-          Hint = '  Vorstagpunkt (Mast) als Fixpunkt festlegen'
-          OnClick = A0_ItemClick
-        end
-        object D_Item: TMenuItem
-          Caption = 'D'
-          Hint = '  Salingpunkt (Mast) als Fixpunkt festlegen'
-          OnClick = A0_ItemClick
-        end
-        object E_Item: TMenuItem
-          Caption = 'E'
-          Hint = '  Controllerpunkt (Mast) als Fixpunkt festlegen'
-          OnClick = A0_ItemClick
-        end
-        object F_Item: TMenuItem
-          Caption = 'F'
-          Hint = '  Masttop als Fixpunkt festlegen'
-          OnClick = A0_ItemClick
-        end
-      end
-      object StepItem: TMenuItem
-        Caption = 'Schrittweite'
-        Hint = ' Schrittweite f'#252'r die Drehung (und Verschiebung) festlegen'
-        object Step01Item: TMenuItem
-          Caption = '0.1 Grad'
-          Hint = '  Winkel-Schrittweite von 0,1 Grad einstellen'
-          OnClick = Step01ItemClick
-        end
-        object Step1Item: TMenuItem
-          Caption = '   1 Grad'
-          Hint = '  Winkel-Schrittweite von 1 Grad einstellen'
-          OnClick = Step1ItemClick
-        end
-        object Step5Item: TMenuItem
-          Caption = '   5 Grad'
-          Hint = '  Winkel-Schrittweite von 5 Grad einstellen'
-          OnClick = Step5ItemClick
-        end
-        object Step10Item: TMenuItem
-          Caption = ' 10 Grad'
-          Hint = '  Winkel-Schrittweite von 10 Grad einstellen'
-          OnClick = Step10ItemClick
-        end
-        object Step30Item: TMenuItem
-          Caption = ' 30 Grad'
-          Hint = '  Winkel-Schrittweite von 30 Grad einstellen'
-          OnClick = Step30ItemClick
-        end
-      end
-      object Positionen1: TMenuItem
-        Caption = 'Positionen'
-        Hint = '  Ansichtspositionen'
-        object PositionItem: TMenuItem
-          Caption = 'Position wechseln'
-          Hint = '  Position des Betrachters umschalten'
-          OnClick = NullBtnClick
-        end
-        object PositionSaveItem: TMenuItem
-          Caption = 'Position speichern'
-          Hint = '  aktuelle Position '#252'bernehmen'
-          OnClick = PositionSaveItemClick
-        end
-        object PositionResetItem: TMenuItem
-          Caption = 'Positionen zur'#252'cksetzen'
-          Hint = '  alle Positionen auf Standardwerte setzen'
-          OnClick = PositionResetItemClick
-        end
-      end
-      object MinusItem2: TMenuItem
-        Caption = '-'
-      end
-      object ModusItem: TMenuItem
-        Caption = 'Absolutwinkel'
-        Hint = '  Absolutwerte f'#252'r Drehwinkel oder Inkremente'
-        OnClick = ModusItemClick
-      end
-      object KeepInsideItem: TMenuItem
-        Caption = 'Drehpunkt sichtbar'
-        Checked = True
-        Hint = '  Drehpunkt immer innerhalb der Bildgrenzen halten'
-        OnClick = KeepInsideItemClick
-      end
-      object PaintItem: TMenuItem
-        Caption = 'Alte Grafik stehenlassen'
-        Hint = '  Alte Grafik stehenlassen oder l'#246'schen'
-        ShortCut = 45
-        OnClick = PaintBtnClick
-      end
-      object RumpfItem: TMenuItem
-        Caption = 'Boot einblenden'
-        Hint = '  Bootsrumpf einblenden'
-        ShortCut = 16450
-        OnClick = RumpfBtnClick
-      end
-      object DrawAlwaysItem: TMenuItem
-        Caption = 'Boot immer zeichnen'
-        Hint = '  Boot auch w'#228'hrend der Bewegung zeichnen'
-        OnClick = DrawAlwaysItemClick
-      end
-      object MinusItem3: TMenuItem
-        Caption = '-'
-      end
-      object PreviewItem: TMenuItem
-        Caption = 'Seite einblenden'
-        Hint = '  Seitenr'#228'nder einblenden'
-        OnClick = PreviewItemClick
-      end
-      object PrintItem: TMenuItem
-        Caption = 'Drucken ...'
-        Hint = '  Gafik drucken'
-        OnClick = PrintItemClick
-      end
-      object PlotItem: TMenuItem
-        Caption = 'Plotfile ...'
-        Hint = '  Grafik im HPGL Format ausgeben'
-        OnClick = PlotItemClick
-      end
-      object MinusItem4: TMenuItem
-        Caption = '-'
-      end
-      object SpeedBarItem: TMenuItem
-        Caption = 'Symbolleiste'
-        Checked = True
-        Hint = '  Symbolleiste einblenden (3D Grafik)'
-        OnClick = SpeedBarItemClick
-      end
-      object PosiToolItem: TMenuItem
-        Caption = 'Positionsschalter'
-        Checked = True
-        Hint = '  Auswahlschalter f'#252'r Positionen einblenden'
-        OnClick = PosiToolItemClick
-      end
-      object StatusBarItem: TMenuItem
-        Caption = 'Statusleiste'
-        Checked = True
-        Hint = '  Statusleiste einblenden (3D Grafik)'
-        OnClick = StatusBarItemClick
-      end
-    end
-    object Options3DMenu: TMenuItem
-      Caption = '3D &Optionen'
-      GroupIndex = 8
-      Hint = '  Optionen f'#252'r 3D Grafik'
-      OnClick = Options3DMenuClick
-      object SelectHullItem: TMenuItem
-        Caption = 'Rumpf ausw'#228'hlen'
-        object Sample420Item: TMenuItem
-          Caption = 'Beispiel 420er Jolle'
-          OnClick = Sample420ItemClick
-        end
-        object SampleDinghyItem: TMenuItem
-          Caption = 'Beispiel Dinglhy'
-          OnClick = Sample420ItemClick
-        end
-        object SampleYachtItem: TMenuItem
-          Caption = 'Beispiel Yacht'
-          OnClick = Sample420ItemClick
-        end
-        object SamplePlaningItem: TMenuItem
-          Caption = 'Beispiel Planing'
-          OnClick = Sample420ItemClick
-        end
-      end
-      object HullItem: TMenuItem
-        Caption = 'Rumpf laden...'
-        Hint = '  Rumpfdaten aus Datei laden'
-        OnClick = HullItemClick
-      end
-      object FaktorDlgItem: TMenuItem
-        Caption = 'Rumpf skalieren...'
-        Hint = '  Rumpfgr'#246#223'e anpassen'
-        OnClick = FaktorDlgItemClick
-      end
-      object MinusItem5: TMenuItem
-        Caption = '-'
-      end
-      object OpenBackBmpItem: TMenuItem
-        Caption = 'Hintergrund laden...'
-        Hint = '  Bitmapdatei als Hintergrundbild laden'
-        OnClick = OpenBackBmpItemClick
-      end
-      object CloseBackBmpItem: TMenuItem
-        Caption = 'Hintergrund l'#246'schen'
-        Hint = '  Hintergrundbitmap l'#246'schen'
-        OnClick = CloseBackBmpItemClick
-      end
-      object MinusItem6: TMenuItem
-        Caption = '-'
-      end
-      object IndicatorItem: TMenuItem
-        Caption = 'Indikator'
-        Hint = '  Indikator f'#252'r Drehwinkel anzeigen'
-        OnClick = IndicatorItemClick
-      end
-      object IndicatorLocalRotItem: TMenuItem
-        Caption = 'Lokale Achsen (Indikator)'
-        Hint = '  Indikator um lokale Achsen drehen'
-        OnClick = IndicatorLocalRotItemClick
-      end
-      object MatrixItem: TMenuItem
-        Caption = 'Rotationmatrix'
-        Hint = '  Rotationsmatrix einblenden'
-        OnClick = MatrixItemClick
-      end
-    end
+    Left = 137
+    Top = 114
   end
   object OpenDialog: TOpenDialog
     DefaultExt = 'dat'
     Filter = 'Hull Data File (*.dat)|*.dat|alle Dateien (*.*)|*.*'
-    Left = 265
-    Top = 58
+    Left = 273
+    Top = 114
   end
   object OpenPictureDialog: TOpenPictureDialog
     Filter = 'Bitmaps (*.bmp)|*.bmp'
-    Left = 297
-    Top = 58
+    Left = 401
+    Top = 114
   end
 end

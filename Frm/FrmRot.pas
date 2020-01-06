@@ -94,90 +94,19 @@ type
     TransRightBtn: TSpeedButton;
     TransUpBtn: TSpeedButton;
     TransDownBtn: TSpeedButton;
-    MainMenu: TMainMenu;
-    GrafikMenu: TMenuItem;
-    ZoomItem: TMenuItem;
-    ZoomInItem: TMenuItem;
-    ZoomOutItem: TMenuItem;
-    DrehenItem: TMenuItem;
-    PhiDownItem: TMenuItem;
-    PhiUpItem: TMenuItem;
-    ThetaDownItem: TMenuItem;
-    ThetaUpItem: TMenuItem;
-    GammaDownItem: TMenuItem;
-    GammaUpItem: TMenuItem;
-    VerschiebenItem: TMenuItem;
-    TransLeftItem: TMenuItem;
-    TransRightItem: TMenuItem;
-    TransUpItem: TMenuItem;
-    TransDownItem: TMenuItem;
-    MinusItem1: TMenuItem;
-    DrehpunktItem: TMenuItem;
-    A0_Item: TMenuItem;
-    B0_Item: TMenuItem;
-    C0_Item: TMenuItem;
-    D0_Item: TMenuItem;
-    E0_Item: TMenuItem;
-    F0_Item: TMenuItem;
-    MinusItem8: TMenuItem;
-    A_Item: TMenuItem;
-    B_Item: TMenuItem;
-    C_Item: TMenuItem;
-    D_Item: TMenuItem;
-    E_Item: TMenuItem;
-    F_Item: TMenuItem;
-    StepItem: TMenuItem;
-    Step01Item: TMenuItem;
-    Step1Item: TMenuItem;
-    Step5Item: TMenuItem;
-    Step10Item: TMenuItem;
-    Step30Item: TMenuItem;
-    MinusItem2: TMenuItem;
-    PositionItem: TMenuItem;
-    PaintItem: TMenuItem;
-    RumpfItem: TMenuItem;
-    PreviewItem: TMenuItem;
-    PrintItem: TMenuItem;
-    PlotItem: TMenuItem;
-    SpeedBarItem: TMenuItem;
-    StatusBarItem: TMenuItem;
-    KeepInsideItem: TMenuItem;
     Panel: TPanel;
     LeftButton: TSpeedButton;
     RightButton: TSpeedButton;
     StatusBar: TStatusBar;
     FocusEdit: TEdit;
-    PositionSaveItem: TMenuItem;
-    PositionResetItem: TMenuItem;
-    MinusItem4: TMenuItem;
-    ModusItem: TMenuItem;
-    MinusItem3: TMenuItem;
-    DrawAlwaysItem: TMenuItem;
-    Positionen1: TMenuItem;
     OpenDialog: TOpenDialog;
     OpenPictureDialog: TOpenPictureDialog;
-    MinusItem5: TMenuItem;
-    MinusItem6: TMenuItem;
-    IndicatorItem: TMenuItem;
-    IndicatorLocalRotItem: TMenuItem;
-    OpenBackBmpItem: TMenuItem;
-    CloseBackBmpItem: TMenuItem;
-    FaktorDlgItem: TMenuItem;
-    HullItem: TMenuItem;
-    Options3DMenu: TMenuItem;
     pnPositionTools: TPanel;
     Pos1Btn: TSpeedButton;
     Pos2Btn: TSpeedButton;
     Pos3Btn: TSpeedButton;
     Pos4Btn: TSpeedButton;
     MemoryBtn: TSpeedButton;
-    PosiToolItem: TMenuItem;
-    MatrixItem: TMenuItem;
-    SelectHullItem: TMenuItem;
-    Sample420Item: TMenuItem;
-    SampleDinghyItem: TMenuItem;
-    SampleYachtItem: TMenuItem;
-    SamplePlaningItem: TMenuItem;
     NullBtn: TSpeedButton;
     PaintBtn: TSpeedButton;
     RumpfBtn: TSpeedButton;
@@ -324,6 +253,79 @@ type
     procedure InitRigg; virtual;
     procedure InitPreview; virtual;
     procedure UpdateGraph; virtual;
+  public
+    MainMenu: TMainMenu;
+    GrafikMenu: TMenuItem;
+    ZoomItem: TMenuItem;
+    ZoomInItem: TMenuItem;
+    ZoomOutItem: TMenuItem;
+    DrehenItem: TMenuItem;
+    PhiDownItem: TMenuItem;
+    PhiUpItem: TMenuItem;
+    ThetaDownItem: TMenuItem;
+    ThetaUpItem: TMenuItem;
+    GammaDownItem: TMenuItem;
+    GammaUpItem: TMenuItem;
+    VerschiebenItem: TMenuItem;
+    TransLeftItem: TMenuItem;
+    TransRightItem: TMenuItem;
+    TransUpItem: TMenuItem;
+    TransDownItem: TMenuItem;
+    MinusItem1: TMenuItem;
+    DrehpunktItem: TMenuItem;
+    A0_Item: TMenuItem;
+    B0_Item: TMenuItem;
+    C0_Item: TMenuItem;
+    D0_Item: TMenuItem;
+    E0_Item: TMenuItem;
+    F0_Item: TMenuItem;
+    MinusItem8: TMenuItem;
+    A_Item: TMenuItem;
+    B_Item: TMenuItem;
+    C_Item: TMenuItem;
+    D_Item: TMenuItem;
+    E_Item: TMenuItem;
+    F_Item: TMenuItem;
+    StepItem: TMenuItem;
+    Step01Item: TMenuItem;
+    Step1Item: TMenuItem;
+    Step5Item: TMenuItem;
+    Step10Item: TMenuItem;
+    Step30Item: TMenuItem;
+    MinusItem2: TMenuItem;
+    PositionItem: TMenuItem;
+    PaintItem: TMenuItem;
+    RumpfItem: TMenuItem;
+    PreviewItem: TMenuItem;
+    PrintItem: TMenuItem;
+    PlotItem: TMenuItem;
+    SpeedBarItem: TMenuItem;
+    StatusBarItem: TMenuItem;
+    KeepInsideItem: TMenuItem;
+    PositionSaveItem: TMenuItem;
+    PositionResetItem: TMenuItem;
+    MinusItem4: TMenuItem;
+    ModusItem: TMenuItem;
+    MinusItem3: TMenuItem;
+    DrawAlwaysItem: TMenuItem;
+    Positionen1: TMenuItem;
+    MinusItem5: TMenuItem;
+    MinusItem6: TMenuItem;
+    IndicatorItem: TMenuItem;
+    IndicatorLocalRotItem: TMenuItem;
+    OpenBackBmpItem: TMenuItem;
+    CloseBackBmpItem: TMenuItem;
+    FaktorDlgItem: TMenuItem;
+    HullItem: TMenuItem;
+    Options3DMenu: TMenuItem;
+    PosiToolItem: TMenuItem;
+    MatrixItem: TMenuItem;
+    SelectHullItem: TMenuItem;
+    Sample420Item: TMenuItem;
+    SampleDinghyItem: TMenuItem;
+    SampleYachtItem: TMenuItem;
+    SamplePlaningItem: TMenuItem;
+    procedure InitMenu; virtual;
   end;
 
 var
@@ -361,6 +363,112 @@ begin
   end;
   result := temp;
 end;
+
+{ TRotaParams }
+
+constructor TRotaParams.Create;
+begin
+  FIncrementIndex := 3;
+  FZoomBase := 0.05;
+  FZoomIndex := 7;
+  FixPunkt := ooD0;
+  Phi := 0;
+  Theta := -90;
+  Gamma := 0;
+  Xrot := -87;
+  Yrot := 0;
+  Zrot := 0;
+end;
+
+procedure TRotaParams.SetIncrementIndex(Value: Integer);
+begin
+  if Value < 1 then
+    Value := 1;
+  if Value > 5 then
+    Value := 5;
+  FIncrementIndex := Value;
+end;
+
+procedure TRotaParams.SetZoomIndex(Value: Integer);
+begin
+  if Value < 1 then
+    Value := 1;
+  if Value > 11 then
+    Value := 11;
+  FZoomIndex := Value;
+end;
+
+procedure TRotaParams.SetFixPunktIndex(Value: Integer);
+begin
+  case Value of
+    0: FixPunkt := ooA0;
+    1: FixPunkt := ooA;
+    2: FixPunkt := ooB0;
+    3: FixPunkt := ooB;
+    4: FixPunkt := ooC0;
+    5: FixPunkt := ooC;
+    6: FixPunkt := ooD0;
+    7: FixPunkt := ooD;
+    8: FixPunkt := ooE0;
+    9: FixPunkt := ooE;
+   10: FixPunkt := ooF0;
+   11: FixPunkt := ooF;
+   else FixPunkt := ooD0;
+  end;
+end;
+
+function TRotaParams.GetFixPunktIndex: Integer;
+begin
+  case FixPunkt of
+    ooA0:  result :=  0;
+    ooA:   result :=  1;
+    ooB0:  result :=  2;
+    ooB:   result :=  3;
+    ooC0:  result :=  4;
+    ooC:   result :=  5;
+    ooD0:  result :=  6;
+    ooD:   result :=  7;
+    ooE0:  result :=  8;
+    ooE:   result :=  9;
+    ooF0:  result := 10;
+    ooF:   result := 11;
+    else
+      result := 6;
+  end;
+end;
+
+function TRotaParams.GetIncrementT: Integer;
+begin
+  case IncrementIndex of
+    1: result := 1;
+    2: result := 5;
+    3: result := 10;
+    4: result := 30;
+    5: result := 100;
+    else
+      result := 1;
+  end;
+end;
+
+function TRotaParams.GetIncrementW: real;
+begin
+  case IncrementIndex of
+    1: result := 0.1;
+    2: result := 1;
+    3: result := 5;
+    4: result := 10;
+    5: result := 30;
+    else
+      result := 1;
+  end;
+end;
+
+function TRotaParams.GetZoom: real;
+begin
+  result := FZoomBase * LookUpRa10(FZoomIndex);
+end;
+
+{ TRotationForm }
 
 procedure TRotationForm.PaintBackGround(Image: TBitmap);
 var
@@ -461,15 +569,18 @@ begin
   ViewPoint := vpTop;
   // SetZoomText;
 
-  { ssAlt ist notwendig, da sonst in der Kommandozeile keine Ziffern
-    eingegeben werden können! }
-  Step01Item.ShortCut := ShortCut(Word('1'), [ssAlt, ssShift]);
-  Step1Item.ShortCut := ShortCut(Word('1'), [ssAlt]);
-  Step5Item.ShortCut := ShortCut(Word('5'), [ssAlt]);
-  Step10Item.ShortCut := ShortCut(Word('1'), [ssAlt, ssCtrl]);
-  Step30Item.ShortCut := ShortCut(Word('3'), [ssAlt]);
-  { ZoomInItem.ShortCut := VK_ADD;} { '+' auf Zehnertastatur }
-  { ZoomOutItem.ShortCut := VK_SUBTRACT; } { '-' auf Zehnertastatur }
+  if MainMenu <> nil then
+  begin
+    { ssAlt ist notwendig, da sonst in der Kommandozeile keine Ziffern
+      eingegeben werden können! }
+    Step01Item.ShortCut := ShortCut(Word('1'), [ssAlt, ssShift]);
+    Step1Item.ShortCut := ShortCut(Word('1'), [ssAlt]);
+    Step5Item.ShortCut := ShortCut(Word('5'), [ssAlt]);
+    Step10Item.ShortCut := ShortCut(Word('1'), [ssAlt, ssCtrl]);
+    Step30Item.ShortCut := ShortCut(Word('3'), [ssAlt]);
+    { ZoomInItem.ShortCut := VK_ADD;} { '+' auf Zehnertastatur }
+    { ZoomOutItem.ShortCut := VK_SUBTRACT; } { '-' auf Zehnertastatur }
+  end;
 
 
   { PaintBox austauschen }
@@ -709,10 +820,10 @@ begin
   NullpunktOffset.y := -RaumGrafik.Offset.y + Bitmap.Height div 2 + FYpos;
   DrawToBitmap1; // bzw. DrawToBitmap2;
 
-  if MatrixItem.Checked then
+  if (MainMenu <> nil) and MatrixItem.Checked then
     DrawMatrix(Bitmap.Canvas);
 
-  if PreviewItem.Checked then
+  if (MainMenu <> nil) and PreviewItem.Checked then
     DrawPreviewBox;
 
   { Bitmap auf den Bildschirm kopieren }
@@ -1937,19 +2048,22 @@ begin
     GammaDownBtn.Hint := 'Bank - Boot nach links (gamma-)|';
     GammaUpBtn.Hint := 'Bank - Boot nach rechts (gamma+)|';
 
-    PhiDownItem.Hint := '  Grafik um die globale Z-Achse drehen';
-    PhiUpItem.Hint := '  Grafik um die globale Z-Achse drehen';
-    ThetaDownItem.Hint := '  Grafik um die lokale Y-Achse drehen';
-    ThetaUpItem.Hint := '  Grafik um die lokale Y-Achse drehen';
-    GammaDownItem.Hint := '  Grafik um die lokale x-Achse drehen';
-    GammaUpItem.Hint := '  Grafik um die lokale x-Achse drehen';
+    if MainMenu <> nil then
+    begin
+      PhiDownItem.Hint := '  Grafik um die globale Z-Achse drehen';
+      PhiUpItem.Hint := '  Grafik um die globale Z-Achse drehen';
+      ThetaDownItem.Hint := '  Grafik um die lokale Y-Achse drehen';
+      ThetaUpItem.Hint := '  Grafik um die lokale Y-Achse drehen';
+      GammaDownItem.Hint := '  Grafik um die lokale x-Achse drehen';
+      GammaUpItem.Hint := '  Grafik um die lokale x-Achse drehen';
 
-    PhiDownItem.Caption := 'H  ( Pfeiltaste ''nach links'' )';
-    PhiUpItem.Caption := 'H  ( Pfeiltaste ''nach rechts'' )';
-    ThetaDownItem.Caption := 'P  ( Pfeiltaste ''nach unten'' )';
-    ThetaUpItem.Caption := 'P  ( Pfeiltaste ''nach oben'' )';
-    GammaDownItem.Caption := 'B  ( Umsch + Pfeiltaste ''nach links'' )';
-    GammaUpItem.Caption := 'B  ( Umsch + Pfeiltaste ''nach rechts'' )';
+      PhiDownItem.Caption := 'H  ( Pfeiltaste ''nach links'' )';
+      PhiUpItem.Caption := 'H  ( Pfeiltaste ''nach rechts'' )';
+      ThetaDownItem.Caption := 'P  ( Pfeiltaste ''nach unten'' )';
+      ThetaUpItem.Caption := 'P  ( Pfeiltaste ''nach oben'' )';
+      GammaDownItem.Caption := 'B  ( Umsch + Pfeiltaste ''nach links'' )';
+      GammaUpItem.Caption := 'B  ( Umsch + Pfeiltaste ''nach rechts'' )';
+    end;
   end;
   if not Mode then
   begin
@@ -1961,19 +2075,22 @@ begin
     GammaDownBtn.Hint := 'Boot nach links drehen|';
     GammaUpBtn.Hint := 'Boot nach rechts drehen|';
 
-    PhiDownItem.Hint := '  Grafik um die lokale X-Achse drehen';
-    PhiUpItem.Hint := '  Grafik um die lokale X-Achse drehen';
-    ThetaDownItem.Hint := '  Grafik um die lokale Y-Achse drehen';
-    ThetaUpItem.Hint := '  Grafik um die lokale Y-Achse drehen';
-    GammaDownItem.Hint := '  Grafik um die lokale Z-Achse drehen';
-    GammaUpItem.Hint := '  Grafik um die lokale Z-Achse drehen';
+    if MainMenu <> nil then
+    begin
+      PhiDownItem.Hint := '  Grafik um die lokale X-Achse drehen';
+      PhiUpItem.Hint := '  Grafik um die lokale X-Achse drehen';
+      ThetaDownItem.Hint := '  Grafik um die lokale Y-Achse drehen';
+      ThetaUpItem.Hint := '  Grafik um die lokale Y-Achse drehen';
+      GammaDownItem.Hint := '  Grafik um die lokale Z-Achse drehen';
+      GammaUpItem.Hint := '  Grafik um die lokale Z-Achse drehen';
 
-    PhiDownItem.Caption := 'X  ( Pfeiltaste ''nach links'' )';
-    PhiUpItem.Caption := 'X  ( Pfeiltaste ''nach rechts'' )';
-    ThetaDownItem.Caption := 'Y  ( Pfeiltaste ''nach unten'' )';
-    ThetaUpItem.Caption := 'Y  ( Pfeiltaste ''nach oben'' )';
-    GammaDownItem.Caption := 'Z  ( Umsch + Pfeiltaste ''nach links'' )';
-    GammaUpItem.Caption := 'Z  ( Umsch + Pfeiltaste ''nach rechts'' )';
+      PhiDownItem.Caption := 'X  ( Pfeiltaste ''nach links'' )';
+      PhiUpItem.Caption := 'X  ( Pfeiltaste ''nach rechts'' )';
+      ThetaDownItem.Caption := 'Y  ( Pfeiltaste ''nach unten'' )';
+      ThetaUpItem.Caption := 'Y  ( Pfeiltaste ''nach oben'' )';
+      GammaDownItem.Caption := 'Z  ( Umsch + Pfeiltaste ''nach links'' )';
+      GammaUpItem.Caption := 'Z  ( Umsch + Pfeiltaste ''nach rechts'' )';
+    end;
   end;
 end;
 
@@ -1989,108 +2106,367 @@ begin
   Draw;
 end;
 
-{ TRotaParams }
+procedure TRotationForm.InitMenu;
+var
+  p, q: TMenuItem;
+  mi: TMenuItem;
 
-constructor TRotaParams.Create;
-begin
-  FIncrementIndex := 3;
-  FZoomBase := 0.05;
-  FZoomIndex := 7;
-  FixPunkt := ooD0;
-  Phi := 0;
-  Theta := -90;
-  Gamma := 0;
-  Xrot := -87;
-  Yrot := 0;
-  Zrot := 0;
-end;
-
-procedure TRotaParams.SetIncrementIndex(Value: Integer);
-begin
-  if Value < 1 then
-    Value := 1;
-  if Value > 5 then
-    Value := 5;
-  FIncrementIndex := Value;
-end;
-
-procedure TRotaParams.SetZoomIndex(Value: Integer);
-begin
-  if Value < 1 then
-    Value := 1;
-  if Value > 11 then
-    Value := 11;
-  FZoomIndex := Value;
-end;
-
-procedure TRotaParams.SetFixPunktIndex(Value: Integer);
-begin
-  case Value of
-    0: FixPunkt := ooA0;
-    1: FixPunkt := ooA;
-    2: FixPunkt := ooB0;
-    3: FixPunkt := ooB;
-    4: FixPunkt := ooC0;
-    5: FixPunkt := ooC;
-    6: FixPunkt := ooD0;
-    7: FixPunkt := ooD;
-    8: FixPunkt := ooE0;
-    9: FixPunkt := ooE;
-   10: FixPunkt := ooF0;
-   11: FixPunkt := ooF;
-   else FixPunkt := ooD0;
+  function AddP(AName: string): TMenuItem;
+  begin
+    mi := TMenuItem.Create(MainMenu);
+    mi.Name := AName;
+    p := mi;
+    MainMenu.Items.Add(p);
+    result := mi;
   end;
-end;
 
-function TRotaParams.GetFixPunktIndex: Integer;
-begin
-  case FixPunkt of
-    ooA0:  result :=  0;
-    ooA:   result :=  1;
-    ooB0:  result :=  2;
-    ooB:   result :=  3;
-    ooC0:  result :=  4;
-    ooC:   result :=  5;
-    ooD0:  result :=  6;
-    ooD:   result :=  7;
-    ooE0:  result :=  8;
-    ooE:   result :=  9;
-    ooF0:  result := 10;
-    ooF:   result := 11;
-    else
-      result := 6;
+  function AddI(AName: string): TMenuItem;
+  begin
+    mi := TMenuItem.Create(MainMenu);
+    mi.Name := AName;
+    p.Add(mi);
+    result := mi;
+    q := mi;
   end;
-end;
 
-function TRotaParams.GetIncrementT: Integer;
-begin
-  case IncrementIndex of
-    1: result := 1;
-    2: result := 5;
-    3: result := 10;
-    4: result := 30;
-    5: result := 100;
-    else
-      result := 1;
+  function AddJ(AName: string): TMenuItem;
+  begin
+    mi := TMenuItem.Create(MainMenu);
+    mi.Name := AName;
+    q.Add(mi);
+    result := mi;
   end;
-end;
 
-function TRotaParams.GetIncrementW: real;
 begin
-  case IncrementIndex of
-    1: result := 0.1;
-    2: result := 1;
-    3: result := 5;
-    4: result := 10;
-    5: result := 30;
-    else
-      result := 1;
-  end;
-end;
+  MainMenu := TMainMenu.Create(Self);
 
-function TRotaParams.GetZoom: real;
-begin
-  result := FZoomBase * LookUpRa10(FZoomIndex);
+  GrafikMenu := AddP('GrafikMenu');
+  mi.Caption := '&3D Grafik';
+  mi.GroupIndex := 8;
+  mi.Hint := '  Einstellungen für 3D Grafik';
+  mi.OnClick := GrafikMenuClick;
+
+  ZoomItem := AddI('ZoomItem');
+  mi.Caption := 'Skalieren';
+  mi.Hint := '  Grafik skalieren';
+
+  ZoomInItem := AddJ('ZoomInItem');
+  mi.Caption := 'Zoom In';
+  mi.Hint := '  Grafik vergrößern';
+  mi.ShortCut := 16457;
+  mi.OnClick := ZoomInBtnClick;
+
+  ZoomOutItem := AddJ('ZoomOutItem');
+  mi.Caption := 'Zoom Out';
+  mi.Hint := '  Grafik verkleinern';
+  mi.ShortCut := 16463;
+  mi.OnClick := ZoomOutBtnClick;
+
+  DrehenItem := AddI('DrehenItem');
+  mi.Caption := 'Rotieren';
+  mi.Hint := '  Grafik drehen';
+
+  PhiDownItem := AddJ('PhiDownItem');
+  mi.Caption := 'Phi ( Pfeiltaste '#39'nach links'#39' )';
+  mi.OnClick := PhiDownItemClick;
+
+  PhiUpItem := AddJ('PhiUpItem');
+  mi.Caption := 'Phi ( Pfeiltaste '#39'nach rechts'#39' )';
+  mi.OnClick := PhiDownItemClick;
+
+  ThetaDownItem := AddJ('');
+  mi.Caption := 'Theta ( Pfeiltaste '#39'nach unten'#39' )';
+  mi.OnClick := PhiDownItemClick;
+
+  ThetaUpItem := AddJ('');
+  mi.Caption := 'Theta ( Pfeiltaste '#39'nach oben'#39' )';
+  mi.OnClick := PhiDownItemClick;
+
+  GammaDownItem := AddJ('');
+  mi.Caption := 'Gamma ( Umsch + Pfeiltaste '#39'nach links'#39' )';
+  mi.OnClick := PhiDownItemClick;
+
+  GammaUpItem := AddJ('');
+  mi.Caption := 'Gamma ( Umsch + Pfeiltaste '#39'nach rechts'#39' )';
+  mi.OnClick := PhiDownItemClick;
+
+  VerschiebenItem := AddI('');
+  mi.Caption := 'Verschieben';
+  mi.Hint := '  Grafik verschieben';
+
+  TransLeftItem := AddJ('');
+  mi.Caption := 'nach links ( Ctrl + Pfeiltaste '#39'nach links'#39' )';
+  mi.Hint := '  Grafik nach links verschieben';
+  mi.OnClick := TransLeftItemClick;
+
+  TransRightItem := AddJ('');
+  mi.Caption := 'nach rechts ( Ctrl + Pfeiltaste '#39'nach rechts'#39' )';
+  mi.Hint := '  Grafik nach rechts verschieben';
+  mi.OnClick := TransLeftItemClick;
+
+  TransUpItem := AddJ('');
+  mi.Caption := 'nach oben ( Ctrl + Pfeiltaste '#39'nach oben'#39' )';
+  mi.Hint := '  Grafik nach oben verschieben';
+  mi.OnClick := TransLeftItemClick;
+
+  TransDownItem := AddJ('');
+  mi.Caption := 'nach unten ( Ctrl + Pfeiltaste '#39'nach unten'#39' )';
+  mi.Hint := '  Grafik nach unten verschieben';
+  mi.OnClick := TransLeftItemClick;
+
+  MinusItem1 := AddI('MinusItem1');
+  mi.Caption := '-';
+
+  DrehpunktItem := AddI('');
+  mi.Caption := 'Drehpunkt';
+  mi.Hint := '  Den festgehaltenen Punkt der Grafik bestimmen';
+
+  A0_Item := AddJ('');
+  mi.Caption := 'A0';
+  mi.Hint := '  P'#252'tting Stb als Fixpunkt festlegen';
+  mi.OnClick := A0_ItemClick;
+
+  B0_Item := AddJ('');
+  mi.Caption := 'B0';
+  mi.Hint := '  Pütting Bb als Fixpunkt festlegen';
+  mi.OnClick := A0_ItemClick;
+
+  C0_Item := AddJ('');
+  mi.Caption := 'C0';
+  mi.Hint := '  Vorstagbasis als Fixpunkt festlegen';
+  mi.OnClick := A0_ItemClick;
+
+  D0_Item := AddJ('');
+  mi.Caption := 'D0';
+  mi.Hint := '  Mastfuß als Fixpunkt festlegen';
+  mi.OnClick := A0_ItemClick;
+
+  E0_Item := AddJ('');
+  mi.Caption := 'E0';
+  mi.Hint := '  Controllerbasis als Fixpunkt festlegen';
+  mi.OnClick := A0_ItemClick;
+
+  F0_Item := AddJ('');
+  mi.Caption := 'F0';
+  mi.Hint := '  Me'#223'punkt Spiegel als Fixpunkt festlegen';
+  mi.OnClick := A0_ItemClick;
+
+  MinusItem8 := AddJ('');
+  mi.Caption := '-';
+
+  A_Item := AddJ('');
+  mi.Caption := 'A';
+  mi.Hint := '  Salingnocke Stb als Fixpunkt festlegen';
+  mi.OnClick := A0_ItemClick;
+
+  B_Item := AddJ('');
+  mi.Caption := 'B';
+  mi.Hint := '  Salingnocke Bb als Fixpunkt festlegen';
+  mi.OnClick := A0_ItemClick;
+
+  C_Item := AddJ('');
+  mi.Caption := 'C';
+  mi.Hint := '  Vorstagpunkt (Mast) als Fixpunkt festlegen';
+  mi.OnClick := A0_ItemClick;
+
+  D_Item := AddJ('');
+  mi.Caption := 'D';
+  mi.Hint := '  Salingpunkt (Mast) als Fixpunkt festlegen';
+  mi.OnClick := A0_ItemClick;
+
+  E_Item := AddJ('');
+  mi.Caption := 'E';
+  mi.Hint := '  Controllerpunkt (Mast) als Fixpunkt festlegen';
+  mi.OnClick := A0_ItemClick;
+
+  F_Item := AddJ('');
+  mi.Caption := 'F';
+  mi.Hint := '  Masttop als Fixpunkt festlegen';
+  mi.OnClick := A0_ItemClick;
+
+  StepItem := AddI('');
+  mi.Caption := 'Schrittweite';
+  mi.Hint := ' Schrittweite für die Drehung (und Verschiebung) festlegen';
+
+  Step01Item := AddJ('');
+  mi.Caption := '0.1 Grad';
+  mi.Hint := '  Winkel-Schrittweite von 0,1 Grad einstellen';
+  mi.OnClick := Step01ItemClick;
+
+  Step1Item := AddJ('');
+  mi.Caption := '   1 Grad';
+  mi.Hint := '  Winkel-Schrittweite von 1 Grad einstellen';
+  mi.OnClick := Step1ItemClick;
+
+  Step5Item := AddJ('');
+  mi.Caption := '   5 Grad';
+  mi.Hint := '  Winkel-Schrittweite von 5 Grad einstellen';
+  mi.OnClick := Step5ItemClick;
+
+  Step10Item := AddJ('');
+  mi.Caption := ' 10 Grad';
+  mi.Hint := '  Winkel-Schrittweite von 10 Grad einstellen';
+  mi.OnClick := Step10ItemClick;
+
+  Step30Item := AddJ('');
+  mi.Caption := ' 30 Grad';
+  mi.Hint := '  Winkel-Schrittweite von 30 Grad einstellen';
+  mi.OnClick := Step30ItemClick;
+
+  Positionen1 := AddI('');
+  mi.Caption := 'Positionen';
+  mi.Hint := '  Ansichtspositionen';
+
+  PositionItem := AddJ('');
+  mi.Caption := 'Position wechseln';
+  mi.Hint := '  Position des Betrachters umschalten';
+  mi.OnClick := NullBtnClick;
+
+  PositionSaveItem := AddJ('');
+  mi.Caption := 'Position speichern';
+  mi.Hint := '  aktuelle Position übernehmen';
+  mi.OnClick := PositionSaveItemClick;
+
+  PositionResetItem := AddJ('');
+  mi.Caption := 'Positionen zurücksetzen';
+  mi.Hint := '  alle Positionen auf Standardwerte setzen';
+  mi.OnClick := PositionResetItemClick;
+
+  MinusItem2 := AddI('');
+  mi.Caption := '-';
+
+  ModusItem := AddI('');
+  mi.Caption := 'Absolutwinkel';
+  mi.Hint := '  Absolutwerte für Drehwinkel oder Inkremente';
+  mi.OnClick := ModusItemClick;
+
+  KeepInsideItem := AddI('');
+  mi.Caption := 'Drehpunkt sichtbar';
+  mi.Checked := True;
+  mi.Hint := '  Drehpunkt immer innerhalb der Bildgrenzen halten';
+  mi.OnClick := KeepInsideItemClick;
+
+  PaintItem := AddI('');
+  mi.Caption := 'Alte Grafik stehenlassen';
+  mi.Hint := '  Alte Grafik stehenlassen oder löschen';
+  mi.ShortCut := 45;
+  mi.OnClick := PaintBtnClick;
+
+  RumpfItem := AddI('');
+  mi.Caption := 'Boot einblenden';
+  mi.Hint := '  Bootsrumpf einblenden';
+  mi.ShortCut := 16450;
+  mi.OnClick := RumpfBtnClick;
+
+  DrawAlwaysItem := AddI('');
+  mi.Caption := 'Boot immer zeichnen';
+  mi.Hint := '  Boot auch w'#228'hrend der Bewegung zeichnen';
+  mi.OnClick := DrawAlwaysItemClick;
+
+  MinusItem3 := AddI('');
+  mi.Caption := '-';
+
+  PreviewItem := AddI('');
+  mi.Caption := 'Seite einblenden';
+  mi.Hint := '  Seitenr'#228'nder einblenden';
+  mi.OnClick := PreviewItemClick;
+
+  PrintItem := AddI('');
+  mi.Caption := 'Drucken ...';
+  mi.Hint := '  Gafik drucken';
+  mi.OnClick := PrintItemClick;
+
+  PlotItem := AddI('');
+  mi.Caption := 'Plotfile ...';
+  mi.Hint := '  Grafik im HPGL Format ausgeben';
+  mi.OnClick := PlotItemClick;
+
+  MinusItem4 := AddI('');
+  mi.Caption := '-';
+
+  SpeedBarItem := AddI('');
+  mi.Caption := 'Symbolleiste';
+  mi.Checked := True;
+  mi.Hint := '  Symbolleiste einblenden (3D Grafik)';
+  mi.OnClick := SpeedBarItemClick;
+
+  PosiToolItem := AddI('');
+  mi.Caption := 'Positionsschalter';
+  mi.Checked := True;
+  mi.Hint := '  Auswahlschalter für Positionen einblenden';
+  mi.OnClick := PosiToolItemClick;
+
+  StatusBarItem := AddI('');
+  mi.Caption := 'Statusleiste';
+  mi.Checked := True;
+  mi.Hint := '  Statusleiste einblenden (3D Grafik)';
+  mi.OnClick := StatusBarItemClick;
+
+  Options3DMenu := AddP('');
+  mi.Caption := '3D &Optionen';
+  mi.GroupIndex := 8;
+  mi.Hint := '  Optionen für 3D Grafik';
+  mi.OnClick := Options3DMenuClick;
+
+  SelectHullItem := AddI('');
+  mi.Caption := 'Rumpf auswählen';
+
+  Sample420Item := AddJ('');
+  mi.Caption := 'Beispiel 420er Jolle';
+  mi.OnClick := Sample420ItemClick;
+
+  SampleDinghyItem := AddJ('');
+  mi.Caption := 'Beispiel Dinglhy';
+  mi.OnClick := Sample420ItemClick;
+
+  SampleYachtItem := AddJ('');
+  mi.Caption := 'Beispiel Yacht';
+  mi.OnClick := Sample420ItemClick;
+
+  SamplePlaningItem := AddJ('');
+  mi.Caption := 'Beispiel Planing';
+  mi.OnClick := Sample420ItemClick;
+
+  HullItem := AddJ('');
+  mi.Caption := 'Rumpf laden...';
+  mi.Hint := '  Rumpfdaten aus Datei laden';
+  mi.OnClick := HullItemClick;
+
+  FaktorDlgItem := AddI('');
+  mi.Caption := 'Rumpf skalieren...';
+  mi.Hint := '  Rumpfgr'#246#223'e anpassen';
+  mi.OnClick := FaktorDlgItemClick;
+
+  MinusItem5 := AddI('');
+  mi.Caption := '-';
+
+  OpenBackBmpItem := AddI('');
+  mi.Caption := 'Hintergrund laden...';
+  mi.Hint := '  Bitmapdatei als Hintergrundbild laden';
+  mi.OnClick := OpenBackBmpItemClick;
+
+  CloseBackBmpItem := AddI('');
+  mi.Caption := 'Hintergrund löschen';
+  mi.Hint := '  Hintergrundbitmap löschen';
+  mi.OnClick := CloseBackBmpItemClick;
+
+  MinusItem6 := AddI('');
+  mi.Caption := '-';
+
+  IndicatorItem := AddI('');
+  mi.Caption := 'Indikator';
+  mi.Hint := '  Indikator für Drehwinkel anzeigen';
+  mi.OnClick := IndicatorItemClick;
+
+  IndicatorLocalRotItem := AddI('');
+  mi.Caption := 'Lokale Achsen (Indikator)';
+  mi.Hint := '  Indikator um lokale Achsen drehen';
+  mi.OnClick := IndicatorLocalRotItemClick;
+
+  MatrixItem := AddI('');
+  mi.Caption := 'Rotationmatrix';
+  mi.Hint := '  Rotationsmatrix einblenden';
+  mi.OnClick := MatrixItemClick;
 end;
 
 end.
