@@ -311,10 +311,11 @@ uses
 constructor TRiggModul.Create(AOwner: TComponent);
 begin
   inherited;
-  if Application.Title = 'RG19A' then
-    ViewModelMain := TViewModelMainA.Create
+
+  if Application.Title = 'RG19B' then
+    ViewModelMain := TViewModelMainB.Create
   else
-    ViewModelMain := TViewModelMainB.Create;
+    ViewModelMain := TViewModelMainA.Create;
 
   FSofortBerechnen := True;
   FKorrigiertItem := True;
