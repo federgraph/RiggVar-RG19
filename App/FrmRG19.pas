@@ -53,7 +53,7 @@ type
     BiegeNeigeItem: TMenuItem;
     ReglerItem: TMenuItem;
     MemoryItem: TMenuItem;
-    MemoryRecallkItem: TMenuItem;
+    MemoryRecallItem: TMenuItem;
     AnsichtMenu: TMenuItem;
     InputFormItem: TMenuItem;
     OutputFormItem: TMenuItem;
@@ -108,11 +108,6 @@ type
     N2: TMenuItem;
     KorrigiertItem: TMenuItem;
     AutoLoadItem: TMenuItem;
-    WindowMenu: TMenuItem;
-    WindowCascadeItem: TMenuItem;
-    WindowTileItem: TMenuItem;
-    WindowArrangeItem: TMenuItem;
-    WindowMinimizeItem: TMenuItem;
     HelpMenu: TMenuItem;
     HilfeItem: TMenuItem;
     AboutItem: TMenuItem;
@@ -165,8 +160,6 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormResize(Sender: TObject);
-
-    procedure UpdateMenuItems(Sender: TObject);
     procedure WindowCascadeItemClick(Sender: TObject);
     procedure WindowTileItemClick(Sender: TObject);
     procedure WindowArrangeItemClick(Sender: TObject);
@@ -286,6 +279,7 @@ type
     procedure InitSpeedButtons;
     procedure InitSpeedPanel;
     procedure InitLED;
+    procedure InitMenuClick;
     procedure InitMenu;
   public
     procedure SetControllerEnabled;
@@ -354,8 +348,6 @@ begin
     Width := 1500
   else
     Width := 1024;
-
-  Screen.OnActiveFormChange := UpdateMenuItems;
 
   Caption := 'Rigg';
   StatusBar.Panels[0].Text := '';
@@ -819,14 +811,6 @@ begin
     MDIChildren[i].WindowState := wsMinimized;
 end;
 
-procedure TFormRG19.UpdateMenuItems(Sender: TObject);
-begin
-  WindowCascadeItem.Enabled := MDIChildCount > 0;
-  WindowTileItem.Enabled := MDIChildCount > 0;
-  WindowArrangeItem.Enabled := MDIChildCount > 0;
-  WindowMinimizeItem.Enabled := MDIChildCount > 0;
-end;
-
 procedure TFormRG19.InputFormItemClick(Sender: TObject);
 begin
   InputFormItem.Checked := not InputFormItem.Checked;
@@ -1137,438 +1121,6 @@ begin
   LedShape.Brush.Color := clGreen;
 end;
 
-procedure TFormRG19.InitMenu;
-var
-  mi: TMenuItem;
-begin
-
-  mi := FileMenu;
-  mi.Caption := '&Datei';
-  mi.Hint := '  Dateibefehle';
-
-  mi := NewItem;
-  mi.Caption := '&Neu';
-  mi.Hint := '  Standardwerte laden';
-  mi.OnClick := NewItemClick;
-
-  mi := OpenItem;
-  mi.Caption := '&Öffnen ...';
-  mi.Hint := '  Konfiguration aus Datei laden';
-  mi.OnClick := OpenItemClick;
-
-  mi := SaveItem;
-  mi.Caption := '&Speichern';
-  mi.Hint := '  Konfiguration in Datei speichern';
-  mi.OnClick := SaveItemClick;
-
-  mi := N9;
-  mi.Caption := '-';
-
-  mi := ExitItem;
-  mi.Caption := '&Beenden';
-  mi.Hint := '  Anwendung verlassen';
-  //mi.ShortCut := 32856;
-  mi.OnClick := ExitItemClick;
-
-  { Bearbeiten Menu }
-
-  mi := BearbeitenMenu;
-  mi.Caption := '&Bearbeiten';
-  mi.GroupIndex := 2;
-  mi.Hint := '  Bearbeitungsbefehle';
-
-  mi := RecalcItem;
-  mi.Caption := 'Neu &berechnen ( = )';
-  mi.Hint := '  Rigg neu berechnen';
-  mi.OnClick := UpdateBtnClick;
-
-  mi := BiegeNeigeItem;
-  mi.Caption := 'Biegen und &Neigen ...';
-  mi.Hint := '  Mastbiegung und Mastfall einstellen';
-  mi.OnClick := BiegeNeigeItemClick;
-
-  mi := ReglerItem;
-  mi.Caption := 'Trimm &regeln ... ( R )';
-  mi.Hint := '  Trimm automatisch einstellen';
-  mi.OnClick := ReglerBtnClick;
-
-  mi := MemoryItem;
-  mi.Caption := 'Trimm &speichern ( M )';
-  mi.Hint := '  Trimm in den Zwischenspeicher kopieren';
-  mi.OnClick := MemoryBtnClick;
-
-  mi := MemoryRecallkItem;
-  mi.Caption := 'Trimm &zur'#252'cksetzen ( MR )';
-  mi.Hint := '  Trimm aus dem Zwischenspeicher zurückholen';
-  mi.OnClick := MemoryRecallBtnClick;
-
-  { Ansicht Menu }
-
-  mi := AnsichtMenu;
-  mi.Caption := '&Ansicht';
-  mi.GroupIndex := 2;
-  mi.Hint := '  Fenster anzeigen und verbergen';
-
-  mi := InputFormItem;
-  mi.Caption := '&Eingabe ...';
-  mi.Hint := '  Eingabeseiten im eigenen Fenster anzeigen';
-  mi.ShortCut := 16453;
-  mi.OnClick := InputFormItemClick;
-
-  mi := OutputFormItem;
-  mi.Caption := '&Ausgabe ...';
-  mi.Hint := '  Ausgabeseiten im eigenen Fenster anzeigen';
-  mi.ShortCut := 16449;
-  mi.OnClick := OutputFormItemClick;
-
-  mi := GrafikFormItem;
-  mi.Caption := '&Grafik ...';
-  mi.Hint := '  Grafik-Ausgabeseiten separat anzeigen';
-  mi.ShortCut := 16455;
-  mi.OnClick := GrafikFormItemClick;
-
-  mi := OptionItem;
-  mi.Caption := '&Konfiguration ...';
-  mi.Hint := '  Konstanten und Parameter verändern';
-  mi.ShortCut := 16459;
-  mi.OnClick := OptionItemClick;
-
-  mi := N4;
-  mi.Caption := '-';
-
-  mi := ConsoleItem;
-  mi.Caption := 'Konsole';
-  mi.OnClick := ConsoleItemClick;
-
-  mi := RotaFormItem;
-  mi.Caption := '3D Grafik ...';
-  mi.Hint := '  Rigg r'#228'umlich darstellen';
-  mi.OnClick := RotaFormItemClick;
-
-  mi := ChartFormItem;
-  mi.Caption := 'Diagramm ...';
-  mi.Hint := '  Diagramm aktivieren';
-  mi.OnClick := ChartFormItemClick;
-
-  mi := ReportFormItem;
-  mi.Caption := 'Report ...';
-  mi.Hint := '  Report erstellen';
-  mi.OnClick := ReportFormItemClick;
-
-  mi := N1;
-  mi.Caption := '-';
-
-  mi := SpeedBarItem;
-  mi.Caption := 'Symbolleiste';
-  mi.Checked := True;
-  mi.Hint := '  Symbolleiste einblenden';
-  mi.OnClick := SpeedBarItemClick;
-
-  mi := StatusBarItem;
-  mi.Caption := 'Statusleiste';
-  mi.Checked := True;
-  mi.Hint := '  Statusleiste einblenden';
-  mi.OnClick := StatusBarItemClick;
-
-  { Memo Menu }
-
-  mi := MemoMenu;
-  mi.Caption := '&Tabellen';
-  mi.GroupIndex := 3;
-  mi.Hint := '  Tabelle für Anzeige im Memo auswählen';
-
-  mi := rLItem;
-  mi.Caption := 'rL';
-  mi.Hint := '  Längen (Rigg verformt) anzeigen';
-  mi.RadioItem := True;
-  mi.ShortCut := 16460;
-  mi.OnClick := rLItemClick;
-
-  mi := rLeItem;
-  mi.Caption := 'rLe';
-  mi.Hint := '  Längen (Rigg entspannt) anzeigen';
-  mi.RadioItem := True;
-  mi.OnClick := rLItemClick;
-
-  mi := rFItem;
-  mi.Caption := 'rF';
-  mi.Checked := True;
-  mi.Hint := '  Kräfte anzeigen';
-  mi.RadioItem := True;
-  mi.ShortCut := 16454;
-  mi.OnClick := rLItemClick;
-
-  mi := rPItem;
-  mi.Caption := 'rP';
-  mi.Hint := '  Koordinaten (Rigg verformt ) anzeigen';
-  mi.RadioItem := True;
-  mi.ShortCut := 16464;
-  mi.OnClick := rLItemClick;
-
-  mi := rPeItem;
-  mi.Caption := 'rPe';
-  mi.Hint := '  Koordinaten (Rigg entlastet) anzeigen';
-  mi.RadioItem := True;
-  mi.OnClick := rLItemClick;
-
-  mi := DiffLItem;
-  mi.Caption := 'Diff_L';
-  mi.Hint := '  Längendifferenzen (entlastet - belastet) anzeigen';
-  mi.RadioItem := True;
-  mi.OnClick := rLItemClick;
-
-  mi := DiffPItem;
-  mi.Caption := 'Diff_P';
-  mi.Hint := '  Punktverschiebungen (entlastet - belastet) anzeigen';
-  mi.RadioItem := True;
-  mi.OnClick := rLItemClick;
-
-  mi := LogItem;
-  mi.Caption := 'Log';
-  mi.Hint := '  Log anzeigen';
-  mi.RadioItem := True;
-  mi.OnClick := rLItemClick;
-
-  { Grafik Menu }
-
-  mi := GrafikMenu;
-  mi.Caption := '&Grafik';
-  mi.GroupIndex := 3;
-  mi.Hint := '  2D Grafikoptionen ';
-
-  mi := VonDerSeiteItem;
-  mi.Caption := 'Seitenansicht';
-  mi.Checked := True;
-  mi.Hint := '  Rigg von der Seite gesehen darstellen';
-  mi.RadioItem := True;
-  mi.OnClick := VonDerSeiteItemClick;
-
-  mi := VonHintenItem;
-  mi.Caption := 'Blick von Achtern';
-  mi.Hint := '  Rigg von hinten gesehen darstellen';
-  mi.RadioItem := True;
-  mi.OnClick := VonDerSeiteItemClick;
-
-  mi := VonObenItem;
-  mi.Caption := 'Draufsicht';
-  mi.Hint := '  Rigg von oben gesehen darstellen';
-  mi.RadioItem := True;
-  mi.OnClick := VonDerSeiteItemClick;
-
-  mi := Von3DItem;
-  mi.Caption := 'Perspektive';
-  mi.Hint := '  Rigg schr'#228'g von oben gesehen darstellen';
-  mi.RadioItem := True;
-  mi.OnClick := VonDerSeiteItemClick;
-
-  mi := N3;
-  mi.Caption := '-';
-
-  mi := CalcOffsetItem;
-  mi.Caption := 'Grafik ausrichten';
-  mi.Hint := '  2D Grafik automatisch ausrichten';
-  mi.OnClick := CalcOffsetItemClick;
-
-  mi := AdjustFormItem;
-  mi.Caption := 'Grafik einrichten...';
-  mi.Hint := '  2D Grafik verschieben und skalieren';
-  mi.OnClick := AdjustFormItemClick;
-
-  mi := PrintItem;
-  mi.Caption := 'Grafik exportieren...';
-  mi.Hint := '  2D Grafik ausgeben';
-  mi.OnClick := PrintItemClick;
-
-  mi := N6;
-  mi.Caption := '-';
-
-  mi := PaintItem;
-  mi.Caption := 'Alte Grafik stehenlassen';
-  mi.GroupIndex := 1;
-  mi.Hint := '  Alte Grafik löschen oder stehenlassen';
-  mi.OnClick := PaintBtnClick;
-
-  mi := ReferenzItem;
-  mi.Caption := 'Referenzstellung';
-  mi.GroupIndex := 1;
-  mi.Hint := '  Nullstellung einblenden';
-  mi.OnClick := BtnBlauClick;
-
-  mi := EntlastetItem;
-  mi.Caption := 'Entspanntes Rigg';
-  mi.Checked := True;
-  mi.GroupIndex := 1;
-  mi.Hint := '  Entspanntes Rigg einblenden';
-  mi.OnClick := BtnGrauClick;
-
-  mi := KoppelkurveItem;
-  mi.Caption := 'Koppelkurve';
-  mi.Checked := True;
-  mi.GroupIndex := 1;
-  mi.Hint := '  Koppelkurve einblenden';
-  mi.OnClick := KoppelBtnClick;
-
-  mi := ZweischlagItem;
-  mi.Caption := 'Mast als Zweischlag zeichnen';
-  mi.GroupIndex := 1;
-  mi.Hint := '  Mast als Bogen oder Zweischlag zeichnen';
-  mi.OnClick := ZweischlagBtnClick;
-
-  { Optionen Menu }
-
-  mi := OptionenMenu;
-  mi.Caption := '&Modell';
-  mi.GroupIndex := 3;
-  mi.Hint := '  Modell - und Berechnungsoptionen';
-
-  mi := FestItem;
-  mi.Caption := 'feste Salinge';
-  mi.Checked := True;
-  mi.Hint := '  Modell: Salinge starr befestigt';
-  mi.RadioItem := True;
-  mi.OnClick := SalingTypChange;
-
-  mi := DrehbarItem;
-  mi.Caption := 'drehbare Salinge';
-  mi.Hint := '  Modell: Salinge drehbar angelenkt';
-  mi.RadioItem := True;
-  mi.OnClick := SalingTypChange;
-
-  mi := OhneItem;
-  mi.Caption := 'ohne Salinge / Mast biegt aus';
-  mi.Hint := '  Modell: Biegeknicken des Mastes ohne Salinge';
-  mi.RadioItem := True;
-  mi.OnClick := SalingTypChange;
-
-  mi := OSDlgItem;
-  mi.Caption := 'ohne Saling / Mast starr';
-  mi.Hint := '  Modell: Mast steif ohne Salinge';
-  mi.RadioItem := True;
-  mi.OnClick := SalingTypChange;
-
-  mi := N11;
-  mi.Caption := '-';
-  mi.GroupIndex := 1;
-
-  mi := ControllerItem;
-  mi.Caption := 'Controller ( C )';
-  mi.Checked := True;
-  mi.GroupIndex := 1;
-  mi.Hint := '  Mastcontroller berücksichtigen';
-  mi.ShortCut := 16451;
-  mi.OnClick := ControllerBtnClick;
-
-  mi := DifferenzItem;
-  mi.Caption := 'Differenzen ( D )';
-  mi.GroupIndex := 1;
-  mi.Hint := '  Länge als Differenz oder Absolutwert anzeigen';
-  mi.ShortCut := 16452;
-  mi.OnClick := DifferenzItemClick;
-
-  mi := WinkelItem;
-  mi.Caption := 'Winkel einstellbar ( W )';
-  mi.GroupIndex := 1;
-  mi.Hint := ' Wanten-Winkel oder Vorstagl'#228'nge einstellen';
-  mi.OnClick := WinkelItemClick;
-
-  mi := SofortItem;
-  mi.Caption := 'Rigg automatisch berechnen ( A )';
-  mi.Checked := True;
-  mi.GroupIndex := 1;
-  mi.Hint := '  Rigg (Kräfte) automatisch berechnen';
-  mi.OnClick := SofortItemClick;
-
-  mi := N8;
-  mi.Caption := '-';
-  mi.GroupIndex := 2;
-
-  mi := QuerKraftItem;
-  mi.Caption := 'QuerKraftBiegung';
-  mi.GroupIndex := 2;
-  mi.Hint := '  Kraftberechnung nur mit Querkraftbiegung - kein Knicken';
-  mi.RadioItem := True;
-  mi.OnClick := KnickenItemClick;
-
-  mi := KnickenItem;
-  mi.Caption := 'Biegeknicken';
-  mi.Checked := True;
-  mi.GroupIndex := 2;
-  mi.Hint := '  Biegeknicken bei der Kraftberechnung berücksichtigen';
-  mi.RadioItem := True;
-  mi.OnClick := KnickenItemClick;
-
-  mi := KraftGemessenItem;
-  mi.Caption := 'gemessene Kraftwerte verwenden';
-  mi.GroupIndex := 2;
-  mi.Hint := '  Kräfte aus der Trimmtabelle entnehmen';
-  mi.RadioItem := True;
-  mi.OnClick := KnickenItemClick;
-
-  mi := N2;
-  mi.Caption := '-';
-  mi.GroupIndex := 3;
-
-  mi := KorrigiertItem;
-  mi.Caption := 'BiegeKnicken korrigiert';
-  mi.Checked := True;
-  mi.GroupIndex := 3;
-  mi.Hint := '  Anteil der Salingkraft an der Mastbiegung beachten';
-  mi.OnClick := KorrigiertItemClick;
-
-  mi := AutoLoadItem;
-  mi.Caption := 'Datensatz automatisch laden';
-  mi.GroupIndex := 3;
-  mi.Hint := '  Datensätze aus Datenbank einlesen, wenn selektiert';
-  mi.OnClick := AutoLoadItemClick;
-
-  { Window Menu }
-
-  mi := WindowMenu;
-  mi.Caption := '&Fenster';
-  mi.GroupIndex := 9;
-  mi.Hint := '  MDI Fenster verwalten';
-
-  mi := WindowCascadeItem;
-  mi.Caption := '&'#220'berlappend';
-  mi.Hint := '  Fenster überlappend anordnen';
-  mi.OnClick := WindowCascadeItemClick;
-
-  mi := WindowTileItem;
-  mi.Caption := '&Nebeneinander';
-  mi.Hint := '  Fenster nebeneinander anordnen';
-  mi.OnClick := WindowTileItemClick;
-
-  mi := WindowArrangeItem;
-  mi.Caption := '&Symbole anordnen';
-  mi.Hint := '  Fenstersymbole anordnen';
-  mi.OnClick := WindowArrangeItemClick;
-
-  mi := WindowMinimizeItem;
-  mi.Caption := '&Alle verkleinern';
-  mi.Hint := '  Alle Fenster zum Symbol verkleinern';
-  mi.OnClick := WindowMinimizeItemClick;
-
-  { Help Menu }
-
-  mi := HelpMenu;
-  mi.Caption := '&Hilfe';
-  mi.GroupIndex := 10;
-  mi.Hint := '  Hilfethemen';
-
-  mi := HilfeItem;
-  mi.Caption := '&Hilfe ...';
-  mi.Hint := '  Hilfesystem starten';
-
-  mi := AboutItem;
-  mi.Caption := '&Info...';
-  mi.Hint := '  Infofenster anzeigen';
-  mi.OnClick := AboutItemClick;
-
-  mi := LogoItem;
-  mi.Caption := 'Logo';
-  mi.OnClick := LogoItemClick;
-end;
-
 procedure TFormRG19.InitStatusBar;
 var
   sp: TStatusPanel;
@@ -1653,6 +1205,7 @@ begin
   ShowTrimm;
 
   InitEventHandlers;
+  InitMenu;
 end;
 
 procedure TFormRG19.InitEventHandlers;
@@ -1967,6 +1520,571 @@ begin
     2: Main.HandleAction(faViewpointT);
     3: Main.HandleAction(faViewpoint3);
   end;
+end;
+
+procedure TFormRG19.InitMenuClick;
+begin
+  { File }
+
+  NewItem.OnClick := NewItemClick;
+  OpenItem.OnClick := OpenItemClick;
+  SaveItem.OnClick := SaveItemClick;
+  SaveAsItem.OnClick := SaveAsItemClick;
+
+  ExitItem.OnClick := ExitItemClick;
+
+  { Bearbeiten }
+
+  RecalcItem.OnClick := UpdateBtnClick;
+  BiegeNeigeItem.OnClick := BiegeNeigeItemClick;
+  ReglerItem.OnClick := ReglerBtnClick;
+  MemoryItem.OnClick := MemoryBtnClick;
+  MemoryRecallItem.OnClick := MemoryRecallBtnClick;
+
+  { Ansicht }
+
+  InputFormItem.OnClick := InputFormItemClick;
+  OutputFormItem.OnClick := OutputFormItemClick;
+  GrafikFormItem.OnClick := GrafikFormItemClick;
+
+  OptionItem.OnClick := OptionItemClick;
+
+  ConsoleItem.OnClick := ConsoleItemClick;
+  RotaFormItem.OnClick := RotaFormItemClick;
+  ChartFormItem.OnClick := ChartFormItemClick;
+  ReportFormItem.OnClick := ReportFormItemClick;
+
+  SpeedBarItem.OnClick := SpeedBarItemClick;
+  StatusBarItem.OnClick := StatusBarItemClick;
+
+  { Memo }
+
+  rLItem.OnClick := rLItemClick;
+  rLeItem.OnClick := rLItemClick;
+  rFItem.OnClick := rLItemClick;
+  rPItem.OnClick := rLItemClick;
+  rPeItem.OnClick := rLItemClick;
+  DiffLItem.OnClick := rLItemClick;
+  DiffPItem.OnClick := rLItemClick;
+  LogItem.OnClick := rLItemClick;
+
+  { Grafik }
+
+  VonDerSeiteItem.OnClick := VonDerSeiteItemClick;
+  VonHintenItem.OnClick := VonDerSeiteItemClick;
+  VonObenItem.OnClick := VonDerSeiteItemClick;
+  Von3DItem.OnClick := VonDerSeiteItemClick;
+
+  CalcOffsetItem.OnClick := CalcOffsetItemClick;
+  AdjustFormItem.OnClick := AdjustFormItemClick;
+  PrintItem.OnClick := PrintItemClick;
+
+  PaintItem.OnClick := PaintBtnClick;
+  ReferenzItem.OnClick := BtnBlauClick;
+  EntlastetItem.OnClick := BtnGrauClick;
+  KoppelkurveItem.OnClick := KoppelBtnClick;
+  ZweischlagItem.OnClick := ZweischlagBtnClick;
+
+  { Optionen }
+
+  FestItem.OnClick := SalingTypChange;
+  DrehbarItem.OnClick := SalingTypChange;
+  OhneItem.OnClick := SalingTypChange;
+  OSDlgItem.OnClick := SalingTypChange;
+
+  ControllerItem.OnClick := ControllerBtnClick;
+  DifferenzItem.OnClick := DifferenzItemClick;
+  WinkelItem.OnClick := WinkelItemClick;
+  SofortItem.OnClick := SofortItemClick;
+
+  QuerKraftItem.OnClick := KnickenItemClick;
+  KnickenItem.OnClick := KnickenItemClick;
+  KraftGemessenItem.OnClick := KnickenItemClick;
+
+  KorrigiertItem.OnClick := KorrigiertItemClick;
+
+  AutoLoadItem.OnClick := AutoLoadItemClick; //not visible
+
+  { Window }
+
+//  WindowCascadeItem.OnClick := WindowCascadeItemClick;
+//  WindowTileItem.OnClick := WindowTileItemClick;
+//  WindowArrangeItem.OnClick := WindowArrangeItemClick;
+//  WindowMinimizeItem.OnClick := WindowMinimizeItemClick;
+
+  { Help }
+
+//  HilfeItem.OnClick := HilfeItemClick;
+  AboutItem.OnClick := AboutItemClick;
+  LogoItem.OnClick := LogoItemClick;
+end;
+
+procedure TFormRG19.InitMenu;
+var
+  p: TMenuItem;
+  mi: TMenuItem;
+
+  function AddP(AName: string): TMenuItem;
+  begin
+    mi := TMenuItem.Create(MainMenu);
+    mi.Name := AName;
+    p := mi;
+    MainMenu.Items.Add(p);
+    result := mi;
+  end;
+
+  function AddI(AName: string): TMenuItem;
+  begin
+    mi := TMenuItem.Create(MainMenu);
+    mi.Name := AName;
+    p.Add(mi);
+    result := mi;
+  end;
+
+begin
+  MainMenu.Items.Clear;
+
+  { File }
+
+  FileMenu := AddP('FileMenu');
+  mi.Caption := '&Datei';
+  mi.Hint := '  Dateibefehle';
+
+  NewItem := AddI('NewItem');
+  mi.Caption := '&Neu';
+  mi.Hint := '  Standardwerte laden';
+  mi.OnClick := NewItemClick;
+
+  OpenItem := AddI('OpenItem');
+  mi.Caption := '&Öffnen ...';
+  mi.Hint := '  Konfiguration aus Datei laden';
+  mi.OnClick := OpenItemClick;
+
+  SaveItem := AddI('SaveItem');
+  mi.Caption := '&Speichern';
+  mi.Hint := '  Konfiguration in Datei speichern';
+  mi.OnClick := SaveItemClick;
+
+  SaveAsItem := AddI('SaveAsItem');
+  mi.Caption := 'Speichern &unter ...';
+  mi.Hint := '  Konfiguration in neue Datei schreiben';
+  mi.OnClick := SaveAsItemClick;
+
+  N9 := AddI('N9');
+  mi.Caption := '-';
+
+  ExitItem := AddI('ExitItem');
+  mi.Caption := '&Beenden';
+  mi.Hint := '  Anwendung verlassen';
+  mi.ShortCut := 32856;
+  mi.OnClick := ExitItemClick;
+
+  { Bearbeiten }
+
+  BearbeitenMenu := AddP('BearbeitenMenu');
+  mi.Caption := '&Bearbeiten';
+  mi.GroupIndex := 2;
+  mi.Hint := '  Bearbeitungsbefehle';
+
+  RecalcItem := AddI('RecalcItem');
+  mi.Caption := 'Neu &berechnen ( = )';
+  mi.Hint := '  Rigg neu berechnen';
+  mi.OnClick := UpdateBtnClick;
+
+  BiegeNeigeItem := AddI('BiegeNeigeItem');
+  mi.Caption := 'Biegen und &Neigen ...';
+  mi.Hint := '  Mastbiegung und Mastfall einstellen';
+  mi.OnClick := BiegeNeigeItemClick;
+
+  ReglerItem := AddI('ReglerItem');
+  mi.Caption := 'Trimm &regeln ... ( R )';
+  mi.Hint := '  Trimm automatisch einstellen';
+  mi.OnClick := ReglerBtnClick;
+
+  MemoryItem := AddI('MemoryItem');
+  mi.Caption := 'Trimm &speichern ( M )';
+  mi.Hint := '  Trimm in den Zwischenspeicher kopieren';
+  mi.OnClick := MemoryBtnClick;
+
+  MemoryRecallItem := AddI('MemoryRecallItem');
+  mi.Caption := 'Trimm &zur'#252'cksetzen ( MR )';
+  mi.Hint := '  Trimm aus dem Zwischenspeicher zurückholen';
+  mi.OnClick := MemoryRecallBtnClick;
+
+  { Ansicht }
+
+  AnsichtMenu := AddP('AnsichtMenu');
+  mi.Caption := '&Ansicht';
+  mi.GroupIndex := 2;
+  mi.Hint := '  Fenster anzeigen und verbergen';
+
+  InputFormItem := AddI('InputItem');
+  mi.Caption := '&Eingabe ...';
+  mi.Hint := '  Eingabeseiten im eigenen Fenster anzeigen';
+  mi.ShortCut := 16453;
+  mi.OnClick := InputFormItemClick;
+  mi.Visible := False;
+
+  OutputFormItem := AddI('OutputFormItem');
+  mi.Caption := '&Ausgabe ...';
+  mi.Hint := '  Ausgabeseiten im eigenen Fenster anzeigen';
+  mi.ShortCut := 16449;
+  mi.OnClick := OutputFormItemClick;
+  mi.Visible := False;
+
+  GrafikFormItem := AddI('GrafikFormItem');
+  mi.Caption := '&Grafik ...';
+  mi.Hint := '  Grafik-Ausgabeseiten separat anzeigen';
+  mi.ShortCut := 16455;
+  mi.OnClick := GrafikFormItemClick;
+  mi.Visible := False;
+
+  OptionItem := AddI('OptionItem');
+  mi.Caption := '&Konfiguration ...';
+  mi.Hint := '  Konstanten und Parameter verändern';
+  mi.ShortCut := 16459;
+  mi.OnClick := OptionItemClick;
+
+  N4 := AddI('');
+  mi.Caption := '-';
+
+  ConsoleItem := AddI('ConsoleItem');
+  mi.Caption := 'Konsole';
+  mi.Enabled := False;
+  mi.OnClick := ConsoleItemClick;
+  mi.Visible := False;
+
+  RotaFormItem := AddI('RotaFormItem');
+  mi.Caption := '3D Grafik ...';
+  mi.Hint := '  Rigg r'#228'umlich darstellen';
+  mi.OnClick := RotaFormItemClick;
+//  mi.Visible := False;
+
+  ChartFormItem := AddI('ChartFormItem');
+  mi.Caption := 'Diagramm ...';
+  mi.Hint := '  Diagramm aktivieren';
+  mi.OnClick := ChartFormItemClick;
+  mi.Visible := False;
+
+  ReportFormItem := AddI('ReportFormItem');
+  mi.Caption := 'Report ...';
+  mi.Hint := '  Report erstellen';
+  mi.OnClick := ReportFormItemClick;
+  mi.Visible := False;
+
+  N1 := AddI('N1');
+  mi.Caption := '-';
+
+  SpeedBarItem := AddI('SpeedBarItem');
+  mi.Caption := 'Symbolleiste';
+  mi.Checked := True;
+  mi.Hint := '  Symbolleiste einblenden';
+  mi.OnClick := SpeedBarItemClick;
+
+  StatusBarItem := AddI('StatusBarItem');
+  mi.Caption := 'Statusleiste';
+  mi.Checked := True;
+  mi.Hint := '  Statusleiste einblenden';
+  mi.OnClick := StatusBarItemClick;
+
+  { Memo }
+
+  MemoMenu := AddP('MemoMenu');
+  mi.Caption := '&Tabellen';
+  mi.GroupIndex := 3;
+  mi.Hint := '  Tabelle für Anzeige im Memo auswählen';
+
+  rLItem := AddI('rLItem');
+  mi.Caption := 'rL';
+  mi.Hint := '  Längen (Rigg verformt) anzeigen';
+  mi.RadioItem := True;
+  mi.ShortCut := 16460;
+  mi.OnClick := rLItemClick;
+
+  rLeItem := AddI('rLeItem');
+  mi.Caption := 'rLe';
+  mi.Hint := '  Längen (Rigg entspannt) anzeigen';
+  mi.RadioItem := True;
+  mi.OnClick := rLItemClick;
+
+  rFItem := AddI('rFItem');
+  mi.Caption := 'rF';
+  mi.Checked := True;
+  mi.Hint := '  Kräfte anzeigen';
+  mi.RadioItem := True;
+  mi.ShortCut := 16454;
+  mi.OnClick := rLItemClick;
+
+  rPItem := AddI('rPItem');
+  mi.Caption := 'rP';
+  mi.Hint := '  Koordinaten (Rigg verformt ) anzeigen';
+  mi.RadioItem := True;
+  mi.ShortCut := 16464;
+  mi.OnClick := rLItemClick;
+
+  rPeItem := AddI('rPeItem');
+  mi.Caption := 'rPe';
+  mi.Hint := '  Koordinaten (Rigg entlastet) anzeigen';
+  mi.RadioItem := True;
+  mi.OnClick := rLItemClick;
+
+  DiffLItem := AddI('DiffLItem');
+  mi.Caption := 'Diff_L';
+  mi.Hint := '  Längendifferenzen (entlastet - belastet) anzeigen';
+  mi.RadioItem := True;
+  mi.OnClick := rLItemClick;
+
+  DiffPItem := AddI('DiffPItem');
+  mi.Caption := 'Diff_P';
+  mi.Hint := '  Punktverschiebungen (entlastet - belastet) anzeigen';
+  mi.RadioItem := True;
+  mi.OnClick := rLItemClick;
+
+  LogItem := AddI('LogItem');
+  mi.Caption := 'Log';
+  mi.Hint := '  Log anzeigen';
+  mi.RadioItem := True;
+  mi.OnClick := rLItemClick;
+
+  { Grafik }
+
+  GrafikMenu := AddP('GrafikMenu');
+  mi.Caption := '&Grafik';
+  mi.GroupIndex := 3;
+  mi.Hint := '  2D Grafikoptionen ';
+
+  VonDerSeiteItem := AddI('VonDerSeiteItem');
+  mi.Caption := 'Seitenansicht';
+  mi.Checked := True;
+  mi.Hint := '  Rigg von der Seite gesehen darstellen';
+  mi.RadioItem := True;
+  mi.OnClick := VonDerSeiteItemClick;
+
+  VonHintenItem := AddI('VonHintenItem');
+  mi.Caption := 'Blick von Achtern';
+  mi.Hint := '  Rigg von hinten gesehen darstellen';
+  mi.RadioItem := True;
+  mi.OnClick := VonDerSeiteItemClick;
+
+  VonObenItem := AddI('VonObenItem');
+  mi.Caption := 'Draufsicht';
+  mi.Hint := '  Rigg von oben gesehen darstellen';
+  mi.RadioItem := True;
+  mi.OnClick := VonDerSeiteItemClick;
+
+  Von3DItem := AddI('Von3DItem');
+  mi.Caption := 'Perspektive';
+  mi.Hint := '  Rigg schr'#228'g von oben gesehen darstellen';
+  mi.RadioItem := True;
+  mi.OnClick := VonDerSeiteItemClick;
+
+  N3 := AddI('N3');
+  mi.Caption := '-';
+
+  CalcOffsetItem := AddI('CalcOffsetItem');
+  mi.Caption := 'Grafik ausrichten';
+  mi.Hint := '  2D Grafik automatisch ausrichten';
+  mi.OnClick := CalcOffsetItemClick;
+
+  AdjustFormItem := AddI('AdjustFormItem');
+  mi.Caption := 'Grafik einrichten...';
+  mi.Hint := '  2D Grafik verschieben und skalieren';
+  mi.OnClick := AdjustFormItemClick;
+
+  PrintItem := AddI('PrintItem');
+  mi.Caption := 'Grafik exportieren...';
+  mi.Hint := '  2D Grafik ausgeben';
+  mi.OnClick := PrintItemClick;
+
+  N6 := AddI('N6');
+  mi.Caption := '-';
+
+  PaintItem := AddI('PaintItem');
+  mi.Caption := 'Alte Grafik stehenlassen';
+  mi.GroupIndex := 1;
+  mi.Hint := '  Alte Grafik löschen oder stehenlassen';
+  mi.OnClick := PaintBtnClick;
+
+  ReferenzItem := AddI('ReferenzItem');
+  mi.Caption := 'Referenzstellung';
+  mi.GroupIndex := 1;
+  mi.Hint := '  Nullstellung einblenden';
+  mi.OnClick := BtnBlauClick;
+
+  EntlastetItem := AddI('EntlastetItem');
+  mi.Caption := 'Entspanntes Rigg';
+  mi.Checked := True;
+  mi.GroupIndex := 1;
+  mi.Hint := '  Entspanntes Rigg einblenden';
+  mi.OnClick := BtnGrauClick;
+
+  KoppelkurveItem := AddI('KoppelkurveItem');
+  mi.Caption := 'Koppelkurve';
+  mi.Checked := True;
+  mi.GroupIndex := 1;
+  mi.Hint := '  Koppelkurve einblenden';
+  mi.OnClick := KoppelBtnClick;
+
+  ZweischlagItem := AddI('ZweischlagItem');
+  mi.Caption := 'Mast als Zweischlag zeichnen';
+  mi.GroupIndex := 1;
+  mi.Hint := '  Mast als Bogen oder Zweischlag zeichnen';
+  mi.OnClick := ZweischlagBtnClick;
+
+  { Optionen }
+
+  OptionenMenu := AddP('OptionenMenu');
+  mi.Caption := '&Modell';
+  mi.GroupIndex := 3;
+  mi.Hint := '  Modell - und Berechnungsoptionen';
+
+  FestItem := AddI('FestItem');
+  mi.Caption := 'feste Salinge';
+  mi.Checked := True;
+  mi.Hint := '  Modell: Salinge starr befestigt';
+  mi.RadioItem := True;
+  mi.OnClick := SalingTypChange;
+
+  DrehbarItem := AddI('DrehbarItem');
+  mi.Caption := 'drehbare Salinge';
+  mi.Hint := '  Modell: Salinge drehbar angelenkt';
+  mi.RadioItem := True;
+  mi.OnClick := SalingTypChange;
+
+  OhneItem := AddI('OhneItem');
+  mi.Caption := 'ohne Salinge / Mast biegt aus';
+  mi.Hint := '  Modell: Biegeknicken des Mastes ohne Salinge';
+  mi.RadioItem := True;
+  mi.OnClick := SalingTypChange;
+
+  OSDlgItem := AddI('OSDlgItem');
+  mi.Caption := 'ohne Saling / Mast starr';
+  mi.Hint := '  Modell: Mast steif ohne Salinge';
+  mi.RadioItem := True;
+  mi.OnClick := SalingTypChange;
+
+  N11 := AddI('N11');
+  mi.Caption := '-';
+  mi.GroupIndex := 1;
+
+  ControllerItem := AddI('ControllerItem');
+  mi.Caption := 'Controller ( C )';
+  mi.Checked := True;
+  mi.GroupIndex := 1;
+  mi.Hint := '  Mastcontroller berücksichtigen';
+  mi.ShortCut := 16451;
+  mi.OnClick := ControllerBtnClick;
+
+  DifferenzItem := AddI('DifferenzItem');
+  mi.Caption := 'Differenzen ( D )';
+  mi.GroupIndex := 1;
+  mi.Hint := '  Länge als Differenz oder Absolutwert anzeigen';
+  mi.ShortCut := 16452;
+  mi.OnClick := DifferenzItemClick;
+
+  WinkelItem := AddI('WinkelItem');
+  mi.Caption := 'Winkel einstellbar ( W )';
+  mi.GroupIndex := 1;
+  mi.Hint := ' Wanten-Winkel oder Vorstagl'#228'nge einstellen';
+  mi.OnClick := WinkelItemClick;
+
+  SofortItem := AddI('SofortItem');
+  mi.Caption := 'Rigg automatisch berechnen ( A )';
+  mi.Checked := True;
+  mi.GroupIndex := 1;
+  mi.Hint := '  Rigg (Kräfte) automatisch berechnen';
+  mi.OnClick := SofortItemClick;
+
+  N8 := AddI('N8');
+  mi.Caption := '-';
+  mi.GroupIndex := 2;
+
+  QuerKraftItem := AddI('QuerKraftItem');
+  mi.Caption := 'QuerKraftBiegung';
+  mi.GroupIndex := 2;
+  mi.Hint := '  Kraftberechnung nur mit Querkraftbiegung - kein Knicken';
+  mi.RadioItem := True;
+  mi.OnClick := KnickenItemClick;
+
+  KnickenItem := AddI('KnickenItem');
+  mi.Caption := 'Biegeknicken';
+  mi.Checked := True;
+  mi.GroupIndex := 2;
+  mi.Hint := '  Biegeknicken bei der Kraftberechnung berücksichtigen';
+  mi.RadioItem := True;
+  mi.OnClick := KnickenItemClick;
+
+  KraftGemessenItem := AddI('KraftGemessenItem');
+  mi.Caption := 'gemessene Kraftwerte verwenden';
+  mi.GroupIndex := 2;
+  mi.Hint := '  Kräfte aus der Trimmtabelle entnehmen';
+  mi.RadioItem := True;
+  mi.OnClick := KnickenItemClick;
+
+  N2 := AddI('N2');
+  mi.Caption := '-';
+  mi.GroupIndex := 3;
+
+  KorrigiertItem := AddI('KorrigiertItem');
+  mi.Caption := 'BiegeKnicken korrigiert';
+  mi.Checked := True;
+  mi.GroupIndex := 3;
+  mi.Hint := '  Anteil der Salingkraft an der Mastbiegung beachten';
+  mi.OnClick := KorrigiertItemClick;
+
+  AutoLoadItem := AddI('AutoLoadItem');
+  mi.Caption := 'Datensatz automatisch laden';
+  mi.GroupIndex := 3;
+  mi.Hint := '  Datensätze aus Datenbank einlesen, wenn selektiert';
+  mi.OnClick := AutoLoadItemClick;
+
+  { Window }
+
+//  WindowMenu := AddP('WindowMenu');
+//  mi.Caption := '&Fenster';
+//  mi.GroupIndex := 9;
+//  mi.Hint := '  MDI Fenster verwalten';
+//
+//  WindowCascadeItem := AddI('WindowCascadeItem');
+//  mi.Caption := '&'#220'berlappend';
+//  mi.Hint := '  Fenster überlappend anordnen';
+//  mi.OnClick := WindowCascadeItemClick;
+//
+//  WindowTileItem := AddI('WindowTileItem');
+//  mi.Caption := '&Nebeneinander';
+//  mi.Hint := '  Fenster nebeneinander anordnen';
+//  mi.OnClick := WindowTileItemClick;
+//
+//  WindowArrangeItem := AddI('WindowArrangeItem');
+//  mi.Caption := '&Symbole anordnen';
+//  mi.Hint := '  Fenstersymbole anordnen';
+//  mi.OnClick := WindowArrangeItemClick;
+//
+//  WindowMinimizeItem := AddI('WindowMinimizeItem');
+//  mi.Caption := '&Alle verkleinern';
+//  mi.Hint := '  Alle Fenster zum Symbol verkleinern';
+//  mi.OnClick := WindowMinimizeItemClick;
+
+  { Help }
+
+  HelpMenu := AddP('HelpMenu');;
+  mi.Caption := '&Hilfe';
+  mi.GroupIndex := 10;
+  mi.Hint := '  Hilfethemen';
+  mi.Enabled := False;
+
+  HilfeItem := AddI('HilfeItem');
+  mi.Caption := '&Hilfe ...';
+  mi.Hint := '  Hilfesystem starten';
+
+  AboutItem := AddI('AboutItem');
+  mi.Caption := '&Info...';
+  mi.Hint := '  Infofenster anzeigen';
+  mi.OnClick := AboutItemClick;
+
+  LogoItem := AddI('LogoItem');
+  mi.Caption := 'Logo';
+  mi.OnClick := LogoItemClick;
 end;
 
 end.

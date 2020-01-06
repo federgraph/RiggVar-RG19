@@ -3,17 +3,14 @@
 interface
 
 uses
-  Windows,
-  Messages,
-  SysUtils,
-  Classes,
-  Types,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  StdCtrls,
-  ExtCtrls,
+  Winapi.Windows,
+  System.Classes,
+  System.Types,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.StdCtrls,
+  Vcl.ExtCtrls,
   RggTypes,
   SchnttKK;
 
@@ -52,10 +49,10 @@ type
   private
     SchnittKK: TSchnittKK;
     Sprite1, Sprite2: TSprite;
-    FrM1, FrM2: TRealPoint; {real - Mittelpunkte der großen Kreise}
-    FiM1, FiM2: TPoint; {Integer - Mittelpunkte der großen Kreise}
-    FrPos1, FrPos2: TRealPoint; {real - Mittelpunkte der kleinen Kreise}
-    FiPos1, FiPos2: TPoint; {Integer - Mittelpunkte der kleinen Kreise}
+    FrM1, FrM2: TRealPoint; { real - Mittelpunkte der großen Kreise }
+    FiM1, FiM2: TPoint; { Integer - Mittelpunkte der großen Kreise }
+    FrPos1, FrPos2: TRealPoint; { real - Mittelpunkte der kleinen Kreise }
+    FiPos1, FiPos2: TPoint; { Integer - Mittelpunkte der kleinen Kreise }
     FSchnittOK: Boolean;
     FKreise: Boolean;
     DrawingTool: TDrawingTool;
@@ -73,20 +70,20 @@ type
 
 var
   KreisForm: TKreisForm;
-  KR: Integer; {Radius der großen Kreise}
-  SR: Integer; {Radius der kleinen Kreise}
-  Rand: Integer; {Randabstand der Reflektionskante}
+  KR: Integer; { Radius der großen Kreise }
+  SR: Integer; { Radius der kleinen Kreise }
+  Rand: Integer; { Randabstand der Reflektionskante }
 
 implementation
 
 {$R *.DFM}
 
-{**** TSprite ***********************************************************}
+{ TSprite }
 
 constructor TSprite.Create;
 begin
-  Left := 10; {beliebiger Anfangswert}
-  Top := 10; {beliebiger Anfangswert}
+  Left := 10; { beliebiger Anfangswert }
+  Top := 10; { beliebiger Anfangswert }
   Height := 2 * (Rand + KR);
   Width := 2 * (Rand + KR);
   Step := 1;
@@ -95,35 +92,43 @@ end;
 procedure TSprite.DrawSprite;
 begin
   if GoLeft then
-    if Left > 0 then Left := Left - Step
-    else begin
+    if Left > 0 then
+      Left := Left - Step
+    else
+    begin
       GoLeft := false;
       GoRight := true;
     end;
 
   if GoDown then
-    if (Top + Height) < KreisForm.PaintBox.ClientHeight then Top := Top + Step
-    else begin
+    if (Top + Height) < KreisForm.PaintBox.ClientHeight then
+      Top := Top + Step
+    else
+    begin
       GoDown := false;
       GoUp := true;
     end;
 
   if GoUp then
-    if Top > 0 then Top := Top - Step
-    else begin
+    if Top > 0 then
+      Top := Top - Step
+    else
+    begin
       GoUp := false;
       GoDown := true;
     end;
 
   if GoRight then
-    if (Left + Width) < KreisForm.PaintBox.ClientWidth then Left := Left + Step
-    else begin
+    if (Left + Width) < KreisForm.PaintBox.ClientWidth then
+      Left := Left + Step
+    else
+    begin
       GoRight := false;
       GoLeft := true;
     end;
 end;
 
-{**** TKreisform ********************************************************}
+{ TKreisform }
 
 procedure TKreisForm.FormCreate(Sender: TObject);
 begin
@@ -137,7 +142,8 @@ begin
 
   { SchnittKK }
   SchnittKK := TSchnittKK.Create;
-  with SchnittKK do begin
+  with SchnittKK do
+  begin
     SchnittEbene := seXY;
     Radius1 := KR;
     Radius2 := KR;
@@ -146,14 +152,16 @@ begin
   { Sprite }
   Sprite1 := TSprite.Create;
   Sprite2 := TSprite.Create;
-  with Sprite1 do begin
+  with Sprite1 do
+  begin
     GoRight := true;
     GoDown := true;
     GoLeft := false;
     GoUp := false;
     Step := 1;
   end;
-  with Sprite2 do begin
+  with Sprite2 do
+  begin
     GoRight := false;
     GoDown := false;
     GoLeft := true;
@@ -178,12 +186,14 @@ end;
 
 procedure TKreisForm.MoveSprite;
 begin
-  with Sprite1 do begin
+  with Sprite1 do
+  begin
     DrawSprite;
     FiM1.x := Left + Rand + KR;
     FiM1.y := Top  + Rand + KR;
   end;
-  with Sprite2 do begin
+  with Sprite2 do
+  begin
     DrawSprite;
     FiM2.x := Left + Rand + KR;
     FiM2.y := Top  + Rand + KR;
@@ -199,7 +209,8 @@ begin
   FrM2[x] := FiM2.x;
   FrM2[y] := FiM2.y;
   { Schnittpunkte ausrechnen }
-  with SchnittKK do begin
+  with SchnittKK do
+  begin
     MittelPunkt1 := FrM1;
     MittelPunkt2 := FrM2;
     FrPos1 := SchnittPunkt1;
@@ -210,19 +221,24 @@ begin
   FiPos1.y := Round(FrPos1[y]);
   FiPos2.x := Round(FrPos2[x]);
   FiPos2.y := Round(FrPos2[y]);
-  if not(SchnittKK.Status = bmZwei) then begin
+  if not(SchnittKK.Status = bmZwei) then
+  begin
     FiPos1.x := -3 * SR; { kleine Kreise aus dem Bild schieben }
     FiPos2.x := -3 * SR;
   end;
   { kleine Kreise zeichnen }
-  if SchnittKK.Status = bmZwei then FSchnittOK := True else FSchnittOK := False;
+  if SchnittKK.Status = bmZwei then
+    FSchnittOK := True
+  else
+    FSchnittOK := False;
   ZeichneSchnittPunkte;
   { große Kreise zeichnen }
   ZeichneKreise;
   { Text zeichnen}
   ZeichneText;
   { TheImage auf den Bildschirm kopieren }
-  with PaintBox.Canvas do begin
+  with PaintBox.Canvas do
+  begin
     CopyMode := cmSrcCopy;
     Draw(0, 0, TheImage);
   end;
@@ -236,10 +252,13 @@ begin
   TL4 := Point(Sprite2.Left+Rand, Sprite2.Top+Rand);
   RB3 := Point(TL3.x+2*KR, TL3.y+2*KR);
   RB4 := Point(TL4.x+2*KR, TL4.y+2*KR);
-  if FKreise then begin
+  if FKreise then
+  begin
     DrawShape(TL3, RB3, clTeal);
     DrawShape(TL4, RB4, clTeal);
-  end else begin
+  end
+  else
+  begin
     DrawShape(TL3, RB3, clBlack);
     DrawShape(TL4, RB4, clBlack);
   end;
@@ -282,7 +301,8 @@ end;
 
 procedure TKreisform.ZeichneText;
 begin
-  with TheImage.Canvas do begin
+  with TheImage.Canvas do
+  begin
     SetBkMode(Handle, TRANSPARENT);
     Font := lbProductName.Font; { kann im ObjectInspector gesetzt werden! }
     TextOut(lbProductName.Left, lbProductName.Top, lbProductName.Caption);
@@ -314,8 +334,6 @@ begin
   end;
 end;
 
-{*************************************************************************}
-
 procedure TKreisForm.TimerTimer(Sender: TObject);
 begin
   Action;
@@ -339,8 +357,8 @@ begin
 end;
 
 initialization
-  KR := 100; {Radius große Kreise}
-  SR := 5; {Radius kleine Kreise}
-  Rand := 5 + SR; {Randabstand der Reflektionskante}
+  KR := 100; { Radius große Kreise }
+  SR := 5; { Radius kleine Kreise }
+  Rand := 5 + SR; { Randabstand der Reflektionskante }
   
 end.

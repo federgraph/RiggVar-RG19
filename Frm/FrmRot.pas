@@ -306,8 +306,8 @@ type
   public
     Rigg: TRigg;
     Rotator: TPolarKar2;
-    HullGraph: TRggGraph; //THullGraph;
-    RaumGrafik: TRaumGrafik; //TGetriebeGraph;
+    HullGraph: TRggGraph; // THullGraph;
+    RaumGrafik: TRaumGrafik; // TGetriebeGraph;
     IndicatorForm: TIndicatorForm;
     BackBmp: TBitmap;
     Preview: TPreview;
@@ -344,7 +344,7 @@ function LookUpRa10(Index: Integer): real;
 var
   temp: real;
 begin
-  {dezimalgeometrische Reihe Ra10}
+  { dezimalgeometrische Reihe Ra10 }
   temp := 1;
   case Index of
     1: temp := 1;
@@ -403,7 +403,8 @@ begin
   AlwaysShowAngle := False;
   ChangeRotationHints;
 
-  with Panel do begin
+  with Panel do
+  begin
     BevelOuter := bvNone;
     Caption := '';
   end;
@@ -414,10 +415,12 @@ begin
   MaxTrackY := 768;
 
   CreatedScreenWidth := Screen.Width;
-  wx := GetSystemMetrics(SM_CXSCREEN); {Width := Screen.Width}
-  wy := GetSystemMetrics(SM_CYSCREEN); {Height := Screen.Height}
-  if wx > MaxTrackX then wx := MaxTrackX;
-  if wy > MaxTrackY then wy := MaxTrackY;
+  wx := GetSystemMetrics(SM_CXSCREEN); { Width := Screen.Width }
+  wy := GetSystemMetrics(SM_CYSCREEN); { Height := Screen.Height }
+  if wx > MaxTrackX then
+    wx := MaxTrackX;
+  if wy > MaxTrackY then
+    wy := MaxTrackY;
 
   (*
   BackBmp := TBitmap.Create;
@@ -425,18 +428,22 @@ begin
     'E:\Programme\Borland\Delphi 3\Images\Splash\16color\Athena.BMP');
   hPal := BackBmp.Palette;
   *)
-  if hPal = 0 then hPal := CreateRggPal32;
+  if hPal = 0 then
+    hPal := CreateRggPal32;
 
   Bitmap := TBitmap.Create;
-  with Bitmap do begin
+  with Bitmap do
+  begin
     Width := wx;
     Height := wy;
-    if hPal <> 0 then Palette := hPal;
+    if hPal <> 0 then
+      Palette := hPal;
   end;
   PaintBackGround(Bitmap);
 
   Metafile := TRiggMetaFile.Create;
-  with Metafile do begin
+  with Metafile do
+  begin
     Width := Bitmap.Width;
     Height := Bitmap.Height;
   end;
@@ -444,40 +451,39 @@ begin
   ActiveControl := FixPunktCombo;
 
   { auskommentierte Anweisungen werden in ChangePosition() ausgeführt }
-  //Btn5Grad.Down := true;
-  //FIncrementT := 10;
-  //FIncrementW := 5;
+  // Btn5Grad.Down := true;
+  // FIncrementT := 10;
+  // FIncrementW := 5;
   FZoomBase := 0.05;
-  //FZoomIndex := 7;
-  //FZoom := FZoomBase * LookUpRa10(FZoomIndex);
-  //FixPunktCombo.ItemIndex := 6;
+  // FZoomIndex := 7;
+  // FZoom := FZoomBase * LookUpRa10(FZoomIndex);
+  // FixPunktCombo.ItemIndex := 6;
   ViewPoint := vpTop;
-  //SetZoomText;
+  // SetZoomText;
 
-  //ssAlt ist notwendig, da sonst in der Kommandozeile keine Ziffern
-  //eingegeben werden können!
+  { ssAlt ist notwendig, da sonst in der Kommandozeile keine Ziffern
+    eingegeben werden können! }
   Step01Item.ShortCut := ShortCut(Word('1'), [ssAlt, ssShift]);
   Step1Item.ShortCut := ShortCut(Word('1'), [ssAlt]);
   Step5Item.ShortCut := ShortCut(Word('5'), [ssAlt]);
   Step10Item.ShortCut := ShortCut(Word('1'), [ssAlt, ssCtrl]);
   Step30Item.ShortCut := ShortCut(Word('3'), [ssAlt]);
-  {ZoomInItem.ShortCut := VK_ADD;} {'+' auf Zehnertastatur}
-  {ZoomOutItem.ShortCut := VK_SUBTRACT;} {'-' auf Zehnertastatur}
+  { ZoomInItem.ShortCut := VK_ADD;} { '+' auf Zehnertastatur }
+  { ZoomOutItem.ShortCut := VK_SUBTRACT; } { '-' auf Zehnertastatur }
 
 
-  //PaintBox austauschen
+  { PaintBox austauschen }
   NewPaintBox := TRggPaintBox.Create(PaintBox3D.Owner);
   try
-  with NewPaintBox do begin
-    Parent := PaintBox3D.Parent;
-    Align := PaintBox3D.Align;
-    OnMouseDown := PaintBox3D.OnMouseDown;
-    OnMouseMove := PaintBox3D.OnMouseMove;
-    OnMouseUp := PaintBox3D.OnMouseUp;
-    OnPaint := PaintBox3D.OnPaint;
-  end;
-  PaintBox3D.Free;
-  PaintBox3D := NewPaintBox;
+    NewPaintBox.Parent := PaintBox3D.Parent;
+    NewPaintBox.Align := PaintBox3D.Align;
+    NewPaintBox.OnMouseDown := PaintBox3D.OnMouseDown;
+    NewPaintBox.OnMouseMove := PaintBox3D.OnMouseMove;
+    NewPaintBox.OnMouseUp := PaintBox3D.OnMouseUp;
+    NewPaintBox.OnPaint := PaintBox3D.OnPaint;
+
+    PaintBox3D.Free;
+    PaintBox3D := NewPaintBox;
   except
     NewPaintBox.Free;
   end;
@@ -524,42 +530,39 @@ end;
 procedure TRotationForm.InitRigg; {virtual}
 begin
   Rigg := TRigg.Create;
-  with Rigg do
-  begin
-    Rigg.ControllerTyp := ctOhne;
-  end;
-  with RaumGrafik do
-  begin
-    Salingtyp := Rigg.Salingtyp;
-    ControllerTyp := Rigg.ControllerTyp;
-    Koordinaten := Rigg.rP;
-    SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-    if RaumGrafik is TGetriebeGraph then
-      TGetriebeGraph(RaumGrafik).WanteGestrichelt := not Rigg.GetriebeOK;
-  end;
+  Rigg.ControllerTyp := ctOhne;
+
+  RaumGrafik.Salingtyp := Rigg.Salingtyp;
+  RaumGrafik.ControllerTyp := Rigg.ControllerTyp;
+  RaumGrafik.Koordinaten := Rigg.rP;
+  RaumGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  if RaumGrafik is TGetriebeGraph then
+    TGetriebeGraph(RaumGrafik).WanteGestrichelt := not Rigg.GetriebeOK;
 end;
 
-procedure TRotationForm.InitPreview; {virtual}
+procedure TRotationForm.InitPreview;
 begin
-  //Preview ruft GetDeviceCaps(Printer.Handle, LOGPIXELSX) auf
-  //dauert extrem lange, wenn der konfigurierte Standard-Drucker
-  //nicht erreichbar ist.
+ { virtual }
 
-  //Preview := TPreview.Create;
+  { Preview ruft GetDeviceCaps(Printer.Handle, LOGPIXELSX) auf
+    dauert extrem lange, wenn der konfigurierte Standard-Drucker
+    nicht erreichbar ist. }
+
+  // Preview := TPreview.Create;
 end;
 
-procedure TRotationForm.UpdateGraph; {virtual}
+procedure TRotationForm.UpdateGraph;
 begin
-  with RaumGrafik do
-  begin
-    Salingtyp := Rigg.Salingtyp;
-    ControllerTyp := Rigg.ControllerTyp;
-    Koordinaten := Rigg.rP;
-    SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-    if RaumGrafik is TGetriebeGraph then
-      TGetriebeGraph(RaumGrafik).WanteGestrichelt := not Rigg.GetriebeOK;
-  end;
-  Draw;
+ { virtual }
+
+  RaumGrafik.Salingtyp := Rigg.Salingtyp;
+  RaumGrafik.ControllerTyp := Rigg.ControllerTyp;
+  RaumGrafik.Koordinaten := Rigg.rP;
+  RaumGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  if RaumGrafik is TGetriebeGraph then
+    TGetriebeGraph(RaumGrafik).WanteGestrichelt := not Rigg.GetriebeOK;
+
+ Draw;
 end;
 
 procedure TRotationForm.FormDestroy(Sender: TObject);
@@ -587,7 +590,8 @@ procedure TRotationForm.InitRotaData;
   end;
 
 begin
-  with RotaData1 do begin
+  with RotaData1 do
+  begin
     Xpos := -150;
     Ypos := -40;
     Matrix := GetMatrix(0,0);
@@ -597,7 +601,8 @@ begin
     IncrementT := 10;
     IncrementW := 5;
   end;
-  with RotaData2 do begin
+  with RotaData2 do
+  begin
     Xpos := -150;
     Ypos := -50;
     Matrix := GetMatrix(0,90);
@@ -607,7 +612,8 @@ begin
     IncrementT := 10;
     IncrementW := 5;
   end;
-  with RotaData3 do begin
+  with RotaData3 do
+  begin
     Xpos := -130;
     Ypos := -80;
     Matrix := GetMatrix(90,-87);
@@ -617,7 +623,8 @@ begin
     IncrementT := 10;
     IncrementW := 5;
   end;
-  with RotaData4 do begin
+  with RotaData4 do
+  begin
     Xpos := -170;
     Ypos := -120;
     Matrix := GetMatrix(-90,90);
@@ -654,7 +661,8 @@ begin
   S1 := Format('%8.4f %8.4f %8.4f',[m4x4[1,1],m4x4[1,2], m4x4[1,3]]);
   S2 := Format('%8.4f %8.4f %8.4f',[m4x4[2,1],m4x4[2,2], m4x4[2,3]]);
   S3 := Format('%8.4f %8.4f %8.4f',[m4x4[3,1],m4x4[3,2], m4x4[3,3]]);
-  with Canvas do begin
+  with Canvas do
+  begin
     Font.Name := 'Courier New';
     Font.Size := 10;
     TextOut(20,40,S1);
@@ -665,7 +673,8 @@ end;
 
 procedure TRotationForm.DrawAngleText(Canvas: TCanvas);
 begin
-  with Canvas do begin
+  with Canvas do
+  begin
     Font.Name := 'Courier New';
     Font.Size := 10;
     TextOut(20,120,SHeadingPhi);
@@ -706,7 +715,7 @@ begin
   if PreviewItem.Checked then
     DrawPreviewBox;
 
-  //Bitmap auf den Bildschirm kopieren
+  { Bitmap auf den Bildschirm kopieren }
   with PaintBox3D.Canvas do
   begin
     CopyMode := cmSrcCopy;
@@ -716,8 +725,9 @@ begin
   Painted := True;
 end;
 
-procedure TRotationForm.DrawToBitmap1; //Variante 1
+procedure TRotationForm.DrawToBitmap1;
 begin
+  { Variante 1 }
   with Bitmap.Canvas do
   begin
     SetMapMode(Handle, MM_ANISOTROPIC);
@@ -744,13 +754,14 @@ end;
 
 procedure TRotationForm.DrawToBitmap2; //Variante 2
 begin
-  //Metafile anlegen, alten Eintrag grau überschreiben
+  { Metafile anlegen, alten Eintrag grau überschreiben }
   MetaCanvas := TMetaFileCanvas.Create(MetaFile, 0);
   try
     if not PaintBtn.Down then MetaCanvas.Draw(0,0,MetaFile);
     RaumGrafik.Coloriert := True;
     RaumGrafik.Draw(MetaCanvas);
-    if FPaintRumpf = True then begin
+    if FPaintRumpf = True then
+    begin
       HullGraph.Coloriert := True;
       HullGraph.FixPunkt := RaumGrafik.FixPunkt;
       HullGraph.Draw(MetaCanvas);
@@ -758,14 +769,15 @@ begin
   finally
     MetaCanvas.Free;
   end;
-  // Metafile auf das Bitmap schreiben
+  { Metafile auf das Bitmap schreiben }
   Bitmap.Canvas.Draw(NullpunktOffset.x, NullpunktOffset.y, MetaFile);
-  // aktuelles Bild mit grauem Stift in das Metafile schreiben
+  { aktuelles Bild mit grauem Stift in das Metafile schreiben }
   MetaCanvas := TMetaFileCanvas.Create(MetaFile, 0);
   try
     RaumGrafik.Coloriert := False;
     RaumGrafik.Draw(MetaCanvas);
-    if FPaintRumpf = True then begin
+    if FPaintRumpf = True then
+    begin
       HullGraph.Coloriert := False;
       HullGraph.FixPunkt := RaumGrafik.FixPunkt;
       HullGraph.Draw(MetaCanvas);
@@ -785,17 +797,17 @@ begin
   if not Assigned(Preview) then
   begin
     MessageDlg('Preview Object nicht verfügbar.', mtInformation, [mbOK], 0);
-    exit;
+    Exit;
   end;
 
   if not RggPrinter.OKToPrint then
   begin
     MessageDlg('Kein Drucker konfiguriert.', mtInformation, [mbOK], 0);
-    exit;
+    Exit;
   end;
 
-  if MessageDlg('Jetzt Drucken?',
-    mtInformation, [mbYes, mbNo], 0) = mrNO then Exit;
+  if MessageDlg('Jetzt Drucken?', mtInformation, [mbYes, mbNo], 0) = mrNO then
+    Exit;
 
   PrintZoom := 8.5;
   RandX := 250;
@@ -813,23 +825,23 @@ begin
   HullGraph.Offset := PrintOffset;
   RaumGrafik.Offset := PrintOffset;
 
-  with Printer do
+  Printer.Orientation := Preview.Orientierung;
+  Printer.BeginDoc;
+  if PreviewItem.Checked then
+    Preview.Print;
+  Rgn := CreateRectRgnIndirect(Preview.EnvPos);
+  { SelectClipRgn() arbeitet mit Kopie von Rgn }
+  SelectClipRgn(Printer.Canvas.Handle, Rgn);
+  DeleteObject(Rgn);
+  RaumGrafik.Coloriert := True;
+  RaumGrafik.Draw(Printer.Canvas);
+  if FPaintRumpf = True then
   begin
-    Orientation := Preview.Orientierung;
-    BeginDoc;
-    if PreviewItem.Checked then Preview.Print;
-    Rgn := CreateRectRgnIndirect(Preview.EnvPos);
-    SelectClipRgn(Canvas.Handle, Rgn); {SelectClipRgn() arbeitet mit Kopie von Rgn!}
-    DeleteObject(Rgn);
-    RaumGrafik.Coloriert := True;
-    RaumGrafik.Draw(Canvas); {Printer.Canvas}
-    if FPaintRumpf = True then begin
-      HullGraph.Coloriert := True;
-      HullGraph.FixPunkt := RaumGrafik.FixPunkt;
-      HullGraph.Draw(Canvas); {Printer.Canvas}
-    end;
-    EndDoc;
+    HullGraph.Coloriert := True;
+    HullGraph.FixPunkt := RaumGrafik.FixPunkt;
+    HullGraph.Draw(Printer.Canvas);
   end;
+  Printer.EndDoc;
 
   HullGraph.Zoom := FZoom;
   RaumGrafik.Zoom := FZoom;
@@ -839,21 +851,29 @@ end;
 
 procedure TRotationForm.PhiDownItemClick(Sender: TObject);
 begin
-  if Sender = PhiDownItem then LeftBtnClick(LeftBtn)
-  else if Sender = PhiUpItem then LeftBtnClick(RightBtn)
-  else if Sender = ThetaDownItem then LeftBtnClick(DownBtn)
-  else if Sender = ThetaUpItem then LeftBtnClick(UpBtn)
-  else if Sender = GammaDownItem then LeftBtnClick(GammaDownBtn)
-  else if Sender = GammaUpItem then LeftBtnClick(GammaUpBtn);
+  if Sender = PhiDownItem then
+    LeftBtnClick(LeftBtn)
+  else if Sender = PhiUpItem then
+    LeftBtnClick(RightBtn)
+  else if Sender = ThetaDownItem then
+    LeftBtnClick(DownBtn)
+  else if Sender = ThetaUpItem then
+    LeftBtnClick(UpBtn)
+  else if Sender = GammaDownItem then
+    LeftBtnClick(GammaDownBtn)
+  else if Sender = GammaUpItem then
+    LeftBtnClick(GammaUpBtn);
 end;
 
 procedure TRotationForm.LeftBtnClick(Sender: TObject);
 var
   wp, wt, wg: real;
 begin
-  if Mode = False then begin //Incremente
+  if Mode = False then
+  begin
+    { Incremente }
     wp := 0; wt := 0; wg := 0;
-    if Sender = LeftBtn then wp :=  FIncrementW
+    if Sender = LeftBtn then wp := FIncrementW
     else if Sender = RightBtn then wp := -FIncrementW
     else if Sender = UpBtn then wt := FIncrementW
     else if Sender = DownBtn then wt := - FIncrementW
@@ -861,7 +881,9 @@ begin
     else if Sender = GammaDownBtn then wg := - FIncrementW;
     Rotate(wp, -wt, -wg, 0, 0, 0);
   end
-  else begin //Absolutwinkel
+  else
+  begin
+    { Absolutwinkel }
     if Sender = LeftBtn then FPhi := FPhi + FIncrementW
     else if Sender = RightBtn then FPhi := FPhi - FIncrementW
     else if Sender = UpBtn then FTheta := FTheta - FIncrementW
@@ -882,23 +904,29 @@ end;
 
 procedure TRotationForm.TransLeftItemClick(Sender: TObject);
 begin
-  if Sender = TransLeftItem then TransLeftBtnClick(TransLeftBtn)
-  else if Sender = TransRightItem then TransLeftBtnClick(TransRightBtn)
-  else if Sender = TransUpItem then TransLeftBtnClick(TransUpBtn)
-  else if Sender = TransDownItem then TransLeftBtnClick(TransDownBtn);
+  if Sender = TransLeftItem then
+    TransLeftBtnClick(TransLeftBtn)
+  else if Sender = TransRightItem then
+    TransLeftBtnClick(TransRightBtn)
+  else if Sender = TransUpItem then
+    TransLeftBtnClick(TransUpBtn)
+  else if Sender = TransDownItem then
+    TransLeftBtnClick(TransDownBtn);
 end;
 
 procedure TRotationForm.TransLeftBtnClick(Sender: TObject);
 var
   xmin, ymin, xmax, ymax: Integer;
 begin
-  if KeepInsideItem.Checked then begin
+  if KeepInsideItem.Checked then
+  begin
     xmin := -Bitmap.Width div 2;
     ymin := -Bitmap.Height div 2;
     xmax := xmin + PaintBox3D.Width;
     ymax := ymin + PaintBox3D.Height;
   end
-  else begin
+  else
+  begin
     xmin := -3000;
     ymin := -3000;
     xmax := 3000;
@@ -918,7 +946,8 @@ end;
 
 procedure TRotationForm.ZoomInBtnClick(Sender: TObject);
 begin
-  if FZoomIndex < 11 then begin
+  if FZoomIndex < 11 then
+  begin
     Inc(FZoomIndex);
     FZoom := FZoomBase * LookUpRa10(FZoomIndex);
     HullGraph.Zoom := FZoom;
@@ -930,7 +959,8 @@ end;
 
 procedure TRotationForm.ZoomOutBtnClick(Sender: TObject);
 begin
-  if FZoomIndex > 1 then begin
+  if FZoomIndex > 1 then
+  begin
     Dec(FZoomIndex);
     FZoom := FZoomBase * LookUpRa10(FZoomIndex);
     HullGraph.Zoom := FZoom;
@@ -971,11 +1001,31 @@ end;
 
 procedure TRotationForm.Btn1GradClick(Sender: TObject);
 begin
-  if Sender = Btn01Grad then begin FIncrementW := 0.1; FIncrementT := 1; end
-  else if Sender = Btn1Grad then begin FIncrementW := 1; FIncrementT := 5; end
-  else if Sender = Btn5Grad then begin FIncrementW := 5; FIncrementT := 10; end
-  else if Sender = Btn10Grad then begin FIncrementW := 10; FIncrementT := 30; end
-  else if Sender = Btn30Grad then begin FIncrementW := 30; FIncrementT := 100; end;
+  if Sender = Btn01Grad then
+  begin
+    FIncrementW := 0.1;
+    FIncrementT := 1;
+  end
+  else if Sender = Btn1Grad then
+  begin
+    FIncrementW := 1;
+    FIncrementT := 5;
+  end
+  else if Sender = Btn5Grad then
+  begin
+    FIncrementW := 5;
+    FIncrementT := 10;
+  end
+  else if Sender = Btn10Grad then
+  begin
+   FIncrementW := 10;
+   FIncrementT := 30;
+  end
+  else if Sender = Btn30Grad then
+  begin
+    FIncrementW := 30;
+    FIncrementT := 100;
+  end;
 end;
 
 procedure TRotationForm.Step01ItemClick(Sender: TObject);
@@ -1062,7 +1112,7 @@ begin
 
     MessageDlg(SL.Text, mtInformation, [mbOK], 0);
     SL.Free;
-    exit;
+    Exit;
   end;
 
   PreviewItem.Checked := not PreviewItem.Checked;
@@ -1080,7 +1130,8 @@ procedure TRotationForm.PlotItemClick(Sender: TObject);
 var
   List: TStringList;
 begin
-  if SaveDialog.Execute then begin
+  if SaveDialog.Execute then
+  begin
     List := TStringList.Create;
     try
       RaumGrafik.GetPlotList(List);
@@ -1094,7 +1145,7 @@ end;
 
 procedure TRotationForm.GrafikMenuClick(Sender: TObject);
 var
-  S: String;
+  S: string;
 begin
   A0_Item.Checked := False;
   B0_Item.Checked := False;
@@ -1146,22 +1197,27 @@ end;
 procedure TRotationForm.StatusBarItemClick(Sender: TObject);
 begin
   StatusBarItem.Checked := not StatusBarItem.Checked;
-  if StatusBarItem.Checked then StatusBar.Visible := True
-  else StatusBar.Visible := False;
+  if StatusBarItem.Checked then
+    StatusBar.Visible := True
+  else
+    StatusBar.Visible := False;
 end;
 
 procedure TRotationForm.SpeedBarItemClick(Sender: TObject);
 begin
   SpeedBarItem.Checked := not SpeedBarItem.Checked;
-  if SpeedBarItem.Checked then ToolbarPanel.Visible := True
-  else ToolbarPanel.Visible := False;
+  if SpeedBarItem.Checked then
+    ToolbarPanel.Visible := True
+  else
+    ToolbarPanel.Visible := False;
 end;
 
 procedure TRotationForm.PaintBtnClick(Sender: TObject);
 begin
   PaintItem.Checked := not PaintItem.Checked;
   PaintBtn.Down := PaintItem.Checked;
-  if not PaintBtn.Down then EraseBK := True;
+  if not PaintBtn.Down then
+    EraseBK := True;
   Draw;
 end;
 
@@ -1193,7 +1249,7 @@ begin
 
   FXpos := RotaData.Xpos;
   FYpos := RotaData.Ypos;
-  //*** Increment
+  { Increment }
   case RotaData.IncrementIndex of
     1: Btn01Grad.Down := true;
     2: Btn1Grad.Down := true;
@@ -1203,22 +1259,22 @@ begin
   end;
   FIncrementT := RotaData.IncrementT;
   FIncrementW := RotaData.IncrementW;
-  //Rotationmatrix
+  { Rotationmatrix }
   Rotator.Matrix := RotaData.Matrix;
   Rotator.GetAngle(FPhi, FTheta, FGamma);
   SetAngleText; // Rotate() hier nicht aufrufen, um Matrix nicht zu verändern!
-  //*** Zoom
+  { Zoom }
   FZoomIndex := RotaData.ZoomIndex;
   FZoom := FZoomBase * LookUpRa10(FZoomIndex);
   SetZoomText;
   RaumGrafik.Zoom := FZoom;
   HullGraph.Zoom := FZoom;
-  //*** Fixpunkt
+  { Fixpunkt }
   FixPunktCombo.ItemIndex := RotaData.FixpunktIndex;
   RaumGrafik.FixName := ComboFixName;
-  RaumGrafik.Update; //Rotate;
+  RaumGrafik.Update; // Rotate;
   HullGraph.FixPunkt := Raumgrafik.FixPunkt;
-  //*** Neuzeichnen
+  { Neuzeichnen }
   EraseBK := True; Draw;
   IndicatorForm.UpdateIndicator;
 end;
@@ -1231,7 +1287,8 @@ begin
     vpTop: RotaData := RotaData3;
     vp3D: RotaData := RotaData4;
   end;
-  with RotaData do begin
+  with RotaData do
+  begin
     Xpos := FXpos;
     Ypos := FYpos;
     Matrix := Rotator.Matrix;
@@ -1277,24 +1334,27 @@ var
   wx, wy: Integer;
 begin
   CreatedScreenWidth := Screen.Width;
-  wx := GetSystemMetrics(SM_CXSCREEN); {Width := Screen.Width}
-  wy := GetSystemMetrics(SM_CYSCREEN); {Height := Screen.Height}
+  wx := GetSystemMetrics(SM_CXSCREEN); { Width := Screen.Width }
+  wy := GetSystemMetrics(SM_CYSCREEN); { Height := Screen.Height }
   if wx > 1024 then wx := 1024;
   if wy > 768 then wy := 768;
 
   Bitmap.Palette := 0;
   Bitmap.Free;
   Bitmap := TBitmap.Create;
-  with Bitmap do begin
+  with Bitmap do
+  begin
     Width := wx;
     Height := wy;
-    if hPal <> 0 then Palette := hPal;
+    if hPal <> 0 then
+      Palette := hPal;
   end;
   PaintBackGround(Bitmap);
 
   MetaFile.Free;
   Metafile := TRiggMetaFile.Create;
-  with Metafile do begin
+  with Metafile do
+  begin
     Width := Bitmap.Width;
     Height := Bitmap.Height;
   end;
@@ -1307,8 +1367,6 @@ begin
   KeepInsideItem.Checked := not KeepInsideItem.Checked;
   if KeepInsideItem.Checked then Draw;
 end;
-
-{******************************************************************************}
 
 { Scroll left by one button. If no buttons are visible anymore, do nothing. }
 procedure TRotationForm.LeftButtonClick(Sender: TObject);
@@ -1484,8 +1542,7 @@ begin
   RedoButtons;
 end;
 
-{****************************************************************************}
-// Ergänzung für das Drehen mit der Maus.
+{ Ergänzung für das Drehen mit der Maus. }
 
 procedure TRotationForm.PaintBox3DMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -1507,17 +1564,20 @@ var
 begin
   if not MouseDown then Exit;
   if Mode then Exit;
-  if MouseButton = mbLeft then begin
+  if MouseButton = mbLeft then
+  begin
     wx := Round((x - prevx) * 360 / PaintBox3D.Width);
     wy := Round((y - prevy) * 360 / PaintBox3D.Height);
     wz := 0;
   end
-  else begin
+  else
+  begin
     wx := 0;
     wy := 0;
     wz := Round((x - prevx) * 360 / PaintBox3D.Width);
   end;
-  if Painted then begin
+  if Painted then
+  begin
     Painted := False;
     if FTranslation or (Shift = [ssLeft, ssRight]) then
       Translate(x,y)
@@ -1555,13 +1615,15 @@ procedure TRotationForm.Translate(x, y: Integer);
 var
   xmin, ymin, xmax, ymax: Integer;
 begin
-  if KeepInsideItem.Checked then begin
+  if KeepInsideItem.Checked then
+  begin
     xmin := -Bitmap.Width div 2;
     ymin := -Bitmap.Height div 2;
     xmax := xmin + PaintBox3D.Width;
     ymax := ymin + PaintBox3D.Height;
   end
-  else begin
+  else
+  begin
     xmin := -3000;
     ymin := -3000;
     xmax := 3000;
@@ -1570,10 +1632,14 @@ begin
   FXpos := SavedXpos - (MouseDownX - x);
   FYpos := SavedYpos - (MouseDownY - y);
   if FXpos < xmin then FXpos := xmin
-  else if FXpos > xmax then FXpos := xmax
-  else if FYpos < ymin then FYpos := ymin
-  else if FYpos > ymax then FYpos := ymax;
-  if not PaintBtn.Down then EraseBK := True;
+  else if FXpos > xmax then
+    FXpos := xmax
+  else if FYpos < ymin then
+    FYpos := ymin
+  else if FYpos > ymax then
+    FYpos := ymax;
+  if not PaintBtn.Down then
+    EraseBK := True;
   Draw;
 end;
 
@@ -1605,110 +1671,6 @@ begin
   end;
 end;
 
-{****************************************************************************}
-//zur Zeit nicht verwendete Klasse TRotaParams
-
-constructor TRotaParams.Create;
-begin
-  FIncrementIndex := 3;
-  FZoomBase := 0.05;
-  FZoomIndex := 7;
-  FixPunkt := ooD0;
-  Phi := 0;
-  Theta := -90;
-  Gamma := 0;
-  Xrot := -87;
-  Yrot := 0;
-  Zrot := 0;
-end;
-
-procedure TRotaParams.SetIncrementIndex(Value: Integer);
-begin
-  //Begrenzen auf gültige Werte
-  if Value < 1 then Value := 1;
-  if Value > 5 then Value := 5;
-  FIncrementIndex := Value;
-end;
-
-procedure TRotaParams.SetZoomIndex(Value: Integer);
-begin
-  //Begrenzen auf gültige Werte
-  if Value < 1 then Value := 1;
-  if Value > 11 then Value := 11;
-  FZoomIndex := Value;
-end;
-
-procedure TRotaParams.SetFixPunktIndex(Value: Integer);
-begin
-  case Value of
-    0: FixPunkt := ooA0;
-    1: FixPunkt := ooA;
-    2: FixPunkt := ooB0;
-    3: FixPunkt := ooB;
-    4: FixPunkt := ooC0;
-    5: FixPunkt := ooC;
-    6: FixPunkt := ooD0;
-    7: FixPunkt := ooD;
-    8: FixPunkt := ooE0;
-    9: FixPunkt := ooE;
-   10: FixPunkt := ooF0;
-   11: FixPunkt := ooF;
-   else FixPunkt := ooD0;
-  end;
-end;
-
-function TRotaParams.GetFixPunktIndex: Integer;
-begin
-  case FixPunkt of
-    ooA0:  result :=  0;
-    ooA:   result :=  1;
-    ooB0:  result :=  2;
-    ooB:   result :=  3;
-    ooC0:  result :=  4;
-    ooC:   result :=  5;
-    ooD0:  result :=  6;
-    ooD:   result :=  7;
-    ooE0:  result :=  8;
-    ooE:   result :=  9;
-    ooF0:  result := 10;
-    ooF:   result := 11;
-    else result := 6;
-  end;
-end;
-
-function TRotaParams.GetIncrementT: Integer;
-begin
-  case IncrementIndex of
-    1: result := 1;
-    2: result := 5;
-    3: result := 10;
-    4: result := 30;
-    5: result := 100;
-    else
-      result := 1;
-  end;
-end;
-
-function TRotaParams.GetIncrementW: real;
-begin
-  case IncrementIndex of
-    1: result := 0.1;
-    2: result := 1;
-    3: result := 5;
-    4: result := 10;
-    5: result := 30;
-    else
-      result := 1;
-  end;
-end;
-
-function TRotaParams.GetZoom: real;
-begin
-  result := FZoomBase * LookUpRa10(FZoomIndex);
-end;
-
-{****************************************************************************}
-
 procedure TRotationForm.SetZoomText;
 begin
   StatusBar.Panels.Items[7].Text :=
@@ -1726,7 +1688,8 @@ begin
   SHeadingPhi := Format('Heading: %5.1f',[FPhi]);
   SPitchTheta := Format('Pitch:   %5.1f',[FTheta]);
   SBankGamma  := Format('Bank:    %5.1f',[FGamma]);
-  with StatusBar.Panels do begin
+  with StatusBar.Panels do
+  begin
     BeginUpdate;
     try
       Items[1].Text := Format('%5.1f',[FPhi]);
@@ -1744,13 +1707,17 @@ begin
   ChangeRotationHints;
   Rotator.Mode := Mode;
 
-  if AlwaysShowAngle then Exit;
+  if AlwaysShowAngle then
+    Exit;
 
-  if Mode = False then begin //Increment - Modus
+  if Mode = False then
+  begin
+    { Increment - Modus }
     SHeadingPhi := '';
     SPitchTheta := '';
     SBankGamma  := '';
-    with StatusBar.Panels do begin
+    with StatusBar.Panels do
+    begin
       BeginUpdate;
       try
         Items[1].Text := '';
@@ -1761,7 +1728,9 @@ begin
       end;
     end;
   end;
-  if Mode = True then begin //Absolut - Modus
+  if Mode = True then
+  begin
+    { Absolut - Modus }
     { wenn Ereignis Rotator.OnCalcAngle nicht zugewiesen wurde, dann
       werden FPhi, FTheta und FGamma auf Null gesetzt }
     Rotator.GetAngle(FPhi, FTheta, FGamma);
@@ -1775,12 +1744,12 @@ begin
   FDrawAlways := not FDrawAlways;
 end;
 
-{****************************************************************************}
-
 procedure TRotationForm.HullItemClick(Sender: TObject);
 begin
-  if OpenDialog.Execute then begin
-    with HullGraph as THullGraph do begin
+  if OpenDialog.Execute then
+  begin
+    with HullGraph as THullGraph do
+    begin
       VertexFileName := OpenDialog.FileName;
       VertexMemo := nil;
       Load;
@@ -1805,7 +1774,8 @@ begin
 
   if Assigned(Memo) then
   begin
-    with HullGraph as THullGraph do begin
+    with HullGraph as THullGraph do
+    begin
       VertexFileName := '';
       VertexMemo := Memo;
       Load;
@@ -1818,17 +1788,19 @@ procedure TRotationForm.FaktorDlgItemClick(Sender: TObject);
 begin
   RumpfFaktorDlg := TRumpfFaktorDlg.Create(Self);
   try
-    with RumpfFaktorDlg, HullGraph as THullGraph do begin
-      Caption := 'Rumpf skalieren';
-      GroupBox.Caption := 'Faktor in %';
-      L := Round(Factor.x*100);
-      B := Round(Factor.y*100);
-      H := Round(Factor.z*100);
+    with HullGraph as THullGraph do
+    begin
+      RumpfFaktorDlg.Caption := 'Rumpf skalieren';
+      RumpfFaktorDlg.GroupBox.Caption := 'Faktor in %';
+      RumpfFaktorDlg.L := Round(Factor.x * 100);
+      RumpfFaktorDlg.B := Round(Factor.y * 100);
+      RumpfFaktorDlg.H := Round(Factor.z * 100);
       ShowModal;
-      if ModalResult = mrOK then begin
-        Factor.x := L/100;
-        Factor.y := B/100;
-        Factor.z := H/100;
+      if ModalResult = mrOK then
+      begin
+        Factor.x := RumpfFaktorDlg.L / 100;
+        Factor.y := RumpfFaktorDlg.B / 100;
+        Factor.z := RumpfFaktorDlg.H / 100;
         Load;
       end;
     end;
@@ -1842,13 +1814,16 @@ procedure TRotationForm.OpenBackBmpItemClick(Sender: TObject);
 var
   wx, wy: Integer;
 begin
-  if not OpenPictureDialog.Execute then Exit;
-  if OpenPictureDialog.Filename = '' then Exit;
+  if not OpenPictureDialog.Execute then
+    Exit;
+  if OpenPictureDialog.Filename = '' then
+    Exit;
 
   SelectPalette(PaintBox3D.Canvas.Handle, GetStockObject(Default_Palette), False);
   RealizePalette(PaintBox3D.Canvas.Handle);
 
-  if hPal <> 0 then begin
+  if hPal <> 0 then
+  begin
     DeleteObject(hPal);
     hPal := 0;
   end;
@@ -1876,7 +1851,8 @@ begin
     hPal := CreateRggPal32;
 
   Bitmap := TBitmap.Create;
-  with Bitmap do begin
+  with Bitmap do
+  begin
     Width := wx;
     Height := wy;
     Palette := hPal;
@@ -1892,7 +1868,8 @@ begin
   SelectPalette(PaintBox3D.Canvas.Handle, GetStockObject(Default_Palette), False);
   RealizePalette(PaintBox3D.Canvas.Handle);
 
-  if hPal <> 0 then begin
+  if hPal <> 0 then
+  begin
     DeleteObject(hPal);
     hPal := 0;
   end;
@@ -1907,7 +1884,8 @@ begin
   hPal := CreateRggPal32;
 
   Bitmap := TBitmap.Create;
-  with Bitmap do begin
+  with Bitmap do
+  begin
     Width := wx;
     Height := wy;
     Palette := hPal;
@@ -1949,7 +1927,9 @@ end;
 
 procedure TRotationForm.ChangeRotationHints;
 begin
-  if Mode then begin //Absolute Winkel
+  if Mode then
+  begin
+    { Absolute Winkel }
     LeftBtn.Hint := 'Heading - Boot links drehen (phi+)|';
     RightBtn.Hint :='Heading - Boot rechts drehen (phi-)|';
     UpBtn.Hint := 'Pitch - Bug nach oben kippen (theta-)|';
@@ -1971,7 +1951,9 @@ begin
     GammaDownItem.Caption := 'B  ( Umsch + Pfeiltaste ''nach links'' )';
     GammaUpItem.Caption := 'B  ( Umsch + Pfeiltaste ''nach rechts'' )';
   end;
-  if not Mode then begin //um Winkelinkremente drehen
+  if not Mode then
+  begin
+    { um Winkelinkremente drehen }
     LeftBtn.Hint := 'Boot nach links kippen|';
     RightBtn.Hint :='Boot nach rechts kippen|';
     UpBtn.Hint := 'Bug nach oben kippen|';
@@ -2003,8 +1985,112 @@ end;
 
 procedure TRotationForm.AngleTextItemClick(Sender: TObject);
 begin
-  //AngleTextItem.Checked := not AngleTextItem.Checked;
+  // AngleTextItem.Checked := not AngleTextItem.Checked;
   Draw;
+end;
+
+{ TRotaParams }
+
+constructor TRotaParams.Create;
+begin
+  FIncrementIndex := 3;
+  FZoomBase := 0.05;
+  FZoomIndex := 7;
+  FixPunkt := ooD0;
+  Phi := 0;
+  Theta := -90;
+  Gamma := 0;
+  Xrot := -87;
+  Yrot := 0;
+  Zrot := 0;
+end;
+
+procedure TRotaParams.SetIncrementIndex(Value: Integer);
+begin
+  if Value < 1 then
+    Value := 1;
+  if Value > 5 then
+    Value := 5;
+  FIncrementIndex := Value;
+end;
+
+procedure TRotaParams.SetZoomIndex(Value: Integer);
+begin
+  if Value < 1 then
+    Value := 1;
+  if Value > 11 then
+    Value := 11;
+  FZoomIndex := Value;
+end;
+
+procedure TRotaParams.SetFixPunktIndex(Value: Integer);
+begin
+  case Value of
+    0: FixPunkt := ooA0;
+    1: FixPunkt := ooA;
+    2: FixPunkt := ooB0;
+    3: FixPunkt := ooB;
+    4: FixPunkt := ooC0;
+    5: FixPunkt := ooC;
+    6: FixPunkt := ooD0;
+    7: FixPunkt := ooD;
+    8: FixPunkt := ooE0;
+    9: FixPunkt := ooE;
+   10: FixPunkt := ooF0;
+   11: FixPunkt := ooF;
+   else FixPunkt := ooD0;
+  end;
+end;
+
+function TRotaParams.GetFixPunktIndex: Integer;
+begin
+  case FixPunkt of
+    ooA0:  result :=  0;
+    ooA:   result :=  1;
+    ooB0:  result :=  2;
+    ooB:   result :=  3;
+    ooC0:  result :=  4;
+    ooC:   result :=  5;
+    ooD0:  result :=  6;
+    ooD:   result :=  7;
+    ooE0:  result :=  8;
+    ooE:   result :=  9;
+    ooF0:  result := 10;
+    ooF:   result := 11;
+    else
+      result := 6;
+  end;
+end;
+
+function TRotaParams.GetIncrementT: Integer;
+begin
+  case IncrementIndex of
+    1: result := 1;
+    2: result := 5;
+    3: result := 10;
+    4: result := 30;
+    5: result := 100;
+    else
+      result := 1;
+  end;
+end;
+
+function TRotaParams.GetIncrementW: real;
+begin
+  case IncrementIndex of
+    1: result := 0.1;
+    2: result := 1;
+    3: result := 5;
+    4: result := 10;
+    5: result := 30;
+    else
+      result := 1;
+  end;
+end;
+
+function TRotaParams.GetZoom: real;
+begin
+  result := FZoomBase * LookUpRa10(FZoomIndex);
 end;
 
 end.

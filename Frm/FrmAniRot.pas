@@ -19,6 +19,9 @@ uses
   Winapi.Windows,
   System.SysUtils,
   System.Classes,
+  RggTypes,
+  Rggunit4,
+  FrmRot,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -27,9 +30,8 @@ uses
   Vcl.ExtCtrls,
   Vcl.ComCtrls,
   Vcl.Buttons,
-  RggTypes,
-  Rggunit4,
-  FrmRot, Vcl.ExtDlgs, Vcl.Dialogs;
+  Vcl.ExtDlgs,
+  Vcl.Dialogs;
 
 const
   AniStepCountMax = 50;
@@ -65,8 +67,7 @@ type
     procedure AnimationItemClick(Sender: TObject);
     procedure CommandLineItemClick(Sender: TObject);
     procedure TimerTimer(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrackBarChange(Sender: TObject);
     procedure ListBoxClick(Sender: TObject);
     procedure RiggTypItemClick(Sender: TObject);
@@ -79,7 +80,7 @@ type
     FsbName: TsbName;
     FAniStepCount: Integer;
     AniSteps: array[0..AniStepCountMax] of real;
-    AniStep: Integer; {Index in das Array AniSteps}
+    AniStep: Integer; { Index in das Array AniSteps }
     AniIncrement: Integer;
 
     procedure SetParameter(Value: TsbName);
@@ -500,8 +501,6 @@ begin
 {$endif}
   inherited;
 end;
-
-{****************************************************************************}
 
 procedure TAniRotationForm.UpdateLocalRigg;
 {$ifdef Rigg19}

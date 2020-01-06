@@ -713,7 +713,7 @@ object RotationForm: TRotationForm
     Top = 58
   end
   object MainMenu: TMainMenu
-    Left = 112
+    Left = 152
     Top = 58
     object GrafikMenu: TMenuItem
       Caption = '&3D Grafik'

@@ -407,7 +407,7 @@ object FormMain: TFormMain
         Hint = '  Trimm in den Zwischenspeicher kopieren'
         OnClick = MemoryBtnClick
       end
-      object MemoryRecallkItem: TMenuItem
+      object MemoryRecallItem: TMenuItem
         Caption = 'Trimm &zur'#252'cksetzen ( MR )'
         Hint = '  Trimm aus dem Zwischenspeicher zur'#252'ckholen'
         OnClick = MemoryRecallBtnClick

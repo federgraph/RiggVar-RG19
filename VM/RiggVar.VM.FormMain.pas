@@ -415,7 +415,7 @@ begin
   FormRG19.OutputFormItem.Enabled := OutputFormItemEnabled;
   FormRG19.GrafikFormItem.Enabled := GrafikFormItemEnabled;
 
-  FormRG19.ConsoleItem.Caption := ConsoleItemCaption;
+//  FormRG19.ConsoleItem.Caption := ConsoleItemCaption;
   FormRG19.ConsoleItem.Hint := ConsoleItemHint;
 end;
 

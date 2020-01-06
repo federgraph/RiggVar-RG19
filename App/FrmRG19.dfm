@@ -523,7 +523,7 @@ object FormRG19: TFormRG19
         Caption = 'Trimm &speichern ( M )'
         Hint = '  Trimm in den Zwischenspeicher kopieren'
       end
-      object MemoryRecallkItem: TMenuItem
+      object MemoryRecallItem: TMenuItem
         Caption = 'Trimm &zur'#252'cksetzen ( MR )'
         Hint = '  Trimm aus dem Zwischenspeicher zur'#252'ckholen'
       end
@@ -794,27 +794,6 @@ object FormRG19: TFormRG19
         Caption = 'Datensatz automatisch laden'
         GroupIndex = 3
         Hint = '  Datens'#228'tze aus Datenbank einlesen, wenn selektiert'
-      end
-    end
-    object WindowMenu: TMenuItem
-      Caption = '&Fenster'
-      GroupIndex = 9
-      Hint = '  MDI Fenster verwalten'
-      object WindowCascadeItem: TMenuItem
-        Caption = '&'#220'berlappend'
-        Hint = '  Fenster '#252'berlappend anordnen'
-      end
-      object WindowTileItem: TMenuItem
-        Caption = '&Nebeneinander'
-        Hint = '  Fenster nebeneinander anordnen'
-      end
-      object WindowArrangeItem: TMenuItem
-        Caption = '&Symbole anordnen'
-        Hint = '  Fenstersymbole anordnen'
-      end
-      object WindowMinimizeItem: TMenuItem
-        Caption = '&Alle verkleinern'
-        Hint = '  Alle Fenster zum Symbol verkleinern'
       end
     end
     object HelpMenu: TMenuItem

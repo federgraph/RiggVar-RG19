@@ -39,41 +39,38 @@ procedure TConsoleForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   RiggModul.ConsoleActive := False;
 
-  with InputForm do
-  begin
-    Hide;
-    Parent := nil;
-    BorderStyle := bsSizeable; //bsDialog;
-    ClientWidth := InputForm.InputPages.Width;
-    ClientHeight := InputForm.InputPages.Height;
-    Position := poScreenCenter;
-  end;
+  { InputForm }
 
-  with OutputForm do
-  begin
-    { Das WindowHandle von YComboBox wird zerstört, wenn ConsoleForm freigegeben
-      wird. Wenn OutputForm dann neu angezeigt wird ist YComboBox.ItemIndex = -1,
-      da ItemIndex der ComboBox von VCL nicht gesichert wird im Gegensatz zum
-      ItemIndex einer ListBox! YComboBox.ItemIndex wird außerdem als Index in
-      ein Array verwendet und dieser darf nicht Null sein. }
-    RiggModul.YComboSavedItemIndex := YComboBox.ItemIndex;
-    Hide;
-    Parent := nil;
-    BorderStyle := bsSizeable; //bsDialog;
-    ClientWidth := OutputForm.OutputPages.Width;
-    ClientHeight := OutputForm.OutputPages.Height;
-    Position := poScreenCenter;
-  end;
+  InputForm.Hide;
+  InputForm.Parent := nil;
+  InputForm.BorderStyle := bsSizeable;
+  InputForm.ClientWidth := InputForm.InputPages.Width;
+  InputForm.ClientHeight := InputForm.InputPages.Height;
+  InputForm.Position := poScreenCenter;
 
-  with GrafikForm do
-  begin
-    Hide;
-    Parent := nil;
-    BorderStyle := bsSizeable; //bsDialog;
-    ClientWidth := GrafikForm.ViewTab.Width;
-    ClientHeight := GrafikForm.ViewTab.Height;
-    Position := poScreenCenter;
-  end;
+  { OutputForm }
+
+  { Das WindowHandle von YComboBox wird zerstört, wenn ConsoleForm freigegeben
+    wird. Wenn OutputForm dann neu angezeigt wird ist YComboBox.ItemIndex = -1,
+    da ItemIndex der ComboBox von VCL nicht gesichert wird im Gegensatz zum
+    ItemIndex einer ListBox! YComboBox.ItemIndex wird außerdem als Index in
+    ein Array verwendet und dieser darf nicht Null sein. }
+  RiggModul.YComboSavedItemIndex := OutputForm.YComboBox.ItemIndex;
+  OutputForm.Hide;
+  OutputForm.Parent := nil;
+  OutputForm.BorderStyle := bsSizeable;
+  OutputForm.ClientWidth := OutputForm.OutputPages.Width;
+  OutputForm.ClientHeight := OutputForm.OutputPages.Height;
+  OutputForm.Position := poScreenCenter;
+
+  { GrafikForm }
+  GrafikForm.Hide;
+  GrafikForm.Parent := nil;
+  GrafikForm.BorderStyle := bsSizeable;
+  GrafikForm.ClientWidth := GrafikForm.ViewTab.Width;
+  GrafikForm.ClientHeight := GrafikForm.ViewTab.Height;
+  GrafikForm.Position := poScreenCenter;
+
   Action := caFree;
 end;
 
@@ -81,74 +78,50 @@ procedure TConsoleForm.FormCreate(Sender: TObject);
 var
   temp: Integer;
 begin
-  ConsoleForm := Self;
+  ConsoleForm := self;
 
   ClientWidth := 788;
   ClientHeight :=  470;
 
-  with GrafikForm do
-  begin
-    Hide;
-    BorderStyle := bsNone;
-    Parent := ConsoleForm;
-    Position := poDesigned;
-    { funktioniert nicht:
-      diffX := 293 - PaintBoxG.ClientWidth;
-      diffY := 422 - PaintBoxG.ClientHeight;
-      SetBounds(8, 8, ViewTab.Width + diffX, ViewTab.Height + diffY);
-      }
-    Left := 6;
-    Top := 8;
-    ClientWidth := 305;
-    ClientHeight := 457;
+  { GrafikForm }
 
-    Visible := True;
-  end;
+  GrafikForm.Hide;
+  GrafikForm.BorderStyle := bsNone;
+  GrafikForm.Parent := ConsoleForm;
+  GrafikForm.Position := poDesigned;
+  GrafikForm.Left := 6;
+  GrafikForm.Top := 8;
+  GrafikForm.ClientWidth := 305;
+  GrafikForm.ClientHeight := 457;
+  GrafikForm.Visible := True;
 
-  with InputForm do
-  begin
-    Hide;
-    BorderStyle := bsNone;
-    Parent := ConsoleForm;
-    Position := poDesigned;
-    { funktioniert nicht:
-      diffX := 457 - pnOhne.ClientWidth;
-      diffY := 164 - pnOhne.ClientHeight;
-      SetBounds(GrafikForm.Left + GrafikForm.Width + 12, 8,
-      InputPages.Width + diffX, InputPages.Height + diffY);
-      }
-    Left := 318;
-    Top := 8;
-    ClientHeight := 195;
-    ClientWidth := 465;
+  { InputForm }
 
-    Visible := True;
-  end;
+  InputForm.Hide;
+  InputForm.BorderStyle := bsNone;
+  InputForm.Parent := ConsoleForm;
+  InputForm.Position := poDesigned;
+  InputForm.Left := 318;
+  InputForm.Top := 8;
+  InputForm.ClientHeight := 195;
+  InputForm.ClientWidth := 465;
+  InputForm.Visible := True;
 
-  with OutputForm do
-  begin
-    temp := YComboBox.ItemIndex;
-    if temp = -1 then
-      temp := RiggModul.YComboSavedItemIndex;
-    Hide;
-    BorderStyle := bsNone;
-    Parent := ConsoleForm;
-    Position := poDesigned;
-    { funktioniert nicht:
-      diffX := 453 - SalingPaintBox.ClientWidth;
-      diffY := 220 - SalingPaintBox.ClientHeight;
-      SetBounds(InputForm.Left,
-      InputForm.Top + InputForm.Height + 12,
-      OutputPages.Width + diffX, OutputPages.Height + diffY);
-      }
-    Left := 318;
-    Top := 210;
-    ClientHeight := 255;
-    ClientWidth := 465;
+  { OutputForm}
 
-    YComboBox.ItemIndex := temp;
-    Visible := True;
-  end;
+  temp := OutputForm.YComboBox.ItemIndex;
+  if temp = -1 then
+    temp := RiggModul.YComboSavedItemIndex;
+  OutputForm.Hide;
+  OutputForm.BorderStyle := bsNone;
+  OutputForm.Parent := ConsoleForm;
+  OutputForm.Position := poDesigned;
+  OutputForm.Left := 318;
+  OutputForm.Top := 210;
+  OutputForm.ClientHeight := 255;
+  OutputForm.ClientWidth := 465;
+  OutputForm.YComboBox.ItemIndex := temp;
+  OutputForm.Visible := True;
 
   RiggModul.ConsoleActive := True;
 end;

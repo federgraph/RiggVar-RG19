@@ -3,17 +3,15 @@
 interface
 
 uses
-  Windows,
-  Messages,
-  SysUtils,
-  Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  ExtCtrls,
-  StdCtrls,
-  ComCtrls;
+  Winapi.Windows,
+  System.SysUtils,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.ExtCtrls,
+  Vcl.StdCtrls,
+  Vcl.ComCtrls;
 
 type
   TInputForm = class(TForm)
@@ -128,28 +126,45 @@ procedure TInputForm.rbWinkelClick(Sender: TObject);
 var
   SBName: TSBName;
 begin
-  if Sender = rbController then SBname := fpController
-  else if Sender = rbControllerD then SBname := fpController
-  else if Sender = rbControllerOhne then SBname := fpController
+  if Sender = rbController then
+    SBname := fpController
+  else if Sender = rbControllerD then
+    SBname := fpController
+  else if Sender = rbControllerOhne then
+    SBname := fpController
 
-  else if (Sender = rbWinkel) and RiggModul.WinkelBtnDown then SBname := fpWinkel
-  else if (Sender = rbWinkel) and not RiggModul.WinkelBtnDown then SBname := fpVorstag
-  else if Sender = rbVorstagD then SBname := fpVorstag
-  else if Sender = rbVorstagOhne then SBname := fpVorstag
-  else if Sender = rbVorstagOS then SBname := fpVorstagOS
+  else if (Sender = rbWinkel) and RiggModul.WinkelBtnDown then
+    SBname := fpWinkel
+  else if (Sender = rbWinkel) and not RiggModul.WinkelBtnDown then
+    SBname := fpVorstag
+  else if Sender = rbVorstagD then
+    SBname := fpVorstag
+  else if Sender = rbVorstagOhne then
+    SBname := fpVorstag
+  else if Sender = rbVorstagOS then
+    SBname := fpVorstagOS
 
-  else if Sender = rbWante then SBname := fpWante
-  else if Sender = rbWanteD then SBname := fpWante
-  else if Sender = rbWanteOhne then SBname := fpWante
+  else if Sender = rbWante then
+    SBname := fpWante
+  else if Sender = rbWanteD then
+    SBname := fpWante
+  else if Sender = rbWanteOhne then
+    SBname := fpWante
 
-  else if Sender = rbWoben then SBname := fpWoben
-  else if Sender = rbWobenD then SBname := fpWoben
+  else if Sender = rbWoben then
+    SBname := fpWoben
+  else if Sender = rbWobenD then
+    SBname := fpWoben
 
-  else if Sender = rbSalingH then SBname := fpSalingH
-  else if Sender = rbSalingA then SBname := fpSalingA
-  else if Sender = rbSalingLD then SBname := fpSalingL
+  else if Sender = rbSalingH then
+    SBname := fpSalingH
+  else if Sender = rbSalingA then
+    SBname := fpSalingA
+  else if Sender = rbSalingLD then
+    SBname := fpSalingL
 
-  else SBName := fpVorstag;
+  else
+    SBName := fpVorstag;
 
   RiggModul.SBName := SBName;
 end;
@@ -160,7 +175,8 @@ begin
   { dadurch wird TRadioButton.Click auch aufgerufen, wenn der
     RadioButton gechecked ist! }
   with Sender as TRadioButton do
-    if Checked then begin
+    if Checked then
+    begin
       Checked := False;
       Checked := True;
     end;

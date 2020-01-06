@@ -53,7 +53,7 @@ type
 
     BearbeitenMenu: TMenuItem;
     MemoryItem: TMenuItem;
-    MemoryRecallkItem: TMenuItem;
+    MemoryRecallItem: TMenuItem;
     RecalcItem: TMenuItem;
     ReglerItem: TMenuItem;
     BiegeNeigeItem: TMenuItem;

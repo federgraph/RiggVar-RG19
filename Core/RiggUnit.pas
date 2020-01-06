@@ -1708,8 +1708,14 @@ end;
 
 procedure TRiggModul.RotaFormItemClick;
 begin
+  if Application.Title = 'RG19B' then
+  begin
+
+  end;
+
   AniRotationForm := TAniRotationForm.Create(Application.MainForm);
   AniRotationForm.UpdateAll(Rigg);
+
   (*
   { dies wird durch AniRotationForm.UpdateAll(Rigg) ersetzt
     beachte, daß Draw nicht aufgerufen wird }
