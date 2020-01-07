@@ -2,8 +2,14 @@
 
 interface
 
-uses 
-  Windows, SysUtils, Classes, Graphics, Forms, Controls, Buttons, StdCtrls,
+uses
+  System.SysUtils,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Forms,
+  Vcl.Controls,
+  Vcl.Buttons,
+  Vcl.StdCtrls,
   RggTypes;
 
 type
@@ -54,14 +60,12 @@ begin
   try
     Mastfall := sbMastfall.Position;
     Biegung := sbBiegungS.Position;
-    with RiggModul.Rigg do
+    RiggModul.Rigg.BiegeUndNeigeF(Mastfall, Biegung);
+    RiggModul.Rigg.SchnittKraefte;
+    { Getriebe nicht neu berechnen,
+      damit die Einstellwerte nicht sofort gerundet werden. }
+    if RiggModul.Rigg.GetriebeOK then
     begin
-      BiegeUndNeigeF(Mastfall, Biegung);
-      SchnittKraefte;
-    end;
-    {Getriebe nicht neu berechnen, damit die Einstellwerte nicht sofort
-     gerundet werden.}
-    if RiggModul.Rigg.GetriebeOK then begin
       RiggModul.DoGraphics;
       RiggModul.UpdateRigg;
     end;

@@ -3,8 +3,15 @@
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, ExtCtrls,
+  Winapi.Windows,
+  System.SysUtils,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.StdCtrls,
+  Vcl.Buttons,
+  Vcl.ExtCtrls,
   RggTypes,
   FrmRegler;
 
@@ -59,32 +66,42 @@ end;
 
 procedure TCtrlDlg1.Draw(Sender: TObject);
 begin
-  if ChartValid then begin
+  if ChartValid then
+  begin
     LeftTitel := GetYText;
     BottomTitel := GetXText;
     GetData;
     GetXMinMax;
     GetYMinMax;
   end
-  else begin
+  else
+  begin
     TopTitel := '';
     LeftTitel := 'Funktionswerte';
     BottomTitel := 'Argumente';
     RightTitel := '';
-    Xmin := 0; Xmax := 100;
-    Ymin := 0; Ymax := 100;
+    Xmin := 0;
+    Xmax := 100;
+    Ymin := 0;
+    Ymax := 100;
     f := TestF;
   end;
 
   YGap := Round((Ymax-Ymin)/10)+1;
-  if YGap = 0 then YGap := 0.2;
+  if YGap = 0 then
+    YGap := 0.2;
   XGap := Round((Xmax-Xmin)/10)+1;
-  if XGap = 0 then XGap := 0.2;
-  if (Ymax-Ymin < 1) then begin
-    Ymin := Ymin-1; Ymax := Ymax+1;
+  if XGap = 0 then
+    XGap := 0.2;
+  if (Ymax-Ymin < 1) then
+  begin
+    Ymin := Ymin-1;
+    Ymax := Ymax+1;
   end;
-  if (Xmax-Xmin < 1) then begin
-    Xmin := Xmin-1; Ymax := Ymax+1;
+  if (Xmax-Xmin < 1) then
+  begin
+    Xmin := Xmin-1;
+    Ymax := Ymax+1;
   end;
 
   DrawToPaintBox(RegelPaintBox.Canvas, RegelPaintBox.BoundsRect);
@@ -102,37 +119,41 @@ begin
   ZoomY := 5;
 
   Bitmap := TBitmap.Create;
-  with Bitmap do begin
+  with Bitmap do
+  begin
     Width := Rect.Right - Rect.Left;
     Height := Rect.Bottom - Rect.Top;
   end;
   try
     PaintBackGround(Bitmap);
 
-    with Bitmap.Canvas do begin
+    with Bitmap.Canvas do
+    begin
       SetMapMode(Handle, MM_ANISOTROPIC);
       SetWindowExtEx(Handle, Round((Xmax-Xmin)*ZoomX), Round((Ymin-Ymax)*ZoomY), nil);
       SetWindowOrgEx(Handle, Round(Xmin*ZoomX), Round(Ymin*ZoomY), nil);
       SetViewPortExtEx(Handle, Bitmap.Width, Bitmap.Height, nil);
       SetViewPortOrgEx(Handle, 0, Bitmap.Height, nil);
 
-      {Kurve}
+      { Kurve }
       Pen.Color := clBlue;
       temp := (Xmin + (CLMax-2)/CLMax*(Xmax-Xmin));
       P.x := Round(temp*ZoomX);
       P.y := Round(f[CLMax-2]*ZoomY);
       MoveTo(P.x,P.y);
-      for i := CLMax-2 downto 6 do begin
+      for i := CLMax-2 downto 6 do
+      begin
         P.x := Round( ( Xmin + (Xmax-Xmin)*i/CLMax )*ZoomX );
-        if f[i] > 5000 then begin
-          f[i] := 5000; {Overflow verhindern: 5000 * ZoomY > 32000}
+        if f[i] > 5000 then
+        begin
+          f[i] := 5000; { Overflow verhindern: 5000 * ZoomY > 32000 }
           Pen.Color := clSilver;
         end;
         P.y := Round(f[i]*ZoomY);
         LineTo(P.x, P.y);
       end;
 
-      {Maßstab Kraft}
+      { Maßstab Kraft }
       temp1 := (Xmin + 3/CLMax*(Xmax-Xmin));
       temp2 := (Xmin + 6/CLMax*(Xmax-Xmin));
       Pen.Color := clBlack;
@@ -143,15 +164,15 @@ begin
       P.x := Round(temp1*ZoomX); P.y := Round(1500*ZoomY);
       MoveTo(P.x,P.y); P.x := Round(temp2*ZoomX); LineTo(P.x, P.y);
 
-      {Sollwert Kraft}
+      { Sollwert Kraft }
       Pen.Color := clRed;
       P.x := Round(Xmin*ZoomX);
       P.y := Round(sbSpannung.Position*ZoomY);
       MoveTo(P.x,P.y);
-      P.x := Round(Xmax*ZoomX); {P.y bleibt unverändert}
+      P.x := Round(Xmax*ZoomX); { P.y bleibt unverändert }
       LineTo(P.x, P.y);
 
-      {Istwert SalingH/SalingL - Scheibenwischer-Linie}
+      { Istwert SalingH/SalingL - Scheibenwischer-Linie }
       temp := RiggModul.Rigg.Antrieb;
       Pen.Color := clGreen;
       P.x := Round(temp*ZoomX);
@@ -161,7 +182,7 @@ begin
       P.y := Round(Ymax*ZoomY);
       LineTo(P.x, P.y);
 
-      {Y-Achse}
+      { Y-Achse }
       temp := (Xmin + 6/CLMax*(Xmax-Xmin));
       Pen.Color := clBlack;
       P.x := Round(temp*ZoomX);
@@ -171,7 +192,7 @@ begin
       P.y := Round(Ymax*ZoomY);
       LineTo(P.x, P.y);
 
-      {TrySalingH}
+      { TrySalingH }
       temp := RiggModul.Rigg.TrySalingH;
       Pen.Color := clRed;
       P.x := Round(temp*ZoomX);
@@ -182,7 +203,7 @@ begin
       LineTo(P.x, P.y);
 
       (*
-      {limitA}
+      { limitA }
       temp := RiggModul.Rigg.limitA;
       Pen.Color := clRed;
       P.x := Round(temp*ZoomX);
@@ -192,7 +213,7 @@ begin
       P.y := Round(Ymax*ZoomY);
       LineTo(P.x, P.y);
 
-      {limitB}
+      { limitB }
       temp := RiggModul.Rigg.limitB;
       Pen.Color := clRed;
       P.x := Round(temp*ZoomX);
@@ -204,7 +225,7 @@ begin
       *)
 
       (*
-      {aktueller Punkt}
+      { aktueller Punkt }
       R.Left := 0; R.Top := 0; R.Bottom := 5; R.Right := 5;
       DPTOLP(Handle, R, 2);
       RadiusX := R.Right-R.Left; RadiusY := R.Bottom-R.Top;
@@ -220,14 +241,15 @@ begin
       SetWindowOrgEx(Handle, 0, 0, nil);
       SetViewPortOrgEx(Handle, 0, 0, nil);
 
-      {Rahmen zeichnen}
+      { Rahmen zeichnen }
       Pen.Width := 1;
       Pen.Color := clBlack;
       Brush.Style := bsClear;
       Rectangle( 0, 0, Bitmap.Width, Bitmap.Height);
     end;
 
-    with Canvas do begin
+    with Canvas do
+    begin
       CopyMode := cmSrcCopy;
       Draw(0, 0, BitMap);
     end;
@@ -270,9 +292,12 @@ var
 begin
   Ymax := f[0];
   Ymin := Ymax;
-  for i := 0 to CLMax do begin
-    if f[i] > Ymax then Ymax := f[i];
-    if f[i] < Ymin then Ymin := f[i];
+  for i := 0 to CLMax do
+  begin
+    if f[i] > Ymax then
+      Ymax := f[i];
+    if f[i] < Ymin then
+      Ymin := f[i];
   end;
 end;
 
@@ -301,7 +326,8 @@ var
   R: TRect;
 begin
   R := Rect(0, 0, Image.Width, Image.Height);
-  with Image.Canvas do begin
+  with Image.Canvas do
+  begin
     Brush.Color := clWhite;
     FillRect(R);
   end;

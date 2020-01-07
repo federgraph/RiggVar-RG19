@@ -2,8 +2,15 @@
 
 interface
 
-uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls,
-  Buttons, ExtCtrls, Rggunit4;
+uses
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Forms,
+  Vcl.Controls,
+  Vcl.StdCtrls,
+  Vcl.Buttons,
+  Vcl.ExtCtrls,
+  Rggunit4;
 
 type
   TRiggDialog = class(TForm)
@@ -46,10 +53,13 @@ begin
     ctOhne: cbController.Checked := False;
   end;
 
-  if Rigg.SalingTyp = stFest then begin
+  if Rigg.SalingTyp = stFest then
+  begin
     cbWinkel.enabled := True;
     cbWinkel.Checked := Rigg.ManipulatorMode
-  end else begin
+  end
+  else
+  begin
     cbWinkel.Checked := Rigg.ManipulatorMode;
     cbWinkel.enabled := False;
   end;
@@ -57,24 +67,28 @@ end;
 
 procedure TRiggDialog.rgSalingTypClick(Sender: TObject);
 begin
-  //Winkel
-  if rgSalingTyp.ItemIndex <> 0 then begin
+  { Winkel }
+  if rgSalingTyp.ItemIndex <> 0 then
+  begin
     cbWinkel.enabled := False;
     cbWinkel.Checked := False;
-  end else
+  end
+  else
     cbWinkel.enabled := True;
 
-  //Controller
-  if rgSalingTyp.ItemIndex = 3 then begin
+  { Controller }
+  if rgSalingTyp.ItemIndex = 3 then
+  begin
     cbController.enabled := False;
     cbController.Checked := False;
-  end else
+  end
+  else
     cbController.enabled := True;
 end;
 
 procedure TRiggDialog.HelpBtnClick(Sender: TObject);
 begin
-  {Application.HelpContext(HelpContext);}
+  { Application.HelpContext(HelpContext); }
 end;
 
 procedure TRiggDialog.OKBtnClick(Sender: TObject);

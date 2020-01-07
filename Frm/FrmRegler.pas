@@ -3,13 +3,13 @@
 interface
 
 uses
-  Sysutils,
-  Classes,
-  Graphics,
-  Forms,
-  Controls,
-  Buttons,
-  StdCtrls,
+  System.Sysutils,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Forms,
+  Vcl.Controls,
+  Vcl.Buttons,
+  Vcl.StdCtrls,
   RggTypes;
 
 type
@@ -22,7 +22,7 @@ type
     lbBiegungS: TLabel;
     lbZaehler: TLabel;
     ZaehlerEdit: TEdit;
-    LoopBtn: TBitBtn; {startet die Regelung}
+    LoopBtn: TBitBtn; { startet die Regelung }
     OK: TBitBtn;
     procedure LoopBtnClick(Sender: TObject);
     procedure sbMastfallScroll(Sender: TObject; ScrollCode: TScrollCode;
@@ -77,7 +77,8 @@ begin
   Screen.Cursor := crHourGlass;
   try
     Zaehler := RiggModul.Rigg.Regeln(TrimmSoll);
-    if RiggModul.Rigg.GetriebeOK then begin
+    if RiggModul.Rigg.GetriebeOK then
+    begin
     { GCtrls werden nicht sofort aktualisiert. Deshalb sind die Einstellwerte
       für Mastfall und Biegung noch exakt. Die Wanten haben ungeradzahlige Längen.
       In UpdateRigg werden die Labels und die Graphic richtig aktualisiert.
@@ -94,8 +95,10 @@ begin
       RiggModul.UpdateGetriebe; *)
     end;
   finally
-    if Zaehler = 20 then ZaehlerEdit.Text := 'Max'
-    else ZaehlerEdit.Text := IntToStr(Zaehler);
+    if Zaehler = 20 then
+      ZaehlerEdit.Text := 'Max'
+    else
+      ZaehlerEdit.Text := IntToStr(Zaehler);
     Screen.Cursor := crDefault;
   end;
 end;

@@ -89,6 +89,7 @@ type
 
   TViewModelMainB = class(TViewModelMain00)
   public
+    constructor Create;
     procedure UpdateView; override;
   end;
 
@@ -97,6 +98,16 @@ implementation
 uses
   FrmRG19,
   FrmMain;
+
+function TViewModelMain00.GetOpenFileName(dn, fn: string): string;
+begin
+  result := FormMain.GetOpenFileName(dn, fn);
+end;
+
+function TViewModelMain00.GetSaveFileName(dn, fn: string): string;
+begin
+  result := FormMain.GetSaveFileName(dn, fn);
+end;
 
 procedure TViewModelMain00.FestItemClick;
 begin
@@ -118,16 +129,6 @@ begin
   KoppelKurveEnabled := True;
 end;
 
-function TViewModelMain00.GetOpenFileName(dn, fn: string): string;
-begin
-  result := FormMain.GetOpenFileName(dn, fn);
-end;
-
-function TViewModelMain00.GetSaveFileName(dn, fn: string): string;
-begin
-  result := FormMain.GetSaveFileName(dn, fn);
-end;
-
 procedure TViewModelMain00.DrehbarItemClick;
 begin
   WinkelDown := False;
@@ -143,6 +144,30 @@ begin
   BiegeNeigeItemEnabled := True;
   ReglerItemEnabled := True;
   ReglerBtnEnabled := True;
+
+  QuerKraftItemEnabled := True;
+  KnickenItemEnabled := True;
+  KraftGemessenItemEnabled := True;
+  KorrigiertItemEnabled := True;
+
+  KoppelKurveEnabled := False;
+end;
+
+procedure TViewModelMain00.OhneItemClick;
+begin
+  WinkelDown := False;
+
+  FestItemChecked := False;
+  DrehbarItemChecked := False;
+  OhneItemChecked := True;
+  OSDlgItemChecked := False;
+
+  WinkelDown := False;
+  WinkelEnabled := False;
+
+  BiegeNeigeItemEnabled := False;
+  ReglerItemEnabled := False;
+  ReglerBtnEnabled := False;
 
   QuerKraftItemEnabled := True;
   KnickenItemEnabled := True;
@@ -174,30 +199,6 @@ begin
   KnickenItemEnabled := False;
   KraftGemessenItemEnabled := False;
   KorrigiertItemEnabled := False;
-end;
-
-procedure TViewModelMain00.OhneItemClick;
-begin
-  WinkelDown := False;
-
-  FestItemChecked := False;
-  DrehbarItemChecked := False;
-  OhneItemChecked := True;
-  OSDlgItemChecked := False;
-
-  WinkelDown := False;
-  WinkelEnabled := False;
-
-  BiegeNeigeItemEnabled := False;
-  ReglerItemEnabled := False;
-  ReglerBtnEnabled := False;
-
-  QuerKraftItemEnabled := True;
-  KnickenItemEnabled := True;
-  KraftGemessenItemEnabled := True;
-  KorrigiertItemEnabled := True;
-
-  KoppelKurveEnabled := False;
 end;
 
 procedure TViewModelMain00.KnickenItemClick(ct: TCalcTyp);
@@ -243,9 +244,13 @@ begin
   ConsoleItemCaption := 'Console schlieﬂen';
   ConsoleItemHint := '  Anordnung der Dialoge aufheben';
 
-  InputFormItemEnabled := True;
-  OutputFormItemEnabled := True;
-  GrafikFormItemEnabled := True;
+  InputFormItemEnabled := False;
+  OutputFormItemEnabled := False;
+  GrafikFormItemEnabled := False;
+
+  InputFormItemChecked := True;
+  OutputFormItemChecked := True;
+  GrafikFormItemChecked := True;
 
   UpdateView;
 end;
@@ -255,13 +260,13 @@ begin
   ConsoleItemCaption := 'Console ...';
   ConsoleItemHint := '  Dialoge im Formular anordnen';
 
+  InputFormItemEnabled := True;
+  OutputFormItemEnabled := True;
+  GrafikFormItemEnabled := True;
+
   InputFormItemChecked := False;
   OutputFormItemChecked := False;
   GrafikFormItemChecked := False;
-
-  InputFormItemEnabled := False;
-  OutputFormItemEnabled := False;
-  GrafikFormItemEnabled := False;
 
   UpdateView;
 end;
@@ -272,8 +277,13 @@ begin
   ChartFormItemHint := '  Diagramm aktivieren';
   if FormMain <> nil then
   begin
-    FormMain.ChartFormItem.Caption := 'Diagramm ...';
-    FormMain.ChartFormItem.Hint := '  Diagramm aktivieren';
+    FormMain.ChartFormItem.Caption := ChartFormItemCaption;
+    FormMain.ChartFormItem.Hint := ChartFormItemHint;
+  end
+  else if FormRG19 <> nil then
+  begin
+    FormRG19.ChartFormItem.Caption := ChartFormItemCaption;
+    FormRG19.ChartFormItem.Hint := ChartFormItemHint;
   end;
 end;
 
@@ -285,6 +295,11 @@ begin
   begin
     FormMain.ReportFormItem.Caption := 'Report ...';
     FormMain.ReportFormItem.Hint := '  Report anzeigen';
+  end
+  else if FormRG19 <> nil then
+  begin
+    FormRG19.ReportFormItem.Caption := ReportFormItemCaption;
+    FormRG19.ReportFormItem.Hint := ReportFormItemHint;
   end;
 end;
 
@@ -294,8 +309,13 @@ begin
   RotaFormItemHint := '  3D Grafik anzeigen';
   if FormMain <> nil then
   begin
-    FormMain.RotaFormItem.Caption := '3D Grafik ...';
-    FormMain.RotaFormItem.Hint := '  3D Grafik anzeigen';
+    FormMain.RotaFormItem.Caption := RotaFormItemCaption;
+    FormMain.RotaFormItem.Hint := RotaFormItemHint;
+  end
+  else if FormRG19 <> nil then
+  begin
+    FormRG19.RotaFormItem.Caption := RotaFormItemCaption;
+    FormRG19.RotaFormItem.Hint := RotaFormItemHint;
   end;
 end;
 
@@ -343,10 +363,6 @@ begin
   FormMain.VonObenItem.Checked := VonObenItemChecked;
   FormMain.Von3DItem.Checked := Von3DItemChecked;
 
-  FormMain.GrafikFormItem.Checked := GrafikFormItemChecked;
-  FormMain.OutputFormItem.Checked := OutputFormItemChecked;
-  FormMain.InputFormItem.Checked := InputFormItemChecked;
-
   FormMain.InputFormItem.Checked := InputFormItemChecked;
   FormMain.OutputFormItem.Checked := OutputFormItemChecked;
   FormMain.GrafikFormItem.Checked := GrafikFormItemChecked;
@@ -360,6 +376,17 @@ begin
 end;
 
 { TViewModelMainB }
+
+constructor TViewModelMainB.Create;
+begin
+  InputFormItemEnabled := True;
+  OutputFormItemEnabled := True;
+  GrafikFormItemEnabled := True;
+
+  InputFormItemChecked := False;
+  OutputFormItemChecked := False;
+  GrafikFormItemChecked := False;
+end;
 
 procedure TViewModelMainB.UpdateView;
 begin
@@ -403,10 +430,6 @@ begin
   FormRG19.VonObenItem.Checked := VonObenItemChecked;
   FormRG19.Von3DItem.Checked := Von3DItemChecked;
 
-  FormRG19.GrafikFormItem.Checked := GrafikFormItemChecked;
-  FormRG19.OutputFormItem.Checked := OutputFormItemChecked;
-  FormRG19.InputFormItem.Checked := InputFormItemChecked;
-
   FormRG19.InputFormItem.Checked := InputFormItemChecked;
   FormRG19.OutputFormItem.Checked := OutputFormItemChecked;
   FormRG19.GrafikFormItem.Checked := GrafikFormItemChecked;
@@ -417,6 +440,8 @@ begin
 
 //  FormRG19.ConsoleItem.Caption := ConsoleItemCaption;
   FormRG19.ConsoleItem.Hint := ConsoleItemHint;
+
+
 end;
 
 end.

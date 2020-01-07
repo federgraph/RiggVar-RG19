@@ -3,17 +3,15 @@
 interface
 
 uses
-  Windows,
-  Messages,
-  SysUtils,
-  Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  ExtCtrls,
-  StdCtrls,
-  Buttons;
+  System.SysUtils,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.StdCtrls,
+  Vcl.Buttons;
 
 type
   TPreviewGForm = class(TForm)
@@ -48,22 +46,23 @@ end;
 procedure TPreviewGForm.PrintBtnClick(Sender: TObject);
 begin
   case rgMediaChoice.ItemIndex of
-    {Drucker}
+    { Drucker }
     0: RiggModul.PrintPaintBoxG;
 
-    {Datei}
+    { Datei }
     1: if SaveDlg.Execute then
       RiggModul.MetaFileG.SaveToFile(SaveDlg.FileName);
 
       (* if RiggModul.PaintBtnDown then
            RiggModul.MetaFileG.SaveToFile(SaveDlg.FileName)
-         else begin
+         else
+         begin
            RiggForm.PaintBtnClick(nil);
            RiggModul.MetaFileG.SaveToFile(SaveDlg.FileName);
            RiggForm.PaintBtnClick(nil);
          end; *)
 
-    {Zwischenablage}
+    { Zwischenablage }
     2: RiggModul.CopyMetaFileG;
 
   end;

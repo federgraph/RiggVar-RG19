@@ -13,12 +13,10 @@ type
     lbAchseX: TLabel;
     lbXRight: TLabel;
     ChartPaintBox: TPaintBox;
-    RectangleItem: TMenuItem;
     PaintBoxLegend: TPaintBox;
     ChartBevelOuter: TBevel;
     ChartBevelInner: TBevel;
     lbParam: TLabel;
-    N4: TMenuItem;
     procedure FormPaint(Sender: TObject);
     procedure RectangleItemClick(Sender: TObject);
     procedure ChartPaintBoxPaint(Sender: TObject);
@@ -31,6 +29,11 @@ type
     procedure DoLegend; override;
     procedure DrawLegend(Canvas: TCanvas; Rect: TRect);
     procedure DrawLabels;
+  protected
+    WantRectangles: Boolean;
+    RectangleItem: TMenuItem;
+    N4: TMenuItem;
+    procedure InitMenu; override;
   end;
 
 var
@@ -59,10 +62,11 @@ begin
   end;
 end;
 
-procedure TChartFormGS.DoLegend; { überschriebene virtuelle Methode }
+procedure TChartFormGS.DoLegend;
 var
   R: TRect;
 begin
+  { überschriebene virtuelle Methode }
   inherited;
   if Legend then DrawLegend(PaintBoxLegend.Canvas, PaintBoxLegend.BoundsRect)
   else
@@ -73,8 +77,9 @@ begin
     end;
 end;
 
-procedure TChartFormGS.DrawToChart; { überschriebene virtuelle Methode }
+procedure TChartFormGS.DrawToChart;
 begin
+ { überschriebene virtuelle Methode }
   DrawChartPaintBox(ChartPaintBox.Canvas, ChartPaintBox.BoundsRect);
 end;
 
@@ -90,19 +95,19 @@ begin
   end;
   try
     PaintBackGround(Bitmap);
-    with Bitmap.Canvas do begin
+    with Bitmap.Canvas do
+    begin
       PosX := 0;
       PosY := 0;
       for p := 0 to ParamCount-1 do
       begin
-        {Bullet}
-        Pen.Color := clBlack; {clBlue}
+        { Bullet }
+        Pen.Color := clBlack; { clBlue }
         Brush.Color := cf[p];
         Brush.Style := bsSolid;
         PosY := PosY + 30;
-        Rectangle( PosX, PosY,
-                   PosX + 10, PosY + 5);
-        {Text}
+        Rectangle( PosX, PosY, PosX + 10, PosY + 5);
+        { Text }
         Brush.Style := bsClear;
         PosY := PosY + 10;
         if Valid then
@@ -111,15 +116,16 @@ begin
           TextOut(PosX, PosY, PColorText[p]);
       end;
       (*
-      {Rahmen zeichnen}
+      { Rahmen zeichnen }
       Pen.Width := 1;
       Pen.Color := clBlack;
       Brush.Style := bsClear;
       Rectangle( 0, 0, Bitmap.Width, Bitmap.Height);
       *)
-    end; {with Bitmap.Canvas do begin}
+    end;
 
-    with Canvas do begin
+    with Canvas do
+    begin
       CopyMode := cmSrcCopy;
       Draw(0, 0, BitMap);
     end;
@@ -132,8 +138,10 @@ procedure TChartFormGS.DrawChartPaintBox(Canvas: TCanvas; Rect: TRect);
 
   function Limit(a: double): double;
   begin
-    if a < -32000 then a := -32000
-    else if a > 32000 then a := 32000;
+    if a < -32000 then
+      a := -32000
+    else if a > 32000 then
+      a := 32000;
     Result := a;
   end;
 
@@ -147,7 +155,8 @@ var
   PlotOrgX, PlotOrgY: Integer;
   tempX, tempY: double;
 begin
-  DrawLabels; { schnelle direkte Textausgabe für oft veränderte Labels }
+  { schnelle direkte Textausgabe für oft veränderte Labels }
+  DrawLabels;
 
   { diese Labels sind nicht zeitkritisch }
   lbAchseX.Caption := BottomTitel;
@@ -163,21 +172,23 @@ begin
   PlotOrgY := 0;
 
   Bitmap := TBitmap.Create;
-  with Bitmap do begin
+  with Bitmap do
+  begin
     Width := PlotWidth;
     Height := PlotHeight;
   end;
   try
     PaintBackGround(Bitmap);
 
-    with Bitmap.Canvas do begin
+    with Bitmap.Canvas do
+    begin
       SetMapMode(Handle, MM_ANISOTROPIC);
       SetWindowExtEx(Handle, PlotExtX, -PlotExtY, nil);
       SetWindowOrgEx(Handle, PlotOrgX, PlotOrgY, nil);
       SetViewPortExtEx(Handle, PlotWidth, PlotHeight, nil);
       SetViewPortOrgEx(Handle, 0, PlotHeight, nil);
 
-      {Radius}
+      { Radius }
       R.Left := 0; R.Top := 0; R.Bottom := 3; R.Right := 3;
       DPTOLP(Handle, R, 2);
       RadiusX := R.Right-R.Left; RadiusY := R.Bottom-R.Top;
@@ -185,12 +196,13 @@ begin
       for p := 0 to ParamCount-1 do
       begin
 
-        {Kurve}
+        { Kurve }
         Pen.Color := cf[p];
         tempY := PlotExtY * (bf[p,0]-Ymin)/(Ymax-Ymin);
         Pt.y := Round(Limit(tempY));
         MoveTo(0,Pt.y);
-        for i := 1 to 100 do begin
+        for i := 1 to 100 do
+        begin
           tempX := PlotExtX * (i/100);
           tempY := PlotExtY * (bf[p,i]-Ymin)/(Ymax-Ymin);
           Pt.x := Round(Limit(tempX));
@@ -198,9 +210,10 @@ begin
           LineTo(Pt.x, Pt.y);
         end;
 
-        if RectangleItem.Checked then begin
-          {Rechtecke}
-          Pen.Color := clBlack; {clBlue}
+        if WantRectangles then
+        begin
+          { Rechtecke }
+          Pen.Color := clBlack;
           Brush.Color := cf[p];
           Brush.Style := bsSolid;
           for i := 0 to 100 do begin
@@ -213,7 +226,7 @@ begin
           end;
         end;
 
-      end; {p-Schleife}
+      end;
 
       SetMapMode(Handle, MM_TEXT);
       SetWindowOrgEx(Handle, 0, 0, nil);
@@ -226,9 +239,10 @@ begin
       Brush.Style := bsClear;
       Rectangle( 0, 0, Bitmap.Width, Bitmap.Height);
       *)
-    end; {with Bitmap.Canvas do begin}
+    end;
 
-    with Canvas do begin
+    with Canvas do
+    begin
       CopyMode := cmSrcCopy;
       Draw(0, 0, BitMap);
     end;
@@ -244,7 +258,8 @@ var
   R: TRect;
   S: String;
 begin
-  with Canvas do begin
+  with Canvas do
+  begin
     Brush.Style := bsSolid;
     Brush.Color := ClBtnFace;
     PosX := ChartPaintBox.Left - 55;
@@ -272,14 +287,16 @@ end;
 procedure TChartFormGS.FormPaint(Sender: TObject);
 begin
   inherited;
-  DrawLabels; { direkt auf den Canvas des Formulars zeichnen }
+  { direkt auf den Canvas des Formulars zeichnen }
+  DrawLabels;
 end;
 
 procedure TChartFormGS.ChartPaintBoxPaint(Sender: TObject);
 var
   tempParamCount: Integer;
 begin
-  if ShowGroup then begin
+  if ShowGroup then
+  begin
     tempParamCount := ParamCount;
     ParamCount := GroupKurvenzahl;
     DrawToChart;
@@ -294,7 +311,8 @@ var
   tempParamCount: Integer;
   tempPText: TYAchseStringArray;
 begin
-  if ShowGroup then begin
+  if ShowGroup then
+  begin
     tempParamCount := ParamCount;
     tempPText := PText;
     ParamCount := GroupKurvenzahl;
@@ -309,8 +327,111 @@ end;
 
 procedure TChartFormGS.RectangleItemClick(Sender: TObject);
 begin
-  RectangleItem.Checked := not RectangleItem.Checked;
-  if ShowGroup then ShowTogetherBtnClick(Self) else Draw;
+  WantRectangles := not WantRectangles;
+  RectangleItem.Checked := WantRectangles;
+  if ShowGroup then
+    ShowTogetherBtnClick(Self)
+  else
+    Draw;
+end;
+
+procedure TChartFormGS.InitMenu;
+var
+  p: TMenuItem;
+  mi: TMenuItem;
+
+  function AddP(AName: string): TMenuItem;
+  begin
+    mi := TMenuItem.Create(MainMenu);
+    mi.Name := AName;
+    p := mi;
+    MainMenu.Items.Add(p);
+    result := mi;
+  end;
+
+  function AddI(AName: string): TMenuItem;
+  begin
+    mi := TMenuItem.Create(MainMenu);
+    mi.Name := AName;
+    p.Add(mi);
+    result := mi;
+  end;
+
+begin
+  inherited;
+
+  p := ChartMenu;
+
+  N4 := AddI('N4');
+  mi.Caption := '-';
+  mi.GroupIndex := 3;
+
+  RectangleItem := AddI('RectangleItem');
+  mi.Caption := 'Rechtecke';
+  mi.Checked := True;
+  mi.GroupIndex := 3;
+  mi.Hint := '  Rechtecke anzeigen';
+  mi.OnClick := RectangleItemClick;
+
+{
+  inherited MainMenu: TMainMenu
+    Left = 168
+    Top = 200
+    inherited ChartMenu: TMenuItem
+      inherited UpdateChartItem: TMenuItem
+        GroupIndex = 3
+        Hint = '  Aktuelle Werte von Rigg einlesen'
+      end
+      inherited UpdateRiggItem: TMenuItem
+        GroupIndex = 3
+        Hint = '  Erzeugungsdaten zur'#252'ckschreiben'
+      end
+      inherited N1: TMenuItem
+        GroupIndex = 3
+      end
+      inherited APItem: TMenuItem
+        GroupIndex = 3
+      end
+      inherited BereichItem: TMenuItem
+        GroupIndex = 3
+      end
+      inherited N2: TMenuItem
+        GroupIndex = 3
+      end
+      inherited AuswahlItem: TMenuItem
+        GroupIndex = 3
+      end
+      inherited MemoItem: TMenuItem
+        GroupIndex = 3
+        Hint = '  Einstellungen f'#252'r das gezeigte Diagramm'
+      end
+      inherited TogetherItem: TMenuItem
+        GroupIndex = 3
+      end
+      inherited N3: TMenuItem
+        GroupIndex = 3
+      end
+      inherited OpenItem: TMenuItem
+        GroupIndex = 3
+        Hint = '  Diagramm '#246'ffnen'
+      end
+      inherited SaveItem: TMenuItem
+        GroupIndex = 3
+      end
+      object N4: TMenuItem
+        Caption = '-'
+        GroupIndex = 3
+      end
+      object RectangleItem: TMenuItem
+        Caption = 'Rechtecke'
+        Checked = True
+        GroupIndex = 3
+        Hint = '  Rechtecke anzeigen'
+        OnClick = RectangleItemClick
+      end
+    end
+  end
+}
 end;
 
 end.

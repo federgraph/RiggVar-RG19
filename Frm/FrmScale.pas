@@ -2,8 +2,16 @@
 
 interface
 
-uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls, 
-  Buttons, ExtCtrls, Mask;
+uses
+  System.SysUtils,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Forms,
+  Vcl.Controls,
+  Vcl.StdCtrls,
+  Vcl.Buttons,
+  ExtCtrls,
+  Vcl.Mask;
 
 type
   TRumpfFaktorDlg = class(TForm)

@@ -1,9 +1,11 @@
 inherited ChartFormGS: TChartFormGS
   Left = 51
+  Width = 838
   HorzScrollBar.Range = 795
   VertScrollBar.Range = 469
   Position = poScreenCenter
   OnPaint = FormPaint
+  ExplicitWidth = 838
   PixelsPerInch = 96
   TextHeight = 13
   object ChartBevelOuter: TBevel [0]
@@ -66,63 +68,6 @@ inherited ChartFormGS: TChartFormGS
   inherited BedienPanel: TPanel
     inherited PEdit: TEdit
       Hint = 'Min/Max (Y-Achse) f'#252'r diese Kurve anzeigen|'
-    end
-  end
-  inherited MainMenu: TMainMenu
-    Left = 168
-    Top = 200
-    inherited ChartMenu: TMenuItem
-      inherited UpdateChartItem: TMenuItem
-        GroupIndex = 3
-        Hint = '  Aktuelle Werte von Rigg einlesen'
-      end
-      inherited UpdateRiggItem: TMenuItem
-        GroupIndex = 3
-        Hint = '  Erzeugungsdaten zur'#252'ckschreiben'
-      end
-      inherited N1: TMenuItem
-        GroupIndex = 3
-      end
-      inherited APItem: TMenuItem
-        GroupIndex = 3
-      end
-      inherited BereichItem: TMenuItem
-        GroupIndex = 3
-      end
-      inherited N2: TMenuItem
-        GroupIndex = 3
-      end
-      inherited AuswahlItem: TMenuItem
-        GroupIndex = 3
-      end
-      inherited MemoItem: TMenuItem
-        GroupIndex = 3
-        Hint = '  Einstellungen f'#252'r das gezeigte Diagramm'
-      end
-      inherited TogetherItem: TMenuItem
-        GroupIndex = 3
-      end
-      inherited N3: TMenuItem
-        GroupIndex = 3
-      end
-      inherited OpenItem: TMenuItem
-        GroupIndex = 3
-        Hint = '  Diagramm '#246'ffnen'
-      end
-      inherited SaveItem: TMenuItem
-        GroupIndex = 3
-      end
-      object N4: TMenuItem
-        Caption = '-'
-        GroupIndex = 3
-      end
-      object RectangleItem: TMenuItem
-        Caption = 'Rechtecke'
-        Checked = True
-        GroupIndex = 3
-        Hint = '  Rechtecke anzeigen'
-        OnClick = RectangleItemClick
-      end
     end
   end
   inherited OpenDialog: TOpenDialog

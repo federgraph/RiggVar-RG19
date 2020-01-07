@@ -3,16 +3,15 @@
 interface
 
 uses
-  Windows,
-  Messages,
-  SysUtils,
-  Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  StdCtrls,
-  ExtCtrls;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.StdCtrls,
+  Vcl.ExtCtrls;
 
 const
   SFormatError = 'Syntaxfehler'; { Format Error }
@@ -39,8 +38,7 @@ type
     BufferName: String;
     BufferValue: String;
     function ProcessInput: String;
-    procedure wmGetMinMaxInfo(var Msg: TMessage);
-    message wm_GetMinMaxInfo;
+    procedure wmGetMinMaxInfo(var Msg: TMessage); message wm_GetMinMaxInfo;
   end;
 
 var
@@ -127,7 +125,7 @@ var
 begin
   result := SFormatError;
 
-  // *** Test auf Eingabe ohne '=' (Anfrage)
+  { Test auf Eingabe ohne '=' (Anfrage) }
   Param := AniRotationForm.Text2Param(Buffer); // Default: WPowerOS
   if Param <> fpWPowerOS then
   begin
@@ -140,11 +138,11 @@ begin
     Exit;
   end;
 
-  // *** Test auf korrekte Eingabe mit '='
+  { Test auf korrekte Eingabe mit '=' }
   Param := AniRotationForm.Text2Param(BufferName); // Default: WPowerOS
   if Param <> fpWPowerOS then
   begin
-    // *** Anfrage mit '='
+    { Anfrage mit '=' }
     if BufferValue = '?' then
     begin
       if Param = fpWinkel then
@@ -158,29 +156,29 @@ begin
       Exit;
     end;
 
-    // *** Werteingabe
+    { Werteingabe }
     Val(BufferValue, temp, Code);
-    // Falscher Wert
+    { Falscher Wert }
     if Code <> 0 then
     begin
       result := SValueError;
       Exit;
     end;
-    // Falscher Parameter. Zuweisen an den Parameter nicht erlaubt
+    { Falscher Parameter. Zuweisen an den Parameter nicht erlaubt }
     if AniRotationForm.ListBox.Items.IndexOf(AniRotationForm.Param2Text(Param))
       = -1 then
     begin
       result := SParamError;
       Exit;
     end;
-    // Versuch der Zuweisung
+    { Versuch der Zuweisung }
     AniRotationForm.ParamProp[Param] := temp;
     if temp <> AniRotationForm.ParamProp[Param] then
     begin
       result := SRangeError;
       Exit;
     end;
-    // nach erfogreicher Wertveränderung GUI aktualisieren
+    { nach erfogreicher Wertveränderung GUI aktualisieren }
     if Param = fpWinkel then
     begin
       result := Format('%s = %6.2f E-1Grad', [BufferName,

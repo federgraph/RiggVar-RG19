@@ -52,22 +52,6 @@ type
   TChartForm = class(TForm)
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
-    {Menu}
-    MainMenu: TMainMenu;
-    ChartMenu: TMenuItem;
-    BerechnenItem: TMenuItem;
-    AuswahlItem: TMenuItem;
-    ResetItem: TMenuItem;
-    APItem: TMenuItem;
-    BereichItem: TMenuItem;
-    N2: TMenuItem;
-    OpenItem: TMenuItem;
-    SaveItem: TMenuItem;
-    MemoItem: TMenuItem;
-    TogetherItem: TMenuItem;
-    UpdateRiggItem: TMenuItem;
-    UpdateChartItem: TMenuItem;
-    N3: TMenuItem;
     {Panel AlignTop}
     BedienPanel: TPanel;
     {Y}
@@ -115,7 +99,6 @@ type
     PMaxLabel: TLabel;
     PLED: TShape;
     PBevel: TBevel;
-    {neu}
     procedure FormCreate(Sender: TObject);
     procedure YAuswahlClick(Sender: TObject);
     procedure YComboBoxChange(Sender: TObject);
@@ -144,22 +127,21 @@ type
     procedure UpdateRiggItemClick(Sender: TObject);
     procedure KurvenZahlSpinnerChanging(Sender: TObject; var AllowChange: Boolean);
   private
-    { Private-Deklarationen }
     FBuissy: Boolean;
     FStatus: Set of TChartStatus;
     FValid: Boolean;
     FLegend: Boolean;
     FShowTogether: Boolean;
     FSalingTyp: TSalingTyp;
-    {FControllerTyp: TControllerTyp;}
-    {FCalcTyp: TCalcTyp;}
+    { FControllerTyp: TControllerTyp; }
+    { FCalcTyp: TCalcTyp; }
     FXTextClicked, FPTextClicked: string;
     procedure GetMemoText;
     function GetYText(Text: string): string;
     function GetTsbName(Text: string): TxpName;
     procedure SetSalingTyp(Value: TSalingTyp);
-    {procedure SetControllerTyp(Value: TSalingTyp);}
-    {procedure SetCalcTyp(Value: TSalingTyp);}
+    { procedure SetControllerTyp(Value: TSalingTyp); }
+    { procedure SetCalcTyp(Value: TSalingTyp); }
     function ValidateInput(Input: TMaskEdit): Boolean;
     procedure TakeOver;
   protected
@@ -214,11 +196,29 @@ type
     procedure Reset;
 
     property SalingTyp: TSalingTyp read FSalingTyp write SetSalingTyp;
-    {property ControllerTyp: TControllerTyp read FControllerTyp write SetControllerTyp;}
-    {property CalcTyp: TCalcTyp read FCalcTyp write SetCalcTyp;}
+    { property ControllerTyp: TControllerTyp read FControllerTyp write SetControllerTyp; }
+    { property CalcTyp: TCalcTyp read FCalcTyp write SetCalcTyp; }
     property Legend: Boolean read FLegend;
     property Valid: Boolean read FValid write FValid;
     property ShowGroup: Boolean read FShowTogether;
+  protected
+    MainMenu: TMainMenu;
+    ChartMenu: TMenuItem;
+    BerechnenItem: TMenuItem;
+    AuswahlItem: TMenuItem;
+    ResetItem: TMenuItem;
+    APItem: TMenuItem;
+    BereichItem: TMenuItem;
+    OpenItem: TMenuItem;
+    SaveItem: TMenuItem;
+    MemoItem: TMenuItem;
+    TogetherItem: TMenuItem;
+    UpdateRiggItem: TMenuItem;
+    UpdateChartItem: TMenuItem;
+    N1: TMenuItem;
+    N2: TMenuItem;
+    N3: TMenuItem;
+    procedure InitMenu; virtual;
   end;
 
 var
@@ -241,7 +241,7 @@ procedure TChartForm.FormCreate(Sender: TObject);
 begin
   HorzScrollBar.Position := 0;
 
-  ChartForm := Self; {wird schon in AchsForm.Create benötigt}
+  ChartForm := Self; { wird schon in AchsForm.Create benötigt }
   ProgressDlg := TProgressDlg.Create(Self);
   ProgressDlg.OnStart := Calc;
   RggDocument := TRggDocument.Create;
@@ -285,7 +285,13 @@ begin
 
   YComboBox.Items.Assign(YAuswahlDlg.DstList.Items);
   YComboBox.ItemIndex := 1;
-  UpdateYAchseList; {ComboIndex festlegen in YAchseRecordList}
+  UpdateYAchseList; { ComboIndex festlegen in YAchseRecordList }
+
+  if Application.Title = 'RG19A' then
+  begin
+    FormStyle := fsMDIChild;
+    InitMenu;
+  end;
 
   StraightLine;
   Draw;
@@ -2020,6 +2026,103 @@ begin
     RiggModul.Neu(RggDocument);
     RiggModul.ViewModelMain.Caption := 'Rigg';
   end;
+end;
+
+procedure TChartForm.InitMenu;
+var
+  p: TMenuItem;
+  mi: TMenuItem;
+
+  function AddP(AName: string): TMenuItem;
+  begin
+    mi := TMenuItem.Create(MainMenu);
+    mi.Name := AName;
+    p := mi;
+    MainMenu.Items.Add(p);
+    result := mi;
+  end;
+
+  function AddI(AName: string): TMenuItem;
+  begin
+    mi := TMenuItem.Create(MainMenu);
+    mi.Name := AName;
+    p.Add(mi);
+    result := mi;
+  end;
+
+begin
+  MainMenu := TMainMenu.Create(Self);
+
+  ChartMenu := AddP('ChartMenu');
+  mi.Caption := 'Diagram&m';
+  mi.GroupIndex := 8;
+  mi.Hint := '  Diagramm Optionen';
+  mi.OnClick := ChartMenuClick;
+
+  BerechnenItem := AddI('BerechnenItem');
+  mi.Caption := '&Berechnen...';
+  mi.Hint := '  Berechnung starten';
+  mi.OnClick := CalcItemClick;
+
+  ResetItem := AddI('ResetItem');
+  mi.Caption := '&Zurücksetzen';
+  mi.Hint := '  Diagramm für Neuberechnung freigeben (nach Fehler)';
+  mi.OnClick := BuissyItemClick;
+
+  UpdateChartItem := AddI('UpdateChartItem');
+  mi.Caption := 'Diagramm aktualisieren';
+  mi.Hint := '  Istwerte neu einlesen';
+  mi.OnClick := UpdateChartItemClick;
+
+  UpdateRiggItem := AddI('UpdateRiggItem');
+  mi.Caption := 'Rigg aktualisieren';
+  mi.Hint := 'Erzeugungsdaten zurückschreiben';
+  mi.OnClick := UpdateRiggItemClick;
+
+  N1 := AddI('N1');
+  mi.Caption := '-';
+
+  APItem := AddI('APItem');
+  mi.Caption := 'Arbeits&punkt';
+  mi.Checked := True;
+  mi.Hint := '  automatische X - Werte: Arbeitspunkt +/- 30';
+  mi.OnClick := APItemClick;
+
+  BereichItem := AddI('BereichItem');
+  mi.Caption := 'Be&reich';
+  mi.Hint := '  automatische X - Werte: gesamter Bereich';
+  mi.OnClick := BereichItemClick;
+
+  N2 := AddI('N2');
+  mi.Caption := '-';
+
+  AuswahlItem := AddI('AuswahlItem');
+  mi.Caption := '&Auswahl Y ...';
+  mi.Hint := '  Auswahl der Größen für die Y-Achse';
+  mi.OnClick := YAuswahlClick;
+
+  MemoItem := AddI('MemoItem');
+  mi.Caption := 'Erzeugungsdaten...';
+  mi.Hint := '  Erzeugungsdaten anzeigen';
+  mi.OnClick := MemoItemClick;
+
+  TogetherItem := AddI('TogetherItem');
+  mi.Caption := '&Gruppiert anzeigen';
+  mi.Hint := '  Kurven in einem Diagramm anzeigen';
+  mi.OnClick := ShowTogetherBtnClick;
+
+  N3 := AddI('N3');
+  mi.Caption := '-';
+
+  OpenItem := AddI('OpenItem');
+  mi.Caption := '&Öffnen...';
+  mi.Hint := '  gespeichertes Diagramm laden';
+  mi.OnClick := OpenItemClick;
+
+  SaveItem := AddI('SaveItem');
+  mi.Caption := '&Speichern...';
+  mi.Hint := '  Diagramm speichern';
+  mi.OnClick := SaveItemClick;
 end;
 
 end.

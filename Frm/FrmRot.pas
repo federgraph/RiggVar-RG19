@@ -578,7 +578,7 @@ begin
     Step5Item.ShortCut := ShortCut(Word('5'), [ssAlt]);
     Step10Item.ShortCut := ShortCut(Word('1'), [ssAlt, ssCtrl]);
     Step30Item.ShortCut := ShortCut(Word('3'), [ssAlt]);
-    { ZoomInItem.ShortCut := VK_ADD;} { '+' auf Zehnertastatur }
+    { ZoomInItem.ShortCut := VK_ADD; } { '+' auf Zehnertastatur }
     { ZoomOutItem.ShortCut := VK_SUBTRACT; } { '-' auf Zehnertastatur }
   end;
 

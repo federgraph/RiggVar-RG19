@@ -3,16 +3,15 @@
 interface
 
 uses
-  Windows,
-  Messages,
-  SysUtils,
-  Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  ExtCtrls,
-  Menus,
+  Winapi.Windows,
+  System.SysUtils,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.Menus,
   ThreeD,
   ThreeDSolid,
   Rggmat01,
@@ -85,7 +84,7 @@ procedure TIndicatorForm.FormCreate(Sender: TObject);
 var
   NewPaintBox: TPaintBox;
 begin
-  //PaintBox austauschen
+  { PaintBox austauschen }
   NewPaintBox := TRggPaintBox.Create(PaintBox.Owner);
   try
     with NewPaintBox do
@@ -106,7 +105,7 @@ begin
   PlotExtX := VRR - VLL;
   PlotExtY := VBB - VTT;
 
-  //Initialisierungen für das Drehen mit der Maus
+  { Initialisierungen für das Drehen mit der Maus }
   GlobalRot := True;
   Painted := True;
   amat := TMatrix4x4.Create;
@@ -156,7 +155,7 @@ begin
   prevy := Y;
 end;
 
-//Drehen hier immer durch Bewegen der Kamera.
+{ Drehen hier immer durch Bewegen der Kamera. }
 procedure TIndicatorForm.PaintBoxMouseMove(Sender: TObject; Shift: TShiftState;
   X, Y: Integer);
 var
@@ -170,7 +169,8 @@ begin
   xtheta := (X - prevx) * 360 / PaintBox.Width;
   ytheta := (Y - prevy) * 360 / PaintBox.Height;
   if GlobalRot then
-  begin //Drehung um globales Achsensystem
+  begin
+    { Drehung um globales Achsensystem }
     if MouseButton = mbLeft then
       tmat.zrot(-xtheta);
     if MouseButton = mbLeft then
@@ -181,7 +181,8 @@ begin
     amat.CopyFrom(tmat);
   end
   else
-  begin //Drehung um lokales Achsensystem
+  begin
+    { Drehung um lokales Achsensystem }
     if MouseButton = mbLeft then
       tmat.zrot(-xtheta);
     if MouseButton = mbLeft then
@@ -194,7 +195,7 @@ begin
   { beim Indikator bleibt das Modell fest und die Blickrichtung ändert sich
     während in Rigg sich das Modell dreht und die Blickrichtung konstant bleibt }
   tempmat.CopyFrom(amat);
-  tempmat.Transpose; //die inverse von amat!
+  tempmat.Transpose; // die inverse von amat!
   bmat.identity;
   bmat.PreMultiply(tempmat.mat);
 
@@ -227,8 +228,8 @@ begin
     Exit;
   with ThreeD do
   begin
-    //Kamera und Lichtquelle um den At-Point drehen, dadurch entsteht der
-    //Eindruck, daß das Model um die lokalen Achsen gedreht wird.
+    { Kamera und Lichtquelle um den At-Point drehen, dadurch entsteht der
+      Eindruck, daß das Model um die lokalen Achsen gedreht wird. }
     tempDist := Mag(Subtract(From, At));
     { From - At }
     vert1.X := 0;

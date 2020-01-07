@@ -75,10 +75,9 @@ object MemoDlg: TMemoDlg
     Top = 220
     Width = 77
     Height = 27
-    DoubleBuffered = True
     Kind = bkOK
     Margin = 2
-    ParentDoubleBuffered = False
+    NumGlyphs = 2
     Spacing = -1
     TabOrder = 0
     IsControl = True
@@ -88,10 +87,9 @@ object MemoDlg: TMemoDlg
     Top = 220
     Width = 97
     Height = 27
-    DoubleBuffered = True
     Kind = bkCancel
     Margin = 2
-    ParentDoubleBuffered = False
+    NumGlyphs = 2
     Spacing = -1
     TabOrder = 1
     IsControl = True
@@ -101,10 +99,9 @@ object MemoDlg: TMemoDlg
     Top = 220
     Width = 77
     Height = 27
-    DoubleBuffered = True
     Kind = bkHelp
     Margin = 2
-    ParentDoubleBuffered = False
+    NumGlyphs = 2
     Spacing = -1
     TabOrder = 2
     IsControl = True

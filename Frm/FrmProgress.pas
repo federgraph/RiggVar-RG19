@@ -3,17 +3,16 @@
 interface
 
 uses
-  SysUtils,
-  Messages,
-  Classes,
-  UITypes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  StdCtrls,
-  Buttons,
-  ComCtrls;
+  System.SysUtils,
+  System.Classes,
+  System.UITypes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls,
+  Vcl.Buttons,
+  Vcl.ComCtrls;
 
 type
   TProgressDlg = class(TForm)

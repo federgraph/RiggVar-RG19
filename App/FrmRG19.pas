@@ -824,15 +824,6 @@ begin
     InputForm.Hide;
 end;
 
-procedure TFormRG19.GrafikFormItemClick(Sender: TObject);
-begin
-  GrafikFormItem.Checked := not GrafikFormItem.Checked;
-  if GrafikFormItem.Checked then
-    GrafikForm.Show
-  else
-    GrafikForm.Hide;
-end;
-
 procedure TFormRG19.OutputFormItemClick(Sender: TObject);
 begin
   OutputFormItem.Checked := not OutputFormItem.Checked;
@@ -844,6 +835,15 @@ begin
   end
   else
     OutputForm.Hide;
+end;
+
+procedure TFormRG19.GrafikFormItemClick(Sender: TObject);
+begin
+  GrafikFormItem.Checked := not GrafikFormItem.Checked;
+  if GrafikFormItem.Checked then
+    GrafikForm.Show
+  else
+    GrafikForm.Hide;
 end;
 
 procedure TFormRG19.ChartFormItemClick(Sender: TObject);
@@ -1727,21 +1727,21 @@ begin
   mi.Hint := '  Eingabeseiten im eigenen Fenster anzeigen';
   mi.ShortCut := 16453;
   mi.OnClick := InputFormItemClick;
-  mi.Visible := False;
+//  mi.Visible := False;
 
   OutputFormItem := AddI('OutputFormItem');
   mi.Caption := '&Ausgabe ...';
   mi.Hint := '  Ausgabeseiten im eigenen Fenster anzeigen';
   mi.ShortCut := 16449;
   mi.OnClick := OutputFormItemClick;
-  mi.Visible := False;
+//  mi.Visible := False;
 
   GrafikFormItem := AddI('GrafikFormItem');
   mi.Caption := '&Grafik ...';
   mi.Hint := '  Grafik-Ausgabeseiten separat anzeigen';
   mi.ShortCut := 16455;
   mi.OnClick := GrafikFormItemClick;
-  mi.Visible := False;
+//  mi.Visible := False;
 
   OptionItem := AddI('OptionItem');
   mi.Caption := '&Konfiguration ...';
@@ -1768,13 +1768,13 @@ begin
   mi.Caption := 'Diagramm ...';
   mi.Hint := '  Diagramm aktivieren';
   mi.OnClick := ChartFormItemClick;
-  mi.Visible := False;
+//  mi.Visible := False;
 
   ReportFormItem := AddI('ReportFormItem');
   mi.Caption := 'Report ...';
   mi.Hint := '  Report erstellen';
   mi.OnClick := ReportFormItemClick;
-  mi.Visible := False;
+//  mi.Visible := False;
 
   N1 := AddI('N1');
   mi.Caption := '-';

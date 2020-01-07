@@ -4,7 +4,7 @@ object ChartForm: TChartForm
   HorzScrollBar.Margin = 1
   VertScrollBar.Margin = 1
   Caption = 'Diagramm'
-  ClientHeight = 317
+  ClientHeight = 337
   ClientWidth = 805
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -12,7 +12,6 @@ object ChartForm: TChartForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  FormStyle = fsMDIChild
   Icon.Data = {
     0000010001002020100000000000E80200001600000028000000200000004000
     0000010004000000000080020000000000000000000000000000000000000000
@@ -38,7 +37,6 @@ object ChartForm: TChartForm
     0000000000000000000000000000000000000000000000000000000000000000
     0000000000000000000000000000000000000000000000000000000000000000
     000000000000000000000000000000000000000000000000000000000000}
-  Menu = MainMenu
   OldCreateOrder = True
   Position = poDefault
   Scaled = False
@@ -523,81 +521,6 @@ object ChartForm: TChartForm
       Max = 30
       Position = 30
       TabOrder = 14
-    end
-  end
-  object MainMenu: TMainMenu
-    Left = 8
-    Top = 152
-    object ChartMenu: TMenuItem
-      Caption = 'Diagram&m'
-      GroupIndex = 8
-      Hint = '  Diagramm Optionen'
-      OnClick = ChartMenuClick
-      object BerechnenItem: TMenuItem
-        Caption = '&Berechnen...'
-        Hint = '  Berechnung starten'
-        OnClick = CalcItemClick
-      end
-      object ResetItem: TMenuItem
-        Caption = '&Zur'#252'cksetzen'
-        Hint = '  Diagramm f'#252'r Neuberechnung freigeben (nach Fehler)'
-        OnClick = BuissyItemClick
-      end
-      object UpdateChartItem: TMenuItem
-        Caption = 'Diagramm aktualisieren'
-        Hint = '  Istwerte neu einlesen'
-        OnClick = UpdateChartItemClick
-      end
-      object UpdateRiggItem: TMenuItem
-        Caption = 'Rigg aktualisieren'
-        Hint = 'Erzeugungsdaten zur'#252'ckschreiben'
-        OnClick = UpdateRiggItemClick
-      end
-      object N1: TMenuItem
-        Caption = '-'
-      end
-      object APItem: TMenuItem
-        Caption = 'Arbeits&punkt'
-        Checked = True
-        Hint = '  automatische X - Werte: Arbeitspunkt +/- 30'
-        OnClick = APItemClick
-      end
-      object BereichItem: TMenuItem
-        Caption = 'Be&reich'
-        Hint = '  automatische X - Werte: gesamter Bereich'
-        OnClick = BereichItemClick
-      end
-      object N2: TMenuItem
-        Caption = '-'
-      end
-      object AuswahlItem: TMenuItem
-        Caption = '&Auswahl Y ...'
-        Hint = '  Auswahl der Gr'#246#223'en f'#252'r die Y-Achse'
-        OnClick = YAuswahlClick
-      end
-      object MemoItem: TMenuItem
-        Caption = 'Erzeugungsdaten...'
-        Hint = '  Erzeugungsdaten anzeigen'
-        OnClick = MemoItemClick
-      end
-      object TogetherItem: TMenuItem
-        Caption = '&Gruppiert anzeigen'
-        Hint = '  Kurven in einem Diagramm anzeigen'
-        OnClick = ShowTogetherBtnClick
-      end
-      object N3: TMenuItem
-        Caption = '-'
-      end
-      object OpenItem: TMenuItem
-        Caption = '&'#214'ffnen...'
-        Hint = '  gespeichertes Diagramm laden'
-        OnClick = OpenItemClick
-      end
-      object SaveItem: TMenuItem
-        Caption = '&Speichern...'
-        Hint = '  Diagramm speichern'
-        OnClick = SaveItemClick
-      end
     end
   end
   object OpenDialog: TOpenDialog

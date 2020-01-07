@@ -2,7 +2,7 @@ object ReportForm: TReportForm
   Left = 108
   Top = 152
   Caption = 'Report'
-  ClientHeight = 312
+  ClientHeight = 332
   ClientWidth = 632
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -10,7 +10,6 @@ object ReportForm: TReportForm
   Font.Height = -13
   Font.Name = 'System'
   Font.Style = []
-  FormStyle = fsMDIChild
   Icon.Data = {
     0000010001002020100000000000E80200001600000028000000200000004000
     0000010004000000000080020000000000000000000000000000000000000000
@@ -36,11 +35,11 @@ object ReportForm: TReportForm
     0000000000000000000000000000000000000000000000000000000000000000
     0000000000000000000000000000000000000000000000000000000000000000
     000000000000000000000000000000000000000000000000000000000000}
-  Menu = MainMenu
   OldCreateOrder = True
   Position = poScreenCenter
   Visible = True
   OnClose = FormClose
+  OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 16
@@ -48,7 +47,7 @@ object ReportForm: TReportForm
     Left = 0
     Top = 0
     Width = 632
-    Height = 312
+    Height = 332
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
@@ -56,7 +55,7 @@ object ReportForm: TReportForm
       Left = 0
       Top = 0
       Width = 632
-      Height = 312
+      Height = 332
       Align = alClient
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
@@ -72,52 +71,15 @@ object ReportForm: TReportForm
     end
   end
   object PrintDialog: TPrintDialog
-    Left = 448
-    Top = 24
+    Left = 200
+    Top = 32
   end
   object SaveDialog: TSaveDialog
     DefaultExt = 'txt'
     Filter = 'Text Datei (*.txt)|*.text|Alle Dateien (*.*)|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofCreatePrompt, ofNoReadOnlyReturn]
     Title = 'Report Speichern'
-    Left = 416
-    Top = 24
-  end
-  object MainMenu: TMainMenu
-    Left = 384
-    Top = 24
-    object ReportMenu: TMenuItem
-      Caption = '&Report'
-      GroupIndex = 8
-      Hint = '  Befehle f'#252'r den Report'
-      object KopierenItem: TMenuItem
-        Caption = '&Kopieren'
-        Hint = '  Selektierten Text in die Zwischenablage kopieren'
-        OnClick = CopyItemClick
-      end
-      object SpeichernItem: TMenuItem
-        Caption = '&Speichern unter ...'
-        Hint = '  Report in Textdatei speichern'
-        OnClick = PrintToFileItemClick
-      end
-      object DruckenItem: TMenuItem
-        Caption = '&Drucken ...'
-        Hint = '  Report ausdrucken'
-        OnClick = PrintItemClick
-      end
-      object N4: TMenuItem
-        Caption = '-'
-      end
-      object AktualisierenItem: TMenuItem
-        Caption = '&Aktualisieren'
-        Hint = '  Report aktualisieren'
-        OnClick = UpdateItemClick
-      end
-      object ElementeItem: TMenuItem
-        Caption = '&Elemente ausw'#228'hlen ...'
-        Hint = '  den Inhalt des Reports festlegen'
-        OnClick = AuswahlItemClick
-      end
-    end
+    Left = 96
+    Top = 32
   end
 end

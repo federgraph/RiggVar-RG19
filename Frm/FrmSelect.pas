@@ -1,5 +1,6 @@
-﻿{ Form Template - Source and Destination Choices Lists }
-unit FrmSelect;
+﻿unit FrmSelect;
+
+{ Form Template - Source and Destination Choices Lists }
 
 interface
 
@@ -118,16 +119,14 @@ procedure TMemoDlg.SetItem(List: TListBox; Index: Integer);
 var
   MaxIndex: Integer;
 begin
-  with List do
-  begin
-    SetFocus;
-    MaxIndex := List.Items.Count - 1;
-    if Index = LB_ERR then
-      Index := 0
-    else if Index > MaxIndex then
-      Index := MaxIndex;
-    Selected[Index] := True;
-  end;
+  List.SetFocus;
+  MaxIndex := List.Items.Count - 1;
+  if Index = LB_ERR then
+    Index := 0
+  else if Index > MaxIndex then
+    Index := MaxIndex;
+  List.Selected[Index] := True;
+
   SetButtons;
 end;
 

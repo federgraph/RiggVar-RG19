@@ -102,6 +102,7 @@ type
       procedure DrawPoint;
       procedure DrawChartPaintBox(Canvas: TCanvas; Rect: TRect);
     }
+    //ShowRectangle: Boolean;
     sbPuffer: TTrimmControls;
     TopTitel, LeftTitel, BottomTitel, RightTitel: string;
     Xmin, Xmax, Ymin, Ymax, YGap: single;
@@ -1260,7 +1261,6 @@ begin
     GrafikForm.ViewTab.TabIndex := Ord(FViewPoint);
   end;
   ViewModelMain.VonDerSeiteItemClick(Value);
-//  ViewModelMain.UpdateView;
 end;
 
 procedure TRiggModul.ResetPaintBoxG;

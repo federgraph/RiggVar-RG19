@@ -4,7 +4,7 @@ inherited CtrlDlg1: TCtrlDlg1
   ClientWidth = 333
   OnPaint = FormPaint
   ExplicitWidth = 339
-  ExplicitHeight = 373
+  ExplicitHeight = 376
   PixelsPerInch = 96
   TextHeight = 13
   object Bevel1: TBevel [0]
