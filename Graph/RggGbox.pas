@@ -5,15 +5,15 @@ interface
 {.$define Rotator}
 
 uses
-  Windows,
-  Graphics,
-  Classes,
-  Types,
-  ExtCtrls,
+  Winapi.Windows,
+  System.Classes,
+  System.Types,
+  Vcl.Graphics,
+  Vcl.ExtCtrls,
+  Vcl.Dialogs,
   RggTypes,
   Vcalc116,
   RggMat01,
-  Dialogs,
   RaumGraph;
 
 type
@@ -120,7 +120,8 @@ begin
 
 {$ifdef Rotator}
   Rotator := TPolarKar2.Create;
-  with Rotator do begin
+  with Rotator do
+  begin
     DeltaPhi := 0;
     DeltaTheta := -90;
     Xrot := -87;
@@ -665,7 +666,7 @@ begin
     aber immer der nicht gedrehte Fixpunkt benötigt! }
   FixPunkt2D := rP[FixName];
 
-  {*** Koppelkurve }
+  { Koppelkurve }
   if FKoppelkurveNeedFill then begin
     for j := 0 to 100 do begin
       Temp := vsub(FKoppelKurve[j], FixPunkt2D);
@@ -677,7 +678,7 @@ begin
     FKoppelkurveNeedFill := False;
   end;
 
-  { *** Mastkurve }
+  { Mastkurve }
   for j := 0 to BogenMax do begin
     Temp := vsub(Kurve[j], FixPunkt2D);
     xTemp := Round(Temp[x] * FZoom2D);
@@ -686,7 +687,7 @@ begin
     Zug1MastKurve[j+1].Y := -zTemp + OffsetY1;
   end;
 
-  { *** Radius für Kreisbogen um C0 }
+  { Radius für Kreisbogen um C0 }
   IntR := Round( Abstand(rP[ooC],rP[ooC0]) * FZoom2D );
 
   A0 := vsub(rP[ooA0],FixPunkt2D);
@@ -927,8 +928,10 @@ begin
   xmin := Round(Temp[x]); xmax := xmin;
   ymin := Round(Temp[y]); ymax := ymin;
   zmin := Round(Temp[z]); zmax := zmin;
-  for k := ooA0 to ooF do begin
-    if k = ooF0 then Continue;
+  for k := ooA0 to ooF do
+  begin
+    if k = ooF0 then
+      Continue;
     Temp := rP[k];
     tempx := Round(Temp[x]);
     tempy := Round(Temp[y]);

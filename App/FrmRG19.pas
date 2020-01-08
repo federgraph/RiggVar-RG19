@@ -23,7 +23,6 @@ uses
   Winapi.Messages,
   System.SysUtils,
   System.Classes,
-  System.UITypes,
   RggTypes,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
@@ -36,7 +35,8 @@ uses
   Vcl.Menus,
   Vcl.ExtCtrls,
   Vcl.Buttons,
-  Vcl.StdCtrls;
+  Vcl.StdCtrls,
+  System.UITypes;
 
 type
   TFormRG19 = class(TForm)
@@ -146,14 +146,16 @@ type
     ReadTrimmFileBtn: TSpeedButton;
     SaveTrimmFileBtn: TSpeedButton;
     ParamCombo: TComboBox;
-    TrimmMemo: TMemo;
     TrimmCombo: TComboBox;
     cbSandboxed: TCheckBox;
     cbAllProps: TCheckBox;
     ViewpointCombo: TComboBox;
     cbAllTags: TCheckBox;
-    ListBox: TListBox;
+    Listbox: TListBox;
     ReportMemo: TMemo;
+    TrimmMemo: TMemo;
+    PaintBox1: TPaintBox;
+    PaintBox2: TPaintBox;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -238,6 +240,7 @@ type
     procedure ViewpointComboChange(Sender: TObject);
     procedure PaintBtn2Click(Sender: TObject);
     procedure cbAllTagsClick(Sender: TObject);
+    procedure PaintBoxPaint(Sender: TObject);
   private
     TL: TStrings;
     ML: TStrings;
@@ -249,6 +252,14 @@ type
     BtnCounter: Integer;
     BtnColor: TColor;
 
+    CheckboxLeft: Integer;
+    CheckboxTop: Integer;
+    CheckboxWidth: Integer;
+    CheckboxHeight: Integer;
+    CheckboxCounter: Integer;
+
+    ComboHeight: Integer;
+
     procedure SetupMemo(Memo: TMemo);
     procedure InitListBox;
     procedure InitTrimmCombo;
@@ -257,6 +268,7 @@ type
     procedure SetupListBox(LB: TListBox);
     procedure SetupLabel(L: TLabel);
     procedure AB(B: TSpeedButton);
+    procedure CB(C: TCheckBox);
     procedure ShowTrimm;
     procedure ShowCurrentReport;
     procedure InitViewpointCombo;
@@ -266,6 +278,7 @@ type
     function GetSaveFileName(dn, fn: string): string;
 
   private
+    Margin: Integer;
     procedure wmGetMinMaxInfo(var Msg: TMessage); message wm_GetMinMaxInfo;
     procedure FormCreate1;
     procedure FormCreate2;
@@ -319,8 +332,8 @@ const
 procedure TFormRG19.wmGetMinMaxInfo(var Msg: TMessage);
 begin
   inherited;
-  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.X := 600;
-  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.Y := 220;
+  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.X := 900;
+  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.Y := 700;
 end;
 
 procedure TFormRG19.FormCreate(Sender: TObject);
@@ -1140,17 +1153,48 @@ end;
 
 procedure TFormRG19.FormCreate2;
 begin
-//  Left := 810;
-//  Height := 640;
-
   TL := TrimmMemo.Lines;
   ML := ReportMemo.Lines;
 
+  Margin := 5;
+
+  TrimmMemo.Left := Margin;
+  TrimmMemo.Top := SpeedPanel.Height + Margin;
+  TrimmMemo.Height := 185;
+  TrimmMemo.Width := 170;
+
+  Panel.Top := SpeedPanel.Height + Margin;
+  Panel.Left := TrimmMemo.Left + TrimmMemo.Width + Margin;
+  Panel.Width := 600;
   Panel.ShowCaption := False;
-  Panel.Align := alTop;
-  Listbox.Align := alLeft;
-  TrimmMemo.Align := alLeft;
-  ReportMemo.Align := alLeft;
+
+  Listbox.Left := TrimmMemo.Left;
+  Listbox.Top := TrimmMemo.Top + TrimmMemo.Height + Margin;
+  Listbox.Width := TrimmMemo.Width;
+  Listbox.Height := StatusBar.Top - Listbox.top - Margin;
+  Listbox.Anchors := Listbox.Anchors + [akBottom];
+
+  ReportMemo.Left := Listbox.Left + Listbox.Width + Margin;
+  ReportMemo.Top := Panel.Top + Panel.Height + Margin;
+  ReportMemo.Height := StatusBar.Top - ReportMemo.Top - Margin;
+  ReportMemo.Width := Panel.Width;
+  ReportMemo.Anchors := ReportMemo.Anchors + [akBottom];
+
+  Paintbox1.Left := Panel.Left + Panel.Width + Margin;
+  Paintbox1.Top := Panel.Top;
+  Paintbox1.Width := ClientWidth - Paintbox1.Left - Margin;
+  Paintbox1.Height := 400;
+  Paintbox1.Anchors := Paintbox1.Anchors + [akRight];
+  Paintbox1.Color := clAqua;
+  Paintbox1.OnPaint := PaintboxPaint;
+
+  Paintbox2.Left := Paintbox1.Left;
+  Paintbox2.Top := Paintbox1.Top + Paintbox1.Height + Margin;
+  Paintbox2.Width := ClientWidth - Paintbox2.Left - Margin;
+  Paintbox2.Height := StatusBar.Top - Paintbox2.Top - Margin;
+  Paintbox2.Anchors := Paintbox2.Anchors + [akRight, akBottom];
+  Paintbox2.Color := clYellow;
+  Paintbox2.OnPaint := PaintboxPaint;
 
   BtnCounter := 0;
   BtnWidth := 50;
@@ -1171,6 +1215,15 @@ begin
   BtnColor := clBlack;
   AB(CopyAndPasteBtn);
 
+  CheckboxCounter := 0;
+  CheckboxLeft := BtnLeft + BtnCounter * BtnWidth + 20;
+  CheckboxTop := BtnTop;
+  CheckboxWidth := 100;
+  CheckboxHeight := cbSandboxed.Height + Margin;
+  CB(cbSandboxed);
+  CB(cbAllProps);
+  CB(cbAllTags);
+
   BtnCounter := 0;
   BtnTop := M10Btn.Top;
   BtnLeft := M10Btn.Left;
@@ -1181,6 +1234,11 @@ begin
   AB(P1Btn);
   AB(P10Btn);
 
+  ComboHeight := TrimmCombo.Height + 2 * Margin;
+  TrimmCombo.Top := P10Btn.Top + P10Btn.Height + 3 * Margin;
+  ParamCombo.Top := TrimmCombo.Top + ComboHeight;
+  ViewpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
+
   SetupComboBox(TrimmCombo);
   SetupComboBox(ParamCombo);
   SetupComboBox(ViewpointCombo);
@@ -1189,7 +1247,7 @@ begin
   SetupMemo(TrimmMemo);
   SetupMemo(ReportMemo);
 
-  TrimmMemo.ScrollBars := ssNone;
+  TrimmMemo.ScrollBars := TScrollStyle.ssNone;
   TrimmMemo.Width := ListBox.Width;
 
   ReportManager := TRggReportManager.Create(ReportMemo);
@@ -1253,6 +1311,14 @@ begin
   Inc(BtnCounter);
 end;
 
+procedure TFormRG19.CB(C: TCheckBox);
+begin
+  C.Left := CheckboxLeft;
+  C.Top := CheckboxTop + CheckboxCounter * CheckboxHeight;
+  C.Width := CheckboxWidth;
+  Inc(CheckboxCounter);
+end;
+
 procedure TFormRG19.SetupLabel(L: TLabel);
 begin
   L.Font.Name := 'Consolas';
@@ -1293,7 +1359,7 @@ begin
   Memo.Font.Name := 'Consolas';
   Memo.Font.Size := 11;
   Memo.Font.Color := clTeal;
-  Memo.ScrollBars := ssBoth;
+  Memo.ScrollBars := TScrollStyle.ssBoth;
 end;
 
 procedure TFormRG19.CopyTrimmItemBtnClick(Sender: TObject);
@@ -2092,6 +2158,19 @@ begin
   LogoItem := AddI('LogoItem');
   mi.Caption := 'Logo';
   mi.OnClick := LogoItemClick;
+end;
+
+procedure TFormRG19.PaintBoxPaint(Sender: TObject);
+var
+  r: TRect;
+  c: TCanvas;
+  p: TPaintbox;
+begin
+  p := Sender as TPaintbox;
+  c := p.Canvas;
+  r := TRect.Create(0, 0, p.Width, p.Height);
+  c.Brush.Color := p.Color;
+  c.FillRect(r);
 end;
 
 end.

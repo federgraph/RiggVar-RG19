@@ -3,7 +3,7 @@ object FormRG19: TFormRG19
   Top = 0
   Caption = 'RG19'
   ClientHeight = 675
-  ClientWidth = 1044
+  ClientWidth = 1094
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,10 +16,22 @@ object FormRG19: TFormRG19
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
+  object PaintBox1: TPaintBox
+    Left = 688
+    Top = 71
+    Width = 105
+    Height = 105
+  end
+  object PaintBox2: TPaintBox
+    Left = 688
+    Top = 287
+    Width = 105
+    Height = 105
+  end
   object StatusBar: TStatusBar
     Left = 0
     Top = 653
-    Width = 1044
+    Width = 1094
     Height = 22
     Panels = <
       item
@@ -30,17 +42,19 @@ object FormRG19: TFormRG19
         Text = 'RiggText'
         Width = 50
       end>
+    ExplicitWidth = 1044
   end
   object SpeedPanel: TPanel
     Left = 0
     Top = 0
-    Width = 1044
+    Width = 1094
     Height = 32
     Align = alTop
     BevelOuter = bvNone
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
+    ExplicitWidth = 1044
     object OpenBtn: TSpeedButton
       Left = 8
       Top = 3
@@ -314,116 +328,106 @@ object FormRG19: TFormRG19
     end
   end
   object Panel: TPanel
-    Left = 8
+    Left = 188
     Top = 38
-    Width = 625
+    Width = 450
     Height = 185
     TabOrder = 2
     object ReportLabel: TLabel
-      Left = 337
+      Left = 224
       Top = 151
       Width = 58
       Height = 13
       Caption = 'ReportLabel'
     end
     object M10Btn: TSpeedButton
-      Left = 176
+      Left = 10
       Top = 43
       Width = 41
       Height = 30
       Caption = '-10'
     end
     object M1Btn: TSpeedButton
-      Left = 254
+      Left = 88
       Top = 43
       Width = 23
       Height = 22
       Caption = '-1'
     end
     object P1Btn: TSpeedButton
-      Left = 283
+      Left = 117
       Top = 43
       Width = 23
       Height = 22
       Caption = '+1'
     end
     object P10Btn: TSpeedButton
-      Left = 312
+      Left = 146
       Top = 43
       Width = 23
       Height = 22
       Caption = '+10'
     end
     object CopyAndPasteBtn: TSpeedButton
-      Left = 416
+      Left = 250
       Top = 7
       Width = 23
       Height = 22
       Caption = 'M'
     end
     object CopyTrimmItemBtn: TSpeedButton
-      Left = 343
+      Left = 177
       Top = 7
       Width = 23
       Height = 22
       Caption = 'cti'
     end
     object MT0Btn: TSpeedButton
-      Left = 176
+      Left = 10
       Top = 7
       Width = 45
       Height = 30
       Caption = 'MT0'
     end
     object PasteTrimmItemBtn: TSpeedButton
-      Left = 372
+      Left = 206
       Top = 7
       Width = 23
       Height = 22
       Caption = 'pti'
     end
     object ReadTrimmFileBtn: TSpeedButton
-      Left = 254
+      Left = 88
       Top = 7
       Width = 23
       Height = 22
       Caption = 'rtf'
     end
     object SaveTrimmFileBtn: TSpeedButton
-      Left = 283
+      Left = 117
       Top = 7
       Width = 23
       Height = 22
       Caption = 'stf'
     end
     object ParamCombo: TComboBox
-      Left = 176
+      Left = 10
       Top = 121
-      Width = 217
+      Width = 177
       Height = 21
-      TabOrder = 0
+      TabOrder = 1
       Text = 'ParamCombo'
     end
-    object TrimmMemo: TMemo
-      Left = 1
-      Top = 1
-      Width = 169
-      Height = 183
-      Align = alLeft
-      Lines.Strings = (
-        'TrimmMemo')
-      TabOrder = 1
-    end
     object TrimmCombo: TComboBox
-      Left = 176
+      Left = 10
       Top = 94
       Width = 177
       Height = 21
-      TabOrder = 2
+      TabOrder = 0
       Text = 'TrimmCombo'
     end
     object cbSandboxed: TCheckBox
-      Left = 511
+      Left = 305
       Top = 10
       Width = 97
       Height = 17
@@ -431,7 +435,7 @@ object FormRG19: TFormRG19
       TabOrder = 3
     end
     object cbAllProps: TCheckBox
-      Left = 511
+      Left = 305
       Top = 33
       Width = 97
       Height = 17
@@ -439,38 +443,49 @@ object FormRG19: TFormRG19
       TabOrder = 4
     end
     object ViewpointCombo: TComboBox
-      Left = 176
+      Left = 10
       Top = 148
-      Width = 129
+      Width = 177
       Height = 21
-      TabOrder = 5
+      TabOrder = 2
       Text = 'ViewpointCombo'
     end
     object cbAllTags: TCheckBox
-      Left = 511
+      Left = 305
       Top = 56
       Width = 97
       Height = 17
       Caption = 'All Tags ( XML )'
-      TabOrder = 6
+      TabOrder = 5
     end
   end
-  object ListBox: TListBox
+  object Listbox: TListBox
     Left = 8
-    Top = 229
-    Width = 161
-    Height = 257
+    Top = 237
+    Width = 169
+    Height = 180
     ItemHeight = 13
+    Items.Strings = (
+      'Listbox')
     TabOrder = 3
   end
   object ReportMemo: TMemo
-    Left = 175
-    Top = 229
-    Width = 430
-    Height = 257
+    Left = 188
+    Top = 237
+    Width = 291
+    Height = 140
     Lines.Strings = (
       'ReportMemo')
     TabOrder = 4
+  end
+  object TrimmMemo: TMemo
+    Left = 8
+    Top = 38
+    Width = 169
+    Height = 185
+    Lines.Strings = (
+      'TrimmMemo')
+    TabOrder = 5
   end
   object MainMenu: TMainMenu
     Left = 207
@@ -818,7 +833,7 @@ object FormRG19: TFormRG19
     Filter = 'Alle Dateien (*.*)|*.*|Rigg Einstellungen (*.rgg)|*.rgg'
     FilterIndex = 2
     Options = [ofOverwritePrompt, ofPathMustExist, ofFileMustExist]
-    Left = 287
+    Left = 303
     Top = 550
   end
   object SaveDialog: TSaveDialog
@@ -827,7 +842,7 @@ object FormRG19: TFormRG19
       'Rigg Einstellungen (*.rgg)|*.rgg|Rigg IniFile (*.rgi)|*.rgi|Alle' +
       ' Dateien (*.*)|*.*'
     Options = [ofOverwritePrompt, ofPathMustExist]
-    Left = 360
+    Left = 408
     Top = 550
   end
 end
