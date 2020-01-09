@@ -211,7 +211,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 
-    procedure SalingTypChange(Sender: TObject);
+    procedure SalingTypChanged(Sender: TObject);
     procedure ShowHint(Sender: TObject);
     procedure AdjustFormItemClick(Sender: TObject);
     procedure CalcOffsetItemClick(Sender: TObject);
@@ -271,6 +271,8 @@ begin
 
   RiggModul := TRiggModul.Create(Self);
   rggm := TRggMain.Create(RiggModul.Rigg);
+  RiggModul.PBG := GrafikForm.PaintboxG;
+  RiggModul.RG19A := True;
 
   Main := TMain.Create(rggm);
   Main.Logger.Verbose := True;
@@ -323,16 +325,16 @@ begin
   Main := nil;
 end;
 
-procedure TFormMain.SalingTypChange(Sender: TObject);
+procedure TFormMain.SalingTypChanged(Sender: TObject);
 begin
   if Sender = FestItem then
-    RiggModul.SalingTypChanged(stFest)
+    RiggModul.SalingTyp := stFest
   else if Sender = DrehbarItem then
-    RiggModul.SalingTypChanged(stDrehbar)
+    RiggModul.SalingTyp := stDrehbar
   else if Sender = OhneItem then
-    RiggModul.SalingTypChanged(stOhne)
+    RiggModul.SalingTyp := stOhne
   else if Sender = OSDlgItem then
-    RiggModul.SalingTypChanged(stOhne_2);
+    RiggModul.SalingTyp := stOhne_2;
 end;
 
 procedure TFormMain.rLItemClick(Sender: TObject);
@@ -623,11 +625,11 @@ end;
 procedure TFormMain.KnickenItemClick(Sender: TObject);
 begin
   if Sender = QuerKraftItem then
-    RiggModul.CalcTypChanged(ctQuerKraftBiegung)
+    RiggModul.CalcTyp := ctQuerKraftBiegung
   else if Sender = KnickenItem then
-    RiggModul.CalcTypChanged(ctBiegeKnicken)
+    RiggModul.CalcTyp := ctBiegeKnicken
   else if Sender = KraftGemessenItem then
-    RiggModul.CalcTypChanged(ctKraftGemessen);
+    RiggModul.CalcTyp := ctKraftGemessen;
 end;
 
 procedure TFormMain.KorrigiertItemClick(Sender: TObject);

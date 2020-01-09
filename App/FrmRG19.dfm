@@ -17,14 +17,20 @@ object FormRG19: TFormRG19
   PixelsPerInch = 96
   TextHeight = 13
   object PaintBox1: TPaintBox
-    Left = 688
-    Top = 71
+    Left = 852
+    Top = 38
     Width = 105
     Height = 105
   end
   object PaintBox2: TPaintBox
     Left = 688
     Top = 287
+    Width = 105
+    Height = 105
+  end
+  object PaintBoxG: TPaintBox
+    Left = 664
+    Top = 75
     Width = 105
     Height = 105
   end
@@ -42,7 +48,6 @@ object FormRG19: TFormRG19
         Text = 'RiggText'
         Width = 50
       end>
-    ExplicitWidth = 1044
   end
   object SpeedPanel: TPanel
     Left = 0
@@ -54,7 +59,6 @@ object FormRG19: TFormRG19
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
-    ExplicitWidth = 1044
     object OpenBtn: TSpeedButton
       Left = 8
       Top = 3

@@ -156,6 +156,7 @@ type
     TrimmMemo: TMemo;
     PaintBox1: TPaintBox;
     PaintBox2: TPaintBox;
+    PaintBoxG: TPaintBox;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -213,7 +214,7 @@ type
     procedure ControllerBtnClick(Sender: TObject);
     procedure ZweischlagBtnClick(Sender: TObject);
 
-    procedure SalingTypChange(Sender: TObject);
+    procedure SalingTypChanged(Sender: TObject);
     procedure ShowHint(Sender: TObject);
     procedure AdjustFormItemClick(Sender: TObject);
     procedure CalcOffsetItemClick(Sender: TObject);
@@ -283,6 +284,7 @@ type
     procedure FormCreate1;
     procedure FormCreate2;
     procedure InitEventHandlers;
+    procedure PaintBoxGPaint(Sender: TObject);
   protected
     function AddSpeedBtn(N: string; L: Integer): TSpeedButton;
     procedure InitToolbar;
@@ -319,7 +321,7 @@ uses
   FrmConsole,
   FrmInput,
   FrmOutput,
-  FrmGrafic,
+//  FrmGrafic,
   FrmText,
   FrmReport,
   FrmChart,
@@ -350,10 +352,12 @@ var
 begin
   InputForm := TInputForm.Create(Application);
   OutputForm := TOutputForm.Create(Application);
-  GrafikForm := TGrafikForm.Create(Application);
+//  GrafikForm := TGrafikForm.Create(Application);
 
   RiggModul := TRiggModul.Create(Self);
   rggm := TRggMain.Create(RiggModul.Rigg);
+  RiggModul.PBG := PaintboxG;
+  RiggModul.RG19B := True;
 
   Main := TMain.Create(rggm);
   Main.Logger.Verbose := True;
@@ -411,16 +415,16 @@ begin
   Main := nil;
 end;
 
-procedure TFormRG19.SalingTypChange(Sender: TObject);
+procedure TFormRG19.SalingTypChanged(Sender: TObject);
 begin
   if Sender = FestItem then
-    RiggModul.SalingTypChanged(stFest)
+    RiggModul.SalingTyp := stFest
   else if Sender = DrehbarItem then
-    RiggModul.SalingTypChanged(stDrehbar)
+    RiggModul.SalingTyp := stDrehbar
   else if Sender = OhneItem then
-    RiggModul.SalingTypChanged(stOhne)
+    RiggModul.SalingTyp := stOhne
   else if Sender = OSDlgItem then
-    RiggModul.SalingTypChanged(stOhne_2);
+    RiggModul.SalingTyp := stOhne_2;
 end;
 
 procedure TFormRG19.rLItemClick(Sender: TObject);
@@ -711,11 +715,11 @@ end;
 procedure TFormRG19.KnickenItemClick(Sender: TObject);
 begin
   if Sender = QuerKraftItem then
-    RiggModul.CalcTypChanged(ctQuerKraftBiegung)
+    RiggModul.CalcTyp := ctQuerKraftBiegung
   else if Sender = KnickenItem then
-    RiggModul.CalcTypChanged(ctBiegeKnicken)
+    RiggModul.CalcTyp := ctBiegeKnicken
   else if Sender = KraftGemessenItem then
-    RiggModul.CalcTypChanged(ctKraftGemessen);
+    RiggModul.CalcTyp := ctKraftGemessen;
 end;
 
 procedure TFormRG19.KorrigiertItemClick(Sender: TObject);
@@ -853,10 +857,10 @@ end;
 procedure TFormRG19.GrafikFormItemClick(Sender: TObject);
 begin
   GrafikFormItem.Checked := not GrafikFormItem.Checked;
-  if GrafikFormItem.Checked then
-    GrafikForm.Show
-  else
-    GrafikForm.Hide;
+//  if GrafikFormItem.Checked then
+//    GrafikForm.Show
+//  else
+//    GrafikForm.Hide;
 end;
 
 procedure TFormRG19.ChartFormItemClick(Sender: TObject);
@@ -1180,15 +1184,21 @@ begin
   ReportMemo.Width := Panel.Width;
   ReportMemo.Anchors := ReportMemo.Anchors + [akBottom];
 
-  Paintbox1.Left := Panel.Left + Panel.Width + Margin;
-  Paintbox1.Top := Panel.Top;
+  PaintboxG.Left := Panel.Left + Panel.Width + Margin;
+  PaintboxG.Top := Panel.Top;
+  PaintboxG.Width := 297;
+  PaintboxG.Height := 425;
+  PaintboxG.OnPaint := PaintboxGPaint;
+
+  Paintbox1.Left := PaintboxG.Left + PaintboxG.Width + Margin;
+  Paintbox1.Top := PaintboxG.Top;
   Paintbox1.Width := ClientWidth - Paintbox1.Left - Margin;
-  Paintbox1.Height := 400;
+  Paintbox1.Height := PaintboxG.Height;
   Paintbox1.Anchors := Paintbox1.Anchors + [akRight];
   Paintbox1.Color := clAqua;
   Paintbox1.OnPaint := PaintboxPaint;
 
-  Paintbox2.Left := Paintbox1.Left;
+  Paintbox2.Left := PaintboxG.Left;
   Paintbox2.Top := Paintbox1.Top + Paintbox1.Height + Margin;
   Paintbox2.Width := ClientWidth - Paintbox2.Left - Margin;
   Paintbox2.Height := StatusBar.Top - Paintbox2.Top - Margin;
@@ -1417,6 +1427,7 @@ end;
 
 procedure TFormRG19.InitListBox;
 begin
+  Listbox.Clear;
   ReportManager.InitLB(ListBox.Items);
 end;
 
@@ -1657,10 +1668,10 @@ begin
 
   { Optionen }
 
-  FestItem.OnClick := SalingTypChange;
-  DrehbarItem.OnClick := SalingTypChange;
-  OhneItem.OnClick := SalingTypChange;
-  OSDlgItem.OnClick := SalingTypChange;
+  FestItem.OnClick := SalingTypChanged;
+  DrehbarItem.OnClick := SalingTypChanged;
+  OhneItem.OnClick := SalingTypChanged;
+  OSDlgItem.OnClick := SalingTypChanged;
 
   ControllerItem.OnClick := ControllerBtnClick;
   DifferenzItem.OnClick := DifferenzItemClick;
@@ -2013,25 +2024,25 @@ begin
   mi.Checked := True;
   mi.Hint := '  Modell: Salinge starr befestigt';
   mi.RadioItem := True;
-  mi.OnClick := SalingTypChange;
+  mi.OnClick := SalingTypChanged;
 
   DrehbarItem := AddI('DrehbarItem');
   mi.Caption := 'drehbare Salinge';
   mi.Hint := '  Modell: Salinge drehbar angelenkt';
   mi.RadioItem := True;
-  mi.OnClick := SalingTypChange;
+  mi.OnClick := SalingTypChanged;
 
   OhneItem := AddI('OhneItem');
   mi.Caption := 'ohne Salinge / Mast biegt aus';
   mi.Hint := '  Modell: Biegeknicken des Mastes ohne Salinge';
   mi.RadioItem := True;
-  mi.OnClick := SalingTypChange;
+  mi.OnClick := SalingTypChanged;
 
   OSDlgItem := AddI('OSDlgItem');
   mi.Caption := 'ohne Saling / Mast starr';
   mi.Hint := '  Modell: Mast steif ohne Salinge';
   mi.RadioItem := True;
-  mi.OnClick := SalingTypChange;
+  mi.OnClick := SalingTypChanged;
 
   N11 := AddI('N11');
   mi.Caption := '-';
@@ -2171,6 +2182,11 @@ begin
   r := TRect.Create(0, 0, p.Width, p.Height);
   c.Brush.Color := p.Color;
   c.FillRect(r);
+end;
+
+procedure TFormRG19.PaintBoxGPaint(Sender: TObject);
+begin
+  RiggModul.Draw;
 end;
 
 end.

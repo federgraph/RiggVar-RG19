@@ -628,25 +628,25 @@ object FormMain: TFormMain
         Checked = True
         Hint = '  Modell: Salinge starr befestigt'
         RadioItem = True
-        OnClick = SalingTypChange
+        OnClick = SalingTypChanged
       end
       object DrehbarItem: TMenuItem
         Caption = 'drehbare Salinge'
         Hint = '  Modell: Salinge drehbar angelenkt'
         RadioItem = True
-        OnClick = SalingTypChange
+        OnClick = SalingTypChanged
       end
       object OhneItem: TMenuItem
         Caption = 'ohne Salinge / Mast biegt aus'
         Hint = '  Modell: Biegeknicken des Mastes ohne Salinge'
         RadioItem = True
-        OnClick = SalingTypChange
+        OnClick = SalingTypChanged
       end
       object OSDlgItem: TMenuItem
         Caption = 'ohne Saling / Mast starr'
         Hint = '  Modell: Mast steif ohne Salinge'
         RadioItem = True
-        OnClick = SalingTypChange
+        OnClick = SalingTypChanged
       end
       object N11: TMenuItem
         Caption = '-'

@@ -184,14 +184,12 @@ end;
 
 procedure TInputForm.InputPagesChange(Sender: TObject);
 begin
-  if Sender = tsFest then
-    RiggModul.InputPagesChanged(stFest)
-  else if Sender = tsDrehbar then
-    RiggModul.InputPagesChanged(stDrehbar)
-  else if Sender = tsOhne then
-    RiggModul.InputPagesChanged(stOhne)
-  else if Sender = tsOhneStarr then
-    RiggModul.InputPagesChanged(stOhne_2)
+  case InputForm.InputPages.ActivePage.Tag of
+    0: RiggModul.SalingTyp := stFest;
+    1: RiggModul.SalingTyp := stDrehbar;
+    2: RiggModul.SalingTyp := stOhne;
+    3: RiggModul.SalingTyp := stOhne_2;
+  end;
 end;
 
 procedure TInputForm.sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode;

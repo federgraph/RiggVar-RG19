@@ -137,7 +137,7 @@ begin
       rgNone: ;
       rgReadme:
       begin
-        ML.Add('Use the Scroll Wheel of the Mouse!!!');
+        ML.Add('Use the Scroll Wheel of the Mouse!');
         ML.Add('');
         ML.Add('Scroll Wheel will scroll the text if text is long.');
         ML.Add('Shift Wheel will change current param value (small step)');

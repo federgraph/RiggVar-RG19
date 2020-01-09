@@ -23,15 +23,11 @@ object OutputForm: TOutputForm
     Top = 0
     Width = 465
     Height = 255
-    ActivePage = MasterMemo
+    ActivePage = Salingsheet
     TabOrder = 0
     OnChange = OutputPagesChange
     object MasterMemo: TTabSheet
       Caption = 'Tabellen'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Memo: TMemo
         Left = 0
         Top = 0
@@ -53,10 +49,6 @@ object OutputForm: TOutputForm
     end
     object DetailsSheet: TTabSheet
       Caption = 'Details'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DisplayMemo: TMemo
         Left = 0
         Top = 0
@@ -78,10 +70,6 @@ object OutputForm: TOutputForm
     object Salingsheet: TTabSheet
       Tag = 3
       Caption = 'Saling'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnSaling: TPanel
         Left = 0
         Top = 0
@@ -115,15 +103,11 @@ object OutputForm: TOutputForm
     object ControllerSheet: TTabSheet
       Tag = 1
       Caption = 'Controller'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnController: TPanel
         Left = 0
         Top = 0
         Width = 457
-        Height = 224
+        Height = 227
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsSingle
@@ -132,7 +116,7 @@ object OutputForm: TOutputForm
           Left = 0
           Top = 0
           Width = 453
-          Height = 220
+          Height = 223
           Align = alClient
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -141,6 +125,7 @@ object OutputForm: TOutputForm
           Font.Style = []
           ParentFont = False
           OnPaint = ControllerPaintBoxPaint
+          ExplicitHeight = 220
         end
         object ZustellBtn: TButton
           Left = 368
@@ -156,10 +141,6 @@ object OutputForm: TOutputForm
     object ChartSheet: TTabSheet
       Tag = 4
       Caption = 'Diagramm'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnChart2: TPanel
         Left = 0
         Top = 0
@@ -169,7 +150,6 @@ object OutputForm: TOutputForm
         BevelOuter = bvNone
         BorderStyle = bsSingle
         TabOrder = 0
-        ExplicitHeight = 224
         object KurveBtn: TSpeedButton
           Left = 360
           Top = 8
@@ -269,7 +249,7 @@ object OutputForm: TOutputForm
         end
         object ChartPaintBox: TPaintBox
           Left = 64
-          Top = 72
+          Top = 70
           Width = 377
           Height = 124
           OnPaint = ChartPaintBoxPaint
@@ -303,10 +283,6 @@ object OutputForm: TOutputForm
     end
     object CommentSheet: TTabSheet
       Caption = 'Kommentar'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object KommentarMemo: TMemo
         Left = 0
         Top = 0
@@ -320,15 +296,11 @@ object OutputForm: TOutputForm
     end
     object KraftSheet: TTabSheet
       Caption = 'Kr'#228'fte'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnKraft: TPanel
         Left = 0
         Top = 0
         Width = 457
-        Height = 224
+        Height = 227
         Align = alClient
         BevelOuter = bvNone
         BorderStyle = bsSingle
@@ -337,9 +309,10 @@ object OutputForm: TOutputForm
           Left = 0
           Top = 0
           Width = 345
-          Height = 220
+          Height = 223
           Align = alLeft
           OnPaint = KraftPaintBoxPaint
+          ExplicitHeight = 220
         end
         object TestBtn: TButton
           Left = 368

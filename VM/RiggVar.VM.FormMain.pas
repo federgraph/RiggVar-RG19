@@ -61,6 +61,8 @@ type
     RotaFormItemCaption: string;
     RotaFormItemHint: string;
 
+    constructor Create;
+
     procedure FestItemClick;
     procedure DrehbarItemClick;
     procedure OSDlgItemClick;
@@ -76,7 +78,7 @@ type
     procedure HideReport;
     procedure HideGrafik;
 
-    procedure UpdateView; virtual; abstract;
+    procedure UpdateView; virtual;
 
     function GetOpenFileName(dn, fn: string): string;
     function GetSaveFileName(dn, fn: string): string;
@@ -96,8 +98,14 @@ type
 implementation
 
 uses
+  RiggUnit,
   FrmRG19,
   FrmMain;
+
+constructor TViewModelMain00.Create;
+begin
+  FestItemClick;
+end;
 
 function TViewModelMain00.GetOpenFileName(dn, fn: string): string;
 begin
@@ -117,6 +125,7 @@ begin
   OSDlgItemChecked := False;
 
   WinkelEnabled := True;
+  KoppelKurveEnabled := True;
   BiegeNeigeItemEnabled := True;
   ReglerItemEnabled := True;
   ReglerBtnEnabled := True;
@@ -126,21 +135,18 @@ begin
   KraftGemessenItemEnabled := True;
   KorrigiertItemEnabled := True;
 
-  KoppelKurveEnabled := True;
+  UpdateView;
 end;
 
 procedure TViewModelMain00.DrehbarItemClick;
 begin
-  WinkelDown := False;
-
   FestItemChecked := False;
   DrehbarItemChecked := True;
   OhneItemChecked := False;
   OSDlgItemChecked := False;
 
   WinkelEnabled := False;
-  WinkelDown := False;
-
+  KoppelKurveEnabled := False;
   BiegeNeigeItemEnabled := True;
   ReglerItemEnabled := True;
   ReglerBtnEnabled := True;
@@ -150,7 +156,7 @@ begin
   KraftGemessenItemEnabled := True;
   KorrigiertItemEnabled := True;
 
-  KoppelKurveEnabled := False;
+  UpdateView;
 end;
 
 procedure TViewModelMain00.OhneItemClick;
@@ -162,9 +168,8 @@ begin
   OhneItemChecked := True;
   OSDlgItemChecked := False;
 
-  WinkelDown := False;
   WinkelEnabled := False;
-
+  KoppelKurveEnabled := False;
   BiegeNeigeItemEnabled := False;
   ReglerItemEnabled := False;
   ReglerBtnEnabled := False;
@@ -174,31 +179,28 @@ begin
   KraftGemessenItemEnabled := True;
   KorrigiertItemEnabled := True;
 
-  KoppelKurveEnabled := False;
+  UpdateView;
 end;
 
 procedure TViewModelMain00.OSDlgItemClick;
 begin
-  WinkelDown := False;
-
   FestItemChecked := False;
   DrehbarItemChecked := False;
   OhneItemChecked := False;
   OSDlgItemChecked := True;
 
-  WinkelDown := False;
   WinkelEnabled := False;
-
+  KoppelKurveEnabled := False;
   BiegeNeigeItemEnabled := False;
   ReglerItemEnabled := False;
   ReglerBtnEnabled := False;
-
-  KoppelKurveEnabled := False;
 
   QuerKraftItemEnabled := False;
   KnickenItemEnabled := False;
   KraftGemessenItemEnabled := False;
   KorrigiertItemEnabled := False;
+
+  UpdateView;
 end;
 
 procedure TViewModelMain00.KnickenItemClick(ct: TCalcTyp);
@@ -253,6 +255,16 @@ begin
   GrafikFormItemChecked := True;
 
   UpdateView;
+end;
+
+procedure TViewModelMain00.UpdateView;
+begin
+  if RiggModul <> nil then
+  begin
+    ControllerEnabled := RiggModul.ControllerEnabled;
+    ControllerDown := RiggModul.ControllerBtnDown;
+    WinkelDown := RiggModul.WinkelBtnDown;
+  end;
 end;
 
 procedure TViewModelMain00.HideConsole;
@@ -323,6 +335,8 @@ end;
 
 procedure TViewModelMainA.UpdateView;
 begin
+  inherited;
+
   FormMain.LEDShape.Brush.Color := LEDColor;
   FormMain.Statusbar.Panels[1].Text := StatusPanelText1;
   FormMain.Caption := Caption;
@@ -379,6 +393,8 @@ end;
 
 constructor TViewModelMainB.Create;
 begin
+  inherited;
+
   InputFormItemEnabled := True;
   OutputFormItemEnabled := True;
   GrafikFormItemEnabled := True;
@@ -390,6 +406,8 @@ end;
 
 procedure TViewModelMainB.UpdateView;
 begin
+  inherited;
+
   FormRG19.LEDShape.Brush.Color := LEDColor;
   FormRG19.Statusbar.Panels[1].Text := StatusPanelText1;
   FormRG19.Caption := Caption;
@@ -440,8 +458,6 @@ begin
 
 //  FormRG19.ConsoleItem.Caption := ConsoleItemCaption;
   FormRG19.ConsoleItem.Hint := ConsoleItemHint;
-
-
 end;
 
 end.

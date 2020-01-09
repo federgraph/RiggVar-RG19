@@ -152,6 +152,9 @@ type
     procedure SetRotaFormActive(const Value: Boolean);
   public
     ViewModelMain: TViewModelMain00;
+    PBG: TPaintbox;
+    RG19A: Boolean;
+    RG19B: Boolean;
 
     Rigg: TRigg;
     RiggReport: TRiggReport;
@@ -248,9 +251,6 @@ type
     procedure RotaFormItemClick;
     procedure PrintGrafik;
     procedure WriteReportToMemo(Memo: TMemo);
-    procedure SalingTypChanged(st: TSalingTyp);
-    procedure CalcTypChanged(ct: TCalcTyp);
-    procedure InputPagesChanged(st: TSalingTyp);
     procedure sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
 
     { Properties }
@@ -797,6 +797,9 @@ var
   c: TCanvas;
   g: TCanvas;
 begin
+  if PBG = nil then
+    Exit;
+
   c := BitmapG.Canvas;
   if PaintBtnDown = False then
   begin
@@ -810,7 +813,7 @@ begin
 
   DrawPaintBoxG(c);
 
-  g := GrafikForm.PaintBoxG.Canvas;
+  g := PBG.Canvas;
   g.CopyMode := cmSrcCopy;
   g.Draw(0, 0, BitMapG);
 
@@ -1207,14 +1210,12 @@ begin
   Modified := False;
 
   SalingTyp := Rigg.SalingTyp;
-  // ControllerTyp := Rigg.ControllerTyp; // see SetControllerBtnDown
   CalcTyp := Rigg.CalcTyp;
   ControllerBtnDown := Rigg.ControllerTyp <> ctOhne;
+  // ControllerTyp := Rigg.ControllerTyp; // see SetControllerBtnDown
 
   { 'TakeOver' }
   ViewModelMain.ControllerDown := ControllerBtnDown;
-  RiggModul.SalingTypChanged(SalingTyp);
-  RiggModul.CalcTypChanged(CalcTyp);
   ViewModelMain.UpdateView;
 end;
 
@@ -1258,7 +1259,8 @@ begin
     GetriebeGrafik.Ansicht := Value;
     TextFlipFlop := True;
     ResetPaintBoxG;
-    GrafikForm.ViewTab.TabIndex := Ord(FViewPoint);
+    if RG19A and (GrafikForm <> nil) then
+      GrafikForm.ViewTab.TabIndex := Ord(FViewPoint);
   end;
   ViewModelMain.VonDerSeiteItemClick(Value);
 end;
@@ -1372,12 +1374,14 @@ end;
 
 procedure TRiggModul.SetCalcTyp(Value: TCalcTyp);
 begin
-  if Value = ctKraftGemessen then
-    ControllerBtnDown := False;
   if FCalcTyp <> Value then
   begin
     FCalcTyp := Value;
     Rigg.CalcTyp := Value;
+
+    if Value = ctKraftGemessen then
+      ControllerBtnDown := False;
+
     if Value <> ctBiegeKnicken then
     begin
       if OutputForm.OutputPages.ActivePage = OutputForm.KraftSheet then
@@ -1388,6 +1392,12 @@ begin
       OutputForm.Kraftsheet.TabVisible := True;
     KurveValid := False;
     UpdateGetriebe;
+
+    ViewModelMain.KnickenItemClick(Value);
+    ViewModelMain.ControllerEnabled := ControllerEnabled;
+    ViewModelMain.ControllerDown := ControllerBtnDown;
+    ViewModelMain.WinkelDown := WinkelBtnDown;
+    ViewModelMain.UpdateView;
   end;
 end;
 
@@ -1445,6 +1455,22 @@ begin
     Getriebegrafik.SalingTyp := Value;
     if ChartFormActive then
       ChartForm.SalingTyp := Value;
+
+    case Value of
+      stFest: InputForm.InputPages.ActivePage := InputForm.tsFest;
+      stDrehbar: InputForm.InputPages.ActivePage := InputForm.tsDrehbar;
+      stOhne: InputForm.InputPages.ActivePage := InputForm.tsOhne;
+      stOhne_2: InputForm.InputPages.ActivePage := InputForm.tsOhneStarr;
+    end;
+
+    case Value of
+      stFest: ViewModelMain.FestItemClick;
+      stDrehbar: ViewModelMain.DrehbarItemClick;
+      stOhne: ViewModelMain.OhneItemClick;
+      stOhne_2: ViewModelMain.OSDlgItemClick;
+    end;
+
+    Draw;
   end;
 end;
 
@@ -1647,38 +1673,6 @@ begin
   ViewModelMain.UpdateView;
 end;
 
-procedure TRiggModul.SalingTypChanged(st: TSalingTyp);
-begin
-  case st of
-    stFest: InputForm.InputPages.ActivePage := InputForm.tsFest;
-    stDrehbar: InputForm.InputPages.ActivePage := InputForm.tsDrehbar;
-    stOhne: InputForm.InputPages.ActivePage := InputForm.tsOhne;
-    stOhne_2: InputForm.InputPages.ActivePage := InputForm.tsOhneStarr;
-  end;
-  InputPagesChanged(st);
-end;
-
-procedure TRiggModul.InputPagesChanged(st: TSalingTyp);
-begin
-  case InputForm.InputPages.ActivePage.Tag of
-    0: ViewModelMain.FestItemClick;
-    1: ViewModelMain.DrehbarItemClick;
-    2: ViewModelMain.OhneItemClick;
-    3: ViewModelMain.OSDlgItemClick;
-  end;
-end;
-
-procedure TRiggModul.CalcTypChanged(ct: TCalcTyp);
-begin
-  RiggModul.CalcTyp := ct;
-
-  ViewModelMain.KnickenItemClick(ct);
-  ViewModelMain.ControllerEnabled := ControllerEnabled;
-  ViewModelMain.ControllerDown := ControllerBtnDown;
-  ViewModelMain.WinkelDown := WinkelBtnDown;
-  ViewModelMain.UpdateView;
-end;
-
 procedure TRiggModul.ChartItemClick;
 begin
   ChartForm := TChartFormGS.Create(Application);
@@ -1831,7 +1825,7 @@ begin
   Printer.BeginDoc;
 
   h := Printer.Canvas.Handle;
-  pb := GrafikForm.PaintBoxG;
+  pb := PBG;
   SetMapMode(h, MM_ISOTROPIC);
   SetWindowExtEx(h, pb.Width * Zoom, pb.Height * Zoom, nil);
   SetWindowOrgEx(h, (pb.Width * Zoom) div 2, (pb.Height * Zoom) div 2, nil);
@@ -2617,7 +2611,8 @@ begin
   begin
     TextFlipFlop := True;
     ResetPaintBoxG;
-    GrafikForm.ViewTab.TabIndex := Ord(FViewPoint);
+    if RG19A and (GrafikForm <> nil) then
+      GrafikForm.ViewTab.TabIndex := Ord(FViewPoint);
   end;
 end;
 
@@ -2633,7 +2628,7 @@ end;
 
 procedure TRiggModul.GetGBoxOffset;
 begin
-  GetriebeGrafik.CalcOffset(GrafikForm.PaintBoxG.ClientRect);
+  GetriebeGrafik.CalcOffset(PBG.ClientRect);
   AdjustGbox(Self);
 end;
 

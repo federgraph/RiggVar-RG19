@@ -439,11 +439,11 @@ end;
   k5 := (FrMastoben+FrMastEnde)* sin(tempGamma);
   k7 := (FrMastoben+FrMastEnde)* cos(tempGamma);
   tempBeta := arctan2(k5, (FrMastunten+k7));
-  k3 := sqrt(sqr(k5)+sqr(FrMastunten+k7)); {oder k3 := k5/sin(tempBeta)}
+  k3 := sqrt(sqr(k5)+sqr(FrMastunten+k7)); { oder k3 := k5/sin(tempBeta) }
   {k3 ist der Abstand D0F}
 
   { Bessere Werte für k3 und tempBeta bestimmen }
-  KorrekturF(tempH, k1, k2, k3, tempBeta, tempGamma); {virtuelle Methode !!!}
+  KorrekturF(tempH, k1, k2, k3, tempBeta, tempGamma); { virtuelle Methode }
 
   { 2. Berechnung Punkt F mit Mastfall}
   with SchnittKK do begin
@@ -720,7 +720,7 @@ begin
   {k3 ist der Abstand D0F}
 
   { Bessere Werte für k3 und tempBeta bestimmen }
-  KorrekturF(tempH, k1, k2, k3, tempBeta, tempGamma); {virtuelle Methode !!!}
+  KorrekturF(tempH, k1, k2, k3, tempBeta, tempGamma); { virtuelle Methode }
 
   { 2. Berechnung Punkt F mit Mastfall}
   with SchnittKK do begin
