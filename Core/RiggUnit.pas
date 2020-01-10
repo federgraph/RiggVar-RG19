@@ -57,7 +57,6 @@ type
 
   TRiggModul = class(TComponent)
   private
-    { Felder für Properties }
     FSofortBerechnen: Boolean;
     FKorrigiertItem: Boolean;
     FPaintBtnDown: Boolean;
@@ -80,29 +79,12 @@ type
     FSalingTyp: TSalingTyp;
     FControllerTyp: TControllerTyp;
 
-    { private Variablen, keine Properties }
+    { private variables, not properties }
     NeedPaint: Boolean;
     Grauzeichnen: Boolean;
     TextFlipFlop: Boolean;
 
-    (* wird nicht benötigt ?
-    Changed: Boolean; { um mehrfaches Update zu verhindern }
-    Changing: Boolean;
-    *)
-
-    { Diagramm }
-    {   an anderer Stelle:
-      SBName,
-      CursorSB,
-      KurveValid,
-      ChartValid,
-      YComboSavedItemIndex,
-      YComboBox-Zeiger,
-      ChartPaintBox-Zeiger,
-      procedure DrawPoint;
-      procedure DrawChartPaintBox(Canvas: TCanvas; Rect: TRect);
-    }
-    //ShowRectangle: Boolean;
+    { Diagram.Begin }
     sbPuffer: TTrimmControls;
     TopTitel, LeftTitel, BottomTitel, RightTitel: string;
     Xmin, Xmax, Ymin, Ymax, YGap: single;
@@ -125,7 +107,7 @@ type
     function GetXText(sbn: TsbName): string;
     function GetYText(Text: string): string;
     function GetPunktColor: TColor;
-    { Ende Diagramm }
+    { Diagram.End }
 
     { private Getters and Setters }
     function GetControllerEnabled: Boolean;
@@ -153,8 +135,7 @@ type
   public
     ViewModelMain: TViewModelMain00;
     PBG: TPaintbox;
-    RG19A: Boolean;
-    RG19B: Boolean;
+    RG19A: Boolean; { RG19A = MDI app }
 
     Rigg: TRigg;
     RiggReport: TRiggReport;
@@ -223,7 +204,7 @@ type
     procedure AdjustGBox(Sender: TObject);
     procedure GetGBoxOffset;
 
-    { frühere EventHandler }
+    { former event handlers }
     procedure UpdateGUI;
     procedure Neu(Doc: TRggDocument);
     procedure Open(FileName: string);
@@ -313,7 +294,7 @@ constructor TRiggModul.Create(AOwner: TComponent);
 begin
   inherited;
 
-  if Application.Title = 'RG19B' then
+  if not RG19A then
     ViewModelMain := TViewModelMainB.Create
   else
     ViewModelMain := TViewModelMainA.Create;
@@ -340,8 +321,8 @@ begin
   FSalingTyp := stFest;
   FControllerTyp := ctDruck;
 
-  { Grauzeichnen := False; } { braucht nicht initialisiert werden }
-  { TextFlipFlop := False; } { braucht nicht initialisiert werden }
+  { Grauzeichnen := False; }
+  { TextFlipFlop := False; }
   IniFileName := '';
 
   RiggModul := Self;
@@ -373,8 +354,8 @@ begin
   GetriebeGrafik.Ansicht := vpSeite;
 
   BitmapG := TBitmap.Create;
-  BitmapG.Width := 293; { PaintBoxG.Width; }
-  BitmapG.Height := 422; { PaintBoxG.Height; }
+  BitmapG.Width := 293;
+  BitmapG.Height := 422;
   BitmapG.Canvas.Font.Name := 'Arial';
   BitmapG.Canvas.Font.Height := 14;
   PaintBackGround(BitmapG);
@@ -390,13 +371,13 @@ begin
   // SalingCtrl.PBSize := SalingPaintBox.ClientRect.BottomRight;
 
   BitmapS := TBitmap.Create;
-  BitmapS.Width := 453; { SalingPaintBox.Width; }
-  BitmapS.Height := 220; { SalingPaintBox.Height; }
+  BitmapS.Width := 453;
+  BitmapS.Height := 220;
   PaintBackGround(BitmapS);
 
   BitmapC := TBitmap.Create;
-  BitmapC.Width := 453; { ControllerPaintBox.Width; }
-  BitmapC.Height := 220; { ControllerPaintBox.Height; }
+  BitmapC.Width := 453;
+  BitmapC.Height := 220;
   PaintBackGround(BitmapC);
 
   { Berichte }
@@ -412,23 +393,10 @@ begin
   NeedPaint := True;
   UpdateGetriebe;
   TestBtnClick;
-
-//  try
-//    RggInputServer := TRggInputServer.Create;
-//    RggOutputServer := TRggOutputServer.Create;
-//  except
-//    RggInputServer.Free;
-//    RggInputServer := nil;
-//    RggOutputServer.Free;
-//    RggInputServer := nil;
-//  end;
 end;
 
 destructor TRiggModul.Destroy;
 begin
-//  RggInputServer.Free;
-//  RggOutputServer.Free;
-
   GetriebeGrafik.Rotator.Free;
   GetriebeGrafik.Free;
   SalingCtrl.Free;
@@ -466,18 +434,18 @@ begin
     SetupGCtrl(InputForm.sbWinkel, fpVorstag);
   SetupGCtrl(InputForm.sbVorstagD, fpVorstag);
   SetupGCtrl(InputForm.sbVorstagOhne, fpVorstag);
-  {Wante}
+  { Wante }
   SetupGCtrl(InputForm.sbWante, fpWante);
   SetupGCtrl(InputForm.sbWanteD, fpWante);
   SetupGCtrl(InputForm.sbWanteOhne, fpWante);
-  {Woben}
+  { Woben }
   SetupGCtrl(InputForm.sbWoben, fpWoben);
   SetupGCtrl(InputForm.sbWobenD, fpWoben);
-  {Saling}
+  { Saling }
   SetupGCtrl(InputForm.sbSalingH, fpSalingH);
   SetupGCtrl(InputForm.sbSalingA, fpSalingA);
   SetupGCtrl(InputForm.sbSalingLD, fpSalingL);
-  {Ohne Saling starr}
+  { Ohne Saling starr }
   SetupGCtrl(InputForm.sbVorstagOS, fpVorstagOS);
   InputForm.sbVorstagOS.Position := Round(Rigg.GSB.Find(fpVorstag).Ist);
   SetupGCtrl(InputForm.sbWPowerOS, fpWPowerOS);
@@ -514,7 +482,7 @@ begin
   InputForm.lbD2.Caption := InputForm.lbValue2.Caption;
   InputForm.lbD3.Caption := InputForm.lbValue3.Caption;
   InputForm.lbD4.Caption := InputForm.lbValue4.Caption;
-//InputForm.lbD5.Caption := InputForm.lbValue5.Caption; { SalingL: oben schon gesetzt }
+//InputForm.lbD5.Caption := InputForm.lbValue5.Caption; { SalingL: see above }
 
   InputForm.lbOhne1.Caption := InputForm.lbValue1.Caption;
   InputForm.lbOhne2.Caption := InputForm.lbValue2.Caption;
@@ -714,11 +682,11 @@ begin
   if OutputForm.OutputPages.ActivePage = OutputForm.ControllerSheet then
   begin
     TrimmRec := Rigg.Glieder;
-    { Abstand(iP[ooE0,x],iP[ooE,x]) in mm}
+    { Abstand(iP[ooE0,x], iP[ooE,x]) in mm}
     SalingCtrl.ControllerPos := TrimmRec.Controller;
     { Position des Mastes in Deckshöhe von D0 aus in mm }
     SalingCtrl.ParamXE := Round(Rigg.MastPositionE);
-    { Abstand(iP[ooD0,x],iP[ooE0,x]) in mm }
+    { Abstand(iP[ooD0,x], iP[ooE0,x]) in mm }
     SalingCtrl.ParamXE0 := Round(Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x]);
     { Abstand von E0 zur Anschlagkante Deck + Klotzdicke }
     SalingCtrl.EdgePos := Round(Rigg.GSB.Find(fpController).Min);
@@ -780,16 +748,14 @@ begin
     LEDShape := False;
   end;
   if OutputForm.OutputPages.ActivePage = OutputForm.ChartSheet then
-    UpdateRiggPunkt; {GetriebePunkte oben schon aktualisiert}
-  AusgabeText; {Texte müssen vor Draw gesetzt werden}
+    UpdateRiggPunkt; { GetriebePunkte oben schon aktualisiert }
+  AusgabeText; { update text befor drawing }
   AusgabeKommentar;
   DrawPaintBoxM;
   Draw;
   rLItemClick(ReportItem);
   ViewModelMain.UpdateView;
 end;
-
-(***************************************************************************)
 
 procedure TRiggModul.Draw;
 var
@@ -864,7 +830,7 @@ begin
   end;
 
   { gespanntes Rigg farbig zeichnen}
-//  GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta); // jetzt oben schon gesetzt
+//  GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta); // see above
   GetriebeGrafik.Coloriert := True;
   GetriebeGrafik.WanteGestrichelt := not Rigg.GetriebeOK;
   GetriebeGrafik.Koordinaten := Rigg.rP;
@@ -896,7 +862,7 @@ begin
   end;
 
   { gespanntes Rigg farbig zeichnen}
-  // GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta); // siehe oben
+  // GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta); // see above
   GetriebeGrafik.Coloriert := True;
   GetriebeGrafik.WanteGestrichelt := not Rigg.GetriebeOK;
   GetriebeGrafik.Koordinaten := Rigg.rP;
@@ -928,8 +894,6 @@ begin
   end;
   Rigg.DrawMastLine(PaintBox.Canvas, PaintBox.BoundsRect);
 end;
-
-(******************************************************************)
 
 procedure TRiggModul.AusgabeText;
 var
@@ -1702,11 +1666,6 @@ end;
 
 procedure TRiggModul.RotaFormItemClick;
 begin
-  if Application.Title = 'RG19B' then
-  begin
-
-  end;
-
   AniRotationForm := TAniRotationForm.Create(Application.MainForm);
   AniRotationForm.UpdateAll(Rigg);
 
@@ -1752,8 +1711,6 @@ begin
     UpdateRigg;
   end;
 end;
-
-{******************************************************************************}
 
 function GetEnvelopeSize: TPoint;
 var
@@ -1955,8 +1912,6 @@ begin
   Clipboard.Assign(MetaFile);
   MetaFile.Free;
 end;
-
-{************************************************************************}
 
 procedure TRiggModul.StraightLine;
 var
@@ -2496,36 +2451,6 @@ begin
   GetCurves;
 end;
 
-{
-procedure TRiggModul.ChartFXItemClick;
-var
-  CF: TChartFXForm;
-begin
-  CF := TChartFXForm.Create(Self);
-  try
-    CF.TopTitel := TopTitel;
-    CF.LeftTitel := LeftTitel;
-    CF.BottomTitel := BottomTitel;
-    CF.RightTitel := RightTitel;
-    CF.Xmin := Xmin;
-    CF.Xmax := Xmax;
-    CF.Ymin := Ymin;
-    CF.Ymax := Ymax;
-    CF.YGap := YGap;
-    CF.ChartPunktX := ChartPunktX;
-    CF.ChartPunktY := ChartPunktY;
-    CF.PunktColor := PunktColor;
-    CF.f := f;
-    if KurveValid then CF.LEDColor := clLime else CF.LEDColor := clRed;
-    CF.ShowModal;
-  finally
-    CF.Free;
-  end;
-end;
-}
-
-{******************************************************************************}
-
 procedure TRiggModul.SalingPaintBoxClick;
 begin
   SalingCtrl.SalingDetail := not SalingCtrl.SalingDetail;
@@ -2794,7 +2719,7 @@ begin
 
   end;
 
-  //if not SofortBerechnen then
+  // if not SofortBerechnen then
   begin
     if t = SBMappingArray[CursorSB] then
       ShowTriangle := True

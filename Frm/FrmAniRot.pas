@@ -146,7 +146,7 @@ begin
   MinTrackY := 230;
 {$endif}
 
-  if Application.Title = 'RG19A' then
+  if RiggModul.RG19A then
     Formstyle := fsMDIChild;
 
   AniIncrement := 1;
@@ -161,7 +161,7 @@ begin
   AnimationForm := TAnimationForm.Create(Self);
   CommandForm := TCommandForm.Create(Self);
 
-  if Application.Title = 'RG19A' then
+  if RiggModul.RG19A then
     InitMenu;
 end;
 

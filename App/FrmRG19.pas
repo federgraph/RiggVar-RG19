@@ -357,7 +357,6 @@ begin
   RiggModul := TRiggModul.Create(Self);
   rggm := TRggMain.Create(RiggModul.Rigg);
   RiggModul.PBG := PaintboxG;
-  RiggModul.RG19B := True;
 
   Main := TMain.Create(rggm);
   Main.Logger.Verbose := True;
@@ -2121,7 +2120,7 @@ begin
 
   { Window }
 
-  if Application.Title = 'RG10A' then
+  if RiggModul.RG19A then
   begin
     WindowMenu := AddP('WindowMenu');
     mi.Caption := '&Fenster';

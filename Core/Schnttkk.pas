@@ -319,7 +319,7 @@ M :
 
 end;
 
-{ ***************************************************************************** }
+{ TSplitF }
 
 procedure TSplitF.SplitCalc;
 begin
@@ -329,7 +329,7 @@ begin
   l1 := h / cos(alpha);
 end;
 
-{ ***************************************************************************** }
+{ TTetraF }
 
 constructor TTetraF.Create;
 begin

@@ -184,8 +184,6 @@ begin
   rp[ooM] := ooTemp;
 end;
 
-(* **************************************************************** *)
-
 procedure TGetriebeFS.BerechneWinkel;
 { FrVorstag gegeben, FrWinkel gesucht }
 var
@@ -328,8 +326,6 @@ begin
   Rest;
 end;
 
-(* **************************************************************** *)
-
 function TGetriebeFS.Koppelkurve: TKoordLine;
 { Koppelkurve Viergelenk P0, P, D, D0 }
 { Wanten2d neu bereitgestellt,
@@ -405,8 +401,6 @@ begin
 
   rP := oooTemp; { aktuelle Koordinaten wiederherstellen }
 end;
-
-(* **************************************************************** *)
 
 procedure TGetriebeFS.KorrekturF(tempH, k1, k2: double; var k3, Beta, Gamma: double);
 { Prozedur ist virtuell und wird später überschrieben,
@@ -510,8 +504,6 @@ begin
   FrController := FiControllerAnschlag;
   Wanten2dTo3d;
 end;
-
-(* **************************************************************** *)
 
 procedure TGetriebeFS.UpdateGetriebeDS;
 { gegeben: Woben3d, Wunten3d, Mastunten, Mastoben, SalingL,
@@ -691,8 +683,6 @@ begin
   Rest;
 end;
 
-(* **************************************************************** *)
-
 (*
 procedure TGetriebeFS.BiegeUndNeigeDS(TrimmSoll:TTrimm; var SalingLStart:double);
   { var Parameter SalingLStart wird vom Regler benötigt }
@@ -824,8 +814,6 @@ begin
   FrSalingH := Abstand(rP[ooP], rP[ooD]);
   FrController := FiControllerAnschlag;
 end;
-
-(* **************************************************************** *)
 
 procedure TGetriebeFS.UpdateGetriebeOS;
 { FrVorstag und FrWoben2d gegeben }

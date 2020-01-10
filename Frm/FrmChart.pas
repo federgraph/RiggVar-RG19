@@ -287,7 +287,7 @@ begin
   YComboBox.ItemIndex := 1;
   UpdateYAchseList; { ComboIndex festlegen in YAchseRecordList }
 
-  if Application.Title = 'RG19A' then
+  if RiggModul.RG19A then
   begin
     FormStyle := fsMDIChild;
     InitMenu;

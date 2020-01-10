@@ -65,7 +65,7 @@ end;
 
 procedure TReportForm.FormCreate(Sender: TObject);
 begin
-  if Application.Title = 'RG19A' then
+  if RiggModul.RG19A then
   begin
     FormStyle := fsMDIChild;
     InitMenu;

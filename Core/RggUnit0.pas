@@ -153,8 +153,6 @@ begin
   inherited Destroy;
 end;
 
-(* **************************************************************** *)
-
 procedure TGetriebe.SetSalingTyp(Value: TSalingTyp);
 begin
   if Value <> FSalingTyp then
@@ -315,8 +313,6 @@ begin
   end;
   result := SD;
 end;
-
-(* **************************************************************** *)
 
 procedure TGetriebe.IntGliederToReal;
 begin
@@ -635,8 +631,6 @@ begin
   FrBasis := Abstand(rP[ooP0], rP[ooD0]);
   FrAlpha := arctan2((rP[ooP0, z] - rP[ooD0, z]), (rP[ooD0, x] - rP[ooP0, x]));
 end;
-
-{ ****************************************************************************** }
 
 procedure TGetriebe.WriteToIniFile(ini: TIniFile);
 var

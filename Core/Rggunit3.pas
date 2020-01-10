@@ -247,8 +247,6 @@ begin
   end;
 end;
 
-(* **************************************************************** *)
-
 procedure TRiggFS.UpdateRigg;
 begin
   FRiggOK := True;
@@ -309,8 +307,6 @@ begin
   end;
 end;
 
-(* **************************************************************** *)
-
 procedure TRiggFS.Kraefte;
 begin
   { Kräfte für Verwendung in Probe speichern: }
@@ -362,8 +358,6 @@ begin
     end;
   end;
 end;
-
-(* **************************************************************** *)
 
 procedure TRiggFS.Split;
 var
@@ -475,8 +469,6 @@ begin
     end;
   end;
 end;
-
-(* **************************************************************** *)
 
 procedure TRiggFS.Probe;
 
@@ -615,7 +607,6 @@ begin
   end;
 end;
 
-(* **************************************************************** *)
 procedure TRiggFS.MakeRumpfKoord;
 begin
   { Festpunkte übernehmen }
@@ -866,8 +857,6 @@ begin
   end;
 end;
 
-(* **************************************************************** *)
-
 procedure TRiggFS.KraefteOS;
 var
   temp: double;
@@ -922,8 +911,6 @@ begin
     ActionF;
   end;
 end;
-
-(* **************************************************************** *)
 
 procedure TRiggFS.SplitOS;
 var
@@ -1000,8 +987,6 @@ begin
   end;
 end;
 
-(* **************************************************************** *)
-
 procedure TRiggFS.MakeKoordOS;
 var
   Temp: TRealPoint;
@@ -1060,8 +1045,6 @@ begin
       LogList.Add('TRiggFS.MakeKoord:  ' + E.Message);
   end;
 end;
-
-(* **************************************************************** *)
 
 { Regeln funktioniert auch bei Durchbiegung Null, weil die
   Ermittlung der Höhe hd immer(!) eine kleine Auslenkung

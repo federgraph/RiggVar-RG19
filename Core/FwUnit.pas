@@ -98,8 +98,6 @@ begin
   FS1 := ClearVektorS;
 end;
 
-(* **************************************************************** *)
-
 procedure TFachwerk.KG22(l, l1, l2, l3, l4, i1, i2, i3, i4: Integer);
 begin
   { unbekannte Kraft Nr.1 }
@@ -177,8 +175,6 @@ begin
   FS1[i2] := D2 / D * W2; { 2. neu ermittelte Stabkraft }
 end; { KG21 }
 
-(* **************************************************************** *)
-
 procedure TFachwerk.Stabkraefte;
 { Puffer der ermittelten Stabkräfte ist Vektor FS1 }
 begin
@@ -215,8 +211,6 @@ begin
   KG21(6, 5, 4, 2, 9, 7, 3);
 end;
 
-(* **************************************************************** *)
-
 procedure TFachwerk.Auflagerkraefte(SumFX, SumFY, SumMO: double; var Lager: TAuflager);
 var
   FB: double;
@@ -227,8 +221,6 @@ begin
   Lager[AX] := -SumFX - Lager[BX];
   Lager[AY] := -SumFY - Lager[BY];
 end;
-
-(* **************************************************************** *)
 
 procedure TFachwerk.Verschiebungen;
 var
@@ -297,8 +289,6 @@ begin
 
   end; { l }
 end; { Verschiebungen }
-
-(* **************************************************************** *)
 
 procedure TFachwerk.ActionF;
 var
