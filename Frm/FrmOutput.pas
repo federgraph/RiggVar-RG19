@@ -83,8 +83,11 @@ end;
 
 procedure TOutputForm.FormDestroy(Sender: TObject);
 begin
-  RiggModul.ControllerPaintBox := nil;
-  RiggModul.SalingPaintBox := nil;
+  if RiggModul <> nil then
+  begin
+    RiggModul.ControllerPaintBox := nil;
+    RiggModul.SalingPaintBox := nil;
+  end;
 end;
 
 procedure TOutputForm.YComboBoxChange(Sender: TObject);
@@ -165,8 +168,11 @@ end;
 
 procedure TOutputForm.FormHide(Sender: TObject);
 begin
-  RiggModul.ViewModelMain.OutputFormItemChecked := False;
-  RiggModul.ViewModelMain.UpdateView;
+  if RiggModul <> nil then
+  begin
+    RiggModul.ViewModelMain.OutputFormItemChecked := False;
+    RiggModul.ViewModelMain.UpdateView;
+  end;
 end;
 
 end.

@@ -62,8 +62,11 @@ end;
 
 procedure TGrafikForm.FormHide(Sender: TObject);
 begin
-  RiggModul.ViewModelMain.GrafikFormItemChecked := False;
-  RiggModul.ViewModelMain.UpdateView;
+  if RiggModul <> nil then
+  begin
+    RiggModul.ViewModelMain.GrafikFormItemChecked := False;
+    RiggModul.ViewModelMain.UpdateView;
+  end;
 end;
 
 procedure TGrafikForm.FormShow(Sender: TObject);

@@ -38,8 +38,6 @@ type
     procedure ViewpointT;
   public
     Logger: TLogger;
-    IsRetina: Boolean;
-    RetinaScale: single;
     IsUp: Boolean;
     IsOrthoProjection: Boolean;
     constructor Create;

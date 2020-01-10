@@ -436,7 +436,7 @@ object FormRG19: TFormRG19
       Width = 97
       Height = 17
       Caption = 'Sandboxed'
-      TabOrder = 3
+      TabOrder = 2
     end
     object cbAllProps: TCheckBox
       Left = 305
@@ -444,15 +444,7 @@ object FormRG19: TFormRG19
       Width = 97
       Height = 17
       Caption = 'All Props ( TI )'
-      TabOrder = 4
-    end
-    object ViewpointCombo: TComboBox
-      Left = 10
-      Top = 148
-      Width = 177
-      Height = 21
-      TabOrder = 2
-      Text = 'ViewpointCombo'
+      TabOrder = 3
     end
     object cbAllTags: TCheckBox
       Left = 305
@@ -460,7 +452,15 @@ object FormRG19: TFormRG19
       Width = 97
       Height = 17
       Caption = 'All Tags ( XML )'
+      TabOrder = 4
+    end
+    object ViewpointCombo: TComboBox
+      Left = 10
+      Top = 148
+      Width = 177
+      Height = 21
       TabOrder = 5
+      Text = 'ViewpointCombo'
     end
   end
   object Listbox: TListBox

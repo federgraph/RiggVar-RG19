@@ -176,6 +176,7 @@ type
     destructor Destroy; override;
 
     procedure DoOnWheelScroll(fp: TFederParam; ScrollPos: Integer);
+    procedure DoOnUpdateSalingTyp(Value: TSalingTyp);
 
     procedure SetupGCtrl(a: TScrollBar; b: TsbName);
     procedure SetupGCtrls;
@@ -269,6 +270,7 @@ var
 implementation
 
 uses
+  RiggVar.App.Main,
   FWUnit,
   RggScroll,
   Rggmat01,
@@ -408,6 +410,8 @@ begin
   BitmapC.Free;
 
   ViewModelMain.Free;
+
+  RiggModul := nil;
   inherited;
 end;
 
@@ -1411,11 +1415,26 @@ begin
 end;
 
 procedure TRiggModul.SetSalingTyp(Value: TSalingTyp);
+var
+  fa: Integer;
+begin
+  case Value of
+    stFest: fa := faSalingTypFest;
+    stDrehbar: fa := faSalingTypDrehbar;
+    stOhne: fa := faSalingTypOhne;
+    stOhne_2: fa := faSalingTypOhneStarr;
+    else
+      fa := faSalingTypFest;
+  end;
+  Main.HandleAction(fa);
+end;
+
+procedure TRiggModul.DoOnUpdateSalingTyp(Value: TSalingTyp);
 begin
   if FSalingTyp <> Value then
   begin
     FSalingTyp := Value;
-    Rigg.SalingTyp := Value;
+//    Rigg.SalingTyp := Value;
     Getriebegrafik.SalingTyp := Value;
     if ChartFormActive then
       ChartForm.SalingTyp := Value;

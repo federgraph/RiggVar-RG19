@@ -141,7 +141,7 @@ type
 
     procedure Init420;
     procedure InitLogo;
-    procedure InitSalingTyp(i: Integer);
+    procedure InitSalingTyp(fa: Integer);
 
     procedure Draw;
 
@@ -980,15 +980,17 @@ begin
   Main.TrimmNoChange := 8;
 end;
 
-procedure TRggMain.InitSalingTyp(i: Integer);
+procedure TRggMain.InitSalingTyp(fa: Integer);
 begin
-  case i of
-    0: Rigg.SalingTyp := stOhne;
-    1: Rigg.SalingTyp := stDrehbar;
-    2: Rigg.SalingTyp := stFest;
+  case fa of
+    faSalingTypOhne: Rigg.SalingTyp := stOhne;
+    faSalingTypDrehbar: Rigg.SalingTyp := stDrehbar;
+    faSalingTypFest: Rigg.SalingTyp := stFest;
+    faSalingTypOhneStarr: Rigg.SalingTyp := stOhne_2;
   end;
   StrokeRigg.SalingTyp := Rigg.SalingTyp;
   SetParam(FParam);
+  RiggModul.DoOnUpdateSalingTyp(Rigg.SalingTyp);
 end;
 
 procedure TRggMain.UpdateColumnC(ML: TStrings);

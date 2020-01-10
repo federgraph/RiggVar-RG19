@@ -3,9 +3,9 @@
 interface
 
 uses
-  Winapi.Windows,
   System.SysUtils,
   System.Classes,
+  System.UITypes,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -205,8 +205,11 @@ end;
 
 procedure TInputForm.FormHide(Sender: TObject);
 begin
-  RiggModul.ViewModelMain.InputFormItemChecked := False;
-  RiggModul.ViewModelMain.UpdateView;
+  if RiggModul <> nil then
+  begin
+    RiggModul.ViewModelMain.InputFormItemChecked := False;
+    RiggModul.ViewModelMain.UpdateView;
+  end;
 end;
 
 end.

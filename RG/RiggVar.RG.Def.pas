@@ -117,6 +117,8 @@ const
   faUpdateReportText = 74;
   faToggleDebugText = 75;
 
+  faSalingTypOhneStarr = 76;
+
   cFaktor = 'Faktor';
   cName = 'Name';
 

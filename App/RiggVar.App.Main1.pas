@@ -654,9 +654,10 @@ begin
     faFixpointF0: RggMain.FixName := ooF0;
     faFixpointF: RggMain.FixName := ooF;
 
-    faSalingTypOhne: RggMain.InitSalingTyp(0);
-    faSalingTypDrehbar: RggMain.InitSalingTyp(1);
-    faSalingTypFest: RggMain.InitSalingTyp(2);
+    faSalingTypFest,
+    faSalingTypDrehbar,
+    faSalingTypOhne,
+    faSalingTypOhneStarr: RggMain.InitSalingTyp(fa);
 
     faWantRenderH,
     faWantRenderP,
@@ -800,12 +801,9 @@ begin
 
   ML.Add('Report:');
   ML.Add('  ReportCounter = ' + IntToStr(ReportCounter));
-  ML.Add('  Scale = ' + FloatToStr(RetinaScale));
-  ML.Add('  Retina = ' + BoolStr[IsRetina]);
   ML.Add('  Sandboxed = ' + BoolStr[IsSandboxed]);
   ML.Add('  WantOnResize = ' + BoolStr[MainVar.WantOnResize]);
   ML.Add('  ResizeCounter = ' + IntToStr(ResizeCounter));
-//  ML.Add(Format('  (%d x %d)', [ClientWidth, ClientHeight]));
   ML.Add('---');
   ShowDataText := true;
 end;

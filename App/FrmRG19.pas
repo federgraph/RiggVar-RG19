@@ -149,7 +149,6 @@ type
     TrimmCombo: TComboBox;
     cbSandboxed: TCheckBox;
     cbAllProps: TCheckBox;
-    ViewpointCombo: TComboBox;
     cbAllTags: TCheckBox;
     Listbox: TListBox;
     ReportMemo: TMemo;
@@ -157,6 +156,7 @@ type
     PaintBox1: TPaintBox;
     PaintBox2: TPaintBox;
     PaintBoxG: TPaintBox;
+    ViewpointCombo: TComboBox;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -1194,7 +1194,7 @@ begin
   Paintbox1.Width := ClientWidth - Paintbox1.Left - Margin;
   Paintbox1.Height := PaintboxG.Height;
   Paintbox1.Anchors := Paintbox1.Anchors + [akRight];
-  Paintbox1.Color := clAqua;
+  Paintbox1.Color := TColors.Antiquewhite;
   Paintbox1.OnPaint := PaintboxPaint;
 
   Paintbox2.Left := PaintboxG.Left;
@@ -1202,7 +1202,7 @@ begin
   Paintbox2.Width := ClientWidth - Paintbox2.Left - Margin;
   Paintbox2.Height := StatusBar.Top - Paintbox2.Top - Margin;
   Paintbox2.Anchors := Paintbox2.Anchors + [akRight, akBottom];
-  Paintbox2.Color := clYellow;
+  Paintbox2.Color := TColors.Beige;
   Paintbox2.OnPaint := PaintboxPaint;
 
   BtnCounter := 0;

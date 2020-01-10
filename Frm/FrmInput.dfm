@@ -345,10 +345,6 @@ object InputForm: TInputForm
     object tsDrehbar: TTabSheet
       Tag = 1
       Caption = 'drehbar'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnDrehbar: TPanel
         Left = 0
         Top = 0
@@ -619,10 +615,6 @@ object InputForm: TInputForm
     object tsOhne: TTabSheet
       Tag = 2
       Caption = 'ohne'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnOhneBK: TPanel
         Left = 0
         Top = 0
@@ -799,10 +791,6 @@ object InputForm: TInputForm
     object tsOhneStarr: TTabSheet
       Tag = 3
       Caption = 'ohne ( Mast steif)'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnOhne: TPanel
         Left = 0
         Top = 0
