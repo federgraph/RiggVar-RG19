@@ -19,7 +19,7 @@
 interface
 
 uses
-  SysUtils,
+  System.SysUtils,
   System.Classes,
   System.UITypes,
   RiggVar.RG.Def;

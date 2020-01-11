@@ -149,6 +149,9 @@ begin
   InitTrimmData;
 
   RggMain := rggm; //TRggMain.Create;
+
+  RggMain.Init420;
+  RggMain.InitLogo;
 end;
 
 destructor TMain1.Destroy;
@@ -602,6 +605,7 @@ end;
 
 procedure TMain1.SetTrimm(const Value: Integer);
 begin
+  RiggModul.DoResetForTrimmData;
   Logger.Info('SetTrimm: ' + IntToStr(Value));
   FTrimm := Value;
   RggMain.LoadTrimm(CurrentTrimm);

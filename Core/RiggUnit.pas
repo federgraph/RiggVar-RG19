@@ -177,6 +177,8 @@ type
 
     procedure DoOnWheelScroll(fp: TFederParam; ScrollPos: Integer);
     procedure DoOnUpdateSalingTyp(Value: TSalingTyp);
+    procedure DoUpdateChartBuffer;
+    procedure DoResetForTrimmData;
 
     procedure SetupGCtrl(a: TScrollBar; b: TsbName);
     procedure SetupGCtrls;
@@ -341,7 +343,7 @@ begin
 
   MemCtrl := ZeroCtrl;
   RefCtrl := Rigg.Glieder;
-  SBPuffer := Rigg.Glieder;
+  sbPuffer := Rigg.Glieder;
   RefPoints := Rigg.rP;
 
   { GetriebeGrafik }
@@ -1418,15 +1420,19 @@ procedure TRiggModul.SetSalingTyp(Value: TSalingTyp);
 var
   fa: Integer;
 begin
-  case Value of
-    stFest: fa := faSalingTypFest;
-    stDrehbar: fa := faSalingTypDrehbar;
-    stOhne: fa := faSalingTypOhne;
-    stOhne_2: fa := faSalingTypOhneStarr;
-    else
-      fa := faSalingTypFest;
+  if SalingTyp <> Value then
+  begin
+    AllreadyUpdatedGetriebeFlag := False;
+    case Value of
+      stFest: fa := faSalingTypFest;
+      stDrehbar: fa := faSalingTypDrehbar;
+      stOhne: fa := faSalingTypOhne;
+      stOhne_2: fa := faSalingTypOhneStarr;
+      else
+        fa := faSalingTypFest;
+    end;
+    Main.HandleAction(fa);
   end;
-  Main.HandleAction(fa);
 end;
 
 procedure TRiggModul.DoOnUpdateSalingTyp(Value: TSalingTyp);
@@ -1679,7 +1685,7 @@ begin
     UpdateGetriebe;
     // Rigg.UpdateGSB; { enfällt hier, da GSB schon aktuell }
     SetupGCtrls;
-    SBPuffer := Rigg.Glieder; { weil Istwerte nicht über Scrollbar verändert }
+    sbPuffer := Rigg.Glieder; { weil Istwerte nicht über Scrollbar verändert }
   end;
 end;
 
@@ -2752,6 +2758,20 @@ begin
     UpdateGetriebe;
     AllreadyUpdatedGetriebeFlag := True;
   end;
+end;
+
+procedure TRiggModul.DoUpdateChartBuffer;
+begin
+  sbPuffer := Rigg.Glieder;
+end;
+
+procedure TRiggModul.DoResetForTrimmData;
+begin
+  AllreadyUpdatedGetriebeFlag := True;
+  SalingTyp := stFest;
+  ControllerTyp := ctOhne;
+  CalcTyp := ctQuerKraftBiegung;
+  AllreadyUpdatedGetriebeFlag := False;
 end;
 
 end.
