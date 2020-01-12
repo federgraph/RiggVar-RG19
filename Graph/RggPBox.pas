@@ -3,16 +3,15 @@
 interface
 
 uses
-  Windows,
-  Messages,
-  Types,
-  SysUtils,
-  Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  ExtCtrls;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.Types,
+  System.SysUtils,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.ExtCtrls;
 
 type
   TRggPaintBox = class(TPaintBox)

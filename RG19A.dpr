@@ -76,7 +76,8 @@ uses
   FrmText in 'App\FrmText.pas' {TextForm},
   RiggVar.RG.Report in 'RG\RiggVar.RG.Report.pas',
   RiggVar.VM.FormMain in 'VM\RiggVar.VM.FormMain.pas',
-  FrmRG19 in 'App\FrmRG19.pas' {FormRG19};
+  RiggVar.VM.FormMainA in 'VM\RiggVar.VM.FormMainA.pas',
+  RggRota in 'Graph\RggRota.pas';
 
 {$R *.res}
 

@@ -2,9 +2,8 @@
 
 uses
   Vcl.Forms,
-  FrmMain in 'App\FrmMain.pas' {FormMain},
-  FrmText in 'App\FrmText.pas' {TextForm},
   FrmRG19 in 'App\FrmRG19.pas' {FormRG19},
+  FrmText in 'App\FrmText.pas' {TextForm},
   FrmRegler in 'Frm\FrmRegler.pas' {CtrlDlg},
   FrmReport in 'Frm\FrmReport.pas' {ReportForm},
   FrmSelect in 'Frm\FrmSelect.pas' {MemoDlg},
@@ -30,53 +29,55 @@ uses
   FrmAdjust in 'Frm\FrmAdjust.pas' {AdjustForm},
   FrmScale in 'Frm\FrmScale.pas' {RumpfFaktorDlg},
   FrmIndicator in 'Frm\FrmIndicator.pas' {IndicatorForm},
-  RiggVar.App.Main in 'App\RiggVar.App.Main.pas',
-  RiggVar.App.Main0 in 'App\RiggVar.App.Main0.pas',
-  RiggVar.App.Main1 in 'App\RiggVar.App.Main1.pas',
   FrmKreis in 'Frm\FrmKreis.pas',
   FwUnit in 'Core\FwUnit.pas',
   Iotypes in 'Core\Iotypes.pas',
-  Schnttkk in 'Core\Schnttkk.pas',
-  Vcalc116 in 'Core\Vcalc116.pas',
+  Rggdoc in 'Core\Rggdoc.pas',
+  RggUnit0 in 'Core\RggUnit0.pas',
+  RggUnit1 in 'Core\RggUnit1.pas',
+  RggUnit2 in 'Core\RggUnit2.pas',
+  RggUnit3 in 'Core\RggUnit3.pas',
+  RggUnit4 in 'Core\RggUnit4.pas',
   RiggUnit in 'Core\RiggUnit.pas',
   RggTypes in 'Core\RggTypes.pas',
-  RggUnit0 in 'Core\RggUnit0.pas',
-  Rggunit1 in 'Core\RggUnit1.pas',
-  RggUnit2 in 'Core\RggUnit2.pas',
-  Rggunit3 in 'Core\RggUnit3.pas',
-  Rggunit4 in 'Core\RggUnit4.pas',
-  Rggdoc in 'Core\Rggdoc.pas',
+  Schnttkk in 'Core\Schnttkk.pas',
+  Saling3Eck in 'Core\Saling3Eck.pas',
   TrimmTab in 'Core\TrimmTab.pas',
-  Rggmat01 in 'Graph\Rggmat01.pas',
+  Vcalc116 in 'Core\Vcalc116.pas',
+  RggKraft in 'Graph\RggKraft.pas',
   RggCtrls in 'Graph\RggCtrls.pas',
+  Rggmat01 in 'Graph\Rggmat01.pas',
+  RggScroll in 'Core\RggScroll.pas',
   RggGbox in 'Graph\RggGbox.pas',
+  RggPBox in 'Graph\RggPBox.pas',
   RggHull in 'Graph\RggHull.pas',
   RggPal in 'Graph\RggPal.pas',
-  RggScroll in 'Core\RggScroll.pas',
-  uRggPrinter in 'Graph\uRggPrinter.pas',
+  RggRota in 'Graph\RggRota.pas',
   Vector3d in 'Graph\Vector3d.pas',
-  Saling3Eck in 'Core\Saling3Eck.pas',
   ThreeD in 'Graph\ThreeD.pas',
   ThreeDSolid in 'Graph\ThreeDSolid.pas',
-  RggPBox in 'Graph\RggPBox.pas',
   RggGraph in 'Graph\RggGraph.pas',
   Polarkar in 'Graph\Polarkar.pas',
   BootGraph in 'Graph\BootGraph.pas',
   RaumGraph in 'Graph\RaumGraph.pas',
-  RggKraft in 'Graph\RggKraft.pas',
-  Print004 in 'Util\Print004.pas',
-  StrBox in 'Util\StrBox.pas',
+  RiggVar.Util.AppUtils in 'Util\RiggVar.Util.AppUtils.pas',
   RiggVar.InfoMemo in 'Util\RiggVar.InfoMemo.pas',
   RiggVar.Util.Logger in 'Util\RiggVar.Util.Logger.pas',
+  StrBox in 'Util\StrBox.pas',
   RiggVar.FB.Classes in 'FB\RiggVar.FB.Classes.pas',
-  RiggVar.Util.AppUtils in 'Util\RiggVar.Util.AppUtils.pas',
   RiggVar.RG.Data in 'RG\RiggVar.RG.Data.pas',
-  RiggVar.RG.Def in 'RG\RiggVar.RG.Def.pas',
-  RiggVar.RG.Graph in 'RG\RiggVar.RG.Graph.pas',
+  RiggVar.App.Main in 'App\RiggVar.App.Main.pas',
+  RiggVar.App.Main0 in 'App\RiggVar.App.Main0.pas',
+  RiggVar.App.Main1 in 'App\RiggVar.App.Main1.pas',
   RiggVar.RG.Main in 'RG\RiggVar.RG.Main.pas',
-  RiggVar.RG.Report in 'RG\RiggVar.RG.Report.pas',
+  RiggVar.RG.Def in 'RG\RiggVar.RG.Def.pas',
   RiggVar.RG.Track in 'RG\RiggVar.RG.Track.pas',
-  RiggVar.VM.FormMain in 'VM\RiggVar.VM.FormMain.pas';
+  RiggVar.RG.Graph in 'RG\RiggVar.RG.Graph.pas',
+  RiggVar.RG.Report in 'RG\RiggVar.RG.Report.pas',
+  RiggVar.VM.FormMain in 'VM\RiggVar.VM.FormMain.pas',
+  RiggVar.VM.FormMainC in 'VM\RiggVar.VM.FormMainC.pas',
+  uRggPrinter in 'Graph\uRggPrinter.pas',
+  Print004 in 'Util\Print004.pas';
 
 {$R *.res}
 
@@ -84,7 +85,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.Title := 'RG19';
-  Application.CreateForm(TFormMain, FormMain);
+  Application.CreateForm(TFormRG19, FormRG19);
   Application.CreateForm(TBiegeUndNeigeForm, BiegeUndNeigeForm);
   Application.CreateForm(TCtrlDlg, CtrlDlg);
   Application.CreateForm(TCtrlDlg1, CtrlDlg1);
@@ -92,7 +93,5 @@ begin
   Application.CreateForm(TOptionForm, OptionForm);
   Application.CreateForm(TPreviewGForm, PreviewGForm);
   Application.CreateForm(TYAuswahlDlg, YAuswahlDlg);
-  Application.CreateForm(TConsoleForm, ConsoleForm);
-  Application.CreateForm(TTextForm, TextForm);
   Application.Run;
 end.

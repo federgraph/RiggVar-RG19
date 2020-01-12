@@ -100,8 +100,8 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="App\FrmRG19.pas">
-            <Form>FormRG19</Form>
+        <DCCReference Include="App\FrmRG19B.pas">
+            <Form>FormRG19B</Form>
         </DCCReference>
         <DCCReference Include="App\FrmMain.pas">
             <Form>FormMain</Form>
@@ -231,6 +231,9 @@
         <DCCReference Include="RG\RiggVar.RG.Graph.pas"/>
         <DCCReference Include="RG\RiggVar.RG.Report.pas"/>
         <DCCReference Include="VM\RiggVar.VM.FormMain.pas"/>
+        <DCCReference Include="VM\RiggVar.VM.FormMainB.pas"/>
+        <DCCReference Include="VM\RiggVar.VM.FormMainA.pas"/>
+        <DCCReference Include="Graph\RggRota.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

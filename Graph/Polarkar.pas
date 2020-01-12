@@ -57,8 +57,7 @@ type
     property xrot: real read GetXrot write SetXrot;
     property yrot: real read GetYrot write SetYrot;
     property zrot: real read GetZrot write SetZrot;
-    property RotAngle[index: TRotationAngle]
-      : real read GetRotAngle write SetRotAngle;
+    property RotAngle[index: TRotationAngle]: real read GetRotAngle write SetRotAngle;
     property Matrix: Matrix4x4 read GetMatrix write SetMatrix;
     property Mode: Boolean read FMode write SetRotMode;
     property OnCalcAngle: TCalcAngleEvent read FOnCalcAngle write FOnCalcAngle;

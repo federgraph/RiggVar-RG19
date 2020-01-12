@@ -1,4 +1,4 @@
-object FormRG19: TFormRG19
+object FormRG19B: TFormRG19B
   Left = 0
   Top = 0
   Caption = 'RG19'
@@ -16,17 +16,23 @@ object FormRG19: TFormRG19
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
-  object PaintBox2: TPaintBox
-    Left = 644
+  object PaintBox1: TPaintBox
+    Left = 852
     Top = 38
     Width = 105
     Height = 105
   end
+  object PaintBox2: TPaintBox
+    Left = 688
+    Top = 287
+    Width = 105
+    Height = 105
+  end
   object PaintBoxG: TPaintBox
-    Left = 493
-    Top = 237
-    Width = 145
-    Height = 140
+    Left = 664
+    Top = 75
+    Width = 105
+    Height = 105
   end
   object StatusBar: TStatusBar
     Left = 0

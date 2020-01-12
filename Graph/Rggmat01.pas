@@ -3,11 +3,11 @@
 interface
 
 uses
-  Windows,
+  Winapi.Windows,
+  System.SysUtils,
+  System.Math,
   RggTypes,
-  Graphics,
-  SysUtils,
-  Math,
+  Vcl.Graphics,
   Vector3D;
 
 const
@@ -50,6 +50,43 @@ type
     procedure transformF(var v: TvertArrayF; var tv: TvertArrayF; nvert: Integer);
     procedure copyFrom(m: TMatrix4x4);
     property mat: Matrix4x4 read Fmat write Fmat;
+  end;
+
+  TRotaData = record
+    Xpos: Integer;
+    Ypos: Integer;
+    IncrementIndex: Integer;
+    IncrementT: Integer;
+    IncrementW: real;
+    ZoomIndex: Integer;
+    FixpunktIndex: Integer;
+    Matrix: Matrix4x4;
+  end;
+
+  TRotaParams = class
+  private
+    FZoomBase: real;
+    FZoomIndex: Integer;
+    FIncrementIndex: Integer;
+    procedure SetIncrementIndex(Value: Integer);
+    procedure SetFixPunktIndex(Value: Integer);
+    procedure SetZoomIndex(Value: Integer);
+    function GetIncrementT: Integer;
+    function GetIncrementW: real;
+    function GetFixPunktIndex: Integer;
+    function GetZoom: real;
+  public
+    Xpos: Integer;
+    Ypos: Integer;
+    FixPunkt: TRiggPoints;
+    Phi, Theta, Gamma, Xrot, Yrot, Zrot: Integer;
+    constructor Create;
+    property IncrementIndex: Integer read FIncrementIndex write SetIncrementIndex;
+    property FixPunktIndex: Integer read GetFixPunktIndex write SetFixPunktIndex;
+    property ZoomIndex: Integer read FZoomIndex write SetZoomIndex;
+    property IncrementT: Integer read GetIncrementT;
+    property IncrementW: real read GetIncrementW;
+    property Zoom: real read GetZoom;
   end;
 
 const
@@ -389,6 +426,110 @@ begin
   uz.x := Fmat[1, 3];
   uz.y := Fmat[2, 3];
   uz.z := Fmat[3, 3];
+end;
+
+{ TRotaParams }
+
+constructor TRotaParams.Create;
+begin
+  FIncrementIndex := 3;
+  FZoomBase := 0.05;
+  FZoomIndex := 7;
+  FixPunkt := ooD0;
+  Phi := 0;
+  Theta := -90;
+  Gamma := 0;
+  Xrot := -87;
+  Yrot := 0;
+  Zrot := 0;
+end;
+
+procedure TRotaParams.SetIncrementIndex(Value: Integer);
+begin
+  if Value < 1 then
+    Value := 1;
+  if Value > 5 then
+    Value := 5;
+  FIncrementIndex := Value;
+end;
+
+procedure TRotaParams.SetZoomIndex(Value: Integer);
+begin
+  if Value < 1 then
+    Value := 1;
+  if Value > 11 then
+    Value := 11;
+  FZoomIndex := Value;
+end;
+
+procedure TRotaParams.SetFixPunktIndex(Value: Integer);
+begin
+  case Value of
+    0: FixPunkt := ooA0;
+    1: FixPunkt := ooA;
+    2: FixPunkt := ooB0;
+    3: FixPunkt := ooB;
+    4: FixPunkt := ooC0;
+    5: FixPunkt := ooC;
+    6: FixPunkt := ooD0;
+    7: FixPunkt := ooD;
+    8: FixPunkt := ooE0;
+    9: FixPunkt := ooE;
+   10: FixPunkt := ooF0;
+   11: FixPunkt := ooF;
+   else FixPunkt := ooD0;
+  end;
+end;
+
+function TRotaParams.GetFixPunktIndex: Integer;
+begin
+  case FixPunkt of
+    ooA0:  result :=  0;
+    ooA:   result :=  1;
+    ooB0:  result :=  2;
+    ooB:   result :=  3;
+    ooC0:  result :=  4;
+    ooC:   result :=  5;
+    ooD0:  result :=  6;
+    ooD:   result :=  7;
+    ooE0:  result :=  8;
+    ooE:   result :=  9;
+    ooF0:  result := 10;
+    ooF:   result := 11;
+    else
+      result := 6;
+  end;
+end;
+
+function TRotaParams.GetIncrementT: Integer;
+begin
+  case IncrementIndex of
+    1: result := 1;
+    2: result := 5;
+    3: result := 10;
+    4: result := 30;
+    5: result := 100;
+    else
+      result := 1;
+  end;
+end;
+
+function TRotaParams.GetIncrementW: real;
+begin
+  case IncrementIndex of
+    1: result := 0.1;
+    2: result := 1;
+    3: result := 5;
+    4: result := 10;
+    5: result := 30;
+    else
+      result := 1;
+  end;
+end;
+
+function TRotaParams.GetZoom: real;
+begin
+  result := FZoomBase * LookUpRa10(FZoomIndex);
 end;
 
 end.

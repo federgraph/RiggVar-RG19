@@ -2,7 +2,7 @@
 
 uses
   Vcl.Forms,
-  FrmRG19 in 'App\FrmRG19.pas' {FormRG19},
+  FrmRG19B in 'App\FrmRG19B.pas' {FormRG19B},
   FrmMain in 'App\FrmMain.pas' {FormMain},
   FrmText in 'App\FrmText.pas' {TextForm},
   FrmRegler in 'Frm\FrmRegler.pas' {CtrlDlg},
@@ -76,7 +76,10 @@ uses
   RiggVar.RG.Track in 'RG\RiggVar.RG.Track.pas',
   RiggVar.RG.Graph in 'RG\RiggVar.RG.Graph.pas',
   RiggVar.RG.Report in 'RG\RiggVar.RG.Report.pas',
-  RiggVar.VM.FormMain in 'VM\RiggVar.VM.FormMain.pas';
+  RiggVar.VM.FormMain in 'VM\RiggVar.VM.FormMain.pas',
+  RiggVar.VM.FormMainB in 'VM\RiggVar.VM.FormMainB.pas',
+  RiggVar.VM.FormMainA in 'VM\RiggVar.VM.FormMainA.pas',
+  RggRota in 'Graph\RggRota.pas';
 
 {$R *.res}
 
@@ -84,7 +87,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.Title := 'RG19B';
-  Application.CreateForm(TFormRG19, FormRG19);
+  Application.CreateForm(TFormRG19B, FormRG19B);
   Application.CreateForm(TBiegeUndNeigeForm, BiegeUndNeigeForm);
   Application.CreateForm(TCtrlDlg, CtrlDlg);
   Application.CreateForm(TCtrlDlg1, CtrlDlg1);

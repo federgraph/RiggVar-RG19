@@ -29,48 +29,10 @@ uses
   RggGraph,
   RaumGraph,
   RggHull,
+  Vector3D,
   Polarkar;
 
-function LookUpRa10(Index: Integer): real;
-
 type
-  TRotaParams = class
-  private
-    FZoomBase: real;
-    FZoomIndex: Integer;
-    FIncrementIndex: Integer;
-    procedure SetIncrementIndex(Value: Integer);
-    procedure SetFixPunktIndex(Value: Integer);
-    procedure SetZoomIndex(Value: Integer);
-    function GetIncrementT: Integer;
-    function GetIncrementW: real;
-    function GetFixPunktIndex: Integer;
-    function GetZoom: real;
-  public
-    Xpos: Integer;
-    Ypos: Integer;
-    FixPunkt: TRiggPoints;
-    Phi, Theta, Gamma, Xrot, Yrot, Zrot: Integer;
-    constructor Create;
-    property IncrementIndex: Integer read FIncrementIndex write SetIncrementIndex;
-    property FixPunktIndex: Integer read GetFixPunktIndex write SetFixPunktIndex;
-    property ZoomIndex: Integer read FZoomIndex write SetZoomIndex;
-    property IncrementT: Integer read GetIncrementT;
-    property IncrementW: real read GetIncrementW;
-    property Zoom: real read GetZoom;
-  end;
-
-  TRotaData = record
-    Xpos: Integer;
-    Ypos: Integer;
-    IncrementIndex: Integer;
-    IncrementT: Integer;
-    IncrementW: real;
-    ZoomIndex: Integer;
-    FixpunktIndex: Integer;
-    Matrix: Matrix4x4;
-  end;
-
   TRotationForm = class(TForm)
     SaveDialog: TSaveDialog;
     ToolbarPanel: TPanel;
@@ -254,6 +216,8 @@ type
     procedure InitPreview; virtual;
     procedure UpdateGraph; virtual;
   public
+    KeepInsideItemChecked: Boolean;
+  public
     MainMenu: TMainMenu;
     GrafikMenu: TMenuItem;
     ZoomItem: TMenuItem;
@@ -342,132 +306,6 @@ uses
 
 {$R *.DFM}
 
-function LookUpRa10(Index: Integer): real;
-var
-  temp: real;
-begin
-  { dezimalgeometrische Reihe Ra10 }
-  temp := 1;
-  case Index of
-    1: temp := 1;
-    2: temp := 1.2;
-    3: temp := 1.6;
-    4: temp := 2;
-    5: temp := 2.5;
-    6: temp := 3.2;
-    7: temp := 4;
-    8: temp := 5;
-    9: temp := 6.3;
-    10: temp := 8;
-    11: temp := 10;
-  end;
-  result := temp;
-end;
-
-{ TRotaParams }
-
-constructor TRotaParams.Create;
-begin
-  FIncrementIndex := 3;
-  FZoomBase := 0.05;
-  FZoomIndex := 7;
-  FixPunkt := ooD0;
-  Phi := 0;
-  Theta := -90;
-  Gamma := 0;
-  Xrot := -87;
-  Yrot := 0;
-  Zrot := 0;
-end;
-
-procedure TRotaParams.SetIncrementIndex(Value: Integer);
-begin
-  if Value < 1 then
-    Value := 1;
-  if Value > 5 then
-    Value := 5;
-  FIncrementIndex := Value;
-end;
-
-procedure TRotaParams.SetZoomIndex(Value: Integer);
-begin
-  if Value < 1 then
-    Value := 1;
-  if Value > 11 then
-    Value := 11;
-  FZoomIndex := Value;
-end;
-
-procedure TRotaParams.SetFixPunktIndex(Value: Integer);
-begin
-  case Value of
-    0: FixPunkt := ooA0;
-    1: FixPunkt := ooA;
-    2: FixPunkt := ooB0;
-    3: FixPunkt := ooB;
-    4: FixPunkt := ooC0;
-    5: FixPunkt := ooC;
-    6: FixPunkt := ooD0;
-    7: FixPunkt := ooD;
-    8: FixPunkt := ooE0;
-    9: FixPunkt := ooE;
-   10: FixPunkt := ooF0;
-   11: FixPunkt := ooF;
-   else FixPunkt := ooD0;
-  end;
-end;
-
-function TRotaParams.GetFixPunktIndex: Integer;
-begin
-  case FixPunkt of
-    ooA0:  result :=  0;
-    ooA:   result :=  1;
-    ooB0:  result :=  2;
-    ooB:   result :=  3;
-    ooC0:  result :=  4;
-    ooC:   result :=  5;
-    ooD0:  result :=  6;
-    ooD:   result :=  7;
-    ooE0:  result :=  8;
-    ooE:   result :=  9;
-    ooF0:  result := 10;
-    ooF:   result := 11;
-    else
-      result := 6;
-  end;
-end;
-
-function TRotaParams.GetIncrementT: Integer;
-begin
-  case IncrementIndex of
-    1: result := 1;
-    2: result := 5;
-    3: result := 10;
-    4: result := 30;
-    5: result := 100;
-    else
-      result := 1;
-  end;
-end;
-
-function TRotaParams.GetIncrementW: real;
-begin
-  case IncrementIndex of
-    1: result := 0.1;
-    2: result := 1;
-    3: result := 5;
-    4: result := 10;
-    5: result := 30;
-    else
-      result := 1;
-  end;
-end;
-
-function TRotaParams.GetZoom: real;
-begin
-  result := FZoomBase * LookUpRa10(FZoomIndex);
-end;
-
 { TRotationForm }
 
 procedure TRotationForm.PaintBackGround(Image: TBitmap);
@@ -476,7 +314,8 @@ var
   P: TPoint;
 begin
   R := Rect(0, 0, Image.Width, Image.Height);
-  with Image.Canvas do begin
+  with Image.Canvas do
+  begin
     Brush.Color := clBtnFace;
     FillRect(R);
     if BackBmp <> nil then
@@ -492,8 +331,10 @@ end;
 procedure TRotationForm.wmGetMinMaxInfo(var Msg: TWMGetMinMaxInfo);
 begin
   inherited;
-  if csLoading in ComponentState then Exit;
-  with Msg.MinMaxInfo^ do begin
+  if csLoading in ComponentState then
+    Exit;
+  with Msg.MinMaxInfo^ do
+  begin
     ptMinTrackSize := Point(MinTrackX, MinTrackY);
     //ptMaxTrackSize := Point(MaxTrackX, MaxTrackY);
   end;
@@ -808,17 +649,15 @@ begin
   if Screen.Width <> CreatedScreenWidth then
     ChangeResolution;
 
- {für DrawToBitmap1}
   if not PaintBtn.Down or EraseBK then
   begin
-  //if EraseBK then begin {für DrawToBitmap2}
     PaintBackGround(Bitmap);
     EraseBK := False;
   end;
 
   NullpunktOffset.x := -RaumGrafik.Offset.x + Bitmap.Width div 2 + FXpos;
   NullpunktOffset.y := -RaumGrafik.Offset.y + Bitmap.Height div 2 + FYpos;
-  DrawToBitmap1; // bzw. DrawToBitmap2;
+  DrawToBitmap1;
 
   if (MainMenu <> nil) and MatrixItem.Checked then
     DrawMatrix(Bitmap.Canvas);
@@ -1029,7 +868,7 @@ procedure TRotationForm.TransLeftBtnClick(Sender: TObject);
 var
   xmin, ymin, xmax, ymax: Integer;
 begin
-  if KeepInsideItem.Checked then
+  if KeepInsideItemChecked then
   begin
     xmin := -Bitmap.Width div 2;
     ymin := -Bitmap.Height div 2;
@@ -1475,8 +1314,10 @@ end;
 
 procedure TRotationForm.KeepInsideItemClick(Sender: TObject);
 begin
-  KeepInsideItem.Checked := not KeepInsideItem.Checked;
-  if KeepInsideItem.Checked then Draw;
+  KeepInsideItemChecked := not KeepInsideItemChecked;
+  KeepInsideItem.Checked := KeepInsideItemChecked;
+  if KeepInsideItem.Checked then
+    Draw;
 end;
 
 { Scroll left by one button. If no buttons are visible anymore, do nothing. }
@@ -1726,7 +1567,7 @@ procedure TRotationForm.Translate(x, y: Integer);
 var
   xmin, ymin, xmax, ymax: Integer;
 begin
-  if KeepInsideItem.Checked then
+  if KeepInsideItemChecked then
   begin
     xmin := -Bitmap.Width div 2;
     ymin := -Bitmap.Height div 2;
@@ -1757,28 +1598,90 @@ end;
 procedure TRotationForm.FocusEditKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if (ssCtrl in Shift) then begin
-    if Key = VK_Left then begin TransLeftBtnClick(TransLeftBtn); Key := 0; end
-    else if Key = VK_Right then begin TransLeftBtnClick(TransRightBtn); Key := 0; end
-    else if Key = VK_Up then begin TransLeftBtnClick(TransUpBtn); Key := 0; end
-    else if Key = VK_Down then begin TransLeftBtnClick(TransDownBtn); Key := 0; end;
+  if (ssCtrl in Shift) then
+  begin
+    if Key = VK_Left then
+    begin
+      TransLeftBtnClick(TransLeftBtn);
+      Key := 0;
+      end
+    else if Key = VK_Right then
+    begin
+      TransLeftBtnClick(TransRightBtn);
+      Key := 0;
+    end
+    else if Key = VK_Up then
+    begin
+      TransLeftBtnClick(TransUpBtn);
+      Key := 0;
+    end
+    else if Key = VK_Down then
+    begin
+      TransLeftBtnClick(TransDownBtn);
+      Key := 0;
+    end;
   end
 
-  else if (ssShift in Shift) then begin
-    if Key = VK_Left then begin LeftBtnClick(GammaDownBtn); Key := 0; end
-    else if Key = VK_Right then begin LeftBtnClick(GammaUpBtn); Key := 0; end
-    else if (Key = VK_Up) then begin {LeftBtnClick(LeftBtn);} Key := 0; end
-    else if (Key = VK_Down) then begin {LeftBtnClick(RightBtn);} Key := 0; end;
+  else if (ssShift in Shift) then
+  begin
+    if Key = VK_Left then
+    begin
+      LeftBtnClick(GammaDownBtn);
+      Key := 0;
+    end
+    else if Key = VK_Right then
+    begin
+      LeftBtnClick(GammaUpBtn);
+      Key := 0;
+    end
+    else if (Key = VK_Up) then
+    begin
+      {^LeftBtnClick(LeftBtn); }
+      Key := 0;
+    end
+    else if (Key = VK_Down) then
+    begin
+      { LeftBtnClick(RightBtn); }
+      Key := 0;
+    end;
   end
 
   else begin
-    if Key = VK_Left then begin LeftBtnClick(LeftBtn); Key := 0; end
-    else if Key = VK_Right then begin LeftBtnClick(RightBtn); Key := 0; end
-    else if Key = VK_Up then begin LeftBtnClick(UpBtn); Key := 0; end
-    else if Key = VK_Down then begin LeftBtnClick(DownBtn); Key := 0; end
-    else if Key = VK_Add then begin ZoomInBtnClick(Sender); Key := 0; end
-    else if Key = VK_Subtract then begin ZoomOutBtnClick(Sender); Key := 0; end
-    else if Key = $20 then begin EraseBK := True; Draw; end;
+    if Key = VK_Left then
+    begin
+      LeftBtnClick(LeftBtn);
+      Key := 0;
+    end
+    else if Key = VK_Right then
+    begin
+      LeftBtnClick(RightBtn);
+      Key := 0;
+    end
+    else if Key = VK_Up then
+    begin
+      LeftBtnClick(UpBtn);
+      Key := 0;
+    end
+    else if Key = VK_Down then
+    begin
+      LeftBtnClick(DownBtn);
+      Key := 0;
+    end
+    else if Key = VK_Add then
+    begin
+      ZoomInBtnClick(Sender);
+      Key := 0;
+    end
+    else if Key = VK_Subtract then
+    begin
+      ZoomOutBtnClick(Sender);
+      Key := 0;
+    end
+    else if Key = $20 then
+    begin
+      EraseBK := True;
+      Draw;
+    end;
   end;
 end;
 
@@ -2008,10 +1911,12 @@ end;
 procedure TRotationForm.IndicatorItemClick(Sender: TObject);
 begin
   IndicatorItem.Checked := not IndicatorItem.Checked;
-  if IndicatorItem.Checked then begin
+  if IndicatorItem.Checked then
+  begin
     IndicatorForm.Show;
     IndicatorForm.UpdateIndicator;
-  end else
+  end
+  else
     IndicatorForm.Hide;
 end;
 

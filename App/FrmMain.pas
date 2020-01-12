@@ -236,6 +236,7 @@ implementation
 
 uses
   RiggVar.App.Main,
+  RiggVar.VM.FormMainA,
   RiggVar.RG.Main,
   RiggUnit,
   FrmInfo,
@@ -270,6 +271,9 @@ begin
   GrafikForm := TGrafikForm.Create(Application);
 
   RiggModul := TRiggModul.Create(Self);
+  RiggModul.RG19A := True;
+  RiggModul.ViewModelMain := TViewModelMainA.Create;
+  RiggModul.Init;
   rggm := TRggMain.Create(RiggModul.Rigg);
   RiggModul.PBG := GrafikForm.PaintboxG;
   RiggModul.RG19A := True;

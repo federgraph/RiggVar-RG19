@@ -1,4 +1,4 @@
-﻿unit FrmRG19;
+﻿unit FrmRG19B;
 
 (*
 -
@@ -39,7 +39,7 @@ uses
   System.UITypes;
 
 type
-  TFormRG19 = class(TForm)
+  TFormRG19B = class(TForm)
     MainMenu: TMainMenu;
     FileMenu: TMenuItem;
     NewItem: TMenuItem;
@@ -153,6 +153,7 @@ type
     Listbox: TListBox;
     ReportMemo: TMemo;
     TrimmMemo: TMemo;
+    PaintBox1: TPaintBox;
     PaintBox2: TPaintBox;
     PaintBoxG: TPaintBox;
     ViewpointCombo: TComboBox;
@@ -306,7 +307,7 @@ type
   end;
 
 var
-  FormRG19: TFormRG19;
+  FormRG19B: TFormRG19B;
 
 implementation
 
@@ -314,15 +315,13 @@ implementation
 
 uses
   RiggVar.App.Main,
-  RiggVar.VM.FormMainC,
+  RiggVar.VM.FormMainB,
   RiggVar.RG.Main,
   RiggUnit,
-  RggRota,
   FrmInfo,
   FrmConsole,
   FrmInput,
   FrmOutput,
-//  FrmGrafic,
   FrmText,
   FrmReport,
   FrmChart,
@@ -332,32 +331,31 @@ uses
 const
   SWarningText = 'Änderungen in %s sichern?';
 
-procedure TFormRG19.wmGetMinMaxInfo(var Msg: TMessage);
+procedure TFormRG19B.wmGetMinMaxInfo(var Msg: TMessage);
 begin
   inherited;
   PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.X := 900;
   PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.Y := 700;
 end;
 
-procedure TFormRG19.FormCreate(Sender: TObject);
+procedure TFormRG19B.FormCreate(Sender: TObject);
 begin
-  FormRG19 := Self;
+  FormRG19B := Self;
 
   FormCreate1;
   FormCreate2;
 end;
 
-procedure TFormRG19.FormCreate1;
+procedure TFormRG19B.FormCreate1;
 var
   rggm: TRggMain;
 begin
   InputForm := TInputForm.Create(Application);
   OutputForm := TOutputForm.Create(Application);
-//  GrafikForm := TGrafikForm.Create(Application);
 
   RiggModul := TRiggModul.Create(Self);
   RiggModul.RG19A := False;
-  RiggModul.ViewModelMain := TViewModelMainC.Create;
+  RiggModul.ViewModelMain := TViewModelMainB.Create;
   RiggModul.Init;
 
   rggm := TRggMain.Create(RiggModul.Rigg);
@@ -402,22 +400,16 @@ begin
   Caption := 'Rigg - Form';
   OnClose := FormClose;
   OnCloseQuery := FormCloseQuery;
-
-  RiggModul.RotaForm := TRotaForm.Create;
-  RiggModul.RotaForm.PaintBox3D := Paintbox2;
-  RiggModul.RotaForm.Init;
-  Paintbox2 := RiggModul.RotaForm.PaintBox3D;
-  RiggModul.DoGraphics;
 end;
 
-procedure TFormRG19.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TFormRG19B.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Screen.OnActiveFormChange := nil;
   RiggModul.Free;
   // Application.HelpCommand(HELP_QUIT,0);
 end;
 
-procedure TFormRG19.FormDestroy(Sender: TObject);
+procedure TFormRG19B.FormDestroy(Sender: TObject);
 begin
   ReportManager.Free;
 
@@ -425,7 +417,7 @@ begin
   Main := nil;
 end;
 
-procedure TFormRG19.SalingTypChanged(Sender: TObject);
+procedure TFormRG19B.SalingTypChanged(Sender: TObject);
 begin
   if Sender = FestItem then
     RiggModul.SalingTyp := stFest
@@ -437,7 +429,7 @@ begin
     RiggModul.SalingTyp := stOhne_2;
 end;
 
-procedure TFormRG19.rLItemClick(Sender: TObject);
+procedure TFormRG19B.rLItemClick(Sender: TObject);
 var
   i: Integer;
   Item: TReportItem;
@@ -489,12 +481,12 @@ begin
   RiggModul.ReportItem := Item;
 end;
 
-procedure TFormRG19.ShowHint(Sender: TObject);
+procedure TFormRG19B.ShowHint(Sender: TObject);
 begin
   StatusBar.Panels[0].Text := Application.Hint;
 end;
 
-procedure TFormRG19.NewItemClick(Sender: TObject);
+procedure TFormRG19B.NewItemClick(Sender: TObject);
 var
   DialogValue: Integer;
   FName: string;
@@ -516,7 +508,7 @@ begin
   Caption := 'Rigg';
 end;
 
-procedure TFormRG19.OpenItemClick(Sender: TObject);
+procedure TFormRG19B.OpenItemClick(Sender: TObject);
 var
   DialogValue: Integer;
   FName: string;
@@ -541,7 +533,7 @@ begin
   end;
 end;
 
-procedure TFormRG19.SaveItemClick(Sender: TObject);
+procedure TFormRG19B.SaveItemClick(Sender: TObject);
 begin
   if RiggModul.IniFileName = '' then
     SaveAsItemClick(Sender)
@@ -549,7 +541,7 @@ begin
     RiggModul.Save;
 end;
 
-procedure TFormRG19.SaveAsItemClick(Sender: TObject);
+procedure TFormRG19B.SaveAsItemClick(Sender: TObject);
 begin
   SaveDialog.FileName := RiggModul.IniFileName;
   if SaveDialog.Execute then
@@ -560,12 +552,12 @@ begin
   end;
 end;
 
-procedure TFormRG19.ExitItemClick(Sender: TObject);
+procedure TFormRG19B.ExitItemClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TFormRG19.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+procedure TFormRG19B.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 var
   DialogValue: Integer;
   FName: string;
@@ -595,7 +587,7 @@ begin
   end;
 end;
 
-procedure TFormRG19.VonDerSeiteItemClick(Sender: TObject);
+procedure TFormRG19B.VonDerSeiteItemClick(Sender: TObject);
 var
   ViewPoint: TViewPoint;
 begin
@@ -627,61 +619,61 @@ begin
   RiggModul.ViewPoint := ViewPoint;
 end;
 
-procedure TFormRG19.PaintBtnClick(Sender: TObject);
+procedure TFormRG19B.PaintBtnClick(Sender: TObject);
 begin
   PaintItem.Checked := not PaintItem.Checked;
   PaintBtn.Down := PaintItem.Checked;
   RiggModul.PaintBtnDown := PaintBtn.Down;
 end;
 
-procedure TFormRG19.BtnBlauClick(Sender: TObject);
+procedure TFormRG19B.BtnBlauClick(Sender: TObject);
 begin
   ReferenzItem.Checked := not ReferenzItem.Checked;
   BtnBlau.Down := ReferenzItem.Checked;
   RiggModul.BtnBlauDown := BtnBlau.Down;
 end;
 
-procedure TFormRG19.BtnGrauClick(Sender: TObject);
+procedure TFormRG19B.BtnGrauClick(Sender: TObject);
 begin
   EntlastetItem.Checked := not EntlastetItem.Checked;
   BtnGrau.Down := EntlastetItem.Checked;
   RiggModul.BtnGrauDown := BtnGrau.Down;
 end;
 
-procedure TFormRG19.SetKoppelChecked(Value: Boolean);
+procedure TFormRG19B.SetKoppelChecked(Value: Boolean);
 begin
   KoppelkurveItem.Checked := Value;
   KoppelBtn.Down := Value;
   RiggModul.KoppelBtnDown := Value;
 end;
 
-procedure TFormRG19.KoppelBtnClick(Sender: TObject);
+procedure TFormRG19B.KoppelBtnClick(Sender: TObject);
 begin
   SetKoppelChecked(not KoppelkurveItem.Checked);
 end;
 
-procedure TFormRG19.ZweischlagBtnClick(Sender: TObject);
+procedure TFormRG19B.ZweischlagBtnClick(Sender: TObject);
 begin
   ZweischlagItem.Checked := not ZweischlagItem.Checked;
   ZweischlagBtn.Down := ZweischlagItem.Checked;
   RiggModul.ZweischlagBtnDown := ZweischlagBtn.Down;
 end;
 
-procedure TFormRG19.WinkelItemClick(Sender: TObject);
+procedure TFormRG19B.WinkelItemClick(Sender: TObject);
 begin
   WinkelItem.Checked := not WinkelItem.Checked;
   WinkelBtn.Down := WinkelItem.Checked;
   RiggModul.WinkelBtnDown := WinkelBtn.Down;
 end;
 
-procedure TFormRG19.DifferenzItemClick(Sender: TObject);
+procedure TFormRG19B.DifferenzItemClick(Sender: TObject);
 begin
   DifferenzItem.Checked := not DifferenzItem.Checked;
   DiffBtn.Down := DifferenzItem.Checked;
   RiggModul.DiffBtnDown := DiffBtn.Down;
 end;
 
-procedure TFormRG19.SofortItemClick(Sender: TObject);
+procedure TFormRG19B.SofortItemClick(Sender: TObject);
 begin
   SofortItem.Checked := not SofortItem.Checked;
   SofortBtn.Down := SofortItem.Checked;
@@ -701,7 +693,7 @@ begin
   end;
 end;
 
-procedure TFormRG19.SetControllerEnabled;
+procedure TFormRG19B.SetControllerEnabled;
 var
   tempBool: Boolean;
 begin
@@ -710,19 +702,19 @@ begin
   ControllerBtn.Enabled := tempBool;
 end;
 
-procedure TFormRG19.SetControllerChecked(Value: Boolean);
+procedure TFormRG19B.SetControllerChecked(Value: Boolean);
 begin
   ControllerItem.Checked := Value;
   ControllerBtn.Down := Value;
   RiggModul.ControllerBtnDown := Value;
 end;
 
-procedure TFormRG19.ControllerBtnClick(Sender: TObject);
+procedure TFormRG19B.ControllerBtnClick(Sender: TObject);
 begin
   SetControllerChecked(not ControllerItem.Checked);
 end;
 
-procedure TFormRG19.KnickenItemClick(Sender: TObject);
+procedure TFormRG19B.KnickenItemClick(Sender: TObject);
 begin
   if Sender = QuerKraftItem then
     RiggModul.CalcTyp := ctQuerKraftBiegung
@@ -732,13 +724,13 @@ begin
     RiggModul.CalcTyp := ctKraftGemessen;
 end;
 
-procedure TFormRG19.KorrigiertItemClick(Sender: TObject);
+procedure TFormRG19B.KorrigiertItemClick(Sender: TObject);
 begin
   KorrigiertItem.Checked := not KorrigiertItem.Checked;
   RiggModul.KorrigiertItem := KorrigiertItem.Checked;
 end;
 
-procedure TFormRG19.LogoItemClick(Sender: TObject);
+procedure TFormRG19B.LogoItemClick(Sender: TObject);
 begin
   WantLogoData := not WantLogoData;
   LogoItem.Checked := WantLogoData;
@@ -746,94 +738,94 @@ begin
   RiggModul.UpdateGetriebe;
 end;
 
-procedure TFormRG19.UpdateBtnClick(Sender: TObject);
+procedure TFormRG19B.UpdateBtnClick(Sender: TObject);
 begin
   RiggModul.UpdateBtnClick;
 end;
 
-procedure TFormRG19.BiegeNeigeItemClick(Sender: TObject);
+procedure TFormRG19B.BiegeNeigeItemClick(Sender: TObject);
 begin
   RiggModul.BiegeNeigeItemClick;
 end;
 
-procedure TFormRG19.ReglerBtnClick(Sender: TObject);
+procedure TFormRG19B.ReglerBtnClick(Sender: TObject);
 begin
   RiggModul.ReglerBtnClick;
   SetKoppelChecked(False);
 end;
 
-procedure TFormRG19.MemoryBtnClick(Sender: TObject);
+procedure TFormRG19B.MemoryBtnClick(Sender: TObject);
 begin
   RiggModul.MemoryBtnClick;
 end;
 
-procedure TFormRG19.MemoryRecallBtnClick(Sender: TObject);
+procedure TFormRG19B.MemoryRecallBtnClick(Sender: TObject);
 begin
   RiggModul.MemoryRecallBtnClick;
 end;
 
-procedure TFormRG19.OhneItemClick(Sender: TObject);
+procedure TFormRG19B.OhneItemClick(Sender: TObject);
 begin
   RiggModul.OhneItemClick;
 end;
 
-procedure TFormRG19.DrehbarItemClick(Sender: TObject);
+procedure TFormRG19B.DrehbarItemClick(Sender: TObject);
 begin
   RiggModul.DrehbarItemClick;
 end;
 
-procedure TFormRG19.FestItemClick(Sender: TObject);
+procedure TFormRG19B.FestItemClick(Sender: TObject);
 begin
   RiggModul.FestItemClick;
 end;
 
-procedure TFormRG19.OSDlgItemClick(Sender: TObject);
+procedure TFormRG19B.OSDlgItemClick(Sender: TObject);
 begin
   RiggModul.OSDlgItemClick;
 end;
 
-procedure TFormRG19.OptionItemClick(Sender: TObject);
+procedure TFormRG19B.OptionItemClick(Sender: TObject);
 begin
   RiggModul.OptionItemClick;
 end;
 
-procedure TFormRG19.AboutItemClick(Sender: TObject);
+procedure TFormRG19B.AboutItemClick(Sender: TObject);
 begin
   FrmInfo.ShowInfo;
 end;
 
-procedure TFormRG19.PrintItemClick(Sender: TObject);
+procedure TFormRG19B.PrintItemClick(Sender: TObject);
 begin
   RiggModul.PrintGrafik;
 end;
 
-procedure TFormRG19.AdjustFormItemClick(Sender: TObject);
+procedure TFormRG19B.AdjustFormItemClick(Sender: TObject);
 begin
   RiggModul.AdjustGrafik;
 end;
 
-procedure TFormRG19.CalcOffsetItemClick(Sender: TObject);
+procedure TFormRG19B.CalcOffsetItemClick(Sender: TObject);
 begin
   RiggModul.GetGBoxOffset;
 end;
 
-procedure TFormRG19.WindowCascadeItemClick(Sender: TObject);
+procedure TFormRG19B.WindowCascadeItemClick(Sender: TObject);
 begin
   Cascade;
 end;
 
-procedure TFormRG19.WindowTileItemClick(Sender: TObject);
+procedure TFormRG19B.WindowTileItemClick(Sender: TObject);
 begin
   TileMode := TTileMode.tbVertical;
   Tile;
 end;
 
-procedure TFormRG19.WindowArrangeItemClick(Sender: TObject);
+procedure TFormRG19B.WindowArrangeItemClick(Sender: TObject);
 begin
   ArrangeIcons;
 end;
 
-procedure TFormRG19.WindowMinimizeItemClick(Sender: TObject);
+procedure TFormRG19B.WindowMinimizeItemClick(Sender: TObject);
 var
   i: Integer;
 begin
@@ -842,7 +834,7 @@ begin
     MDIChildren[i].WindowState := wsMinimized;
 end;
 
-procedure TFormRG19.InputFormItemClick(Sender: TObject);
+procedure TFormRG19B.InputFormItemClick(Sender: TObject);
 begin
   InputFormItem.Checked := not InputFormItem.Checked;
   if InputFormItem.Checked then
@@ -851,7 +843,7 @@ begin
     InputForm.Hide;
 end;
 
-procedure TFormRG19.OutputFormItemClick(Sender: TObject);
+procedure TFormRG19B.OutputFormItemClick(Sender: TObject);
 begin
   OutputFormItem.Checked := not OutputFormItem.Checked;
   if OutputFormItem.Checked then
@@ -864,7 +856,7 @@ begin
     OutputForm.Hide;
 end;
 
-procedure TFormRG19.GrafikFormItemClick(Sender: TObject);
+procedure TFormRG19B.GrafikFormItemClick(Sender: TObject);
 begin
   GrafikFormItem.Checked := not GrafikFormItem.Checked;
 //  if GrafikFormItem.Checked then
@@ -873,7 +865,7 @@ begin
 //    GrafikForm.Hide;
 end;
 
-procedure TFormRG19.ChartFormItemClick(Sender: TObject);
+procedure TFormRG19B.ChartFormItemClick(Sender: TObject);
 begin
   if RiggModul.ChartFormActive then
   begin
@@ -886,7 +878,7 @@ begin
   ChartFormItem.Hint := '  Diagramm schließen';
 end;
 
-procedure TFormRG19.ReportFormItemClick(Sender: TObject);
+procedure TFormRG19B.ReportFormItemClick(Sender: TObject);
 begin
   if RiggModul.ReportFormActive then
   begin
@@ -899,7 +891,7 @@ begin
   ReportFormItem.Hint := '  Report schließen';
 end;
 
-procedure TFormRG19.RotaFormItemClick(Sender: TObject);
+procedure TFormRG19B.RotaFormItemClick(Sender: TObject);
 begin
   if RiggModul.RotaFormActive then
   begin
@@ -912,7 +904,7 @@ begin
   RotaFormItem.Hint := '  3D Grafik schließen';
 end;
 
-procedure TFormRG19.ConsoleItemClick(Sender: TObject);
+procedure TFormRG19B.ConsoleItemClick(Sender: TObject);
 begin
   if RiggModul.ConsoleActive then
   begin
@@ -922,24 +914,24 @@ begin
   ConsoleForm := TConsoleForm.Create(nil);
 end;
 
-procedure TFormRG19.SpeedBarItemClick(Sender: TObject);
+procedure TFormRG19B.SpeedBarItemClick(Sender: TObject);
 begin
   SpeedBarItem.Checked := not SpeedBarItem.Checked;
   SpeedPanel.Visible := SpeedBarItem.Checked;
 end;
 
-procedure TFormRG19.StatusBarItemClick(Sender: TObject);
+procedure TFormRG19B.StatusBarItemClick(Sender: TObject);
 begin
   StatusBarItem.Checked := not StatusBarItem.Checked;
   StatusBar.Visible := StatusBarItem.Checked;
 end;
 
-procedure TFormRG19.AutoLoadItemClick(Sender: TObject);
+procedure TFormRG19B.AutoLoadItemClick(Sender: TObject);
 begin
   AutoLoadItem.Checked := not AutoLoadItem.Checked;
 end;
 
-function TFormRG19.GetOpenFileName(dn, fn: string): string;
+function TFormRG19B.GetOpenFileName(dn, fn: string): string;
 begin
   if not Assigned(OpenDialog) then
     OpenDialog := TOpenDialog.Create(self);
@@ -959,7 +951,7 @@ begin
     result := '';
 end;
 
-function TFormRG19.GetSaveFileName(dn, fn: string): string;
+function TFormRG19B.GetSaveFileName(dn, fn: string): string;
 begin
   if not Assigned(SaveDialog) then
     SaveDialog := TSaveDialog.Create(self);
@@ -980,7 +972,7 @@ begin
     result := '';
 end;
 
-procedure TFormRG19.InitToolbar;
+procedure TFormRG19B.InitToolbar;
 begin
   OpenBtn.OnClick := OpenItemClick;
   SaveBtn.OnClick := SaveItemClick;
@@ -1003,7 +995,7 @@ begin
   SofortBtn.OnClick := SofortItemClick;
 end;
 
-procedure TFormRG19.InitOpenDialog;
+procedure TFormRG19B.InitOpenDialog;
 begin
   OpenDialog.DefaultExt := 'ini';
   OpenDialog.Filter := 'Alle Dateien (*.*)|*.*|Rigg Einstellungen (*.rgg)|*.rgg';
@@ -1011,14 +1003,14 @@ begin
   OpenDialog.Options := [ofOverwritePrompt, ofPathMustExist, ofFileMustExist];
 end;
 
-procedure TFormRG19.InitSaveDialog;
+procedure TFormRG19B.InitSaveDialog;
 begin
   SaveDialog.DefaultExt := 'rgg';
   SaveDialog.Filter := 'Rigg Einstellungen (*.rgg)|*.rgg|Rigg IniFile (*.rgi)|*.rgi|Alle Dateien (*.*)|*.*';
   SaveDialog.Options := [ofOverwritePrompt, ofPathMustExist];
 end;
 
-procedure TFormRG19.InitSpeedPanel;
+procedure TFormRG19B.InitSpeedPanel;
 begin
   SpeedPanel.Align := alTop;
   SpeedPanel.BevelOuter := bvNone;
@@ -1027,7 +1019,7 @@ begin
   SpeedPanel.TabOrder := 0;
 end;
 
-function TFormRG19.AddSpeedBtn(N: string; L: Integer): TSpeedButton;
+function TFormRG19B.AddSpeedBtn(N: string; L: Integer): TSpeedButton;
 begin
   result := TSpeedButton.Create(SpeedPanel);
   result.Name := N;
@@ -1037,7 +1029,7 @@ begin
   result.Height := 25;
 end;
 
-procedure TFormRG19.InitSpeedButtons;
+procedure TFormRG19B.InitSpeedButtons;
 var
   sb: TSpeedButton;
 begin
@@ -1142,7 +1134,7 @@ begin
 
 end;
 
-procedure TFormRG19.InitLED;
+procedure TFormRG19B.InitLED;
 begin
 //  LedShape := TShape.Create(Self);
   LedShape.Left := 520;
@@ -1152,7 +1144,7 @@ begin
   LedShape.Brush.Color := clGreen;
 end;
 
-procedure TFormRG19.InitStatusBar;
+procedure TFormRG19B.InitStatusBar;
 var
   sp: TStatusPanel;
 begin
@@ -1165,7 +1157,7 @@ begin
   sp.Width := 50;
 end;
 
-procedure TFormRG19.FormCreate2;
+procedure TFormRG19B.FormCreate2;
 begin
   TL := TrimmMemo.Lines;
   ML := ReportMemo.Lines;
@@ -1191,20 +1183,30 @@ begin
   ReportMemo.Left := Listbox.Left + Listbox.Width + Margin;
   ReportMemo.Top := Panel.Top + Panel.Height + Margin;
   ReportMemo.Height := StatusBar.Top - ReportMemo.Top - Margin;
-  ReportMemo.Width := Panel.Width - 297;
+  ReportMemo.Width := Panel.Width;
   ReportMemo.Anchors := ReportMemo.Anchors + [akBottom];
 
-  PaintboxG.Left := ReportMemo.Left + ReportMemo.Width + Margin;
-  PaintboxG.Top := ReportMemo.Top;
+  PaintboxG.Left := Panel.Left + Panel.Width + Margin;
+  PaintboxG.Top := Panel.Top;
   PaintboxG.Width := 297;
   PaintboxG.Height := 425;
   PaintboxG.OnPaint := PaintboxGPaint;
 
-  Paintbox2.Left := Panel.Left + Panel.Width + Margin;
-  Paintbox2.Top := Panel.Top;
+  Paintbox1.Left := PaintboxG.Left + PaintboxG.Width + Margin;
+  Paintbox1.Top := PaintboxG.Top;
+  Paintbox1.Width := ClientWidth - Paintbox1.Left - Margin;
+  Paintbox1.Height := PaintboxG.Height;
+  Paintbox1.Anchors := Paintbox1.Anchors + [akRight];
+  Paintbox1.Color := TColors.Antiquewhite;
+  Paintbox1.OnPaint := PaintboxPaint;
+
+  Paintbox2.Left := PaintboxG.Left;
+  Paintbox2.Top := Paintbox1.Top + Paintbox1.Height + Margin;
   Paintbox2.Width := ClientWidth - Paintbox2.Left - Margin;
   Paintbox2.Height := StatusBar.Top - Paintbox2.Top - Margin;
   Paintbox2.Anchors := Paintbox2.Anchors + [akRight, akBottom];
+  Paintbox2.Color := TColors.Beige;
+  Paintbox2.OnPaint := PaintboxPaint;
 
   BtnCounter := 0;
   BtnWidth := 50;
@@ -1280,7 +1282,7 @@ begin
   InitMenu;
 end;
 
-procedure TFormRG19.InitEventHandlers;
+procedure TFormRG19B.InitEventHandlers;
 begin
   ListBox.OnClick := ListBoxClick;
   Self.OnMouseWheel := FormMouseWheel;
@@ -1305,12 +1307,12 @@ begin
   cbAllTags.OnClick := cbAllTagsClick;
 end;
 
-procedure TFormRG19.FormResize(Sender: TObject);
+procedure TFormRG19B.FormResize(Sender: TObject);
 begin
   Inc(ResizeCounter);
 end;
 
-procedure TFormRG19.AB(B: TSpeedButton);
+procedure TFormRG19B.AB(B: TSpeedButton);
 begin
   B.Left := BtnLeft + BtnCounter * BtnWidth + 12;
   B.Width := 45;
@@ -1321,7 +1323,7 @@ begin
   Inc(BtnCounter);
 end;
 
-procedure TFormRG19.CB(C: TCheckBox);
+procedure TFormRG19B.CB(C: TCheckBox);
 begin
   C.Left := CheckboxLeft;
   C.Top := CheckboxTop + CheckboxCounter * CheckboxHeight;
@@ -1329,14 +1331,14 @@ begin
   Inc(CheckboxCounter);
 end;
 
-procedure TFormRG19.SetupLabel(L: TLabel);
+procedure TFormRG19B.SetupLabel(L: TLabel);
 begin
   L.Font.Name := 'Consolas';
   L.Font.Size := 11;
   L.Font.Color := clPurple;
 end;
 
-procedure TFormRG19.SetupComboBox(CB: TComboBox);
+procedure TFormRG19B.SetupComboBox(CB: TComboBox);
 begin
   CB.Style := csDropDownList;
   CB.DropDownCount := Integer(High(TFederParam));
@@ -1345,14 +1347,14 @@ begin
   CB.Font.Color := clRed;
 end;
 
-procedure TFormRG19.SetupListBox(LB: TListBox);
+procedure TFormRG19B.SetupListBox(LB: TListBox);
 begin
   LB.Font.Name := 'Consolas';
   LB.Font.Size := 11;
   LB.Font.Color := clBlue;
 end;
 
-procedure TFormRG19.SetupMemo(Memo: TMemo);
+procedure TFormRG19B.SetupMemo(Memo: TMemo);
 begin
 {$ifdef FMX}
   //Memo.Align := TAlignLayout.Client;
@@ -1372,66 +1374,66 @@ begin
   Memo.ScrollBars := TScrollStyle.ssBoth;
 end;
 
-procedure TFormRG19.CopyTrimmItemBtnClick(Sender: TObject);
+procedure TFormRG19B.CopyTrimmItemBtnClick(Sender: TObject);
 begin
   Main.CopyTrimmItem;
   ShowTrimm;
 end;
 
-procedure TFormRG19.PasteTrimmItemBtnClick(Sender: TObject);
+procedure TFormRG19B.PasteTrimmItemBtnClick(Sender: TObject);
 begin
   Main.PasteTrimmItem;
   ShowTrimm;
 end;
 
-procedure TFormRG19.CopyAndPasteBtnClick(Sender: TObject);
+procedure TFormRG19B.CopyAndPasteBtnClick(Sender: TObject);
 begin
   Main.CopyAndPaste;
   ShowTrimm;
 end;
 
-procedure TFormRG19.CopyTrimmFileBtnClick(Sender: TObject);
+procedure TFormRG19B.CopyTrimmFileBtnClick(Sender: TObject);
 begin
   Main.CopyTrimmFile;
   ShowTrimm;
 end;
 
-procedure TFormRG19.ReadTrimmFileBtnClick(Sender: TObject);
+procedure TFormRG19B.ReadTrimmFileBtnClick(Sender: TObject);
 begin
   Main.ReadTrimmFile;
   ShowTrimm;
 end;
 
-procedure TFormRG19.SaveTrimmFileBtnClick(Sender: TObject);
+procedure TFormRG19B.SaveTrimmFileBtnClick(Sender: TObject);
 begin
   Main.SaveTrimmFile;
   ShowTrimm;
 end;
 
-procedure TFormRG19.MT0BtnClick(Sender: TObject);
+procedure TFormRG19B.MT0BtnClick(Sender: TObject);
 begin
   Main.UpdateTrimm0;
   //Main.FederText.UpdateText;
   ShowTrimm;
 end;
 
-procedure TFormRG19.cbAllTagsClick(Sender: TObject);
+procedure TFormRG19B.cbAllTagsClick(Sender: TObject);
 begin
   ReportManager.XmlAllTags := cbAllTags.Checked;
 end;
 
-procedure TFormRG19.cbSandboxedClick(Sender: TObject);
+procedure TFormRG19B.cbSandboxedClick(Sender: TObject);
 begin
   IsSandboxed := cbSandboxed.Checked;
 end;
 
-procedure TFormRG19.InitListBox;
+procedure TFormRG19B.InitListBox;
 begin
   Listbox.Clear;
   ReportManager.InitLB(ListBox.Items);
 end;
 
-procedure TFormRG19.ListBoxClick(Sender: TObject);
+procedure TFormRG19B.ListBoxClick(Sender: TObject);
 var
   ii: Integer;
 begin
@@ -1443,19 +1445,19 @@ begin
   end;
 end;
 
-procedure TFormRG19.ShowCurrentReport;
+procedure TFormRG19B.ShowCurrentReport;
 begin
   ReportManager.ShowCurrentReport;
   ReportLabel.Caption := ReportManager.GetCurrentCaption;
 end;
 
-procedure TFormRG19.TestBtnClick(Sender: TObject);
+procedure TFormRG19B.TestBtnClick(Sender: TObject);
 begin
   ReportMemo.Lines.Clear;
   Main.RggData.WriteReport(ML);
 end;
 
-procedure TFormRG19.InitViewpointCombo;
+procedure TFormRG19B.InitViewpointCombo;
 var
   cl: TStrings;
 begin
@@ -1466,7 +1468,7 @@ begin
   cl.Add('3D');
 end;
 
-procedure TFormRG19.InitParamCombo;
+procedure TFormRG19B.InitParamCombo;
   procedure ACI(fp: TFederParam);
   var
     s: string;
@@ -1491,7 +1493,7 @@ begin
   ACI(fpD0X);
 end;
 
-procedure TFormRG19.InitTrimmCombo;
+procedure TFormRG19B.InitTrimmCombo;
 var
   cl: TStrings;
 begin
@@ -1506,7 +1508,7 @@ begin
   cl.AddObject('Trimm8 (Logo)', TObject(8));
 end;
 
-procedure TFormRG19.TrimmComboChange(Sender: TObject);
+procedure TFormRG19B.TrimmComboChange(Sender: TObject);
 var
   t: Integer;
   ii: Integer;
@@ -1533,7 +1535,7 @@ begin
   end;
 end;
 
-procedure TFormRG19.ParamComboChange(Sender: TObject);
+procedure TFormRG19B.ParamComboChange(Sender: TObject);
 var
   ii: Integer;
   fp: TFederParam;
@@ -1544,37 +1546,37 @@ begin
   ShowTrimm;
 end;
 
-procedure TFormRG19.M10BtnClick(Sender: TObject);
+procedure TFormRG19B.M10BtnClick(Sender: TObject);
 begin
   Main.HandleAction(faParamValueMinus10);
   ShowTrimm;
 end;
 
-procedure TFormRG19.M1BtnClick(Sender: TObject);
+procedure TFormRG19B.M1BtnClick(Sender: TObject);
 begin
   Main.HandleAction(faParamValueMinus1);
   ShowTrimm;
 end;
 
-procedure TFormRG19.P10BtnClick(Sender: TObject);
+procedure TFormRG19B.P10BtnClick(Sender: TObject);
 begin
   Main.HandleAction(faParamValuePlus10);
   ShowTrimm;
 end;
 
-procedure TFormRG19.P1BtnClick(Sender: TObject);
+procedure TFormRG19B.P1BtnClick(Sender: TObject);
 begin
   Main.HandleAction(faParamValuePlus1);
   ShowTrimm;
 end;
 
-procedure TFormRG19.ShowTrimm;
+procedure TFormRG19B.ShowTrimm;
 begin
   Main.RggMain.UpdateTrimmText(TL);
   ShowCurrentReport;
 end;
 
-procedure TFormRG19.FormMouseWheel(Sender: TObject; Shift: TShiftState;
+procedure TFormRG19B.FormMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 begin
   if (ssShift in Shift) or (ssCtrl in Shift) then
@@ -1585,12 +1587,12 @@ begin
   end;
 end;
 
-procedure TFormRG19.PaintBtn2Click(Sender: TObject);
+procedure TFormRG19B.PaintBtn2Click(Sender: TObject);
 begin
   Main.RggMain.UpdateGraph;
 end;
 
-procedure TFormRG19.ViewpointComboChange(Sender: TObject);
+procedure TFormRG19B.ViewpointComboChange(Sender: TObject);
 var
   ii: Integer;
 begin
@@ -1603,7 +1605,7 @@ begin
   end;
 end;
 
-procedure TFormRG19.InitMenuClick;
+procedure TFormRG19B.InitMenuClick;
 begin
   { File }
 
@@ -1700,7 +1702,7 @@ begin
   LogoItem.OnClick := LogoItemClick;
 end;
 
-procedure TFormRG19.InitMenu;
+procedure TFormRG19B.InitMenu;
 var
   p: TMenuItem;
   mi: TMenuItem;
@@ -2171,7 +2173,7 @@ begin
   mi.OnClick := LogoItemClick;
 end;
 
-procedure TFormRG19.PaintBoxPaint(Sender: TObject);
+procedure TFormRG19B.PaintBoxPaint(Sender: TObject);
 var
   r: TRect;
   c: TCanvas;
@@ -2184,7 +2186,7 @@ begin
   c.FillRect(r);
 end;
 
-procedure TFormRG19.PaintBoxGPaint(Sender: TObject);
+procedure TFormRG19B.PaintBoxGPaint(Sender: TObject);
 begin
   RiggModul.Draw;
 end;

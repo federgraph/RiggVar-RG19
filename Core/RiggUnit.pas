@@ -22,6 +22,7 @@ uses
   Vcl.ComCtrls,
   Vcl.Printers,
   Vcl.Clipbrd,
+  RggRota,
   RggTypes,
   RggGBox,
   Rggunit4,
@@ -136,6 +137,7 @@ type
     ViewModelMain: TViewModelMain00;
     PBG: TPaintbox;
     RG19A: Boolean; { RG19A = MDI app }
+    RotaForm: TRotaForm;
 
     Rigg: TRigg;
     RiggReport: TRiggReport;
@@ -174,6 +176,7 @@ type
 
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Init;
 
     procedure DoOnWheelScroll(fp: TFederParam; ScrollPos: Integer);
     procedure DoOnUpdateSalingTyp(Value: TSalingTyp);
@@ -297,12 +300,10 @@ uses
 constructor TRiggModul.Create(AOwner: TComponent);
 begin
   inherited;
+end;
 
-  if not RG19A then
-    ViewModelMain := TViewModelMainB.Create
-  else
-    ViewModelMain := TViewModelMainA.Create;
-
+procedure TRiggModul.Init;
+begin
   FSofortBerechnen := True;
   FKorrigiertItem := True;
   FPaintBtnDown := False;
@@ -527,6 +528,8 @@ begin
   UpdateGCtrlLabels(InputRec);
   if RotaFormActive then
     AniRotationForm.Modified := True;
+  if RotaForm <> nil then
+    RotaForm.Modified := True;
 end;
 
 procedure TRiggModul.sbControllerScroll(Sender: TObject;
@@ -680,6 +683,14 @@ begin
       AniRotationForm.Draw;
       AniRotationForm.Invalidate;
     end;
+  end;
+
+  if RotaForm <> nil then
+  begin
+//    if SofortBerechnen then
+//      Modified := True;
+    RotaForm.UpdateAll(Rigg);
+    RotaForm.Draw;
   end;
 
   Getriebegrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
@@ -883,7 +894,11 @@ var
   R: TRect;
 begin
   R := Rect(0, 0, Image.Width, Image.Height);
-  Image.Canvas.Brush.Color := clBtnFace;
+  if RG19A then
+    Image.Canvas.Brush.Color := clBtnFace
+  else
+    Image.Canvas.Brush.Color := TColors.Wheat;
+
   Image.Canvas.FillRect(R);
 end;
 
@@ -1696,7 +1711,7 @@ begin
 
   (*
   { dies wird durch AniRotationForm.UpdateAll(Rigg) ersetzt
-    beachte, daß Draw nicht aufgerufen wird }
+    beachte, dass Draw nicht aufgerufen wird }
   RotationForm.RaumGrafik.Salingtyp := Salingtyp;
   RotationForm.RaumGrafik.ControllerTyp := ControllerTyp;
   RotationForm.RaumGrafik.Koordinaten := Rigg.rP;

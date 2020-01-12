@@ -33,11 +33,11 @@ type
     ParamXE,           { Abstand(iP[ooD0,x],iP[ooE ,x]) in mm }
     ParamXE0: Integer; { Abstand(iP[ooD0,x],iP[ooE0,x]) in mm }
 
-    SalingA,           { Abstand(iP[ooA ,x],iP[ooB ,x]) in mm }
+    SalingA, { Abstand(iP[ooA ,x],iP[ooB ,x]) in mm }
     SalingH, { Abstand Verbindungslinie Salinge zu Hinterkante Mast in mm }
     SalingL, { Salinglänge in mm - außerhalb berechnen }
-    SalingHOffset: Integer; { Abstand Hinterkante Mast zur neutrale Faser in mm}
-    SalingDetail: Boolean; {Umschalten zwischen den beiden SalingViews}
+    SalingHOffset: Integer; { Abstand Hinterkante Mast zur neutrale Faser in mm }
+    SalingDetail: Boolean; { Umschalten zwischen den beiden SalingViews }
     constructor Create;
     procedure DrawSalingAll(Canvas: TCanvas);
     procedure DrawSalingDetail(Canvas: TCanvas);
@@ -69,7 +69,8 @@ procedure TSalingCtrl.DrawProfile(Canvas: TCanvas);
 
 procedure MetaLINE(x1, y1, x2, y2: Integer);
 begin
-  if Lage = quer then begin
+  if Lage = quer then
+  begin
     x1 := x1 + OffsetX;
     y1 := y1 + OffsetY;
     x2 := x2 + OffsetX;
@@ -81,7 +82,8 @@ begin
     Canvas.MoveTo(y1, x1);
     Canvas.LineTo(y2, x2);
   end
-  else if Lage = hoch then begin
+  else if Lage = hoch then
+  begin
     x1 := x1 + OffsetX;
     y1 := y1 + OffsetY;
     x2 := x2 + OffsetX;
@@ -99,7 +101,8 @@ procedure MetaARC(xm, ym, Radius: Integer; phi1, phi2: real);
 var
   temp: Integer;
 begin
-  if Lage = quer then begin
+  if Lage = quer then
+  begin
     xm := xm + OffsetX;
     ym := ym + OffsetY;
     xm := xm div ControllerZoom;
@@ -115,8 +118,10 @@ begin
       ym + Round(cos(phi2*pi/180)*Radius),
       xm + Round(sin(phi1*pi/180)*Radius),
       ym + Round(cos(phi1*pi/180)*Radius)
-    ); end
-  else if Lage = hoch then begin
+    );
+  end
+  else if Lage = hoch then
+  begin
     xm := xm + OffsetX;
     ym := ym + OffsetY;
     xm := xm div SalingZoom;
