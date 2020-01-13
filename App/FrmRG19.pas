@@ -133,29 +133,23 @@ type
     ZweischlagBtn: TSpeedButton;
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
-    Panel: TPanel;
-    ReportLabel: TLabel;
     M10Btn: TSpeedButton;
     M1Btn: TSpeedButton;
     P1Btn: TSpeedButton;
     P10Btn: TSpeedButton;
-    CopyAndPasteBtn: TSpeedButton;
-    CopyTrimmItemBtn: TSpeedButton;
     MT0Btn: TSpeedButton;
     PasteTrimmItemBtn: TSpeedButton;
     ReadTrimmFileBtn: TSpeedButton;
     SaveTrimmFileBtn: TSpeedButton;
-    ParamCombo: TComboBox;
+    CopyTrimmItemBtn: TSpeedButton;
+    CopyAndPasteBtn: TSpeedButton;
     TrimmCombo: TComboBox;
-    cbSandboxed: TCheckBox;
-    cbAllProps: TCheckBox;
-    cbAllTags: TCheckBox;
+    ParamCombo: TComboBox;
+    ViewpointCombo: TComboBox;
     Listbox: TListBox;
     ReportMemo: TMemo;
     TrimmMemo: TMemo;
-    PaintBox2: TPaintBox;
-    PaintBoxG: TPaintBox;
-    ViewpointCombo: TComboBox;
+    PaintBoxR: TPaintBox;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -240,7 +234,6 @@ type
     procedure ViewpointComboChange(Sender: TObject);
     procedure PaintBtn2Click(Sender: TObject);
     procedure cbAllTagsClick(Sender: TObject);
-    procedure PaintBoxPaint(Sender: TObject);
   private
     TL: TStrings;
     ML: TStrings;
@@ -249,16 +242,15 @@ type
     BtnTop: Integer;
     BtnLeft: Integer;
     BtnWidth: Integer;
+    BtnHeight: Integer;
     BtnCounter: Integer;
+    BtnSpace: Integer;
+    BtnGroupSpace: Integer;
     BtnColor: TColor;
 
-    CheckboxLeft: Integer;
-    CheckboxTop: Integer;
-    CheckboxWidth: Integer;
-    CheckboxHeight: Integer;
-    CheckboxCounter: Integer;
-
     ComboHeight: Integer;
+    ConsoleWidth: Integer;
+    ConsoleHeight: Integer;
 
     procedure SetupMemo(Memo: TMemo);
     procedure InitListBox;
@@ -266,12 +258,11 @@ type
     procedure InitParamCombo;
     procedure SetupComboBox(CB: TComboBox);
     procedure SetupListBox(LB: TListBox);
-    procedure SetupLabel(L: TLabel);
-    procedure AB(B: TSpeedButton);
-    procedure CB(C: TCheckBox);
     procedure ShowTrimm;
     procedure ShowCurrentReport;
     procedure InitViewpointCombo;
+  protected
+    procedure SetupLabel(L: TLabel);
   public
     ResizeCounter: Integer;
     function GetOpenFileName(dn, fn: string): string;
@@ -279,20 +270,22 @@ type
 
   private
     Margin: Integer;
+    FReportLabelCaption: string;
     procedure wmGetMinMaxInfo(var Msg: TMessage); message wm_GetMinMaxInfo;
     procedure FormCreate1;
     procedure FormCreate2;
     procedure InitEventHandlers;
-    procedure PaintBoxGPaint(Sender: TObject);
+    procedure SetReportLabelCaption(const Value: string);
   protected
-    function AddSpeedBtn(N: string; L: Integer): TSpeedButton;
+    function AddSpeedBtn(N: string; AGroupSpace: Integer = 0): TSpeedButton;
+    function RefSpeedBtn(B: TSpeedButton; AGroupSpace: Integer = 0): TSpeedButton;
+    function RefShapeBtn(B: TShape; AGroupSpace: Integer): TShape;
     procedure InitToolbar;
     procedure InitOpenDialog;
     procedure InitSaveDialog;
     procedure InitStatusBar;
     procedure InitSpeedButtons;
     procedure InitSpeedPanel;
-    procedure InitLED;
     procedure InitMenuClick;
     procedure InitMenu;
   public
@@ -303,6 +296,11 @@ type
     procedure SetControllerEnabled;
     procedure SetControllerChecked(Value: Boolean);
     procedure SetKoppelChecked(Value: Boolean);
+  public
+    SandboxedBtn: TSpeedButton;
+    AllPropsBtn: TSpeedButton;
+    AllTagsBtn: TSpeedButton;
+    property ReportLabelCaption: string read FReportLabelCaption write SetReportLabelCaption;
   end;
 
 var
@@ -322,7 +320,7 @@ uses
   FrmConsole,
   FrmInput,
   FrmOutput,
-//  FrmGrafic,
+  FrmGrafic,
   FrmText,
   FrmReport,
   FrmChart,
@@ -353,7 +351,7 @@ var
 begin
   InputForm := TInputForm.Create(Application);
   OutputForm := TOutputForm.Create(Application);
-//  GrafikForm := TGrafikForm.Create(Application);
+  GrafikForm := TGrafikForm.Create(Application);
 
   RiggModul := TRiggModul.Create(Self);
   RiggModul.RG19A := False;
@@ -361,7 +359,7 @@ begin
   RiggModul.Init;
 
   rggm := TRggMain.Create(RiggModul.Rigg);
-  RiggModul.PBG := PaintboxG;
+  RiggModul.PBG := GrafikForm.PaintBoxG;
 
   Main := TMain.Create(rggm);
   Main.Logger.Verbose := True;
@@ -404,9 +402,9 @@ begin
   OnCloseQuery := FormCloseQuery;
 
   RiggModul.RotaForm := TRotaForm.Create;
-  RiggModul.RotaForm.PaintBox3D := Paintbox2;
+  RiggModul.RotaForm.PaintBox3D := PaintboxR;
   RiggModul.RotaForm.Init;
-  Paintbox2 := RiggModul.RotaForm.PaintBox3D;
+  PaintboxR := RiggModul.RotaForm.PaintBox3D;
   RiggModul.DoGraphics;
 end;
 
@@ -655,6 +653,12 @@ begin
   RiggModul.KoppelBtnDown := Value;
 end;
 
+procedure TFormRG19.SetReportLabelCaption(const Value: string);
+begin
+  FReportLabelCaption := Value;
+  StatusBar.Panels[2].Text := Value;
+end;
+
 procedure TFormRG19.KoppelBtnClick(Sender: TObject);
 begin
   SetKoppelChecked(not KoppelkurveItem.Checked);
@@ -867,10 +871,10 @@ end;
 procedure TFormRG19.GrafikFormItemClick(Sender: TObject);
 begin
   GrafikFormItem.Checked := not GrafikFormItem.Checked;
-//  if GrafikFormItem.Checked then
-//    GrafikForm.Show
-//  else
-//    GrafikForm.Hide;
+  if GrafikFormItem.Checked then
+    GrafikForm.Show
+  else
+    GrafikForm.Hide;
 end;
 
 procedure TFormRG19.ChartFormItemClick(Sender: TObject);
@@ -1027,104 +1031,138 @@ begin
   SpeedPanel.TabOrder := 0;
 end;
 
-function TFormRG19.AddSpeedBtn(N: string; L: Integer): TSpeedButton;
+function TFormRG19.AddSpeedBtn(N: string; AGroupSpace: Integer): TSpeedButton;
 begin
   result := TSpeedButton.Create(SpeedPanel);
+  result.Parent := SpeedPanel;
   result.Name := N;
-  result.Left := L;
-  result.Top := 3;
-  result.Width := 25;
-  result.Height := 25;
+  RefSpeedBtn(result, AGroupSpace);
+end;
+
+function TFormRG19.RefSpeedBtn(B: TSpeedButton; AGroupSpace: Integer): TSpeedButton;
+begin
+  result := B;
+  BtnLeft := BtnLeft + AGroupSpace;
+  B.Left := BtnLeft + BtnCounter * BtnWidth + BtnSpace;
+  B.Top := BtnTop;
+  B.Width := BtnWidth;
+  B.Height := BtnHeight;
+  B.Font.Name := 'Consolas';
+  B.Font.Size := 12;
+  B.Font.Color := BtnColor;
+  Inc(BtnCounter);
+end;
+
+function TFormRG19.RefShapeBtn(B: TShape; AGroupSpace: Integer): TShape;
+var
+  temp: Integer;
+begin
+  temp := (BtnWidth - 10) div 2;
+  result := B;
+  LedShape.Left := BtnLeft + BtnCounter * BtnWidth + BtnSpace + temp;
+  LedShape.Top := BtnTop + 1;
+  LedShape.Width := BtnWidth - 2 * temp;
+  LedShape.Height := BtnHeight - 2;
+  LedShape.Brush.Color := clGreen;
+  Inc(BtnCounter);
 end;
 
 procedure TFormRG19.InitSpeedButtons;
 var
   sb: TSpeedButton;
 begin
-  sb := AddSpeedBtn('OpenBtn', 8);
+  BtnCounter := 0;
+  BtnLeft := 0;
+  BtnTop := 3;
+  BtnSpace := 3;
+  BtnGroupSpace := 12;
+  BtnWidth := 30;
+  BtnHeight := 30;
+
+  SpeedPanel.Height := BtnHeight + 2 * BtnTop;
+
+  { File Menu buttons }
+
+  sb := RefSpeedBtn(OpenBtn, BtnGroupSpace);
   sb.Hint := 'Öffnen|';
+  sb.GroupIndex := 0;
   sb.OnClick := OpenItemClick;
 
-  sb := AddSpeedBtn('SaveBtn', 33);
+  sb := RefSpeedBtn(SaveBtn, 0);
   sb.Hint := 'Speichern|';
+  sb.GroupIndex := 0;
   sb.OnClick := SaveItemClick;
 
-  sb := AddSpeedBtn('ExitBtn', 66);
+  sb := RefSpeedBtn(ExitBtn, 0);
   sb.Hint := 'Beenden|';
+  sb.GroupIndex := 0;
   sb.OnClick := ExitItemClick;
 
-  sb := AddSpeedBtn('UpdateBtn', 113);
+  { visual group of four buttons, still group index 0 }
+
+  sb := RefSpeedBtn(UpdateBtn, BtnGroupSpace);
   sb.Hint := 'Rigg neu Berechnen|';
+  sb.GroupIndex := 0;
   sb.OnClick := UpdateBtnClick;
 
-  sb := AddSpeedBtn('BtnGrau', 294);
-  sb.Hint := '2D Grafik - Entspanntes Rigg einblenden|';
-  sb.AllowAllUp := True;
-  sb.Down := True;
-  sb.GroupIndex := 2;
-  sb.OnClick := BtnGrauClick;
-
-  sb := AddSpeedBtn('KoppelBtn', 319);
-  sb.Hint := '2D Grafik - Koppelkurve anzeigen|';
-  sb.AllowAllUp := True;
-  sb.Down := True;
-  sb.GroupIndex := 2;
-  sb.OnClick := KoppelBtnClick;
-
-  sb := AddSpeedBtn('ReglerBtn', 138);
+  sb := RefSpeedBtn(ReglerBtn, 0);
   sb.Caption := 'R';
   sb.Hint := 'Trimm Regeln|';
+  sb.GroupIndex := 0;
   sb.OnClick := ReglerBtnClick;
 
-  sb := AddSpeedBtn('MemoryBtn', 163);
+  sb := RefSpeedBtn(MemoryBtn, 0);
   sb.Caption := 'M';
   sb.Hint := 'Memory (Trimm als Referenz speichern|)';
+  sb.GroupIndex := 0;
   sb.OnClick := MemoryBtnClick;
 
-  sb := AddSpeedBtn('MemoryRecallBtn', 188);
+  sb := RefSpeedBtn(MemoryRecallBtn, 0);
   sb.Caption := 'MR';
   sb.Hint := 'Memory Recall|';
+  sb.GroupIndex := 0;
   sb.OnClick := MemoryRecallBtnClick;
 
-  sb := AddSpeedBtn('PaintBtn', 244);
+  { Paint option buttons with AllowAllUp true }
+
+  sb := RefSpeedBtn(PaintBtn, BtnGroupSpace);
   sb.Hint := '2D Grafik - Alte Grafik stehenlassen|';
   sb.AllowAllUp := True;
   sb.Down := False;
   sb.GroupIndex := 1;
   sb.OnClick := PaintBtnClick;
 
-  sb := AddSpeedBtn('BtnBlau', 269);
+  sb := RefSpeedBtn(BtnBlau, 0);
   sb.Hint := '2D Grafik - Nullstellung anzeigen|';
   sb.AllowAllUp := True;
   sb.Down := False;
-  sb.GroupIndex := 4;
+  sb.GroupIndex := 2;
   sb.OnClick := BtnBlauClick;
 
-  sb := AddSpeedBtn('SofortBtn', 485);
-  sb.Caption := 'A';
-  sb.Hint := 'Umschalter Rigg sofort berechnen (Automatik)|';
+  sb := RefSpeedBtn(BtnGrau, 0);
+  sb.Hint := '2D Grafik - Entspanntes Rigg einblenden|';
   sb.AllowAllUp := True;
   sb.Down := True;
-  sb.GroupIndex := 8;
-  sb.OnClick := SofortItemClick;
+  sb.GroupIndex := 3;
+  sb.OnClick := BtnGrauClick;
 
-  sb := AddSpeedBtn('DiffBtn', 423);
-  sb.Caption := 'D';
-  sb.Hint := 'Umschalter Differenzen/Absolutwerte|';
+  sb := RefSpeedBtn(KoppelBtn, 0);
+  sb.Hint := '2D Grafik - Koppelkurve anzeigen|';
+  sb.AllowAllUp := True;
+  sb.Down := True;
+  sb.GroupIndex := 4;
+  sb.OnClick := KoppelBtnClick;
+
+  sb := RefSpeedBtn(ZweischlagBtn, 0);
+  sb.Hint := '2D Grafik - Mast als Zweischlag einzeichnen|';
   sb.AllowAllUp := True;
   sb.Down := False;
-  sb.GroupIndex := 7;
-  sb.OnClick := DifferenzItemClick;
+  sb.GroupIndex := 5;
+  sb.OnClick := ControllerBtnClick;
 
-  sb := AddSpeedBtn('WinkelBtn', 454);
-  sb.Caption := 'W';
-  sb.Hint := 'Umschalter Winkel/Vorstag|';
-  sb.AllowAllUp := True;
-  sb.Down := False;
-  sb.GroupIndex := 9;
-  sb.OnClick := WinkelItemClick;
+  { Model option buttons }
 
-  sb := AddSpeedBtn('ControllerBtn', 404);
+  sb := RefSpeedBtn(ControllerBtn, BtnGroupSpace);
   sb.Caption := 'C';
   sb.Hint := 'Umschalter für Controller-Modus|';
   sb.AllowAllUp := True;
@@ -1132,36 +1170,161 @@ begin
   sb.GroupIndex := 6;
   sb.OnClick := ControllerBtnClick;
 
-  sb := AddSpeedBtn('ZweischlagBtn', 344);
-//  sb.Caption := 'Z';
-  sb.Hint := '2D Grafik - Mast als Zweischlag einzeichnen|';
+  sb := RefSpeedBtn(DiffBtn, 0);
+  sb.Caption := 'D';
+  sb.Hint := 'Umschalter Differenzen/Absolutwerte|';
   sb.AllowAllUp := True;
   sb.Down := False;
-  sb.GroupIndex := 5;
-  sb.OnClick := ControllerBtnClick;
+  sb.GroupIndex := 7;
+  sb.OnClick := DifferenzItemClick;
 
-end;
+  sb := RefSpeedBtn(WinkelBtn, 0);
+  sb.Caption := 'W';
+  sb.Hint := 'Umschalter Winkel/Vorstag|';
+  sb.AllowAllUp := True;
+  sb.Down := False;
+  sb.GroupIndex := 8;
+  sb.OnClick := WinkelItemClick;
 
-procedure TFormRG19.InitLED;
-begin
-//  LedShape := TShape.Create(Self);
-  LedShape.Left := 520;
-  LedShape.Top := 7;
-  LedShape.Width := 9;
-  LedShape.Height := 16;
-  LedShape.Brush.Color := clGreen;
+  sb := RefSpeedBtn(SofortBtn, 0);
+  sb.Caption := 'A';
+  sb.Hint := 'Umschalter Rigg sofort berechnen (Automatik)|';
+  sb.AllowAllUp := True;
+  sb.Down := True;
+  sb.GroupIndex := 9;
+  sb.OnClick := SofortItemClick;
+
+  { LED }
+
+  RefShapeBtn(LedShape, BtnGroupSpace);
+
+  { New Button group Trimm Data }
+
+  BtnCounter := 0; // reset button counter
+  BtnLeft := LedShape.Left + LEDShape.Width + BtnSpace; // skip over LED shape
+  BtnWidth := 50; // new button width for new buttons
+
+  BtnColor := clGreen;
+
+  sb := RefSpeedBtn(MT0Btn, BtnGroupSpace);
+  sb.Caption := 'MT0';
+  sb.Hint := 'Memory Trimm 0|';
+  sb.GroupIndex := 10;
+  sb.OnClick := MT0BtnClick;
+
+  BtnColor := clFuchsia;
+
+  sb := RefSpeedBtn(ReadTrimmFileBtn, 0);
+  sb.Caption := 'rtf';
+  sb.Hint := 'Read Trimm File|';
+  sb.GroupIndex := 10;
+  sb.OnClick := ReadTrimmFileBtnClick;
+
+  sb := RefSpeedBtn(SaveTrimmFileBtn, 0);
+  sb.Caption := 'stf';
+  sb.Hint := 'MT0|';
+  sb.GroupIndex := 10;
+  sb.OnClick := SaveTrimmFileBtnClick;
+
+  BtnColor := clBlue;
+
+  sb := RefSpeedBtn(CopyTrimmItemBtn, 0);
+  sb.Caption := 'cti';
+  sb.Hint := 'Copy Trimm Item|';
+  sb.GroupIndex := 10;
+  sb.OnClick := CopyTrimmItemBtnClick;
+
+  BtnColor := clBlack;
+
+  sb := RefSpeedBtn(PasteTrimmItemBtn, 0);
+  sb.Caption := 'pti';
+  sb.Hint := 'Paste Trimm Item|';
+  sb.GroupIndex := 10;
+  sb.OnClick := PasteTrimmItemBtnClick;
+
+  sb := RefSpeedBtn(CopyAndPasteBtn, 0);
+  sb.Caption := 'M';
+  sb.Hint := 'Copy and Paste Btn|';
+  sb.GroupIndex := 10;
+  sb.OnClick := CopyAndPasteBtnClick;
+
+  { Button Group Param Value Change }
+
+  BtnColor := TColors.Teal;
+
+  sb := RefSpeedBtn(M10Btn, BtnGroupSpace);
+  sb.Caption := 'M10';
+  sb.Hint := 'Param Value Minus 10|';
+  sb.GroupIndex := 10;
+  sb.OnClick := M10BtnClick;
+
+  sb := RefSpeedBtn(M1Btn, 0);
+  sb.Caption := 'M1';
+  sb.Hint := 'Param Value Minus 1|';
+  sb.GroupIndex := 10;
+  sb.OnClick := M1BtnClick;
+
+  sb := RefSpeedBtn(P1Btn, 0);
+  sb.Caption := 'P1';
+  sb.Hint := 'Param Value Plus 1|';
+  sb.GroupIndex := 10;
+  sb.OnClick := P1BtnClick;
+
+  sb := RefSpeedBtn(P10Btn, 0);
+  sb.Caption := 'P10';
+  sb.Hint := 'Param Value Plus 10|';
+  sb.GroupIndex := 10;
+  sb.OnClick := P10BtnClick;
+
+  { new 'checkbox' group }
+
+//  sb := RefSpeedBtn(SandboxedBtn, BtnGroupSpace);
+  sb := AddSpeedBtn('SandboxedBtn', BtnGroupSpace);
+  SandboxedBtn := sb;
+  sb.Caption := 'SB';
+  sb.Hint := 'Sandboxed|';
+  sb.AllowAllUp := True;
+  sb.Down := IsSandboxed;
+  sb.GroupIndex := 11;
+  sb.OnClick := cbSandboxedClick;
+
+//  sb := RefSpeedBtn(AllPropsBtn, 0);
+  sb := AddSpeedBtn('AllPropsBtn', 0);
+  AllPropsBtn := sb;
+  sb.Caption := 'AP';
+  sb.Hint := 'All Props|';
+  sb.AllowAllUp := True;
+  sb.Down := False;
+  sb.GroupIndex := 11;
+  sb.OnClick := cbSandboxedClick;
+
+//  sb := RefSpeedBtn(AllTagsBtn, 0);
+  sb := AddSpeedBtn('AllTagsBtn', 0);
+  AllTagsBtn := sb;
+  sb.Caption := 'AT';
+  sb.Hint := 'All Tags|';
+  sb.AllowAllUp := True;
+  sb.Down := False;
+  sb.GroupIndex := 11;
+  sb.OnClick := cbSandboxedClick;
 end;
 
 procedure TFormRG19.InitStatusBar;
 var
   sp: TStatusPanel;
 begin
+  StatusBar.Panels.Clear;
+
   sp := StatusBar.Panels.Add;
   sp.Text := 'MenuText';
   sp.Width := 353;
 
   sp := StatusBar.Panels.Add;
   sp.Text := 'RiggText';
+  sp.Width := 300;
+
+  sp := StatusBar.Panels.Add;
+  sp.Text := 'RepotLabel';
   sp.Width := 50;
 end;
 
@@ -1172,87 +1335,52 @@ begin
 
   Margin := 5;
 
+  InitSpeedPanel;
+  InitSpeedButtons;
+  InitStatusBar;
+
   TrimmMemo.Left := Margin;
   TrimmMemo.Top := SpeedPanel.Height + Margin;
   TrimmMemo.Height := 185;
   TrimmMemo.Width := 170;
 
-  Panel.Top := SpeedPanel.Height + Margin;
-  Panel.Left := TrimmMemo.Left + TrimmMemo.Width + Margin;
-  Panel.Width := 600;
-  Panel.ShowCaption := False;
+  TrimmCombo.Left := TrimmMemo.Left;
+  ParamCombo.Left := TrimmMemo.Left;
+  ViewpointCombo.Left := TrimmMemo.Left;
+
+  TrimmCombo.Width := TrimmMemo.Width;
+  ParamCombo.Width := TrimmCombo.Width;
+  ViewpointCombo.Width := TrimmCombo.Width;
+
+  ComboHeight := TrimmCombo.Height + 2 * Margin;
+  TrimmCombo.Top := TrimmMemo.Top + TrimmMemo.Height + Margin;
+  ParamCombo.Top := TrimmCombo.Top + ComboHeight;
+  ViewpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
 
   Listbox.Left := TrimmMemo.Left;
-  Listbox.Top := TrimmMemo.Top + TrimmMemo.Height + Margin;
+  Listbox.Top := ViewpointCombo.Top + ComboHeight + Margin;
   Listbox.Width := TrimmMemo.Width;
   Listbox.Height := StatusBar.Top - Listbox.top - Margin;
   Listbox.Anchors := Listbox.Anchors + [akBottom];
 
+  ConsoleWidth := 500; //770 + 1 * Margin;
+  ConsoleHeight := 0; //457;
+
   ReportMemo.Left := Listbox.Left + Listbox.Width + Margin;
-  ReportMemo.Top := Panel.Top + Panel.Height + Margin;
+  ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + ConsoleHeight + Margin;
   ReportMemo.Height := StatusBar.Top - ReportMemo.Top - Margin;
-  ReportMemo.Width := Panel.Width - 297;
+  ReportMemo.Width := ConsoleWidth;
   ReportMemo.Anchors := ReportMemo.Anchors + [akBottom];
 
-  PaintboxG.Left := ReportMemo.Left + ReportMemo.Width + Margin;
-  PaintboxG.Top := ReportMemo.Top;
-  PaintboxG.Width := 297;
-  PaintboxG.Height := 425;
-  PaintboxG.OnPaint := PaintboxGPaint;
-
-  Paintbox2.Left := Panel.Left + Panel.Width + Margin;
-  Paintbox2.Top := Panel.Top;
-  Paintbox2.Width := ClientWidth - Paintbox2.Left - Margin;
-  Paintbox2.Height := StatusBar.Top - Paintbox2.Top - Margin;
-  Paintbox2.Anchors := Paintbox2.Anchors + [akRight, akBottom];
-
-  BtnCounter := 0;
-  BtnWidth := 50;
-  BtnTop := MT0Btn.Top;
-  BtnLeft := MT0Btn.Left;
-
-  BtnColor := clGreen;
-  AB(MT0Btn);
-
-  BtnColor := clFuchsia;
-  AB(ReadTrimmFileBtn);
-  AB(SaveTrimmFileBtn);
-
-  BtnColor := clBlue;
-  AB(CopyTrimmItemBtn);
-  AB(PasteTrimmItemBtn);
-
-  BtnColor := clBlack;
-  AB(CopyAndPasteBtn);
-
-  CheckboxCounter := 0;
-  CheckboxLeft := BtnLeft + BtnCounter * BtnWidth + 20;
-  CheckboxTop := BtnTop;
-  CheckboxWidth := 100;
-  CheckboxHeight := cbSandboxed.Height + Margin;
-  CB(cbSandboxed);
-  CB(cbAllProps);
-  CB(cbAllTags);
-
-  BtnCounter := 0;
-  BtnTop := M10Btn.Top;
-  BtnLeft := M10Btn.Left;
-
-  BtnColor := clTeal;
-  AB(M10Btn);
-  AB(M1Btn);
-  AB(P1Btn);
-  AB(P10Btn);
-
-  ComboHeight := TrimmCombo.Height + 2 * Margin;
-  TrimmCombo.Top := P10Btn.Top + P10Btn.Height + 3 * Margin;
-  ParamCombo.Top := TrimmCombo.Top + ComboHeight;
-  ViewpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
+  PaintboxR.Left := ReportMemo.Left + ReportMemo.Width + Margin;
+  PaintboxR.Top := SpeedPanel.Top + SpeedPanel.Height + Margin;
+  PaintboxR.Width := ClientWidth - PaintboxR.Left - Margin;
+  PaintboxR.Height := StatusBar.Top - PaintboxR.Top - Margin;
+  PaintboxR.Anchors := PaintboxR.Anchors + [akRight, akBottom];
 
   SetupComboBox(TrimmCombo);
   SetupComboBox(ParamCombo);
   SetupComboBox(ViewpointCombo);
-  SetupLabel(ReportLabel);
   SetupListBox(ListBox);
   SetupMemo(TrimmMemo);
   SetupMemo(ReportMemo);
@@ -1278,6 +1406,7 @@ begin
 
   InitEventHandlers;
   InitMenu;
+//  InitOutputForm;
 end;
 
 procedure TFormRG19.InitEventHandlers;
@@ -1300,33 +1429,14 @@ begin
   TrimmCombo.OnChange := TrimmComboChange;
   ViewpointCombo.OnChange := ViewpointComboChange;
 
-  cbSandboxed.OnClick := cbSandboxedClick;
-  cbAllProps.OnClick := nil;
-  cbAllTags.OnClick := cbAllTagsClick;
+  SandboxedBtn.OnClick := cbSandboxedClick;
+  AllPropsBtn.OnClick := nil;
+  AllTagsBtn.OnClick := cbAllTagsClick;
 end;
 
 procedure TFormRG19.FormResize(Sender: TObject);
 begin
   Inc(ResizeCounter);
-end;
-
-procedure TFormRG19.AB(B: TSpeedButton);
-begin
-  B.Left := BtnLeft + BtnCounter * BtnWidth + 12;
-  B.Width := 45;
-  B.Height := 30;
-  B.Font.Name := 'Consolas';
-  B.Font.Size := 12;
-  B.Font.Color := BtnColor;
-  Inc(BtnCounter);
-end;
-
-procedure TFormRG19.CB(C: TCheckBox);
-begin
-  C.Left := CheckboxLeft;
-  C.Top := CheckboxTop + CheckboxCounter * CheckboxHeight;
-  C.Width := CheckboxWidth;
-  Inc(CheckboxCounter);
 end;
 
 procedure TFormRG19.SetupLabel(L: TLabel);
@@ -1417,12 +1527,12 @@ end;
 
 procedure TFormRG19.cbAllTagsClick(Sender: TObject);
 begin
-  ReportManager.XmlAllTags := cbAllTags.Checked;
+  ReportManager.XmlAllTags := AllTagsBtn.Down;
 end;
 
 procedure TFormRG19.cbSandboxedClick(Sender: TObject);
 begin
-  IsSandboxed := cbSandboxed.Checked;
+  IsSandboxed := SandboxedBtn.Down;
 end;
 
 procedure TFormRG19.InitListBox;
@@ -1446,7 +1556,7 @@ end;
 procedure TFormRG19.ShowCurrentReport;
 begin
   ReportManager.ShowCurrentReport;
-  ReportLabel.Caption := ReportManager.GetCurrentCaption;
+  ReportLabelCaption := ReportManager.GetCurrentCaption;
 end;
 
 procedure TFormRG19.TestBtnClick(Sender: TObject);
@@ -1521,13 +1631,13 @@ begin
 
     //Main.CurrentTrimm.SaveTrimmFile(ML);
 
-    Main.CurrentTrimm.WantAll := cbAllProps.Checked;
+    Main.CurrentTrimm.WantAll := AllPropsBtn.Down;
     Main.CurrentTrimm.SaveTrimmItem(ML);
     Main.CurrentTrimm.WantAll := False;
 
     //Main.CurrentTrimm.WriteReport(ML);
 
-    ReportLabel.Caption := 'Trimm' + IntToStr(t);
+    ReportLabelCaption := 'Trimm' + IntToStr(t);
   finally
     ML.EndUpdate;
   end;
@@ -1804,21 +1914,21 @@ begin
   mi.Hint := '  Eingabeseiten im eigenen Fenster anzeigen';
   mi.ShortCut := 16453;
   mi.OnClick := InputFormItemClick;
-//  mi.Visible := False;
+  mi.Visible := True;
 
   OutputFormItem := AddI('OutputFormItem');
   mi.Caption := '&Ausgabe ...';
   mi.Hint := '  Ausgabeseiten im eigenen Fenster anzeigen';
   mi.ShortCut := 16449;
   mi.OnClick := OutputFormItemClick;
-//  mi.Visible := False;
+  mi.Visible := True;
 
   GrafikFormItem := AddI('GrafikFormItem');
   mi.Caption := '&Grafik ...';
   mi.Hint := '  Grafik-Ausgabeseiten separat anzeigen';
   mi.ShortCut := 16455;
   mi.OnClick := GrafikFormItemClick;
-//  mi.Visible := False;
+  mi.Visible := True;
 
   OptionItem := AddI('OptionItem');
   mi.Caption := '&Konfiguration ...';
@@ -1839,19 +1949,16 @@ begin
   mi.Caption := '3D Grafik ...';
   mi.Hint := '  Rigg r'#228'umlich darstellen';
   mi.OnClick := RotaFormItemClick;
-//  mi.Visible := False;
 
   ChartFormItem := AddI('ChartFormItem');
   mi.Caption := 'Diagramm ...';
   mi.Hint := '  Diagramm aktivieren';
   mi.OnClick := ChartFormItemClick;
-//  mi.Visible := False;
 
   ReportFormItem := AddI('ReportFormItem');
   mi.Caption := 'Report ...';
   mi.Hint := '  Report erstellen';
   mi.OnClick := ReportFormItemClick;
-//  mi.Visible := False;
 
   N1 := AddI('N1');
   mi.Caption := '-';
@@ -2155,11 +2262,12 @@ begin
   mi.Caption := '&Hilfe';
   mi.GroupIndex := 10;
   mi.Hint := '  Hilfethemen';
-  mi.Enabled := False;
+  mi.Enabled := True;
 
   HilfeItem := AddI('HilfeItem');
   mi.Caption := '&Hilfe ...';
   mi.Hint := '  Hilfesystem starten';
+  mi.Enabled := False;
 
   AboutItem := AddI('AboutItem');
   mi.Caption := '&Info...';
@@ -2169,24 +2277,6 @@ begin
   LogoItem := AddI('LogoItem');
   mi.Caption := 'Logo';
   mi.OnClick := LogoItemClick;
-end;
-
-procedure TFormRG19.PaintBoxPaint(Sender: TObject);
-var
-  r: TRect;
-  c: TCanvas;
-  p: TPaintbox;
-begin
-  p := Sender as TPaintbox;
-  c := p.Canvas;
-  r := TRect.Create(0, 0, p.Width, p.Height);
-  c.Brush.Color := p.Color;
-  c.FillRect(r);
-end;
-
-procedure TFormRG19.PaintBoxGPaint(Sender: TObject);
-begin
-  RiggModul.Draw;
 end;
 
 end.

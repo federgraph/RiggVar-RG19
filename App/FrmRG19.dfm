@@ -16,17 +16,11 @@ object FormRG19: TFormRG19
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
-  object PaintBox2: TPaintBox
-    Left = 644
-    Top = 38
+  object PaintBoxR: TPaintBox
+    Left = 688
+    Top = 287
     Width = 105
     Height = 105
-  end
-  object PaintBoxG: TPaintBox
-    Left = 493
-    Top = 237
-    Width = 145
-    Height = 140
   end
   object StatusBar: TStatusBar
     Left = 0
@@ -47,7 +41,7 @@ object FormRG19: TFormRG19
     Left = 0
     Top = 0
     Width = 1094
-    Height = 32
+    Height = 55
     Align = alTop
     BevelOuter = bvNone
     ParentShowHint = False
@@ -324,166 +318,128 @@ object FormRG19: TFormRG19
         00007777CCCCCAA00777700000007777CCCCC00777777000000077777CCC7777
         777770000000}
     end
-  end
-  object Panel: TPanel
-    Left = 188
-    Top = 38
-    Width = 450
-    Height = 185
-    TabOrder = 2
-    object ReportLabel: TLabel
-      Left = 224
-      Top = 151
-      Width = 58
-      Height = 13
-      Caption = 'ReportLabel'
-    end
     object M10Btn: TSpeedButton
-      Left = 10
-      Top = 43
+      Left = 762
+      Top = 3
       Width = 41
       Height = 30
       Caption = '-10'
     end
     object M1Btn: TSpeedButton
-      Left = 88
-      Top = 43
+      Left = 809
+      Top = 3
       Width = 23
       Height = 22
       Caption = '-1'
     end
     object P1Btn: TSpeedButton
-      Left = 117
-      Top = 43
+      Left = 838
+      Top = 3
       Width = 23
       Height = 22
       Caption = '+1'
     end
     object P10Btn: TSpeedButton
-      Left = 146
-      Top = 43
+      Left = 867
+      Top = 3
       Width = 23
       Height = 22
       Caption = '+10'
     end
     object CopyAndPasteBtn: TSpeedButton
-      Left = 250
-      Top = 7
+      Left = 712
+      Top = 6
       Width = 23
       Height = 22
       Caption = 'M'
     end
     object CopyTrimmItemBtn: TSpeedButton
-      Left = 177
+      Left = 654
       Top = 7
       Width = 23
       Height = 22
       Caption = 'cti'
     end
     object MT0Btn: TSpeedButton
-      Left = 10
+      Left = 545
       Top = 7
       Width = 45
       Height = 30
       Caption = 'MT0'
     end
     object PasteTrimmItemBtn: TSpeedButton
-      Left = 206
+      Left = 683
       Top = 7
       Width = 23
       Height = 22
       Caption = 'pti'
     end
     object ReadTrimmFileBtn: TSpeedButton
-      Left = 88
+      Left = 596
       Top = 7
       Width = 23
       Height = 22
       Caption = 'rtf'
     end
     object SaveTrimmFileBtn: TSpeedButton
-      Left = 117
-      Top = 7
+      Left = 625
+      Top = 6
       Width = 23
       Height = 22
       Caption = 'stf'
     end
-    object ParamCombo: TComboBox
-      Left = 10
-      Top = 121
-      Width = 177
-      Height = 21
-      TabOrder = 1
-      Text = 'ParamCombo'
-    end
-    object TrimmCombo: TComboBox
-      Left = 10
-      Top = 94
-      Width = 177
-      Height = 21
-      TabOrder = 0
-      Text = 'TrimmCombo'
-    end
-    object cbSandboxed: TCheckBox
-      Left = 305
-      Top = 10
-      Width = 97
-      Height = 17
-      Caption = 'Sandboxed'
-      TabOrder = 2
-    end
-    object cbAllProps: TCheckBox
-      Left = 305
-      Top = 33
-      Width = 97
-      Height = 17
-      Caption = 'All Props ( TI )'
-      TabOrder = 3
-    end
-    object cbAllTags: TCheckBox
-      Left = 305
-      Top = 56
-      Width = 97
-      Height = 17
-      Caption = 'All Tags ( XML )'
-      TabOrder = 4
-    end
-    object ViewpointCombo: TComboBox
-      Left = 10
-      Top = 148
-      Width = 177
-      Height = 21
-      TabOrder = 5
-      Text = 'ViewpointCombo'
-    end
   end
   object Listbox: TListBox
     Left = 8
-    Top = 237
+    Top = 357
     Width = 169
     Height = 180
     ItemHeight = 13
     Items.Strings = (
       'Listbox')
-    TabOrder = 3
+    TabOrder = 2
   end
   object ReportMemo: TMemo
-    Left = 188
-    Top = 237
+    Left = 211
+    Top = 289
     Width = 291
     Height = 140
     Lines.Strings = (
       'ReportMemo')
-    TabOrder = 4
+    TabOrder = 3
   end
   object TrimmMemo: TMemo
     Left = 8
-    Top = 38
+    Top = 62
     Width = 169
     Height = 185
     Lines.Strings = (
       'TrimmMemo')
+    TabOrder = 4
+  end
+  object TrimmCombo: TComboBox
+    Left = 8
+    Top = 262
+    Width = 155
+    Height = 21
     TabOrder = 5
+    Text = 'TrimmCombo'
+  end
+  object ParamCombo: TComboBox
+    Left = 8
+    Top = 289
+    Width = 155
+    Height = 21
+    TabOrder = 6
+    Text = 'ParamCombo'
+  end
+  object ViewpointCombo: TComboBox
+    Left = 8
+    Top = 316
+    Width = 155
+    Height = 21
+    TabOrder = 7
+    Text = 'ViewpointCombo'
   end
   object MainMenu: TMainMenu
     Left = 207

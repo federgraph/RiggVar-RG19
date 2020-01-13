@@ -133,13 +133,6 @@ type
     ZweischlagBtn: TSpeedButton;
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
-    Listbox: TListBox;
-    ReportMemo: TMemo;
-    TrimmMemo: TMemo;
-    PaintBoxR: TPaintBox;
-    TrimmCombo: TComboBox;
-    ParamCombo: TComboBox;
-    ViewpointCombo: TComboBox;
     M10Btn: TSpeedButton;
     M1Btn: TSpeedButton;
     P1Btn: TSpeedButton;
@@ -150,6 +143,13 @@ type
     SaveTrimmFileBtn: TSpeedButton;
     CopyTrimmItemBtn: TSpeedButton;
     CopyAndPasteBtn: TSpeedButton;
+    TrimmCombo: TComboBox;
+    ParamCombo: TComboBox;
+    ViewpointCombo: TComboBox;
+    Listbox: TListBox;
+    ReportMemo: TMemo;
+    TrimmMemo: TMemo;
+    PaintBoxR: TPaintBox;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -234,7 +234,6 @@ type
     procedure ViewpointComboChange(Sender: TObject);
     procedure PaintBtn2Click(Sender: TObject);
     procedure cbAllTagsClick(Sender: TObject);
-    procedure PaintBoxPaint(Sender: TObject);
   private
     TL: TStrings;
     ML: TStrings;
@@ -317,11 +316,12 @@ uses
   RiggVar.VM.FormMainB,
   RiggVar.RG.Main,
   RiggUnit,
+  RggRota,
   FrmInfo,
   FrmConsole,
-  FrmGrafic,
   FrmInput,
   FrmOutput,
+  FrmGrafic,
   FrmText,
   FrmReport,
   FrmChart,
@@ -350,9 +350,9 @@ procedure TFormRG19B.FormCreate1;
 var
   rggm: TRggMain;
 begin
-  GrafikForm := TGrafikForm.Create(Application);
   InputForm := TInputForm.Create(Application);
   OutputForm := TOutputForm.Create(Application);
+  GrafikForm := TGrafikForm.Create(Application);
 
   RiggModul := TRiggModul.Create(Self);
   RiggModul.RG19A := False;
@@ -360,7 +360,6 @@ begin
   RiggModul.Init;
 
   rggm := TRggMain.Create(RiggModul.Rigg);
-//  RiggModul.PBG := PaintboxG;
   RiggModul.PBG := GrafikForm.PaintboxG;
 
   Main := TMain.Create(rggm);
@@ -402,6 +401,12 @@ begin
   Caption := 'Rigg - Form';
   OnClose := FormClose;
   OnCloseQuery := FormCloseQuery;
+
+  RiggModul.RotaForm := TRotaForm.Create;
+  RiggModul.RotaForm.PaintBox3D := PaintboxR;
+  RiggModul.RotaForm.Init;
+  PaintboxR := RiggModul.RotaForm.PaintBox3D;
+  RiggModul.DoGraphics;
 end;
 
 procedure TFormRG19B.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1373,8 +1378,6 @@ begin
   PaintboxR.Width := ClientWidth - PaintboxR.Left - Margin;
   PaintboxR.Height := StatusBar.Top - PaintboxR.Top - Margin;
   PaintboxR.Anchors := PaintboxR.Anchors + [akRight, akBottom];
-  PaintboxR.Color := TColors.Gray;
-  PaintboxR.OnPaint := PaintboxPaint;
 
   SetupComboBox(TrimmCombo);
   SetupComboBox(ParamCombo);
@@ -2278,19 +2281,6 @@ begin
   LogoItem := AddI('LogoItem');
   mi.Caption := 'Logo';
   mi.OnClick := LogoItemClick;
-end;
-
-procedure TFormRG19B.PaintBoxPaint(Sender: TObject);
-var
-  r: TRect;
-  c: TCanvas;
-  p: TPaintbox;
-begin
-  p := Sender as TPaintbox;
-  c := p.Canvas;
-  r := TRect.Create(0, 0, p.Width, p.Height);
-  c.Brush.Color := p.Color;
-  c.FillRect(r);
 end;
 
 procedure TFormRG19B.InitOutputForm;

@@ -894,11 +894,7 @@ var
   R: TRect;
 begin
   R := Rect(0, 0, Image.Width, Image.Height);
-  if RG19A then
-    Image.Canvas.Brush.Color := clBtnFace
-  else
-    Image.Canvas.Brush.Color := TColors.Wheat;
-
+  Image.Canvas.Brush.Color := clBtnFace;
   Image.Canvas.FillRect(R);
 end;
 
