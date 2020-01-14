@@ -6,7 +6,7 @@ uses
   Windows,
   Graphics,
   Classes,
-  Vector3d,
+  Vector3D,
   SysUtils;
 
 const
@@ -407,7 +407,7 @@ function TThreeD.Read3DModel: Integer;
     ColorPal[i].g := g;
     ColorPal[i].b := b;
   end;
-  procedure ReadPoint(i: Integer; x, y, z: real);
+  procedure ReadPoint(i: Integer; x, y, z: double);
   begin
     Points[i].x := x;
     Points[i].y := y;

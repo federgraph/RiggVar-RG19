@@ -23,7 +23,7 @@ type
   TconArray = array [0 .. maxcon] of Integer;
   TconColors = array [0 .. 15] of TColor;
 
-  Matrix4x4 = array [1 .. 4, 1 .. 4] of real;
+  Matrix4x4 = array [1 .. 4, 1 .. 4] of double;
 
   TMatrix4x4 = class(TObject)
   private
@@ -36,15 +36,15 @@ type
     procedure Multiply(m: Matrix4x4);
     procedure PreMultiply(m: Matrix4x4);
     procedure transpose;
-    procedure translate(tx, ty, tz: real);
-    procedure translateDirect(tx, ty, tz: real);
-    procedure scaleCenter(sx, sy, sz: real; center: vec3);
-    procedure scale(f: real);
-    procedure scaleXYZ(xf, yf, zf: real);
+    procedure translate(tx, ty, tz: double);
+    procedure translateDirect(tx, ty, tz: double);
+    procedure scaleCenter(sx, sy, sz: double; center: vec3);
+    procedure scale(f: double);
+    procedure scaleXYZ(xf, yf, zf: double);
     procedure xrot(Theta: double);
     procedure yrot(Theta: double);
     procedure zrot(Theta: double);
-    procedure rotate(p1, p2: vec3; angle: real);
+    procedure rotate(p1, p2: vec3; angle: double);
     procedure transformPoint(var point: vec3);
     procedure transform(var v: TvertArrayF; var tv: TvertArrayI; nvert: Integer);
     procedure transformF(var v: TvertArrayF; var tv: TvertArrayF; nvert: Integer);
@@ -57,7 +57,7 @@ type
     Ypos: Integer;
     IncrementIndex: Integer;
     IncrementT: Integer;
-    IncrementW: real;
+    IncrementW: double;
     ZoomIndex: Integer;
     FixpunktIndex: Integer;
     Matrix: Matrix4x4;
@@ -65,16 +65,16 @@ type
 
   TRotaParams = class
   private
-    FZoomBase: real;
+    FZoomBase: double;
     FZoomIndex: Integer;
     FIncrementIndex: Integer;
     procedure SetIncrementIndex(Value: Integer);
     procedure SetFixPunktIndex(Value: Integer);
     procedure SetZoomIndex(Value: Integer);
     function GetIncrementT: Integer;
-    function GetIncrementW: real;
+    function GetIncrementW: double;
     function GetFixPunktIndex: Integer;
-    function GetZoom: real;
+    function GetZoom: double;
   public
     Xpos: Integer;
     Ypos: Integer;
@@ -85,8 +85,8 @@ type
     property FixPunktIndex: Integer read GetFixPunktIndex write SetFixPunktIndex;
     property ZoomIndex: Integer read FZoomIndex write SetZoomIndex;
     property IncrementT: Integer read GetIncrementT;
-    property IncrementW: real read GetIncrementW;
-    property Zoom: real read GetZoom;
+    property IncrementW: double read GetIncrementW;
+    property Zoom: double read GetZoom;
   end;
 
 const
@@ -127,7 +127,7 @@ end;
 { die Transponierte ist die Inverse der Rotationsmatrix! }
 procedure TMatrix4x4.transpose;
 var
-  tmp: real;
+  tmp: double;
 begin
   tmp := Fmat[1, 2];
   Fmat[1, 2] := Fmat[2, 1];
@@ -173,7 +173,7 @@ begin
       Fmat[r, c] := tmp[r, c];
 end;
 
-procedure TMatrix4x4.scaleCenter(sx, sy, sz: real; center: vec3);
+procedure TMatrix4x4.scaleCenter(sx, sy, sz: double; center: vec3);
 var
   m: Matrix4x4;
 begin
@@ -187,7 +187,7 @@ begin
   PreMultiply(m);
 end;
 
-procedure TMatrix4x4.scale(f: real);
+procedure TMatrix4x4.scale(f: double);
 begin
   Fmat[1, 1] := Fmat[1, 1] * f;
   Fmat[1, 2] := Fmat[1, 2] * f;
@@ -204,7 +204,7 @@ begin
 end;
 
 { Scale along each axis independently }
-procedure TMatrix4x4.scaleXYZ(xf, yf, zf: real);
+procedure TMatrix4x4.scaleXYZ(xf, yf, zf: double);
 begin
   Fmat[1, 1] := Fmat[1, 1] * xf;
   Fmat[1, 2] := Fmat[1, 2] * xf;
@@ -220,7 +220,7 @@ begin
   Fmat[3, 4] := Fmat[3, 4] * zf;
 end;
 
-procedure TMatrix4x4.translate(tx, ty, tz: real);
+procedure TMatrix4x4.translate(tx, ty, tz: double);
 var
   m: Matrix4x4;
 begin
@@ -232,18 +232,18 @@ begin
 end;
 
 { Translate the origin }
-procedure TMatrix4x4.translateDirect(tx, ty, tz: real);
+procedure TMatrix4x4.translateDirect(tx, ty, tz: double);
 begin
   Fmat[1, 4] := Fmat[1, 4] + tx;
   Fmat[2, 4] := Fmat[2, 4] + ty;
   Fmat[3, 4] := Fmat[3, 4] + tz;
 end;
 
-procedure TMatrix4x4.rotate(p1, p2: vec3; angle: real);
+procedure TMatrix4x4.rotate(p1, p2: vec3; angle: double);
 var
   m: Matrix4x4;
   vec: vec3;
-  s, sinA2, vecLength, a, b, c: real;
+  s, sinA2, vecLength, a, b, c: double;
 begin
   s := cos(angle / 2.0);
   vec.x := p2.x - p1.x;
@@ -273,7 +273,7 @@ end;
 procedure TMatrix4x4.yrot(Theta: double);
 var
   ct, st: double;
-  Nxx, Nxy, Nxz, Nxo, Nzx, Nzy, Nzz, Nzo: real;
+  Nxx, Nxy, Nxz, Nxo, Nzx, Nzy, Nzz, Nzo: double;
 begin
   Theta := Theta * (pi / 180);
   ct := cos(Theta);
@@ -303,7 +303,7 @@ end;
 procedure TMatrix4x4.xrot(Theta: double);
 var
   ct, st: double;
-  Nyx, Nyy, Nyz, Nyo, Nzx, Nzy, Nzz, Nzo: real;
+  Nyx, Nyy, Nyz, Nyo, Nzx, Nzy, Nzz, Nzo: double;
 begin
   Theta := Theta * (pi / 180);
   ct := cos(Theta);
@@ -333,7 +333,7 @@ end;
 procedure TMatrix4x4.zrot(Theta: double);
 var
   ct, st: double;
-  Nyx, Nyy, Nyz, Nyo, Nxx, Nxy, Nxz, Nxo: real;
+  Nyx, Nyy, Nyz, Nyo, Nxx, Nxy, Nxz, Nxo: double;
 begin
   Theta := Theta * (pi / 180);
   ct := cos(Theta);
@@ -514,7 +514,7 @@ begin
   end;
 end;
 
-function TRotaParams.GetIncrementW: real;
+function TRotaParams.GetIncrementW: double;
 begin
   case IncrementIndex of
     1: result := 0.1;
@@ -527,7 +527,7 @@ begin
   end;
 end;
 
-function TRotaParams.GetZoom: real;
+function TRotaParams.GetZoom: double;
 begin
   result := FZoomBase * LookUpRa10(FZoomIndex);
 end;

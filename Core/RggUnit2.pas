@@ -26,7 +26,7 @@ uses
 
 type
   TKurvenTyp = (KurveOhneController, KurveMitController);
-  TLineDataR150 = array[0..150] of real;
+  TLineDataR150 = array[0..150] of double;
   TMastStatusSet = set of TMastStatus;
 
   TKraftGraph0 = class
@@ -1103,7 +1103,7 @@ end;
 procedure TMast.DrawMastLine(Canvas: TCanvas; Rect: TRect);
 var
   Pos: TPoint;
-  min, max, Mitte: real;
+  min, max, Mitte: double;
   i: Integer;
   bmp: TBitmap;
   PlotLine: Linie;

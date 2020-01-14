@@ -572,13 +572,13 @@ end;
 procedure TChartForm.GetCurves;
 var
   i, j, p: Integer;
-  Antrieb, PAntrieb: real;
-  Anfang, Ende, PAnfang, PEnde: real;
+  Antrieb, PAntrieb: double;
+  Anfang, Ende, PAnfang, PEnde: double;
   InputRec: TTrimmControls;
   PunktOK: Boolean;
   Rigg: TRigg;
   S: string;
-  temp, tempL, tempH, tempA: real;
+  temp, tempL, tempH, tempA: double;
 begin
   Rigg := RiggModul.Rigg;
 
@@ -948,7 +948,7 @@ procedure TChartForm.ShowTogether(ParamNo: Integer);
 var
   i, j, p: Integer;
   YAV: TYAchseValue;
-  min, max, diff, temp: Real;
+  min, max, diff, temp: double;
   tempParamCount: Integer;
   tempPText: TYAchseStringArray;
 begin
@@ -1040,7 +1040,7 @@ end;
 { Maximum und Minimum suchen für eine einzelne Kurve. }
 procedure TChartForm.UpdateYMinMax;
 var
-  min, max: real;
+  min, max: double;
   i, j, p: Integer;
 begin
   p := PSpinner.Position-1;

@@ -276,6 +276,7 @@ type
     procedure FormCreate2;
     procedure InitEventHandlers;
     procedure SetReportLabelCaption(const Value: string);
+    procedure LayoutComponents;
   protected
     function AddSpeedBtn(N: string; AGroupSpace: Integer = 0): TSpeedButton;
     function RefSpeedBtn(B: TSpeedButton; AGroupSpace: Integer = 0): TSpeedButton;
@@ -357,6 +358,7 @@ begin
   RiggModul.RG19A := False;
   RiggModul.ViewModelMain := TViewModelMainC.Create;
   RiggModul.Init;
+  RiggModul.BackgroundColor := TColors.Wheat;
 
   rggm := TRggMain.Create(RiggModul.Rigg);
   RiggModul.PBG := GrafikForm.PaintBoxG;
@@ -1339,44 +1341,7 @@ begin
   InitSpeedButtons;
   InitStatusBar;
 
-  TrimmMemo.Left := Margin;
-  TrimmMemo.Top := SpeedPanel.Height + Margin;
-  TrimmMemo.Height := 185;
-  TrimmMemo.Width := 170;
-
-  TrimmCombo.Left := TrimmMemo.Left;
-  ParamCombo.Left := TrimmMemo.Left;
-  ViewpointCombo.Left := TrimmMemo.Left;
-
-  TrimmCombo.Width := TrimmMemo.Width;
-  ParamCombo.Width := TrimmCombo.Width;
-  ViewpointCombo.Width := TrimmCombo.Width;
-
-  ComboHeight := TrimmCombo.Height + 2 * Margin;
-  TrimmCombo.Top := TrimmMemo.Top + TrimmMemo.Height + Margin;
-  ParamCombo.Top := TrimmCombo.Top + ComboHeight;
-  ViewpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
-
-  Listbox.Left := TrimmMemo.Left;
-  Listbox.Top := ViewpointCombo.Top + ComboHeight + Margin;
-  Listbox.Width := TrimmMemo.Width;
-  Listbox.Height := StatusBar.Top - Listbox.top - Margin;
-  Listbox.Anchors := Listbox.Anchors + [akBottom];
-
-  ConsoleWidth := 500; //770 + 1 * Margin;
-  ConsoleHeight := 0; //457;
-
-  ReportMemo.Left := Listbox.Left + Listbox.Width + Margin;
-  ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + ConsoleHeight + Margin;
-  ReportMemo.Height := StatusBar.Top - ReportMemo.Top - Margin;
-  ReportMemo.Width := ConsoleWidth;
-  ReportMemo.Anchors := ReportMemo.Anchors + [akBottom];
-
-  PaintboxR.Left := ReportMemo.Left + ReportMemo.Width + Margin;
-  PaintboxR.Top := SpeedPanel.Top + SpeedPanel.Height + Margin;
-  PaintboxR.Width := ClientWidth - PaintboxR.Left - Margin;
-  PaintboxR.Height := StatusBar.Top - PaintboxR.Top - Margin;
-  PaintboxR.Anchors := PaintboxR.Anchors + [akRight, akBottom];
+  LayoutComponents;
 
   SetupComboBox(TrimmCombo);
   SetupComboBox(ParamCombo);
@@ -1407,6 +1372,59 @@ begin
   InitEventHandlers;
   InitMenu;
 //  InitOutputForm;
+end;
+
+procedure TFormRG19.LayoutComponents;
+
+  function BelowOf(cr: TControl): Integer;
+  begin
+    result := cr.Top + cr.Height + Margin;
+  end;
+
+  function RightOf(cr: TControl): Integer;
+  begin
+    result := cr.Left + cr.Width + Margin;
+  end;
+
+begin
+  TrimmMemo.Left := Margin;
+  TrimmMemo.Top := SpeedPanel.Height + Margin;
+  TrimmMemo.Height := 185;
+  TrimmMemo.Width := 170;
+
+  TrimmCombo.Left := TrimmMemo.Left;
+  ParamCombo.Left := TrimmCombo.Left;
+  ViewpointCombo.Left := TrimmCombo.Left;
+
+  TrimmCombo.Width := TrimmMemo.Width;
+  ParamCombo.Width := TrimmCombo.Width;
+  ViewpointCombo.Width := TrimmCombo.Width;
+
+  ComboHeight := TrimmCombo.Height + 2 * Margin;
+  TrimmCombo.Top := BelowOf(TrimmMemo);
+  ParamCombo.Top := TrimmCombo.Top + ComboHeight;
+  ViewpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
+
+  Listbox.Left := TrimmMemo.Left;
+  Listbox.Top := ViewpointCombo.Top + ComboHeight + Margin;
+  Listbox.Width := TrimmMemo.Width;
+  Listbox.Height := StatusBar.Top - Listbox.top - Margin;
+  Listbox.Anchors := Listbox.Anchors + [akBottom];
+
+  ConsoleWidth := 500;
+  ConsoleHeight := 0;
+
+  ReportMemo.Left := RightOf(Listbox);
+  ReportMemo.Top := BelowOf(SpeedPanel) + ConsoleHeight;
+  ReportMemo.Height := StatusBar.Top - ReportMemo.Top - Margin;
+  ReportMemo.Width := ConsoleWidth;
+  ReportMemo.Anchors := ReportMemo.Anchors + [akBottom];
+
+  PaintboxR.Left := RightOf(ReportMemo);
+  PaintboxR.Top := BelowOf(SpeedPanel);
+  PaintboxR.Width := ClientWidth - PaintboxR.Left - Margin;
+  PaintboxR.Height := StatusBar.Top - PaintboxR.Top - Margin;
+  PaintboxR.Anchors := PaintboxR.Anchors + [akRight, akBottom];
 end;
 
 procedure TFormRG19.InitEventHandlers;

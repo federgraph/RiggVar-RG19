@@ -15,7 +15,7 @@ function Cross(v1, v2: vec3): vec3;
 function Divide(v :vec3; num: double): vec3;
 procedure Normalize(var v: vec3);
 function Dot(v1, v2: vec3): double;
-function LookUpRa10(Index: Integer): real;
+function LookUpRa10(Index: Integer): double;
 
 implementation
 
@@ -79,9 +79,9 @@ begin
 	result := v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 end;
 
-function LookUpRa10(Index: Integer): real;
+function LookUpRa10(Index: Integer): double;
 var
-  temp: real;
+  temp: double;
 begin
   { dezimalgeometrische Reihe Ra10 }
   temp := 1;

@@ -30,7 +30,8 @@ var
   P: TPrinter;
 begin
   result := False;
-  if Printingdisabled then exit;
+  if Printingdisabled then
+    Exit;
 
   if RggPrinterStatus = psUnknown then
   try

@@ -78,18 +78,23 @@ type
     MetaCanvas: TMetaFileCanvas;
 
     ViewPoint: TViewPoint;
-    FZoomBase: real;
-    FZoom: real;
+    FZoomBase: double;
+    FZoom: double;
 
-    FPhi, FTheta, FGamma: real;
+    FPhi: double;
+    FTheta: double;
+    FGamma: double;
 
     FXpos: Integer;
     FYpos: Integer;
-    FIncrementW: real;
+    FIncrementW: double;
     FIncrementT: Integer;
     FZoomIndex: Integer;
     RotaData: TRotaData;
-    RotaData1, RotaData2, RotaData3, RotaData4: TRotaData;
+    RotaData1: TRotaData;
+    RotaData2: TRotaData;
+    RotaData3: TRotaData;
+    RotaData4: TRotaData;
 
     NullpunktOffset: TPoint;
     FPaintRumpf: Boolean;
@@ -113,7 +118,7 @@ type
     EraseBK: Boolean;
     MinTrackX, MinTrackY: Integer;
     MaxTrackX, MaxTrackY: Integer;
-    procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: real);
+    procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
     procedure Translate(x, y: Integer);
     procedure SetAngleText;
     procedure SetZoomText;
@@ -127,8 +132,8 @@ type
   public
     Rigg: TRigg;
     Rotator: TPolarKar2;
-    HullGraph: TRggGraph; // THullGraph;
-    RaumGrafik: TRaumGrafik; // TGetriebeGraph;
+    HullGraph: TRggGraph;
+    RaumGrafik: TRaumGrafik;
     IndicatorForm: TIndicatorForm;
     BackBmp: TBitmap;
     Mode: Boolean;
@@ -331,7 +336,7 @@ end;
 
 procedure TRotaForm.InitRotaData;
 
-  function GetMatrix(Theta, Xrot: real): Matrix4x4;
+  function GetMatrix(Theta, Xrot: double): Matrix4x4;
   begin
     Rotator.Reset;
     Rotator.DeltaTheta := Theta;
@@ -539,7 +544,7 @@ end;
 
 procedure TRotaForm.LeftBtnClick(Sender: TObject);
 //var
-//  wp, wt, wg: real;
+//  wp, wt, wg: double;
 begin
 //  if Mode = False then
 //  begin
@@ -1009,7 +1014,7 @@ begin
   IndicatorForm.UpdateIndicator;
 end;
 
-procedure TRotaForm.Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: real);
+procedure TRotaForm.Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
 begin
   Rotator.DeltaPhi := Phi;
   Rotator.DeltaTheta := Theta;

@@ -53,7 +53,7 @@ uses
   RggHull in 'Graph\RggHull.pas',
   RggPal in 'Graph\RggPal.pas',
   RggRota in 'Graph\RggRota.pas',
-  Vector3d in 'Graph\Vector3d.pas',
+  Vector3D in 'Graph\Vector3D.pas',
   ThreeD in 'Graph\ThreeD.pas',
   ThreeDSolid in 'Graph\ThreeDSolid.pas',
   RggGraph in 'Graph\RggGraph.pas',

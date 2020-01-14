@@ -29,7 +29,7 @@ type
   TKraftGraph = class(TKraftGraph0)
   private
     FOffsetX, FOffsetY: Integer;
-    FZoomX, FZoomY: real;
+    FZoomX, FZoomY: double;
     FPunktPos: TPoint;
     FKurveOhne,
     FKurveMit,
@@ -41,8 +41,8 @@ type
     procedure DrawPunkt(Canvas: TCanvas; Punkt: TPoint);
     procedure DrawKurve(Canvas: TCanvas; Kurve: TLineDataR150);
     procedure DrawKurveQuer(Canvas: TCanvas; Kurve: TLineDataR100);
-    function GetKoppelFaktor: real;
-    function GetSalingAlpha: real;
+    function GetKoppelFaktor: double;
+    function GetSalingAlpha: double;
     function GetKorrigiert: Boolean;
     function GetControllerTyp: TControllerTyp;
   public
@@ -50,8 +50,8 @@ type
     constructor Create(AMast: TMast); virtual;
     procedure DrawPaintBoxK(Canvas: TCanvas; Rect: TRect); override;
     procedure GetTestKurven; override;
-    property KoppelFaktor: real read GetKoppelFaktor;
-    property SalingAlpha: real read GetSalingAlpha;
+    property KoppelFaktor: double read GetKoppelFaktor;
+    property SalingAlpha: double read GetSalingAlpha;
     property Korrigiert: Boolean read GetKorrigiert;
     property ControllerTyp: TControllerTyp read GetControllerTyp;
   end;
@@ -73,12 +73,12 @@ begin
   ShowAll := True;
 end;
 
-function TKraftGraph.GetKoppelFaktor: real;
+function TKraftGraph.GetKoppelFaktor: double;
 begin
   result := Mast.KoppelFaktor;
 end;
 
-function TKraftGraph.GetSalingAlpha: real;
+function TKraftGraph.GetSalingAlpha: double;
 begin
   result := Mast.SalingAlpha;
 end;
@@ -278,10 +278,10 @@ end;
 procedure TKraftGraph.GetTestKurven;
 var
   i: Integer;
-  tempHd: real;
+  tempHd: double;
   tempKorrigiert: Boolean;
   tempControllerTyp: TControllerTyp;
-  Knicklaenge, KnickLast, Kraft, Weg: real;
+  Knicklaenge, KnickLast, Kraft, Weg: double;
 begin
   with Mast do
   begin

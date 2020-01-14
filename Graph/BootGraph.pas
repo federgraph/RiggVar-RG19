@@ -21,7 +21,7 @@ type
   public
     constructor Create; override;
     procedure LoadFromIniFile(FileName: string);
-    procedure SetMastKurve(f: TLineDataR100; L, beta: real);
+    procedure SetMastKurve(f: TLineDataR100; L, beta: double);
 
     property FixName: TRiggPoints read FFixName write SetFixName;
     property SalingTyp: TSalingTyp read FSalingTyp write FSalingTyp;
@@ -55,9 +55,9 @@ begin
   FixPunkt := rP[Value]; //--> Updated := False;
 end;
 
-procedure TBootGraph.SetMastKurve(f: TLineDataR100; L, beta: real);
+procedure TBootGraph.SetMastKurve(f: TLineDataR100; L, beta: double);
 var
-  temp1, temp2, temp3, temp4, tempL: real;
+  temp1, temp2, temp3, temp4, tempL: double;
   j, k: Integer;
 begin
   temp1 := cos(pi / 2 - beta);

@@ -25,6 +25,7 @@ type
     procedure DrawProfile(Canvas: TCanvas);
 
   public
+    BackgroundColor: TColor;
     ControllerTyp: TControllerTyp;
     PBSize: TPoint; { PaintBox-Size }
 
@@ -48,6 +49,7 @@ implementation
 
 constructor TSalingCtrl.Create;
 begin
+  BackgroundColor := clBtnFace;
   PBSize.x := 453;
   PBSize.y := 220;
   ControllerZoom := 1;
@@ -97,7 +99,7 @@ begin
   end;
 end;
 
-procedure MetaARC(xm, ym, Radius: Integer; phi1, phi2: real);
+procedure MetaARC(xm, ym, Radius: Integer; phi1, phi2: double);
 var
   temp: Integer;
 begin
@@ -389,8 +391,8 @@ begin
 
   KlotzX2 := EdgePosition * 100;
   KlotzX1 := KlotzX2 - 2000;
-  Canvas.Pen.Color := clBtnFace;
-  Canvas.Brush.Color := clBtnFace;
+  Canvas.Pen.Color := BackgroundColor;
+  Canvas.Brush.Color := BackgroundColor;
   Canvas.RoundRect( KlotzX1, -3200, KlotzX2,  3200, 1000, 1000);
 
   { Controller ausblenden, wenn OhneSaling/Mast starr }

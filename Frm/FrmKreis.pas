@@ -49,9 +49,9 @@ type
   private
     SchnittKK: TSchnittKK;
     Sprite1, Sprite2: TSprite;
-    FrM1, FrM2: TRealPoint; { real - Mittelpunkte der großen Kreise }
+    FrM1, FrM2: TRealPoint; { double - Mittelpunkte der großen Kreise }
     FiM1, FiM2: TPoint; { Integer - Mittelpunkte der großen Kreise }
-    FrPos1, FrPos2: TRealPoint; { real - Mittelpunkte der kleinen Kreise }
+    FrPos1, FrPos2: TRealPoint; { double - Mittelpunkte der kleinen Kreise }
     FiPos1, FiPos2: TPoint; { Integer - Mittelpunkte der kleinen Kreise }
     FSchnittOK: Boolean;
     FKreise: Boolean;

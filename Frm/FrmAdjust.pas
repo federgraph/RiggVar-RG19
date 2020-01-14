@@ -30,12 +30,10 @@ type
     procedure MinusBtnClick(Sender: TObject);
     procedure ViewBtnClick(Sender: TObject);
   private
-    { Private-Deklarationen }
     FOnChange: TNotifyEvent;
     procedure Change;
   public
-    { Public-Deklarationen }
-    Grafik: TGetriebeGraph; //RggGraph;
+    Grafik: TGetriebeGraph;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
 
@@ -51,33 +49,40 @@ procedure TAdjustForm.LeftBtnClick(Sender: TObject);
 var
   temp: TPoint;
 begin
-  if not Assigned(Grafik) then Exit;
-  //temp := Grafik.Offset;
+  if not Assigned(Grafik) then
+    Exit;
   case Grafik.Ansicht of
     vpSeite: temp := Point(Grafik.cOffsetX1,Grafik.cOffsetY1);
     vpAchtern: temp := Point(Grafik.cOffsetX2,Grafik.cOffsetY2);
     vpTop: temp := Point(Grafik.cOffsetX3,Grafik.cOffsetY3);
     vp3D: temp := Point(Grafik.cOffsetX4,Grafik.cOffsetY4);
   end;
-  if Sender = LeftBtn then temp.x := temp.x - 10;
-  if Sender = RightBtn then temp.x := temp.x + 10;
-  if Sender = UpBtn then temp.y := temp.y - 10;
-  if Sender = DownBtn then temp.y := temp.y + 10;
-  //Grafik.Offset := temp;
+  if Sender = LeftBtn then
+    temp.x := temp.x - 10;
+  if Sender = RightBtn then
+    temp.x := temp.x + 10;
+  if Sender = UpBtn then
+    temp.y := temp.y - 10;
+  if Sender = DownBtn then
+    temp.y := temp.y + 10;
   case Grafik.Ansicht of
-    vpSeite: begin
+    vpSeite:
+    begin
       Grafik.cOffsetX1 := temp.x;
       Grafik.cOffsetY1 := temp.y;
     end;
-    vpAchtern: begin
+    vpAchtern:
+    begin
       Grafik.cOffsetX2 := temp.x;
       Grafik.cOffsetY2 := temp.y;
     end;
-    vpTop: begin
+    vpTop:
+    begin
       Grafik.cOffsetX3 := temp.x;
       Grafik.cOffsetY3 := temp.y;
     end;
-    vp3D: begin
+    vp3D:
+    begin
       Grafik.cOffsetX4 := temp.x;
       Grafik.cOffsetY4 := temp.y;
     end;
@@ -88,19 +93,23 @@ end;
 
 procedure TAdjustForm.MinusBtnClick(Sender: TObject);
 var
-  temp: real;
+  temp: double;
 begin
-  if not Assigned(Grafik) then Exit;
+  if not Assigned(Grafik) then
+    Exit;
   temp := Grafik.Zoom;
-  if Sender = MinusBtn then temp := temp/1.1;
-  if Sender = PlusBtn then temp := temp*1.1;
+  if Sender = MinusBtn then
+    temp := temp/1.1;
+  if Sender = PlusBtn then
+    temp := temp*1.1;
   Grafik.Zoom := temp;
   Change;
 end;
 
 procedure TAdjustForm.ViewBtnClick(Sender: TObject);
 begin
-  if not Assigned(Grafik) then Exit;
+  if not Assigned(Grafik) then
+    Exit;
   case Grafik.Ansicht of
     vpSeite: Grafik.Ansicht := vpAchtern;
     vpAchtern: Grafik.Ansicht := vpTop;

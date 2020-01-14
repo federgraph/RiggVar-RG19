@@ -507,6 +507,10 @@ object OptionForm: TOptionForm
     end
     object tsRumpf: TTabSheet
       Caption = 'Rumpf'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object RumpfGroupBox: TGroupBox
         Left = 330
         Top = 65

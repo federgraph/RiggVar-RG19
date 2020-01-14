@@ -58,6 +58,7 @@ type
 
   TRiggModul = class(TComponent)
   private
+    FBackgroundColor: TColor;
     FSofortBerechnen: Boolean;
     FKorrigiertItem: Boolean;
     FPaintBtnDown: Boolean;
@@ -93,11 +94,12 @@ type
     PunktColor: TColor;
     f, TestF: TChartLineData;
     af: ChartArray;
-    bf: array[0..ANr - 1] of real;
+    bf: array[0..ANr - 1] of double;
     ShowTriangle: Boolean;
     FConsoleActive: Boolean;
     FReportFormActive: Boolean;
     FRotaFormActive: Boolean;
+    FBackgoundColor: TColor;
 
     procedure StraightLine;
     procedure GetCurves;
@@ -133,6 +135,7 @@ type
     procedure SetConsoleActive(const Value: Boolean);
     procedure SetReportFormActive(const Value: Boolean);
     procedure SetRotaFormActive(const Value: Boolean);
+    procedure SetBackgroundColor(const Value: TColor);
   public
     ViewModelMain: TViewModelMain00;
     PBG: TPaintbox;
@@ -263,6 +266,7 @@ type
     property ControllerTyp: TControllerTyp read FControllerTyp write SetControllerTyp;
     property SofortBerechnen: Boolean read FSofortBerechnen write FSofortBerechnen;
 
+    property BackgroundColor: TColor read FBackgoundColor write SetBackgroundColor;
     property ConsoleActive: Boolean read FConsoleActive write SetConsoleActive;
     property ReportFormActive: Boolean read FReportFormActive write SetReportFormActive;
     property RotaFormActive: Boolean read FRotaFormActive write SetRotaFormActive;
@@ -304,6 +308,7 @@ end;
 
 procedure TRiggModul.Init;
 begin
+  FBackgroundColor := clBtnFace;
   FSofortBerechnen := True;
   FKorrigiertItem := True;
   FPaintBtnDown := False;
@@ -372,8 +377,8 @@ begin
 
   { SalingCtrls }
   SalingCtrl := TSalingCtrl.Create;
+  SalingCtrl.BackgroundColor := BackgroundColor;
   SalingCtrl.PBSize := Point(453, 220);
-  // SalingCtrl.PBSize := SalingPaintBox.ClientRect.BottomRight;
 
   BitmapS := TBitmap.Create;
   BitmapS.Width := 453;
@@ -894,7 +899,7 @@ var
   R: TRect;
 begin
   R := Rect(0, 0, Image.Width, Image.Height);
-  Image.Canvas.Brush.Color := clBtnFace;
+  Image.Canvas.Brush.Color := BackgroundColor;
   Image.Canvas.FillRect(R);
 end;
 
@@ -999,7 +1004,7 @@ end;
 
 procedure TRiggModul.AusgabeKommentar;
 var
-  temp: real;
+  temp: double;
   ML: TStrings;
 begin
   ML := OutputForm.KommentarMemo.Lines;
@@ -1263,6 +1268,12 @@ begin
     FPaintBtnDown := Value;
     ResetPaintBoxG;
   end;
+end;
+
+procedure TRiggModul.SetBackgroundColor(const Value: TColor);
+begin
+  FBackgoundColor := Value;
+  SalingCtrl.BackgroundColor := Value;
 end;
 
 procedure TRiggModul.SetBtnBlauDown(Value: Boolean);
@@ -1961,7 +1972,7 @@ end;
 procedure TRiggModul.GetCurves;
 var
   i, tempIndex: Integer;
-  Antrieb, Anfang, Ende: real;
+  Antrieb, Anfang, Ende: double;
   InputRec: TTrimmControls;
   PunktOK: Boolean;
 begin

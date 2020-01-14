@@ -63,7 +63,7 @@ type
 implementation
 
 uses
-  Vector3d,
+  Vector3D,
   RggPBox;
 
 {$r *.DFM}

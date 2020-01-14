@@ -46,9 +46,9 @@ var
   FixPunkt3D: TRealPoint;
   i: TRiggPoints;
   j: Integer;
-  { temporäre Koordinaten Mastkurve real transformed }
+  { temporäre Koordinaten Mastkurve double transformed }
   KurveRotiert: array [0 .. BogenMax] of TRealPoint;
-  { temporäre Koordinaten real transformed }
+  { temporäre Koordinaten double transformed }
   A0, B0, C0, D0, E0, F0: TRealPoint;
   A,  B,  C,  D,  E,  F:  TRealPoint;
    { temporäre Koordinaten Integer transformed }
@@ -267,7 +267,7 @@ procedure TRaumGrafik.GetPlotList(List: TStringList);
     end;
   end;
 var
-  SavedZoom: real;
+  SavedZoom: double;
 begin
   SavedZoom := Zoom;
   Zoom := 10;

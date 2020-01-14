@@ -25,8 +25,8 @@ type
       var ScrollPos: Integer);
   private
     TopTitel, LeftTitel, BottomTitel, RightTitel: string;
-    Xmin, Xmax, Ymin, Ymax, XGap, YGap: real;
-    {ChartPunktX, ChartPunktY: real;}
+    Xmin, Xmax, Ymin, Ymax, XGap, YGap: double;
+    { ChartPunktX, ChartPunktY: double; }
     f, TestF: TChartLine;
     procedure GetTestData;
     procedure GetData;
@@ -112,7 +112,7 @@ var
   P: TPoint;
   i: Integer;
   ZoomX, ZoomY: Integer;
-  temp, temp1, temp2: real;
+  temp, temp1, temp2: double;
   Bitmap: TBitmap;
 begin
   ZoomX := 10;

@@ -21,7 +21,7 @@ type
   private
     FKoppelkurve: TKoordLine; // Daten für Koppelkurve
 
-    FZoom2D: real; // eventuell von Zoom unterschiedlicher Faktor für 2D
+    FZoom2D: double; // eventuell von Zoom unterschiedlicher Faktor für 2D
     FZoomFaktor: Integer; // Faktor für 'Auflösung' (typisch 0 oder 10)
 
     FAnsicht: TViewPoint;
@@ -62,9 +62,9 @@ type
     { procedure FillZug3D wird vererbt }
 
     procedure FillZug2D;
-    procedure SetZoom(Value: real); override;
+    procedure SetZoom(Value: double); override;
   public
-    RelationZoom2D: real; // Verhältnis Zoom2D/Zoom. (Zoom = Zoom3D)
+    RelationZoom2D: double; // Verhältnis Zoom2D/Zoom. (Zoom = Zoom3D)
 
     cOffsetX1, cOffsetY1: Integer;
     cOffsetX2, cOffsetY2: Integer;
@@ -137,7 +137,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TGetriebeGraph.SetZoom(Value: real);
+procedure TGetriebeGraph.SetZoom(Value: double);
 begin
   inherited SetZoom(Value);
   FZoom2D := RelationZoom2D * Zoom;
@@ -647,7 +647,7 @@ procedure TGetriebeGraph.FillZug2D;
 var
   i, j: Integer;
   FixPunkt2D: TRealPoint;
-  { temporäre Koordinaten real transformed }
+  { temporäre Koordinaten double transformed }
   Temp: TRealPoint;
   A0, B0, C0, D0, E0, F0: TRealPoint;
   A,  B,  C,  D,  E,  F:  TRealPoint;
@@ -921,7 +921,7 @@ var
   xmin, xmax, ymin, ymax, zmin, zmax: Integer;
   tempx, tempy, tempz: Integer;
   w, h: Integer;
-  tempf1, tempf2: real;
+  tempf1, tempf2: double;
 begin
   { maximale Abmessungen ermitteln }
   Temp := rP[ooD0]; // beliebiger Eckpunkt

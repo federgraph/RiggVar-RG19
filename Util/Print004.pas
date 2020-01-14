@@ -47,7 +47,7 @@ type
 
     RPL01, RPL02, RPL03: array[1..5] of TPoint;
     RPLOffsetX, RPLOffsetY: Integer;
-    Faktor: real;
+    Faktor: double;
     constructor Create;
     procedure Draw(Canvas: TCanvas);
     procedure Print;

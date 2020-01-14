@@ -69,7 +69,7 @@ type
   private
     FsbName: TsbName;
     FAniStepCount: Integer;
-    AniSteps: array[0..AniStepCountMax] of real;
+    AniSteps: array[0..AniStepCountMax] of double;
     AniStep: Integer; { Index in das Array AniSteps }
     AniIncrement: Integer;
 
@@ -105,6 +105,8 @@ type
     property ParamMax[Index: TsbName]: Integer read GetParamMax;
     property ParamPos[Index: TsbName]: Integer read GetParamPos;
     property AniStepCount: Integer read FAniStepCount write SetAniStepCount;
+  public
+    AnimationItemChecked: Boolean; // needed when Menu will not be created
   public
     OptionenMenu: TMenuItem;
     AniDlgItem: TMenuItem;
@@ -165,8 +167,9 @@ begin
     InitMenu;
 end;
 
-procedure TAniRotationForm.InitRigg; {overwritten virtual}
+procedure TAniRotationForm.InitRigg;
 begin
+ { overwritten virtual }
   Rigg := TRigg.Create;
   with RaumGrafik do
   begin
@@ -194,23 +197,35 @@ begin
   RightPanel.Visible := not RightPanel.Visible;
   ShowItem.Checked := RightPanel.Visible;
   { jetzt in FormActivate: }
-  //if RightPanel.Visible then LocalUpdateItemClick(Self);
+  //if RightPanel.Visible then
+  //  LocalUpdateItemClick(Self);
 end;
 
 procedure TAniRotationForm.AniDlgItemClick(Sender: TObject);
 begin
   AniDlgItem.Checked := not AniDlgItem.Checked;
-  if AniDlgItem.Checked then AnimationForm.Show else AnimationForm.Hide;
+  if AniDlgItem.Checked then
+    AnimationForm.Show
+  else
+    AnimationForm.Hide;
 end;
 
 procedure TAniRotationForm.AnimationItemClick(Sender: TObject);
 begin
-  AnimationItem.Checked := not AnimationItem.Checked;
-  AnimationForm.AnimateBtn.Down := AnimationItem.Checked;
-  if AnimationItem.Checked then begin
+  AnimationItemChecked := not AnimationItemChecked;
+
+  if AnimationItem <> nil then
+    AnimationItem.Checked := AnimationItemChecked;
+
+  AnimationForm.AnimateBtn.Down := AnimationItemChecked;
+
+  if AnimationItemChecked then
+  begin
     PrepareAnimation;
     Timer.Enabled := True;
-  end else begin
+  end
+  else
+  begin
     Timer.Enabled := False;
     SetupTrackbar;
   end;
@@ -253,10 +268,14 @@ end;
 procedure TAniRotationForm.TimerTimer(Sender: TObject);
 begin
   AniStep := AniStep + AniIncrement;
-  if AniStep < 0 then AniStep := 0;
-  if AniStep > AniStepCount then AniStep := AniStepCount;
-  if AniStep = AniStepCount then AniIncrement := -1;
-  if AniStep = 0 then AniIncrement := 1;
+  if AniStep < 0 then
+    AniStep := 0;
+  if AniStep > AniStepCount then
+    AniStep := AniStepCount;
+  if AniStep = AniStepCount then
+    AniIncrement := -1;
+  if AniStep = 0 then
+    AniIncrement := 1;
   Rigg.RealGlied[fpWinkel] := AniSteps[AniStep]/10*pi/180;
   UpdateGraph;
   AnimationForm.tbWinkel.Position := Round(ParamProp[fpWinkel]);
@@ -273,15 +292,19 @@ procedure TAniRotationForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if (ssCtrl in Shift) and (Key = VK_TAB) then
-    if AnimationForm.Visible then AnimationForm.SetFocus
-    else if CommandForm.Visible then CommandForm.SetFocus;
+    if AnimationForm.Visible then
+      AnimationForm.SetFocus
+    else if CommandForm.Visible then
+      CommandForm.SetFocus;
 end;
 
 procedure TAniRotationForm.SetAniStepCount(Value: Integer);
 begin
   FAniStepCount := Value;
-  if FAniStepCount > AniStepCountMax then FAniStepCount := AniStepCountMax
-  else if FAniStepCount < 1 then FAniStepCount := 1;
+  if FAniStepCount > AniStepCountMax then
+    FAniStepCount := AniStepCountMax
+  else if FAniStepCount < 1 then
+    FAniStepCount := 1;
 end;
 
 function TAniRotationForm.GetParamMin(Index: TsbName): Integer;
@@ -335,13 +358,15 @@ end;
 
 procedure TAniRotationForm.TrackBarChange(Sender: TObject);
 var
-  temp: real;
+  temp: double;
 begin
   ParamProp[Parameter] := TrackBar.Position;
-  if Parameter = fpWinkel then begin
+  if Parameter = fpWinkel then
+  begin
     temp := TrackBar.Position/10;
     lbIstVal.Caption := Format('%6.1f Grad',[temp]);
-  end else
+  end
+  else
     lbIstVal.Caption := Format('%4d mm',[TrackBar.Position]);
 end;
 
@@ -366,11 +391,14 @@ begin
     PageSize := Round(cr.BigStep);
     //Frequency := (Max-Min) div 10;
   end;
-  if Parameter = fpWinkel then begin
+  if Parameter = fpWinkel then
+  begin
     lbMinVal.Caption := Format('%6.1f Grad',[cr.Min / 10]);
     lbMaxVal.Caption := Format('%6.1f Grad',[cr.Max / 10]);
     lbIstVal.Caption := Format('%6.1f Grad',[temp / 10]);
-  end else begin
+  end
+  else
+  begin
     lbMinVal.Caption := Format('%4.0f mm',[cr.Min]);
     lbMaxVal.Caption := Format('%4.0f mm',[cr.Max]);
     lbIstVal.Caption := Format('%4.0f mm',[temp]);
@@ -387,7 +415,8 @@ end;
 procedure TAniRotationForm.RiggTypItemClick(Sender: TObject);
 begin
   { Animation gegebenenfalls ausschalten }
-  if AnimationItem.Checked then AnimationItemClick(Self);
+  if AnimationItemChecked then
+    AnimationItemClick(Self);
   ShowDialog;
   TypeChanged;
 end;
@@ -400,39 +429,48 @@ begin
   S := 'Vorstag';
   if ListBox.ItemIndex <> -1 then
     S := ListBox.Items[ListBox.ItemIndex];
-  with ListBox.Items do begin
+  with ListBox.Items do
+  begin
     Clear;
     if (Rigg.ControllerTyp = ctDruck) and (Rigg.SalingTyp <> stOhne) then
       Add('Controller');
-    if Rigg.SalingTyp = stFest then begin
-      if Rigg.ManipulatorMode then Add('Winkel')
-      else Add('Vorstag');
+    if Rigg.SalingTyp = stFest then
+    begin
+      if Rigg.ManipulatorMode then
+        Add('Winkel')
+      else
+        Add('Vorstag');
       Add('Wante');
       Add('Wante oben');
       Add('Saling Höhe');
       Add('Saling Abstand');
     end;
-    if Rigg.SalingTyp = stDrehbar then begin
+    if Rigg.SalingTyp = stDrehbar then
+    begin
       Add('Vorstag');
       Add('Wante');
       Add('Wante oben');
       Add('Saling Länge');
     end;
-    if Rigg.SalingTyp = stOhne_2 then begin
+    if Rigg.SalingTyp = stOhne_2 then
+    begin
       Add('Vorstag');
       Add('Wante');
     end;
-    if Rigg.SalingTyp = stOhne then begin
+    if Rigg.SalingTyp = stOhne then
+    begin
       Add('Vorstag');
     end;
   end;
   //Assert(ListBox.Items.Count <> 0, 'Fehler: ListBox leer!');
   i := ListBox.Items.IndexOf(S);
-  if i <> -1 then begin
+  if i <> -1 then
+  begin
     ListBox.ItemIndex := i;
     Parameter := Text2Param(S);
   end
-  else begin
+  else
+  begin
     ListBox.ItemIndex := 0;
     Parameter := Text2Param(ListBox.Items[0]);
   end;

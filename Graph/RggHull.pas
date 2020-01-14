@@ -18,7 +18,7 @@ uses
   Rggmat01,
   Math,
   Inifiles,
-  Vector3d,
+  Vector3D,
   RggGraph,
   BootGraph,
   RaumGraph;
@@ -36,8 +36,8 @@ type
     gr: TconColors;
     { Matrix }
     mat: Tmatrix4x4;
-    xmin, xmax, ymin, ymax, zmin, zmax: real;
-    zfac: real;
+    xmin, xmax, ymin, ymax, zmin, zmax: double;
+    zfac: double;
     procedure ReadVertex;
     procedure ReadVertex1;
     procedure ReadVertex2(Memo: TStrings);
@@ -50,7 +50,7 @@ type
     procedure findBB;
     function GetColor(i: Integer): TColor;
   public
-    Factor: vec3; // FaktorX, FaktorY, FaktorZ: real;
+    Factor: vec3; // FaktorX, FaktorY, FaktorZ: double;
     ModelFactor: vec3;
     VertexFileName: string;
     VertexMemo: TStrings;
@@ -72,7 +72,7 @@ uses
 
 constructor THullGraph.Create;
 var
-  xw, yw, zw: real;
+  xw, yw, zw: double;
 begin
   inherited Create;
   Factor.x := 1;
@@ -288,7 +288,7 @@ var
   c: TconArray;
   v: TvertArrayI;
   s: string;
-  SavedZoom: real;
+  SavedZoom: double;
 begin
   if (ncon <= 0) or (nvert <= 0) then
     Exit;
@@ -324,7 +324,7 @@ var
   a, b, c: Integer;
 
   { local procedure }
-  procedure GetReal(var RealValue: real);
+  procedure GetReal(var RealValue: double);
   begin
     Zeile := Trim(Zeile);
     Wort := TUtils.StripFirstWord(Zeile);

@@ -48,7 +48,7 @@ type
     procedure AusgabeDiffP(rP, rPe: TRealRiggPoints);
     procedure AusgabeRF(rF: TRiggLvektor);
     procedure AusgabeWinkel(alpha, alpha1, alpha2, beta, gamma,
-      delta1, delta2, epsilon, phi, psi: real);
+      delta1, delta2, epsilon, phi, psi: double);
     procedure AusgabeTrimmControls(Ctrls: TTrimmControls);
     procedure AusgabeSalingDaten(SData: TSalingDaten);
     procedure AusgabeLog(Liste: TStringList);
@@ -369,7 +369,7 @@ begin
 end;
 
 procedure TRiggReport.AusgabeWinkel(alpha, alpha1, alpha2, beta, gamma,
-  delta1, delta2, epsilon, phi, psi: real);
+  delta1, delta2, epsilon, phi, psi: double);
 begin
   with FML do
   begin

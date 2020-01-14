@@ -205,7 +205,7 @@
         <DCCReference Include="Graph\RggHull.pas"/>
         <DCCReference Include="Graph\RggPal.pas"/>
         <DCCReference Include="Graph\RggRota.pas"/>
-        <DCCReference Include="Graph\Vector3d.pas"/>
+        <DCCReference Include="Graph\Vector3D.pas"/>
         <DCCReference Include="Graph\ThreeD.pas"/>
         <DCCReference Include="Graph\ThreeDSolid.pas"/>
         <DCCReference Include="Graph\RggGraph.pas"/>

@@ -135,18 +135,23 @@ type
     MetaCanvas: TMetaFileCanvas;
 
     ViewPoint: TViewPoint;
-    FZoomBase: real;
-    FZoom: real;
+    FZoomBase: double;
+    FZoom: double;
 
-    FPhi, FTheta, FGamma: real;
+    FPhi: double;
+    FTheta: double;
+    FGamma: double;
 
     FXpos: Integer;
     FYpos: Integer;
-    FIncrementW: real;
+    FIncrementW: double;
     FIncrementT: Integer;
     FZoomIndex: Integer;
     RotaData: TRotaData;
-    RotaData1, RotaData2, RotaData3, RotaData4: TRotaData;
+    RotaData1: TRotaData;
+    RotaData2: TRotaData;
+    RotaData3: TRotaData;
+    RotaData4: TRotaData;
 
     NullpunktOffset: TPoint;
     FPaintRumpf: Boolean;
@@ -180,7 +185,7 @@ type
     function IsButtonVisible(Button: TControl): Boolean;
     property Buttons[Index: Integer]: TControl read GetButton;
     property ButtonCount: Integer read GetButtonCount;
-    procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: real);
+    procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
     procedure Translate(x, y: Integer);
     procedure SetAngleText;
     procedure SetZoomText;
@@ -217,6 +222,8 @@ type
     procedure UpdateGraph; virtual;
   public
     KeepInsideItemChecked: Boolean;
+    RumpfItemChecked: Boolean;
+    PaintItemChecked: Boolean;
   public
     MainMenu: TMainMenu;
     GrafikMenu: TMenuItem;
@@ -533,7 +540,7 @@ end;
 
 procedure TRotationForm.InitRotaData;
 
-  function GetMatrix(Theta, Xrot: real): Matrix4x4;
+  function GetMatrix(Theta, Xrot: double): Matrix4x4;
   begin
     Rotator.Reset;
     Rotator.DeltaTheta := Theta;
@@ -740,7 +747,7 @@ end;
 procedure TRotationForm.PrintIt;
 var
   PrintOffset, SavedOffset: TPoint;
-  PrintZoom: real;
+  PrintZoom: double;
   RandX, RandY: Integer;
   Rgn: THandle;
 begin
@@ -817,7 +824,7 @@ end;
 
 procedure TRotationForm.LeftBtnClick(Sender: TObject);
 var
-  wp, wt, wg: real;
+  wp, wt, wg: double;
 begin
   if Mode = False then
   begin
@@ -1037,9 +1044,11 @@ end;
 
 procedure TRotationForm.RumpfBtnClick(Sender: TObject);
 begin
-  RumpfItem.Checked := not RumpfItem.Checked;
-  RumpfBtn.Down := RumpfItem.Checked;
-  FPaintRumpf := RumpfItem.Checked;
+  RumpfItemChecked := not RumpfItemChecked;
+  if RumpfItem <> nil then
+    RumpfItem.Checked := RumpfItemChecked;
+  RumpfBtn.Down := RumpfItemChecked;
+  FPaintRumpf := RumpfItemChecked;
   Draw;
 end;
 
@@ -1164,8 +1173,10 @@ end;
 
 procedure TRotationForm.PaintBtnClick(Sender: TObject);
 begin
-  PaintItem.Checked := not PaintItem.Checked;
-  PaintBtn.Down := PaintItem.Checked;
+  PaintItemChecked := not PaintItemChecked;
+  if PaintItem <> nil then
+    PaintItem.Checked := PaintItemChecked;
+  PaintBtn.Down := PaintItemChecked;
   if not PaintBtn.Down then
     EraseBK := True;
   Draw;
@@ -1551,7 +1562,7 @@ begin
   IndicatorForm.UpdateIndicator;
 end;
 
-procedure TRotationForm.Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: real);
+procedure TRotationForm.Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
 begin
   Rotator.DeltaPhi := Phi;
   Rotator.DeltaTheta := Theta;

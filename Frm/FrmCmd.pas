@@ -119,7 +119,7 @@ end;
 
 function TCommandForm.ProcessInput: String;
 var
-  temp: real;
+  temp: double;
   Code: Integer;
   Param: TsbName;
 begin

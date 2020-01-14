@@ -168,9 +168,8 @@ object AdjustForm: TAdjustForm
     Top = 72
     Width = 75
     Height = 25
-    DoubleBuffered = True
     Kind = bkOK
-    ParentDoubleBuffered = False
+    NumGlyphs = 2
     TabOrder = 0
   end
 end

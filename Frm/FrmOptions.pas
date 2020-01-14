@@ -789,7 +789,7 @@ end;
 procedure TOptionForm.PaintBoxTabelleMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-  tempX, tempY: real;
+  tempX, tempY: double;
 begin
   tempY := PaintBoxTabelle.Height;
   tempY := (tempY -Y) * FTrimmTabelle.EndwertKraft/tempY;

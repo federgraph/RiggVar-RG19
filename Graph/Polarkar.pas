@@ -10,32 +10,32 @@ uses
   Rggmat01;
 
 type
-  TCalcAngleEvent = procedure(Sender: TObject; var wx, wy, wz: real) of object;
+  TCalcAngleEvent = procedure(Sender: TObject; var wx, wy, wz: double) of object;
 
-  TPolarKar2 = class(TObject)
+  TPolarKar2 = class
   private
-    FPhi, FTheta, FGamma, Fxrot, Fyrot, Fzrot: real;
+    FPhi, FTheta, FGamma, Fxrot, Fyrot, Fzrot: double;
     FValid: Boolean;
     FMode: Boolean;
     FOnCalcAngle: TCalcAngleEvent;
-    procedure SetPhi(Value: real);
-    procedure SetTheta(Value: real);
-    procedure SetGamma(Value: real);
-    procedure SetXrot(Value: real);
-    procedure SetYrot(Value: real);
-    procedure SetZrot(Value: real);
+    procedure SetPhi(Value: double);
+    procedure SetTheta(Value: double);
+    procedure SetGamma(Value: double);
+    procedure SetXrot(Value: double);
+    procedure SetYrot(Value: double);
+    procedure SetZrot(Value: double);
     procedure SetRotMode(Value: Boolean);
-    procedure SetRotAngle(index: TRotationAngle; Value: real);
-    function GetPhi: real;
-    function GetTheta: real;
-    function GetGamma: real;
-    function GetXrot: real;
-    function GetYrot: real;
-    function GetZrot: real;
-    function GetRotAngle(index: TRotationAngle): real;
+    procedure SetRotAngle(index: TRotationAngle; Value: double);
+    function GetPhi: double;
+    function GetTheta: double;
+    function GetGamma: double;
+    function GetXrot: double;
+    function GetYrot: double;
+    function GetZrot: double;
+    function GetRotAngle(index: TRotationAngle): double;
   protected
     p1, p2: vec3;
-    angle: real;
+    angle: double;
     tmat: TMatrix4x4;
     procedure GetMat;
     procedure FillMatrix;
@@ -48,16 +48,16 @@ type
     destructor Destroy; override;
     function Rotiere(Punkt: TRealPoint): TRealPoint;
     procedure Reset;
-    procedure GetAngle(var wx, wy, wz: real);
-    procedure GetAngle1(Sender: TObject; var wx, wy, wz: real);
-    procedure GetAngle2(Sender: TObject; var wp, wt, wg: real);
-    property DeltaTheta: real read GetTheta write SetTheta;
-    property DeltaPhi: real read GetPhi write SetPhi;
-    property DeltaGamma: real read GetGamma write SetGamma;
-    property xrot: real read GetXrot write SetXrot;
-    property yrot: real read GetYrot write SetYrot;
-    property zrot: real read GetZrot write SetZrot;
-    property RotAngle[index: TRotationAngle]: real read GetRotAngle write SetRotAngle;
+    procedure GetAngle(var wx, wy, wz: double);
+    procedure GetAngle1(Sender: TObject; var wx, wy, wz: double);
+    procedure GetAngle2(Sender: TObject; var wp, wt, wg: double);
+    property DeltaTheta: double read GetTheta write SetTheta;
+    property DeltaPhi: double read GetPhi write SetPhi;
+    property DeltaGamma: double read GetGamma write SetGamma;
+    property xrot: double read GetXrot write SetXrot;
+    property yrot: double read GetYrot write SetYrot;
+    property zrot: double read GetZrot write SetZrot;
+    property RotAngle[index: TRotationAngle]: double read GetRotAngle write SetRotAngle;
     property Matrix: Matrix4x4 read GetMatrix write SetMatrix;
     property Mode: Boolean read FMode write SetRotMode;
     property OnCalcAngle: TCalcAngleEvent read FOnCalcAngle write FOnCalcAngle;
@@ -78,75 +78,75 @@ begin
   tmat.Free;
 end;
 
-procedure TPolarKar2.SetPhi(Value: real);
+procedure TPolarKar2.SetPhi(Value: double);
 begin
   FPhi := Value * pi / 180;
   FValid := False;
 end;
 
-procedure TPolarKar2.SetTheta(Value: real);
+procedure TPolarKar2.SetTheta(Value: double);
 begin
   FTheta := Value * pi / 180;
   FValid := False;
 end;
 
-procedure TPolarKar2.SetGamma(Value: real);
+procedure TPolarKar2.SetGamma(Value: double);
 begin
   FGamma := Value * pi / 180;
   FValid := False;
 end;
 
-procedure TPolarKar2.SetXrot(Value: real);
+procedure TPolarKar2.SetXrot(Value: double);
 begin
   Fxrot := Value * pi / 180;
   FValid := False;
 end;
 
-procedure TPolarKar2.SetYrot(Value: real);
+procedure TPolarKar2.SetYrot(Value: double);
 begin
   Fyrot := Value * pi / 180;
   FValid := False;
 end;
 
-procedure TPolarKar2.SetZrot(Value: real);
+procedure TPolarKar2.SetZrot(Value: double);
 begin
   Fzrot := Value * pi / 180;
   FValid := False;
 end;
 
-function TPolarKar2.GetPhi: real;
+function TPolarKar2.GetPhi: double;
 begin
   Result := Int(FPhi * 180 / pi);
 end;
 
-function TPolarKar2.GetTheta: real;
+function TPolarKar2.GetTheta: double;
 begin
   Result := Int(FTheta * 180 / pi);
 end;
 
-function TPolarKar2.GetGamma: real;
+function TPolarKar2.GetGamma: double;
 begin
   Result := Int(FGamma * 180 / pi);
 end;
 
-function TPolarKar2.GetXrot: real;
+function TPolarKar2.GetXrot: double;
 begin
   Result := Int(Fxrot * 180 / pi);
 end;
 
-function TPolarKar2.GetYrot: real;
+function TPolarKar2.GetYrot: double;
 begin
   Result := Int(Fyrot * 180 / pi);
 end;
 
-function TPolarKar2.GetZrot: real;
+function TPolarKar2.GetZrot: double;
 begin
   Result := Int(Fzrot * 180 / pi);
 end;
 
-procedure TPolarKar2.SetRotAngle(index: TRotationAngle; Value: real);
+procedure TPolarKar2.SetRotAngle(index: TRotationAngle; Value: double);
 var
-  temp: real;
+  temp: double;
 begin
   temp := Value * pi / 180;
   case index of
@@ -165,9 +165,9 @@ begin
   end;
 end;
 
-function TPolarKar2.GetRotAngle(index: TRotationAngle): real;
+function TPolarKar2.GetRotAngle(index: TRotationAngle): double;
 var
-  temp: real;
+  temp: double;
 begin
   temp := 0;
   case index of
@@ -324,7 +324,7 @@ begin
   FValid := True;
 end;
 
-procedure TPolarKar2.GetAngle(var wx, wy, wz: real);
+procedure TPolarKar2.GetAngle(var wx, wy, wz: double);
 begin
   wx := 0;
   wy := 0;
@@ -333,11 +333,11 @@ begin
     OnCalcAngle(Self, wx, wy, wz);
 end;
 
-procedure TPolarKar2.GetAngle1(Sender: TObject; var wx, wy, wz: real);
+procedure TPolarKar2.GetAngle1(Sender: TObject; var wx, wy, wz: double);
 
-  function angle(a, b: vec3): real;
+  function angle(a, b: vec3): double;
   var
-    temp: real;
+    temp: double;
   begin
     temp := dot(a, b);
     if temp > 1 then
@@ -381,7 +381,7 @@ begin
   end;
 end;
 
-procedure TPolarKar2.GetAngle2(Sender: TObject; var wp, wt, wg: real);
+procedure TPolarKar2.GetAngle2(Sender: TObject; var wp, wt, wg: double);
 
   function CheckSinCos(c: Extended): Extended;
   begin
@@ -395,7 +395,7 @@ procedure TPolarKar2.GetAngle2(Sender: TObject; var wp, wt, wg: real);
   end;
 
 var
-  tempcos, tempsin: real;
+  tempcos, tempsin: double;
   ux, uy, uz, tempVec, tempY, tempZ: vec3;
   tempmat: TMatrix4x4;
   Theta90: Boolean;
