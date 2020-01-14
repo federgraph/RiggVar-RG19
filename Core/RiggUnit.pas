@@ -99,7 +99,6 @@ type
     FConsoleActive: Boolean;
     FReportFormActive: Boolean;
     FRotaFormActive: Boolean;
-    FBackgoundColor: TColor;
 
     procedure StraightLine;
     procedure GetCurves;
@@ -266,7 +265,7 @@ type
     property ControllerTyp: TControllerTyp read FControllerTyp write SetControllerTyp;
     property SofortBerechnen: Boolean read FSofortBerechnen write FSofortBerechnen;
 
-    property BackgroundColor: TColor read FBackgoundColor write SetBackgroundColor;
+    property BackgroundColor: TColor read FBackgroundColor write SetBackgroundColor;
     property ConsoleActive: Boolean read FConsoleActive write SetConsoleActive;
     property ReportFormActive: Boolean read FReportFormActive write SetReportFormActive;
     property RotaFormActive: Boolean read FRotaFormActive write SetRotaFormActive;
@@ -304,11 +303,11 @@ uses
 constructor TRiggModul.Create(AOwner: TComponent);
 begin
   inherited;
+  FBackgroundColor := clBtnFace;
 end;
 
 procedure TRiggModul.Init;
 begin
-  FBackgroundColor := clBtnFace;
   FSofortBerechnen := True;
   FKorrigiertItem := True;
   FPaintBtnDown := False;
@@ -377,7 +376,7 @@ begin
 
   { SalingCtrls }
   SalingCtrl := TSalingCtrl.Create;
-  SalingCtrl.BackgroundColor := BackgroundColor;
+  SalingCtrl.BackgroundColor := FBackgroundColor;
   SalingCtrl.PBSize := Point(453, 220);
 
   BitmapS := TBitmap.Create;
@@ -1272,7 +1271,7 @@ end;
 
 procedure TRiggModul.SetBackgroundColor(const Value: TColor);
 begin
-  FBackgoundColor := Value;
+  FBackgroundColor := Value;
   SalingCtrl.BackgroundColor := Value;
 end;
 

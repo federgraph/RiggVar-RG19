@@ -5,6 +5,7 @@ interface
 uses
   Winapi.Windows,
   Winapi.Messages,
+  System.SysUtils,
   System.Classes,
   System.Types,
   System.UITypes,
@@ -19,12 +20,12 @@ uses
   Vcl.Printers,
   Vcl.ComCtrls,
   Vcl.ExtDlgs,
-  uRggPrinter,
   RggTypes,
   RggGBox,
   Rggmat01,
   Rggunit4,
   Print004,
+  uRggPrinter,
   FrmIndicator,
   RggGraph,
   RaumGraph,
@@ -105,14 +106,10 @@ type
     procedure LeftButtonClick(Sender: TObject);
     procedure RightButtonClick(Sender: TObject);
     procedure ToolbarPanelResize(Sender: TObject);
-    procedure PaintBox3DMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure PaintBox3DMouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
-    procedure PaintBox3DMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure FocusEditKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure PaintBox3DMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure PaintBox3DMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure PaintBox3DMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure FocusEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure PositionSaveItemClick(Sender: TObject);
     procedure PositionResetItemClick(Sender: TObject);
     procedure ModusItemClick(Sender: TObject);
@@ -128,7 +125,6 @@ type
     procedure PosiToolItemClick(Sender: TObject);
     procedure MatrixItemClick(Sender: TObject);
     procedure Sample420ItemClick(Sender: TObject);
-    procedure AngleTextItemClick(Sender: TObject);
   private
     CreatedScreenWidth: Integer;
     MetaFile: TRiggMetaFile;
@@ -141,6 +137,8 @@ type
     FPhi: double;
     FTheta: double;
     FGamma: double;
+
+    xmin, ymin, xmax, ymax: Integer;
 
     FXpos: Integer;
     FYpos: Integer;
@@ -168,8 +166,10 @@ type
     SPitchTheta: String;
     SBankGamma: String;
     function ComboFixName: TRiggPoints;
-    procedure PrintIt;
     procedure ChangeResolution;
+    procedure UpdateMinMax;
+    procedure DoTrans;
+    procedure PrintIt;
     function GetButton(Tag: Integer): TControl;
     function GetButtonCount: Integer;
     procedure EnableScrollButtons;
@@ -202,8 +202,8 @@ type
   public
     Rigg: TRigg;
     Rotator: TPolarKar2;
-    HullGraph: TRggGraph; // THullGraph;
-    RaumGrafik: TRaumGrafik; // TGetriebeGraph;
+    HullGraph: TRggGraph;
+    RaumGrafik: TRaumGrafik;
     IndicatorForm: TIndicatorForm;
     BackBmp: TBitmap;
     Preview: TPreview;
@@ -221,9 +221,14 @@ type
     procedure InitPreview; virtual;
     procedure UpdateGraph; virtual;
   public
+    PaintItemChecked: Boolean;
+    MatrixItemChecked: Boolean;
     KeepInsideItemChecked: Boolean;
     RumpfItemChecked: Boolean;
-    PaintItemChecked: Boolean;
+    IndicatorItemChecked: Boolean;
+    IndicatorLocalRotItemChecked: Boolean;
+    FixPunktComboText: string;
+    PreviewItemChecked: Boolean;
   public
     MainMenu: TMainMenu;
     GrafikMenu: TMenuItem;
@@ -305,7 +310,6 @@ var
 implementation
 
 uses
-  SysUtils,
   Vcalc116,
   RggPal,
   FrmScale,
@@ -315,24 +319,18 @@ uses
 
 { TRotationForm }
 
-procedure TRotationForm.PaintBackGround(Image: TBitmap);
-var
-  R: TRect;
-  P: TPoint;
+procedure TRotationForm.FormDestroy(Sender: TObject);
 begin
-  R := Rect(0, 0, Image.Width, Image.Height);
-  with Image.Canvas do
-  begin
-    Brush.Color := clBtnFace;
-    FillRect(R);
-    if BackBmp <> nil then
-      if (BackBmp.Width < 100) and (BackBmp.Height < 100) then
-        P := Point(30,FocusEdit.Top-PaintBox3D.Top)
-        {P := Point(30, 5)}
-      else
-        P := Point(0,0);
-      Draw(P.x,P.y,BackBmp);
-  end;
+  BackBmp.Free;
+  Bitmap.Free;
+  MetaFile.Free;
+  RaumGrafik.Free;
+  HullGraph.Free;
+  Rotator.Free;
+  Preview.Free;
+  Preview := nil;
+  if hPal <> 0 then
+    DeleteObject(hPal);
 end;
 
 procedure TRotationForm.wmGetMinMaxInfo(var Msg: TWMGetMinMaxInfo);
@@ -355,6 +353,7 @@ begin
   ClientWidth := 800;
   ClientHeight := 480;
 
+  KeepInsideItemChecked := True;
   FDrawAlways := True;
   AlwaysShowAngle := False;
   ChangeRotationHints;
@@ -406,16 +405,8 @@ begin
 
   ActiveControl := FixPunktCombo;
 
-  { auskommentierte Anweisungen werden in ChangePosition() ausgeführt }
-  // Btn5Grad.Down := true;
-  // FIncrementT := 10;
-  // FIncrementW := 5;
   FZoomBase := 0.05;
-  // FZoomIndex := 7;
-  // FZoom := FZoomBase * LookUpRa10(FZoomIndex);
-  // FixPunktCombo.ItemIndex := 6;
   ViewPoint := vpTop;
-  // SetZoomText;
 
   if MainMenu <> nil then
   begin
@@ -436,10 +427,10 @@ begin
   try
     NewPaintBox.Parent := PaintBox3D.Parent;
     NewPaintBox.Align := PaintBox3D.Align;
-    NewPaintBox.OnMouseDown := PaintBox3D.OnMouseDown;
-    NewPaintBox.OnMouseMove := PaintBox3D.OnMouseMove;
-    NewPaintBox.OnMouseUp := PaintBox3D.OnMouseUp;
-    NewPaintBox.OnPaint := PaintBox3D.OnPaint;
+    NewPaintBox.OnMouseDown := PaintBox3DMouseDown;
+    NewPaintBox.OnMouseMove := PaintBox3DMouseMove;
+    NewPaintBox.OnMouseUp := PaintBox3DMouseUp;
+    NewPaintBox.OnPaint := PaintBox3DPaint;
 
     PaintBox3D.Free;
     PaintBox3D := NewPaintBox;
@@ -460,16 +451,18 @@ begin
   ChangePosition(ViewPoint);
 end;
 
-procedure TRotationForm.InitGraph; {virtual}
+procedure TRotationForm.InitGraph;
 begin
+  { virtual }
   Rotator := TPolarKar2.Create;
   Rotator.OnCalcAngle := Rotator.GetAngle2;
   InitRotaData;
 end;
 
-procedure TRotationForm.InitRaumGrafik; {virtual}
+procedure TRotationForm.InitRaumGrafik;
 begin
-  RaumGrafik := TGetriebeGraph.Create; //TRaumGrafik.Create;
+  { virtual }
+  RaumGrafik := TGetriebeGraph.Create;
   RaumGrafik.Rotator := Rotator;
   RaumGrafik.Offset := Point(1000,1000);
   RaumGrafik.Zoom := FZoom;
@@ -478,16 +471,18 @@ begin
     TGetriebeGraph(RaumGrafik).Ansicht := vp3D;
 end;
 
-procedure TRotationForm.InitHullGraph; {virtual}
+procedure TRotationForm.InitHullGraph;
 begin
-  HullGraph := THullGraph.Create; //TRggGraph.Create;
+  { virtual }
+  HullGraph := THullGraph.Create;
   HullGraph.Rotator := Rotator;
   HullGraph.Zoom := FZoom;
   HullGraph.FixPunkt := Raumgrafik.FixPunkt;
 end;
 
-procedure TRotationForm.InitRigg; {virtual}
+procedure TRotationForm.InitRigg;
 begin
+  { virtual }
   Rigg := TRigg.Create;
   Rigg.ControllerTyp := ctOhne;
 
@@ -499,43 +494,16 @@ begin
     TGetriebeGraph(RaumGrafik).WanteGestrichelt := not Rigg.GetriebeOK;
 end;
 
-procedure TRotationForm.InitPreview;
-begin
- { virtual }
-
-  { Preview ruft GetDeviceCaps(Printer.Handle, LOGPIXELSX) auf
-    dauert extrem lange, wenn der konfigurierte Standard-Drucker
-    nicht erreichbar ist. }
-
-  // Preview := TPreview.Create;
-end;
-
 procedure TRotationForm.UpdateGraph;
 begin
  { virtual }
-
   RaumGrafik.Salingtyp := Rigg.Salingtyp;
   RaumGrafik.ControllerTyp := Rigg.ControllerTyp;
   RaumGrafik.Koordinaten := Rigg.rP;
   RaumGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
   if RaumGrafik is TGetriebeGraph then
     TGetriebeGraph(RaumGrafik).WanteGestrichelt := not Rigg.GetriebeOK;
-
- Draw;
-end;
-
-procedure TRotationForm.FormDestroy(Sender: TObject);
-begin
-  BackBmp.Free;
-  Bitmap.Free;
-  MetaFile.Free;
-  RaumGrafik.Free;
-  HullGraph.Free;
-  Rotator.Free;
-  Preview.Free;
-  Preview := nil;
-  if hPal <> 0 then
-    DeleteObject(hPal);
+  Draw;
 end;
 
 procedure TRotationForm.InitRotaData;
@@ -600,20 +568,9 @@ begin
   Draw;
 end;
 
-procedure TRotationForm.DrawPreviewBox;
-begin
-  if Assigned(Preview) then
-  begin
-    Preview.Faktor := 1/8.5;
-    Preview.RPLOffsetX := 250;
-    Preview.RPLOffsetY := 15;
-    Preview.Draw(Bitmap.Canvas);
-  end;
-end;
-
 procedure TRotationForm.DrawMatrix(Canvas: TCanvas);
 var
-S1, S2, S3: String;
+S1, S2, S3: string;
 m4x4: Matrix4x4;
 begin
   m4x4 := Rotator.mat.mat;
@@ -624,9 +581,9 @@ begin
   begin
     Font.Name := 'Courier New';
     Font.Size := 10;
-    TextOut(20,40,S1);
-    TextOut(20,60,S2);
-    TextOut(20,80,S3);
+    TextOut(20,40, S1);
+    TextOut(20,60, S2);
+    TextOut(20,80, S3);
   end;
 end;
 
@@ -636,9 +593,9 @@ begin
   begin
     Font.Name := 'Courier New';
     Font.Size := 10;
-    TextOut(20,120,SHeadingPhi);
-    TextOut(20,140,SPitchtheta);
-    TextOut(20,160,SBankGamma);
+    TextOut(20,120, SHeadingPhi);
+    TextOut(20,140, SPitchtheta);
+    TextOut(20,160, SBankGamma);
   end;
 end;
 
@@ -656,7 +613,7 @@ begin
   if Screen.Width <> CreatedScreenWidth then
     ChangeResolution;
 
-  if not PaintBtn.Down or EraseBK then
+  if not PaintItemChecked or EraseBK then
   begin
     PaintBackGround(Bitmap);
     EraseBK := False;
@@ -666,10 +623,10 @@ begin
   NullpunktOffset.y := -RaumGrafik.Offset.y + Bitmap.Height div 2 + FYpos;
   DrawToBitmap1;
 
-  if (MainMenu <> nil) and MatrixItem.Checked then
+  if MatrixItemChecked then
     DrawMatrix(Bitmap.Canvas);
 
-  if (MainMenu <> nil) and PreviewItem.Checked then
+  if PreviewItemChecked then
     DrawPreviewBox;
 
   { Bitmap auf den Bildschirm kopieren }
@@ -705,16 +662,17 @@ begin
   begin
     SetWindowOrgEx(Handle, 0, 0, nil);
     SetViewPortOrgEx(Handle, 0, 0, nil);
-    SetMapMode(Canvas.Handle, MM_TEXT);
+    SetMapMode(Handle, MM_TEXT);
   end;
 end;
 
-procedure TRotationForm.DrawToBitmap2; //Variante 2
+procedure TRotationForm.DrawToBitmap2;
 begin
   { Metafile anlegen, alten Eintrag grau überschreiben }
   MetaCanvas := TMetaFileCanvas.Create(MetaFile, 0);
   try
-    if not PaintBtn.Down then MetaCanvas.Draw(0,0,MetaFile);
+    if not PaintItemChecked then
+      MetaCanvas.Draw(0,0,MetaFile);
     RaumGrafik.Coloriert := True;
     RaumGrafik.Draw(MetaCanvas);
     if FPaintRumpf = True then
@@ -742,68 +700,6 @@ begin
   finally
     MetaCanvas.Free;
   end;
-end;
-
-procedure TRotationForm.PrintIt;
-var
-  PrintOffset, SavedOffset: TPoint;
-  PrintZoom: double;
-  RandX, RandY: Integer;
-  Rgn: THandle;
-begin
-  if not Assigned(Preview) then
-  begin
-    MessageDlg('Preview Object nicht verfügbar.', mtInformation, [mbOK], 0);
-    Exit;
-  end;
-
-  if not RggPrinter.OKToPrint then
-  begin
-    MessageDlg('Kein Drucker konfiguriert.', mtInformation, [mbOK], 0);
-    Exit;
-  end;
-
-  if MessageDlg('Jetzt Drucken?', mtInformation, [mbYes, mbNo], 0) = mrNO then
-    Exit;
-
-  PrintZoom := 8.5;
-  RandX := 250;
-  RandY := 15;
-
-  PrintOffset.x := Round( (Bitmap.Width div 2 + FXpos - RandX) * PrintZoom
-                            - Preview.PagePos.Left);
-  PrintOffset.y := Round((Bitmap.Height div 2 + FYpos - RandY) * PrintZoom
-                            - Preview.PagePos.Top);
-
-  SavedOffset := RaumGrafik.Offset;
-
-  HullGraph.Zoom := FZoom * PrintZoom;
-  RaumGrafik.Zoom := FZoom * PrintZoom;
-  HullGraph.Offset := PrintOffset;
-  RaumGrafik.Offset := PrintOffset;
-
-  Printer.Orientation := Preview.Orientierung;
-  Printer.BeginDoc;
-  if PreviewItem.Checked then
-    Preview.Print;
-  Rgn := CreateRectRgnIndirect(Preview.EnvPos);
-  { SelectClipRgn() arbeitet mit Kopie von Rgn }
-  SelectClipRgn(Printer.Canvas.Handle, Rgn);
-  DeleteObject(Rgn);
-  RaumGrafik.Coloriert := True;
-  RaumGrafik.Draw(Printer.Canvas);
-  if FPaintRumpf = True then
-  begin
-    HullGraph.Coloriert := True;
-    HullGraph.FixPunkt := RaumGrafik.FixPunkt;
-    HullGraph.Draw(Printer.Canvas);
-  end;
-  Printer.EndDoc;
-
-  HullGraph.Zoom := FZoom;
-  RaumGrafik.Zoom := FZoom;
-  HullGraph.Offset := SavedOffset;
-  RaumGrafik.Offset := SavedOffset;
 end;
 
 procedure TRotationForm.PhiDownItemClick(Sender: TObject);
@@ -872,15 +768,49 @@ begin
 end;
 
 procedure TRotationForm.TransLeftBtnClick(Sender: TObject);
-var
-  xmin, ymin, xmax, ymax: Integer;
+begin
+  if Sender = TransLeftBtn then
+    FXpos := FXpos - FIncrementT
+  else if Sender = TransRightBtn then
+    FXpos := FXpos + FIncrementT
+  else if Sender = TransUpBtn then
+    FYpos := FYpos - FIncrementT
+  else if Sender = TransDownBtn then
+    FYpos := FYpos + FIncrementT;
+
+  DoTrans;
+end;
+
+procedure TRotationForm.DoTrans;
+begin
+  UpdateMinMax;
+
+  if FXpos < xmin then
+    FXpos := xmin;
+  if FXpos > xmax then
+    FXpos := xmax;
+  if FYpos < ymin then
+    FYpos := ymin;
+  if FYpos > ymax then
+    FYpos := ymax;
+
+  if not PaintItemChecked then
+    EraseBK := True;
+  Draw;
+end;
+
+procedure TRotationForm.UpdateMinMax;
 begin
   if KeepInsideItemChecked then
   begin
     xmin := -Bitmap.Width div 2;
     ymin := -Bitmap.Height div 2;
-    xmax := xmin + PaintBox3D.Width;
-    ymax := ymin + PaintBox3D.Height;
+    xmax := Abs(xmin);
+    ymax := Abs(ymin);
+    if xmax > xmin + PaintBox3D.Width then
+      xmax := xmin + PaintBox3D.Width;
+    if ymax > ymin + PaintBox3D.Height then
+      ymax := ymin + PaintBox3D.Height;
   end
   else
   begin
@@ -889,16 +819,6 @@ begin
     xmax := 3000;
     ymax := 3000;
   end;
-  if Sender = TransLeftBtn then FXpos := FXpos - FIncrementT
-  else if Sender = TransRightBtn then FXpos := FXpos + FIncrementT
-  else if Sender = TransUpBtn then FYpos := FYpos - FIncrementT
-  else if Sender = TransDownBtn then FYpos := FYpos + FIncrementT;
-  if FXpos < xmin then FXpos := xmin
-  else if FXpos > xmax then FXpos := xmax
-  else if FYpos < ymin then FYpos := ymin
-  else if FYpos > ymax then FYpos := ymax;
-  if not PaintBtn.Down then EraseBK := True;
-  Draw;
 end;
 
 procedure TRotationForm.ZoomInBtnClick(Sender: TObject);
@@ -937,7 +857,7 @@ end;
 function TRotationForm.ComboFixName: TRiggPoints;
 var
   NewFixName: TRiggPoints;
-  S: String;
+  S: string;
 begin
   NewFixName := ooD0;
   S := FixPunktCombo.Text;
@@ -1052,34 +972,6 @@ begin
   Draw;
 end;
 
-procedure TRotationForm.PreviewItemClick(Sender: TObject);
-var
-  SL: TStrings;
-begin
-  if not Assigned(Preview) then
-  begin
-    SL := TStringList.Create;
-    SL.Add('Druckfunktion + Vorschau wurden in dieser Version entfernt,');
-    SL.Add('weil bei der Abfrage der Druckereigenschaften');
-    SL.Add('das System in wenigen Fällen extrem lange braucht,');
-    SL.Add('wenn zum Beispiel der konfigurierte Standard-Drucker,');
-    SL.Add('angeschlossen an einem anderen Computer im Netzwerk,');
-    SL.Add('zur Zeit nicht erreichbar ist.');
-    SL.Add('Die Behandlung derartiger neuer Randprobleme sind für diese Anwendung');
-    SL.Add('im Rahmen der normalen Wartung nicht vorgesehen.');
-    SL.Add('Der blitzschnelle Programmstart unter allen Umständen hat Priorität.');
-
-    MessageDlg(SL.Text, mtInformation, [mbOK], 0);
-    SL.Free;
-    Exit;
-  end;
-
-  PreviewItem.Checked := not PreviewItem.Checked;
-  PreviewBtn.Down := PreviewItem.Checked;
-  EraseBK := True;
-  Draw;
-end;
-
 procedure TRotationForm.CloseItemClick(Sender: TObject);
 begin
   Close;
@@ -1176,8 +1068,9 @@ begin
   PaintItemChecked := not PaintItemChecked;
   if PaintItem <> nil then
     PaintItem.Checked := PaintItemChecked;
-  PaintBtn.Down := PaintItemChecked;
-  if not PaintBtn.Down then
+  if PaintBtn <> nil then
+    PaintBtn.Down := PaintItemChecked;
+  if not PaintItemChecked then
     EraseBK := True;
   Draw;
 end;
@@ -1187,7 +1080,7 @@ begin
   if ViewPoint = vp3D then
     ViewPoint := vpSeite
   else
-    inc(ViewPoint);
+    Inc(ViewPoint);
   case ViewPoint of
     vpSeite: Pos1Btn.Down := True;
     vpAchtern: Pos2Btn.Down := True;
@@ -1297,8 +1190,10 @@ begin
   CreatedScreenWidth := Screen.Width;
   wx := GetSystemMetrics(SM_CXSCREEN); { Width := Screen.Width }
   wy := GetSystemMetrics(SM_CYSCREEN); { Height := Screen.Height }
-  if wx > 1024 then wx := 1024;
-  if wy > 768 then wy := 768;
+  if wx > 1024 then
+    wx := 1024;
+  if wy > 768 then
+    wy := 768;
 
   Bitmap.Palette := 0;
   Bitmap.Free;
@@ -1326,8 +1221,9 @@ end;
 procedure TRotationForm.KeepInsideItemClick(Sender: TObject);
 begin
   KeepInsideItemChecked := not KeepInsideItemChecked;
-  KeepInsideItem.Checked := KeepInsideItemChecked;
-  if KeepInsideItem.Checked then
+  if KeepInsideItem <> nil then
+    KeepInsideItem.Checked := KeepInsideItemChecked;
+  if KeepInsideItemChecked then
     Draw;
 end;
 
@@ -1525,8 +1421,10 @@ procedure TRotationForm.PaintBox3DMouseMove(Sender: TObject;
 var
   wx, wy, wz: Integer;
 begin
-  if not MouseDown then Exit;
-  if Mode then Exit;
+  if not MouseDown then
+    Exit;
+  if Mode then
+    Exit;
   if MouseButton = mbLeft then
   begin
     wx := Round((x - prevx) * 360 / PaintBox3D.Width);
@@ -1575,39 +1473,13 @@ begin
 end;
 
 procedure TRotationForm.Translate(x, y: Integer);
-var
-  xmin, ymin, xmax, ymax: Integer;
 begin
-  if KeepInsideItemChecked then
-  begin
-    xmin := -Bitmap.Width div 2;
-    ymin := -Bitmap.Height div 2;
-    xmax := xmin + PaintBox3D.Width;
-    ymax := ymin + PaintBox3D.Height;
-  end
-  else
-  begin
-    xmin := -3000;
-    ymin := -3000;
-    xmax := 3000;
-    ymax := 3000;
-  end;
   FXpos := SavedXpos - (MouseDownX - x);
   FYpos := SavedYpos - (MouseDownY - y);
-  if FXpos < xmin then FXpos := xmin
-  else if FXpos > xmax then
-    FXpos := xmax
-  else if FYpos < ymin then
-    FYpos := ymin
-  else if FYpos > ymax then
-    FYpos := ymax;
-  if not PaintBtn.Down then
-    EraseBK := True;
-  Draw;
+  DoTrans;
 end;
 
-procedure TRotationForm.FocusEditKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TRotationForm.FocusEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if (ssCtrl in Shift) then
   begin
@@ -1698,8 +1570,7 @@ end;
 
 procedure TRotationForm.SetZoomText;
 begin
-  StatusBar.Panels.Items[7].Text :=
-    FormatFloat('0.0#',LookUpRa10(FZoomIndex));
+  StatusBar.Panels.Items[7].Text := FormatFloat('0.0#',LookUpRa10(FZoomIndex));
 end;
 
 procedure TRotationForm.SetAngleText;
@@ -1820,8 +1691,8 @@ begin
       RumpfFaktorDlg.L := Round(Factor.x * 100);
       RumpfFaktorDlg.B := Round(Factor.y * 100);
       RumpfFaktorDlg.H := Round(Factor.z * 100);
-      ShowModal;
-      if ModalResult = mrOK then
+      RumpfFaktorDlg.ShowModal;
+      if RumpfFaktorDlg.ModalResult = mrOK then
       begin
         Factor.x := RumpfFaktorDlg.L / 100;
         Factor.y := RumpfFaktorDlg.B / 100;
@@ -1921,8 +1792,10 @@ end;
 
 procedure TRotationForm.IndicatorItemClick(Sender: TObject);
 begin
-  IndicatorItem.Checked := not IndicatorItem.Checked;
-  if IndicatorItem.Checked then
+  IndicatorItemChecked := not IndicatorItemChecked;
+  if IndicatorItem <> nil then
+    IndicatorItem.Checked := IndicatorItemChecked;
+  if IndicatorItemChecked then
   begin
     IndicatorForm.Show;
     IndicatorForm.UpdateIndicator;
@@ -2012,14 +1885,29 @@ end;
 
 procedure TRotationForm.MatrixItemClick(Sender: TObject);
 begin
-  MatrixItem.Checked := not MatrixItem.Checked;
+  MatrixItemChecked := not MatrixItemChecked;
+  if MatrixItem <> nil then
+    MatrixItem.Checked := MatrixItemChecked;
   Draw;
 end;
 
-procedure TRotationForm.AngleTextItemClick(Sender: TObject);
+procedure TRotationForm.PaintBackGround(Image: TBitmap);
+var
+  R: TRect;
+  P: TPoint;
 begin
-  // AngleTextItem.Checked := not AngleTextItem.Checked;
-  Draw;
+  R := Rect(0, 0, Image.Width, Image.Height);
+  with Image.Canvas do
+  begin
+    Brush.Color := clBtnFace;
+    FillRect(R);
+    if BackBmp <> nil then
+      if (BackBmp.Width < 100) and (BackBmp.Height < 100) then
+        P := Point(30, FocusEdit.Top-PaintBox3D.Top)
+      else
+        P := Point(0,0);
+      Draw(P.x,P.y,BackBmp);
+  end;
 end;
 
 procedure TRotationForm.InitMenu;
@@ -2383,6 +2271,117 @@ begin
   mi.Caption := 'Rotationmatrix';
   mi.Hint := '  Rotationsmatrix einblenden';
   mi.OnClick := MatrixItemClick;
+end;
+
+procedure TRotationForm.PreviewItemClick(Sender: TObject);
+var
+  SL: TStrings;
+begin
+  if not Assigned(Preview) then
+  begin
+    SL := TStringList.Create;
+    SL.Add('Druckfunktion + Vorschau wurden in dieser Version entfernt,');
+    SL.Add('weil bei der Abfrage der Druckereigenschaften');
+    SL.Add('das System in wenigen Fällen extrem lange braucht,');
+    SL.Add('wenn zum Beispiel der konfigurierte Standard-Drucker,');
+    SL.Add('angeschlossen an einem anderen Computer im Netzwerk,');
+    SL.Add('zur Zeit nicht erreichbar ist.');
+    SL.Add('Die Behandlung derartiger neuer Randprobleme sind für diese Anwendung');
+    SL.Add('im Rahmen der normalen Wartung nicht vorgesehen.');
+    SL.Add('Der blitzschnelle Programmstart unter allen Umständen hat Priorität.');
+
+    MessageDlg(SL.Text, mtInformation, [mbOK], 0);
+    SL.Free;
+    Exit;
+  end;
+
+  PreviewItem.Checked := not PreviewItem.Checked;
+  PreviewBtn.Down := PreviewItem.Checked;
+  EraseBK := True;
+  Draw;
+end;
+
+procedure TRotationForm.InitPreview;
+begin
+ { virtual }
+
+  { Preview ruft GetDeviceCaps(Printer.Handle, LOGPIXELSX) auf
+    dauert extrem lange, wenn der konfigurierte Standard-Drucker
+    nicht erreichbar ist. }
+  // Preview := TPreview.Create;
+end;
+
+procedure TRotationForm.DrawPreviewBox;
+begin
+  if Assigned(Preview) then
+  begin
+    Preview.Faktor := 1/8.5;
+    Preview.RPLOffsetX := 250;
+    Preview.RPLOffsetY := 15;
+    Preview.Draw(Bitmap.Canvas);
+  end;
+end;
+
+procedure TRotationForm.PrintIt;
+var
+  PrintOffset, SavedOffset: TPoint;
+  PrintZoom: double;
+  RandX, RandY: Integer;
+  Rgn: THandle;
+begin
+  if not Assigned(Preview) then
+  begin
+    MessageDlg('Preview Object nicht verfügbar.', mtInformation, [mbOK], 0);
+    Exit;
+  end;
+
+  if not RggPrinter.OKToPrint then
+  begin
+    MessageDlg('Kein Drucker konfiguriert.', mtInformation, [mbOK], 0);
+    Exit;
+  end;
+
+  if MessageDlg('Jetzt Drucken?', mtInformation, [mbYes, mbNo], 0) = mrNO then
+    Exit;
+
+  PrintZoom := 8.5;
+  RandX := 250;
+  RandY := 15;
+
+  PrintOffset.x := Round( (Bitmap.Width div 2 + FXpos - RandX) * PrintZoom
+                            - Preview.PagePos.Left);
+  PrintOffset.y := Round((Bitmap.Height div 2 + FYpos - RandY) * PrintZoom
+                            - Preview.PagePos.Top);
+
+  SavedOffset := RaumGrafik.Offset;
+
+  HullGraph.Zoom := FZoom * PrintZoom;
+  RaumGrafik.Zoom := FZoom * PrintZoom;
+  HullGraph.Offset := PrintOffset;
+  RaumGrafik.Offset := PrintOffset;
+
+  Printer.Orientation := Preview.Orientierung;
+  Printer.BeginDoc;
+  if PreviewItem.Checked then
+    Preview.Print;
+  Rgn := CreateRectRgnIndirect(Preview.EnvPos);
+  { SelectClipRgn() arbeitet mit Kopie von Rgn }
+  SelectClipRgn(Printer.Canvas.Handle, Rgn);
+  DeleteObject(Rgn);
+  RaumGrafik.Coloriert := True;
+  RaumGrafik.Draw(Printer.Canvas);
+  if FPaintRumpf = True then
+  begin
+    HullGraph.Coloriert := True;
+    HullGraph.FixPunkt := RaumGrafik.FixPunkt;
+    HullGraph.Draw(Printer.Canvas);
+  end;
+  Printer.EndDoc;
+
+  HullGraph.Zoom := FZoom;
+  RaumGrafik.Zoom := FZoom;
+  HullGraph.Offset := SavedOffset;
+  RaumGrafik.Offset := SavedOffset;
 end;
 
 end.
