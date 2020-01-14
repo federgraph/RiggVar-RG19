@@ -570,8 +570,8 @@ end;
 
 procedure TRotationForm.DrawMatrix(Canvas: TCanvas);
 var
-S1, S2, S3: string;
-m4x4: Matrix4x4;
+  S1, S2, S3: string;
+  m4x4: Matrix4x4;
 begin
   m4x4 := Rotator.mat.mat;
   S1 := Format('%8.4f %8.4f %8.4f',[m4x4[1,1],m4x4[1,2], m4x4[1,3]]);
@@ -962,16 +962,6 @@ begin
   FixPunktComboChange(Sender);
 end;
 
-procedure TRotationForm.RumpfBtnClick(Sender: TObject);
-begin
-  RumpfItemChecked := not RumpfItemChecked;
-  if RumpfItem <> nil then
-    RumpfItem.Checked := RumpfItemChecked;
-  RumpfBtn.Down := RumpfItemChecked;
-  FPaintRumpf := RumpfItemChecked;
-  Draw;
-end;
-
 procedure TRotationForm.CloseItemClick(Sender: TObject);
 begin
   Close;
@@ -1061,6 +1051,16 @@ begin
     ToolbarPanel.Visible := True
   else
     ToolbarPanel.Visible := False;
+end;
+
+procedure TRotationForm.RumpfBtnClick(Sender: TObject);
+begin
+  RumpfItemChecked := not RumpfItemChecked;
+  if RumpfItem <> nil then
+    RumpfItem.Checked := RumpfItemChecked;
+  RumpfBtn.Down := RumpfItemChecked;
+  FPaintRumpf := RumpfItemChecked;
+  Draw;
 end;
 
 procedure TRotationForm.PaintBtnClick(Sender: TObject);

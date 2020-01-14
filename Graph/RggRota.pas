@@ -23,7 +23,6 @@ uses
   RggGBox,
   Rggmat01,
   Rggunit4,
-  FrmIndicator,
   RggGraph,
   RaumGraph,
   RggHull,
@@ -47,9 +46,6 @@ type
     procedure PositionResetItemClick(Sender: TObject);
     procedure ModusItemClick(Sender: TObject);
     procedure DrawAlwaysItemClick(Sender: TObject);
-    procedure IndicatorItemClick(Sender: TObject);
-    procedure IndicatorLocalRotItemClick(Sender: TObject);
-    procedure Options3DMenuClick(Sender: TObject);
     procedure MatrixItemClick(Sender: TObject);
   private
     CreatedScreenWidth: Integer;
@@ -116,14 +112,12 @@ type
     Rotator: TPolarKar2;
     HullGraph: TRggGraph;
     RaumGrafik: TRaumGrafik;
-    IndicatorForm: TIndicatorForm;
     BackBmp: TBitmap;
     Mode: Boolean;
     Sample420Memo: TStrings;
     SampleDinghyMemo: TStrings;
     SampleYachtMemo: TStrings;
     SamplePlaningMemo: TStrings;
-    procedure IndicatorChanged(Sender: TObject);
     procedure Draw; virtual;
     procedure InitGraph; virtual;
     procedure InitRaumGrafik; virtual;
@@ -135,8 +129,6 @@ type
     MatrixItemChecked: Boolean;
     KeepInsideItemChecked: Boolean;
     RumpfItemChecked: Boolean;
-    IndicatorItemChecked: Boolean;
-    IndicatorLocalRotItemChecked: Boolean;
     FixPunktComboText: string;
     PreviewItemChecked: Boolean;
   public
@@ -247,10 +239,6 @@ begin
   InitRaumGrafik;
   InitHullGraph;
   InitRigg;
-
-  IndicatorForm := TIndicatorForm.Create(Application);
-  IndicatorForm.Rotator := Rotator;
-  IndicatorForm.Onchanged := IndicatorChanged;
 
   ChangePosition(ViewPoint);
 end;
@@ -599,33 +587,12 @@ begin
   Draw;
 end;
 
-procedure TRotaForm.Options3DMenuClick(Sender: TObject);
-begin
-  IndicatorItemChecked := IndicatorForm.Visible;
-  IndicatorLocalRotItemChecked := not IndicatorForm.GlobalRot;
-end;
-
 procedure TRotaForm.PaintBtnClick(Sender: TObject);
 begin
   PaintItemChecked := not PaintItemChecked;
   if not PaintItemChecked then
     EraseBK := True;
   Draw;
-end;
-
-procedure TRotaForm.NullBtnClick(Sender: TObject);
-begin
-//  if ViewPoint = vp3D then
-//    ViewPoint := vpSeite
-//  else
-//    Inc(ViewPoint);
-//  case ViewPoint of
-//    vpSeite: Pos1Btn.Down := True;
-//    vpAchtern: Pos2Btn.Down := True;
-//    vpTop: Pos3Btn.Down := True;
-//    vp3D: Pos4Btn.Down := True;
-//  end;
-//  ChangePosition(ViewPoint);
 end;
 
 procedure TRotaForm.ChangePosition(aViewPoint: TViewPoint);
@@ -659,7 +626,6 @@ begin
   HullGraph.FixPunkt := Raumgrafik.FixPunkt;
   { Neuzeichnen }
   EraseBK := True; Draw;
-  IndicatorForm.UpdateIndicator;
 end;
 
 procedure TRotaForm.PositionSaveItemClick(Sender: TObject);
@@ -790,7 +756,6 @@ begin
   if (prevx = MouseDownX) and (prevy = MouseDownY) then
     EraseBK := True;
   Draw;
-  IndicatorForm.UpdateIndicator;
 end;
 
 procedure TRotaForm.Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
@@ -849,32 +814,6 @@ end;
 procedure TRotaForm.DrawAlwaysItemClick(Sender: TObject);
 begin
   FDrawAlways := not FDrawAlways;
-end;
-
-procedure TRotaForm.IndicatorItemClick(Sender: TObject);
-begin
-  IndicatorItemChecked := not IndicatorItemChecked;
-  if IndicatorItemChecked then
-  begin
-    IndicatorForm.Show;
-    IndicatorForm.UpdateIndicator;
-  end
-  else
-    IndicatorForm.Hide;
-end;
-
-procedure TRotaForm.IndicatorLocalRotItemClick(Sender: TObject);
-begin
-  with IndicatorForm do
-    GlobalRot := not GlobalRot;
-end;
-
-procedure TRotaForm.IndicatorChanged(Sender: TObject);
-begin
-  RaumGrafik.Update;
-  Rotator.GetAngle(FPhi, FTheta, FGamma);
-  SetAngleText;
-  Draw;
 end;
 
 procedure TRotaForm.MatrixItemClick(Sender: TObject);
