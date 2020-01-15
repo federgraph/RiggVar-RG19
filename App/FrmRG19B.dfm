@@ -391,7 +391,7 @@ object FormRG19B: TFormRG19B
   end
   object Listbox: TListBox
     Left = 8
-    Top = 357
+    Top = 389
     Width = 169
     Height = 180
     ItemHeight = 13
@@ -440,6 +440,14 @@ object FormRG19B: TFormRG19B
     Height = 21
     TabOrder = 7
     Text = 'ViewpointCombo'
+  end
+  object FixPointCombo: TComboBox
+    Left = 8
+    Top = 343
+    Width = 155
+    Height = 21
+    TabOrder = 8
+    Text = 'FixpointCombo'
   end
   object MainMenu: TMainMenu
     Left = 207

@@ -118,19 +118,19 @@ type
     SaveBtn: TSpeedButton;
     ExitBtn: TSpeedButton;
     UpdateBtn: TSpeedButton;
-    BtnGrau: TSpeedButton;
-    KoppelBtn: TSpeedButton;
     ReglerBtn: TSpeedButton;
     MemoryBtn: TSpeedButton;
     MemoryRecallBtn: TSpeedButton;
+    BtnGrau: TSpeedButton;
+    KoppelBtn: TSpeedButton;
     PaintBtn: TSpeedButton;
-    LedShape: TShape;
     BtnBlau: TSpeedButton;
+    ZweischlagBtn: TSpeedButton;
+    LedShape: TShape;
     SofortBtn: TSpeedButton;
     DiffBtn: TSpeedButton;
     WinkelBtn: TSpeedButton;
     ControllerBtn: TSpeedButton;
-    ZweischlagBtn: TSpeedButton;
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
     M10Btn: TSpeedButton;
@@ -146,6 +146,7 @@ type
     TrimmCombo: TComboBox;
     ParamCombo: TComboBox;
     ViewpointCombo: TComboBox;
+    FixpointCombo: TComboBox;
     Listbox: TListBox;
     ReportMemo: TMemo;
     TrimmMemo: TMemo;
@@ -217,6 +218,8 @@ type
     procedure ListBoxClick(Sender: TObject);
     procedure TrimmComboChange(Sender: TObject);
     procedure ParamComboChange(Sender: TObject);
+    procedure ViewpointComboChange(Sender: TObject);
+    procedure FixpointComboChange(Sender: TObject);
     procedure M10BtnClick(Sender: TObject);
     procedure M1BtnClick(Sender: TObject);
     procedure P1BtnClick(Sender: TObject);
@@ -231,7 +234,6 @@ type
     procedure PasteTrimmItemBtnClick(Sender: TObject);
     procedure ReadTrimmFileBtnClick(Sender: TObject);
     procedure SaveTrimmFileBtnClick(Sender: TObject);
-    procedure ViewpointComboChange(Sender: TObject);
     procedure PaintBtn2Click(Sender: TObject);
     procedure cbAllTagsClick(Sender: TObject);
   private
@@ -252,15 +254,18 @@ type
     ConsoleWidth: Integer;
     ConsoleHeight: Integer;
 
-    procedure SetupMemo(Memo: TMemo);
     procedure InitListBox;
+
     procedure InitTrimmCombo;
     procedure InitParamCombo;
+    procedure InitViewpointCombo;
+    procedure InitFixpointCombo;
+
+    procedure SetupMemo(Memo: TMemo);
     procedure SetupComboBox(CB: TComboBox);
     procedure SetupListBox(LB: TListBox);
     procedure ShowTrimm;
     procedure ShowCurrentReport;
-    procedure InitViewpointCombo;
   protected
     procedure SetupLabel(L: TLabel);
   public
@@ -278,6 +283,7 @@ type
     procedure InitOutputForm;
     procedure SetReportLabelCaption(const Value: string);
     procedure LayoutComponents;
+    function GetComboFixPoint: TRiggPoints;
   protected
     function AddSpeedBtn(N: string; AGroupSpace: Integer = 0): TSpeedButton;
     function RefSpeedBtn(B: TSpeedButton; AGroupSpace: Integer = 0): TSpeedButton;
@@ -303,6 +309,28 @@ type
     AllPropsBtn: TSpeedButton;
     AllTagsBtn: TSpeedButton;
     property ReportLabelCaption: string read FReportLabelCaption write SetReportLabelCaption;
+  public
+//    PaintBtn: TSpeedButton;
+//    BtnGrau: TSpeedButton;
+//    BtnBlau: TSpeedButton;
+//    KoppelBtn: TSpeedButton;
+//    ZweischlagBtn: TSpeedButton;
+  public
+//    BuntBtn: TSpeedButton;
+//    HullBtn: TSpeedButton;
+
+    SeiteBtn: TSpeedButton;
+    TopBtn: TSpeedButton;
+    AchternBtn: TSpeedButton;
+    NullBtn: TSpeedButton;
+
+    ZoomInBtn: TSpeedButton;
+    ZoomOutBtn: TSpeedButton;
+
+    procedure SeiteBtnClick(Sender: TObject);
+    procedure AchternBtnClick(Sender: TObject);
+    procedure TopBtnClick(Sender: TObject);
+    procedure NullBtnClick(Sender: TObject);
   end;
 
 var
@@ -347,6 +375,7 @@ begin
 
   FormRG19B := Self;
 
+  Margin := 5;
   FormCreate1;
   FormCreate2;
 end;
@@ -363,9 +392,10 @@ begin
   RiggModul.RG19A := False;
   RiggModul.ViewModelMain := TViewModelMainB.Create;
   RiggModul.Init;
+  RiggModul.BackgroundColor := TColors.Wheat;
 
   rggm := TRggMain.Create(RiggModul.Rigg);
-  RiggModul.PBG := GrafikForm.PaintboxG;
+  RiggModul.PBG := GrafikForm.PaintBoxG;
 
   Main := TMain.Create(rggm);
   Main.Logger.Verbose := True;
@@ -401,7 +431,6 @@ begin
     }
   AutoLoadItem.Visible := False;
   LogoItem.Checked := WantLogoData;
-  InitToolbar;
 
   Caption := 'Rigg - Form';
   OnClose := FormClose;
@@ -1129,7 +1158,7 @@ begin
   sb.GroupIndex := 0;
   sb.OnClick := MemoryRecallBtnClick;
 
-  { Paint option buttons with AllowAllUp true }
+  { Paint option buttons }
 
   sb := RefSpeedBtn(PaintBtn, BtnGroupSpace);
   sb.Hint := '2D Grafik - Alte Grafik stehenlassen|';
@@ -1206,10 +1235,9 @@ begin
 
   { New Button group Trimm Data }
 
-  BtnCounter := 0; // reset button counter
-  BtnLeft := LedShape.Left + LEDShape.Width + BtnSpace; // skip over LED shape
+  BtnCounter := 0;
+  BtnLeft := LedShape.Left + LedShape.Width; // skip over LED shape
   BtnWidth := 50; // new button width for new buttons
-
   BtnColor := clGreen;
 
   sb := RefSpeedBtn(MT0Btn, BtnGroupSpace);
@@ -1284,7 +1312,6 @@ begin
 
   { new 'checkbox' group }
 
-//  sb := RefSpeedBtn(SandboxedBtn, BtnGroupSpace);
   sb := AddSpeedBtn('SandboxedBtn', BtnGroupSpace);
   SandboxedBtn := sb;
   sb.Caption := 'SB';
@@ -1294,7 +1321,6 @@ begin
   sb.GroupIndex := 11;
   sb.OnClick := cbSandboxedClick;
 
-//  sb := RefSpeedBtn(AllPropsBtn, 0);
   sb := AddSpeedBtn('AllPropsBtn', 0);
   AllPropsBtn := sb;
   sb.Caption := 'AP';
@@ -1304,7 +1330,6 @@ begin
   sb.GroupIndex := 11;
   sb.OnClick := cbSandboxedClick;
 
-//  sb := RefSpeedBtn(AllTagsBtn, 0);
   sb := AddSpeedBtn('AllTagsBtn', 0);
   AllTagsBtn := sb;
   sb.Caption := 'AT';
@@ -1313,6 +1338,80 @@ begin
   sb.Down := False;
   sb.GroupIndex := 11;
   sb.OnClick := cbSandboxedClick;
+
+  { TRotaForm options }
+
+//  sb := AddSpeedBtn('HullBtn', BtnGroupSpace);
+//  HullBtn := sb;
+//  sb.Caption := 'Hull';
+//  sb.Hint := 'Hull|';
+//  sb.AllowAllUp := True;
+//  sb.Down := RiggModul.RotaForm.RumpfItemChecked;
+//  sb.GroupIndex := 12;
+//  sb.OnClick := RiggModul.RotaForm.RumpfBtnClick;
+
+//  sb := AddSpeedBtn('BuntBtn', 0);
+//  BuntBtn := sb;
+//  sb.Caption := 'Bunt';
+//  sb.Hint := 'Paint Button for RotaForm|';
+//  sb.AllowAllUp := True;
+//  sb.Down := RiggModul.RotaForm.PaintItemChecked;
+//  sb.GroupIndex := 12;
+//  sb.OnClick := RiggModul.RotaForm.PaintBtnClick;
+
+  BtnCounter := 0;
+  BtnLeft := sb.Left + BtnWidth;
+  BtnWidth := 30;
+
+  sb := AddSpeedBtn('SeiteBtn', BtnGroupSpace);
+  SeiteBtn := sb;
+  sb.Caption := 'S';
+  sb.Hint := 'Viewpoint Seite|';
+  sb.AllowAllUp := True;
+  sb.Down := RiggModul.RotaForm.ViewPoint = vpSeite;
+  sb.GroupIndex := 13;
+  sb.OnClick := SeiteBtnClick;
+
+  sb := AddSpeedBtn('AchternBtn', 0);
+  AchternBtn := sb;
+  sb.Caption := 'A';
+  sb.Hint := 'Viewpoint Achtern|';
+  sb.AllowAllUp := False;
+  sb.Down := RiggModul.RotaForm.ViewPoint = vpAchtern;
+  sb.GroupIndex := 13;
+  sb.OnClick := AchternBtnClick;
+
+  sb := AddSpeedBtn('TopBtn', 0);
+  TopBtn := sb;
+  sb.Caption := 'T';
+  sb.Hint := 'Viewpoint Top|';
+  sb.AllowAllUp := False;
+  sb.Down := RiggModul.RotaForm.ViewPoint = vpTop;
+  sb.GroupIndex := 13;
+  sb.OnClick := TopBtnClick;
+
+  sb := AddSpeedBtn('NullBtn', 0);
+  NullBtn := sb;
+  sb.Caption := '3D';
+  sb.Hint := 'Viewpoint 3D|';
+  sb.AllowAllUp := False;
+  sb.Down := RiggModul.RotaForm.ViewPoint = vp3D;
+  sb.GroupIndex := 13;
+  sb.OnClick := NullBtnClick;
+
+  sb := AddSpeedBtn('ZoomOutBtn', BtnGroupSpace);
+  ZoomOutBtn := sb;
+  sb.Caption := 'Z-';
+  sb.Hint := 'Zoom Out|';
+  sb.GroupIndex := 0;
+  sb.OnClick := RiggModul.RotaForm.ZoomOutBtnClick;
+
+  sb := AddSpeedBtn('ZoomInBtn', 0);
+  ZoomInBtn := sb;
+  sb.Caption := 'Z+';
+  sb.Hint := 'Zoom In|';
+  sb.GroupIndex := 0;
+  sb.OnClick := RiggModul.RotaForm.ZoomInBtnClick;
 end;
 
 procedure TFormRG19B.InitStatusBar;
@@ -1339,10 +1438,9 @@ begin
   TL := TrimmMemo.Lines;
   ML := ReportMemo.Lines;
 
-  Margin := 5;
-
   InitSpeedPanel;
   InitSpeedButtons;
+  InitToolbar;
   InitStatusBar;
 
   LayoutComponents;
@@ -1350,6 +1448,8 @@ begin
   SetupComboBox(TrimmCombo);
   SetupComboBox(ParamCombo);
   SetupComboBox(ViewpointCombo);
+  SetupComboBox(FixpointCombo);
+
   SetupListBox(ListBox);
   SetupMemo(TrimmMemo);
   SetupMemo(ReportMemo);
@@ -1363,10 +1463,13 @@ begin
   InitTrimmCombo;
   InitParamCombo;
   InitViewpointCombo;
+  InitFixpointCombo;
 
   TrimmCombo.ItemIndex := 0;
   ParamCombo.ItemIndex := 0;
   ViewpointCombo.ItemIndex := 0;
+  FixpointCombo.ItemIndex := FixpointCombo.Items.IndexOf('D0');
+
   ListBox.ItemIndex := 0;
 
   Main.Trimm := 1;
@@ -1388,18 +1491,21 @@ begin
   TrimmCombo.Left := TrimmMemo.Left;
   ParamCombo.Left := TrimmCombo.Left;
   ViewpointCombo.Left := TrimmCombo.Left;
+  FixpointCombo.Left := TrimmCombo.Left;
 
   TrimmCombo.Width := TrimmMemo.Width;
   ParamCombo.Width := TrimmCombo.Width;
   ViewpointCombo.Width := TrimmCombo.Width;
+  FixpointCombo.Width := TrimmCombo.Width;
 
   ComboHeight := TrimmCombo.Height + 2 * Margin;
   TrimmCombo.Top := TrimmMemo.Top + TrimmMemo.Height + Margin;
   ParamCombo.Top := TrimmCombo.Top + ComboHeight;
   ViewpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
+  FixpointCombo.Top := TrimmCombo.Top + 3 * ComboHeight;
 
   Listbox.Left := TrimmMemo.Left;
-  Listbox.Top := ViewpointCombo.Top + ComboHeight + Margin;
+  Listbox.Top := FixpointCombo.Top + ComboHeight + Margin;
   Listbox.Width := TrimmMemo.Width;
   Listbox.Height := StatusBar.Top - Listbox.top - Margin;
   Listbox.Anchors := Listbox.Anchors + [akBottom];
@@ -1439,6 +1545,7 @@ begin
   ParamCombo.OnChange := ParamComboChange;
   TrimmCombo.OnChange := TrimmComboChange;
   ViewpointCombo.OnChange := ViewpointComboChange;
+  FixpointCombo.OnChange := FixpointComboChange;
 
   SandboxedBtn.OnClick := cbSandboxedClick;
   AllPropsBtn.OnClick := nil;
@@ -1587,6 +1694,47 @@ begin
   cl.Add('3D');
 end;
 
+procedure TFormRG19B.InitFixpointCombo;
+var
+  cl: TStrings;
+begin
+  cl := FixpointCombo.Items;
+  cl.Add('A0');
+  cl.Add('A');
+  cl.Add('B0');
+  cl.Add('B');
+  cl.Add('C0');
+  cl.Add('C');
+  cl.Add('D0');
+  cl.Add('D');
+  cl.Add('E0');
+  cl.Add('E');
+  cl.Add('F0');
+  cl.Add('F');
+end;
+
+function TFormRG19B.GetComboFixPoint: TRiggPoints;
+var
+  NewFixName: TRiggPoints;
+  s: string;
+begin
+  NewFixName := ooD0;
+  s := FixpointCombo.Text;
+  if s = 'A0' then NewFixName := ooA0
+  else if s = 'B0' then NewFixName := ooB0
+  else if s = 'C0' then NewFixName := ooC0
+  else if s = 'D0' then NewFixName := ooD0
+  else if s = 'E0' then NewFixName := ooE0
+  else if s = 'F0' then NewFixName := ooF0
+  else if s = 'A' then NewFixName := ooA
+  else if s = 'B' then NewFixName := ooB
+  else if s = 'C' then NewFixName := ooC
+  else if s = 'D' then NewFixName := ooD
+  else if s = 'E' then NewFixName := ooE
+  else if s = 'F' then NewFixName := ooF;
+  result := NewFixName;
+end;
+
 procedure TFormRG19B.InitParamCombo;
   procedure ACI(fp: TFederParam);
   var
@@ -1722,6 +1870,11 @@ begin
     2: Main.HandleAction(faViewpointT);
     3: Main.HandleAction(faViewpoint3);
   end;
+end;
+
+procedure TFormRG19B.FixpointComboChange(Sender: TObject);
+begin
+  RiggModul.RotaForm.FixPoint := GetComboFixPoint;
 end;
 
 procedure TFormRG19B.InitMenuClick;
@@ -2288,6 +2441,26 @@ begin
   LogoItem := AddI('LogoItem');
   mi.Caption := 'Logo';
   mi.OnClick := LogoItemClick;
+end;
+
+procedure TFormRG19B.SeiteBtnClick(Sender: TObject);
+begin
+  RiggModul.RotaForm.ViewPoint := vpSeite;
+end;
+
+procedure TFormRG19B.AchternBtnClick(Sender: TObject);
+begin
+  RiggModul.RotaForm.ViewPoint := vpAchtern;
+end;
+
+procedure TFormRG19B.TopBtnClick(Sender: TObject);
+begin
+  RiggModul.RotaForm.ViewPoint := vpTop;
+end;
+
+procedure TFormRG19B.NullBtnClick(Sender: TObject);
+begin
+  RiggModul.RotaForm.ViewPoint := vp3D;
 end;
 
 procedure TFormRG19B.InitOutputForm;

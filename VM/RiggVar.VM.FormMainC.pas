@@ -109,7 +109,8 @@ begin
   FormRG19.ControllerBtn.Enabled := ControllerEnabled;
 
   FormRG19.KoppelkurveItem.Checked := KoppelKurveEnabled;
-  FormRG19.KoppelBtn.Down := KoppelKurveEnabled;
+  if FormRG19.KoppelBtn <> nil then
+    FormRG19.KoppelBtn.Down := KoppelKurveEnabled;
 
   FormRG19.QuerKraftItem.Checked := QuerKraftItemChecked;
   FormRG19.KnickenItem.Checked := KnickenItemChecked;

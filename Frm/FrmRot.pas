@@ -130,7 +130,7 @@ type
     MetaFile: TRiggMetaFile;
     MetaCanvas: TMetaFileCanvas;
 
-    ViewPoint: TViewPoint;
+    FViewPoint: TViewPoint;
     FZoomBase: double;
     FZoom: double;
 
@@ -174,6 +174,7 @@ type
     function GetButtonCount: Integer;
     procedure EnableScrollButtons;
     procedure RedoButtons;
+    procedure SetViewpoint(const Value: TViewpoint);
   protected
     hOldPal, hPal: HPalette;
     Bitmap: TBitmap;
@@ -197,7 +198,6 @@ type
     procedure wmGetMinMaxInfo(var Msg: TWMGetMinMaxInfo); message wm_GetMinMaxInfo;
     procedure InitRotaData;
     procedure PaintBackGround(Image: TBitmap);
-    procedure ChangePosition(aViewPoint: TViewPoint);
     procedure ChangeRotationHints;
   public
     Rigg: TRigg;
@@ -302,6 +302,8 @@ type
     SampleYachtItem: TMenuItem;
     SamplePlaningItem: TMenuItem;
     procedure InitMenu; virtual;
+  public
+    property Viewpoint: TViewpoint read FViewpoint write SetViewpoint;
   end;
 
 var
@@ -321,6 +323,7 @@ uses
 
 procedure TRotationForm.FormDestroy(Sender: TObject);
 begin
+  Rigg.Free;
   BackBmp.Free;
   Bitmap.Free;
   MetaFile.Free;
@@ -406,7 +409,7 @@ begin
   ActiveControl := FixPunktCombo;
 
   FZoomBase := 0.05;
-  ViewPoint := vpTop;
+  FViewPoint := vpTop;
 
   if MainMenu <> nil then
   begin
@@ -448,7 +451,7 @@ begin
   IndicatorForm.Rotator := Rotator;
   IndicatorForm.Onchanged := IndicatorChanged;
 
-  ChangePosition(ViewPoint);
+  SetViewPoint(FViewPoint);
 end;
 
 procedure TRotationForm.InitGraph;
@@ -541,10 +544,10 @@ begin
   end;
   with RotaData3 do
   begin
-    Xpos := -130;
-    Ypos := -80;
-    Matrix := GetMatrix(90,-87);
-    ZoomIndex := 8;
+    Xpos := -170;
+    Ypos := -120;
+    Matrix := GetMatrix(-90,90);
+    ZoomIndex := 5;
     FixPunktIndex := 7;
     IncrementIndex := 3;
     IncrementT := 10;
@@ -552,10 +555,10 @@ begin
   end;
   with RotaData4 do
   begin
-    Xpos := -170;
-    Ypos := -120;
-    Matrix := GetMatrix(-90,90);
-    ZoomIndex := 5;
+    Xpos := -130;
+    Ypos := -80;
+    Matrix := GetMatrix(90,-87);
+    ZoomIndex := 8;
     FixPunktIndex := 7;
     IncrementIndex := 3;
     IncrementT := 10;
@@ -857,23 +860,23 @@ end;
 function TRotationForm.ComboFixName: TRiggPoints;
 var
   NewFixName: TRiggPoints;
-  S: string;
+  s: string;
 begin
   NewFixName := ooD0;
-  S := FixPunktCombo.Text;
-  if S = 'A0' then NewFixName := ooA0
-  else if S = 'B0' then NewFixName := ooB0
-  else if S = 'C0' then NewFixName := ooC0
-  else if S = 'D0' then NewFixName := ooD0
-  else if S = 'E0' then NewFixName := ooE0
-  else if S = 'F0' then NewFixName := ooF0
-  else if S = 'A' then NewFixName := ooA
-  else if S = 'B' then NewFixName := ooB
-  else if S = 'C' then NewFixName := ooC
-  else if S = 'D' then NewFixName := ooD
-  else if S = 'E' then NewFixName := ooE
-  else if S = 'F' then NewFixName := ooF;
-  Result := NewFixName;
+  s := FixPunktCombo.Text;
+  if s = 'A0' then NewFixName := ooA0
+  else if s = 'B0' then NewFixName := ooB0
+  else if s = 'C0' then NewFixName := ooC0
+  else if s = 'D0' then NewFixName := ooD0
+  else if s = 'E0' then NewFixName := ooE0
+  else if s = 'F0' then NewFixName := ooF0
+  else if s = 'A' then NewFixName := ooA
+  else if s = 'B' then NewFixName := ooB
+  else if s = 'C' then NewFixName := ooC
+  else if s = 'D' then NewFixName := ooD
+  else if s = 'E' then NewFixName := ooE
+  else if s = 'F' then NewFixName := ooF;
+  result := NewFixName;
 end;
 
 procedure TRotationForm.Btn1GradClick(Sender: TObject);
@@ -1077,29 +1080,29 @@ end;
 
 procedure TRotationForm.NullBtnClick(Sender: TObject);
 begin
-  if ViewPoint = vp3D then
-    ViewPoint := vpSeite
+  if FViewPoint = vp3D then
+    FViewPoint := vpSeite
   else
-    Inc(ViewPoint);
-  case ViewPoint of
+    Inc(FViewPoint);
+  case FViewPoint of
     vpSeite: Pos1Btn.Down := True;
     vpAchtern: Pos2Btn.Down := True;
     vpTop: Pos3Btn.Down := True;
     vp3D: Pos4Btn.Down := True;
   end;
-  ChangePosition(ViewPoint);
+  SetViewPoint(FViewPoint);
 end;
 
-procedure TRotationForm.ChangePosition(aViewPoint: TViewPoint);
+procedure TRotationForm.SetViewPoint(const Value: TViewPoint);
 begin
-  ViewPoint := aViewPoint;
-  case ViewPoint of
+  FViewPoint := Value;
+  case FViewPoint of
     vpSeite: RotaData := RotaData1;
     vpAchtern: RotaData := RotaData2;
     vpTop: RotaData := RotaData3;
     vp3D: RotaData := RotaData4;
   end;
-  FocusEdit.Text := IntToStr(Ord(ViewPoint)+1);
+  FocusEdit.Text := IntToStr(Ord(FViewPoint)+1);
 
   FXpos := RotaData.Xpos;
   FYpos := RotaData.Ypos;
@@ -1135,7 +1138,7 @@ end;
 
 procedure TRotationForm.PositionSaveItemClick(Sender: TObject);
 begin
-  case ViewPoint of
+  case FViewPoint of
     vpSeite: RotaData := RotaData1;
     vpAchtern: RotaData := RotaData2;
     vpTop: RotaData := RotaData3;
@@ -1156,7 +1159,7 @@ begin
     IncrementT := FIncrementT;
     IncrementW := FIncrementW;
   end;
-  case ViewPoint of
+  case FViewPoint of
     vpSeite: RotaData1 := RotaData;
     vpAchtern: RotaData2 := RotaData;
     vpTop: RotaData3 := RotaData;
@@ -1167,7 +1170,7 @@ end;
 procedure TRotationForm.PositionResetItemClick(Sender: TObject);
 begin
   InitRotaData;
-  ChangePosition(ViewPoint);
+  SetViewPoint(FViewPoint);
 end;
 
 procedure TRotationForm.Pos1BtnClick(Sender: TObject);
@@ -1180,7 +1183,7 @@ begin
   else if Sender = Pos4Btn then temp := vp3D
   else temp := vp3D;
 
-  ChangePosition(temp);
+  SetViewPoint(temp);
 end;
 
 procedure TRotationForm.ChangeResolution;
@@ -1215,7 +1218,7 @@ begin
     Height := Bitmap.Height;
   end;
 
-  ChangePosition(ViewPoint);
+  SetViewPoint(FViewPoint);
 end;
 
 procedure TRotationForm.KeepInsideItemClick(Sender: TObject);
@@ -1283,10 +1286,10 @@ begin
   for I := 0 to Panel.ControlCount-1 do
     if Panel.Controls[I].Tag = Tag then
     begin
-      Result := Panel.Controls[I] as TControl;
+      result := Panel.Controls[I] as TControl;
       Exit;
     end;
-  Result := nil;
+  result := nil;
 end;
 
 { Return the number of toolbar buttons on the panel. }

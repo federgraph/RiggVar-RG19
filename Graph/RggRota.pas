@@ -34,7 +34,6 @@ type
     procedure PaintBox3DPaint(Sender: TObject);
     procedure ZoomInBtnClick(Sender: TObject);
     procedure ZoomOutBtnClick(Sender: TObject);
-    procedure FixPunktComboChange(Sender: TObject);
     procedure RumpfBtnClick(Sender: TObject);
     procedure PaintBtnClick(Sender: TObject);
     procedure KeepInsideItemClick(Sender: TObject);
@@ -51,7 +50,7 @@ type
     MetaFile: TRiggMetaFile;
     MetaCanvas: TMetaFileCanvas;
 
-    ViewPoint: TViewPoint;
+    FViewPoint: TViewPoint;
     FZoomBase: double;
     FZoom: double;
 
@@ -86,10 +85,12 @@ type
     SHeadingPhi: String;
     SPitchTheta: String;
     SBankGamma: String;
-    function ComboFixName: TRiggPoints;
+    FFixPoint: TRiggPoints;
     procedure ChangeResolution;
     procedure UpdateMinMax;
     procedure DoTrans;
+    procedure SetViewPoint(const Value: TViewPoint);
+    procedure SetFixPoint(const Value: TRiggPoints);
   protected
     Bitmap: TBitmap;
     EraseBK: Boolean;
@@ -105,7 +106,6 @@ type
     procedure DrawToBitmap2;
     procedure InitRotaData;
     procedure PaintBackGround(Image: TBitmap);
-    procedure ChangePosition(aViewPoint: TViewPoint);
   public
     Rigg: TRigg;
     Rotator: TPolarKar2;
@@ -128,17 +128,14 @@ type
     MatrixItemChecked: Boolean;
     KeepInsideItemChecked: Boolean;
     RumpfItemChecked: Boolean;
-    FixPunktComboText: string;
-    PreviewItemChecked: Boolean;
   public
     PaintBox3D: TPaintBox;
     constructor Create;
     destructor Destroy; override;
     procedure Init;
+    property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
+    property FixPoint: TRiggPoints read FFixPoint write SetFixPoint;
   end;
-
-var
-  RotaForm: TRotaForm;
 
 implementation
 
@@ -211,7 +208,8 @@ begin
   end;
 
   FZoomBase := 0.05;
-  ViewPoint := vpTop;
+  FViewPoint := vp3D;
+  FFixPoint := ooD0;
 
   { PaintBox austauschen }
   NewPaintBox := TRggPaintBox.Create(PaintBox3D.Owner);
@@ -234,7 +232,7 @@ begin
   InitHullGraph;
   InitRigg;
 
-  ChangePosition(ViewPoint);
+  SetViewPoint(FViewPoint);
 end;
 
 procedure TRotaForm.InitGraph;
@@ -250,7 +248,7 @@ begin
   RaumGrafik.Rotator := Rotator;
   RaumGrafik.Offset := Point(1000,1000);
   RaumGrafik.Zoom := FZoom;
-  Raumgrafik.FixName := ComboFixName;
+  Raumgrafik.FixName := FixPoint;
   if RaumGrafik is TGetriebeGraph then
     TGetriebeGraph(RaumGrafik).Ansicht := vp3D;
 end;
@@ -266,8 +264,6 @@ end;
 procedure TRotaForm.InitRigg;
 begin
   Rigg := RiggModul.Rigg;
-//  Rigg := TRigg.Create;
-//  Rigg.ControllerTyp := ctOhne;
 
   RaumGrafik.Salingtyp := Rigg.Salingtyp;
   RaumGrafik.ControllerTyp := Rigg.ControllerTyp;
@@ -323,10 +319,10 @@ begin
   end;
   with RotaData3 do
   begin
-    Xpos := -130;
-    Ypos := -80;
-    Matrix := GetMatrix(90,-87);
-    ZoomIndex := 8;
+    Xpos := -170;
+    Ypos := -120;
+    Matrix := GetMatrix(-90,90);
+    ZoomIndex := 5;
     FixPunktIndex := 7;
     IncrementIndex := 3;
     IncrementT := 10;
@@ -334,10 +330,10 @@ begin
   end;
   with RotaData4 do
   begin
-    Xpos := -170;
-    Ypos := -120;
-    Matrix := GetMatrix(-90,90);
-    ZoomIndex := 5;
+    Xpos := -130;
+    Ypos := -80;
+    Matrix := GetMatrix(90,-87);
+    ZoomIndex := 8;
     FixPunktIndex := 7;
     IncrementIndex := 3;
     IncrementT := 10;
@@ -541,33 +537,12 @@ begin
   end;
 end;
 
-procedure TRotaForm.FixPunktComboChange(Sender: TObject);
+procedure TRotaForm.SetFixPoint(const Value: TRiggPoints);
 begin
-  Raumgrafik.FixName := ComboFixName;
+  FFixPoint := Value;
+  Raumgrafik.FixName := FixPoint;
   HullGraph.FixPunkt := RaumGrafik.FixPunkt;
   Draw;
-end;
-
-function TRotaForm.ComboFixName: TRiggPoints;
-var
-  NewFixName: TRiggPoints;
-  S: string;
-begin
-  NewFixName := ooD0;
-  S := FixPunktComboText;
-  if S = 'A0' then NewFixName := ooA0
-  else if S = 'B0' then NewFixName := ooB0
-  else if S = 'C0' then NewFixName := ooC0
-  else if S = 'D0' then NewFixName := ooD0
-  else if S = 'E0' then NewFixName := ooE0
-  else if S = 'F0' then NewFixName := ooF0
-  else if S = 'A' then NewFixName := ooA
-  else if S = 'B' then NewFixName := ooB
-  else if S = 'C' then NewFixName := ooC
-  else if S = 'D' then NewFixName := ooD
-  else if S = 'E' then NewFixName := ooE
-  else if S = 'F' then NewFixName := ooF;
-  Result := NewFixName;
 end;
 
 procedure TRotaForm.RumpfBtnClick(Sender: TObject);
@@ -585,10 +560,10 @@ begin
   Draw;
 end;
 
-procedure TRotaForm.ChangePosition(aViewPoint: TViewPoint);
+procedure TRotaForm.SetViewPoint(const Value: TViewPoint);
 begin
-  ViewPoint := aViewPoint;
-  case ViewPoint of
+  FViewPoint := Value;
+  case FViewPoint of
     vpSeite: RotaData := RotaData1;
     vpAchtern: RotaData := RotaData2;
     vpTop: RotaData := RotaData3;
@@ -610,8 +585,7 @@ begin
   RaumGrafik.Zoom := FZoom;
   HullGraph.Zoom := FZoom;
   { Fixpunkt }
-//  FixPunktCombo.ItemIndex := RotaData.FixpunktIndex;
-  RaumGrafik.FixName := ComboFixName;
+  RaumGrafik.FixName := FixPoint;
   RaumGrafik.Update; // Rotate;
   HullGraph.FixPunkt := Raumgrafik.FixPunkt;
   { Neuzeichnen }
@@ -620,7 +594,7 @@ end;
 
 procedure TRotaForm.PositionSaveItemClick(Sender: TObject);
 begin
-  case ViewPoint of
+  case FViewPoint of
     vpSeite: RotaData := RotaData1;
     vpAchtern: RotaData := RotaData2;
     vpTop: RotaData := RotaData3;
@@ -636,7 +610,7 @@ begin
     IncrementT := FIncrementT;
     IncrementW := FIncrementW;
   end;
-  case ViewPoint of
+  case FViewPoint of
     vpSeite: RotaData1 := RotaData;
     vpAchtern: RotaData2 := RotaData;
     vpTop: RotaData3 := RotaData;
@@ -647,7 +621,7 @@ end;
 procedure TRotaForm.PositionResetItemClick(Sender: TObject);
 begin
   InitRotaData;
-  ChangePosition(ViewPoint);
+  SetViewPoint(FViewPoint);
 end;
 
 procedure TRotaForm.ChangeResolution;
@@ -680,7 +654,7 @@ begin
     Height := Bitmap.Height;
   end;
 
-  ChangePosition(ViewPoint);
+  SetViewPoint(FViewPoint);
 end;
 
 procedure TRotaForm.KeepInsideItemClick(Sender: TObject);
@@ -774,7 +748,6 @@ end;
 procedure TRotaForm.SetAngleText;
 begin
 end;
-
 procedure TRotaForm.ModusItemClick(Sender: TObject);
 begin
   Mode := not Mode;
