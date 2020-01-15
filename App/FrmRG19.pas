@@ -340,8 +340,13 @@ end;
 
 procedure TFormRG19.FormCreate(Sender: TObject);
 begin
+{$ifdef Debug}
+   ReportMemoryLeaksOnShutdown := True;
+{$endif}
+
   FormRG19 := Self;
 
+  Margin := 5;
   FormCreate1;
   FormCreate2;
 end;
@@ -1334,8 +1339,6 @@ procedure TFormRG19.FormCreate2;
 begin
   TL := TrimmMemo.Lines;
   ML := ReportMemo.Lines;
-
-  Margin := 5;
 
   InitSpeedPanel;
   InitSpeedButtons;

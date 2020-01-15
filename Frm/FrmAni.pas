@@ -39,13 +39,9 @@ type
     procedure AnimateBtnClick(Sender: TObject);
     procedure IntervalEditChange(Sender: TObject);
     procedure FormHide(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
   private
-    { Private declarations }
-  public
-    { Public declarations }
   end;
 
 var
@@ -63,7 +59,8 @@ uses
 
 procedure TAnimationForm.FormCreate(Sender: TObject);
 begin
-  with tbWinkel, AniRotationForm do begin
+  with tbWinkel, AniRotationForm do
+  begin
     Max := ParamMax[fpWinkel];
     tbWinkel.Position := ParamPos[fpWinkel];
     Min := ParamMin[fpWinkel];
@@ -73,26 +70,30 @@ begin
     PageSize := 20;
     Frequency := 20;
   end;
-  with UpdownSelStart do begin
+  with UpdownSelStart do
+  begin
     Max := tbWinkel.Position - 20;
     SelStartEdit.Text := IntToStr(tbWinkel.SelStart);
     Min := tbWinkel.Min;
     Increment := 10;
   end;
-  with UpdownSelEnd do begin
+  with UpdownSelEnd do
+  begin
     Max := tbWinkel.Max;
     SelEndEdit.Text := IntToStr(tbWinkel.SelEnd);
     Min := tbWinkel.Position + 20;
     Increment := 10;
   end;
-  with UpdownInterval do begin
+  with UpdownInterval do
+  begin
     Max := 2000;
     Position := 200;
     Min := 10;
     Increment := 100;
     IntervalEdit.Text := IntToStr(200);
   end;
-  with UpdownStepCount do begin
+  with UpdownStepCount do
+  begin
     Max := AniStepCountMax;
     Position := 10;
     Min := 1;
@@ -103,7 +104,8 @@ end;
 
 procedure TAnimationForm.tbWinkelChange(Sender: TObject);
 begin
-  if AnimateBtn.Down then Exit;
+  if AnimateBtn.Down then
+    Exit;
   if Sender = tbWinkel then
     AniRotationForm.ParamProp[fpWinkel] := tbWinkel.Position;
 end;
@@ -142,8 +144,10 @@ procedure TAnimationForm.FormKeyDown(Sender: TObject; var Key: Word;
 begin
   if Key = VK_ESCAPE then Hide;
   if (ssCtrl in Shift) and (Key = VK_TAB) then
-   if CommandForm.Visible then CommandForm.SetFocus
-   else if AniRotationForm.Visible then AniRotationForm.SetFocus;
+   if CommandForm.Visible then
+    CommandForm.SetFocus
+   else if AniRotationForm.Visible then
+    AniRotationForm.SetFocus;
 end;
 
 procedure TAnimationForm.FormShow(Sender: TObject);

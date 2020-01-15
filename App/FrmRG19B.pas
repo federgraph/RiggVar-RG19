@@ -277,6 +277,7 @@ type
     procedure InitEventHandlers;
     procedure InitOutputForm;
     procedure SetReportLabelCaption(const Value: string);
+    procedure LayoutComponents;
   protected
     function AddSpeedBtn(N: string; AGroupSpace: Integer = 0): TSpeedButton;
     function RefSpeedBtn(B: TSpeedButton; AGroupSpace: Integer = 0): TSpeedButton;
@@ -340,6 +341,10 @@ end;
 
 procedure TFormRG19B.FormCreate(Sender: TObject);
 begin
+{$ifdef Debug}
+   ReportMemoryLeaksOnShutdown := True;
+{$endif}
+
   FormRG19B := Self;
 
   FormCreate1;
@@ -1340,44 +1345,7 @@ begin
   InitSpeedButtons;
   InitStatusBar;
 
-  TrimmMemo.Left := Margin;
-  TrimmMemo.Top := SpeedPanel.Height + Margin;
-  TrimmMemo.Height := 185;
-  TrimmMemo.Width := 170;
-
-  TrimmCombo.Left := TrimmMemo.Left;
-  ParamCombo.Left := TrimmMemo.Left;
-  ViewpointCombo.Left := TrimmMemo.Left;
-
-  TrimmCombo.Width := TrimmMemo.Width;
-  ParamCombo.Width := TrimmCombo.Width;
-  ViewpointCombo.Width := TrimmCombo.Width;
-
-  ComboHeight := TrimmCombo.Height + 2 * Margin;
-  TrimmCombo.Top := TrimmMemo.Top + TrimmMemo.Height + Margin;
-  ParamCombo.Top := TrimmCombo.Top + ComboHeight;
-  ViewpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
-
-  Listbox.Left := TrimmMemo.Left;
-  Listbox.Top := ViewpointCombo.Top + ComboHeight + Margin;
-  Listbox.Width := TrimmMemo.Width;
-  Listbox.Height := StatusBar.Top - Listbox.top - Margin;
-  Listbox.Anchors := Listbox.Anchors + [akBottom];
-
-  ConsoleWidth := 770 + 1 * Margin;
-  ConsoleHeight := 457;
-
-  ReportMemo.Left := Listbox.Left + Listbox.Width + Margin;
-  ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + ConsoleHeight + 2 * Margin;
-  ReportMemo.Height := StatusBar.Top - ReportMemo.Top - Margin;
-  ReportMemo.Width := ConsoleWidth;
-  ReportMemo.Anchors := ReportMemo.Anchors + [akBottom];
-
-  PaintboxR.Left := ReportMemo.Left + ReportMemo.Width + Margin;
-  PaintboxR.Top := SpeedPanel.Top + SpeedPanel.Height + Margin;
-  PaintboxR.Width := ClientWidth - PaintboxR.Left - Margin;
-  PaintboxR.Height := StatusBar.Top - PaintboxR.Top - Margin;
-  PaintboxR.Anchors := PaintboxR.Anchors + [akRight, akBottom];
+  LayoutComponents;
 
   SetupComboBox(TrimmCombo);
   SetupComboBox(ParamCombo);
@@ -1408,6 +1376,48 @@ begin
   InitEventHandlers;
   InitMenu;
   InitOutputForm;
+end;
+
+procedure TFormRG19B.LayoutComponents;
+begin
+  TrimmMemo.Left := Margin;
+  TrimmMemo.Top := SpeedPanel.Height + Margin;
+  TrimmMemo.Height := 185;
+  TrimmMemo.Width := 170;
+
+  TrimmCombo.Left := TrimmMemo.Left;
+  ParamCombo.Left := TrimmCombo.Left;
+  ViewpointCombo.Left := TrimmCombo.Left;
+
+  TrimmCombo.Width := TrimmMemo.Width;
+  ParamCombo.Width := TrimmCombo.Width;
+  ViewpointCombo.Width := TrimmCombo.Width;
+
+  ComboHeight := TrimmCombo.Height + 2 * Margin;
+  TrimmCombo.Top := TrimmMemo.Top + TrimmMemo.Height + Margin;
+  ParamCombo.Top := TrimmCombo.Top + ComboHeight;
+  ViewpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
+
+  Listbox.Left := TrimmMemo.Left;
+  Listbox.Top := ViewpointCombo.Top + ComboHeight + Margin;
+  Listbox.Width := TrimmMemo.Width;
+  Listbox.Height := StatusBar.Top - Listbox.top - Margin;
+  Listbox.Anchors := Listbox.Anchors + [akBottom];
+
+  ConsoleWidth := 770 + 1 * Margin;
+  ConsoleHeight := 457;
+
+  ReportMemo.Left := Listbox.Left + Listbox.Width + Margin;
+  ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + ConsoleHeight + 2 * Margin;
+  ReportMemo.Height := StatusBar.Top - ReportMemo.Top - Margin;
+  ReportMemo.Width := ConsoleWidth;
+  ReportMemo.Anchors := ReportMemo.Anchors + [akBottom];
+
+  PaintboxR.Left := ReportMemo.Left + ReportMemo.Width + Margin;
+  PaintboxR.Top := SpeedPanel.Top + SpeedPanel.Height + Margin;
+  PaintboxR.Width := ClientWidth - PaintboxR.Left - Margin;
+  PaintboxR.Height := StatusBar.Top - PaintboxR.Top - Margin;
+  PaintboxR.Anchors := PaintboxR.Anchors + [akRight, akBottom];
 end;
 
 procedure TFormRG19B.InitEventHandlers;
@@ -1950,19 +1960,16 @@ begin
   mi.Caption := '3D Grafik ...';
   mi.Hint := '  Rigg r'#228'umlich darstellen';
   mi.OnClick := RotaFormItemClick;
-//  mi.Visible := False;
 
   ChartFormItem := AddI('ChartFormItem');
   mi.Caption := 'Diagramm ...';
   mi.Hint := '  Diagramm aktivieren';
   mi.OnClick := ChartFormItemClick;
-//  mi.Visible := False;
 
   ReportFormItem := AddI('ReportFormItem');
   mi.Caption := 'Report ...';
   mi.Hint := '  Report erstellen';
   mi.OnClick := ReportFormItemClick;
-//  mi.Visible := False;
 
   N1 := AddI('N1');
   mi.Caption := '-';

@@ -182,8 +182,9 @@ begin
   end;
 end;
 
-procedure TAniRotationForm.UpdateGraph; {overwritten virtual}
+procedure TAniRotationForm.UpdateGraph;
 begin
+{ overwritten virtual }
   Rigg.UpdateGetriebe;
   RaumGrafik.Koordinaten := Rigg.rP;
   RaumGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
@@ -350,7 +351,8 @@ end;
 
 procedure TAniRotationForm.SetParameter(Value: TsbName);
 begin
-  //if Value <> FsbName then begin
+  //if Value <> FsbName then
+  //begin
     FsbName := Value;
     SetupTrackBar;
   //end;
@@ -587,16 +589,21 @@ begin
 end;
 
 procedure TAniRotationForm.UpdateAll(Rgg: TRigg);
+var
+  hasChanged: Boolean;
 begin
-  { Local Rigg nur dann automatisch nachführen, wenn RightPanel sichtbar ist
-    und der Typ verändert wurde. Nicht nachführen, wenn nur die Werte verändert
-    wurden! Der TrackBar und die Labels werden daher ungültig. Die Grafik kann
-    wegspringen, wenn der Trackbar verändert wird. }
-  if RightPanel.Visible and
-     ((Rigg.SalingTyp <> Rgg.SalingTyp) or
-      (Rigg.ControllerTyp <> Rgg.ControllerTyp) or
-      (Rigg.ManipulatorMode <> Rgg.ManipulatorMode) or
-       Modified) then
+  { Local Rigg nur dann automatisch nachführen,
+    wenn RightPanel sichtbar ist und der Typ verändert wurde.
+    Nicht nachführen, wenn nur die Werte verändert wurden!
+    Der TrackBar und die Labels werden daher ungültig.
+    Die Grafik kann wegspringen, wenn der Trackbar verändert wird. }
+
+  hasChanged := Modified or
+    (Rigg.SalingTyp <> Rgg.SalingTyp) or
+    (Rigg.ControllerTyp <> Rgg.ControllerTyp) or
+    (Rigg.ManipulatorMode <> Rgg.ManipulatorMode);
+
+  if RightPanel.Visible and hasChanged then
   begin
     UpdateLocalRigg;
     GetListBoxItems;

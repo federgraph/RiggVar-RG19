@@ -37,7 +37,6 @@ type
     procedure FixPunktComboChange(Sender: TObject);
     procedure RumpfBtnClick(Sender: TObject);
     procedure PaintBtnClick(Sender: TObject);
-    procedure NullBtnClick(Sender: TObject);
     procedure KeepInsideItemClick(Sender: TObject);
     procedure PaintBox3DMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure PaintBox3DMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -118,12 +117,12 @@ type
     SampleDinghyMemo: TStrings;
     SampleYachtMemo: TStrings;
     SamplePlaningMemo: TStrings;
-    procedure Draw; virtual;
-    procedure InitGraph; virtual;
-    procedure InitRaumGrafik; virtual;
-    procedure InitHullGraph; virtual;
-    procedure InitRigg; virtual;
-    procedure UpdateGraph; virtual;
+    procedure Draw;
+    procedure InitGraph;
+    procedure InitRaumGrafik;
+    procedure InitHullGraph;
+    procedure InitRigg;
+    procedure UpdateGraph;
   public
     PaintItemChecked: Boolean;
     MatrixItemChecked: Boolean;
@@ -136,11 +135,6 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Init;
-   public
-    Modified: Boolean;
-    procedure UpdateAll(Rgg: TRigg);
-//    procedure UpdateGlobalRigg;
-    procedure UpdateLocalRigg;
   end;
 
 var
@@ -245,7 +239,6 @@ end;
 
 procedure TRotaForm.InitGraph;
 begin
-  { virtual }
   Rotator := TPolarKar2.Create;
   Rotator.OnCalcAngle := Rotator.GetAngle2;
   InitRotaData;
@@ -253,7 +246,6 @@ end;
 
 procedure TRotaForm.InitRaumGrafik;
 begin
-  { virtual }
   RaumGrafik := TGetriebeGraph.Create;
   RaumGrafik.Rotator := Rotator;
   RaumGrafik.Offset := Point(1000,1000);
@@ -265,7 +257,6 @@ end;
 
 procedure TRotaForm.InitHullGraph;
 begin
-  { virtual }
   HullGraph := THullGraph.Create;
   HullGraph.Rotator := Rotator;
   HullGraph.Zoom := FZoom;
@@ -274,9 +265,9 @@ end;
 
 procedure TRotaForm.InitRigg;
 begin
-  { virtual }
-  Rigg := TRigg.Create;
-  Rigg.ControllerTyp := ctOhne;
+  Rigg := RiggModul.Rigg;
+//  Rigg := TRigg.Create;
+//  Rigg.ControllerTyp := ctOhne;
 
   RaumGrafik.Salingtyp := Rigg.Salingtyp;
   RaumGrafik.ControllerTyp := Rigg.ControllerTyp;
@@ -288,7 +279,6 @@ end;
 
 procedure TRotaForm.UpdateGraph;
 begin
- { virtual }
   RaumGrafik.Salingtyp := Rigg.Salingtyp;
   RaumGrafik.ControllerTyp := Rigg.ControllerTyp;
   RaumGrafik.Koordinaten := Rigg.rP;
@@ -839,65 +829,6 @@ begin
         P := Point(0,0);
       Draw(P.x,P.y,BackBmp);
   end;
-end;
-
-procedure TRotaForm.UpdateLocalRigg;
-{$ifdef Rigg19}
-var
-  RggDocument: TRggDocument;
-{$endif}
-begin
-{$ifdef Rigg19}
-  RggDocument := TRggDocument.Create;
-  try
-   RiggModul.Rigg.UpdateGSB;
-   RiggModul.Rigg.GetDocument(RggDocument);
-   Rigg.SetDocument(RggDocument);
-   { ManipulatorMode nicht in RggDocument! }
-   Rigg.ManipulatorMode := RiggModul.Rigg.ManipulatorMode;
-   Modified := False;
-  finally
-    RggDocument.Free;
-  end;
-{$endif}
-end;
-
-//procedure TRotaForm.UpdateGlobalRigg;
-//{$ifdef Rigg19}
-//var
-//  RggDocument: TRggDocument;
-//{$endif}
-//begin
-//{$ifdef Rigg19}
-//  RggDocument := TRggDocument.Create;
-//  try
-//   Rigg.GetDocument(RggDocument);
-//   RiggModul.Neu(RggDocument);
-//   if Rigg.ManipulatorMode <> RiggModul.Rigg.ManipulatorMode then
-//     RiggModul.WinkelBtnDown := not RiggModul.WinkelBtnDown;
-//  finally
-//    RggDocument.Free;
-//  end;
-//{$endif}
-//end;
-
-procedure TRotaForm.UpdateAll(Rgg: TRigg);
-begin
-  { Local Rigg nur dann automatisch nachführen, wenn der Typ verändert wurde. }
-  if ((Rigg.SalingTyp <> Rgg.SalingTyp) or
-      (Rigg.ControllerTyp <> Rgg.ControllerTyp) or
-      (Rigg.ManipulatorMode <> Rgg.ManipulatorMode) or
-       Modified) then
-  begin
-    UpdateLocalRigg;
-  end;
-
-  RaumGrafik.Salingtyp := Rgg.Salingtyp;
-  RaumGrafik.ControllerTyp := Rgg.ControllerTyp;
-  RaumGrafik.Koordinaten := Rgg.rP;
-  RaumGrafik.SetMastKurve(Rgg.MastLinie, Rgg.lc, Rgg.beta);
-  with RaumGrafik as TGetriebeGraph do
-    WanteGestrichelt := not Rgg.GetriebeOK;
 end;
 
 end.

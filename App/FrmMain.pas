@@ -264,6 +264,10 @@ procedure TFormMain.FormCreate(Sender: TObject);
 var
   rggm: TRggMain;
 begin
+{$ifdef Debug}
+   ReportMemoryLeaksOnShutdown := True;
+{$endif}
+
   FormMain := Self;
 
   InputForm := TInputForm.Create(Application);
@@ -274,6 +278,7 @@ begin
   RiggModul.RG19A := True;
   RiggModul.ViewModelMain := TViewModelMainA.Create;
   RiggModul.Init;
+
   rggm := TRggMain.Create(RiggModul.Rigg);
   RiggModul.PBG := GrafikForm.PaintboxG;
   RiggModul.RG19A := True;
@@ -763,15 +768,6 @@ begin
     InputForm.Hide;
 end;
 
-procedure TFormMain.GrafikFormItemClick(Sender: TObject);
-begin
-  GrafikFormItem.Checked := not GrafikFormItem.Checked;
-  if GrafikFormItem.Checked then
-    GrafikForm.Show
-  else
-    GrafikForm.Hide;
-end;
-
 procedure TFormMain.OutputFormItemClick(Sender: TObject);
 begin
   OutputFormItem.Checked := not OutputFormItem.Checked;
@@ -783,6 +779,15 @@ begin
   end
   else
     OutputForm.Hide;
+end;
+
+procedure TFormMain.GrafikFormItemClick(Sender: TObject);
+begin
+  GrafikFormItem.Checked := not GrafikFormItem.Checked;
+  if GrafikFormItem.Checked then
+    GrafikForm.Show
+  else
+    GrafikForm.Hide;
 end;
 
 procedure TFormMain.ChartFormItemClick(Sender: TObject);

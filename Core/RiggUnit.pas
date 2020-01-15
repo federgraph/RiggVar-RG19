@@ -416,6 +416,7 @@ begin
   BitmapS.Free;
   BitmapC.Free;
 
+  RotaForm.Free;
   ViewModelMain.Free;
 
   RiggModul := nil;
@@ -532,8 +533,6 @@ begin
   UpdateGCtrlLabels(InputRec);
   if RotaFormActive then
     AniRotationForm.Modified := True;
-  if RotaForm <> nil then
-    RotaForm.Modified := True;
 end;
 
 procedure TRiggModul.sbControllerScroll(Sender: TObject;
@@ -691,10 +690,7 @@ begin
 
   if RotaForm <> nil then
   begin
-//    if SofortBerechnen then
-//      Modified := True;
-    RotaForm.UpdateAll(Rigg);
-    RotaForm.Draw;
+    RotaForm.UpdateGraph;
   end;
 
   Getriebegrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
