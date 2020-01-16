@@ -81,6 +81,9 @@ procedure TViewModelMainC.UpdateView;
 begin
   inherited;
 
+  if not IsUp then
+    Exit;
+
   FormRG19.LEDShape.Brush.Color := LEDColor;
   FormRG19.Statusbar.Panels[1].Text := StatusPanelText1;
   FormRG19.Caption := Caption;
@@ -109,8 +112,14 @@ begin
   FormRG19.ControllerBtn.Enabled := ControllerEnabled;
 
   FormRG19.KoppelkurveItem.Checked := KoppelKurveEnabled;
+
   if FormRG19.KoppelBtn <> nil then
+  begin
+    { Condition strictly no longer necessary because of IsUp guard. }
+    { KoppelBtn is created at runtime,
+      and may not be ready when UpdateView is called.}
     FormRG19.KoppelBtn.Down := KoppelKurveEnabled;
+  end;
 
   FormRG19.QuerKraftItem.Checked := QuerKraftItemChecked;
   FormRG19.KnickenItem.Checked := KnickenItemChecked;

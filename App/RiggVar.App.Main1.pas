@@ -151,7 +151,8 @@ begin
   RggMain := rggm; //TRggMain.Create;
 
   RggMain.Init420;
-  RggMain.InitLogo;
+  RggMain.InitLogo; // sets WantLogoData to true
+  WantLogoData := False;
 end;
 
 destructor TMain1.Destroy;

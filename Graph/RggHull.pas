@@ -3,21 +3,13 @@
 interface
 
 uses
-  SysUtils,
-  Windows,
-  Messages,
-  Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  StdCtrls,
-  ExtCtrls,
+  Winapi.Windows,
+  System.SysUtils,
+  System.Classes,
+  Vcl.Graphics,
   RggTypes,
   Vcalc116,
   Rggmat01,
-  Math,
-  Inifiles,
   Vector3D,
   RggGraph,
   BootGraph,
@@ -370,7 +362,7 @@ begin
   begin
     Zeile := Memo[i];
     if Zeile = '' then
-      continue;
+      Continue;
     GetInteger(a);
     GetInteger(b);
     GetInteger(c);

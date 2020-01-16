@@ -181,7 +181,9 @@
         <DCCReference Include="Frm\FrmIndicator.pas">
             <Form>IndicatorForm</Form>
         </DCCReference>
-        <DCCReference Include="Frm\FrmKreis.pas"/>
+        <DCCReference Include="Frm\FrmKreis.pas">
+            <Form>KreisForm</Form>
+        </DCCReference>
         <DCCReference Include="Core\FwUnit.pas"/>
         <DCCReference Include="Core\Iotypes.pas"/>
         <DCCReference Include="Core\Rggdoc.pas"/>

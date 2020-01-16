@@ -8,6 +8,9 @@ uses
 
 type
   TViewModelMain00 = class
+  private
+    FIsUp: Boolean;
+    procedure SetIsUp(const Value: Boolean);
   public
     Caption: string;
     LEDColor: TColor;
@@ -82,6 +85,7 @@ type
 
     function GetOpenFileName(dn, fn: string): string; virtual;
     function GetSaveFileName(dn, fn: string): string; virtual;
+    property IsUp: Boolean read FIsUp write SetIsUp;
   end;
 
 implementation
@@ -226,6 +230,13 @@ begin
     vpTop: VonObenItemChecked := True;
     vp3D: Von3DItemChecked := True;
   end;
+end;
+
+procedure TViewModelMain00.SetIsUp(const Value: Boolean);
+begin
+  FIsUp := Value;
+  if Value then
+    UpdateView;
 end;
 
 procedure TViewModelMain00.ShowConsole;

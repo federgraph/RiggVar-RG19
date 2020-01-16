@@ -321,6 +321,9 @@ type
     procedure AchternBtnClick(Sender: TObject);
     procedure TopBtnClick(Sender: TObject);
     procedure NullBtnClick(Sender: TObject);
+  public
+    InfoItem: TMenuItem;
+    procedure InfoItemClick(Sender: TObject);
   end;
 
 var
@@ -339,6 +342,7 @@ uses
   FrmInfo,
   FrmConsole,
   FrmInput,
+  FrmKreis,
   FrmOutput,
   FrmGrafic,
   FrmText,
@@ -368,6 +372,8 @@ begin
   Margin := 5;
   FormCreate1;
   FormCreate2;
+  Main.IsUp := True;
+  RiggModul.ViewModelMain.IsUp := True;
 end;
 
 procedure TFormRG19.FormCreate1;
@@ -401,8 +407,6 @@ begin
   Caption := 'Rigg';
   StatusBar.Panels[0].Text := '';
   Application.OnHint := ShowHint;
-
-  Main.IsUp := True;
 
   {
     ControllerItem.Checked := True;
@@ -827,6 +831,14 @@ begin
 end;
 
 procedure TFormRG19.AboutItemClick(Sender: TObject);
+begin
+  if KreisForm = nil then
+    KreisForm := TKreisForm.Create(Application);
+
+  KreisForm.ShowModal;
+end;
+
+procedure TFormRG19.InfoItemClick(Sender: TObject);
 begin
   FrmInfo.ShowInfo;
 end;
@@ -2437,14 +2449,20 @@ begin
   mi.Hint := '  Hilfesystem starten';
   mi.Enabled := False;
 
-  AboutItem := AddI('AboutItem');
+  InfoItem := AddI('InfoItem');
   mi.Caption := '&Info...';
   mi.Hint := '  Infofenster anzeigen';
-  mi.OnClick := AboutItemClick;
+  mi.OnClick := InfoItemClick;
 
   LogoItem := AddI('LogoItem');
   mi.Caption := 'Logo';
+  mi.Hint := '  Toggle between Logo and 420 (Reset)';
   mi.OnClick := LogoItemClick;
+
+  AboutItem := AddI('DreItem');
+  mi.Caption := 'About';
+  mi.Hint := '  KreisForm.ShowModal';
+  mi.OnClick := AboutItemClick;
 end;
 
 procedure TFormRG19.SeiteBtnClick(Sender: TObject);

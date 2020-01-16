@@ -14,7 +14,9 @@ object KreisForm: TKreisForm
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnHide = FormHide
   OnKeyPress = FormKeyPress
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 16
   object ImagePanel: TPanel
@@ -67,9 +69,9 @@ object KreisForm: TKreisForm
     object lbVersionText: TLabel
       Left = 248
       Top = 136
-      Width = 96
+      Width = 103
       Height = 23
-      Caption = 'Version 1.0'
+      Caption = 'Version X.Y'
     end
     object ControlPanel: TPanel
       Left = 2
@@ -79,7 +81,7 @@ object KreisForm: TKreisForm
       Align = alBottom
       Alignment = taLeftJustify
       BevelOuter = bvNone
-      Caption = '   (c) RiggVar  Software UG 1996 - 2011'
+      Caption = 'ControlPanel.Caption'
       Color = clBlack
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clTeal

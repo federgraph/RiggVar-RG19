@@ -48,8 +48,8 @@ begin
   ML.Add('application name: ' + ApplicationName);
   ML.Add('file version: ' + FileVersion);
   ML.Add('');
-  ML.Add('(c) federgraphd.de, 2010');
-  ML.Add('www.riggvar.de');
+  ML.Add('(c) Gustav Schubert, 1996 - 2020');
+  ML.Add('federgraph.de');
 end;
 
 function TInfoMemo.GetFileVersion: string;

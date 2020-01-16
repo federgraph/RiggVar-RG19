@@ -979,7 +979,8 @@ begin
     List := TStringList.Create;
     try
       RaumGrafik.GetPlotList(List);
-      if FPaintRumpf then HullGraph.GetPlotList(List);
+      if FPaintRumpf then
+        HullGraph.GetPlotList(List);
       List.SaveToFile(SaveDialog.FileName);
     finally
       List.Free;

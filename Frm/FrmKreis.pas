@@ -46,6 +46,8 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure ShapeKreiseMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure FormHide(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     SchnittKK: TSchnittKK;
     Sprite1, Sprite2: TSprite;
@@ -132,6 +134,11 @@ end;
 
 procedure TKreisForm.FormCreate(Sender: TObject);
 begin
+  Caption := 'RiggVar About Form';
+  ControlPanel.Font.Name := 'Courier New';
+  ControlPanel.Caption := ' (c) federgraph.de';
+  lbVersionText.Caption := 'RG19';
+
   ImagePanel.FullRepaint := False;
   ControlPanel.FullRepaint := False;
 
@@ -182,6 +189,11 @@ begin
   Sprite1.Free;
   Sprite2.Free;
   TheImage.Free;
+end;
+
+procedure TKreisForm.FormHide(Sender: TObject);
+begin
+  Timer.Enabled := False;
 end;
 
 procedure TKreisForm.MoveSprite;
@@ -342,6 +354,11 @@ end;
 procedure TKreisForm.FormKeyPress(Sender: TObject; var Key: Char);
 begin
   Timer.enabled := not Timer.enabled;
+end;
+
+procedure TKreisForm.FormShow(Sender: TObject);
+begin
+  Timer.Enabled := True;
 end;
 
 procedure TKreisForm.ShapeOKMouseDown(Sender: TObject; Button: TMouseButton;

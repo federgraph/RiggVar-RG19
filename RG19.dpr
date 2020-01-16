@@ -29,7 +29,7 @@ uses
   FrmAdjust in 'Frm\FrmAdjust.pas' {AdjustForm},
   FrmScale in 'Frm\FrmScale.pas' {RumpfFaktorDlg},
   FrmIndicator in 'Frm\FrmIndicator.pas' {IndicatorForm},
-  FrmKreis in 'Frm\FrmKreis.pas',
+  FrmKreis in 'Frm\FrmKreis.pas' {KreisForm},
   FwUnit in 'Core\FwUnit.pas',
   Iotypes in 'Core\Iotypes.pas',
   Rggdoc in 'Core\Rggdoc.pas',
