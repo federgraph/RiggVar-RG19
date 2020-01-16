@@ -1336,9 +1336,9 @@ begin
     Add('Mast:');
     with RiggModul.Rigg do
     begin
-      Add(Format('  D0D: %d mm (Saling)',[MastUnten]));
-      Add(Format('  D0C: %d mm (Vorstag)',[MastUnten+MastOben]));
-      Add(Format('  D0F: %d mm (Top)',[MastLaenge]));
+      Add(Format('  D0D: %d mm (Saling)',[Round(MastUnten)]));
+      Add(Format('  D0C: %d mm (Vorstag)',[Round(MastUnten + MastOben)]));
+      Add(Format('  D0F: %d mm (Top)',[Round(MastLaenge)]));
       Add(Format('  Biegesteifigkeit EI: %d Nm^2',[MastEI]));
     end;
   end;

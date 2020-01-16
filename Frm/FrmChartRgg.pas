@@ -48,6 +48,8 @@ uses
 
 procedure TChartFormGS.FormCreate(Sender: TObject);
 begin
+  WantRectangles := True;
+
   inherited;
 
   ClientWidth := 800;
@@ -368,7 +370,7 @@ begin
 
   RectangleItem := AddI('RectangleItem');
   mi.Caption := 'Rechtecke';
-  mi.Checked := True;
+  mi.Checked := WantRectangles;
   mi.GroupIndex := 3;
   mi.Hint := '  Rechtecke anzeigen';
   mi.OnClick := RectangleItemClick;
