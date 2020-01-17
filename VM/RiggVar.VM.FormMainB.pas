@@ -81,6 +81,9 @@ procedure TViewModelMainB.UpdateView;
 begin
   inherited;
 
+  if not IsUp then
+    Exit;
+
   FormRG19B.LEDShape.Brush.Color := LEDColor;
   FormRG19B.Statusbar.Panels[1].Text := StatusPanelText1;
   FormRG19B.Caption := Caption;

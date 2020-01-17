@@ -51,7 +51,6 @@ type
     PaintBoxR: TPaintBox;
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
-
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -136,12 +135,12 @@ type
     procedure AllTagsBtnClick(Sender: TObject);
 
     procedure MT0BtnClick(Sender: TObject);
-    procedure CopyAndPasteBtnClick(Sender: TObject);
-//    procedure CopyTrimmFileBtnClick(Sender: TObject);
-    procedure CopyTrimmItemBtnClick(Sender: TObject);
-    procedure PasteTrimmItemBtnClick(Sender: TObject);
     procedure ReadTrimmFileBtnClick(Sender: TObject);
     procedure SaveTrimmFileBtnClick(Sender: TObject);
+    procedure CopyTrimmFileBtnClick(Sender: TObject);
+    procedure CopyTrimmItemBtnClick(Sender: TObject);
+    procedure PasteTrimmItemBtnClick(Sender: TObject);
+    procedure CopyAndPasteBtnClick(Sender: TObject);
 
     procedure ListBoxClick(Sender: TObject);
 
@@ -248,10 +247,11 @@ type
     P10Btn: TSpeedButton;
 
     MT0Btn: TSpeedButton;
-    PasteTrimmItemBtn: TSpeedButton;
     ReadTrimmFileBtn: TSpeedButton;
     SaveTrimmFileBtn: TSpeedButton;
+    CopyTrimmFileBtn: TSpeedButton;
     CopyTrimmItemBtn: TSpeedButton;
+    PasteTrimmItemBtn: TSpeedButton;
     CopyAndPasteBtn: TSpeedButton;
 
     SandboxedBtn: TSpeedButton;
@@ -402,10 +402,10 @@ begin
   RiggModul.RG19A := False;
   RiggModul.ViewModelMain := TViewModelMainC.Create;
   RiggModul.Init;
-  RiggModul.BackgroundColor := TColors.Wheat;
+  RiggModul.BackgroundColor := TColors.Wheat; // call after RiggModul.Init
+  RiggModul.PBG := GrafikForm.PaintBoxG;
 
   rggm := TRggMain.Create(RiggModul.Rigg);
-  RiggModul.PBG := GrafikForm.PaintBoxG;
 
   Main := TMain.Create(rggm);
   Main.Logger.Verbose := True;
@@ -1227,6 +1227,13 @@ begin
   sb.GroupIndex := 10;
   sb.OnClick := SaveTrimmFileBtnClick;
 
+  sb := AddSpeedBtn('CopyTrimmFileBtn', 0);
+  CopyTrimmFileBtn := sb;
+  sb.Caption := 'ctf';
+  sb.Hint := 'Copy Trimm File';
+  sb.GroupIndex := 10;
+  sb.OnClick := CopyTrimmFileBtnClick;
+
   BtnColor := clBlue;
 
   sb := AddSpeedBtn('CopyTrimmItemBtn', 0);
@@ -1236,14 +1243,14 @@ begin
   sb.GroupIndex := 10;
   sb.OnClick := CopyTrimmItemBtnClick;
 
-  BtnColor := clBlack;
-
   sb := AddSpeedBtn('PasteTrimmItemBtn', 0);
   PasteTrimmItemBtn := sb;
   sb.Caption := 'pti';
   sb.Hint := 'Paste Trimm Item';
   sb.GroupIndex := 10;
   sb.OnClick := PasteTrimmItemBtnClick;
+
+  BtnColor := clBlack;
 
   sb := AddSpeedBtn('CopyAndPasteBtn', 0);
   CopyAndPasteBtn := sb;
@@ -1613,11 +1620,11 @@ begin
   ShowTrimm;
 end;
 
-//procedure TFormRG19.CopyTrimmFileBtnClick(Sender: TObject);
-//begin
-//  Main.CopyTrimmFile;
-//  ShowTrimm;
-//end;
+procedure TFormRG19.CopyTrimmFileBtnClick(Sender: TObject);
+begin
+  Main.CopyTrimmFile;
+  ShowTrimm;
+end;
 
 procedure TFormRG19.ReadTrimmFileBtnClick(Sender: TObject);
 begin
@@ -1944,7 +1951,7 @@ begin
   mi.OnClick := MemoryBtnClick;
 
   MemoryRecallItem := AddI('MemoryRecallItem');
-  mi.Caption := 'Trimm &zur'#252'cksetzen ( MR )';
+  mi.Caption := 'Trimm &zurücksetzen ( MR )';
   mi.Hint := '  Trimm aus dem Zwischenspeicher zurückholen';
   mi.OnClick := MemoryRecallBtnClick;
 
@@ -1993,7 +2000,7 @@ begin
 
   RotaFormItem := AddI('RotaFormItem');
   mi.Caption := '3D Grafik ...';
-  mi.Hint := '  Rigg r'#228'umlich darstellen';
+  mi.Hint := '  Rigg räumlich darstellen';
   mi.OnClick := RotaFormItemClick;
 
   ChartFormItem := AddI('ChartFormItem');
@@ -2051,7 +2058,7 @@ begin
 
   rPItem := AddI('rPItem');
   mi.Caption := 'rP';
-  mi.Hint := '  Koordinaten (Rigg verformt ) anzeigen';
+  mi.Hint := '  Koordinaten (Rigg verformt) anzeigen';
   mi.RadioItem := True;
   mi.ShortCut := 16464;
   mi.OnClick := rLItemClick;
@@ -2108,7 +2115,7 @@ begin
 
   Von3DItem := AddI('Von3DItem');
   mi.Caption := 'Perspektive';
-  mi.Hint := '  Rigg schr'#228'g von oben gesehen darstellen';
+  mi.Hint := '  Rigg schräg von oben gesehen darstellen';
   mi.RadioItem := True;
   mi.OnClick := VonDerSeiteItemClick;
 
@@ -2219,7 +2226,7 @@ begin
   WinkelItem := AddI('WinkelItem');
   mi.Caption := 'Winkel einstellbar ( W )';
   mi.GroupIndex := 1;
-  mi.Hint := ' Wanten-Winkel oder Vorstagl'#228'nge einstellen';
+  mi.Hint := ' Wanten-Winkel oder Vorstaglänge einstellen';
   mi.OnClick := WinkelItemClick;
 
   SofortItem := AddI('SofortItem');
@@ -2320,58 +2327,5 @@ procedure TFormRG19.NullBtnClick(Sender: TObject);
 begin
   RiggModul.RotaForm.ViewPoint := vp3D;
 end;
-
-//procedure TFormRG19.SetControllerEnabled;
-//var
-//  tempBool: Boolean;
-//begin
-//  tempBool := RiggModul.ControllerEnabled;
-//  ControllerItem.Enabled := tempBool;
-//  ControllerBtn.Enabled := tempBool;
-//end;
-
-//procedure TFormRG19.ViewpointComboChange(Sender: TObject);
-//var
-//  ii: Integer;
-//begin
-//  ii := ViewpointCombo.ItemIndex;
-//  case ii of
-//    0: Main.HandleAction(faViewpointS);
-//    1: Main.HandleAction(faViewpointA);
-//    2: Main.HandleAction(faViewpointT);
-//    3: Main.HandleAction(faViewpoint3);
-//  end;
-//end;
-
-//procedure TFormRG19.OhneItemClick(Sender: TObject);
-//begin
-//  RiggModul.OhneItemClick;
-//end;
-//
-//procedure TFormRG19.DrehbarItemClick(Sender: TObject);
-//begin
-//  RiggModul.DrehbarItemClick;
-//end;
-//
-//procedure TFormRG19.FestItemClick(Sender: TObject);
-//begin
-//  RiggModul.FestItemClick;
-//end;
-//
-//procedure TFormRG19.OSDlgItemClick(Sender: TObject);
-//begin
-//  RiggModul.OSDlgItemClick;
-//end;
-
-//procedure TFormRG19.TestBtnClick(Sender: TObject);
-//begin
-//  ReportMemo.Lines.Clear;
-//  Main.RggData.WriteReport(ML);
-//end;
-
-//procedure TFormRG19.PaintBtn2Click(Sender: TObject);
-//begin
-//  Main.RggMain.UpdateGraph;
-//end;
 
 end.
