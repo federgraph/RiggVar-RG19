@@ -14,7 +14,7 @@ uses
   FrmBiege in 'Frm\FrmBiege.pas' {BiegeUndNeigeForm},
   FrmInput in 'Frm\FrmInput.pas' {InputForm},
   FrmOutput in 'Frm\FrmOutput.pas' {OutputForm},
-  FrmGrafic in 'Frm\FrmGrafic.pas' {GrafikForm},
+  FrmGrafik in 'Frm\FrmGrafik.pas' {GrafikForm},
   FrmRot in 'Frm\FrmRot.pas' {RotationForm},
   FrmConsole in 'Frm\FrmConsole.pas' {ConsoleForm},
   FrmChart in 'Frm\FrmChart.pas' {ChartForm},

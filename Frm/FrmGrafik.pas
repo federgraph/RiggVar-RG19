@@ -1,18 +1,14 @@
-﻿unit FrmGrafic;
+﻿unit FrmGrafik;
 
 interface
 
 uses
-  Windows,
-  Messages,
-  SysUtils,
-  Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  ExtCtrls,
-  ComCtrls;
+  Winapi.Windows,
+  System.Classes,
+  Vcl.Forms,
+  Vcl.ExtCtrls,
+  Vcl.ComCtrls,
+  Vcl.Controls;
 
 type
   TGrafikForm = class(TForm)

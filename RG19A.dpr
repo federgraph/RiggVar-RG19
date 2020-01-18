@@ -22,7 +22,7 @@ uses
   Rggmat01 in 'Graph\Rggmat01.pas',
   FrmInput in 'Frm\FrmInput.pas' {InputForm},
   FrmOutput in 'Frm\FrmOutput.pas' {OutputForm},
-  FrmGrafic in 'Frm\FrmGrafic.pas' {GrafikForm},
+  FrmGrafik in 'Frm\FrmGrafik.pas' {GrafikForm},
   RiggUnit in 'Core\RiggUnit.pas',
   FrmRot in 'Frm\FrmRot.pas' {RotationForm},
   FrmConsole in 'Frm\FrmConsole.pas' {ConsoleForm},

@@ -243,7 +243,7 @@ uses
   FrmConsole,
   FrmInput,
   FrmOutput,
-  FrmGrafic,
+  FrmGrafik,
   FrmText,
   FrmReport,
   FrmChart,

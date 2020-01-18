@@ -75,7 +75,6 @@ type
     procedure BiegeNeigeItemClick(Sender: TObject);
 
     { Ansicht Menu }
-    procedure ConsoleItemClick(Sender: TObject);
     procedure InputFormItemClick(Sender: TObject);
     procedure GrafikFormItemClick(Sender: TObject);
     procedure OutputFormItemClick(Sender: TObject);
@@ -85,6 +84,7 @@ type
     procedure ReportFormItemClick(Sender: TObject);
     procedure OptionItemClick(Sender: TObject);
 
+    procedure ConsoleItemClick(Sender: TObject);
     procedure SpeedBarItemClick(Sender: TObject);
     procedure StatusBarItemClick(Sender: TObject);
 
@@ -146,6 +146,7 @@ type
 
     procedure TrimmComboChange(Sender: TObject);
     procedure ParamComboChange(Sender: TObject);
+//    procedure ViewpointComboChange(Sender: TObject);
     procedure FixpointComboChange(Sender: TObject);
   public
     MainMenu: TMainMenu;
@@ -297,7 +298,6 @@ type
     function AddShapeBtn(N: string; AGroupSpace: Integer): TShape;
     function RefShapeBtn(S: TShape; AGroupSpace: Integer): TShape;
   private
-    ComboHeight: Integer;
     procedure InitTrimmCombo;
     procedure InitParamCombo;
     procedure InitViewpointCombo;
@@ -309,12 +309,13 @@ type
     ML: TStrings;
     ReportManager: TRggReportManager;
     FReportLabelCaption: string;
+    WantConsole: Boolean;
 
     procedure FormCreate1;
     procedure FormCreate2;
 
     procedure LayoutComponents;
-
+    procedure InitOutputForm;
     procedure InitListBox;
     procedure InitToolbar;
     procedure InitOpenDialog;
@@ -358,7 +359,7 @@ uses
   FrmInput,
   FrmKreis,
   FrmOutput,
-  FrmGrafic,
+  FrmGrafik,
   FrmText,
   FrmReport,
   FrmChart,
@@ -829,7 +830,13 @@ procedure TFormRG19.InputFormItemClick(Sender: TObject);
 begin
   InputFormItem.Checked := not InputFormItem.Checked;
   if InputFormItem.Checked then
-    InputForm.Show
+  begin
+    InputForm.Parent := nil;
+    InputForm.BorderStyle := bsSizeable;
+    InputForm.ClientHeight := 195;
+    InputForm.ClientWidth := 465;
+    InputForm.Show;
+  end
   else
     InputForm.Hide;
 end;
@@ -839,6 +846,10 @@ begin
   OutputFormItem.Checked := not OutputFormItem.Checked;
   if OutputFormItem.Checked then
   begin
+    OutputForm.Parent := nil;
+    OutputForm.BorderStyle := bsSizeable;
+    OutputForm.ClientHeight := 255;
+    OutputForm.ClientWidth := 465;
     OutputForm.Show;
     if OutputForm.YComboBox.ItemIndex = -1 then
       OutputForm.YComboBox.ItemIndex := RiggModul.YComboSavedItemIndex;
@@ -851,7 +862,13 @@ procedure TFormRG19.GrafikFormItemClick(Sender: TObject);
 begin
   GrafikFormItem.Checked := not GrafikFormItem.Checked;
   if GrafikFormItem.Checked then
-    GrafikForm.Show
+  begin
+    GrafikForm.Parent := nil;
+    GrafikForm.BorderStyle := bsSizeable;
+    GrafikForm.ClientWidth := 305;
+    GrafikForm.ClientHeight := 457;
+    GrafikForm.Show;
+  end
   else
     GrafikForm.Hide;
 end;
@@ -893,16 +910,6 @@ begin
   RiggModul.RotaFormActive := True;
   RotaFormItem.Caption := '3D Grafik schließen';
   RotaFormItem.Hint := '  3D Grafik schließen';
-end;
-
-procedure TFormRG19.ConsoleItemClick(Sender: TObject);
-begin
-  if RiggModul.ConsoleActive then
-  begin
-    ConsoleForm.Close;
-    Exit;
-  end;
-  ConsoleForm := TConsoleForm.Create(nil);
 end;
 
 procedure TFormRG19.SpeedBarItemClick(Sender: TObject);
@@ -1424,6 +1431,7 @@ begin
   InitToolbar;
   InitStatusBar;
 
+  WantConsole := False;
   LayoutComponents;
 
   SetupComboBox(TrimmCombo);
@@ -1461,7 +1469,8 @@ begin
   InitSaveDialog;
   InitEventHandlers;
   InitMenu;
-//  InitOutputForm;
+  if WantConsole then
+    InitOutputForm;
 
   {
     ControllerItem.Checked := True;
@@ -1483,17 +1492,10 @@ begin
 end;
 
 procedure TFormRG19.LayoutComponents;
-
-  function BelowOf(cr: TControl): Integer;
-  begin
-    result := cr.Top + cr.Height + Margin;
-  end;
-
-  function RightOf(cr: TControl): Integer;
-  begin
-    result := cr.Left + cr.Width + Margin;
-  end;
-
+var
+  ConsoleWidth: Integer;
+  ConsoleHeight: Integer;
+  ComboHeight: Integer;
 begin
   TrimmMemo.Left := Margin;
   TrimmMemo.Top := SpeedPanel.Height + Margin;
@@ -1511,7 +1513,7 @@ begin
   FixpointCombo.Width := TrimmCombo.Width;
 
   ComboHeight := TrimmCombo.Height + 2 * Margin;
-  TrimmCombo.Top := BelowOf(TrimmMemo);
+  TrimmCombo.Top := TrimmMemo.Top + TrimmMemo.Height + Margin;
   ParamCombo.Top := TrimmCombo.Top + ComboHeight;
 //  ViewpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
   FixpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
@@ -1522,14 +1524,25 @@ begin
   Listbox.Height := StatusBar.Top - Listbox.top - Margin;
   Listbox.Anchors := Listbox.Anchors + [akBottom];
 
-  ReportMemo.Left := RightOf(Listbox);
-  ReportMemo.Top := BelowOf(SpeedPanel);
+  if WantConsole then
+  begin
+    ConsoleWidth := 770 + 1 * Margin;
+    ConsoleHeight := 457 + 2 * Margin;
+  end
+  else
+  begin
+    ConsoleWidth := 500;
+    ConsoleHeight := 0;
+  end;
+
+  ReportMemo.Left := Listbox.Left + Listbox.Width + Margin;
+  ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + ConsoleHeight;
   ReportMemo.Height := StatusBar.Top - ReportMemo.Top - Margin;
-  ReportMemo.Width := 500;
+  ReportMemo.Width := ConsoleWidth;
   ReportMemo.Anchors := ReportMemo.Anchors + [akBottom];
 
-  PaintboxR.Left := RightOf(ReportMemo);
-  PaintboxR.Top := BelowOf(SpeedPanel);
+  PaintboxR.Left := ReportMemo.Left + ReportMemo.Width + Margin;
+  PaintboxR.Top := SpeedPanel.Top + SpeedPanel.Height + Margin;
   PaintboxR.Width := ClientWidth - PaintboxR.Left - Margin;
   PaintboxR.Height := StatusBar.Top - PaintboxR.Top - Margin;
   PaintboxR.Anchors := PaintboxR.Anchors + [akRight, akBottom];
@@ -1855,6 +1868,19 @@ begin
   end;
 end;
 
+//procedure TFormRG19.ViewpointComboChange(Sender: TObject);
+//var
+//  ii: Integer;
+//begin
+//  ii := ViewpointCombo.ItemIndex;
+//  case ii of
+//    0: Main.HandleAction(faViewpointS);
+//    1: Main.HandleAction(faViewpointA);
+//    2: Main.HandleAction(faViewpointT);
+//    3: Main.HandleAction(faViewpoint3);
+//  end;
+//end;
+
 procedure TFormRG19.FixpointComboChange(Sender: TObject);
 begin
   RiggModul.RotaForm.FixPoint := GetComboFixPoint;
@@ -1967,21 +1993,18 @@ begin
   mi.Hint := '  Eingabeseiten im eigenen Fenster anzeigen';
   mi.ShortCut := 16453;
   mi.OnClick := InputFormItemClick;
-  mi.Visible := True;
 
   OutputFormItem := AddI('OutputFormItem');
   mi.Caption := '&Ausgabe ...';
   mi.Hint := '  Ausgabeseiten im eigenen Fenster anzeigen';
   mi.ShortCut := 16449;
   mi.OnClick := OutputFormItemClick;
-  mi.Visible := True;
 
   GrafikFormItem := AddI('GrafikFormItem');
   mi.Caption := '&Grafik ...';
   mi.Hint := '  Grafik-Ausgabeseiten separat anzeigen';
   mi.ShortCut := 16455;
   mi.OnClick := GrafikFormItemClick;
-  mi.Visible := True;
 
   OptionItem := AddI('OptionItem');
   mi.Caption := '&Konfiguration ...';
@@ -1991,12 +2014,6 @@ begin
 
   N4 := AddI('');
   mi.Caption := '-';
-
-  ConsoleItem := AddI('ConsoleItem');
-  mi.Caption := 'Konsole';
-  mi.Enabled := False;
-  mi.OnClick := ConsoleItemClick;
-  mi.Visible := False;
 
   RotaFormItem := AddI('RotaFormItem');
   mi.Caption := '3D Grafik ...';
@@ -2015,6 +2032,13 @@ begin
 
   N1 := AddI('N1');
   mi.Caption := '-';
+
+  ConsoleItem := AddI('ConsoleItem');
+  mi.Caption := 'Konsole';
+  mi.Enabled := True;
+  mi.Checked := WantConsole;
+  mi.OnClick := ConsoleItemClick;
+  mi.Visible := True;
 
   SpeedBarItem := AddI('SpeedBarItem');
   mi.Caption := 'Symbolleiste';
@@ -2326,6 +2350,62 @@ end;
 procedure TFormRG19.NullBtnClick(Sender: TObject);
 begin
   RiggModul.RotaForm.ViewPoint := vp3D;
+end;
+
+procedure TFormRG19.InitOutputForm;
+var
+  temp: Integer;
+begin
+  { GrafikForm }
+
+  GrafikForm.Hide;
+  GrafikForm.BorderStyle := bsNone;
+  GrafikForm.Parent := Self;
+  GrafikForm.Position := poDesigned;
+  GrafikForm.Left := TrimmMemo.Left + TrimmMemo.Width + Margin;
+  GrafikForm.Top := SpeedPanel.Top + SpeedPanel.Height + Margin;
+  GrafikForm.ClientWidth := 305;
+  GrafikForm.ClientHeight := 457;
+  GrafikForm.Visible := WantConsole;
+  GrafikFormItem.Checked := WantConsole;
+
+  { InputForm }
+
+  InputForm.Hide;
+  InputForm.BorderStyle := bsNone;
+  InputForm.Parent := Self;
+  InputForm.Position := poDesigned;
+  InputForm.Left := GrafikForm.Left + GrafikForm.Width + Margin;
+  InputForm.Top := SpeedPanel.Top + SpeedPanel.Height + Margin;
+  InputForm.ClientHeight := 195;
+  InputForm.ClientWidth := 465;
+  InputForm.Visible := WantConsole;
+  InputFormItem.Checked := WantConsole;
+
+  { OutputForm }
+
+  temp := OutputForm.YComboBox.ItemIndex;
+  if temp = -1 then
+    temp := RiggModul.YComboSavedItemIndex;
+  OutputForm.Hide;
+  OutputForm.BorderStyle := bsNone;
+  OutputForm.Parent := Self;
+  OutputForm.Position := poDesigned;
+  OutputForm.Left := InputForm.Left;
+  OutputForm.Top := InputForm.Top + InputForm.Height + Margin;
+  OutputForm.ClientHeight := 255;
+  OutputForm.ClientWidth := 465;
+  OutputForm.YComboBox.ItemIndex := temp;
+  OutputForm.Visible := WantConsole;
+  OutputFormItem.Checked := WantConsole;
+end;
+
+procedure TFormRG19.ConsoleItemClick(Sender: TObject);
+begin
+  WantConsole := not WantConsole;
+  ConsoleItem.Checked := WantConsole;
+  LayoutComponents;
+  InitOutputForm;
 end;
 
 end.

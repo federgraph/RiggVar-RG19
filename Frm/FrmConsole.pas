@@ -31,7 +31,7 @@ uses
   Riggunit,
   FrmInput,
   FrmOutput,
-  FrmGrafic;
+  FrmGrafik;
 
 {$R *.DFM}
 

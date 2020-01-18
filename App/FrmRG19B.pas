@@ -52,7 +52,6 @@ type
     PaintBoxR: TPaintBox;
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
-    LedShape: TShape;
     OpenBtn: TSpeedButton;
     SaveBtn: TSpeedButton;
     ExitBtn: TSpeedButton;
@@ -69,16 +68,6 @@ type
     DiffBtn: TSpeedButton;
     WinkelBtn: TSpeedButton;
     ControllerBtn: TSpeedButton;
-    M10Btn: TSpeedButton;
-    M1Btn: TSpeedButton;
-    P1Btn: TSpeedButton;
-    P10Btn: TSpeedButton;
-    MT0Btn: TSpeedButton;
-    PasteTrimmItemBtn: TSpeedButton;
-    ReadTrimmFileBtn: TSpeedButton;
-    SaveTrimmFileBtn: TSpeedButton;
-    CopyTrimmItemBtn: TSpeedButton;
-    CopyAndPasteBtn: TSpeedButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -103,7 +92,6 @@ type
     procedure BiegeNeigeItemClick(Sender: TObject);
 
     { Ansicht Menu }
-    procedure ConsoleItemClick(Sender: TObject);
     procedure InputFormItemClick(Sender: TObject);
     procedure GrafikFormItemClick(Sender: TObject);
     procedure OutputFormItemClick(Sender: TObject);
@@ -113,6 +101,7 @@ type
     procedure ReportFormItemClick(Sender: TObject);
     procedure OptionItemClick(Sender: TObject);
 
+    procedure ConsoleItemClick(Sender: TObject);
     procedure SpeedBarItemClick(Sender: TObject);
     procedure StatusBarItemClick(Sender: TObject);
 
@@ -258,8 +247,7 @@ type
     LogoItem: TMenuItem;
     AboutItem: TMenuItem;
   public
-//    LedShape: TShape;
-
+    LedShape: TShape;
 //    UpdateBtn: TSpeedButton;
 //    ReglerBtn: TSpeedButton;
 //    MemoryBtn: TSpeedButton;
@@ -270,18 +258,18 @@ type
 //    WinkelBtn: TSpeedButton;
 //    ControllerBtn: TSpeedButton;
 
-//    M10Btn: TSpeedButton;
-//    M1Btn: TSpeedButton;
-//    P1Btn: TSpeedButton;
-//    P10Btn: TSpeedButton;
+    M10Btn: TSpeedButton;
+    M1Btn: TSpeedButton;
+    P1Btn: TSpeedButton;
+    P10Btn: TSpeedButton;
 
-//    MT0Btn: TSpeedButton;
-//    ReadTrimmFileBtn: TSpeedButton;
-//    SaveTrimmFileBtn: TSpeedButton;
+    MT0Btn: TSpeedButton;
+    ReadTrimmFileBtn: TSpeedButton;
+    SaveTrimmFileBtn: TSpeedButton;
     CopyTrimmFileBtn: TSpeedButton;
-//    CopyTrimmItemBtn: TSpeedButton;
-//    PasteTrimmItemBtn: TSpeedButton;
-//    CopyAndPasteBtn: TSpeedButton;
+    CopyTrimmItemBtn: TSpeedButton;
+    PasteTrimmItemBtn: TSpeedButton;
+    CopyAndPasteBtn: TSpeedButton;
 
     SandboxedBtn: TSpeedButton;
     AllPropsBtn: TSpeedButton;
@@ -323,10 +311,9 @@ type
 
     function AddSpeedBtn(N: string; AGroupSpace: Integer = 0): TSpeedButton;
     function RefSpeedBtn(B: TSpeedButton; AGroupSpace: Integer = 0): TSpeedButton;
-//    function AddShapeBtn(N: string; AGroupSpace: Integer): TShape;
+    function AddShapeBtn(N: string; AGroupSpace: Integer): TShape;
     function RefShapeBtn(S: TShape; AGroupSpace: Integer): TShape;
   private
-    ComboHeight: Integer;
     procedure InitTrimmCombo;
     procedure InitParamCombo;
     procedure InitViewpointCombo;
@@ -338,12 +325,13 @@ type
     ML: TStrings;
     ReportManager: TRggReportManager;
     FReportLabelCaption: string;
+    WantConsole: Boolean;
 
     procedure FormCreate1;
     procedure FormCreate2;
 
     procedure LayoutComponents;
-
+    procedure InitOutputForm;
     procedure InitListBox;
     procedure InitToolbar;
     procedure InitOpenDialog;
@@ -351,7 +339,6 @@ type
     procedure InitStatusBar;
     procedure InitMenu;
     procedure InitEventHandlers;
-    procedure InitOutputForm;
 
     procedure SetupMemo(Memo: TMemo);
     procedure SetupComboBox(CB: TComboBox);
@@ -388,7 +375,7 @@ uses
   FrmInput,
   FrmKreis,
   FrmOutput,
-  FrmGrafic,
+  FrmGrafik,
   FrmText,
   FrmReport,
   FrmChart,
@@ -859,7 +846,13 @@ procedure TFormRG19B.InputFormItemClick(Sender: TObject);
 begin
   InputFormItem.Checked := not InputFormItem.Checked;
   if InputFormItem.Checked then
-    InputForm.Show
+  begin
+    InputForm.Parent := nil;
+    InputForm.BorderStyle := bsSizeable;
+    InputForm.ClientHeight := 195;
+    InputForm.ClientWidth := 465;
+    InputForm.Show;
+  end
   else
     InputForm.Hide;
 end;
@@ -869,6 +862,10 @@ begin
   OutputFormItem.Checked := not OutputFormItem.Checked;
   if OutputFormItem.Checked then
   begin
+    OutputForm.Parent := nil;
+    OutputForm.BorderStyle := bsSizeable;
+    OutputForm.ClientHeight := 255;
+    OutputForm.ClientWidth := 465;
     OutputForm.Show;
     if OutputForm.YComboBox.ItemIndex = -1 then
       OutputForm.YComboBox.ItemIndex := RiggModul.YComboSavedItemIndex;
@@ -879,11 +876,17 @@ end;
 
 procedure TFormRG19B.GrafikFormItemClick(Sender: TObject);
 begin
-//  GrafikFormItem.Checked := not GrafikFormItem.Checked;
-//  if GrafikFormItem.Checked then
-//    GrafikForm.Show
-//  else
-//    GrafikForm.Hide;
+  GrafikFormItem.Checked := not GrafikFormItem.Checked;
+  if GrafikFormItem.Checked then
+  begin
+    GrafikForm.Parent := nil;
+    GrafikForm.BorderStyle := bsSizeable;
+    GrafikForm.ClientWidth := 305;
+    GrafikForm.ClientHeight := 457;
+    GrafikForm.Show;
+  end
+  else
+    GrafikForm.Hide;
 end;
 
 procedure TFormRG19B.ChartFormItemClick(Sender: TObject);
@@ -923,16 +926,6 @@ begin
   RiggModul.RotaFormActive := True;
   RotaFormItem.Caption := '3D Grafik schließen';
   RotaFormItem.Hint := '  3D Grafik schließen';
-end;
-
-procedure TFormRG19B.ConsoleItemClick(Sender: TObject);
-begin
-  if RiggModul.ConsoleActive then
-  begin
-    ConsoleForm.Close;
-    Exit;
-  end;
-  ConsoleForm := TConsoleForm.Create(nil);
 end;
 
 procedure TFormRG19B.SpeedBarItemClick(Sender: TObject);
@@ -1062,13 +1055,13 @@ begin
   Inc(BtnCounter);
 end;
 
-//function TFormRG19B.AddShapeBtn(N: string; AGroupSpace: Integer): TShape;
-//begin
-//  result := TShape.Create(SpeedPanel);
-//  result.Parent := SpeedPanel;
-//  result.Name := N;
-//  RefShapeBtn(result, AGroupSpace);
-//end;
+function TFormRG19B.AddShapeBtn(N: string; AGroupSpace: Integer): TShape;
+begin
+  result := TShape.Create(SpeedPanel);
+  result.Parent := SpeedPanel;
+  result.Name := N;
+  RefShapeBtn(result, AGroupSpace);
+end;
 
 function TFormRG19B.RefShapeBtn(S: TShape; AGroupSpace: Integer): TShape;
 var
@@ -1214,7 +1207,7 @@ begin
 
   { LED }
 
-  RefShapeBtn(LedShape, BtnGroupSpace);
+  LedShape := AddShapeBtn('LedShape', BtnGroupSpace);
 
   { New Button group Trimm Data }
 
@@ -1223,21 +1216,24 @@ begin
   BtnWidth := 50; // new button width for new buttons
   BtnColor := clGreen;
 
-  sb := RefSpeedBtn(MT0Btn, BtnGroupSpace);
+  sb := AddSpeedBtn('MT0Btn', BtnGroupSpace);
+  MT0Btn := sb;
   sb.Caption := 'MT0';
-  sb.Hint := 'Memory Trimm 0|';
+  sb.Hint := 'Memory Trimm 0';
   sb.GroupIndex := 10;
   sb.OnClick := MT0BtnClick;
 
   BtnColor := clFuchsia;
 
-  sb := RefSpeedBtn(ReadTrimmFileBtn, 0);
+  sb := AddSpeedBtn('ReadTrimmFileBtn', 0);
+  ReadTrimmFileBtn := sb;
   sb.Caption := 'rtf';
   sb.Hint := 'Read Trimm File';
   sb.GroupIndex := 10;
   sb.OnClick := ReadTrimmFileBtnClick;
 
-  sb := RefSpeedBtn(SaveTrimmFileBtn, 0);
+  sb := AddSpeedBtn('SaveTrimmFileBtn', 0);
+  SaveTrimmFileBtn := sb;
   sb.Caption := 'stf';
   sb.Hint := 'MT0';
   sb.GroupIndex := 10;
@@ -1252,13 +1248,15 @@ begin
 
   BtnColor := clBlue;
 
-  sb := RefSpeedBtn(CopyTrimmItemBtn, 0);
+  sb := AddSpeedBtn('CopyTrimmItemBtn', 0);
+  CopyTrimmItemBtn := sb;
   sb.Caption := 'cti';
   sb.Hint := 'Copy Trimm Item';
   sb.GroupIndex := 10;
   sb.OnClick := CopyTrimmItemBtnClick;
 
-  sb := RefSpeedBtn(PasteTrimmItemBtn, 0);
+  sb := AddSpeedBtn('PasteTrimmItemBtn', 0);
+  PasteTrimmItemBtn := sb;
   sb.Caption := 'pti';
   sb.Hint := 'Paste Trimm Item';
   sb.GroupIndex := 10;
@@ -1266,7 +1264,8 @@ begin
 
   BtnColor := clBlack;
 
-  sb := RefSpeedBtn(CopyAndPasteBtn, 0);
+  sb := AddSpeedBtn('CopyAndPasteBtn', 0);
+  CopyAndPasteBtn := sb;
   sb.Caption := 'M';
   sb.Hint := 'Copy and Paste Btn';
   sb.GroupIndex := 10;
@@ -1276,25 +1275,29 @@ begin
 
   BtnColor := TColors.Teal;
 
-  sb := RefSpeedBtn(M10Btn, BtnGroupSpace);
+  sb := AddSpeedBtn('M10Btn', BtnGroupSpace);
+  M10Btn := sb;
   sb.Caption := 'M10';
   sb.Hint := 'Param Value Minus 10';
   sb.GroupIndex := 10;
   sb.OnClick := M10BtnClick;
 
-  sb := RefSpeedBtn(M1Btn, 0);
+  sb := AddSpeedBtn('M1Btn', 0);
+  M1Btn := sb;
   sb.Caption := 'M1';
   sb.Hint := 'Param Value Minus 1';
   sb.GroupIndex := 10;
   sb.OnClick := M1BtnClick;
 
-  sb := RefSpeedBtn(P1Btn, 0);
+  sb := AddSpeedBtn('P1Btn', 0);
+  P1Btn := sb;
   sb.Caption := 'P1';
   sb.Hint := 'Param Value Plus 1';
   sb.GroupIndex := 10;
   sb.OnClick := P1BtnClick;
 
-  sb := RefSpeedBtn(P10Btn, 0);
+  sb := AddSpeedBtn('P10Btn', 0);
+  P10Btn := sb;
   sb.Caption := 'P10';
   sb.Hint := 'Param Value Plus 10';
   sb.GroupIndex := 10;
@@ -1433,6 +1436,7 @@ begin
   InitToolbar;
   InitStatusBar;
 
+  WantConsole := True;
   LayoutComponents;
 
   SetupComboBox(TrimmCombo);
@@ -1495,6 +1499,7 @@ procedure TFormRG19B.LayoutComponents;
 var
   ConsoleWidth: Integer;
   ConsoleHeight: Integer;
+  ComboHeight: Integer;
 begin
   TrimmMemo.Left := Margin;
   TrimmMemo.Top := SpeedPanel.Height + Margin;
@@ -1523,11 +1528,19 @@ begin
   Listbox.Height := StatusBar.Top - Listbox.top - Margin;
   Listbox.Anchors := Listbox.Anchors + [akBottom];
 
+  if WantConsole then
+  begin
   ConsoleWidth := 770 + 1 * Margin;
-  ConsoleHeight := 457;
+    ConsoleHeight := 457 + 2 * Margin;
+  end
+  else
+  begin
+    ConsoleWidth := 500;
+    ConsoleHeight := 0;
+  end;
 
   ReportMemo.Left := Listbox.Left + Listbox.Width + Margin;
-  ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + ConsoleHeight + 2 * Margin;
+  ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + ConsoleHeight;
   ReportMemo.Height := StatusBar.Top - ReportMemo.Top - Margin;
   ReportMemo.Width := ConsoleWidth;
   ReportMemo.Anchors := ReportMemo.Anchors + [akBottom];
@@ -1984,21 +1997,18 @@ begin
   mi.Hint := '  Eingabeseiten im eigenen Fenster anzeigen';
   mi.ShortCut := 16453;
   mi.OnClick := InputFormItemClick;
-  mi.Visible := False;
 
   OutputFormItem := AddI('OutputFormItem');
   mi.Caption := '&Ausgabe ...';
   mi.Hint := '  Ausgabeseiten im eigenen Fenster anzeigen';
   mi.ShortCut := 16449;
   mi.OnClick := OutputFormItemClick;
-  mi.Visible := False;
 
   GrafikFormItem := AddI('GrafikFormItem');
   mi.Caption := '&Grafik ...';
   mi.Hint := '  Grafik-Ausgabeseiten separat anzeigen';
   mi.ShortCut := 16455;
   mi.OnClick := GrafikFormItemClick;
-  mi.Visible := False;
 
   OptionItem := AddI('OptionItem');
   mi.Caption := '&Konfiguration ...';
@@ -2008,12 +2018,6 @@ begin
 
   N4 := AddI('');
   mi.Caption := '-';
-
-  ConsoleItem := AddI('ConsoleItem');
-  mi.Caption := 'Konsole';
-  mi.Enabled := False;
-  mi.OnClick := ConsoleItemClick;
-  mi.Visible := False;
 
   RotaFormItem := AddI('RotaFormItem');
   mi.Caption := '3D Grafik ...';
@@ -2032,6 +2036,13 @@ begin
 
   N1 := AddI('N1');
   mi.Caption := '-';
+
+  ConsoleItem := AddI('ConsoleItem');
+  mi.Caption := 'Konsole';
+  mi.Enabled := True;
+  mi.Checked := WantConsole;
+  mi.OnClick := ConsoleItemClick;
+  mi.Visible := True;
 
   SpeedBarItem := AddI('SpeedBarItem');
   mi.Caption := 'Symbolleiste';
@@ -2359,7 +2370,8 @@ begin
   GrafikForm.Top := SpeedPanel.Top + SpeedPanel.Height + Margin;
   GrafikForm.ClientWidth := 305;
   GrafikForm.ClientHeight := 457;
-  GrafikForm.Visible := True;
+  GrafikForm.Visible := WantConsole;
+  GrafikFormItem.Checked := WantConsole;
 
   { InputForm }
 
@@ -2371,7 +2383,8 @@ begin
   InputForm.Top := SpeedPanel.Top + SpeedPanel.Height + Margin;
   InputForm.ClientHeight := 195;
   InputForm.ClientWidth := 465;
-  InputForm.Visible := True;
+  InputForm.Visible := WantConsole;
+  InputFormItem.Checked := WantConsole;
 
   { OutputForm }
 
@@ -2387,7 +2400,16 @@ begin
   OutputForm.ClientHeight := 255;
   OutputForm.ClientWidth := 465;
   OutputForm.YComboBox.ItemIndex := temp;
-  OutputForm.Visible := True;
+  OutputForm.Visible := WantConsole;
+  OutputFormItem.Checked := WantConsole;
+end;
+
+procedure TFormRG19B.ConsoleItemClick(Sender: TObject);
+begin
+  WantConsole := not WantConsole;
+  ConsoleItem.Checked := WantConsole;
+  LayoutComponents;
+  InitOutputForm;
 end;
 
 end.

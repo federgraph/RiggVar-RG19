@@ -285,7 +285,7 @@ uses
   FrmConsole,
   FrmInput,
   FrmOutput,
-  FrmGrafic,
+  FrmGrafik,
   FrmReport,
   FrmSelect,
   FrmRegler,

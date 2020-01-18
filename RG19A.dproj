@@ -140,7 +140,7 @@
         <DCCReference Include="Frm\FrmOutput.pas">
             <Form>OutputForm</Form>
         </DCCReference>
-        <DCCReference Include="Frm\FrmGrafic.pas">
+        <DCCReference Include="Frm\FrmGrafik.pas">
             <Form>GrafikForm</Form>
         </DCCReference>
         <DCCReference Include="Core\RiggUnit.pas"/>

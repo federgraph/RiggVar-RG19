@@ -46,6 +46,8 @@ object FormRG19B: TFormRG19B
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
+    ExplicitLeft = -136
+    ExplicitTop = 8
     object OpenBtn: TSpeedButton
       Left = 8
       Top = 3
@@ -226,13 +228,6 @@ object FormRG19B: TFormRG19B
         7777777777777777777777000000}
       NumGlyphs = 2
     end
-    object LedShape: TShape
-      Left = 520
-      Top = 7
-      Width = 9
-      Height = 16
-      Brush.Color = clGreen
-    end
     object BtnBlau: TSpeedButton
       Left = 269
       Top = 3
@@ -316,76 +311,6 @@ object FormRG19B: TFormRG19B
         AACCCCCAAA0770000000770AACCCCCCAAA07700000007770ACCCCCAAA0777000
         00007777CCCCCAA00777700000007777CCCCC00777777000000077777CCC7777
         777770000000}
-    end
-    object M10Btn: TSpeedButton
-      Left = 762
-      Top = 3
-      Width = 41
-      Height = 30
-      Caption = '-10'
-    end
-    object M1Btn: TSpeedButton
-      Left = 809
-      Top = 3
-      Width = 23
-      Height = 22
-      Caption = '-1'
-    end
-    object P1Btn: TSpeedButton
-      Left = 838
-      Top = 3
-      Width = 23
-      Height = 22
-      Caption = '+1'
-    end
-    object P10Btn: TSpeedButton
-      Left = 867
-      Top = 3
-      Width = 23
-      Height = 22
-      Caption = '+10'
-    end
-    object CopyAndPasteBtn: TSpeedButton
-      Left = 712
-      Top = 6
-      Width = 23
-      Height = 22
-      Caption = 'M'
-    end
-    object CopyTrimmItemBtn: TSpeedButton
-      Left = 654
-      Top = 7
-      Width = 23
-      Height = 22
-      Caption = 'cti'
-    end
-    object MT0Btn: TSpeedButton
-      Left = 545
-      Top = 7
-      Width = 45
-      Height = 30
-      Caption = 'MT0'
-    end
-    object PasteTrimmItemBtn: TSpeedButton
-      Left = 683
-      Top = 7
-      Width = 23
-      Height = 22
-      Caption = 'pti'
-    end
-    object ReadTrimmFileBtn: TSpeedButton
-      Left = 596
-      Top = 7
-      Width = 23
-      Height = 22
-      Caption = 'rtf'
-    end
-    object SaveTrimmFileBtn: TSpeedButton
-      Left = 625
-      Top = 6
-      Width = 23
-      Height = 22
-      Caption = 'stf'
     end
   end
   object Listbox: TListBox
