@@ -18,16 +18,16 @@ const
 type
   TRotationAngle = (raPhi, raTheta, raGamma, raXrot, raYrot, raZrot);
 
-  TvertArrayF = array [0 .. maxvert] of single;
-  TvertArrayI = array [0 .. maxvert] of Integer;
-  TconArray = array [0 .. maxcon] of Integer;
-  TconColors = array [0 .. 15] of TColor;
+  TVertArrayF = array [0 .. maxvert] of single;
+  TVertArrayI = array [0 .. maxvert] of Integer;
+  TConArray = array [0 .. maxcon] of Integer;
+  TConColors = array [0 .. 15] of TColor;
 
   Matrix4x4 = array [1 .. 4, 1 .. 4] of double;
 
   TMatrix4x4 = class(TObject)
   private
-    Fmat: Matrix4x4;
+    FMat: Matrix4x4;
   public
     constructor Create;
     procedure GetLocals(var ux, uy, uz: vec3);
@@ -35,21 +35,21 @@ type
     procedure SetIdentity(var m: Matrix4x4);
     procedure Multiply(m: Matrix4x4);
     procedure PreMultiply(m: Matrix4x4);
-    procedure transpose;
-    procedure translate(tx, ty, tz: double);
-    procedure translateDirect(tx, ty, tz: double);
-    procedure scaleCenter(sx, sy, sz: double; center: vec3);
-    procedure scale(f: double);
-    procedure scaleXYZ(xf, yf, zf: double);
-    procedure xrot(Theta: double);
-    procedure yrot(Theta: double);
-    procedure zrot(Theta: double);
-    procedure rotate(p1, p2: vec3; angle: double);
-    procedure transformPoint(var point: vec3);
-    procedure transform(var v: TvertArrayF; var tv: TvertArrayI; nvert: Integer);
-    procedure transformF(var v: TvertArrayF; var tv: TvertArrayF; nvert: Integer);
-    procedure copyFrom(m: TMatrix4x4);
-    property mat: Matrix4x4 read Fmat write Fmat;
+    procedure Transpose;
+    procedure Translate(tx, ty, tz: double);
+    procedure TranslateDirect(tx, ty, tz: double);
+    procedure ScaleCenter(sx, sy, sz: double; center: vec3);
+    procedure Scale(f: double);
+    procedure ScaleXYZ(xf, yf, zf: double);
+    procedure XRot(Theta: double);
+    procedure YRot(Theta: double);
+    procedure ZRot(Theta: double);
+    procedure Rotate(p1, p2: vec3; angle: double);
+    procedure TransformPoint(var point: vec3);
+    procedure Transform(var v: TVertArrayF; var tv: TVertArrayI; nvert: Integer);
+    procedure TransformF(var v: TVertArrayF; var tv: TVertArrayF; nvert: Integer);
+    procedure CopyFrom(m: TMatrix4x4);
+    property Mat: Matrix4x4 read FMat write FMat;
   end;
 
   TRotaData = record
@@ -79,7 +79,7 @@ type
     Xpos: Integer;
     Ypos: Integer;
     FixPunkt: TRiggPoints;
-    Phi, Theta, Gamma, Xrot, Yrot, Zrot: Integer;
+    Phi, Theta, Gamma, XRot, YRot, ZRot: Integer;
     constructor Create;
     property IncrementIndex: Integer read FIncrementIndex write SetIncrementIndex;
     property FixPunktIndex: Integer read GetFixPunktIndex write SetFixPunktIndex;
@@ -104,7 +104,7 @@ end;
 
 procedure TMatrix4x4.Identity;
 begin
-  SetIdentity(Fmat);
+  SetIdentity(FMat);
 end;
 
 procedure TMatrix4x4.SetIdentity(var m: Matrix4x4);
@@ -119,28 +119,28 @@ begin
         m[r, c] := 0;
 end;
 
-procedure TMatrix4x4.copyFrom(m: TMatrix4x4);
+procedure TMatrix4x4.CopyFrom(m: TMatrix4x4);
 begin
-  Fmat := m.mat;
+  FMat := m.Mat;
 end;
 
 { die Transponierte ist die Inverse der Rotationsmatrix! }
-procedure TMatrix4x4.transpose;
+procedure TMatrix4x4.Transpose;
 var
   tmp: double;
 begin
-  tmp := Fmat[1, 2];
-  Fmat[1, 2] := Fmat[2, 1];
-  Fmat[2, 1] := tmp;
-  Fmat[1, 4] := 0;
-  tmp := Fmat[2, 3];
-  Fmat[2, 3] := Fmat[3, 2];
-  Fmat[3, 2] := tmp;
-  Fmat[2, 4] := 0;
-  tmp := Fmat[3, 1];
-  Fmat[3, 1] := Fmat[1, 3];
-  Fmat[1, 3] := tmp;
-  Fmat[3, 4] := 0;
+  tmp := FMat[1, 2];
+  FMat[1, 2] := FMat[2, 1];
+  FMat[2, 1] := tmp;
+  FMat[1, 4] := 0;
+  tmp := FMat[2, 3];
+  FMat[2, 3] := FMat[3, 2];
+  FMat[3, 2] := tmp;
+  FMat[2, 4] := 0;
+  tmp := FMat[3, 1];
+  FMat[3, 1] := FMat[1, 3];
+  FMat[1, 3] := tmp;
+  FMat[3, 4] := 0;
 end;
 
 { Premultiply this matrix by a second: M := L*M }
@@ -151,11 +151,11 @@ var
 begin
   for r := 1 to 4 do
     for c := 1 to 4 do
-      tmp[r, c] := m[r, 1] * Fmat[1, c] + m[r, 2] * Fmat[2, c] + m[r, 3] * Fmat
-        [3, c] + m[r, 4] * Fmat[4, c];
+      tmp[r, c] := m[r, 1] * FMat[1, c] + m[r, 2] * FMat[2, c] + m[r, 3] * FMat
+        [3, c] + m[r, 4] * FMat[4, c];
   for r := 1 to 4 do
     for c := 1 to 4 do
-      Fmat[r, c] := tmp[r, c];
+      FMat[r, c] := tmp[r, c];
 end;
 
 { Multiply this matrix by a second: M := M*R }
@@ -166,14 +166,14 @@ var
 begin
   for r := 1 to 4 do
     for c := 1 to 4 do
-      tmp[r, c] := Fmat[r, 1] * m[1, c] + Fmat[r, 2] * m[2, c] + Fmat[r, 3] * m
-        [3, c] + Fmat[r, 4] * m[4, c];
+      tmp[r, c] := FMat[r, 1] * m[1, c] + FMat[r, 2] * m[2, c] + FMat[r, 3] * m
+        [3, c] + FMat[r, 4] * m[4, c];
   for r := 1 to 4 do
     for c := 1 to 4 do
-      Fmat[r, c] := tmp[r, c];
+      FMat[r, c] := tmp[r, c];
 end;
 
-procedure TMatrix4x4.scaleCenter(sx, sy, sz: double; center: vec3);
+procedure TMatrix4x4.ScaleCenter(sx, sy, sz: double; center: vec3);
 var
   m: Matrix4x4;
 begin
@@ -187,40 +187,40 @@ begin
   PreMultiply(m);
 end;
 
-procedure TMatrix4x4.scale(f: double);
+procedure TMatrix4x4.Scale(f: double);
 begin
-  Fmat[1, 1] := Fmat[1, 1] * f;
-  Fmat[1, 2] := Fmat[1, 2] * f;
-  Fmat[1, 3] := Fmat[1, 3] * f;
-  Fmat[1, 4] := Fmat[1, 4] * f;
-  Fmat[2, 1] := Fmat[2, 1] * f;
-  Fmat[2, 2] := Fmat[2, 2] * f;
-  Fmat[2, 3] := Fmat[2, 3] * f;
-  Fmat[2, 4] := Fmat[2, 4] * f;
-  Fmat[3, 1] := Fmat[3, 1] * f;
-  Fmat[3, 2] := Fmat[3, 2] * f;
-  Fmat[3, 3] := Fmat[3, 3] * f;
-  Fmat[3, 4] := Fmat[3, 4] * f;
+  FMat[1, 1] := FMat[1, 1] * f;
+  FMat[1, 2] := FMat[1, 2] * f;
+  FMat[1, 3] := FMat[1, 3] * f;
+  FMat[1, 4] := FMat[1, 4] * f;
+  FMat[2, 1] := FMat[2, 1] * f;
+  FMat[2, 2] := FMat[2, 2] * f;
+  FMat[2, 3] := FMat[2, 3] * f;
+  FMat[2, 4] := FMat[2, 4] * f;
+  FMat[3, 1] := FMat[3, 1] * f;
+  FMat[3, 2] := FMat[3, 2] * f;
+  FMat[3, 3] := FMat[3, 3] * f;
+  FMat[3, 4] := FMat[3, 4] * f;
 end;
 
 { Scale along each axis independently }
-procedure TMatrix4x4.scaleXYZ(xf, yf, zf: double);
+procedure TMatrix4x4.ScaleXYZ(xf, yf, zf: double);
 begin
-  Fmat[1, 1] := Fmat[1, 1] * xf;
-  Fmat[1, 2] := Fmat[1, 2] * xf;
-  Fmat[1, 3] := Fmat[1, 3] * xf;
-  Fmat[1, 4] := Fmat[1, 4] * xf;
-  Fmat[2, 1] := Fmat[2, 1] * yf;
-  Fmat[2, 2] := Fmat[2, 2] * yf;
-  Fmat[2, 3] := Fmat[2, 3] * yf;
-  Fmat[2, 4] := Fmat[2, 4] * yf;
-  Fmat[3, 1] := Fmat[3, 1] * zf;
-  Fmat[3, 2] := Fmat[3, 2] * zf;
-  Fmat[3, 3] := Fmat[3, 3] * zf;
-  Fmat[3, 4] := Fmat[3, 4] * zf;
+  FMat[1, 1] := FMat[1, 1] * xf;
+  FMat[1, 2] := FMat[1, 2] * xf;
+  FMat[1, 3] := FMat[1, 3] * xf;
+  FMat[1, 4] := FMat[1, 4] * xf;
+  FMat[2, 1] := FMat[2, 1] * yf;
+  FMat[2, 2] := FMat[2, 2] * yf;
+  FMat[2, 3] := FMat[2, 3] * yf;
+  FMat[2, 4] := FMat[2, 4] * yf;
+  FMat[3, 1] := FMat[3, 1] * zf;
+  FMat[3, 2] := FMat[3, 2] * zf;
+  FMat[3, 3] := FMat[3, 3] * zf;
+  FMat[3, 4] := FMat[3, 4] * zf;
 end;
 
-procedure TMatrix4x4.translate(tx, ty, tz: double);
+procedure TMatrix4x4.Translate(tx, ty, tz: double);
 var
   m: Matrix4x4;
 begin
@@ -232,14 +232,14 @@ begin
 end;
 
 { Translate the origin }
-procedure TMatrix4x4.translateDirect(tx, ty, tz: double);
+procedure TMatrix4x4.TranslateDirect(tx, ty, tz: double);
 begin
-  Fmat[1, 4] := Fmat[1, 4] + tx;
-  Fmat[2, 4] := Fmat[2, 4] + ty;
-  Fmat[3, 4] := Fmat[3, 4] + tz;
+  FMat[1, 4] := FMat[1, 4] + tx;
+  FMat[2, 4] := FMat[2, 4] + ty;
+  FMat[3, 4] := FMat[3, 4] + tz;
 end;
 
-procedure TMatrix4x4.rotate(p1, p2: vec3; angle: double);
+procedure TMatrix4x4.Rotate(p1, p2: vec3; angle: double);
 var
   m: Matrix4x4;
   vec: vec3;
@@ -254,7 +254,7 @@ begin
   a := sinA2 * vec.x / vecLength;
   b := sinA2 * vec.y / vecLength;
   c := sinA2 * vec.z / vecLength;
-  translate(-p1.x, -p1.y, -p1.z);
+  Translate(-p1.x, -p1.y, -p1.z);
   SetIdentity(m);
   m[1, 1] := 1.0 - 2 * b * b - 2 * c * c;
   m[1, 2] := 2 * a * b - 2 * s * c;
@@ -266,11 +266,11 @@ begin
   m[3, 2] := 2 * b * c + 2 * s * a;
   m[3, 3] := 1.0 - 2 * a * a - 2 * b * b;
   PreMultiply(m);
-  translate(p1.x, p1.y, p1.z);
+  Translate(p1.x, p1.y, p1.z);
 end;
 
 { rotate theta degrees about the y axis }
-procedure TMatrix4x4.yrot(Theta: double);
+procedure TMatrix4x4.YRot(Theta: double);
 var
   ct, st: double;
   Nxx, Nxy, Nxz, Nxo, Nzx, Nzy, Nzz, Nzo: double;
@@ -279,28 +279,28 @@ begin
   ct := cos(Theta);
   st := sin(Theta);
 
-  Nxx := Fmat[1, 1] * ct + Fmat[3, 1] * st;
-  Nxy := Fmat[1, 2] * ct + Fmat[3, 2] * st;
-  Nxz := Fmat[1, 3] * ct + Fmat[3, 3] * st;
-  Nxo := Fmat[1, 4] * ct + Fmat[3, 4] * st;
+  Nxx := FMat[1, 1] * ct + FMat[3, 1] * st;
+  Nxy := FMat[1, 2] * ct + FMat[3, 2] * st;
+  Nxz := FMat[1, 3] * ct + FMat[3, 3] * st;
+  Nxo := FMat[1, 4] * ct + FMat[3, 4] * st;
 
-  Nzx := Fmat[3, 1] * ct - Fmat[1, 1] * st;
-  Nzy := Fmat[3, 2] * ct - Fmat[1, 2] * st;
-  Nzz := Fmat[3, 3] * ct - Fmat[1, 3] * st;
-  Nzo := Fmat[3, 4] * ct - Fmat[1, 4] * st;
+  Nzx := FMat[3, 1] * ct - FMat[1, 1] * st;
+  Nzy := FMat[3, 2] * ct - FMat[1, 2] * st;
+  Nzz := FMat[3, 3] * ct - FMat[1, 3] * st;
+  Nzo := FMat[3, 4] * ct - FMat[1, 4] * st;
 
-  Fmat[1, 4] := Nxo;
-  Fmat[1, 1] := Nxx;
-  Fmat[1, 2] := Nxy;
-  Fmat[1, 3] := Nxz;
-  Fmat[3, 4] := Nzo;
-  Fmat[3, 1] := Nzx;
-  Fmat[3, 2] := Nzy;
-  Fmat[3, 3] := Nzz;
+  FMat[1, 4] := Nxo;
+  FMat[1, 1] := Nxx;
+  FMat[1, 2] := Nxy;
+  FMat[1, 3] := Nxz;
+  FMat[3, 4] := Nzo;
+  FMat[3, 1] := Nzx;
+  FMat[3, 2] := Nzy;
+  FMat[3, 3] := Nzz;
 end;
 
 { rotate theta degrees about the x axis }
-procedure TMatrix4x4.xrot(Theta: double);
+procedure TMatrix4x4.XRot(Theta: double);
 var
   ct, st: double;
   Nyx, Nyy, Nyz, Nyo, Nzx, Nzy, Nzz, Nzo: double;
@@ -309,28 +309,28 @@ begin
   ct := cos(Theta);
   st := sin(Theta);
 
-  Nyx := Fmat[2, 1] * ct + Fmat[3, 1] * st;
-  Nyy := Fmat[2, 2] * ct + Fmat[3, 2] * st;
-  Nyz := Fmat[2, 3] * ct + Fmat[3, 3] * st;
-  Nyo := Fmat[2, 4] * ct + Fmat[3, 4] * st;
+  Nyx := FMat[2, 1] * ct + FMat[3, 1] * st;
+  Nyy := FMat[2, 2] * ct + FMat[3, 2] * st;
+  Nyz := FMat[2, 3] * ct + FMat[3, 3] * st;
+  Nyo := FMat[2, 4] * ct + FMat[3, 4] * st;
 
-  Nzx := Fmat[3, 1] * ct - Fmat[2, 1] * st;
-  Nzy := Fmat[3, 2] * ct - Fmat[2, 2] * st;
-  Nzz := Fmat[3, 3] * ct - Fmat[2, 3] * st;
-  Nzo := Fmat[3, 4] * ct - Fmat[2, 4] * st;
+  Nzx := FMat[3, 1] * ct - FMat[2, 1] * st;
+  Nzy := FMat[3, 2] * ct - FMat[2, 2] * st;
+  Nzz := FMat[3, 3] * ct - FMat[2, 3] * st;
+  Nzo := FMat[3, 4] * ct - FMat[2, 4] * st;
 
-  Fmat[2, 4] := Nyo;
-  Fmat[2, 1] := Nyx;
-  Fmat[2, 2] := Nyy;
-  Fmat[2, 3] := Nyz;
-  Fmat[3, 4] := Nzo;
-  Fmat[3, 1] := Nzx;
-  Fmat[3, 2] := Nzy;
-  Fmat[3, 3] := Nzz;
+  FMat[2, 4] := Nyo;
+  FMat[2, 1] := Nyx;
+  FMat[2, 2] := Nyy;
+  FMat[2, 3] := Nyz;
+  FMat[3, 4] := Nzo;
+  FMat[3, 1] := Nzx;
+  FMat[3, 2] := Nzy;
+  FMat[3, 3] := Nzz;
 end;
 
 { rotate theta degrees about the z axis }
-procedure TMatrix4x4.zrot(Theta: double);
+procedure TMatrix4x4.ZRot(Theta: double);
 var
   ct, st: double;
   Nyx, Nyy, Nyz, Nyo, Nxx, Nxy, Nxz, Nxo: double;
@@ -339,35 +339,35 @@ begin
   ct := cos(Theta);
   st := sin(Theta);
 
-  Nyx := Fmat[2, 1] * ct + Fmat[1, 1] * st;
-  Nyy := Fmat[2, 2] * ct + Fmat[1, 2] * st;
-  Nyz := Fmat[2, 3] * ct + Fmat[1, 3] * st;
-  Nyo := Fmat[2, 4] * ct + Fmat[1, 4] * st;
+  Nyx := FMat[2, 1] * ct + FMat[1, 1] * st;
+  Nyy := FMat[2, 2] * ct + FMat[1, 2] * st;
+  Nyz := FMat[2, 3] * ct + FMat[1, 3] * st;
+  Nyo := FMat[2, 4] * ct + FMat[1, 4] * st;
 
-  Nxx := Fmat[1, 1] * ct - Fmat[2, 1] * st;
-  Nxy := Fmat[1, 2] * ct - Fmat[2, 2] * st;
-  Nxz := Fmat[1, 3] * ct - Fmat[2, 3] * st;
-  Nxo := Fmat[1, 4] * ct - Fmat[2, 4] * st;
+  Nxx := FMat[1, 1] * ct - FMat[2, 1] * st;
+  Nxy := FMat[1, 2] * ct - FMat[2, 2] * st;
+  Nxz := FMat[1, 3] * ct - FMat[2, 3] * st;
+  Nxo := FMat[1, 4] * ct - FMat[2, 4] * st;
 
-  Fmat[2, 4] := Nyo;
-  Fmat[2, 1] := Nyx;
-  Fmat[2, 2] := Nyy;
-  Fmat[2, 3] := Nyz;
-  Fmat[1, 4] := Nxo;
-  Fmat[1, 1] := Nxx;
-  Fmat[1, 2] := Nxy;
-  Fmat[1, 3] := Nxz;
+  FMat[2, 4] := Nyo;
+  FMat[2, 1] := Nyx;
+  FMat[2, 2] := Nyy;
+  FMat[2, 3] := Nyz;
+  FMat[1, 4] := Nxo;
+  FMat[1, 1] := Nxx;
+  FMat[1, 2] := Nxy;
+  FMat[1, 3] := Nxz;
 end;
 
-procedure TMatrix4x4.transformPoint(var point: vec3);
+procedure TMatrix4x4.TransformPoint(var point: vec3);
 var
   tmp: vec3;
 begin
   with point do
   begin
-    tmp.x := Fmat[1, 1] * x + Fmat[1, 2] * y + Fmat[1, 3] * z + Fmat[1, 4];
-    tmp.y := Fmat[2, 1] * x + Fmat[2, 2] * y + Fmat[2, 3] * z + Fmat[2, 4];
-    tmp.z := Fmat[3, 1] * x + Fmat[3, 2] * y + Fmat[3, 3] * z + Fmat[3, 4];
+    tmp.x := FMat[1, 1] * x + FMat[1, 2] * y + FMat[1, 3] * z + FMat[1, 4];
+    tmp.y := FMat[2, 1] * x + FMat[2, 2] * y + FMat[2, 3] * z + FMat[2, 4];
+    tmp.z := FMat[3, 1] * x + FMat[3, 2] * y + FMat[3, 3] * z + FMat[3, 4];
   end;
   point := tmp;
 end;
@@ -376,7 +376,7 @@ end;
   coordinates in floating point.  Three successive entries in
   the array constitute a point.  tv ends up holding the transformed
   points as integers; three successive entries per point }
-procedure TMatrix4x4.transform(var v: TvertArrayF; var tv: TvertArrayI;
+procedure TMatrix4x4.Transform(var v: TVertArrayF; var tv: TVertArrayI;
   nvert: Integer);
 var
   i, j: Integer;
@@ -388,16 +388,16 @@ begin
     x := v[i];
     y := v[i + 1];
     z := v[i + 2];
-    tv[i] := Round(Fmat[1, 1] * x + Fmat[1, 2] * y + Fmat[1, 3] * z + Fmat[1, 4]
+    tv[i] := Round(FMat[1, 1] * x + FMat[1, 2] * y + FMat[1, 3] * z + FMat[1, 4]
       );
-    tv[i + 1] := Round(Fmat[2, 1] * x + Fmat[2, 2] * y + Fmat[2, 3] * z + Fmat
+    tv[i + 1] := Round(FMat[2, 1] * x + FMat[2, 2] * y + FMat[2, 3] * z + FMat
         [2, 4]);
-    tv[i + 2] := Round(Fmat[3, 1] * x + Fmat[3, 2] * y + Fmat[3, 3] * z + Fmat
+    tv[i + 2] := Round(FMat[3, 1] * x + FMat[3, 2] * y + FMat[3, 3] * z + FMat
         [3, 4]);
   end;
 end;
 
-procedure TMatrix4x4.transformF(var v: TvertArrayF; var tv: TvertArrayF;
+procedure TMatrix4x4.TransformF(var v: TVertArrayF; var tv: TVertArrayF;
   nvert: Integer);
 var
   i, j: Integer;
@@ -409,23 +409,23 @@ begin
     x := v[i];
     y := v[i + 1];
     z := v[i + 2];
-    tv[i] := Fmat[1, 1] * x + Fmat[1, 2] * y + Fmat[1, 3] * z + Fmat[1, 4];
-    tv[i + 1] := Fmat[2, 1] * x + Fmat[2, 2] * y + Fmat[2, 3] * z + Fmat[2, 4];
-    tv[i + 2] := Fmat[3, 1] * x + Fmat[3, 2] * y + Fmat[3, 3] * z + Fmat[3, 4];
+    tv[i] := FMat[1, 1] * x + FMat[1, 2] * y + FMat[1, 3] * z + FMat[1, 4];
+    tv[i + 1] := FMat[2, 1] * x + FMat[2, 2] * y + FMat[2, 3] * z + FMat[2, 4];
+    tv[i + 2] := FMat[3, 1] * x + FMat[3, 2] * y + FMat[3, 3] * z + FMat[3, 4];
   end;
 end;
 
 procedure TMatrix4x4.GetLocals(var ux, uy, uz: vec3);
 begin
-  ux.x := Fmat[1, 1];
-  ux.y := Fmat[2, 1];
-  ux.z := Fmat[3, 1];
-  uy.x := Fmat[1, 2];
-  uy.y := Fmat[2, 2];
-  uy.z := Fmat[3, 2];
-  uz.x := Fmat[1, 3];
-  uz.y := Fmat[2, 3];
-  uz.z := Fmat[3, 3];
+  ux.x := FMat[1, 1];
+  ux.y := FMat[2, 1];
+  ux.z := FMat[3, 1];
+  uy.x := FMat[1, 2];
+  uy.y := FMat[2, 2];
+  uy.z := FMat[3, 2];
+  uz.x := FMat[1, 3];
+  uz.y := FMat[2, 3];
+  uz.z := FMat[3, 3];
 end;
 
 { TRotaParams }
@@ -439,9 +439,9 @@ begin
   Phi := 0;
   Theta := -90;
   Gamma := 0;
-  Xrot := -87;
-  Yrot := 0;
-  Zrot := 0;
+  XRot := -87;
+  YRot := 0;
+  ZRot := 0;
 end;
 
 procedure TRotaParams.SetIncrementIndex(Value: Integer);

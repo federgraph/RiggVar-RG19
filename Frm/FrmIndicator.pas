@@ -112,8 +112,8 @@ begin
   bmat := TMatrix4x4.Create;
   tempmat := TMatrix4x4.Create;
   tmat := TMatrix4x4.Create;
-  amat.yrot(0);
-  amat.xrot(0);
+  amat.YRot(0);
+  amat.XRot(0);
 
   ThreeD := TThreeDSolid.Create;
   ThreeD.WireFrame := False;
@@ -172,24 +172,24 @@ begin
   begin
     { Drehung um globales Achsensystem }
     if MouseButton = mbLeft then
-      tmat.zrot(-xtheta);
+      tmat.ZRot(-xtheta);
     if MouseButton = mbLeft then
-      tmat.xrot(ytheta);
+      tmat.XRot(ytheta);
     if MouseButton = mbRight then
-      tmat.yrot(-xtheta);
-    tmat.PreMultiply(amat.mat);
+      tmat.YRot(-xtheta);
+    tmat.PreMultiply(amat.Mat);
     amat.CopyFrom(tmat);
   end
   else
   begin
     { Drehung um lokales Achsensystem }
     if MouseButton = mbLeft then
-      tmat.zrot(-xtheta);
+      tmat.ZRot(-xtheta);
     if MouseButton = mbLeft then
-      tmat.yrot(ytheta);
+      tmat.YRot(ytheta);
     if MouseButton = mbRight then
-      tmat.xrot(-xtheta);
-    amat.PreMultiply(tmat.mat);
+      tmat.XRot(-xtheta);
+    amat.PreMultiply(tmat.Mat);
   end;
 
   { beim Indikator bleibt das Modell fest und die Blickrichtung ändert sich
@@ -197,7 +197,7 @@ begin
   tempmat.CopyFrom(amat);
   tempmat.Transpose; // die inverse von amat!
   bmat.identity;
-  bmat.PreMultiply(tempmat.mat);
+  bmat.PreMultiply(tempmat.Mat);
 
   if Painted then
   begin
@@ -214,7 +214,7 @@ procedure TIndicatorForm.PaintBoxMouseUp(Sender: TObject; Button: TMouseButton;
 begin
   MousDown := False;
   Draw;
-  Rotator.Matrix := bmat.mat;
+  Rotator.Matrix := bmat.Mat;
   if Assigned(OnChanged) then
     OnChanged(Self);
 end;
@@ -238,8 +238,8 @@ begin
     vert2.X := 0;
     vert2.Y := 0;
     vert2.z := 1;
-    amat.transformPoint(vert1);
-    amat.transformPoint(vert2);
+    amat.TransformPoint(vert1);
+    amat.TransformPoint(vert2);
     From.X := vert1.X + At.X;
     From.Y := vert1.Y + At.Y;
     From.z := vert1.z + At.z;
@@ -326,11 +326,11 @@ begin
     Exit;
   if not Assigned(Rotator) then
     Exit;
-  bmat.mat := Rotator.Matrix;
+  bmat.Mat := Rotator.Matrix;
   tempmat.CopyFrom(bmat);
   tempmat.Transpose;
   amat.identity;
-  amat.PreMultiply(tempmat.mat);
+  amat.PreMultiply(tempmat.Mat);
   RotateFromPoint;
   Draw;
 end;

@@ -47,8 +47,6 @@ type
     procedure MatrixItemClick(Sender: TObject);
   private
     CreatedScreenWidth: Integer;
-    MetaFile: TRiggMetaFile;
-    MetaCanvas: TMetaFileCanvas;
 
     FViewPoint: TViewPoint;
     FZoomBase: double;
@@ -102,8 +100,7 @@ type
     procedure SetZoomText;
     procedure DrawMatrix(Canvas: TCanvas);
     procedure DrawAngleText(Canvas: TCanvas);
-    procedure DrawToBitmap1;
-    procedure DrawToBitmap2;
+    procedure DrawToBitmap;
     procedure InitRotaData;
     procedure PaintBackGround(Image: TBitmap);
   public
@@ -111,12 +108,7 @@ type
     Rotator: TPolarKar2;
     HullGraph: TRggGraph;
     RaumGrafik: TRaumGrafik;
-    BackBmp: TBitmap;
     Mode: Boolean;
-    Sample420Memo: TStrings;
-    SampleDinghyMemo: TStrings;
-    SampleYachtMemo: TStrings;
-    SamplePlaningMemo: TStrings;
     procedure Draw;
     procedure InitGraph;
     procedure InitRaumGrafik;
@@ -162,9 +154,7 @@ begin
   RiggModul.RotaForm := nil;
   Paintbox3D.Free;
   Paintbox3D := nil;
-  BackBmp.Free;
   Bitmap.Free;
-  MetaFile.Free;
   RaumGrafik.Free;
   HullGraph.Free;
   Rotator.Free;
@@ -199,13 +189,6 @@ begin
     Height := wy;
   end;
   PaintBackGround(Bitmap);
-
-  Metafile := TRiggMetaFile.Create;
-  with Metafile do
-  begin
-    Width := Bitmap.Width;
-    Height := Bitmap.Height;
-  end;
 
   FZoomBase := 0.05;
   FViewPoint := vp3D;
@@ -290,7 +273,7 @@ procedure TRotaForm.InitRotaData;
   begin
     Rotator.Reset;
     Rotator.DeltaTheta := Theta;
-    Rotator.Xrot := Xrot;
+    Rotator.XRot := Xrot;
     result := Rotator.Matrix;
   end;
 
@@ -351,7 +334,7 @@ var
   S1, S2, S3: string;
   m4x4: Matrix4x4;
 begin
-  m4x4 := Rotator.mat.mat;
+  m4x4 := Rotator.Mat.Mat;
   S1 := Format('%8.4f %8.4f %8.4f',[m4x4[1,1],m4x4[1,2], m4x4[1,3]]);
   S2 := Format('%8.4f %8.4f %8.4f',[m4x4[2,1],m4x4[2,2], m4x4[2,3]]);
   S3 := Format('%8.4f %8.4f %8.4f',[m4x4[3,1],m4x4[3,2], m4x4[3,3]]);
@@ -393,7 +376,7 @@ begin
 
   NullpunktOffset.x := -RaumGrafik.Offset.x + Bitmap.Width div 2 + FXpos;
   NullpunktOffset.y := -RaumGrafik.Offset.y + Bitmap.Height div 2 + FYpos;
-  DrawToBitmap1;
+  DrawToBitmap;
 
   if MatrixItemChecked then
     DrawMatrix(Bitmap.Canvas);
@@ -408,7 +391,7 @@ begin
   Painted := True;
 end;
 
-procedure TRotaForm.DrawToBitmap1;
+procedure TRotaForm.DrawToBitmap;
 begin
   { Variante 1 }
   with Bitmap.Canvas do
@@ -432,42 +415,6 @@ begin
     SetWindowOrgEx(Handle, 0, 0, nil);
     SetViewPortOrgEx(Handle, 0, 0, nil);
     SetMapMode(Handle, MM_TEXT);
-  end;
-end;
-
-procedure TRotaForm.DrawToBitmap2;
-begin
-  { Metafile anlegen, alten Eintrag grau überschreiben }
-  MetaCanvas := TMetaFileCanvas.Create(MetaFile, 0);
-  try
-    if not PaintItemChecked then
-      MetaCanvas.Draw(0,0,MetaFile);
-    RaumGrafik.Coloriert := True;
-    RaumGrafik.Draw(MetaCanvas);
-    if FPaintRumpf = True then
-    begin
-      HullGraph.Coloriert := True;
-      HullGraph.FixPunkt := RaumGrafik.FixPunkt;
-      HullGraph.Draw(MetaCanvas);
-    end;
-  finally
-    MetaCanvas.Free;
-  end;
-  { Metafile auf das Bitmap schreiben }
-  Bitmap.Canvas.Draw(NullpunktOffset.x, NullpunktOffset.y, MetaFile);
-  { aktuelles Bild mit grauem Stift in das Metafile schreiben }
-  MetaCanvas := TMetaFileCanvas.Create(MetaFile, 0);
-  try
-    RaumGrafik.Coloriert := False;
-    RaumGrafik.Draw(MetaCanvas);
-    if FPaintRumpf = True then
-    begin
-      HullGraph.Coloriert := False;
-      HullGraph.FixPunkt := RaumGrafik.FixPunkt;
-      HullGraph.Draw(MetaCanvas);
-    end;
-  finally
-    MetaCanvas.Free;
   end;
 end;
 
@@ -646,14 +593,6 @@ begin
   end;
   PaintBackGround(Bitmap);
 
-  MetaFile.Free;
-  Metafile := TRiggMetaFile.Create;
-  with Metafile do
-  begin
-    Width := Bitmap.Width;
-    Height := Bitmap.Height;
-  end;
-
   SetViewPoint(FViewPoint);
 end;
 
@@ -727,9 +666,9 @@ begin
   Rotator.DeltaPhi := Phi;
   Rotator.DeltaTheta := Theta;
   Rotator.DeltaGamma := Gamma;
-  Rotator.Xrot := Xrot;
-  Rotator.Yrot := Yrot;
-  Rotator.Zrot := Zrot;
+  Rotator.XRot := Xrot;
+  Rotator.YRot := Yrot;
+  Rotator.ZRot := Zrot;
   RaumGrafik.Update;
   SetAngleText;
 end;
@@ -788,20 +727,10 @@ end;
 procedure TRotaForm.PaintBackGround(Image: TBitmap);
 var
   R: TRect;
-  P: TPoint;
 begin
   R := Rect(0, 0, Image.Width, Image.Height);
-  with Image.Canvas do
-  begin
-    Brush.Color := clGray;
-    FillRect(R);
-    if BackBmp <> nil then
-      if (BackBmp.Width < 100) and (BackBmp.Height < 100) then
-        P := Point(30, 5)
-      else
-        P := Point(0,0);
-      Draw(P.x,P.y,BackBmp);
-  end;
+  Image.Canvas.Brush.Color := clGray;
+  Image.Canvas.FillRect(R);
 end;
 
 end.

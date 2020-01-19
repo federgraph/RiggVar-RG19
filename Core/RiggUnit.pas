@@ -356,7 +356,7 @@ begin
   GetriebeGrafik.Rotator := TPolarKar2.Create;
   GetriebeGrafik.Rotator.DeltaPhi := 0;
   GetriebeGrafik.Rotator.DeltaTheta := -90;
-  GetriebeGrafik.Rotator.Xrot := -87;
+  GetriebeGrafik.Rotator.XRot := -87;
   GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
   GetriebeGrafik.Koordinaten := Rigg.rP;
   GetriebeGrafik.Koppelkurve := Rigg.Koppelkurve;

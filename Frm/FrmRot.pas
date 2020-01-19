@@ -515,7 +515,7 @@ procedure TRotationForm.InitRotaData;
   begin
     Rotator.Reset;
     Rotator.DeltaTheta := Theta;
-    Rotator.Xrot := Xrot;
+    Rotator.XRot := Xrot;
     result := Rotator.Matrix;
   end;
 
@@ -576,7 +576,7 @@ var
   S1, S2, S3: string;
   m4x4: Matrix4x4;
 begin
-  m4x4 := Rotator.mat.mat;
+  m4x4 := Rotator.Mat.Mat;
   S1 := Format('%8.4f %8.4f %8.4f',[m4x4[1,1],m4x4[1,2], m4x4[1,3]]);
   S2 := Format('%8.4f %8.4f %8.4f',[m4x4[2,1],m4x4[2,2], m4x4[2,3]]);
   S3 := Format('%8.4f %8.4f %8.4f',[m4x4[3,1],m4x4[3,2], m4x4[3,3]]);
@@ -1469,9 +1469,9 @@ begin
   Rotator.DeltaPhi := Phi;
   Rotator.DeltaTheta := Theta;
   Rotator.DeltaGamma := Gamma;
-  Rotator.Xrot := Xrot;
-  Rotator.Yrot := Yrot;
-  Rotator.Zrot := Zrot;
+  Rotator.XRot := Xrot;
+  Rotator.YRot := Yrot;
+  Rotator.ZRot := Zrot;
   RaumGrafik.Update;
   SetAngleText;
 end;

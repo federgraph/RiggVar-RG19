@@ -19,13 +19,13 @@ type
   THullGraph = class(TRggGraph)
   protected
     { Koordinaten }
-    vert: TvertArrayF; { Gleitkomma-Koordinaten }
-    tvert: TvertArrayI; { Integer-Koordinaten - transformed }
+    vert: TVertArrayF; { Gleitkomma-Koordinaten }
+    tvert: TVertArrayI; { Integer-Koordinaten - transformed }
     nvert: Integer; // maxvert: Integer;
     { Connections }
-    con: TconArray;
+    con: TConArray;
     ncon: Integer; // maxcon: Integer;
-    gr: TconColors;
+    gr: TConColors;
     { Matrix }
     mat: Tmatrix4x4;
     xmin, xmax, ymin, ymax, zmin, zmax: double;
@@ -36,10 +36,10 @@ type
     procedure ReadCons;
     procedure ReadCons1;
     procedure ReadCons2(k, l: Integer);
-    function addVert(x, y, z: single): Integer;
-    procedure add(p1, p2: Integer);
-    procedure paint(g: TCanvas);
-    procedure findBB;
+    function AddVert(x, y, z: single): Integer;
+    procedure AddLine(p1, p2: Integer);
+    procedure Paint(g: TCanvas);
+    procedure FindBB;
     function GetColor(i: Integer): TColor;
   public
     Factor: vec3; // FaktorX, FaktorY, FaktorZ: double;
@@ -72,10 +72,10 @@ begin
   Factor.z := 1;
   ModelFactor := Factor;
   Load;
-  mat := Tmatrix4x4.Create;
-  mat.xrot(20);
-  mat.yrot(30);
-  findBB();
+  mat := TMatrix4x4.Create;
+  mat.XRot(20);
+  mat.YRot(30);
+  FindBB();
   //compress();
   xw := xmax - xmin;
   yw := ymax - ymin;
@@ -102,8 +102,8 @@ begin
   GrafikOK := True;
 end;
 
-{ Add a Vertex to the Model }
-function THullGraph.addVert(x, y, z: single): Integer;
+{ Add a vertex to the Model }
+function THullGraph.AddVert(x, y, z: single): Integer;
 var
   i: Integer;
 begin
@@ -117,12 +117,12 @@ begin
   vert[i] := Factor.x * ModelFactor.x * x;
   vert[i + 1] := Factor.y * ModelFactor.y * y;
   vert[i + 2] := Factor.z * ModelFactor.z * z;
-  inc(nvert);
+  Inc(nvert);
   result := nvert;
 end;
 
 { Add a line from vertex p1 to vertex p2 }
-procedure THullGraph.add(p1, p2: Integer);
+procedure THullGraph.AddLine(p1, p2: Integer);
 var
   i, t: Integer;
 begin
@@ -146,15 +146,15 @@ procedure THullGraph.Update;
 begin
   if not GrafikOK then
     Exit;
-  mat.identity;
-  mat.translate(-FixPunkt[x], -FixPunkt[y], -FixPunkt[z]);
-  mat.Multiply(Rotator.Matrix);
-  { x und z werden abgebildet (siehe GBox3D) }
-  mat.scaleXYZ(Zoom, 20 / zfac, Zoom);
-  mat.translate(Offset.x, 4, -Offset.y);
   if nvert <= 0 then
     Exit;
-  mat.transform(vert, tvert, nvert);
+  mat.Identity;
+  mat.Translate(-FixPunkt[x], -FixPunkt[y], -FixPunkt[z]);
+  mat.Multiply(Rotator.Matrix);
+  { x und z werden abgebildet (siehe GBox3D) }
+  mat.ScaleXYZ(Zoom, 20 / zfac, Zoom);
+  mat.Translate(Offset.x, 4, -Offset.y);
+  mat.Transform(vert, tvert, nvert);
   Updated := True;
 end;
 
@@ -164,14 +164,14 @@ begin
     Exit;
   if not Updated then
     Update;
-  paint(Canvas);
+  Paint(Canvas);
 end;
 
-procedure THullGraph.paint(g: TCanvas);
+procedure THullGraph.Paint(g: TCanvas);
 var
   i, lim, t, p1, p2, grey: Integer;
-  c: TconArray;
-  v: TvertArrayI;
+  c: TConArray;
+  v: TVertArrayI;
 begin
   if nvert <= 0 then
     Exit;
@@ -228,9 +228,9 @@ begin
 end;
 
 { Find the bounding box of this model }
-procedure THullGraph.findBB;
+procedure THullGraph.FindBB;
 var
-  v: TvertArrayF;
+  v: TVertArrayF;
   xmin, ymin, zmin, xmax, ymax, zmax: single;
   x, y, z: single;
   i, j: Integer;
@@ -277,8 +277,8 @@ end;
 procedure THullGraph.GetPlotList(List: TStringList);
 var
   i, t, p1, p2: Integer;
-  c: TconArray;
-  v: TvertArrayI;
+  c: TConArray;
+  v: TVertArrayI;
   s: string;
   SavedZoom: double;
 begin
@@ -296,7 +296,7 @@ begin
   for i := 0 to ncon - 1 do
   begin
     { Indizes in das Vertice-array bestimmen }
-    t := c[i]; //T wie Temp
+    t := c[i]; //T  wie Temp
     p1 := ((t shr 16) and $FFFF) * 3; // Index Punkt1
     p2 := (t and $FFFF) * 3; // Index Punkt2
     // g.MoveTo(v[p1], -v[p1 + 2]);
@@ -345,17 +345,14 @@ begin
   begin
     Zeile := Memo[i];
     if Zeile = '' then
-      continue;
+      Continue;
     GetInteger(a);
     GetInteger(b);
     GetInteger(c);
-    with ModelFactor do
-    begin
-      x := a / 100;
-      y := b / 100;
-      z := c / 100;
-    end;
-    break;
+    ModelFactor.x := a / 100;
+    ModelFactor.y := b / 100;
+    ModelFactor.z := c / 100;
+    Break;
   end;
 
   for i := 1 to Memo.Count - 1 do
@@ -366,7 +363,7 @@ begin
     GetInteger(a);
     GetInteger(b);
     GetInteger(c);
-    addVert(a, b, c);
+    AddVert(a, b, c);
   end;
 end;
 
@@ -392,145 +389,143 @@ end;
 
 procedure THullGraph.ReadVertex1;
 begin
-  with ModelFactor do
-  begin
-    x := 1;
-    y := 1;
-    z := 1;
-  end;
-  addVert(4200, 0, 328); // Steven Spant 1, Koord 1..7
-  addVert(4194, 0, 260);
-  addVert(4188, 0, 195);
-  addVert(4178, 0, 128);
-  addVert(4168, 0, 78);
-  addVert(4151, 0, 26);
-  addVert(4130, 0, 0);
+  ModelFactor.x := 1;
+  ModelFactor.y := 1;
+  ModelFactor.z := 1;
 
-  addVert(4100, -157, 325); // Spant 2, Koord 8..20
-  addVert(4100, -149, 268);
-  addVert(4100, -126, 189);
-  addVert(4100, -100, 131);
-  addVert(4100, -69, 74);
-  addVert(4100, -30, 8);
-  addVert(4100, 0, -48);
-  addVert(4100, 30, 8);
-  addVert(4100, 69, 74);
-  addVert(4100, 100, 131);
-  addVert(4100, 126, 189);
-  addVert(4100, 149, 268);
-  addVert(4100, 157, 325);
+  AddVert(4200, 0, 328); // Steven Spant 1, Koord 1..7
+  AddVert(4194, 0, 260);
+  AddVert(4188, 0, 195);
+  AddVert(4178, 0, 128);
+  AddVert(4168, 0, 78);
+  AddVert(4151, 0, 26);
+  AddVert(4130, 0, 0);
 
-  addVert(4000, -244, 322); // Spant 3, Koord 21..33
-  addVert(4000, -237, 263);
-  addVert(4000, -219, 186);
-  addVert(4000, -193, 115);
-  addVert(4000, -159, 51);
-  addVert(4000, -88, -41);
-  addVert(4000, 0, -117);
-  addVert(4000, 88, -41);
-  addVert(4000, 159, 51);
-  addVert(4000, 193, 115);
-  addVert(4000, 219, 186);
-  addVert(4000, 237, 263);
-  addVert(4000, 244, 322);
+  AddVert(4100, -157, 325); // Spant 2, Koord 8..20
+  AddVert(4100, -149, 268);
+  AddVert(4100, -126, 189);
+  AddVert(4100, -100, 131);
+  AddVert(4100, -69, 74);
+  AddVert(4100, -30, 8);
+  AddVert(4100, 0, -48);
+  AddVert(4100, 30, 8);
+  AddVert(4100, 69, 74);
+  AddVert(4100, 100, 131);
+  AddVert(4100, 126, 189);
+  AddVert(4100, 149, 268);
+  AddVert(4100, 157, 325);
 
-  addVert(3750, -402, 315); // pant 4, Koord 34..46
-  addVert(3750, -387, 263);
-  addVert(3750, -374, 176);
-  addVert(3750, -345, 96);
-  addVert(3750, -281, 7);
-  addVert(3750, -155, -93);
-  addVert(3750, 0, -178);
-  addVert(3750, 155, -93);
-  addVert(3750, 281, 7);
-  addVert(3750, 345, 96);
-  addVert(3750, 374, 176);
-  addVert(3750, 387, 263);
-  addVert(3750, 402, 315);
+  AddVert(4000, -244, 322); // Spant 3, Koord 21..33
+  AddVert(4000, -237, 263);
+  AddVert(4000, -219, 186);
+  AddVert(4000, -193, 115);
+  AddVert(4000, -159, 51);
+  AddVert(4000, -88, -41);
+  AddVert(4000, 0, -117);
+  AddVert(4000, 88, -41);
+  AddVert(4000, 159, 51);
+  AddVert(4000, 193, 115);
+  AddVert(4000, 219, 186);
+  AddVert(4000, 237, 263);
+  AddVert(4000, 244, 322);
 
-  addVert(3400, -570, 308); // Spant 5, Koord 47..59
-  addVert(3400, -541, 253);
-  addVert(3400, -506, 166);
-  addVert(3400, -445, 42);
-  addVert(3400, -380, -30);
-  addVert(3400, -212, -126);
-  addVert(3400, 0, -202);
-  addVert(3400, 212, -126);
-  addVert(3400, 380, -30);
-  addVert(3400, 445, 42);
-  addVert(3400, 506, 166);
-  addVert(3400, 541, 253);
-  addVert(3400, 570, 308);
+  AddVert(3750, -402, 315); // pant 4, Koord 34..46
+  AddVert(3750, -387, 263);
+  AddVert(3750, -374, 176);
+  AddVert(3750, -345, 96);
+  AddVert(3750, -281, 7);
+  AddVert(3750, -155, -93);
+  AddVert(3750, 0, -178);
+  AddVert(3750, 155, -93);
+  AddVert(3750, 281, 7);
+  AddVert(3750, 345, 96);
+  AddVert(3750, 374, 176);
+  AddVert(3750, 387, 263);
+  AddVert(3750, 402, 315);
 
-  addVert(3000, -699, 302); // Spant 6, Koord 60..72
-  addVert(3000, -661, 248);
-  addVert(3000, -619, 163);
-  addVert(3000, -539, 26);
-  addVert(3000, -446, -54);
-  addVert(3000, -251, -138);
-  addVert(3000, 0, -205);
-  addVert(3000, 251, -138);
-  addVert(3000, 446, -54);
-  addVert(3000, 539, 26);
-  addVert(3000, 619, 163);
-  addVert(3000, 661, 248);
-  addVert(3000, 699, 302);
+  AddVert(3400, -570, 308); // Spant 5, Koord 47..59
+  AddVert(3400, -541, 253);
+  AddVert(3400, -506, 166);
+  AddVert(3400, -445, 42);
+  AddVert(3400, -380, -30);
+  AddVert(3400, -212, -126);
+  AddVert(3400, 0, -202);
+  AddVert(3400, 212, -126);
+  AddVert(3400, 380, -30);
+  AddVert(3400, 445, 42);
+  AddVert(3400, 506, 166);
+  AddVert(3400, 541, 253);
+  AddVert(3400, 570, 308);
 
-  addVert(2400, -793, 297); // Spant 7, Koord 73..85
-  addVert(2400, -749, 245);
-  addVert(2400, -716, 167);
-  addVert(2400, -634, 31);
-  addVert(2400, -500, -65);
-  addVert(2400, -296, -135);
-  addVert(2400, 0, -191);
-  addVert(2400, 296, -135);
-  addVert(2400, 500, -65);
-  addVert(2400, 634, 31);
-  addVert(2400, 716, 167);
-  addVert(2400, 749, 245);
-  addVert(2400, 793, 297);
+  AddVert(3000, -699, 302); // Spant 6, Koord 60..72
+  AddVert(3000, -661, 248);
+  AddVert(3000, -619, 163);
+  AddVert(3000, -539, 26);
+  AddVert(3000, -446, -54);
+  AddVert(3000, -251, -138);
+  AddVert(3000, 0, -205);
+  AddVert(3000, 251, -138);
+  AddVert(3000, 446, -54);
+  AddVert(3000, 539, 26);
+  AddVert(3000, 619, 163);
+  AddVert(3000, 661, 248);
+  AddVert(3000, 699, 302);
 
-  addVert(1800, -800, 290); // Spant 8, Koord 86..98
-  addVert(1800, -755, 241);
-  addVert(1800, -725, 173);
-  addVert(1800, -634, 34);
-  addVert(1800, -480, -58);
-  addVert(1800, -269, -115);
-  addVert(1800, 0, -161);
-  addVert(1800, 269, -115);
-  addVert(1800, 480, -58);
-  addVert(1800, 634, 34);
-  addVert(1800, 725, 173);
-  addVert(1800, 755, 241);
-  addVert(1800, 800, 290);
+  AddVert(2400, -793, 297); // Spant 7, Koord 73..85
+  AddVert(2400, -749, 245);
+  AddVert(2400, -716, 167);
+  AddVert(2400, -634, 31);
+  AddVert(2400, -500, -65);
+  AddVert(2400, -296, -135);
+  AddVert(2400, 0, -191);
+  AddVert(2400, 296, -135);
+  AddVert(2400, 500, -65);
+  AddVert(2400, 634, 31);
+  AddVert(2400, 716, 167);
+  AddVert(2400, 749, 245);
+  AddVert(2400, 793, 297);
 
-  addVert(1000, -730, 275); // Spant 9, Koord 99..111
-  addVert(1000, -696, 237);
-  addVert(1000, -674, 185);
-  addVert(1000, -585, 56);
-  addVert(1000, -414, -23);
-  addVert(1000, -214, -64);
-  addVert(1000, 0, -97);
-  addVert(1000, 214, -64);
-  addVert(1000, 414, -23);
-  addVert(1000, 585, 56);
-  addVert(1000, 674, 185);
-  addVert(1000, 696, 237);
-  addVert(1000, 730, 275);
+  AddVert(1800, -800, 290); // Spant 8, Koord 86..98
+  AddVert(1800, -755, 241);
+  AddVert(1800, -725, 173);
+  AddVert(1800, -634, 34);
+  AddVert(1800, -480, -58);
+  AddVert(1800, -269, -115);
+  AddVert(1800, 0, -161);
+  AddVert(1800, 269, -115);
+  AddVert(1800, 480, -58);
+  AddVert(1800, 634, 34);
+  AddVert(1800, 725, 173);
+  AddVert(1800, 755, 241);
+  AddVert(1800, 800, 290);
 
-  addVert(0, -580, 250); // Spant 10, Koord 112..124
-  addVert(0, -568, 226);
-  addVert(0, -560, 187);
-  addVert(0, -485, 89);
-  addVert(0, -300, 30);
-  addVert(0, -167, 13);
-  addVert(0, 0, 0);
-  addVert(0, 167, 13);
-  addVert(0, 300, 30);
-  addVert(0, 485, 89);
-  addVert(0, 560, 187);
-  addVert(0, 568, 226);
-  addVert(0, 580, 250);
+  AddVert(1000, -730, 275); // Spant 9, Koord 99..111
+  AddVert(1000, -696, 237);
+  AddVert(1000, -674, 185);
+  AddVert(1000, -585, 56);
+  AddVert(1000, -414, -23);
+  AddVert(1000, -214, -64);
+  AddVert(1000, 0, -97);
+  AddVert(1000, 214, -64);
+  AddVert(1000, 414, -23);
+  AddVert(1000, 585, 56);
+  AddVert(1000, 674, 185);
+  AddVert(1000, 696, 237);
+  AddVert(1000, 730, 275);
+
+  AddVert(0, -580, 250); // Spant 10, Koord 112..124
+  AddVert(0, -568, 226);
+  AddVert(0, -560, 187);
+  AddVert(0, -485, 89);
+  AddVert(0, -300, 30);
+  AddVert(0, -167, 13);
+  AddVert(0, 0, 0);
+  AddVert(0, 167, 13);
+  AddVert(0, 300, 30);
+  AddVert(0, 485, 89);
+  AddVert(0, 560, 187);
+  AddVert(0, 568, 226);
+  AddVert(0, 580, 250);
 end;
 
 procedure THullGraph.ReadCons;
@@ -542,24 +537,24 @@ end;
 procedure THullGraph.ReadCons1;
   procedure addcon7(a1, a2, a3, a4, a5, a6, a7: Integer);
   begin
-    add(a1 - 1, a2 - 1);
-    add(a2 - 1, a3 - 1);
-    add(a3 - 1, a4 - 1);
-    add(a4 - 1, a5 - 1);
-    add(a5 - 1, a6 - 1);
-    add(a6 - 1, a7 - 1);
+    AddLine(a1 - 1, a2 - 1);
+    AddLine(a2 - 1, a3 - 1);
+    AddLine(a3 - 1, a4 - 1);
+    AddLine(a4 - 1, a5 - 1);
+    AddLine(a5 - 1, a6 - 1);
+    AddLine(a6 - 1, a7 - 1);
   end;
   procedure addcon10(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10: Integer);
   begin
-    add(a1 - 1, a2 - 1);
-    add(a2 - 1, a3 - 1);
-    add(a3 - 1, a4 - 1);
-    add(a4 - 1, a5 - 1);
-    add(a5 - 1, a6 - 1);
-    add(a6 - 1, a7 - 1);
-    add(a7 - 1, a8 - 1);
-    add(a8 - 1, a9 - 1);
-    add(a9 - 1, a10 - 1);
+    AddLine(a1 - 1, a2 - 1);
+    AddLine(a2 - 1, a3 - 1);
+    AddLine(a3 - 1, a4 - 1);
+    AddLine(a4 - 1, a5 - 1);
+    AddLine(a5 - 1, a6 - 1);
+    AddLine(a6 - 1, a7 - 1);
+    AddLine(a7 - 1, a8 - 1);
+    AddLine(a8 - 1, a9 - 1);
+    AddLine(a9 - 1, a10 - 1);
   end;
 
 begin
@@ -609,7 +604,7 @@ end;
 
 procedure THullGraph.ReadCons2(k, l: Integer);
 
-  procedure addSection(a, b, c, n: Integer);
+  procedure AddSection(a, b, c, n: Integer);
   { a = 1.Punkt
     b = 2.Punkt
     c = Increment zwischen Punkten ab dem 2. Punkt
@@ -618,12 +613,12 @@ procedure THullGraph.ReadCons2(k, l: Integer);
   var
     i: Integer;
   begin
-    add(a-1, b-1);
+    AddLine(a-1, b-1);
     if n = 1 then Exit;
     for i := 2 to n do begin
       a := b;
       b := b + c;
-      add(a-1, b-1);
+      AddLine(a-1, b-1);
     end;
   end;
 
@@ -633,8 +628,8 @@ var
   i, a, b, vs, vl: Integer;
 begin
   { Beispiel-Eingaben }
-  // k := 10; //Anzahl der Spanten einschließlich Steven
-  // l := 7; //Anzahl der Linien
+  // k := 10; // Anzahl der Spanten einschließlich Steven
+  // l := 7; // Anzahl der Linien
 
   SpantenZahl := k - 1; // Anzahl Spanten = 9
   LinienZahl := 2*l-1; // Anzahl Linien = 13
@@ -642,11 +637,11 @@ begin
   vl := k - 1; // Anzahl Verbindungen einer Linie = 9
 
   a := 1;
-  addSection(a, a + 1, 1, vs); { der Steven }
+  AddSection(a, a + 1, 1, vs); { der Steven }
   a := l;
   for i := 1 to SpantenZahl do
   begin
-    addSection(a + 1, a + 2, 1, 2 * vs); { die Spanten }
+    AddSection(a + 1, a + 2, 1, 2 * vs); { die Spanten }
     a := a + LinienZahl;
   end;
 
@@ -654,13 +649,13 @@ begin
   b := l + 1;
   for i := 1 to l - 1 do
   begin
-    addSection(a, b, LinienZahl, vl); { Linien links und Kiel }
+    AddSection(a, b, LinienZahl, vl); { Linien links und Kiel }
     a := a + 1;
     b := b + 1;
   end;
   for i := l to LinienZahl do
   begin
-    addSection(a, b, LinienZahl, vl); { Linien rechts }
+    AddSection(a, b, LinienZahl, vl); { Linien rechts }
     a := a - 1;
     b := b + 1;
   end;
