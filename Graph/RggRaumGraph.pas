@@ -11,6 +11,7 @@ uses
   Vcl.Graphics,
   RggCalc,
   RggTypes,
+  RggDisplay,
   RggBootGraph;
 
 type
@@ -32,6 +33,7 @@ type
     procedure FillZug3D;
   public
     procedure Update; override;
+    procedure UpdateDisplayList;
     procedure Draw(Canvas: TCanvas); override;
     procedure GetPlotList(List: TStringList); override;
   end;
@@ -199,6 +201,77 @@ begin
   ZugVorstag[1].y := -yC0 + Offset.y;
   ZugVorstag[2].x := xC + Offset.x;
   ZugVorstag[2].y := -yC + Offset.y;
+end;
+
+procedure TRaumGraph.UpdateDisplayList;
+var
+  DI: TDisplayItem;
+begin
+  DL.Clear;
+  DI := DL.DI;
+
+  DI.Color := clYellow;
+  DI.StrokeWidth := 1;
+  DL.Ellipse(FixPunkt, FixPunkt, Offset, 10);
+
+  { Rumpf }
+  DI.Color := TColors.Lightgrey;
+  DI.StrokeWidth := 10;
+  DL.Line(A0, B0, ZugRumpf[1], ZugRumpf[2]);
+  DL.Line(B0, C0, ZugRumpf[2], ZugRumpf[3]);
+  DL.Line(A0, C0, ZugRumpf[1], ZugRumpf[3]);
+  DL.Line(D0, A0, ZugRumpf[5], ZugRumpf[1]);
+  DL.Line(D0, B0, ZugRumpf[5], ZugRumpf[2]);
+  DL.Line(D0, C0, ZugRumpf[5], ZugRumpf[3]);
+
+  { Mast }
+  DI.Color := TColors.Cornflowerblue;
+  DI.StrokeWidth := 8;
+  DL.PolyLine(D0, D, ZugMastKurve);
+
+  { Wante Stb }
+  DI.Color := clRed;
+  DI.StrokeWidth := 2;
+  DL.Line(A0, A, ZugWanteStb[1], ZugWanteStb[2]);
+  DL.Line(A, C, ZugWanteStb[2], ZugWanteStb[3]);
+
+  { Wante Bb }
+  DI.Color := clGreen;
+  DI.StrokeWidth := 2;
+  DL.Line(B0, B, ZugWanteBb[1], ZugWanteBb[2]);
+  DL.Line(B, C, ZugWanteBb[2], ZugWanteBb[3]);
+
+  { Saling }
+  DI.Color := clLime;
+  DI.StrokeWidth := 6;
+
+  if SalingTyp = stFest then
+  begin
+    DL.Line(A, D, ZugSalingFS[1], ZugSalingFS[2]);
+    DL.Line(B, D, ZugSalingFS[3], ZugSalingFS[2]);
+    DL.Line(A, B, ZugSalingFS[1], ZugSalingFS[3]);
+  end;
+
+  if SalingTyp = stDrehbar then
+  begin
+    DI.Color := clLime;
+    DI.StrokeWidth := 2;
+    DL.Line(A, D, ZugSalingDS[1], ZugSalingDS[2]);
+    DL.Line(B, D, ZugSalingDS[3], ZugSalingDS[2]);
+  end;
+
+  { Controller }
+  if ControllerTyp <> ctOhne then
+  begin
+    DI.Color := clAqua;
+    DI.StrokeWidth := 4;
+    DL.Line(E0, E, ZugController[1], ZugController[2]);
+  end;
+
+  { Vorstag }
+  DI.Color := clYellow;
+  DI.StrokeWidth := 4;
+  DL.Line(C, C0, ZugVorstag[1], ZugVorstag[2]);
 end;
 
 procedure TRaumGraph.Draw(Canvas: TCanvas);

@@ -8,7 +8,7 @@ uses
   System.Types,
   Vcl.Graphics,
   RggTypes,
-//  RggDisplay,
+  RggDisplay,
   RggPolarKar;
 
 type
@@ -26,7 +26,9 @@ type
     procedure SetZoom(Value: double); virtual;
   public
     Rotator: TPolarKar;
+    DL: TRggDisplayList;
     constructor Create; virtual;
+    destructor Destroy; override;
     procedure Update; virtual;
     procedure Draw(Canvas: TCanvas); virtual;
     procedure GetPlotList(List: TStringList); virtual;
@@ -41,9 +43,16 @@ implementation
 
 constructor TRggGraph.Create;
 begin
+  DL := TRggDisplayList.Create;
   FColored := True;
   FOffset := Point(1000, 1000);
   FZoom := 0.05;
+end;
+
+destructor TRggGraph.Destroy;
+begin
+  DL.Free;
+  inherited;
 end;
 
 procedure TRggGraph.SetFixPunkt(Value: TRealPoint);

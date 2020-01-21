@@ -61,6 +61,7 @@ uses
   RggPolarkar in 'Graph\RggPolarkar.pas',
   RggBootGraph in 'Graph\RggBootGraph.pas',
   RggRaumGraph in 'Graph\RggRaumGraph.pas',
+  RggDisplay in 'Graph\RggDisplay.pas',
   RiggVar.App.Main in 'App\RiggVar.App.Main.pas',
   RiggVar.App.Main0 in 'App\RiggVar.App.Main0.pas',
   RiggVar.App.Main1 in 'App\RiggVar.App.Main1.pas',

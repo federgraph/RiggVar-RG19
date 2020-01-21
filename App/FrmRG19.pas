@@ -432,6 +432,7 @@ begin
 
   RiggModul.RotaForm := TRotaForm.Create;
   RiggModul.RotaForm.PaintBox3D := PaintboxR;
+  RiggModul.RotaForm.UseDisplayList := True;
   RiggModul.RotaForm.Init;
   PaintboxR := RiggModul.RotaForm.PaintBox3D;
 end;

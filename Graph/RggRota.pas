@@ -122,6 +122,7 @@ type
     RumpfItemChecked: Boolean;
   public
     PaintBox3D: TPaintBox;
+    UseDisplayList: Boolean;
     constructor Create;
     destructor Destroy; override;
     procedure Init;
@@ -227,7 +228,10 @@ end;
 
 procedure TRotaForm.InitRaumGrafik;
 begin
-  RaumGrafik := TGetriebeGraph.Create;
+  if UseDisplayList then
+    RaumGrafik := TRaumGraph.Create
+  else
+    RaumGrafik := TGetriebeGraph.Create;
   RaumGrafik.Rotator := Rotator;
   RaumGrafik.Offset := Point(1000,1000);
   RaumGrafik.Zoom := FZoom;
@@ -403,7 +407,14 @@ begin
     SetViewPortOrgEx(Handle, NullpunktOffset.x, NullpunktOffset.y, nil);
   end;
   RaumGrafik.Coloriert := True;
-  RaumGrafik.Draw(Bitmap.Canvas);
+  if UseDisplayList then
+  begin
+    RaumGrafik.Update;
+    RaumGrafik.UpdateDisplayList;
+    RaumGrafik.DL.Draw(Bitmap.Canvas);
+  end
+  else
+    RaumGrafik.Draw(Bitmap.Canvas);
 
   if FPaintRumpf and (not MouseDown or (MouseDown and FDrawAlways)) then
   begin
