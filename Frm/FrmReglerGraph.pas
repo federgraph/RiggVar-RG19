@@ -46,7 +46,8 @@ var
 
 implementation
 
-uses RiggUnit;
+uses
+  RggModul;
 
 {$R *.DFM}
 

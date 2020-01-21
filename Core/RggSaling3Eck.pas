@@ -1,12 +1,12 @@
-﻿unit Saling3Eck;
+﻿unit RggSaling3Eck;
 
 interface
 
 uses
   System.Math,
   RggTypes,
-  Vcalc116,
-  Rggunit4;
+  RggCalc,
+  RggUnit4;
 
 type
   TSalingDreieck = class

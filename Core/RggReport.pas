@@ -1,4 +1,4 @@
-﻿unit Iotypes;
+﻿unit RggReport;
 
 interface
 
@@ -6,7 +6,7 @@ uses
   SysUtils,
   Classes,
   RggTypes,
-  FWUnit;
+  RggFachwerk;
 
 const
   LinkerRand: String[10] = ' ';
@@ -37,7 +37,7 @@ type
     FML: TStrings;
   public
     IndexAuswahlL: set of TRiggLIndexRange;
-    IndexAuswahlP: set of TRiggPoints;
+    IndexAuswahlP: set of TRiggPoint;
     constructor Create;
     destructor Destroy; override;
     procedure AusgabeRL(rL: TRiggLvektor);
@@ -292,7 +292,7 @@ end;
 
 procedure TRiggReport.AusgabeRP(rP: TRealRiggPoints);
 var
-  i: TRiggPoints;
+  i: TRiggPoint;
 begin
   with FML do
   begin
@@ -312,7 +312,7 @@ end;
 
 procedure TRiggReport.AusgabeRPE(rPe: TRealRiggPoints);
 var
-  i: TRiggPoints;
+  i: TRiggPoint;
 begin
   with FML do
   begin
@@ -332,7 +332,7 @@ end;
 
 procedure TRiggReport.AusgabeDiffP(rP, rPe: TRealRiggPoints);
 var
-  i: TRiggPoints;
+  i: TRiggPoint;
 begin
   with FML do
   begin

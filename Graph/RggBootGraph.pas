@@ -1,4 +1,4 @@
-﻿unit BootGraph;
+﻿unit RggBootGraph;
 
 interface
 
@@ -10,11 +10,11 @@ uses
 type
   TBootGraph = class(TRggGraph)
   private
-    FFixName: TRiggPoints;
+    FFixPoint: TRiggPoint;
     FSalingTyp: TSalingTyp;
     FControllerTyp: TControllerTyp;
     procedure SetKoord(Value: TRealRiggPoints);
-    procedure SetFixName(Value: TRiggPoints);
+    procedure SetFixPoint(Value: TRiggPoint);
   protected
     rP: TRealRiggPoints;
     Kurve: array [0 .. BogenMax] of TRealPoint;
@@ -23,7 +23,7 @@ type
     procedure LoadFromIniFile(FileName: string);
     procedure SetMastKurve(f: TLineDataR100; L, beta: double);
 
-    property FixName: TRiggPoints read FFixName write SetFixName;
+    property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
     property SalingTyp: TSalingTyp read FSalingTyp write FSalingTyp;
     property ControllerTyp: TControllerTyp read FControllerTyp write FControllerTyp;
     property Koordinaten: TRealRiggPoints read rP write SetKoord;
@@ -34,7 +34,7 @@ implementation
 constructor TBootGraph.Create;
 begin
   inherited Create;
-  FFixName := ooD0;
+  FFixPoint := ooD0;
   FSalingTyp := stFest;
   FControllerTyp := ctDruck;
 end;
@@ -44,14 +44,14 @@ begin
   rP := Value;
   { Fixpunkt wird in TBootGraph nicht benötigt, aber er wird eventuell herauskopiert
     z.Bsp. nach HullGraph - und muß deshalb aktuell sein. }
-  FixPunkt := rP[FixName];
+  FixPunkt := rP[FixPoint];
   GrafikOK := True;
   Updated := False;
 end;
 
-procedure TBootGraph.SetFixName(Value: TRiggPoints);
+procedure TBootGraph.SetFixPoint(Value: TRiggPoint);
 begin
-  FFixName := Value;
+  FFixPoint := Value;
   FixPunkt := rP[Value]; //--> Updated := False;
 end;
 
@@ -78,7 +78,7 @@ procedure TBootGraph.LoadFromIniFile(FileName: string);
 var
   IniFile: TIniFile;
   S: string;
-  i: TRiggPoints;
+  i: TRiggPoint;
   iP: TIntRiggPoints;
 begin
   IniFile := TIniFile.Create(FileName);

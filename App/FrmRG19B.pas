@@ -24,9 +24,9 @@ uses
   System.SysUtils,
   System.Classes,
   RggTypes,
+  RggReport,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
-  IoTypes,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -318,7 +318,7 @@ type
     procedure InitParamCombo;
     procedure InitViewpointCombo;
     procedure InitFixpointCombo;
-    function GetComboFixPoint: TRiggPoints;
+    function GetComboFixPoint: TRiggPoint;
   private
     Margin: Integer;
     TL: TStrings;
@@ -368,7 +368,7 @@ uses
   RiggVar.App.Main,
   RiggVar.VM.FormMainB,
   RiggVar.RG.Main,
-  RiggUnit,
+  RggModul,
   RggRota,
   FrmInfo,
   FrmConsole,
@@ -376,7 +376,6 @@ uses
   FrmKreis,
   FrmOutput,
   FrmGrafik,
-  FrmText,
   FrmReport,
   FrmChart,
   FrmRot,
@@ -1235,7 +1234,7 @@ begin
   sb := AddSpeedBtn('SaveTrimmFileBtn', 0);
   SaveTrimmFileBtn := sb;
   sb.Caption := 'stf';
-  sb.Hint := 'MT0';
+  sb.Hint := 'Save Trimm File';
   sb.GroupIndex := 10;
   sb.OnClick := SaveTrimmFileBtnClick;
 
@@ -1731,26 +1730,26 @@ begin
   cl.Add('F');
 end;
 
-function TFormRG19B.GetComboFixPoint: TRiggPoints;
+function TFormRG19B.GetComboFixPoint: TRiggPoint;
 var
-  NewFixName: TRiggPoints;
+  fp: TRiggPoint;
   s: string;
 begin
-  NewFixName := ooD0;
+  fp := ooD0;
   s := FixpointCombo.Text;
-  if s = 'A0' then NewFixName := ooA0
-  else if s = 'B0' then NewFixName := ooB0
-  else if s = 'C0' then NewFixName := ooC0
-  else if s = 'D0' then NewFixName := ooD0
-  else if s = 'E0' then NewFixName := ooE0
-  else if s = 'F0' then NewFixName := ooF0
-  else if s = 'A' then NewFixName := ooA
-  else if s = 'B' then NewFixName := ooB
-  else if s = 'C' then NewFixName := ooC
-  else if s = 'D' then NewFixName := ooD
-  else if s = 'E' then NewFixName := ooE
-  else if s = 'F' then NewFixName := ooF;
-  result := NewFixName;
+  if s = 'A0' then fp := ooA0
+  else if s = 'B0' then fp := ooB0
+  else if s = 'C0' then fp := ooC0
+  else if s = 'D0' then fp := ooD0
+  else if s = 'E0' then fp := ooE0
+  else if s = 'F0' then fp := ooF0
+  else if s = 'A' then fp := ooA
+  else if s = 'B' then fp := ooB
+  else if s = 'C' then fp := ooC
+  else if s = 'D' then fp := ooD
+  else if s = 'E' then fp := ooE
+  else if s = 'F' then fp := ooF;
+  result := fp;
 end;
 
 procedure TFormRG19B.InitParamCombo;

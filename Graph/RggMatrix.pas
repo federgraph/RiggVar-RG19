@@ -1,4 +1,4 @@
-﻿unit Rggmat01;
+﻿unit RggMatrix;
 
 interface
 
@@ -78,7 +78,7 @@ type
   public
     Xpos: Integer;
     Ypos: Integer;
-    FixPunkt: TRiggPoints;
+    FixPunkt: TRiggPoint;
     Phi, Theta, Gamma, XRot, YRot, ZRot: Integer;
     constructor Create;
     property IncrementIndex: Integer read FIncrementIndex write SetIncrementIndex;

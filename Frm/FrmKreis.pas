@@ -12,7 +12,7 @@ uses
   Vcl.StdCtrls,
   Vcl.ExtCtrls,
   RggTypes,
-  SchnttKK;
+  RggSchnittKK;
 
 type
   TSprite = class

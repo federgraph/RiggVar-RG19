@@ -24,9 +24,9 @@ uses
   System.SysUtils,
   System.Classes,
   RggTypes,
+  RggReport,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
-  IoTypes,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -276,10 +276,14 @@ type
     ZoomInBtn: TSpeedButton;
     ZoomOutBtn: TSpeedButton;
 
+    DisplayModeBtn: TSpeedButton;
+
     procedure SeiteBtnClick(Sender: TObject);
     procedure AchternBtnClick(Sender: TObject);
     procedure TopBtnClick(Sender: TObject);
     procedure NullBtnClick(Sender: TObject);
+
+//    procedure ToggleDisplayMode(Sender: TObject);
   private
     BtnTop: Integer;
     BtnLeft: Integer;
@@ -302,7 +306,7 @@ type
     procedure InitParamCombo;
     procedure InitViewpointCombo;
     procedure InitFixpointCombo;
-    function GetComboFixPoint: TRiggPoints;
+    function GetComboFixPoint: TRiggPoint;
   private
     Margin: Integer;
     TL: TStrings;
@@ -352,7 +356,7 @@ uses
   RiggVar.App.Main,
   RiggVar.VM.FormMainC,
   RiggVar.RG.Main,
-  RiggUnit,
+  RggModul,
   RggRota,
   FrmInfo,
   FrmConsole,
@@ -360,7 +364,6 @@ uses
   FrmKreis,
   FrmOutput,
   FrmGrafik,
-  FrmText,
   FrmReport,
   FrmChart,
   FrmRot,
@@ -431,7 +434,6 @@ begin
   RiggModul.RotaForm.PaintBox3D := PaintboxR;
   RiggModul.RotaForm.Init;
   PaintboxR := RiggModul.RotaForm.PaintBox3D;
-  RiggModul.DoGraphics;
 end;
 
 procedure TFormRG19.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1079,21 +1081,21 @@ begin
   sb := AddSpeedBtn('UpdateBtn', BtnGroupSpace);
   UpdateBtn := sb;
   sb.Caption := '=';
-  sb.Hint := 'Rigg neu Berechnen';
+  sb.Hint := 'Compute|Rigg neu Berechnen';
   sb.GroupIndex := 0;
   sb.OnClick := UpdateBtnClick;
 
   sb := AddSpeedBtn('ReglerBtn', 0);
   ReglerBtn := sb;
   sb.Caption := 'R';
-  sb.Hint := 'Trimm Regeln';
+  sb.Hint := 'Regeln|Trimm Regeln';
   sb.GroupIndex := 0;
   sb.OnClick := ReglerBtnClick;
 
   sb := AddSpeedBtn('MemoryBtn', 0);
   MemoryBtn := sb;
   sb.Caption := 'M';
-  sb.Hint := 'Memory (Trimm als Referenz speichern)';
+  sb.Hint := 'Memory|Memory (Trimm als Referenz speichern)';
   sb.GroupIndex := 0;
   sb.OnClick := MemoryBtnClick;
 
@@ -1109,7 +1111,7 @@ begin
   sb := AddSpeedBtn('PaintBtn', BtnGroupSpace);
   PaintBtn := sb;
   sb.Caption := 'pb';
-  sb.Hint := '2D Grafik - Alte Grafik stehenlassen';
+  sb.Hint := 'Paint Btn|2D Grafik - Alte Grafik stehenlassen';
   sb.AllowAllUp := True;
   sb.Down := False;
   sb.GroupIndex := 1;
@@ -1119,7 +1121,7 @@ begin
   sb := AddSpeedBtn('BtnBlau', 0);
   BtnBlau := sb;
   sb.Caption := 'bb';
-  sb.Hint := '2D Grafik - Nullstellung anzeigen';
+  sb.Hint := 'Blue Btn|2D Grafik - Nullstellung anzeigen';
   sb.AllowAllUp := True;
   sb.Down := False;
   sb.GroupIndex := 2;
@@ -1129,7 +1131,7 @@ begin
   sb := AddSpeedBtn('BtnGrau', 0);
   BtnGrau := sb;
   sb.Caption := 'gb';
-  sb.Hint := '2D Grafik - Entspanntes Rigg einblenden';
+  sb.Hint := 'Gray Btn|2D Grafik - Entspanntes Rigg einblenden';
   sb.AllowAllUp := True;
   sb.Down := True;
   sb.GroupIndex := 3;
@@ -1139,7 +1141,7 @@ begin
   sb := AddSpeedBtn('KoppelBtn', 0);
   KoppelBtn := sb;
   sb.Caption := 'kk';
-  sb.Hint := '2D Grafik - Koppelkurve anzeigen';
+  sb.Hint := 'Koppelkurve|2D Grafik - Koppelkurve anzeigen';
   sb.AllowAllUp := True;
   sb.Down := True;
   sb.GroupIndex := 4;
@@ -1149,7 +1151,7 @@ begin
   sb := AddSpeedBtn('ZweischlagBtn', 0);
   ZweischlagBtn := sb;
   sb.Caption := 'zs';
-  sb.Hint := '2D Grafik - Mast als Zweischlag einzeichnen';
+  sb.Hint := 'Zweischlag|2D Grafik - Mast als Zweischlag einzeichnen';
   sb.AllowAllUp := True;
   sb.Down := False;
   sb.GroupIndex := 5;
@@ -1167,7 +1169,7 @@ begin
   sb := AddSpeedBtn('ControllerBtn', BtnGroupSpace);
   ControllerBtn := sb;
   sb.Caption := 'C';
-  sb.Hint := 'Umschalter für Controller-Modus';
+  sb.Hint := 'Controller|Umschalter für Controller-Modus';
   sb.AllowAllUp := True;
   sb.Down := True;
   sb.GroupIndex := 6;
@@ -1176,7 +1178,7 @@ begin
   sb := AddSpeedBtn('DiffBtn', 0);
   DiffBtn := sb;
   sb.Caption := 'D';
-  sb.Hint := 'Umschalter Differenzen/Absolutwerte';
+  sb.Hint := 'Diff|Umschalter Differenzen/Absolutwerte';
   sb.AllowAllUp := True;
   sb.Down := False;
   sb.GroupIndex := 7;
@@ -1185,7 +1187,7 @@ begin
   sb := AddSpeedBtn('WinkelBtn', 0);
   WinkelBtn := sb;
   sb.Caption := 'W';
-  sb.Hint := 'Umschalter Winkel/Vorstag';
+  sb.Hint := 'Winkel|Umschalter Winkel/Vorstag';
   sb.AllowAllUp := True;
   sb.Down := False;
   sb.GroupIndex := 8;
@@ -1194,7 +1196,7 @@ begin
   sb := AddSpeedBtn('SofortBtn', 0);
   SofortBtn := sb;
   sb.Caption := 'A';
-  sb.Hint := 'Umschalter Rigg sofort berechnen (Automatik)';
+  sb.Hint := 'Automatik|Umschalter Rigg sofort berechnen (Automatik)';
   sb.AllowAllUp := True;
   sb.Down := True;
   sb.GroupIndex := 9;
@@ -1223,21 +1225,21 @@ begin
   sb := AddSpeedBtn('ReadTrimmFileBtn', 0);
   ReadTrimmFileBtn := sb;
   sb.Caption := 'rtf';
-  sb.Hint := 'Read Trimm File';
+  sb.Hint := 'Read File|Read Trimm File';
   sb.GroupIndex := 10;
   sb.OnClick := ReadTrimmFileBtnClick;
 
   sb := AddSpeedBtn('SaveTrimmFileBtn', 0);
   SaveTrimmFileBtn := sb;
   sb.Caption := 'stf';
-  sb.Hint := 'MT0';
+  sb.Hint := 'Save File|Save Trimm File';
   sb.GroupIndex := 10;
   sb.OnClick := SaveTrimmFileBtnClick;
 
   sb := AddSpeedBtn('CopyTrimmFileBtn', 0);
   CopyTrimmFileBtn := sb;
   sb.Caption := 'ctf';
-  sb.Hint := 'Copy Trimm File';
+  sb.Hint := 'Copy File|Copy Trimm File';
   sb.GroupIndex := 10;
   sb.OnClick := CopyTrimmFileBtnClick;
 
@@ -1246,14 +1248,14 @@ begin
   sb := AddSpeedBtn('CopyTrimmItemBtn', 0);
   CopyTrimmItemBtn := sb;
   sb.Caption := 'cti';
-  sb.Hint := 'Copy Trimm Item';
+  sb.Hint := 'Copy Item|Copy Trimm Item';
   sb.GroupIndex := 10;
   sb.OnClick := CopyTrimmItemBtnClick;
 
   sb := AddSpeedBtn('PasteTrimmItemBtn', 0);
   PasteTrimmItemBtn := sb;
   sb.Caption := 'pti';
-  sb.Hint := 'Paste Trimm Item';
+  sb.Hint := 'Paste Item|Paste Trimm Item';
   sb.GroupIndex := 10;
   sb.OnClick := PasteTrimmItemBtnClick;
 
@@ -1262,7 +1264,7 @@ begin
   sb := AddSpeedBtn('CopyAndPasteBtn', 0);
   CopyAndPasteBtn := sb;
   sb.Caption := 'M';
-  sb.Hint := 'Copy and Paste Btn';
+  sb.Hint := 'Update Item|Copy and Paste Btn';
   sb.GroupIndex := 10;
   sb.OnClick := CopyAndPasteBtnClick;
 
@@ -1273,28 +1275,28 @@ begin
   sb := AddSpeedBtn('M10Btn', BtnGroupSpace);
   M10Btn := sb;
   sb.Caption := 'M10';
-  sb.Hint := 'Param Value Minus 10';
+  sb.Hint := '-10|Param Value Minus 10';
   sb.GroupIndex := 10;
   sb.OnClick := M10BtnClick;
 
   sb := AddSpeedBtn('M1Btn', 0);
   M1Btn := sb;
   sb.Caption := 'M1';
-  sb.Hint := 'Param Value Minus 1';
+  sb.Hint := '-1|Param Value Minus 1';
   sb.GroupIndex := 10;
   sb.OnClick := M1BtnClick;
 
   sb := AddSpeedBtn('P1Btn', 0);
   P1Btn := sb;
   sb.Caption := 'P1';
-  sb.Hint := 'Param Value Plus 1';
+  sb.Hint := '+1|Param Value Plus 1';
   sb.GroupIndex := 10;
   sb.OnClick := P1BtnClick;
 
   sb := AddSpeedBtn('P10Btn', 0);
   P10Btn := sb;
   sb.Caption := 'P10';
-  sb.Hint := 'Param Value Plus 10';
+  sb.Hint := '+10|Param Value Plus 10';
   sb.GroupIndex := 10;
   sb.OnClick := P10BtnClick;
 
@@ -1341,7 +1343,7 @@ begin
   sb := AddSpeedBtn('BuntBtn', 0);
   BuntBtn := sb;
   sb.Caption := 'Bunt';
-  sb.Hint := 'Paint Button for RotaForm';
+  sb.Hint := 'Paint Btn 2|Paint Button for RotaForm';
   sb.AllowAllUp := True;
   sb.Down := RiggModul.RotaForm.PaintItemChecked;
   sb.GroupIndex := 12;
@@ -1354,7 +1356,7 @@ begin
   sb := AddSpeedBtn('SeiteBtn', BtnGroupSpace);
   SeiteBtn := sb;
   sb.Caption := 'S';
-  sb.Hint := 'Viewpoint Seite';
+  sb.Hint := 'Side View|Viewpoint Seite';
   sb.AllowAllUp := True;
   sb.Down := RiggModul.RotaForm.ViewPoint = vpSeite;
   sb.GroupIndex := 13;
@@ -1363,7 +1365,7 @@ begin
   sb := AddSpeedBtn('AchternBtn', 0);
   AchternBtn := sb;
   sb.Caption := 'A';
-  sb.Hint := 'Viewpoint Achtern';
+  sb.Hint := 'Stern View|Viewpoint Achtern';
   sb.AllowAllUp := False;
   sb.Down := RiggModul.RotaForm.ViewPoint = vpAchtern;
   sb.GroupIndex := 13;
@@ -1372,7 +1374,7 @@ begin
   sb := AddSpeedBtn('TopBtn', 0);
   TopBtn := sb;
   sb.Caption := 'T';
-  sb.Hint := 'Viewpoint Top';
+  sb.Hint := 'Top View|Viewpoint Top';
   sb.AllowAllUp := False;
   sb.Down := RiggModul.RotaForm.ViewPoint = vpTop;
   sb.GroupIndex := 13;
@@ -1400,6 +1402,13 @@ begin
   sb.Hint := 'Zoom In';
   sb.GroupIndex := 0;
   sb.OnClick := RiggModul.RotaForm.ZoomInBtnClick;
+
+//  sb := AddSpeedBtn('DisplayModeBtn', 0);
+//  DisplayModeBtn := sb;
+//  sb.Caption := 'DM';
+//  sb.Hint := 'Display Mode Toggle';
+//  sb.GroupIndex := 0;
+//  sb.OnClick := ToggleDisplayMode;
 end;
 
 procedure TFormRG19.InitStatusBar;
@@ -1727,26 +1736,26 @@ begin
   cl.Add('F');
 end;
 
-function TFormRG19.GetComboFixPoint: TRiggPoints;
+function TFormRG19.GetComboFixPoint: TRiggPoint;
 var
-  NewFixName: TRiggPoints;
+  fp: TRiggPoint;
   s: string;
 begin
-  NewFixName := ooD0;
+  fp := ooD0;
   s := FixpointCombo.Text;
-  if s = 'A0' then NewFixName := ooA0
-  else if s = 'B0' then NewFixName := ooB0
-  else if s = 'C0' then NewFixName := ooC0
-  else if s = 'D0' then NewFixName := ooD0
-  else if s = 'E0' then NewFixName := ooE0
-  else if s = 'F0' then NewFixName := ooF0
-  else if s = 'A' then NewFixName := ooA
-  else if s = 'B' then NewFixName := ooB
-  else if s = 'C' then NewFixName := ooC
-  else if s = 'D' then NewFixName := ooD
-  else if s = 'E' then NewFixName := ooE
-  else if s = 'F' then NewFixName := ooF;
-  result := NewFixName;
+  if s = 'A0' then fp := ooA0
+  else if s = 'B0' then fp := ooB0
+  else if s = 'C0' then fp := ooC0
+  else if s = 'D0' then fp := ooD0
+  else if s = 'E0' then fp := ooE0
+  else if s = 'F0' then fp := ooF0
+  else if s = 'A' then fp := ooA
+  else if s = 'B' then fp := ooB
+  else if s = 'C' then fp := ooC
+  else if s = 'D' then fp := ooD
+  else if s = 'E' then fp := ooE
+  else if s = 'F' then fp := ooF;
+  result := fp;
 end;
 
 procedure TFormRG19.InitParamCombo;

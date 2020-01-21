@@ -1,4 +1,4 @@
-﻿unit Rggunit1;
+﻿unit RggUnit1;
 
 interface
 
@@ -7,8 +7,8 @@ uses
   System.Classes,
   System.Math,
   RggTypes,
-  Vcalc116,
-  SchnttKK,
+  RggCalc,
+  RggSchnittKK,
   RggUnit0;
 
 type
@@ -138,7 +138,7 @@ end;
 
 procedure TGetriebeFS.Rest;
 var
-  i: TRiggPoints;
+  i: TRiggPoint;
   j: TKoord;
 begin
   { Berechnung Punkt ooE }
@@ -180,7 +180,7 @@ begin
   a := Abstand(rp[ooF0], rp[ooF]);
   t := (a - MastfallVorlauf) / a;
   ooTemp := vsub(rp[ooF], rp[ooF0]);
-  ooTemp := vadd(rp[ooF0], skalarmult(ooTemp, t));
+  ooTemp := vadd(rp[ooF0], SkalarMult(ooTemp, t));
   rp[ooM] := ooTemp;
 end;
 
@@ -660,14 +660,14 @@ begin
   { weiter räumlich: }
   Skalar := W1Strich / WStrich;
   temp := vsub(rP[ooC], rP[ooA0]);
-  temp := skalarmult(temp, Skalar);
+  temp := SkalarMult(temp, Skalar);
   temp := vadd(rP[ooA0], temp);
   { Temp enthält jetzt den räumlichen Schnittpunkt der Diagonalen }
 
   { Berechnung Punkt ooA }
   Skalar := FrSalingL / Saling1L;
   temp := vsub(temp, rP[ooD]);
-  temp := skalarmult(temp, Skalar);
+  temp := SkalarMult(temp, Skalar);
   rP[ooA] := vadd(rP[ooD], temp);
 
   { aktualisieren }
@@ -791,14 +791,14 @@ begin
   { weiter räumlich: }
   Skalar := W1Strich / WStrich;
   temp := vsub(rP[ooC], rP[ooA0]);
-  temp := skalarmult(temp, Skalar);
+  temp := SkalarMult(temp, Skalar);
   temp := vadd(rP[ooA0], temp);
   { Temp enthält jetzt den räumlichen Schnittpunkt der Diagonalen }
 
   { Berechnung Punkt ooA }
   Skalar := FrSalingL / Saling1L;
   temp := vsub(temp, rP[ooD]);
-  temp := skalarmult(temp, Skalar);
+  temp := SkalarMult(temp, Skalar);
   rP[ooA] := vadd(rP[ooD], temp);
 
   { FrWunten3d ermitteln und aktualisieren }
@@ -1264,8 +1264,8 @@ begin
   BiegeUndNeigeF(TrimmSoll.Mastfall, TrimmSoll.BiegungS);
 
   { 4. Startwert für FrSalingH ermitteln }
-  ooTemp := Evektor(rP[ooC], rP[ooP0]);
-  ooTemp := skalarmult(ooTemp, FrWoben2d);
+  ooTemp := EVektor(rP[ooC], rP[ooP0]);
+  ooTemp := SkalarMult(ooTemp, FrWoben2d);
   rP[ooP] := vadd(rP[ooC], ooTemp);
   SalingHStart := Abstand(rP[ooP], rP[ooD]);
   FrSalingH := Trunc(SalingHStart) + 1; { FiSalingH garantiert größer }
@@ -1282,8 +1282,8 @@ begin
   BiegeUndNeigeF(TrimmSoll.Mastfall, TrimmSoll.BiegungS);
 
   { Startwert für SalingL ermitteln }
-  ooTemp := Evektor(rP[ooC], rP[ooA0]);
-  ooTemp := skalarmult(ooTemp, FrWoben3d);
+  ooTemp := EVektor(rP[ooC], rP[ooA0]);
+  ooTemp := SkalarMult(ooTemp, FrWoben3d);
   rP[ooA] := vadd(rP[ooC], ooTemp);
   SalingLStart := Abstand(rP[ooA], rP[ooD]);
   FrSalingL := Trunc(SalingLStart) + 1; { FiSalingL dann garantiert größer! }

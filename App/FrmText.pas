@@ -33,7 +33,7 @@ uses
   Vcl.ComCtrls,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
-  IoTypes,
+  RggReport,
   Vcl.Buttons;
 
 type
@@ -59,20 +59,21 @@ type
     cbAllProps: TCheckBox;
     ViewpointCombo: TComboBox;
     cbAllTags: TCheckBox;
+    CopyTrimmFileBtn: TSpeedButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormResize(Sender: TObject);
-    procedure TestBtnClick(Sender: TObject);
-    procedure ListBoxClick(Sender: TObject);
+    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure TrimmComboChange(Sender: TObject);
     procedure ParamComboChange(Sender: TObject);
+    procedure ViewpointComboChange(Sender: TObject);
+    procedure TestBtnClick(Sender: TObject);
+    procedure ListBoxClick(Sender: TObject);
     procedure M10BtnClick(Sender: TObject);
     procedure M1BtnClick(Sender: TObject);
     procedure P1BtnClick(Sender: TObject);
     procedure P10BtnClick(Sender: TObject);
-    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
-      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-    procedure cbSandboxedClick(Sender: TObject);
     procedure CopyAndPasteBtnClick(Sender: TObject);
     procedure CopyTrimmFileBtnClick(Sender: TObject);
     procedure CopyTrimmItemBtnClick(Sender: TObject);
@@ -80,17 +81,22 @@ type
     procedure PasteTrimmItemBtnClick(Sender: TObject);
     procedure ReadTrimmFileBtnClick(Sender: TObject);
     procedure SaveTrimmFileBtnClick(Sender: TObject);
-    procedure ViewpointComboChange(Sender: TObject);
     procedure PaintBtnClick(Sender: TObject);
+    procedure cbSandboxedClick(Sender: TObject);
     procedure cbAllTagsClick(Sender: TObject);
   private
     TL: TStrings;
     ML: TStrings;
     ReportManager: TRggReportManager;
 
+    LeftPos: Integer;
+    ComboHeight: Integer;
+    Margin: Integer;
+    BtnMargin: Integer;
     BtnTop: Integer;
     BtnLeft: Integer;
     BtnWidth: Integer;
+    BtnHeight: Integer;
     BtnCounter: Integer;
     BtnColor: TColor;
 
@@ -101,10 +107,11 @@ type
     procedure SetupComboBox(CB: TComboBox);
     procedure SetupListBox(LB: TListBox);
     procedure SetupLabel(L: TLabel);
-    procedure AB(B: TSpeedButton);
+    procedure AddBtn(B: TSpeedButton);
     procedure ShowTrimm;
     procedure ShowCurrentReport;
     procedure InitViewpointCombo;
+    procedure LayoutComponents;
 public
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
@@ -122,7 +129,7 @@ implementation
 uses
   RiggVar.App.Main,
   RiggVar.FB.Classes,
-  RiggUnit;
+  RggModul;
 
 procedure TTextForm.FormCreate(Sender: TObject);
 begin
@@ -138,34 +145,7 @@ begin
   TrimmMemo.Align := alLeft;
   ReportMemo.Align := alClient;
 
-  BtnCounter := 0;
-  BtnWidth := 50;
-  BtnTop := MT0Btn.Top;
-  BtnLeft := MT0Btn.Left;
-
-  BtnColor := clGreen;
-  AB(MT0Btn);
-
-  BtnColor := clFuchsia;
-  AB(ReadTrimmFileBtn);
-  AB(SaveTrimmFileBtn);
-
-  BtnColor := clBlue;
-  AB(CopyTrimmItemBtn);
-  AB(PasteTrimmItemBtn);
-
-  BtnColor := clBlack;
-  AB(CopyAndPasteBtn);
-
-  BtnCounter := 0;
-  BtnTop := M10Btn.Top;
-  BtnLeft := M10Btn.Left;
-
-  BtnColor := clTeal;
-  AB(M10Btn);
-  AB(M1Btn);
-  AB(P1Btn);
-  AB(P10Btn);
+  LayoutComponents;
 
   SetupComboBox(TrimmCombo);
   SetupComboBox(ParamCombo);
@@ -203,17 +183,6 @@ end;
 procedure TTextForm.FormResize(Sender: TObject);
 begin
   Inc(Main.ResizeCounter);
-end;
-
-procedure TTextForm.AB(B: TSpeedButton);
-begin
-  B.Left := BtnLeft + BtnCounter * BtnWidth + 12;
-  B.Width := 45;
-  B.Height := 30;
-  B.Font.Name := 'Consolas';
-  B.Font.Size := 12;
-  B.Font.Color := BtnColor;
-  Inc(BtnCounter);
 end;
 
 procedure TTextForm.SetupLabel(L: TLabel);
@@ -528,6 +497,68 @@ begin
     2: Main.HandleAction(faViewpointT);
     3: Main.HandleAction(faViewpoint3);
   end;
+end;
+
+procedure TTextForm.AddBtn(B: TSpeedButton);
+begin
+  B.Left := BtnLeft;
+  B.Top := BtnTop;
+  B.Width := BtnWidth;
+  B.Height := BtnHeight;
+  B.Font.Name := 'Consolas';
+  B.Font.Size := 12;
+  B.Font.Color := BtnColor;
+  Inc(BtnCounter);
+  BtnLeft := LeftPos + BtnCounter * (BtnWidth + BtnMargin);
+end;
+
+procedure TTextForm.LayoutComponents;
+begin
+  LeftPos := TrimmMemo.Left + TrimmMemo.Width + Margin;
+
+  Margin := 10;
+  BtnMargin := 3;
+  BtnCounter := 0;
+  BtnWidth := 45;
+  BtnHeight := 30;
+  BtnLeft := LeftPos;
+  BtnTop := Margin;
+  BtnColor := clGreen;
+
+  AddBtn(MT0Btn);
+  BtnColor := clFuchsia;
+  AddBtn(ReadTrimmFileBtn);
+  AddBtn(SaveTrimmFileBtn);
+  AddBtn(CopyTrimmFileBtn);
+  BtnColor := clBlue;
+  AddBtn(CopyTrimmItemBtn);
+  AddBtn(PasteTrimmItemBtn);
+  BtnColor := clBlack;
+  AddBtn(CopyAndPasteBtn);
+
+  BtnCounter := 0;
+  BtnTop := MT0Btn.Top + MT0Btn.Height + Margin;
+  BtnLeft := LeftPos;
+
+  BtnColor := clTeal;
+  AddBtn(M10Btn);
+  AddBtn(M1Btn);
+  AddBtn(P1Btn);
+  AddBtn(P10Btn);
+
+  TrimmCombo.Left := LeftPos;
+  ParamCombo.Left := LeftPos;
+  ViewpointCombo.Left := LeftPos;
+
+  ComboHeight := TrimmCombo.Height + Margin;
+
+  TrimmCombo.Top := M10Btn.Top + M10Btn.Height + Margin;
+  ParamCombo.Top := TrimmCombo.Top + 1 * ComboHeight;
+  ViewpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
+
+  cbSandboxed.Left := CopyAndPasteBtn.Left + CopyAndPasteBtn.Width + 2 * Margin;
+  cbAllProps.Left := cbSandboxed.Left;
+  cbAllTags.Left := cbSandboxed.Left;
 end;
 
 end.

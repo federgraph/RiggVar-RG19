@@ -1,4 +1,4 @@
-﻿unit TrimmTab;
+﻿unit RggTrimmTab;
 
 interface
 

@@ -91,7 +91,7 @@ type
 implementation
 
 uses
-  RiggUnit;
+  RggModul;
 
 constructor TViewModelMain00.Create;
 begin

@@ -53,7 +53,7 @@ implementation
 uses
   Clipbrd,
   RggTypes,
-  RiggUnit,
+  RggModul,
   RiggVar.App.Main;
 
 { TMain0 }

@@ -1,9 +1,12 @@
-﻿unit RiggVar.InfoMemo;
+﻿unit RiggVar.Util.InfoMemo;
 
 interface
 
 uses
-  Windows, SysUtils, Classes, Forms;
+  Winapi.Windows,
+  System.SysUtils,
+  System.Classes,
+  Vcl.Forms;
 
 type
   TInfoMemo = class

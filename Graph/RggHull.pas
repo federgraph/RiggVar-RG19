@@ -8,12 +8,12 @@ uses
   System.Classes,
   Vcl.Graphics,
   RggTypes,
-  Vcalc116,
-  Rggmat01,
+  RggCalc,
+  RggMatrix,
   Vector3D,
   RggGraph,
-  BootGraph,
-  RaumGraph;
+  RggBootGraph,
+  RggRaumGraph;
 
 type
   THullGraph = class(TRggGraph)

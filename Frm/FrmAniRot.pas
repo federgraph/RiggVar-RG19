@@ -136,8 +136,8 @@ uses
   RggGBox,
   FrmModel,
   RggScroll,
-  Rggdoc,
-  RiggUnit;
+  RggDoc,
+  RggModul;
 
 procedure TAniRotationForm.FormCreate(Sender: TObject);
 begin

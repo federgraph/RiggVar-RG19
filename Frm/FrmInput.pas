@@ -113,7 +113,7 @@ implementation
 
 uses
   RiggVar.RG.Def,
-  RiggUnit,
+  RggModul,
   RggTypes;
 
 procedure TInputForm.FormCreate(Sender: TObject);

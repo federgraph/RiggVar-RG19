@@ -59,7 +59,7 @@ object TextForm: TTextForm
       OnClick = M10BtnClick
     end
     object M1Btn: TSpeedButton
-      Left = 254
+      Left = 238
       Top = 43
       Width = 23
       Height = 22
@@ -67,7 +67,7 @@ object TextForm: TTextForm
       OnClick = M1BtnClick
     end
     object P1Btn: TSpeedButton
-      Left = 283
+      Left = 267
       Top = 43
       Width = 23
       Height = 22
@@ -75,7 +75,7 @@ object TextForm: TTextForm
       OnClick = P1BtnClick
     end
     object P10Btn: TSpeedButton
-      Left = 312
+      Left = 296
       Top = 43
       Width = 23
       Height = 22
@@ -115,7 +115,7 @@ object TextForm: TTextForm
       OnClick = PasteTrimmItemBtnClick
     end
     object ReadTrimmFileBtn: TSpeedButton
-      Left = 254
+      Left = 238
       Top = 7
       Width = 23
       Height = 22
@@ -123,12 +123,20 @@ object TextForm: TTextForm
       OnClick = ReadTrimmFileBtnClick
     end
     object SaveTrimmFileBtn: TSpeedButton
-      Left = 283
+      Left = 267
       Top = 7
       Width = 23
       Height = 22
       Caption = 'stf'
       OnClick = SaveTrimmFileBtnClick
+    end
+    object CopyTrimmFileBtn: TSpeedButton
+      Left = 296
+      Top = 7
+      Width = 23
+      Height = 22
+      Caption = 'ctf'
+      OnClick = CopyTrimmFileBtnClick
     end
     object ParamCombo: TComboBox
       Left = 176

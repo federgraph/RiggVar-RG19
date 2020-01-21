@@ -7,7 +7,7 @@ uses
   System.Generics.Collections,
   Vcl.StdCtrls,
   RiggVar.RG.Def,
-  IoTypes;
+  RggReport;
 
 type
   TRggReport = (

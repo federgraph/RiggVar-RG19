@@ -3,11 +3,11 @@
 interface
 
 uses
-  Windows,
-  Dialogs,
-  SysUtils,
-  UITypes,
-  Graphics,
+  Winapi.Windows,
+  Vcl.Dialogs,
+  System.SysUtils,
+  System.UITypes,
+  Vcl.Graphics,
   Vector3D,
   ThreeD;
 

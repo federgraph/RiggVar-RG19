@@ -32,7 +32,7 @@ implementation
 
 uses
   RggTypes,
-  RiggUnit;
+  RggModul;
 
 procedure TGrafikForm.ViewTabChange(Sender: TObject);
 begin

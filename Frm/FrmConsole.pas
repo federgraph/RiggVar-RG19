@@ -28,7 +28,7 @@ var
 implementation
 
 uses
-  Riggunit,
+  RggModul,
   FrmInput,
   FrmOutput,
   FrmGrafik;

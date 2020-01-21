@@ -3,11 +3,11 @@
 interface
 
 uses
-  Windows,
-  Graphics,
-  Classes,
-  Vector3D,
-  SysUtils;
+  Winapi.Windows,
+  System.Classes,
+  System.SysUtils,
+  Vcl.Graphics,
+  Vector3D;
 
 const
   EM_FILEOPENERROR = -100;
@@ -39,7 +39,7 @@ type
   end;
 
   { A three dimensional viewing class }
-  TThreeD = class(TObject)
+  TThreeD = class
   public
     A, B, C, D, DVal: double;
     From, At, Up: VECTOR; { Viewing parameters }

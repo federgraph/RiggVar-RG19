@@ -73,12 +73,12 @@ implementation
 {$R *.DFM}
 
 uses
-  RiggUnit;
+  RggModul;
 
 procedure TOutputForm.FormCreate(Sender: TObject);
 begin
   cbFollowPoint.Checked := False;
-  YComboBox.ItemIndex := 1; {sonst Exception, wenn ItemIndex := -1}
+  YComboBox.ItemIndex := 1; { sonst Exception, wenn ItemIndex := -1 }
 end;
 
 procedure TOutputForm.FormDestroy(Sender: TObject);

@@ -1,4 +1,4 @@
-﻿unit Schnttkk;
+﻿unit RggSchnittKK;
 
 interface
 
@@ -7,7 +7,7 @@ uses
   System.Classes,
   System.Math,
   RggTypes,
-  Vcalc116;
+  RggCalc;
 
 type
   TBemerkungKK = (bmKonzentrisch, bmZwei, bmEinerAussen, bmEntfernt,

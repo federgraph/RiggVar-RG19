@@ -1,4 +1,4 @@
-﻿unit Rggunit4;
+﻿unit RggUnit4;
 
 interface
 
@@ -6,9 +6,9 @@ uses
   System.SysUtils,
   System.Classes,
   RggTypes,
-  Rggunit3,
-  Rggdoc,
-  Vcalc116,
+  RggUnit3,
+  RggDoc,
+  RggCalc,
   RiggVar.RG.Data;
 
 type

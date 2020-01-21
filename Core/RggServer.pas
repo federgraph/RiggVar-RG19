@@ -1,9 +1,14 @@
-﻿unit uRggServer;
+﻿unit RggServer;
 
 interface
 
 uses
-  SysUtils, Classes, ScktComp, RggTypes, RggDoc, RiggUnit;
+  System.SysUtils,
+  System.Classes,
+  ScktComp,
+  RggTypes,
+  RggDoc,
+  RggModul;
 
 type
   THandleMsgEvent = procedure(Sender: TObject; s: string) of object;

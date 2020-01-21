@@ -22,7 +22,7 @@ uses
   Vcl.ComCtrls,
   RggScroll,
   RggTypes,
-  TrimmTab;
+  RggTrimmTab;
 
 type
   TOptionForm = class(TForm)
@@ -189,7 +189,7 @@ implementation
 
 uses
   RiggVar.RG.Def,
-  RiggUnit;
+  RggModul;
 
 type
   TIniFileGS = class(TInifile)
@@ -427,7 +427,7 @@ end;
 
 procedure TOptionForm.LoadRiggCombos;
 var
-  m: TRiggPoints;
+  m: TRiggPoint;
   n: TKoord;
 begin
   { Trimm }
@@ -715,7 +715,7 @@ end;
 
 procedure TOptionForm.RumpfBtnClick(Sender: TObject);
 begin
-  FiP[TRiggPoints(FRumpfCell.y-1),TKoord(FRumpfCell.x-1)] :=  RumpfSpinEdit.Position;
+  FiP[TRiggPoint(FRumpfCell.y-1),TKoord(FRumpfCell.x-1)] :=  RumpfSpinEdit.Position;
   RumpfGrid.Cells[FRumpfCell.x,FRumpfCell.y] := Format(' %4d',[RumpfSpinEdit.Position]);
   if FRumpfCell.y = 2 then
   begin

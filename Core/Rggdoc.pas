@@ -1,4 +1,4 @@
-﻿unit Rggdoc;
+﻿unit RggDoc;
 
 {
   Als primäre Daten werden die Rumpfkoordinaten und die RiggLängen betrachtet.
@@ -67,7 +67,7 @@ const
 type
   TRggDocument = class
   private
-    FFileName: String; // nur zum Zwischenspeichern des Dateinamens
+    FFileName: string; // nur zum Zwischenspeichern des Dateinamens
     procedure GetLogoDoc;
     procedure GetDefaultDoc;
     procedure LoadSignatureFromStream(strm: TStream);
@@ -105,12 +105,12 @@ type
 
     function SignatureOK: Boolean; virtual;
     procedure GetDefaultDocument; virtual;
-    procedure LoadFromFile(FileName: String); virtual;
-    procedure SaveToFile(FileName: String); virtual;
+    procedure LoadFromFile(FileName: string); virtual;
+    procedure SaveToFile(FileName: string); virtual;
     procedure LoadFromStream(strm: TStream); virtual;
     procedure SaveToStream(strm: TStream); virtual;
-    procedure LoadFromIniFile(FileName: String); virtual;
-    procedure WriteToIniFile(FileName: String); virtual;
+    procedure LoadFromIniFile(FileName: string); virtual;
+    procedure WriteToIniFile(FileName: string); virtual;
     procedure DumpToMemo(Memo: TStrings); virtual;
     procedure ReadFromDFM(Memo: TStrings);
     procedure WriteToDFM(Memo: TStrings);
@@ -142,7 +142,7 @@ begin
   inherited;
 end;
 
-procedure TRggDocument.LoadFromFile(FileName: String);
+procedure TRggDocument.LoadFromFile(FileName: string);
 var
   S: TFileStream;
 begin
@@ -155,7 +155,7 @@ begin
   end;
 end;
 
-procedure TRggDocument.SaveToFile(FileName: String);
+procedure TRggDocument.SaveToFile(FileName: string);
 var
   S: TFileStream;
 begin
@@ -269,9 +269,9 @@ begin
   strm.WriteBuffer(TrimmTabDaten, SizeOf(TTrimmTabDaten));
 end;
 
-procedure TRggDocument.LoadFromIniFile(FileName: String);
+procedure TRggDocument.LoadFromIniFile(FileName: string);
 var
-  S, S1, S2: String;
+  S, S1, S2: string;
   i: Integer;
   T: TTrimmTabDaten;
   IniFile: TIniFile;
@@ -408,9 +408,9 @@ begin
   end;
 end;
 
-procedure TRggDocument.WriteToIniFile(FileName: String);
+procedure TRggDocument.WriteToIniFile(FileName: string);
 var
-  S, S1, S2: String;
+  S, S1, S2: string;
   i, tempEI: Integer;
   IniFile: TIniFile;
 begin
@@ -835,10 +835,10 @@ end;
 
 function TRggDocument.SignatureOK: Boolean;
 var
-  S, SCaption, S1: String;
+  S, SCaption, S1: string;
 begin
   result := False;
-  if Signature = String(RggDocSignature) then
+  if Signature = string(RggDocSignature) then
     result := True
   else
   begin
@@ -848,7 +848,7 @@ begin
     if S1 = 'RGGDOC' then
     begin
       S := S + #13 + 'vorliegend: Version ' + Signature;
-      S := S + #13 + 'erforderlich: Version ' + String(RggDocSignature);
+      S := S + #13 + 'erforderlich: Version ' + string(RggDocSignature);
     end
     else
     begin
@@ -861,7 +861,7 @@ end;
 
 procedure TRggDocument.DumpToMemo(Memo: TStrings);
 var
-  S1, S2: String;
+  S1, S2: string;
   i, tempEI: Integer;
 begin
   with Memo do
@@ -1050,9 +1050,9 @@ begin
 end;
 
 procedure TRggDocument.ReadFromDFM(Memo: TStrings);
-  procedure ReadGSB(c: TsbName; S: String);
+  procedure ReadGSB(c: TsbName; S: string);
   var
-    S1: String;
+    S1: string;
     sb: TRggSB;
   begin
     if S = '' then
@@ -1068,9 +1068,9 @@ procedure TRggDocument.ReadFromDFM(Memo: TStrings);
     sb.Ist := StrToInt(S1);
     sb.Max := StrToInt(S);
   end;
-  procedure ReadKoord(k: TRiggPoints; S: String);
+  procedure ReadKoord(k: TRiggPoint; S: string);
   var
-    S1: String;
+    S1: string;
   begin
     if S = '' then
       Exit;
@@ -1082,13 +1082,13 @@ procedure TRggDocument.ReadFromDFM(Memo: TStrings);
     iP[k, y] := StrToInt(S1);
     iP[k, z] := StrToInt(S);
   end;
-  procedure ReadInteger(S: String; var a: Integer);
+  procedure ReadInteger(S: string; var a: Integer);
   begin
     if S = '' then
       Exit;
     a := StrToInt(S);
   end;
-  procedure ReadFloat(S: String; var a: double);
+  procedure ReadFloat(S: string; var a: double);
   begin
     if S = '' then
       Exit;
@@ -1096,7 +1096,7 @@ procedure TRggDocument.ReadFromDFM(Memo: TStrings);
   end;
 
 var
-  S: String;
+  S: string;
   i, tempEI: Integer;
   T: TTrimmTabDaten;
 begin
@@ -1289,7 +1289,7 @@ function TRggDocument.SaveToXML(d: IXMLNode): string;
 var
   OldDecimalSeparator: Char;
   i: Integer;
-  rp: TRiggPoints;
+  rp: TRiggPoint;
   tempEI: double;
   SBParam: TsbParam; // = (Ist, Min, Max, TinyStep, BigStep);
   SBName: TsbName;

@@ -113,10 +113,10 @@ type
 implementation
 
 uses
-  RggTypes,
-  RiggUnit,
   System.Rtti,
-  Clipbrd,
+  Vcl.Clipbrd,
+  RggTypes,
+  RggModul,
   RiggVar.FB.Classes,
   RiggVar.App.Main,
   RiggVar.Util.AppUtils;
@@ -646,18 +646,18 @@ begin
     faParamT1: RggMain.SetParameter(faParamT1);
     faParamT2: RggMain.SetParameter(faParamT2);
 
-    faFixpointA0: RggMain.FixName := ooA0;
-    faFixpointA: RggMain.FixName := ooA;
-    faFixpointB0: RggMain.FixName := ooB0;
-    faFixpointB: RggMain.FixName := ooB;
-    faFixpointC0: RggMain.FixName := ooC0;
-    faFixpointC: RggMain.FixName := ooC;
-    faFixpointD0: RggMain.FixName := ooD0;
-    faFixpointD: RggMain.FixName := ooD;
-    faFixpointE0: RggMain.FixName := ooE0;
-    faFixpointE: RggMain.FixName := ooE;
-    faFixpointF0: RggMain.FixName := ooF0;
-    faFixpointF: RggMain.FixName := ooF;
+    faFixpointA0: RggMain.FixPoint := ooA0;
+    faFixpointA: RggMain.FixPoint := ooA;
+    faFixpointB0: RggMain.FixPoint := ooB0;
+    faFixpointB: RggMain.FixPoint := ooB;
+    faFixpointC0: RggMain.FixPoint := ooC0;
+    faFixpointC: RggMain.FixPoint := ooC;
+    faFixpointD0: RggMain.FixPoint := ooD0;
+    faFixpointD: RggMain.FixPoint := ooD;
+    faFixpointE0: RggMain.FixPoint := ooE0;
+    faFixpointE: RggMain.FixPoint := ooE;
+    faFixpointF0: RggMain.FixPoint := ooF0;
+    faFixpointF: RggMain.FixPoint := ooF;
 
     faSalingTypFest,
     faSalingTypDrehbar,
@@ -733,18 +733,18 @@ begin
     faParamT1: result := RggMain.Param = fpT1;
     faParamT2: result := RggMain.Param = fpT2;
 
-    faFixpointA0: result := RggMain.FixName = ooA0;
-    faFixpointA: result := RggMain.FixName = ooA;
-    faFixpointB0: result := RggMain.FixName = ooB0;
-    faFixpointB: result := RggMain.FixName = ooB;
-    faFixpointC0: result := RggMain.FixName = ooC0;
-    faFixpointC: result := RggMain.FixName = ooC;
-    faFixpointD0: result := RggMain.FixName = ooD0;
-    faFixpointD: result := RggMain.FixName = ooD;
-    faFixpointE0: result := RggMain.FixName = ooE0;
-    faFixpointE: result := RggMain.FixName = ooE;
-    faFixpointF0: result := RggMain.FixName = ooF0;
-    faFixpointF: result := RggMain.FixName = ooF;
+    faFixpointA0: result := RggMain.FixPoint = ooA0;
+    faFixpointA: result := RggMain.FixPoint = ooA;
+    faFixpointB0: result := RggMain.FixPoint = ooB0;
+    faFixpointB: result := RggMain.FixPoint = ooB;
+    faFixpointC0: result := RggMain.FixPoint = ooC0;
+    faFixpointC: result := RggMain.FixPoint = ooC;
+    faFixpointD0: result := RggMain.FixPoint = ooD0;
+    faFixpointD: result := RggMain.FixPoint = ooD;
+    faFixpointE0: result := RggMain.FixPoint = ooE0;
+    faFixpointE: result := RggMain.FixPoint = ooE;
+    faFixpointF0: result := RggMain.FixPoint = ooF0;
+    faFixpointF: result := RggMain.FixPoint = ooF;
 
     faSalingTypFest: result := RggMain.Rigg.SalingTyp = stFest;
     faSalingTypDrehbar: result := RggMain.Rigg.SalingTyp = stDrehbar;

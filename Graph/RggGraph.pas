@@ -8,7 +8,8 @@ uses
   System.Types,
   Vcl.Graphics,
   RggTypes,
-  Polarkar;
+//  RggDisplay,
+  RggPolarKar;
 
 type
   TRggGraph = class
@@ -24,7 +25,7 @@ type
     procedure SetOffset(Value: TPoint); virtual;
     procedure SetZoom(Value: double); virtual;
   public
-    Rotator: TPolarKar2;
+    Rotator: TPolarKar;
     constructor Create; virtual;
     procedure Update; virtual;
     procedure Draw(Canvas: TCanvas); virtual;

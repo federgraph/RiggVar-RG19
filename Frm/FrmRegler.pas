@@ -44,7 +44,7 @@ implementation
 {$R *.DFM}
 
 uses
-  Riggunit;
+  RggModul;
 
 procedure TCtrlDlg.SetupCtrls;
 begin

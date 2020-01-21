@@ -30,7 +30,7 @@ implementation
 {$R *.DFM}
 
 uses
-  RiggVar.InfoMemo;
+  RiggVar.Util.InfoMemo;
 
 procedure ShowInfo;
 begin

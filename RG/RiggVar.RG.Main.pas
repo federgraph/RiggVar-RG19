@@ -28,8 +28,8 @@ uses
   RiggVar.RG.Graph,
   RggScroll,
   RggTypes,
-  Rggunit4,
-  VCalc116;
+  RggUnit4,
+  RggCalc;
 
 type
   TFederAction = Integer;
@@ -73,7 +73,7 @@ type
 
   TRggMain = class(TRggMain0)
   private
-    FFixName: TRiggPoints;
+    FFixPoint: TRiggPoint;
     FixPunkt: TRealPoint;
     FVisible: Boolean;
 
@@ -90,7 +90,7 @@ type
     procedure SetParam(Value: TFederParam);
     procedure SetParamValue(idx: TFederParam; Value: single);
     function GetParamValue(idx: TFederParam): single;
-    procedure SetFixName(const Value: TRiggPoints);
+    procedure SetFixPoint(const Value: TRiggPoint);
     function GetCurrentValue: single;
     procedure SetCurrentValue(const Value: single);
     function GetParamValueString(fp: TFederParam): string;
@@ -122,7 +122,7 @@ type
     LEDShape: Boolean;
     StatusText: string;
 
-    InitialFixName: TRiggPoints;
+    InitialFixPoint: TRiggPoint;
 
     UpdateTextCounter: Integer;
 
@@ -163,7 +163,7 @@ type
     procedure SetOption(fa: TFederAction);
 
     property Action: TFederAction read FAction;
-    property FixName: TRiggPoints read FFixName write SetFixName;
+    property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
     property Param: TFederParam read FParam write SetParam;
     property ParamValue[index: TFederParam]: single read GetParamValue write SetParamValue;
     property ParamValueString[index: TFederParam]: string read GetParamValueString;
@@ -178,7 +178,7 @@ implementation
 
 uses
   RggDoc,
-  RiggUnit,
+  RggModul,
   RiggVar.App.Main;
 
 const
@@ -190,7 +190,7 @@ constructor TRggMain.Create(ARigg: TRigg);
 begin
   inherited Create;
 
-  InitialFixName := ooD;
+  InitialFixPoint := ooD;
 
   Demo := False;
 
@@ -218,7 +218,7 @@ begin
   InitFactArray;
 
   Param := fpVorstag;
-  FixName := InitialFixName;
+  FixPoint := InitialFixPoint;
 
   InitStrokeRigg;
   Draw;
@@ -264,9 +264,9 @@ begin
   FactArray.Find(FParam).Ist := Value;
 end;
 
-procedure TRggMain.SetFixName(const Value: TRiggPoints);
+procedure TRggMain.SetFixPoint(const Value: TRiggPoint);
 begin
-  FFixName := Value;
+  FFixPoint := Value;
   FixPunkt := Rigg.rP[Value];
   Draw;
 end;
@@ -954,7 +954,7 @@ begin
   InitFactArray();
   StrokeRigg.SalingTyp := Rigg.SalingTyp;
   SetParam(FParam);
-  FixName := ooD;
+  FixPoint := ooD;
 
   SaveTrimm(Main.Trimm7);
   Main.TrimmNoChange := 7;
@@ -974,7 +974,7 @@ begin
   InitFactArray();
   StrokeRigg.SalingTyp := Rigg.SalingTyp;
   SetParam(FParam);
-  FixName := ooD;
+  FixPoint := ooD;
 
   SaveTrimm(Main.Trimm8);
   Main.TrimmNoChange := 8;

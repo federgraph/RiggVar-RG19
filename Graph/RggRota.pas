@@ -19,15 +19,15 @@ uses
   Vcl.ExtCtrls,
   Vcl.ComCtrls,
   Vcl.ExtDlgs,
+  Vector3D,
   RggTypes,
   RggGBox,
-  Rggmat01,
-  Rggunit4,
+  RggMatrix,
+  RggUnit4,
   RggGraph,
-  RaumGraph,
+  RggRaumGraph,
   RggHull,
-  Vector3D,
-  Polarkar;
+  RggPolarKar;
 
 type
   TRotaForm = class
@@ -83,12 +83,12 @@ type
     SHeadingPhi: String;
     SPitchTheta: String;
     SBankGamma: String;
-    FFixPoint: TRiggPoints;
+    FFixPoint: TRiggPoint;
     procedure ChangeResolution;
     procedure UpdateMinMax;
     procedure DoTrans;
     procedure SetViewPoint(const Value: TViewPoint);
-    procedure SetFixPoint(const Value: TRiggPoints);
+    procedure SetFixPoint(const Value: TRiggPoint);
   protected
     Bitmap: TBitmap;
     EraseBK: Boolean;
@@ -105,9 +105,9 @@ type
     procedure PaintBackGround(Image: TBitmap);
   public
     Rigg: TRigg;
-    Rotator: TPolarKar2;
+    Rotator: TPolarKar;
     HullGraph: TRggGraph;
-    RaumGrafik: TRaumGrafik;
+    RaumGrafik: TRaumGraph;
     Mode: Boolean;
     procedure Draw;
     procedure InitGraph;
@@ -126,15 +126,15 @@ type
     destructor Destroy; override;
     procedure Init;
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
-    property FixPoint: TRiggPoints read FFixPoint write SetFixPoint;
+    property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
   end;
 
 implementation
 
 uses
-  RiggUnit,
+  RggModul,
   RggDoc,
-  Vcalc116,
+  RggCalc,
   FrmScale,
   RggPBox;
 
@@ -220,7 +220,7 @@ end;
 
 procedure TRotaForm.InitGraph;
 begin
-  Rotator := TPolarKar2.Create;
+  Rotator := TPolarKar.Create;
   Rotator.OnCalcAngle := Rotator.GetAngle2;
   InitRotaData;
 end;
@@ -231,7 +231,7 @@ begin
   RaumGrafik.Rotator := Rotator;
   RaumGrafik.Offset := Point(1000,1000);
   RaumGrafik.Zoom := FZoom;
-  Raumgrafik.FixName := FixPoint;
+  Raumgrafik.FixPoint := FixPoint;
   if RaumGrafik is TGetriebeGraph then
     TGetriebeGraph(RaumGrafik).Ansicht := vp3D;
 end;
@@ -404,6 +404,7 @@ begin
   end;
   RaumGrafik.Coloriert := True;
   RaumGrafik.Draw(Bitmap.Canvas);
+
   if FPaintRumpf and (not MouseDown or (MouseDown and FDrawAlways)) then
   begin
     HullGraph.Coloriert := True;
@@ -484,10 +485,10 @@ begin
   end;
 end;
 
-procedure TRotaForm.SetFixPoint(const Value: TRiggPoints);
+procedure TRotaForm.SetFixPoint(const Value: TRiggPoint);
 begin
   FFixPoint := Value;
-  Raumgrafik.FixName := FixPoint;
+  Raumgrafik.FixPoint := FixPoint;
   HullGraph.FixPunkt := RaumGrafik.FixPunkt;
   Draw;
 end;
@@ -532,11 +533,12 @@ begin
   RaumGrafik.Zoom := FZoom;
   HullGraph.Zoom := FZoom;
   { Fixpunkt }
-  RaumGrafik.FixName := FixPoint;
+  RaumGrafik.FixPoint := FixPoint;
   RaumGrafik.Update; // Rotate;
   HullGraph.FixPunkt := Raumgrafik.FixPunkt;
   { Neuzeichnen }
-  EraseBK := True; Draw;
+  EraseBK := True;
+  Draw;
 end;
 
 procedure TRotaForm.PositionSaveItemClick(Sender: TObject);
@@ -621,7 +623,7 @@ end;
 procedure TRotaForm.PaintBox3DMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
 var
-  wx, wy, wz: Integer;
+  wx, wy, wz: single;
 begin
   if not MouseDown then
     Exit;
@@ -629,15 +631,15 @@ begin
     Exit;
   if MouseButton = mbLeft then
   begin
-    wx := Round((x - prevx) * 360 / PaintBox3D.Width);
-    wy := Round((y - prevy) * 360 / PaintBox3D.Height);
+    wx := (x - prevx) * 0.15;
+    wy := (y - prevy) * 0.15;
     wz := 0;
   end
   else
   begin
     wx := 0;
     wy := 0;
-    wz := Round((x - prevx) * 360 / PaintBox3D.Width);
+    wz := (x - prevx) * 0.3;
   end;
   if Painted then
   begin
@@ -687,6 +689,7 @@ end;
 procedure TRotaForm.SetAngleText;
 begin
 end;
+
 procedure TRotaForm.ModusItemClick(Sender: TObject);
 begin
   Mode := not Mode;
@@ -709,7 +712,8 @@ begin
       werden FPhi, FTheta und FGamma auf Null gesetzt }
     Rotator.GetAngle(FPhi, FTheta, FGamma);
     Rotate(FPhi, FTheta, FGamma, 0, 0, 0);
-    EraseBK := True; Draw;
+    EraseBK := True;
+    Draw;
   end;
 end;
 

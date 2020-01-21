@@ -20,18 +20,18 @@ uses
   Vcl.Printers,
   Vcl.ComCtrls,
   Vcl.ExtDlgs,
+  Vector3D,
   RggTypes,
   RggGBox,
-  Rggmat01,
+  RggMatrix,
   Rggunit4,
-  Print004,
-  uRggPrinter,
+  RggPreview,
+  RggPrinter,
   FrmIndicator,
   RggGraph,
-  RaumGraph,
+  RggRaumGraph,
   RggHull,
-  Vector3D,
-  Polarkar;
+  RggPolarKar;
 
 type
   TRotationForm = class(TForm)
@@ -165,7 +165,7 @@ type
     SHeadingPhi: String;
     SPitchTheta: String;
     SBankGamma: String;
-    function ComboFixName: TRiggPoints;
+    function ComboFixPoint: TRiggPoint;
     procedure ChangeResolution;
     procedure UpdateMinMax;
     procedure DoTrans;
@@ -201,9 +201,9 @@ type
     procedure ChangeRotationHints;
   public
     Rigg: TRigg;
-    Rotator: TPolarKar2;
+    Rotator: TPolarKar;
     HullGraph: TRggGraph;
-    RaumGrafik: TRaumGrafik;
+    RaumGrafik: TRaumGraph;
     IndicatorForm: TIndicatorForm;
     BackBmp: TBitmap;
     Preview: TPreview;
@@ -312,7 +312,7 @@ var
 implementation
 
 uses
-  Vcalc116,
+  RggCalc,
   RggPal,
   FrmScale,
   RggPBox;
@@ -457,7 +457,7 @@ end;
 procedure TRotationForm.InitGraph;
 begin
   { virtual }
-  Rotator := TPolarKar2.Create;
+  Rotator := TPolarKar.Create;
   Rotator.OnCalcAngle := Rotator.GetAngle2;
   InitRotaData;
 end;
@@ -469,7 +469,7 @@ begin
   RaumGrafik.Rotator := Rotator;
   RaumGrafik.Offset := Point(1000,1000);
   RaumGrafik.Zoom := FZoom;
-  Raumgrafik.FixName := ComboFixName;
+  Raumgrafik.FixPoint := ComboFixPoint;
   if RaumGrafik is TGetriebeGraph then
     TGetriebeGraph(RaumGrafik).Ansicht := vp3D;
 end;
@@ -728,7 +728,9 @@ begin
   if Mode = False then
   begin
     { Incremente }
-    wp := 0; wt := 0; wg := 0;
+    wp := 0;
+    wt := 0;
+    wg := 0;
     if Sender = LeftBtn then wp := FIncrementW
     else if Sender = RightBtn then wp := -FIncrementW
     else if Sender = UpBtn then wt := FIncrementW
@@ -852,31 +854,31 @@ end;
 
 procedure TRotationForm.FixPunktComboChange(Sender: TObject);
 begin
-  Raumgrafik.FixName := ComboFixName;
+  Raumgrafik.FixPoint := ComboFixPoint;
   HullGraph.FixPunkt := RaumGrafik.FixPunkt;
   Draw;
 end;
 
-function TRotationForm.ComboFixName: TRiggPoints;
+function TRotationForm.ComboFixPoint: TRiggPoint;
 var
-  NewFixName: TRiggPoints;
+  fp: TRiggPoint;
   s: string;
 begin
-  NewFixName := ooD0;
+  fp := ooD0;
   s := FixPunktCombo.Text;
-  if s = 'A0' then NewFixName := ooA0
-  else if s = 'B0' then NewFixName := ooB0
-  else if s = 'C0' then NewFixName := ooC0
-  else if s = 'D0' then NewFixName := ooD0
-  else if s = 'E0' then NewFixName := ooE0
-  else if s = 'F0' then NewFixName := ooF0
-  else if s = 'A' then NewFixName := ooA
-  else if s = 'B' then NewFixName := ooB
-  else if s = 'C' then NewFixName := ooC
-  else if s = 'D' then NewFixName := ooD
-  else if s = 'E' then NewFixName := ooE
-  else if s = 'F' then NewFixName := ooF;
-  result := NewFixName;
+  if s = 'A0' then fp := ooA0
+  else if s = 'B0' then fp := ooB0
+  else if s = 'C0' then fp := ooC0
+  else if s = 'D0' then fp := ooD0
+  else if s = 'E0' then fp := ooE0
+  else if s = 'F0' then fp := ooF0
+  else if s = 'A' then fp := ooA
+  else if s = 'B' then fp := ooB
+  else if s = 'C' then fp := ooC
+  else if s = 'D' then fp := ooD
+  else if s = 'E' then fp := ooE
+  else if s = 'F' then fp := ooF;
+  result := fp;
 end;
 
 procedure TRotationForm.Btn1GradClick(Sender: TObject);
@@ -1129,11 +1131,12 @@ begin
   HullGraph.Zoom := FZoom;
   { Fixpunkt }
   FixPunktCombo.ItemIndex := RotaData.FixpunktIndex;
-  RaumGrafik.FixName := ComboFixName;
+  RaumGrafik.FixPoint := ComboFixPoint;
   RaumGrafik.Update; // Rotate;
   HullGraph.FixPunkt := Raumgrafik.FixPunkt;
   { Neuzeichnen }
-  EraseBK := True; Draw;
+  EraseBK := True;
+  Draw;
   IndicatorForm.UpdateIndicator;
 end;
 
@@ -1382,7 +1385,7 @@ begin
     Right := Left + Width;
   if ClientWidth >= Right then
   begin
-    Panel.Left := 0;    { unscroll }
+    Panel.Left := 0; { unscroll }
     Panel.Width := ClientWidth;
     { Hide the scroll buttons. }
     LeftButton.Visible := False;
@@ -1412,8 +1415,14 @@ procedure TRotationForm.PaintBox3DMouseDown(Sender: TObject;
 begin
   MouseDown := True;
   MouseButton := Button;
-  prevx := x; MouseDownX := x; SavedXPos := FXPos;
-  prevy := y; MouseDownY := y; SavedYPos := FYPos;
+
+  prevx := x;
+  MouseDownX := x;
+  SavedXPos := FXPos;
+
+  prevy := y;
+  MouseDownY := y;
+  SavedYPos := FYPos;
 
   FTranslation :=
     (Abs(RaumGrafik.Offset.x + NullPunktOffset.x - X) < 10) and
@@ -1523,7 +1532,7 @@ begin
     end
     else if (Key = VK_Up) then
     begin
-      {^LeftBtnClick(LeftBtn); }
+      { LeftBtnClick(LeftBtn); }
       Key := 0;
     end
     else if (Key = VK_Down) then
@@ -1635,7 +1644,8 @@ begin
       werden FPhi, FTheta und FGamma auf Null gesetzt }
     Rotator.GetAngle(FPhi, FTheta, FGamma);
     Rotate(FPhi, FTheta, FGamma, 0, 0, 0);
-    EraseBK := True; Draw;
+    EraseBK := True;
+    Draw;
   end;
 end;
 
@@ -1758,7 +1768,8 @@ begin
     Palette := hPal;
   end;
 
-  EraseBK := True; Draw;
+  EraseBK := True;
+  Draw;
 end;
 
 procedure TRotationForm.CloseBackBmpItemClick(Sender: TObject);
@@ -1791,7 +1802,8 @@ begin
     Palette := hPal;
   end;
 
-  EraseBK := True; Draw;
+  EraseBK := True;
+  Draw;
 end;
 
 procedure TRotationForm.IndicatorItemClick(Sender: TObject);
@@ -2339,7 +2351,7 @@ begin
     Exit;
   end;
 
-  if not RggPrinter.OKToPrint then
+  if not RiggPrinter.OKToPrint then
   begin
     MessageDlg('Kein Drucker konfiguriert.', mtInformation, [mbOK], 0);
     Exit;

@@ -3,20 +3,18 @@
 interface
 
 uses
-  Windows,
-  Messages,
-  SysUtils,
-  Classes,
-  UITypes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  Menus,
-  StdCtrls,
-  ExtCtrls,
-  Printers,
-  uRggPrinter;
+  System.SysUtils,
+  System.Classes,
+  System.UITypes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.Menus,
+  Vcl.StdCtrls,
+  Vcl.ExtCtrls,
+  Vcl.Printers,
+  RggPrinter;
 
 type
   TReportForm = class(TForm)
@@ -54,7 +52,7 @@ implementation
 {$R *.DFM}
 
 uses
-  RiggUnit,
+  RggModul,
   FrmSelect;
 
 procedure TReportForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -104,7 +102,7 @@ var
   i: Integer;
   MemoText: TextFile;
 begin
-  if not RggPrinter.OKToPrint then
+  if not RiggPrinter.OKToPrint then
   begin
     MessageDlg('Kein Drucker konfiguriert.', mtInformation, [mbOK], 0);
     Exit;

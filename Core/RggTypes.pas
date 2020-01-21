@@ -104,7 +104,7 @@ type
   TKoordLine = array [0 .. 100] of TRealPoint;
   TIntPoint = array [TKoord] of double;
 
-  TRiggPoints = (
+  TRiggPoint = (
     ooN0,
     ooA0,
     ooB0,
@@ -123,8 +123,8 @@ type
     ooM
     );
 
-  TIntRiggPoints = array [TRiggPoints] of TIntPoint;
-  TRealRiggPoints = array [TRiggPoints] of TRealPoint;
+  TIntRiggPoints = array [TRiggPoint] of TIntPoint;
+  TRealRiggPoints = array [TRiggPoint] of TRealPoint;
 
   TRiggLvektor = array [0 .. 19] of double;
   TRiggLIndexRange = 0 .. 19;
@@ -214,7 +214,7 @@ type
     FKorrekturFaktor: double; { dimensionslos }
     *)
 
-  TKoordLabels = array [TRiggPoints] of string;
+  TKoordLabels = array [TRiggPoint] of string;
 
 const
   ZeroCtrl: TTrimmControls = (
@@ -375,7 +375,7 @@ const
 
 procedure PaintBackGround(Image: TBitmap);
 procedure InitYAchseRecordList(var RecordList: TYAchseRecordList);
-function StrToFixName(const s: string): TRiggPoints;
+function StrToRiggPoint(const s: string): TRiggPoint;
 
 implementation
 
@@ -503,7 +503,7 @@ begin
   end;
 end;
 
-function StrToFixName(const s: string): TRiggPoints;
+function StrToRiggPoint(const s: string): TRiggPoint;
 begin
   result := ooD0;
   if s = 'A0' then

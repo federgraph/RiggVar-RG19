@@ -1,4 +1,4 @@
-﻿unit uRggPrinter;
+﻿unit RggPrinter;
 
 interface
 
@@ -8,7 +8,7 @@ uses
 type
   TRggPrinterStatus = (psUnknown, psPrinterOK, psNoPrinter);
 
-  TRggPrinter = class
+  TRiggPrinter = class
   private
     RggPrinterStatus: TRggPrinterStatus;
   public
@@ -21,11 +21,11 @@ type
   end;
 
 var
-  RggPrinter: TRggPrinter;
+  RiggPrinter: TRiggPrinter;
 
 implementation
 
-function TRggPrinter.OKToPrint: Boolean;
+function TRiggPrinter.OKToPrint: Boolean;
 var
   P: TPrinter;
 begin
@@ -51,12 +51,12 @@ begin
 end;
 
 initialization
-  RggPrinter := TRggPrinter.Create;
-  RggPrinter.PageWidth := 2400;
-  RggPrinter.PageHeight := 3285;
-  RggPrinter.PixPerInX := 300;
-  RggPrinter.PixPerInY := 300;
+  RiggPrinter := TRiggPrinter.Create;
+  RiggPrinter.PageWidth := 2400;
+  RiggPrinter.PageHeight := 3285;
+  RiggPrinter.PixPerInX := 300;
+  RiggPrinter.PixPerInY := 300;
 finalization
-  RggPrinter.Free;
+  RiggPrinter.Free;
 
 end.

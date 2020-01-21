@@ -18,10 +18,10 @@ uses
   Vcl.Menus,
   Vcl.Buttons,
   Vcl.ComCtrls,
-  RggTypes,
-  Rggdoc,
   FrmProgress,
-  Saling3Eck;
+  RggTypes,
+  RggDoc,
+  RggSaling3Eck;
 
 const
   ANr = 6; { maximale Anzahl Kurven, d.h. berechneter Y Werte }
@@ -230,9 +230,9 @@ implementation
 
 uses
   RiggVar.RG.Def,
-  RiggUnit,
-  Vcalc116,
-  Rggunit4,
+  RggModul,
+  RggCalc,
+  RggUnit4,
   RggScroll,
   FrmAuswahl,
   FrmMemo;

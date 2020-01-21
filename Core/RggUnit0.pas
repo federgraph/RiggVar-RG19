@@ -11,9 +11,9 @@ uses
   RiggVar.RG.Def,
   RggScroll,
   RggTypes,
-  Vcalc116,
-  SchnttKK,
-  TrimmTab;
+  RggCalc,
+  RggSchnittKK,
+  RggTrimmTab;
 
 type
   TGetriebe = class(TPersistent)
@@ -270,8 +270,8 @@ var
   tempWW, tempWS: double;
   tempSinus, tempCosinus: double;
 begin
-  ooTempA := Evektor(rP[ooA], rP[ooC]);
-  ooTempB := Evektor(rP[ooA0], rP[ooA]);
+  ooTempA := EVektor(rP[ooA], rP[ooC]);
+  ooTempB := EVektor(rP[ooA0], rP[ooA]);
   tempWW := sprod(ooTempA, ooTempB);
   try
     tempWW := arctan2(sqrt(1 - sqr(tempWW)), tempWW);
@@ -281,15 +281,15 @@ begin
       tempWW := 0;
   end;
   { ooTempA := Evektor(rP[ooA],rP[ooC]); }
-  ooTempB := Evektor(rP[ooA], rP[ooD]);
+  ooTempB := EVektor(rP[ooA], rP[ooD]);
   EbeneACD := vprod(ooTempA, ooTempB);
 
   { ooTempA := Evektor(rP[ooA],rP[ooC]); }
-  ooTempB := Evektor(rP[ooA], rP[ooA0]);
+  ooTempB := EVektor(rP[ooA], rP[ooA0]);
   EbeneACA0 := vprod(ooTempA, ooTempB);
 
-  ooTempA := Evektor(Null, EbeneACD);
-  ooTempB := Evektor(Null, EbeneACA0);
+  ooTempA := EVektor(Null, EbeneACD);
+  ooTempB := EVektor(Null, EbeneACA0);
   ooTempC := vprod(ooTempA, ooTempB);
   tempSinus := Abstand(Null, ooTempC);
   tempCosinus := sprod(ooTempA, ooTempB);
@@ -611,7 +611,7 @@ procedure TGetriebe.Reset;
 { Wenn die Integerwerte für Rumpf und Mast verändert wurden, dann muß Reset
   aufgerufen werden, um die Gleitkommawerte zu aktualisieren. }
 var
-  i: TRiggPoints;
+  i: TRiggPoint;
   j: TKoord;
 begin
   { Rumpfkoordinaten }

@@ -12,12 +12,12 @@ uses
   Vcl.ExtCtrls,
   Vcl.Dialogs,
   RggTypes,
-  Vcalc116,
-  RggMat01,
-  RaumGraph;
+  RggCalc,
+  RggMatrix,
+  RggRaumGraph;
 
 type
-  TGetriebeGraph = class(TRaumGrafik)
+  TGetriebeGraph = class(TRaumGraph)
   private
     FKoppelkurve: TKoordLine; // Daten für Koppelkurve
 
@@ -177,7 +177,10 @@ end;
 procedure TGetriebeGraph.Update;
 begin
   FillZug2D;
-  if Assigned(Rotator) then FillZug3D;
+  if Assigned(Rotator) then
+  begin
+    FillZug3D;
+  end;
 end;
 
 procedure TGetriebeGraph.Draw(Canvas: TCanvas);
@@ -406,9 +409,9 @@ begin
           Pen.Color := FColor;
         PolyLine(ZugVorstag);
       end;
-    end; {case}
-  end; {with Canvas do begin}
-end; {draw}
+    end;
+  end;
+end;
 
 procedure TGetriebeGraph.DrawToMeta(Canvas: TMetaFileCanvas);
 var
@@ -639,9 +642,9 @@ begin
           Pen.Color := FColor;
         PolyLine(ZugVorstag);
       end;
-    end; {case}
-  end; {with Canvas do begin}
-end; {draw}
+    end;
+  end;
+end;
 
 procedure TGetriebeGraph.FillZug2D;
 var
@@ -664,11 +667,13 @@ begin
 
   { Fixpunkt enthält nach Aufruf von FillZug3D den gedrehten Fixpunkt, hier wird
     aber immer der nicht gedrehte Fixpunkt benötigt! }
-  FixPunkt2D := rP[FixName];
+  FixPunkt2D := rP[FixPoint];
 
   { Koppelkurve }
-  if FKoppelkurveNeedFill then begin
-    for j := 0 to 100 do begin
+  if FKoppelkurveNeedFill then
+  begin
+    for j := 0 to 100 do
+    begin
       Temp := vsub(FKoppelKurve[j], FixPunkt2D);
       xTemp := Round(Temp[x] * FZoom2D);
       zTemp := Round(Temp[z] * FZoom2D);
@@ -679,7 +684,8 @@ begin
   end;
 
   { Mastkurve }
-  for j := 0 to BogenMax do begin
+  for j := 0 to BogenMax do
+  begin
     Temp := vsub(Kurve[j], FixPunkt2D);
     xTemp := Round(Temp[x] * FZoom2D);
     zTemp := Round(Temp[z] * FZoom2D);
@@ -916,7 +922,7 @@ end;
 
 procedure TGetriebeGraph.CalcOffset(R: TRect);
 var
-  k: TRiggPoints;
+  k: TRiggPoint;
   Temp: TRealPoint;
   xmin, xmax, ymin, ymax, zmin, zmax: Integer;
   tempx, tempy, tempz: Integer;

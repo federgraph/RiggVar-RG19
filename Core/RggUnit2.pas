@@ -1,4 +1,4 @@
-﻿unit Rggunit2;
+﻿unit RggUnit2;
 
 interface
 
@@ -20,9 +20,9 @@ uses
   Vcl.StdCtrls,
   Vcl.ComCtrls,
   RggTypes,
-  Vcalc116,
-  SchnttKK,
-  Rggunit1;
+  RggCalc,
+  RggSchnittKK,
+  RggUnit1;
 
 type
   TKurvenTyp = (KurveOhneController, KurveMitController);

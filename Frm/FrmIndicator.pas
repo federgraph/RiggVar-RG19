@@ -14,8 +14,8 @@ uses
   Vcl.Menus,
   ThreeD,
   ThreeDSolid,
-  Rggmat01,
-  Polarkar;
+  RggMatrix,
+  RggPolarKar;
 
 type
   TIndicatorForm = class(TForm)
@@ -50,7 +50,7 @@ type
   public
     Filename: string;
     GlobalRot: Boolean;
-    Rotator: TPolarkar2;
+    Rotator: TPolarKar;
     procedure RotateFromPoint;
     procedure Draw;
     procedure Update; override;

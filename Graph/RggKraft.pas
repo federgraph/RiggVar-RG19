@@ -20,9 +20,9 @@ uses
   Vcl.StdCtrls,
   Vcl.ComCtrls,
   RggTypes,
-  Vcalc116,
-  SchnttKK,
-  Rggunit1,
+  RggCalc,
+  RggSchnittKK,
+  RggUnit1,
   RggUnit2;
 
 type

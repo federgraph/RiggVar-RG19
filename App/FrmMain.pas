@@ -238,7 +238,7 @@ uses
   RiggVar.App.Main,
   RiggVar.VM.FormMainA,
   RiggVar.RG.Main,
-  RiggUnit,
+  RggModul,
   FrmInfo,
   FrmConsole,
   FrmInput,

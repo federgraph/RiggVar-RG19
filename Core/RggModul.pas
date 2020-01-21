@@ -1,4 +1,4 @@
-﻿unit RiggUnit;
+﻿unit RggModul;
 
 interface
 
@@ -25,13 +25,13 @@ uses
   RggRota,
   RggTypes,
   RggGBox,
-  Rggunit4,
-  IOTypes,
-  Vcalc116,
+  RggUnit4,
+  RggReport,
+  RggCalc,
   RggCtrls,
-  Rggdoc,
-  uRggPrinter,
-  Polarkar,
+  RggDoc,
+  RggPrinter,
+  RggPolarKar,
   RiggVar.RG.Def,
   RiggVar.VM.FormMain;
 
@@ -279,9 +279,9 @@ implementation
 
 uses
   RiggVar.App.Main,
-  FWUnit,
+  RggFachwerk,
   RggScroll,
-  Rggmat01,
+  RggMatrix,
   FrmConsole,
   FrmInput,
   FrmOutput,
@@ -353,7 +353,7 @@ begin
 
   { GetriebeGrafik }
   GetriebeGrafik := TGetriebeGraph.Create;
-  GetriebeGrafik.Rotator := TPolarKar2.Create;
+  GetriebeGrafik.Rotator := TPolarKar.Create;
   GetriebeGrafik.Rotator.DeltaPhi := 0;
   GetriebeGrafik.Rotator.DeltaTheta := -90;
   GetriebeGrafik.Rotator.XRot := -87;
@@ -400,8 +400,11 @@ begin
   DrawChart;
 
   NeedPaint := True;
-  UpdateGetriebe;
-  TestBtnClick;
+//  if Main <> nil then
+//  begin
+//    UpdateGetriebe;
+//    TestBtnClick;
+//  end;
 end;
 
 destructor TRiggModul.Destroy;
@@ -1760,7 +1763,7 @@ var
   PixPerInX: Integer;
   PixPerInY: Integer;
 begin
-  if RggPrinter.OKToPrint then
+  if RiggPrinter.OKToPrint then
   begin
     PixPerInX := GetDeviceCaps(Printer.Handle, LOGPIXELSX);
     PixPerInY := GetDeviceCaps(Printer.Handle, LOGPIXELSY);
@@ -1770,8 +1773,8 @@ begin
   end
   else
   begin
-    PixPerInX := RggPrinter.PixPerInX;
-    PixPerInY := RggPrinter.PixPerInY;
+    PixPerInX := RiggPrinter.PixPerInX;
+    PixPerInY := RiggPrinter.PixPerInY;
     EnvW := trunc((210 - 50) / 25.4 * PixPerInX);
     EnvH := trunc((297 - 50) / 25.4 * PixPerInY);
     Result := Point(EnvW, EnvH);
@@ -1780,7 +1783,7 @@ end;
 
 function GetEnvelopePos(EnvSize: TPoint): TRect;
 begin
-  if RggPrinter.OKToPrint then
+  if RiggPrinter.OKToPrint then
   begin
     Result := Rect(
       (Printer.PageWidth - EnvSize.x) div 2,
@@ -1791,10 +1794,10 @@ begin
   else
   begin
     Result := Rect(
-      (RggPrinter.PageWidth - EnvSize.x) div 2,
-      (RggPrinter.PageHeight - EnvSize.y) div 2 + 58,
-      (RggPrinter.PageWidth - EnvSize.x) div 2 + EnvSize.x,
-      (RggPrinter.PageHeight - EnvSize.y) div 2 + EnvSize.y + 58);
+      (RiggPrinter.PageWidth - EnvSize.x) div 2,
+      (RiggPrinter.PageHeight - EnvSize.y) div 2 + 58,
+      (RiggPrinter.PageWidth - EnvSize.x) div 2 + EnvSize.x,
+      (RiggPrinter.PageHeight - EnvSize.y) div 2 + EnvSize.y + 58);
   end;
 end;
 
@@ -1808,7 +1811,7 @@ var
   h: HDC;
   pb: TPaintBox;
 begin
-  if not RggPrinter.OKToPrint then
+  if not RiggPrinter.OKToPrint then
   begin
     MessageDlg('Kein Drucker konfiguriert.', mtInformation, [mbOK], 0);
     exit;
@@ -2055,7 +2058,9 @@ begin
       else if Screen.ActiveForm = OutputForm then
         OutputForm.ActiveControl := OutputForm.YComboBox
       else
-        MessageBeep(MB_ICONASTERISK);
+      begin
+//        MessageBeep(MB_ICONASTERISK);
+      end;
 
   finally
     { Getriebe wiederherstellen }

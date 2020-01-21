@@ -1,4 +1,4 @@
-﻿unit Polarkar;
+﻿unit RggPolarkar;
 
 interface
 
@@ -7,12 +7,12 @@ uses
   System.Math,
   Vector3D,
   RggTypes,
-  Rggmat01;
+  RggMatrix;
 
 type
   TCalcAngleEvent = procedure(Sender: TObject; var wx, wy, wz: double) of object;
 
-  TPolarKar2 = class
+  TPolarKar = class
   private
     FPhi, FTheta, FGamma, FXRot, FYRot, FZRot: double;
     FValid: Boolean;
@@ -65,86 +65,86 @@ type
 
 implementation
 
-constructor TPolarKar2.Create;
+constructor TPolarKar.Create;
 begin
   Mat := TMatrix4x4.Create;
   tmat := TMatrix4x4.Create;
   Reset;
 end;
 
-destructor TPolarKar2.Destroy;
+destructor TPolarKar.Destroy;
 begin
   Mat.Free;
   tmat.Free;
 end;
 
-procedure TPolarKar2.SetPhi(Value: double);
+procedure TPolarKar.SetPhi(Value: double);
 begin
   FPhi := Value * pi / 180;
   FValid := False;
 end;
 
-procedure TPolarKar2.SetTheta(Value: double);
+procedure TPolarKar.SetTheta(Value: double);
 begin
   FTheta := Value * pi / 180;
   FValid := False;
 end;
 
-procedure TPolarKar2.SetGamma(Value: double);
+procedure TPolarKar.SetGamma(Value: double);
 begin
   FGamma := Value * pi / 180;
   FValid := False;
 end;
 
-procedure TPolarKar2.SetXrot(Value: double);
+procedure TPolarKar.SetXrot(Value: double);
 begin
   FXRot := Value * pi / 180;
   FValid := False;
 end;
 
-procedure TPolarKar2.SetYrot(Value: double);
+procedure TPolarKar.SetYrot(Value: double);
 begin
   FYRot := Value * pi / 180;
   FValid := False;
 end;
 
-procedure TPolarKar2.SetZrot(Value: double);
+procedure TPolarKar.SetZrot(Value: double);
 begin
   FZRot := Value * pi / 180;
   FValid := False;
 end;
 
-function TPolarKar2.GetPhi: double;
+function TPolarKar.GetPhi: double;
 begin
   Result := Int(FPhi * 180 / pi);
 end;
 
-function TPolarKar2.GetTheta: double;
+function TPolarKar.GetTheta: double;
 begin
   Result := Int(FTheta * 180 / pi);
 end;
 
-function TPolarKar2.GetGamma: double;
+function TPolarKar.GetGamma: double;
 begin
   Result := Int(FGamma * 180 / pi);
 end;
 
-function TPolarKar2.GetXrot: double;
+function TPolarKar.GetXrot: double;
 begin
   Result := Int(FXRot * 180 / pi);
 end;
 
-function TPolarKar2.GetYrot: double;
+function TPolarKar.GetYrot: double;
 begin
   Result := Int(FYRot * 180 / pi);
 end;
 
-function TPolarKar2.GetZrot: double;
+function TPolarKar.GetZrot: double;
 begin
   Result := Int(FZRot * 180 / pi);
 end;
 
-procedure TPolarKar2.SetRotAngle(index: TRotationAngle; Value: double);
+procedure TPolarKar.SetRotAngle(index: TRotationAngle; Value: double);
 var
   temp: double;
 begin
@@ -165,7 +165,7 @@ begin
   end;
 end;
 
-function TPolarKar2.GetRotAngle(index: TRotationAngle): double;
+function TPolarKar.GetRotAngle(index: TRotationAngle): double;
 var
   temp: double;
 begin
@@ -187,20 +187,20 @@ begin
   Result := Int(temp * 180 / pi);
 end;
 
-function TPolarKar2.GetMatrix: Matrix4x4;
+function TPolarKar.GetMatrix: Matrix4x4;
 begin
   if FValid = False then
     GetMat;
   Result := Mat.Mat;
 end;
 
-procedure TPolarKar2.SetMatrix(Value: Matrix4x4);
+procedure TPolarKar.SetMatrix(Value: Matrix4x4);
 begin
   Reset;
   Mat.Mat := Value;
 end;
 
-procedure TPolarKar2.GetMat;
+procedure TPolarKar.GetMat;
 begin
   if Mode = False then
     FillMatrixInc
@@ -208,7 +208,7 @@ begin
     FillMatrix;
 end;
 
-procedure TPolarKar2.FillMatrixInc;
+procedure TPolarKar.FillMatrixInc;
 begin
   tmat.Identity;
   p1 := NullVec;
@@ -264,8 +264,9 @@ begin
   Mat.PreMultiply(tmat.Mat);
 end;
 
-procedure TPolarKar2.FillMatrix; //für Absolutmodus
+procedure TPolarKar.FillMatrix;
 begin
+  { für Absolutmodus }
   Mat.Identity;
   { 1. Rotation um globale y-Achse, gleichzeitig lokale y-Achse }
   p1.x := 0.0;
@@ -297,7 +298,7 @@ begin
   FValid := True;
 end;
 
-function TPolarKar2.Rotiere(Punkt: TRealPoint): TRealPoint;
+function TPolarKar.Rotiere(Punkt: TRealPoint): TRealPoint;
 var
   temp: vec3;
 begin
@@ -312,7 +313,7 @@ begin
   Result[z] := temp.z;
 end;
 
-procedure TPolarKar2.Reset;
+procedure TPolarKar.Reset;
 begin
   Mat.Identity;
   FPhi := 0;
@@ -324,7 +325,7 @@ begin
   FValid := True;
 end;
 
-procedure TPolarKar2.GetAngle(var wx, wy, wz: double);
+procedure TPolarKar.GetAngle(var wx, wy, wz: double);
 begin
   wx := 0;
   wy := 0;
@@ -333,7 +334,7 @@ begin
     OnCalcAngle(Self, wx, wy, wz);
 end;
 
-procedure TPolarKar2.GetAngle1(Sender: TObject; var wx, wy, wz: double);
+procedure TPolarKar.GetAngle1(Sender: TObject; var wx, wy, wz: double);
 
   function angle(a, b: vec3): double;
   var
@@ -356,21 +357,23 @@ begin
   wz := angle(FLocalZ, zVec);
 end;
 
-procedure TPolarKar2.SetRotMode(Value: Boolean);
+procedure TPolarKar.SetRotMode(Value: Boolean);
 begin
   if FMode <> Value then
   begin
     FMode := Value;
     FValid := False;
     if FMode then
-    begin //AbsolutMode
+    begin
+      { Absolute }
       GetAngle(FPhi, FTheta, FGamma);
       FXRot := 0;
       FYRot := 0;
       FZRot := 0;
     end;
     if FMode = False then
-    begin //IncrementMode
+    begin
+      { Incremental }
       FPhi := 0;
       FTheta := 0;
       FGamma := 0;
@@ -381,7 +384,7 @@ begin
   end;
 end;
 
-procedure TPolarKar2.GetAngle2(Sender: TObject; var wp, wt, wg: double);
+procedure TPolarKar.GetAngle2(Sender: TObject; var wp, wt, wg: double);
 
   function CheckSinCos(c: Extended): Extended;
   begin
@@ -406,7 +409,7 @@ begin
 
   tempmat := TMatrix4x4.Create;
   try
-    tempmat.CopyFrom((Sender as TPolarKar2).Mat);
+    tempmat.CopyFrom((Sender as TPolarKar).Mat);
     tempmat.GetLocals(ux, uy, uz);
 
     { Winkel Theta ermitteln im Bereich -90..90 Grad }

@@ -48,11 +48,12 @@ begin
 end;
 
 { Divide the scalar number into the vector v }
-function Divide(v :vec3; num: double): vec3;
+function Divide(v: vec3; num: double): vec3;
 var
 	d: vec3;
 begin
-	if (num <> 0) then begin
+	if (num <> 0) then
+  begin
 		d.x := v.x /num;
 		d.y := v.y /num;
 		d.z := v.z /num;
@@ -66,7 +67,8 @@ var
 	d: double;
 begin
   d := sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-	if (d <> 0) then begin
+	if (d <> 0) then
+  begin
 		v.x := v.x / d;
 		v.y := v.y / d;
 		v.z := v.z / d;

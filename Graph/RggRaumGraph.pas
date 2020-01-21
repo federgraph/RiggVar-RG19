@@ -1,4 +1,4 @@
-﻿unit RaumGraph;
+﻿unit RggRaumGraph;
 
 interface
 
@@ -6,13 +6,19 @@ uses
   Winapi.Windows,
   System.SysUtils,
   System.Classes,
-  Graphics,
-  VCalc116,
+  System.UITypes,
+  System.UIConsts,
+  Vcl.Graphics,
+  RggCalc,
   RggTypes,
-  BootGraph;
+  RggBootGraph;
 
 type
-  TRaumGrafik = class(TBootGraph)
+  TRaumGraph = class(TBootGraph)
+  private
+    { temporäre Koordinaten double transformed }
+    A0, B0, C0, D0, E0, F0: TRealPoint;
+    A,  B,  C,  D,  E,  F:  TRealPoint;
   protected
     ZugRumpf: array [1 .. 8] of TPoint;
     ZugMast: array [1 .. 4] of TPoint;
@@ -35,23 +41,20 @@ implementation
 uses
   RiggVar.RG.Def;
 
-procedure TRaumGrafik.Update;
+procedure TRaumGraph.Update;
 begin
   FillZug3D;
 end;
 
-procedure TRaumGrafik.FillZug3D;
+procedure TRaumGraph.FillZug3D;
 var
   tempRP: TRealRiggPoints;
   FixPunkt3D: TRealPoint;
-  i: TRiggPoints;
+  i: TRiggPoint;
   j: Integer;
   { temporäre Koordinaten Mastkurve double transformed }
   KurveRotiert: array [0 .. BogenMax] of TRealPoint;
-  { temporäre Koordinaten double transformed }
-  A0, B0, C0, D0, E0, F0: TRealPoint;
-  A,  B,  C,  D,  E,  F:  TRealPoint;
-   { temporäre Koordinaten Integer transformed }
+  { temporäre Koordinaten Integer transformed }
   xA0, xB0, xC0, xD0, xE0, { xF0, } xA, xB, xC, xD, xE, xF: Integer;
   yA0, yB0, yC0, yD0, yE0, { yF0, } yA, yB, yC, yD, yE, yF: Integer;
 begin
@@ -67,7 +70,7 @@ begin
   end;
 
   { den Fixpunkt des gedrehten Graphen in den Nullpunkt verschieben }
-  FixPunkt3D := tempRP[FixName];
+  FixPunkt3D := tempRP[FixPoint];
   FixPunkt := FixPunkt3D;
   A0 := vsub(tempRP[ooA0], FixPunkt3D);
   B0 := vsub(tempRP[ooB0], FixPunkt3D);
@@ -160,12 +163,12 @@ begin
   ZugWanteStb[3].y := -yC + Offset.y;
 
   { WanteBb }
-  ZugWanteBb[1].x := xC + Offset.x;
-  ZugWanteBb[1].y := -yC + Offset.y;
+  ZugWanteBb[3].x := xC + Offset.x;
+  ZugWanteBb[3].y := -yC + Offset.y;
   ZugWanteBb[2].x := xB + Offset.x;
   ZugWanteBb[2].y := -yB + Offset.y;
-  ZugWanteBb[3].x := xB0 + Offset.x;
-  ZugWanteBb[3].y := -yB0 + Offset.y;
+  ZugWanteBb[1].x := xB0 + Offset.x;
+  ZugWanteBb[1].y := -yB0 + Offset.y;
 
   { SalingFS }
   ZugSalingFS[1].x := xA + Offset.x;
@@ -198,7 +201,7 @@ begin
   ZugVorstag[2].y := -yC + Offset.y;
 end;
 
-procedure TRaumGrafik.Draw(Canvas: TCanvas);
+procedure TRaumGraph.Draw(Canvas: TCanvas);
 begin
   if GrafikOK then
   begin
@@ -249,7 +252,7 @@ begin
   end;
 end;
 
-procedure TRaumGrafik.GetPlotList(List: TStringList);
+procedure TRaumGraph.GetPlotList(List: TStringList);
   procedure Plot(L: array of TPoint);
   var
     s: string;

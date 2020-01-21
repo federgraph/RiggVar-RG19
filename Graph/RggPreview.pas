@@ -1,15 +1,15 @@
-﻿unit Print004;
+﻿unit RggPreview;
 
 interface
 
 uses
-  Windows,
-  SysUtils,
-  Classes,
-  Types,
-  Graphics,
-  Printers,
-  uRggPrinter;
+  Winapi.Windows,
+  System.SysUtils,
+  System.Classes,
+  System.Types,
+  Vcl.Graphics,
+  Vcl.Printers,
+  RggPrinter;
 
 type
   TSwapType = (stLinksRum, stRechtsRum);
@@ -180,7 +180,7 @@ var
   PixPerInX: Integer;
   PixPerInY: Integer;
 begin
-  if RggPrinter.OKToPrint then
+  if RiggPrinter.OKToPrint then
   begin
     PixPerInX := GetDeviceCaps(Printer.Handle, LOGPIXELSX);
     PixPerInY := GetDeviceCaps(Printer.Handle, LOGPIXELSY);
@@ -190,8 +190,8 @@ begin
   end
   else
   begin
-    PixPerInX := RggPrinter.PixPerInX;
-    PixPerInY := RggPrinter.PixPerInY;
+    PixPerInX := RiggPrinter.PixPerInX;
+    PixPerInY := RiggPrinter.PixPerInY;
     SheetW := trunc(210/25.4 * PixPerInX); {A4 Papier 210 mm breit}
     SheetH := trunc(297/25.4 * PixPerInY); {A4 Papier 297 mm hoch}
     Result := Point(SheetW, SheetH);
@@ -200,15 +200,15 @@ end;
 
 function TPreview.GetPageSize: TPoint;
 begin
-  if RggPrinter.OKToPrint then
+  if RiggPrinter.OKToPrint then
   begin
     Result.x := Printer.PageWidth;
     Result.y := Printer.PageHeight;
   end
   else
   begin
-    Result.x := RggPrinter.PageWidth;
-    Result.y := RggPrinter.PageHeight;
+    Result.x := RiggPrinter.PageWidth;
+    Result.y := RiggPrinter.PageHeight;
   end;
 end;
 
@@ -220,7 +220,7 @@ var
   PixPerInX: Integer;
   PixPerInY: Integer;
 begin
-  if RggPrinter.OKToPrint then
+  if RiggPrinter.OKToPrint then
   begin
     PixPerInX := GetDeviceCaps(Printer.Handle, LOGPIXELSX);
     PixPerInY := GetDeviceCaps(Printer.Handle, LOGPIXELSY);
@@ -230,8 +230,8 @@ begin
   end
   else
   begin
-    PixPerInX := RggPrinter.PixPerInX;
-    PixPerInY := RggPrinter.PixPerInY;
+    PixPerInX := RiggPrinter.PixPerInX;
+    PixPerInY := RiggPrinter.PixPerInY;
     EnvW := trunc(PrintSize.x/25.4 * PixPerInX);
     EnvH := trunc(PrintSize.y/25.4 * PixPerInY);
     Result := Point(EnvW, EnvH);
@@ -258,7 +258,7 @@ function TPreview.GetEnvelopePos: TRect;
 { Envelope Position in Bezug auf Page - vertikal 58 Pixel außermittig }
 { Asymetrie von Page kompensiert }
 begin
-  if RggPrinter.OKToPrint then
+  if RiggPrinter.OKToPrint then
   begin
     Result := Rect(
     (Printer.PageWidth  - EnvSize.x) div 2,
@@ -269,10 +269,10 @@ begin
   else
   begin
     Result := Rect(
-    (RggPrinter.PageWidth  - EnvSize.x) div 2,
-    (RggPrinter.PageHeight - EnvSize.y) div 2 + 58,
-    (RggPrinter.PageWidth  - EnvSize.x) div 2 + EnvSize.X,
-    (RggPrinter.PageHeight - EnvSize.y) div 2 + EnvSize.Y + 58);
+    (RiggPrinter.PageWidth  - EnvSize.x) div 2,
+    (RiggPrinter.PageHeight - EnvSize.y) div 2 + 58,
+    (RiggPrinter.PageWidth  - EnvSize.x) div 2 + EnvSize.X,
+    (RiggPrinter.PageHeight - EnvSize.y) div 2 + EnvSize.Y + 58);
   end;
 end;
 
@@ -320,7 +320,7 @@ begin
   RPL07[5].x := EnvPos.Left;
   RPL07[5].y := EnvPos.Top;
 
-  if RggPrinter.OkToPrint then
+  if RiggPrinter.OkToPrint then
     with Printer.Canvas do
     begin
       { Draw a rectangle that represents the envelope }

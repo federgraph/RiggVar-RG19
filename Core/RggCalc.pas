@@ -1,4 +1,4 @@
-﻿unit Vcalc116;
+﻿unit RggCalc;
 
 interface
 
@@ -9,7 +9,10 @@ uses
 var
   Null: TRealPoint;
 
-procedure SchnittGG(P1, P2, P3, P4: TRealPoint; var SP: TRealPoint);
+type
+  TBermerkungGG = (g1Vertical, g2Vertical, ggParallel, ggOK);
+
+function SchnittGG(P1, P2, P3, P4: TRealPoint; var SP: TRealPoint): Boolean;
 function Abstand(P1, P2: TRealPoint): double;
 function PsiVonPhi(phi, l1, l2, l3, l4: double; var sv: Boolean): double;
 function StartWinkel(l1, l2, l3, l4: double; var sv: Boolean): double;
@@ -18,8 +21,8 @@ function vadd(a, b: TRealPoint): TRealPoint;
 function vsub(a, b: TRealPoint): TRealPoint;
 function vprod(a, b: TRealPoint): TRealPoint;
 function sprod(a, b: TRealPoint): double;
-function Evektor(a, b: TRealPoint): TRealPoint;
-function skalarmult(a: TRealPoint; b: double): TRealPoint;
+function EVektor(a, b: TRealPoint): TRealPoint;
+function SkalarMult(a: TRealPoint; b: double): TRealPoint;
 function CleanUpReal(a: double): double;
 function Maximum(a, b: double): double;
 function Minimum(a, b: double): double;
@@ -50,18 +53,18 @@ begin
     result := a;
 end;
 
-function Evektor(a, b: TRealPoint): TRealPoint;
+function EVektor(a, b: TRealPoint): TRealPoint;
 var
   temp: double;
   ooTemp: TRealPoint;
 begin
   ooTemp := vsub(b, a);
   temp := 1 / Abstand(a, b);
-  ooTemp := skalarmult(ooTemp, temp);
+  ooTemp := SkalarMult(ooTemp, temp);
   result := ooTemp;
 end;
 
-function skalarmult(a: TRealPoint; b: double): TRealPoint;
+function SkalarMult(a: TRealPoint; b: double): TRealPoint;
 begin
   a[x] := a[x] * b;
   a[y] := a[y] * b;
@@ -107,16 +110,15 @@ begin
   Abstand := sqrt(h4);
 end;
 
-procedure SchnittGG(P1, P2, P3, P4: TRealPoint; var SP: TRealPoint);
-type
-  Art = (g1Vertical, g2Vertical, parallel, ok);
+function SchnittGG(P1, P2, P3, P4: TRealPoint; var SP: TRealPoint): Boolean;
 var
   a1, a2: double;
   sx, sz, x1, z1, x3, z3: double;
   Quotient: double;
-  Fall: Art;
+  Fall: TBermerkungGG;
 begin
-  Fall := ok;
+  result := True;
+  Fall := ggOK;
 
   a1 := 0;
   a2 := 0;
@@ -139,8 +141,18 @@ begin
   else
     Fall := g2Vertical;
 
+  if (Fall = ggOK) and (a2-a1 < 0.001) then
+    Fall := ggParallel;
+
   case Fall of
-    ok:
+    ggParallel:
+    begin
+      sx := 0;
+      sz := 0;
+      result := False;
+    end;
+
+    ggOK:
       begin
         x1 := P1[x];
         z1 := P1[z];

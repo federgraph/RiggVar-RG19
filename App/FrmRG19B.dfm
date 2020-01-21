@@ -46,8 +46,6 @@ object FormRG19B: TFormRG19B
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
-    ExplicitLeft = -136
-    ExplicitTop = 8
     object OpenBtn: TSpeedButton
       Left = 8
       Top = 3

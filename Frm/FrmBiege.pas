@@ -38,7 +38,7 @@ implementation
 {$R *.DFM}
 
 uses
-  RiggUnit;
+  RggModul;
 
 procedure TBiegeUndNeigeForm.SetupCtrls;
 begin

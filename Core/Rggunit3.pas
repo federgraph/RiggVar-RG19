@@ -1,4 +1,4 @@
-﻿unit Rggunit3;
+﻿unit RggUnit3;
 
 interface
 
@@ -8,10 +8,10 @@ uses
   System.IniFiles,
   System.Math,
   RggTypes,
-  Vcalc116,
-  SchnttKK,
+  RggCalc,
+  RggSchnittKK,
   RggUnit2,
-  FwUnit;
+  RggFachwerk;
 
 const
   { in KN / cm^2 }
@@ -472,7 +472,7 @@ end;
 
 procedure TRiggFS.Probe;
 
-  function Probe(o, a, b, c, d: TRiggPoints; al, bl, cl, dl: Integer): Boolean;
+  function Probe(o, a, b, c, d: TRiggPoint; al, bl, cl, dl: Integer): Boolean;
   begin
     with TetraF do
     begin
@@ -822,19 +822,19 @@ begin
       { weiter räumlich: }
       Skalar := W1Strich / WStrich3d;
       Temp := vsub(rPe[ooC], rPe[ooA0]);
-      Temp := skalarmult(Temp, Skalar);
+      Temp := SkalarMult(Temp, Skalar);
       Temp := vadd(rPe[ooA0], Temp);
       { Temp enthält jetzt den räumlichen Schnittpunkt der Diagonalen }
 
       Skalar := rLe[16] / (rLe[16] + rLe[15]);
       rPe[ooD] := vsub(rPe[ooC], rPe[ooD0]);
-      rPe[ooD] := skalarmult(rPe[ooD], Skalar);
+      rPe[ooD] := SkalarMult(rPe[ooD], Skalar);
       rPe[ooD] := vadd(rPe[ooD0], rPe[ooD]);
 
       { Berechnung Punkt ooA }
       Skalar := rLe[10] / Saling1L;
       Temp := vsub(Temp, rPe[ooD]);
-      Temp := skalarmult(Temp, Skalar);
+      Temp := SkalarMult(Temp, Skalar);
       rPe[ooA] := vadd(rPe[ooD], Temp);
 
       { aktualisieren }
