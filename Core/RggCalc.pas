@@ -10,7 +10,7 @@ var
   Null: TRealPoint;
 
 type
-  TBermerkungGG = (g1Vertical, g2Vertical, ggParallel, ggOK);
+  TBemerkungGG = (g1Vertical, g2Vertical, ggParallel, ggOK);
 
 function SchnittGG(P1, P2, P3, P4: TRealPoint; var SP: TRealPoint): Boolean;
 function Abstand(P1, P2: TRealPoint): double;
@@ -115,7 +115,7 @@ var
   a1, a2: double;
   sx, sz, x1, z1, x3, z3: double;
   Quotient: double;
-  Fall: TBermerkungGG;
+  Fall: TBemerkungGG;
 begin
   result := True;
   Fall := ggOK;

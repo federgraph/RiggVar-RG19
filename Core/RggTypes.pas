@@ -17,6 +17,7 @@ const
   CPMax = 50;
   CLMax = 50;
   BogenMax = 50;
+  TransKreisRadius = 16;
 
 var
   WantLogoData: Boolean;

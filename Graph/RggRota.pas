@@ -134,9 +134,6 @@ implementation
 
 uses
   RggModul,
-  RggDoc,
-  RggCalc,
-  FrmScale,
   RggPBox;
 
 { TRotaForm }
@@ -236,8 +233,7 @@ begin
   RaumGrafik.Offset := Point(1000,1000);
   RaumGrafik.Zoom := FZoom;
   Raumgrafik.FixPoint := FixPoint;
-  if RaumGrafik is TGetriebeGraph then
-    TGetriebeGraph(RaumGrafik).Ansicht := vp3D;
+  RaumGrafik.Ansicht := vp3D;
 end;
 
 procedure TRotaForm.InitHullGraph;
@@ -256,8 +252,7 @@ begin
   RaumGrafik.ControllerTyp := Rigg.ControllerTyp;
   RaumGrafik.Koordinaten := Rigg.rP;
   RaumGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  if RaumGrafik is TGetriebeGraph then
-    TGetriebeGraph(RaumGrafik).WanteGestrichelt := not Rigg.GetriebeOK;
+  RaumGrafik.WanteGestrichelt := not Rigg.GetriebeOK;
 end;
 
 procedure TRotaForm.UpdateGraph;
@@ -266,9 +261,8 @@ begin
   RaumGrafik.ControllerTyp := Rigg.ControllerTyp;
   RaumGrafik.Koordinaten := Rigg.rP;
   RaumGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  if RaumGrafik is TGetriebeGraph then
-    TGetriebeGraph(RaumGrafik).WanteGestrichelt := not Rigg.GetriebeOK;
- Draw;
+  RaumGrafik.WanteGestrichelt := not Rigg.GetriebeOK;
+  Draw;
 end;
 
 procedure TRotaForm.InitRotaData;
@@ -627,8 +621,8 @@ begin
   prevy := y; MouseDownY := y; SavedYPos := FYPos;
 
   FTranslation :=
-    (Abs(RaumGrafik.Offset.x + NullPunktOffset.x - X) < 10) and
-    (Abs(RaumGrafik.Offset.y + NullPunktOffset.y - Y) < 10);
+    (Abs(RaumGrafik.Offset.x + NullPunktOffset.x - X) < TransKreisRadius) and
+    (Abs(RaumGrafik.Offset.y + NullPunktOffset.y - Y) < TransKreisRadius);
 end;
 
 procedure TRotaForm.PaintBox3DMouseMove(Sender: TObject;

@@ -6,6 +6,8 @@ uses
   Winapi.Windows,
   System.SysUtils,
   System.Classes,
+  System.Math,
+  System.Math.Vectors,
   System.Generics.Collections,
   System.Generics.Defaults,
   Vcl.Graphics,
@@ -19,15 +21,39 @@ type
     diEllipse
   );
 
-  TSchnittGG = class
-  public
-    A, B: TRealPoint;
-    C, D: TRealPoint;
-    SP: TRealPoint;
-    Fall: TBermerkungGG;
-    Eps: double;
-    procedure Schnitt;
+  TRggPoint = record
+    P: TRealPoint;
+    function IsEqual(B: TRggPoint): Boolean;
+    function Compare(Q: TRggPoint): Integer;
   end;
+
+  TRggLine = record
+    A: TRggPoint;
+    B: TRggPoint;
+    function IsTotallyAbove(Other: TRggLine): Boolean;
+    function IsSame(Other: TRggLine): Boolean;
+  private
+    function ComputeSPY(SP: TRealPoint): double;
+  end;
+
+  TRggLinePair = record
+    L1: TRggLine;
+    L2: TRggLine;
+    SP: TRealPoint;
+    function HasCommonPoint: Boolean;
+    function CompareCommon: Integer;
+    function IsParallel: Boolean;
+    function CompareSPY: Integer;
+  end;
+
+//  TSchnittGG = class
+//  public
+//    A, B: TRealPoint;
+//    C, D: TRealPoint;
+//    SP: TRealPoint;
+//    Fall: TBemerkungGG;
+//    procedure Schnitt;
+//  end;
 
   TDisplayItem = class
   public
@@ -36,7 +62,7 @@ type
     P2: TRealPoint;
 
     StrokeWidth: Integer;
-    Color: TColor;
+    StrokeColor: TColor;
 
     LineStart, LineEnd: TPoint;
     CenterPoint: TPoint;
@@ -46,7 +72,7 @@ type
 
     procedure Draw(Canvas: TCanvas);
     procedure Assign(Value: TDisplayItem);
-    class function CompareDepth(const Left, Right: TDisplayItem): Integer;
+    class function Compare(const Left, Right: TDisplayItem): Integer;
   end;
 
   TDisplayItemComparer = class(TInterfacedObject, IComparer<TDisplayItem>)
@@ -68,32 +94,33 @@ type
     DisplayItemComparer: IComparer<TDisplayItem>;
   public
     DI: TDisplayItem;
+    WantLineColors: Boolean;
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
     procedure Ellipse(P1, P2: TRealPoint; CenterPoint: TPoint; Radius: Integer = 10);
-    procedure Line(P1, P2: TRealPoint; A, B: TPoint);
+    procedure Line(P1, P2: TRealPoint; A, B: TPoint; Color: TColor);
     procedure PolyLine(P1, P2: TRealPoint; A: array of TPoint);
     procedure Draw(Canvas: TCanvas);
   end;
 
 implementation
 
-uses
-  System.Math.Vectors;
+const
+  Eps = 0.0001;
 
 { TDisplayItem }
 
 procedure TDisplayItem.Assign(Value: TDisplayItem);
 begin
   StrokeWidth := Value.StrokeWidth;
-  Color := Value.Color;
+  StrokeColor := Value.StrokeColor;
 end;
 
 procedure TDisplayItem.Draw(Canvas: TCanvas);
 begin
   Canvas.Pen.Width := StrokeWidth;
-  Canvas.Pen.Color := Color;
+  Canvas.Pen.Color := StrokeColor;
 
   case ItemType of
     diLine:
@@ -117,98 +144,63 @@ begin
   end;
 end;
 
-class function TDisplayItem.CompareDepth(const Left, Right: TDisplayItem): Integer;
+class function TDisplayItem.Compare(const Left, Right: TDisplayItem): Integer;
 var
-  A, B, C, D: TRealPoint;
-  sp: TRealPoint;
-
-  vv: TRealPoint; // Rgg Vector 3D
-  vx: double;
-  vy: double;
-  vz: double;
-
-  ya, yb, dy: double;
-
-  v, w: TVector; // Delphi 2D Vectors
-  lv, lw: double;
-  f: double;
-
-  IsParallel: Boolean;
+  LP: TRggLinePair;
+  r: Integer;
 begin
-  result := 0;
-
-  A := Left.P1;
-  B := Left.P2;
-  C := Right.P1;
-  D := Right.P2;
-
-  if (A[y] = B[y]) and (C[y] > D[y]) then
+  if Left = nil then
   begin
-    dy := Left.P1[y] - Right.P1[y];
-    if dy > 0 then
-      result := 1
-    else if dy < 0 then
-      result := -1
-    else
-      result := 0;
-    Exit;
-  end;
-
-  IsParallel := SchnittGG(A, B, C, D, sp);
-  if IsParallel then
-  begin
-    Exit;
-  end;
-
-  { compute ya }
-  vv := vsub(B, A);
-  vx := vv[x];
-  vy := vv[y];
-  vz := vv[z];
-
-  v := TVector.Create(vx, vz);
-  lv := v.Length;
-  w := TVector.Create(sp[x]-A[x], sp[z]-B[z]);
-  lw := w.Length;
-
-  if lv < 0.001 then
-    Exit;
-  f := lw / lv;
-  ya := Left.P1[y] + f * vy;
-
-  { compute yb }
-  vv := vsub(D, C);
-  vx := vv[x];
-  vy := vv[y];
-  vz := vv[z];
-
-  v := TVector.Create(vx, vz);
-  lv := v.Length;
-  w := TVector.Create(sp[x]-C[x], sp[z]-D[z]);
-  lw := w.Length;
-
-  if lv < 0.001 then
-    Exit;
-  f := lw / lv;
-  yb := Right.P1[y] + f * vy;
-
-  { diff }
-  dy := yb - ya;
-
-  { return result }
-  if dy > 0 then
-    result := 1
-  else if dy < 0 then
-    result := -1
-  else
     result := 0;
+    Exit;
+  end;
+
+  if Right = nil then
+  begin
+    result := 0;
+    Exit;
+  end;
+
+  LP.L1.A.P := Left.P1;
+  LP.L1.B.P := Left.P2;
+  LP.L2.A.P := Right.P1;
+  LP.L2.B.P := Right.P2;
+
+  if False then
+
+  else if LP.L1.IsSame(LP.L2) then
+  begin
+    r := 0;
+  end
+
+  else if LP.L1.IsTotallyAbove(LP.L2) then
+  begin
+    r := 1;
+  end
+
+  else if LP.HasCommonPoint then
+  begin
+    r := LP.CompareCommon;
+  end
+
+  else if LP.IsParallel then
+  begin
+    r := 0;
+  end
+
+  else
+  begin
+    r := LP.CompareSPY;
+  end;
+
+  result := r;
 end;
 
 { TRggDisplayList }
 
 constructor TRggDisplayList.Create;
 begin
-  FCapacity := 200;
+  FCapacity := 100;
   FList := TDisplayList.Create;
   DI := TDisplayItem.Create;
   Clear;
@@ -270,10 +262,12 @@ begin
   cr.Radius := Radius;
 end;
 
-procedure TRggDisplayList.Line(P1, P2: TRealPoint; A, B: TPoint);
+procedure TRggDisplayList.Line(P1, P2: TRealPoint; A, B: TPoint; Color: TColor);
 var
   cr: TDisplayItem;
 begin
+  if WantLineColors then
+    DI.StrokeColor := Color;
   cr := Add;
   cr.ItemType := diLine;
   cr.P1 := P1;
@@ -317,77 +311,212 @@ end;
 
 function TDisplayItemComparer.Compare(const Left, Right: TDisplayItem): Integer;
 begin
-  result := TDisplayItem.CompareDepth(Left, Right);
+  result := TDisplayItem.Compare(Left, Right);
 end;
 
 { TSchnittGG }
 
-procedure TSchnittGG.Schnitt;
-var
-  a1, a2: double;
-  sx, sz, x1, z1, x3, z3: double;
-  q: double;
+//procedure TSchnittGG.Schnitt;
+//var
+//  a1, a2: double;
+//  sx, sz, x1, z1, x3, z3: double;
+//  q: double;
+//begin
+//  Fall := ggOK;
+//
+//  a1 := 0;
+//  a2 := 0;
+//  sx := 0;
+//  sz := 0;
+//  x1 := 0;
+//  z1 := 0;
+//  x3 := 0;
+//  z3 := 0;
+//
+//  q := B[x] - A[x];
+//  if abs(q) > Eps then
+//    a1 := (B[z] - A[z]) / q
+//  else
+//    Fall := g1Vertical;
+//
+//  q := D[x] - C[x];
+//  if abs(q) > Eps then
+//    a2 := (D[z] - C[z]) / q
+//  else
+//    Fall := g2Vertical;
+//
+//  if (Fall = ggOK) and (a2-a1 < Eps) then
+//    Fall := ggParallel;
+//
+//  case Fall of
+//    ggParallel:
+//    begin
+//      sx := 0;
+//      sz := 0;
+//    end;
+//
+//    ggOK:
+//      begin
+//        x1 := A[x];
+//        z1 := A[z];
+//        x3 := C[x];
+//        z3 := C[z];
+//        sx := (-a1 * x1 + a2 * x3 - z3 + z1) / (-a1 + a2);
+//        sz := (-a2 * a1 * x1 + a2 * z1 + a2 * x3 * a1 - z3 * a1) / (-a1 + a2);
+//      end;
+//
+//    g1Vertical:
+//      begin
+//        sz := a2 * x1 - a2 * x3 + z3;
+//        sx := x1;
+//      end;
+//
+//    g2Vertical:
+//      begin
+//        sz := a1 * x3 - a1 * x1 + z1;
+//        sx := x3;
+//      end;
+//  end;
+//
+//  SP[x] := sx;
+//  SP[y] := 0;
+//  SP[z] := sz;
+//end;
+
+{ TRggPoint }
+
+function TRggPoint.Compare(Q: TRggPoint): Integer;
 begin
-  Eps := 0.001;
-  Fall := ggOK;
-
-  a1 := 0;
-  a2 := 0;
-  sx := 0;
-  sz := 0;
-  x1 := 0;
-  z1 := 0;
-  x3 := 0;
-  z3 := 0;
-
-  q := B[x] - A[x];
-  if abs(q) > Eps then
-    a1 := (B[z] - A[z]) / q
+  if P[y] > Q.P[y] then
+    result := 1
+  else if P[y] < Q.P[y] then
+    result := -1
   else
-    Fall := g1Vertical;
+    result := 0;
+end;
 
-  q := D[x] - C[x];
-  if abs(q) > Eps then
-    a2 := (D[z] - C[z]) / q
+function TRggPoint.IsEqual(B: TRggPoint): Boolean;
+begin
+  result :=
+    (P[x] = B.P[x]) and
+    (P[y] = B.P[y]) and
+    (P[z] = B.P[z]);
+end;
+
+{ TRggLine }
+
+function TRggLine.IsSame(Other: TRggLine): Boolean;
+begin
+  result := False;
+  if A.IsEqual(Other.A) and B.IsEqual(Other.B) then
+    result := True
+  else if A.IsEqual(Other.B) and B.IsEqual(Other.A) then
+    result := True;
+end;
+
+function TRggLine.IsTotallyAbove(Other: TRggLine): Boolean;
+begin
+  result :=
+    (A.P[y] > Other.A.P[y]) and
+    (A.P[y] > Other.B.P[y]) and
+    (B.P[y] > Other.A.P[y]) and
+    (B.P[y] > Other.B.P[y]);
+end;
+
+function TRggLine.ComputeSPY(SP: TRealPoint): double;
+var
+  vs: TRealPoint;
+  vv: TRealPoint; // Rgg Vector 3D
+  vx: double;
+  vy: double;
+  vz: double;
+
+  v, w: TVector; // Delphi 2D Vectors
+  lv, lw: double;
+  f, g: double;
+begin
+  result := (A.P[y] + B.P[y]) / 2;
+
+  vs := vsub(SP, A.P);
+  vv := vsub(B.P, A.P);
+  vx := vv[x];
+  vy := vv[y];
+  vz := vv[z];
+
+  v := TVector.Create(vx, vz);
+  lv := v.Length;
+  w := TVector.Create(vs[x], vs[z]);
+  lw := w.Length;
+
+//  if lv < Eps then
+//  begin
+//    result := (A.P[y] + B.P[y]) / 2;
+//    Exit;
+//  end;
+
+  f := lw / lv;
+
+  if Sign(vv[x]) <> Sign(vs[x]) then
+    g := -f
   else
-    Fall := g2Vertical;
+    g := f;
 
-  if (Fall = ggOK) and (a2-a1 < Eps) then
-    Fall := ggParallel;
-
-  case Fall of
-    ggParallel:
-    begin
-      sx := 0;
-      sz := 0;
-    end;
-
-    ggOK:
-      begin
-        x1 := A[x];
-        z1 := A[z];
-        x3 := C[x];
-        z3 := C[z];
-        sx := (-a1 * x1 + a2 * x3 - z3 + z1) / (-a1 + a2);
-        sz := (-a2 * a1 * x1 + a2 * z1 + a2 * x3 * a1 - z3 * a1) / (-a1 + a2);
-      end;
-
-    g1Vertical:
-      begin
-        sz := a2 * x1 - a2 * x3 + z3;
-        sx := x1;
-      end;
-
-    g2Vertical:
-      begin
-        sz := a1 * x3 - a1 * x1 + z1;
-        sx := x3;
-      end;
+  if f > 10000 then
+  begin
+    result := A.P[y];
+    Exit;
   end;
 
-  SP[x] := sx;
-  SP[y] := 0;
-  SP[z] := sz;
+  if f < 1 then
+  begin
+    result := A.P[y] + g * vy;
+    Exit;
+  end;
+
+  if f > 1 then
+  begin
+    result := A.P[y] + g * vy;
+    Exit;
+  end;
+
+end;
+
+{ TRggLinePair }
+
+function TRggLinePair.CompareCommon: Integer;
+begin
+  result := 0;
+  if L1.A.IsEqual(L2.A) then
+    result := L1.B.Compare(L2.B)
+  else if L1.A.IsEqual(L2.B) then
+    result := L1.B.Compare(L2.A);
+end;
+
+function TRggLinePair.HasCommonPoint: Boolean;
+begin
+  result := L1.A.IsEqual(L2.A) or L1.A.IsEqual(L2.B);
+end;
+
+function TRggLinePair.IsParallel: Boolean;
+begin
+  result := SchnittGG(L1.A.P, L1.B.P, L2.A.P, L2.B.P, SP);
+end;
+
+function TRggLinePair.CompareSPY: Integer;
+var
+  ya, yb, dy: double;
+begin
+  ya := L1.ComputeSPY(SP);
+  yb := L2.ComputeSPY(SP);
+
+  dy := ya - yb;
+
+  if dy > 0 then
+    result := 1
+  else if dy < 0 then
+    result := -1
+  else
+    result := 0;
 end;
 
 end.

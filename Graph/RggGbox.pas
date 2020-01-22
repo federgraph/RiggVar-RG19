@@ -24,10 +24,7 @@ type
     FZoom2D: double; // eventuell von Zoom unterschiedlicher Faktor für 2D
     FZoomFaktor: Integer; // Faktor für 'Auflösung' (typisch 0 oder 10)
 
-    FAnsicht: TViewPoint;
     FColor: TColor;
-    FBogen: Boolean;
-    FGestrichelt: Boolean;
     FKoppelBtnDown: Boolean;
     FKoppelkurveNeedFill: Boolean;
 
@@ -84,11 +81,8 @@ type
     procedure UpdateOffset;
     procedure CalcOffset(R: TRect);
 
-    property Ansicht: TViewPoint read FAnsicht write FAnsicht;
     property Farbe: TColor read FColor write FColor;
     property ZoomFaktor: Integer read FZoomFaktor write SetZoomFaktor;
-    property Bogen: Boolean read FBogen write FBogen;
-    property WanteGestrichelt: Boolean write FGestrichelt;
     property KoppelKurve: TKoordLine read FKoppelKurve write SetKoppelKurve;
     property ZeichneKoppel: Boolean read FKoppelBtnDown write FKoppelBtnDown;
   end;
@@ -350,9 +344,16 @@ begin
           Pen.Color := clYellow
         else
           Pen.Color := FColor;
-        Ellipse(Offset.x - 10, Offset.y - 10, Offset.x + 10, Offset.y + 10);
+        Ellipse(
+          Offset.x - TransKreisRadius,
+          Offset.y - TransKreisRadius,
+          Offset.x + TransKreisRadius,
+          Offset.y + TransKreisRadius);
         { Rumpf }
-        if Coloriert then Pen.Color := clRumpf else Pen.Color := FColor;
+        if Coloriert then
+          Pen.Color := clRumpf
+        else
+          Pen.Color := FColor;
         PolyLine(ZugRumpf);
         { Salinge }
         if Coloriert then
@@ -580,7 +581,11 @@ begin
         { FixPunkt }
           // if Coloriert then
           //   Pen.Color := clYellow;
-          // Ellipse(Offset.x - 10, Offset.y - 10, Offset.x + 10, Offset.y + 10);
+          // Ellipse(
+          //     Offset.x - TransKreisRadius,
+          //     Offset.y - TransKreisRadius,
+          //     Offset.x + TransKreisRadius,
+          //     Offset.y + TransKreisRadius);
         { Rumpf }
         if Coloriert then
           Pen.Color := clRumpf

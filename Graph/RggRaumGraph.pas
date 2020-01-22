@@ -17,10 +17,14 @@ uses
 type
   TRaumGraph = class(TBootGraph)
   private
-    { temporäre Koordinaten double transformed }
+    { coordinates, transformed }
     A0, B0, C0, D0, E0, F0: TRealPoint;
     A,  B,  C,  D,  E,  F:  TRealPoint;
   protected
+    FBogen: Boolean;
+    FGestrichelt: Boolean;
+    FAnsicht: TViewPoint;
+
     ZugRumpf: array [1 .. 8] of TPoint;
     ZugMast: array [1 .. 4] of TPoint;
     ZugMastKurve: array [1 .. BogenMax + 2] of TPoint;
@@ -36,6 +40,10 @@ type
     procedure UpdateDisplayList;
     procedure Draw(Canvas: TCanvas); override;
     procedure GetPlotList(List: TStringList); override;
+
+    property Ansicht: TViewPoint read FAnsicht write FAnsicht;
+    property Bogen: Boolean read FBogen write FBogen;
+    property WanteGestrichelt: Boolean write FGestrichelt;
   end;
 
 implementation
@@ -51,7 +59,6 @@ end;
 procedure TRaumGraph.FillZug3D;
 var
   tempRP: TRealRiggPoints;
-  FixPunkt3D: TRealPoint;
   i: TRiggPoint;
   j: Integer;
   { temporäre Koordinaten Mastkurve double transformed }
@@ -72,24 +79,23 @@ begin
   end;
 
   { den Fixpunkt des gedrehten Graphen in den Nullpunkt verschieben }
-  FixPunkt3D := tempRP[FixPoint];
-  FixPunkt := FixPunkt3D;
-  A0 := vsub(tempRP[ooA0], FixPunkt3D);
-  B0 := vsub(tempRP[ooB0], FixPunkt3D);
-  C0 := vsub(tempRP[ooC0], FixPunkt3D);
-  D0 := vsub(tempRP[ooD0], FixPunkt3D);
-  E0 := vsub(tempRP[ooE0], FixPunkt3D);
-  F0 := vsub(tempRP[ooF0], FixPunkt3D);
-  A := vsub(tempRP[ooA],FixPunkt3D);
-  B := vsub(tempRP[ooB], FixPunkt3D);
-  C := vsub(tempRP[ooC],FixPunkt3D);
-  D := vsub(tempRP[ooD], FixPunkt3D);
-  E := vsub(tempRP[ooE], FixPunkt3D);
-  F := vsub(tempRP[ooF],FixPunkt3D);
+  FixPunkt := tempRP[FixPoint];
+  A0 := vsub(tempRP[ooA0], FixPunkt);
+  B0 := vsub(tempRP[ooB0], FixPunkt);
+  C0 := vsub(tempRP[ooC0], FixPunkt);
+  D0 := vsub(tempRP[ooD0], FixPunkt);
+  E0 := vsub(tempRP[ooE0], FixPunkt);
+  F0 := vsub(tempRP[ooF0], FixPunkt);
+  A := vsub(tempRP[ooA],FixPunkt);
+  B := vsub(tempRP[ooB], FixPunkt);
+  C := vsub(tempRP[ooC],FixPunkt);
+  D := vsub(tempRP[ooD], FixPunkt);
+  E := vsub(tempRP[ooE], FixPunkt);
+  F := vsub(tempRP[ooF],FixPunkt);
   for j := 0 to BogenMax do
-    KurveRotiert[j] := vsub(KurveRotiert[j], FixPunkt3D);
+    KurveRotiert[j] := vsub(KurveRotiert[j], FixPunkt);
 
-   { Skalieren und um den Offset verschieben }
+  { Skalieren und um den Offset verschieben }
   for j := 0 to BogenMax do
   begin
     xA0 := Round(KurveRotiert[j, x] * Zoom);
@@ -208,70 +214,72 @@ var
   DI: TDisplayItem;
 begin
   DL.Clear;
+  DL.WantLineColors := False;
   DI := DL.DI;
 
-  DI.Color := clYellow;
+  DI.StrokeColor := clYellow;
   DI.StrokeWidth := 1;
-  DL.Ellipse(FixPunkt, FixPunkt, Offset, 10);
+  DL.Ellipse(FixPunkt, FixPunkt, Offset, TransKreisRadius);
 
   { Rumpf }
-  DI.Color := TColors.Lightgrey;
+  DI.StrokeColor := TColors.Lightgrey;
   DI.StrokeWidth := 10;
-  DL.Line(A0, B0, ZugRumpf[1], ZugRumpf[2]);
-  DL.Line(B0, C0, ZugRumpf[2], ZugRumpf[3]);
-  DL.Line(A0, C0, ZugRumpf[1], ZugRumpf[3]);
-  DL.Line(D0, A0, ZugRumpf[5], ZugRumpf[1]);
-  DL.Line(D0, B0, ZugRumpf[5], ZugRumpf[2]);
-  DL.Line(D0, C0, ZugRumpf[5], ZugRumpf[3]);
+  DL.Line(A0, B0, ZugRumpf[1], ZugRumpf[2], clRed);
+  DL.Line(B0, C0, ZugRumpf[2], ZugRumpf[3], clGreen);
+  DL.Line(C0, A0, ZugRumpf[3], ZugRumpf[1], clBlue);
+  DL.Line(D0, A0, ZugRumpf[5], ZugRumpf[1], clAqua);
+  DL.Line(D0, B0, ZugRumpf[5], ZugRumpf[2], clFuchsia);
+  DL.Line(D0, C0, ZugRumpf[5], ZugRumpf[3], TColors.Orange);
 
   { Mast }
-  DI.Color := TColors.Cornflowerblue;
+  DI.StrokeColor := TColors.Cornflowerblue;
   DI.StrokeWidth := 8;
-  DL.PolyLine(D0, D, ZugMastKurve);
+  if FBogen then
+    DL.PolyLine(D0, D, ZugMastKurve)
+  else
+    DL.PolyLine(D0, D, ZugMast);
 
   { Wante Stb }
-  DI.Color := clRed;
+  DI.StrokeColor := clRed;
   DI.StrokeWidth := 2;
-  DL.Line(A0, A, ZugWanteStb[1], ZugWanteStb[2]);
-  DL.Line(A, C, ZugWanteStb[2], ZugWanteStb[3]);
+  DL.Line(A0, A, ZugWanteStb[1], ZugWanteStb[2], clRed);
+  DL.Line(A, C, ZugWanteStb[2], ZugWanteStb[3], clRed);
 
   { Wante Bb }
-  DI.Color := clGreen;
+  DI.StrokeColor := clGreen;
   DI.StrokeWidth := 2;
-  DL.Line(B0, B, ZugWanteBb[1], ZugWanteBb[2]);
-  DL.Line(B, C, ZugWanteBb[2], ZugWanteBb[3]);
+  DL.Line(B0, B, ZugWanteBb[1], ZugWanteBb[2], clGreen);
+  DL.Line(B, C, ZugWanteBb[2], ZugWanteBb[3], clGreen);
 
   { Saling }
-  DI.Color := clLime;
+  DI.StrokeColor := clLime;
   DI.StrokeWidth := 6;
-
   if SalingTyp = stFest then
   begin
-    DL.Line(A, D, ZugSalingFS[1], ZugSalingFS[2]);
-    DL.Line(B, D, ZugSalingFS[3], ZugSalingFS[2]);
-    DL.Line(A, B, ZugSalingFS[1], ZugSalingFS[3]);
+    DL.Line(A, D, ZugSalingFS[1], ZugSalingFS[2], clLime);
+    DL.Line(B, D, ZugSalingFS[3], ZugSalingFS[2], clLime);
+    DL.Line(A, B, ZugSalingFS[1], ZugSalingFS[3], clLime);
   end;
-
   if SalingTyp = stDrehbar then
   begin
-    DI.Color := clLime;
+    DI.StrokeColor := clLime;
     DI.StrokeWidth := 2;
-    DL.Line(A, D, ZugSalingDS[1], ZugSalingDS[2]);
-    DL.Line(B, D, ZugSalingDS[3], ZugSalingDS[2]);
+    DL.Line(A, D, ZugSalingDS[1], ZugSalingDS[2], clLime);
+    DL.Line(B, D, ZugSalingDS[3], ZugSalingDS[2], clLime);
   end;
 
   { Controller }
   if ControllerTyp <> ctOhne then
   begin
-    DI.Color := clAqua;
+    DI.StrokeColor := clAqua;
     DI.StrokeWidth := 4;
-    DL.Line(E0, E, ZugController[1], ZugController[2]);
+    DL.Line(E0, E, ZugController[1], ZugController[2], clAqua);
   end;
 
   { Vorstag }
-  DI.Color := clYellow;
+  DI.StrokeColor := clYellow;
   DI.StrokeWidth := 4;
-  DL.Line(C, C0, ZugVorstag[1], ZugVorstag[2]);
+  DL.Line(C, C0, ZugVorstag[1], ZugVorstag[2], clYellow);
 end;
 
 procedure TRaumGraph.Draw(Canvas: TCanvas);
@@ -287,7 +295,11 @@ begin
       { FixPunkt }
       if Coloriert then
         Pen.Color := clYellow;
-      Ellipse(Offset.x - 10, Offset.y - 10, Offset.x + 10, Offset.y + 10);
+      Ellipse(
+        Offset.x - TransKreisRadius,
+        Offset.y - TransKreisRadius,
+        Offset.x + TransKreisRadius,
+        Offset.y + TransKreisRadius);
       { Rumpf }
       if Coloriert then
         Pen.Color := clRumpf;

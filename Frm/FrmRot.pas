@@ -1425,8 +1425,8 @@ begin
   SavedYPos := FYPos;
 
   FTranslation :=
-    (Abs(RaumGrafik.Offset.x + NullPunktOffset.x - X) < 10) and
-    (Abs(RaumGrafik.Offset.y + NullPunktOffset.y - Y) < 10);
+    (Abs(RaumGrafik.Offset.x + NullPunktOffset.x - X) < TransKreisRadius) and
+    (Abs(RaumGrafik.Offset.y + NullPunktOffset.y - Y) < TransKreisRadius);
 end;
 
 procedure TRotationForm.PaintBox3DMouseMove(Sender: TObject;
