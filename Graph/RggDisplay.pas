@@ -1,4 +1,4 @@
-unit RggDisplay;
+﻿unit RggDisplay;
 
 interface
 
@@ -31,6 +31,7 @@ type
     A: TRggPoint;
     B: TRggPoint;
     function IsTotallyAbove(Other: TRggLine): Boolean;
+    function IsTotallyBelow(Other: TRggLine): Boolean;
     function IsSame(Other: TRggLine): Boolean;
   private
     function ComputeSPY(SP: TRealPoint): double;
@@ -86,10 +87,10 @@ type
   private
     FList: TDisplayList;
     FIndex: Integer;
-    FCount: Integer;
     FCapacity: Integer;
     FNeedSort: Boolean;
     function Add: TDisplayItem;
+    procedure CheckCount;
   protected
     DisplayItemComparer: IComparer<TDisplayItem>;
   public
@@ -168,6 +169,16 @@ begin
 
   if False then
 
+  else if Left.ItemType = diEllipse then
+  begin
+    r := 1;
+  end
+
+  else if Right.ItemType = diEllipse then
+  begin
+    r := -1;
+  end
+
   else if LP.L1.IsSame(LP.L2) then
   begin
     r := 0;
@@ -176,6 +187,11 @@ begin
   else if LP.L1.IsTotallyAbove(LP.L2) then
   begin
     r := 1;
+  end
+
+  else if LP.L1.IsTotallyBelow(LP.L2) then
+  begin
+    r := -1;
   end
 
   else if LP.HasCommonPoint then
@@ -193,7 +209,7 @@ begin
     r := LP.CompareSPY;
   end;
 
-  result := r;
+  result := -r;
 end;
 
 { TRggDisplayList }
@@ -226,19 +242,29 @@ begin
   FNeedSort := True;
 end;
 
+procedure TRggDisplayList.CheckCount;
+var
+  i: Integer;
+begin
+  if FList.Count > FIndex + 1 then
+  begin
+    for i := FIndex + 1 to FList.Count - 1 do
+      FList[i].Free;
+    FList.Count := FIndex + 1;
+  end;
+end;
+
 function TRggDisplayList.Add: TDisplayItem;
 begin
   Inc(FIndex);
-  if FIndex < FCount then
+  if FIndex < FList.Count then
   begin
     result := FList[FIndex];
   end
-  else if (FIndex >= FCount) and (FIndex < FCapacity) then
+  else if (FIndex >= FList.Count) and (FIndex < FCapacity) then
   begin
     result := TDisplayItem.Create;
     FList.Add(result); // returns Index in List
-    Inc(FCount);
-    Assert(FCount <= FList.Count);
   end
   else
   begin
@@ -296,14 +322,18 @@ procedure TRggDisplayList.Draw(Canvas: TCanvas);
 var
   cr: TDisplayItem;
 begin
+  CheckCount;
+
   if FNeedSort then
   begin
     FList.Sort(DisplayItemComparer);
   end;
+
   for cr in FList do
   begin
     cr.Draw(Canvas);
   end;
+
   FNeedSort := False;
 end;
 
@@ -388,9 +418,9 @@ end;
 function TRggPoint.Compare(Q: TRggPoint): Integer;
 begin
   if P[y] > Q.P[y] then
-    result := 1
-  else if P[y] < Q.P[y] then
     result := -1
+  else if P[y] < Q.P[y] then
+    result := 1
   else
     result := 0;
 end;
@@ -421,6 +451,15 @@ begin
     (A.P[y] > Other.B.P[y]) and
     (B.P[y] > Other.A.P[y]) and
     (B.P[y] > Other.B.P[y]);
+end;
+
+function TRggLine.IsTotallyBelow(Other: TRggLine): Boolean;
+begin
+  result :=
+    (A.P[y] < Other.A.P[y]) and
+    (A.P[y] < Other.B.P[y]) and
+    (B.P[y] < Other.A.P[y]) and
+    (B.P[y] < Other.B.P[y]);
 end;
 
 function TRggLine.ComputeSPY(SP: TRealPoint): double;
@@ -489,12 +528,21 @@ begin
   if L1.A.IsEqual(L2.A) then
     result := L1.B.Compare(L2.B)
   else if L1.A.IsEqual(L2.B) then
-    result := L1.B.Compare(L2.A);
+    result := L1.B.Compare(L2.A)
+
+  else if L1.B.IsEqual(L2.A) then
+    result := L1.A.Compare(L2.B)
+  else if L1.B.IsEqual(L2.B) then
+    result := L1.A.Compare(L2.A);
 end;
 
 function TRggLinePair.HasCommonPoint: Boolean;
 begin
-  result := L1.A.IsEqual(L2.A) or L1.A.IsEqual(L2.B);
+  result :=
+    L1.A.IsEqual(L2.A) or
+    L1.A.IsEqual(L2.B) or
+    L1.B.IsEqual(L2.A) or
+    L1.B.IsEqual(L2.B);
 end;
 
 function TRggLinePair.IsParallel: Boolean;

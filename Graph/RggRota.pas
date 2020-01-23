@@ -391,7 +391,6 @@ end;
 
 procedure TRotaForm.DrawToBitmap;
 begin
-  { Variante 1 }
   with Bitmap.Canvas do
   begin
     SetMapMode(Handle, MM_ANISOTROPIC);
@@ -400,6 +399,7 @@ begin
     SetViewPortExtEx(Handle, 1000, 1000, nil);
     SetViewPortOrgEx(Handle, NullpunktOffset.x, NullpunktOffset.y, nil);
   end;
+
   RaumGrafik.Coloriert := True;
   if UseDisplayList then
   begin
@@ -416,6 +416,7 @@ begin
     HullGraph.FixPunkt := RaumGrafik.FixPunkt;
     HullGraph.Draw(Bitmap.Canvas);
   end;
+
   with Bitmap.Canvas do
   begin
     SetWindowOrgEx(Handle, 0, 0, nil);

@@ -114,8 +114,8 @@ begin
   yD0 := Round(D0[z] * Zoom);
   xE0 := Round(E0[x] * Zoom);
   yE0 := Round(E0[z] * Zoom);
-  //xF0 := Round(F0[x]*Zoom);
-  //yF0 := Round(F0[z]*Zoom);
+//xF0 := Round(F0[x]*Zoom);
+//yF0 := Round(F0[z]*Zoom);
 
   xA := Round(A[x]*Zoom);
   yA := Round(A[z]*Zoom);
@@ -171,12 +171,12 @@ begin
   ZugWanteStb[3].y := -yC + Offset.y;
 
   { WanteBb }
-  ZugWanteBb[3].x := xC + Offset.x;
-  ZugWanteBb[3].y := -yC + Offset.y;
-  ZugWanteBb[2].x := xB + Offset.x;
-  ZugWanteBb[2].y := -yB + Offset.y;
   ZugWanteBb[1].x := xB0 + Offset.x;
   ZugWanteBb[1].y := -yB0 + Offset.y;
+  ZugWanteBb[2].x := xB + Offset.x;
+  ZugWanteBb[2].y := -yB + Offset.y;
+  ZugWanteBb[3].x := xC + Offset.x;
+  ZugWanteBb[3].y := -yC + Offset.y;
 
   { SalingFS }
   ZugSalingFS[1].x := xA + Offset.x;
@@ -214,7 +214,6 @@ var
   DI: TDisplayItem;
 begin
   DL.Clear;
-  DL.WantLineColors := False;
   DI := DL.DI;
 
   DI.StrokeColor := clYellow;
@@ -226,7 +225,7 @@ begin
   DI.StrokeWidth := 10;
   DL.Line(A0, B0, ZugRumpf[1], ZugRumpf[2], clRed);
   DL.Line(B0, C0, ZugRumpf[2], ZugRumpf[3], clGreen);
-  DL.Line(C0, A0, ZugRumpf[3], ZugRumpf[1], clBlue);
+  DL.Line(A0, C0, ZugRumpf[1], ZugRumpf[3], clBlue);
   DL.Line(D0, A0, ZugRumpf[5], ZugRumpf[1], clAqua);
   DL.Line(D0, B0, ZugRumpf[5], ZugRumpf[2], clFuchsia);
   DL.Line(D0, C0, ZugRumpf[5], ZugRumpf[3], TColors.Orange);
@@ -237,7 +236,11 @@ begin
   if FBogen then
     DL.PolyLine(D0, D, ZugMastKurve)
   else
-    DL.PolyLine(D0, D, ZugMast);
+  begin
+    DL.Line(D0, D, ZugMast[1], ZugMast[2], TColors.Cornflowerblue);
+    DL.Line(D, C, ZugMast[2], ZugMast[3], TColors.Cornflowerblue);
+    DL.Line(C, F, ZugMast[3], ZugMast[4], TColors.Cornflowerblue);
+  end;
 
   { Wante Stb }
   DI.StrokeColor := clRed;
@@ -279,7 +282,7 @@ begin
   { Vorstag }
   DI.StrokeColor := clYellow;
   DI.StrokeWidth := 4;
-  DL.Line(C, C0, ZugVorstag[1], ZugVorstag[2], clYellow);
+  DL.Line(C0, C, ZugVorstag[1], ZugVorstag[2], clYellow);
 end;
 
 procedure TRaumGraph.Draw(Canvas: TCanvas);
@@ -292,6 +295,7 @@ begin
     begin
       Pen.Color := clBtnFace;
       Pen.Width := 1;
+
       { FixPunkt }
       if Coloriert then
         Pen.Color := clYellow;
@@ -300,10 +304,12 @@ begin
         Offset.y - TransKreisRadius,
         Offset.x + TransKreisRadius,
         Offset.y + TransKreisRadius);
+
       { Rumpf }
       if Coloriert then
         Pen.Color := clRumpf;
       PolyLine(ZugRumpf);
+
       { Saling }
       if Coloriert then
         Pen.Color := clSaling;
@@ -311,10 +317,15 @@ begin
         PolyLine(ZugSalingFS)
       else if SalingTyp = stDrehbar then
         PolyLine(ZugSalingDS);
+
       { Mast }
       if Coloriert then
         Pen.Color := clMast;
-      PolyLine(ZugMastKurve); { PolyLine(ZugMast); }
+      if FBogen then
+         PolyLine(ZugMast)
+      else
+        PolyLine(ZugMastKurve);
+
       { Controller }
       if ControllerTyp <> ctOhne then
       begin
@@ -322,6 +333,7 @@ begin
           Pen.Color := clController;
         PolyLine(ZugController);
       end;
+
       { Wanten }
       if Coloriert then
         Pen.Color := clGreen;
@@ -329,6 +341,7 @@ begin
       if Coloriert then
         Pen.Color := clRed;
       PolyLine(ZugWanteBb);
+
       { Vorstag }
       if Coloriert then
         Pen.Color := clVorstag;
