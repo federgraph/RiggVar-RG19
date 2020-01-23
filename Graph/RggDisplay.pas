@@ -103,6 +103,7 @@ type
     procedure Line(P1, P2: TRealPoint; A, B: TPoint; Color: TColor);
     procedure PolyLine(P1, P2: TRealPoint; A: array of TPoint);
     procedure Draw(Canvas: TCanvas);
+    function CompareItems(i1, i2: Integer): Integer;
   end;
 
 implementation
@@ -171,12 +172,12 @@ begin
 
   else if Left.ItemType = diEllipse then
   begin
-    r := 1;
+    r := -1;
   end
 
   else if Right.ItemType = diEllipse then
   begin
-    r := -1;
+    r := 1;
   end
 
   else if LP.L1.IsSame(LP.L2) then
@@ -186,12 +187,12 @@ begin
 
   else if LP.L1.IsTotallyAbove(LP.L2) then
   begin
-    r := 1;
+    r := -1;
   end
 
   else if LP.L1.IsTotallyBelow(LP.L2) then
   begin
-    r := -1;
+    r := 1;
   end
 
   else if LP.HasCommonPoint then
@@ -209,7 +210,7 @@ begin
     r := LP.CompareSPY;
   end;
 
-  result := -r;
+  result := r;
 end;
 
 { TRggDisplayList }
@@ -240,6 +241,15 @@ procedure TRggDisplayList.Clear;
 begin
   FIndex := -1;
   FNeedSort := True;
+end;
+
+function TRggDisplayList.CompareItems(i1, i2: Integer): Integer;
+var
+  cr1, cr2: TDisplayItem;
+begin
+  cr1 := FList.Items[i1];
+  cr2 := FList.Items[i2];
+  result := TDisplayItem.Compare(cr1, cr2);
 end;
 
 procedure TRggDisplayList.CheckCount;
@@ -531,9 +541,9 @@ begin
     result := L1.B.Compare(L2.A)
 
   else if L1.B.IsEqual(L2.A) then
-    result := L1.A.Compare(L2.B)
+    result := -L1.A.Compare(L2.B)
   else if L1.B.IsEqual(L2.B) then
-    result := L1.A.Compare(L2.A);
+    result := -L1.A.Compare(L2.A);
 end;
 
 function TRggLinePair.HasCommonPoint: Boolean;
