@@ -9,6 +9,7 @@ uses
   System.Classes,
   System.Types,
   System.UITypes,
+  System.Math,
   Vcl.Graphics,
   Vcl.Forms,
   Vcl.Controls,
@@ -25,8 +26,8 @@ uses
   RggGBox,
   RggMatrix,
   Rggunit4,
-  RggPreview,
   RggPrinter,
+  RggPreview,
   FrmIndicator,
   RggGraph,
   RggRaumGraph,
@@ -78,6 +79,10 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure PaintBox3DPaint(Sender: TObject);
+    procedure PaintBox3DMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure PaintBox3DMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure PaintBox3DMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure FocusEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure LeftBtnClick(Sender: TObject);
     procedure ZoomInBtnClick(Sender: TObject);
     procedure ZoomOutBtnClick(Sender: TObject);
@@ -106,10 +111,6 @@ type
     procedure LeftButtonClick(Sender: TObject);
     procedure RightButtonClick(Sender: TObject);
     procedure ToolbarPanelResize(Sender: TObject);
-    procedure PaintBox3DMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure PaintBox3DMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
-    procedure PaintBox3DMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure FocusEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure PositionSaveItemClick(Sender: TObject);
     procedure PositionResetItemClick(Sender: TObject);
     procedure ModusItemClick(Sender: TObject);
@@ -125,6 +126,7 @@ type
     procedure PosiToolItemClick(Sender: TObject);
     procedure MatrixItemClick(Sender: TObject);
     procedure Sample420ItemClick(Sender: TObject);
+    procedure AngleTextItemClick(Sender: TObject);
   private
     CreatedScreenWidth: Integer;
     MetaFile: TRiggMetaFile;
@@ -145,6 +147,7 @@ type
     FIncrementW: double;
     FIncrementT: Integer;
     FZoomIndex: Integer;
+
     RotaData: TRotaData;
     RotaData1: TRotaData;
     RotaData2: TRotaData;
@@ -203,26 +206,27 @@ type
     Rigg: TRigg;
     Rotator: TPolarKar;
     HullGraph: TRggGraph;
-    RaumGrafik: TRaumGraph;
-    IndicatorForm: TIndicatorForm;
+    RaumGraph: TRaumGraph;
     BackBmp: TBitmap;
     Preview: TPreview;
+    IndicatorForm: TIndicatorForm;
     Mode: Boolean;
     Sample420Memo: TStrings;
     SampleDinghyMemo: TStrings;
     SampleYachtMemo: TStrings;
     SamplePlaningMemo: TStrings;
     procedure IndicatorChanged(Sender: TObject);
-    procedure Draw; virtual;
-    procedure InitGraph; virtual;
-    procedure InitRaumGrafik; virtual;
-    procedure InitHullGraph; virtual;
+    procedure Draw;
+    procedure InitPreview;
+    procedure InitGraph;
+    procedure InitRaumGraph;
+    procedure InitHullGraph;
     procedure InitRigg; virtual;
-    procedure InitPreview; virtual;
     procedure UpdateGraph; virtual;
   public
     PaintItemChecked: Boolean;
     MatrixItemChecked: Boolean;
+    AngleTextItemChecked: Boolean;
     KeepInsideItemChecked: Boolean;
     RumpfItemChecked: Boolean;
     IndicatorItemChecked: Boolean;
@@ -312,41 +316,14 @@ var
 implementation
 
 uses
+  FrmScale,
   RggCalc,
   RggPal,
-  FrmScale,
   RggPBox;
 
 {$R *.DFM}
 
 { TRotationForm }
-
-procedure TRotationForm.FormDestroy(Sender: TObject);
-begin
-  Rigg.Free;
-  BackBmp.Free;
-  Bitmap.Free;
-  MetaFile.Free;
-  RaumGrafik.Free;
-  HullGraph.Free;
-  Rotator.Free;
-  Preview.Free;
-  Preview := nil;
-  if hPal <> 0 then
-    DeleteObject(hPal);
-end;
-
-procedure TRotationForm.wmGetMinMaxInfo(var Msg: TWMGetMinMaxInfo);
-begin
-  inherited;
-  if csLoading in ComponentState then
-    Exit;
-  with Msg.MinMaxInfo^ do
-  begin
-    ptMinTrackSize := Point(MinTrackX, MinTrackY);
-    //ptMaxTrackSize := Point(MaxTrackX, MaxTrackY);
-  end;
-end;
 
 procedure TRotationForm.FormCreate(Sender: TObject);
 var
@@ -361,14 +338,11 @@ begin
   AlwaysShowAngle := False;
   ChangeRotationHints;
 
-  with Panel do
-  begin
-    BevelOuter := bvNone;
-    Caption := '';
-  end;
+  Panel.BevelOuter := bvNone;
+  Panel.Caption := '';
 
-  MinTrackX := 410;
-  MinTrackY := 280;
+  MinTrackX := 520;
+  MinTrackY := 420;
   MaxTrackX := 1024;
   MaxTrackY := 768;
 
@@ -390,26 +364,20 @@ begin
     hPal := CreateRggPal32;
 
   Bitmap := TBitmap.Create;
-  with Bitmap do
-  begin
-    Width := wx;
-    Height := wy;
-    if hPal <> 0 then
-      Palette := hPal;
-  end;
+  Bitmap.Width := wx;
+  Bitmap.Height := wy;
+  if hPal <> 0 then
+    Bitmap.Palette := hPal;
   PaintBackGround(Bitmap);
 
   Metafile := TRiggMetaFile.Create;
-  with Metafile do
-  begin
-    Width := Bitmap.Width;
-    Height := Bitmap.Height;
-  end;
+  Metafile.Width := Bitmap.Width;
+  Metafile.Height := Bitmap.Height;
 
   ActiveControl := FixPunktCombo;
 
   FZoomBase := 0.05;
-  FViewPoint := vpTop;
+  FViewPoint := vp3D;
 
   if MainMenu <> nil then
   begin
@@ -423,7 +391,6 @@ begin
     { ZoomInItem.ShortCut := VK_ADD; } { '+' auf Zehnertastatur }
     { ZoomOutItem.ShortCut := VK_SUBTRACT; } { '-' auf Zehnertastatur }
   end;
-
 
   { PaintBox austauschen }
   NewPaintBox := TRggPaintBox.Create(PaintBox3D.Owner);
@@ -442,7 +409,7 @@ begin
   end;
 
   InitGraph;
-  InitRaumGrafik;
+  InitRaumGraph;
   InitHullGraph;
   InitRigg;
   InitPreview;
@@ -454,6 +421,33 @@ begin
   SetViewPoint(FViewPoint);
 end;
 
+procedure TRotationForm.FormDestroy(Sender: TObject);
+begin
+  Rigg.Free;
+  BackBmp.Free;
+  Bitmap.Free;
+  MetaFile.Free;
+  RaumGraph.Free;
+  HullGraph.Free;
+  Rotator.Free;
+  Preview.Free;
+  Preview := nil;
+  if hPal <> 0 then
+    DeleteObject(hPal);
+end;
+
+procedure TRotationForm.wmGetMinMaxInfo(var Msg: TWMGetMinMaxInfo);
+begin
+  inherited;
+  if csLoading in ComponentState then
+    Exit;
+  with Msg.MinMaxInfo^ do
+  begin
+    ptMinTrackSize := Point(MinTrackX, MinTrackY);
+    //ptMaxTrackSize := Point(MaxTrackX, MaxTrackY);
+  end;
+end;
+
 procedure TRotationForm.InitGraph;
 begin
   { virtual }
@@ -462,16 +456,15 @@ begin
   InitRotaData;
 end;
 
-procedure TRotationForm.InitRaumGrafik;
+procedure TRotationForm.InitRaumGraph;
 begin
   { virtual }
-  RaumGrafik := TGetriebeGraph.Create;
-  RaumGrafik.Rotator := Rotator;
-  RaumGrafik.Offset := Point(1000,1000);
-  RaumGrafik.Zoom := FZoom;
-  Raumgrafik.FixPoint := ComboFixPoint;
-  if RaumGrafik is TGetriebeGraph then
-    TGetriebeGraph(RaumGrafik).Ansicht := vp3D;
+  RaumGraph := TGetriebeGraph.Create;
+  RaumGraph.Rotator := Rotator;
+  RaumGraph.Offset := Point(1000, 1000);
+  RaumGraph.Zoom := FZoom;
+  RaumGraph.FixPoint := ComboFixPoint;
+  RaumGraph.Ansicht := vp3D;
 end;
 
 procedure TRotationForm.InitHullGraph;
@@ -480,7 +473,7 @@ begin
   HullGraph := THullGraph.Create;
   HullGraph.Rotator := Rotator;
   HullGraph.Zoom := FZoom;
-  HullGraph.FixPunkt := Raumgrafik.FixPunkt;
+  HullGraph.FixPunkt := RaumGraph.FixPunkt;
 end;
 
 procedure TRotationForm.InitRigg;
@@ -489,23 +482,21 @@ begin
   Rigg := TRigg.Create;
   Rigg.ControllerTyp := ctOhne;
 
-  RaumGrafik.Salingtyp := Rigg.Salingtyp;
-  RaumGrafik.ControllerTyp := Rigg.ControllerTyp;
-  RaumGrafik.Koordinaten := Rigg.rP;
-  RaumGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  if RaumGrafik is TGetriebeGraph then
-    TGetriebeGraph(RaumGrafik).WanteGestrichelt := not Rigg.GetriebeOK;
+  RaumGraph.SalingTyp := Rigg.SalingTyp;
+  RaumGraph.ControllerTyp := Rigg.ControllerTyp;
+  RaumGraph.Koordinaten := Rigg.rP;
+  RaumGraph.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  RaumGraph.WanteGestrichelt := not Rigg.GetriebeOK;
 end;
 
 procedure TRotationForm.UpdateGraph;
 begin
  { virtual }
-  RaumGrafik.Salingtyp := Rigg.Salingtyp;
-  RaumGrafik.ControllerTyp := Rigg.ControllerTyp;
-  RaumGrafik.Koordinaten := Rigg.rP;
-  RaumGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  if RaumGrafik is TGetriebeGraph then
-    TGetriebeGraph(RaumGrafik).WanteGestrichelt := not Rigg.GetriebeOK;
+  RaumGraph.Salingtyp := Rigg.Salingtyp;
+  RaumGraph.ControllerTyp := Rigg.ControllerTyp;
+  RaumGraph.Koordinaten := Rigg.rP;
+  RaumGraph.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  RaumGraph.WanteGestrichelt := not Rigg.GetriebeOK;
   Draw;
 end;
 
@@ -604,13 +595,13 @@ end;
 
 procedure TRotationForm.Draw;
 begin
+  Painted := False;
+
   if hPal <> 0 then
   begin
     hOldPal := SelectPalette(PaintBox3D.Canvas.Handle, hPal, False);
     RealizePalette(PaintBox3D.Canvas.Handle);
   end;
-
-  Painted := False;
 
   { Nach Änderung der Auflösung Probleme mit dem Grau-Überschreiben. Deshalb: }
   if Screen.Width <> CreatedScreenWidth then
@@ -622,12 +613,14 @@ begin
     EraseBK := False;
   end;
 
-  NullpunktOffset.x := -RaumGrafik.Offset.x + Bitmap.Width div 2 + FXpos;
-  NullpunktOffset.y := -RaumGrafik.Offset.y + Bitmap.Height div 2 + FYpos;
+  NullpunktOffset.x := -RaumGraph.Offset.x + Bitmap.Width div 2 + FXpos;
+  NullpunktOffset.y := -RaumGraph.Offset.y + Bitmap.Height div 2 + FYpos;
   DrawToBitmap1;
 
   if MatrixItemChecked then
     DrawMatrix(Bitmap.Canvas);
+  if AngleTextItemChecked then
+  DrawAngleText(Bitmap.Canvas);
 
   if PreviewItemChecked then
     DrawPreviewBox;
@@ -653,14 +646,16 @@ begin
     SetViewPortExtEx(Handle, 1000, 1000, nil);
     SetViewPortOrgEx(Handle, NullpunktOffset.x, NullpunktOffset.y, nil);
   end;
-  RaumGrafik.Coloriert := True;
-  RaumGrafik.Draw(Bitmap.Canvas);
+  RaumGraph.Coloriert := True;
+  RaumGraph.Draw(Bitmap.Canvas);
+
   if FPaintRumpf and (not MouseDown or (MouseDown and FDrawAlways)) then
   begin
     HullGraph.Coloriert := True;
-    HullGraph.FixPunkt := RaumGrafik.FixPunkt;
+    HullGraph.FixPunkt := RaumGraph.FixPunkt;
     HullGraph.Draw(Bitmap.Canvas);
   end;
+
   with Bitmap.Canvas do
   begin
     SetWindowOrgEx(Handle, 0, 0, nil);
@@ -676,12 +671,12 @@ begin
   try
     if not PaintItemChecked then
       MetaCanvas.Draw(0,0,MetaFile);
-    RaumGrafik.Coloriert := True;
-    RaumGrafik.Draw(MetaCanvas);
+    RaumGraph.Coloriert := True;
+    RaumGraph.Draw(MetaCanvas);
     if FPaintRumpf = True then
     begin
       HullGraph.Coloriert := True;
-      HullGraph.FixPunkt := RaumGrafik.FixPunkt;
+      HullGraph.FixPunkt := RaumGraph.FixPunkt;
       HullGraph.Draw(MetaCanvas);
     end;
   finally
@@ -692,12 +687,12 @@ begin
   { aktuelles Bild mit grauem Stift in das Metafile schreiben }
   MetaCanvas := TMetaFileCanvas.Create(MetaFile, 0);
   try
-    RaumGrafik.Coloriert := False;
-    RaumGrafik.Draw(MetaCanvas);
+    RaumGraph.Coloriert := False;
+    RaumGraph.Draw(MetaCanvas);
     if FPaintRumpf = True then
     begin
       HullGraph.Coloriert := False;
-      HullGraph.FixPunkt := RaumGrafik.FixPunkt;
+      HullGraph.FixPunkt := RaumGraph.FixPunkt;
       HullGraph.Draw(MetaCanvas);
     end;
   finally
@@ -833,7 +828,7 @@ begin
     Inc(FZoomIndex);
     FZoom := FZoomBase * LookUpRa10(FZoomIndex);
     HullGraph.Zoom := FZoom;
-    RaumGrafik.Zoom := FZoom;
+    RaumGraph.Zoom := FZoom;
     Draw;
     SetZoomText;
   end;
@@ -846,7 +841,7 @@ begin
     Dec(FZoomIndex);
     FZoom := FZoomBase * LookUpRa10(FZoomIndex);
     HullGraph.Zoom := FZoom;
-    RaumGrafik.Zoom := FZoom;
+    RaumGraph.Zoom := FZoom;
     Draw;
     SetZoomText;
   end;
@@ -854,8 +849,8 @@ end;
 
 procedure TRotationForm.FixPunktComboChange(Sender: TObject);
 begin
-  Raumgrafik.FixPoint := ComboFixPoint;
-  HullGraph.FixPunkt := RaumGrafik.FixPunkt;
+  RaumGraph.FixPoint := ComboFixPoint;
+  HullGraph.FixPunkt := RaumGraph.FixPunkt;
   Draw;
 end;
 
@@ -945,11 +940,6 @@ begin
   Btn30Grad.Down := True;
 end;
 
-procedure TRotationForm.PrintItemClick(Sender: TObject);
-begin
-  PrintIt;
-end;
-
 procedure TRotationForm.A0_ItemClick(Sender: TObject);
 begin
   if Sender = A_Item then FixPunktCombo.ItemIndex := 0
@@ -980,7 +970,7 @@ begin
   begin
     List := TStringList.Create;
     try
-      RaumGrafik.GetPlotList(List);
+      RaumGraph.GetPlotList(List);
       if FPaintRumpf then
         HullGraph.GetPlotList(List);
       List.SaveToFile(SaveDialog.FileName);
@@ -1025,6 +1015,7 @@ begin
   Step5Item.Checked := False;
   Step10Item.Checked := False;
   Step30Item.Checked := False;
+
   if Btn01Grad.Down then Step01Item.Checked := True
   else if Btn1Grad.Down then Step1Item.Checked := True
   else if Btn5Grad.Down then Step5Item.Checked := True
@@ -1039,6 +1030,8 @@ procedure TRotationForm.Options3DMenuClick(Sender: TObject);
 begin
   IndicatorItem.Checked := IndicatorForm.Visible;
   IndicatorLocalRotItem.Checked := not IndicatorForm.GlobalRot;
+//  if AngleTextItem <> nil then
+//    AngleTextItem.Enabled := Mode;
 end;
 
 procedure TRotationForm.StatusBarItemClick(Sender: TObject);
@@ -1127,13 +1120,13 @@ begin
   FZoomIndex := RotaData.ZoomIndex;
   FZoom := FZoomBase * LookUpRa10(FZoomIndex);
   SetZoomText;
-  RaumGrafik.Zoom := FZoom;
+  RaumGraph.Zoom := FZoom;
   HullGraph.Zoom := FZoom;
   { Fixpunkt }
   FixPunktCombo.ItemIndex := RotaData.FixpunktIndex;
-  RaumGrafik.FixPoint := ComboFixPoint;
-  RaumGrafik.Update; // Rotate;
-  HullGraph.FixPunkt := Raumgrafik.FixPunkt;
+  RaumGraph.FixPoint := ComboFixPoint;
+  RaumGraph.Update;
+  HullGraph.FixPunkt := RaumGraph.FixPunkt;
   { Neuzeichnen }
   EraseBK := True;
   Draw;
@@ -1195,8 +1188,8 @@ var
   wx, wy: Integer;
 begin
   CreatedScreenWidth := Screen.Width;
-  wx := GetSystemMetrics(SM_CXSCREEN); { Width := Screen.Width }
-  wy := GetSystemMetrics(SM_CYSCREEN); { Height := Screen.Height }
+  wx := GetSystemMetrics(SM_CXSCREEN);
+  wy := GetSystemMetrics(SM_CYSCREEN);
   if wx > 1024 then
     wx := 1024;
   if wy > 768 then
@@ -1205,22 +1198,16 @@ begin
   Bitmap.Palette := 0;
   Bitmap.Free;
   Bitmap := TBitmap.Create;
-  with Bitmap do
-  begin
-    Width := wx;
-    Height := wy;
-    if hPal <> 0 then
-      Palette := hPal;
-  end;
+  Bitmap.Width := wx;
+  Bitmap.Height := wy;
+  if hPal <> 0 then
+    Bitmap.Palette := hPal;
   PaintBackGround(Bitmap);
 
   MetaFile.Free;
   Metafile := TRiggMetaFile.Create;
-  with Metafile do
-  begin
-    Width := Bitmap.Width;
-    Height := Bitmap.Height;
-  end;
+  Metafile.Width := Bitmap.Width;
+  Metafile.Height := Bitmap.Height;
 
   SetViewPoint(FViewPoint);
 end;
@@ -1233,182 +1220,6 @@ begin
   if KeepInsideItemChecked then
     Draw;
 end;
-
-{ Scroll left by one button. If no buttons are visible anymore, do nothing. }
-procedure TRotationForm.LeftButtonClick(Sender: TObject);
-var
-  Button: TControl;
-begin
-  { Scroll left }
-  Button := GetFirstVisibleButton;
-  if Button <> nil then
-  begin
-    if Buttons[Button.Tag+1] <> nil then
-      Panel.Left := -Buttons[Button.Tag+1].Left
-    else
-      Panel.Left := -(Button.Left + Button.Width);
-    Panel.Width := LeftButton.Left - Panel.Left;
-    RedoButtons;
-  end;
-end;
-
-{ Scroll right by one button. Do not scroll past the first button.
-  If no buttons are visible, then do nothing. }
-procedure TRotationForm.RightButtonClick(Sender: TObject);
-var
-  Button: TControl;
-begin
-  { Scroll right }
-  Button := GetFirstVisibleButton;
-  if (Button <> nil) and (Button.Tag > 0) then
-  begin
-    with Buttons[Button.Tag-1] do
-      Panel.Left := -Left;
-    Panel.Width := LeftButton.Left - Panel.Left;
-    RedoButtons;
-  end;
-end;
-
-{ After a resize, or after a scroll, determine which buttons are visible. }
-procedure TRotationForm.RedoButtons;
-var
-  I: Integer;
-begin
-  { make a partially obscured button completely invisible }
-  with Panel do
-    for I := 0 to ControlCount-1 do
-      if Controls[I].Tag >= 0 then
-        Controls[I].Visible := IsButtonVisible(Controls[I]);
-  EnableScrollButtons;
-end;
-
-{ Return the button whose tag property is Tag, or nil if no button matches. }
-function TRotationForm.GetButton(Tag: Integer): TControl;
-var
-  I: Integer;
-begin
-  for I := 0 to Panel.ControlCount-1 do
-    if Panel.Controls[I].Tag = Tag then
-    begin
-      result := Panel.Controls[I] as TControl;
-      Exit;
-    end;
-  result := nil;
-end;
-
-{ Return the number of toolbar buttons on the panel. }
-function TRotationForm.GetButtonCount: Integer;
-var
-  I: Integer;
-begin
-  Result := 0;
-  for I := 0 to Panel.ControlCount-1 do
-    if Panel.Controls[I].Tag >= 0 then
-      Inc(Result);
-end;
-
-{ Return whether a button is entirely visible. Scale the button's
-  bounds to the toolbar, and make sure the button lies entirely
-  within the bounds of the toolbar. }
-function TRotationForm.IsButtonVisible(Button: TControl): Boolean;
-var
-  TopLeft, BottomRight: TPoint;
-  Right: Integer;
-begin
-  TopLeft := ScreenToClient(Button.ClientToScreen(Button.ClientRect.TopLeft));
-  BottomRight := ScreenToClient(Button.ClientToScreen(Button.ClientRect.BottomRight));
-  if LeftButton.Visible then
-    Right := LeftButton.Left
-  else
-    Right := ClientWidth;
-  if (TopLeft.X < 0) or (TopLeft.Y < 0) then
-    Result := False
-  else if (BottomRight.Y > ClientHeight) or (BottomRight.X > Right) then
-    Result := False
-  else
-    Result := True;
-end;
-
-{ Return the first visible button, or nil if they are all invisible. }
-function TRotationForm.GetFirstVisibleButton: TControl;
-var
-  I: Integer;
-begin
-  with Panel do
-    for I := 0 to ControlCount-1 do
-      if Controls[I].Tag >= 0 then
-      begin
-        Result := Controls[I] as TControl;
-        if IsButtonVisible(Result) then
-          Exit;
-      end;
-  Result := nil;
-end;
-
-{ Return the last (rightmost) visible button, or nil if all the
-  buttons are invisible. }
-function TRotationForm.GetLastVisibleButton: TControl;
-var
-  I: Integer;
-begin
-  with Panel do
-    for I := ControlCount-1 downto 0 do
-      if Controls[I].Tag >= 0 then
-      begin
-        Result := Controls[I] as TControl;
-        if IsButtonVisible(Result) then
-          Exit;
-      end;
-  Result := nil;
-end;
-
-{ Enable or disable the toolbar scroll buttons. If the leftmost
-  button is visible then disable the right button. If the rightmost
-  button is visible then disable the left button. }
-procedure TRotationForm.EnableScrollButtons;
-begin
-  RightButton.Enabled := not IsButtonVisible(Buttons[0]);
-  LeftButton.Enabled  := not IsButtonVisible(Buttons[GetButtonCount-1]);
-end;
-
-{ When the toolbar changes size, move the scroll buttons so they stay
-  at the right edge of the toolbar. Reset the panel to show whichever
-  buttons are visible. }
-procedure TRotationForm.ToolbarPanelResize(Sender: TObject);
-var
-  I, Right: Integer;
-begin
-  LeftButton.Left := ClientWidth - LeftButton.Width - 4;
-  RightButton.Left := ClientWidth - RightButton.Width - 4;
-  { Is there enough room for every button? }
-  with Buttons[GetButtonCount-1] do
-    Right := Left + Width;
-  if ClientWidth >= Right then
-  begin
-    Panel.Left := 0; { unscroll }
-    Panel.Width := ClientWidth;
-    { Hide the scroll buttons. }
-    LeftButton.Visible := False;
-    RightButton.Visible := False;
-    { Make all the toolbar buttons visible. }
-    with Panel do
-      for I := 0 to ControlCount-1 do
-        if Controls[I].Tag >= 0 then
-          Controls[I].Visible := True
-  end
-  else
-  begin
-    { Make the scroll buttons visible. }
-    LeftButton.Visible := True;
-    RightButton.Visible := True;
-    { Set the panel width to leave room for the scroll buttons. }
-    Panel.Width := LeftButton.Left - Panel.Left;
-  end;
-  Panel.Height := ToolbarPanel.Height;
-  RedoButtons;
-end;
-
-{ Ergänzung für das Drehen mit der Maus. }
 
 procedure TRotationForm.PaintBox3DMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -1425,31 +1236,43 @@ begin
   SavedYPos := FYPos;
 
   FTranslation :=
-    (Abs(RaumGrafik.Offset.x + NullPunktOffset.x - X) < TransKreisRadius) and
-    (Abs(RaumGrafik.Offset.y + NullPunktOffset.y - Y) < TransKreisRadius);
+    (Abs(RaumGraph.Offset.x + NullPunktOffset.x - X) < TransKreisRadius) and
+    (Abs(RaumGraph.Offset.y + NullPunktOffset.y - Y) < TransKreisRadius);
 end;
 
 procedure TRotationForm.PaintBox3DMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
 var
+  dx, dy: Integer;
   wx, wy, wz: Integer;
 begin
   if not MouseDown then
     Exit;
   if Mode then
     Exit;
+
+  dx := x - prevx;
+  dy := y - prevy;
+
   if MouseButton = mbLeft then
   begin
-    wx := Round((x - prevx) * 360 / PaintBox3D.Width);
-    wy := Round((y - prevy) * 360 / PaintBox3D.Height);
+    wx := Round(dx * 0.15);
+    wy := Round(dy * 0.15);
     wz := 0;
+    if (Abs(dx) > 0) and (wx = 0) then
+      wx := Sign(dx);
+    if (Abs(dy) > 0) and (wy = 0) then
+      wy := Sign(dy);
   end
   else
   begin
     wx := 0;
     wy := 0;
-    wz := Round((x - prevx) * 360 / PaintBox3D.Width);
+    wz := Round(dx * 0.3);
+    if (Abs(dx) > 0) and (wx = 0) then
+      wz := Sign(dx);
   end;
+
   if Painted then
   begin
     Painted := False;
@@ -1481,7 +1304,7 @@ begin
   Rotator.XRot := Xrot;
   Rotator.YRot := Yrot;
   Rotator.ZRot := Zrot;
-  RaumGrafik.Update;
+  RaumGraph.Update;
   SetAngleText;
 end;
 
@@ -1591,12 +1414,14 @@ begin
   { falls Increment Mode }
   if (Mode = False) and (AlwaysShowAngle = False) then
     Exit;
+
   if (Mode = False) and (AlwaysShowAngle = True) then
     Rotator.GetAngle(FPhi, FTheta, FGamma);
 
   SHeadingPhi := Format('Heading: %5.1f',[FPhi]);
   SPitchTheta := Format('Pitch:   %5.1f',[FTheta]);
   SBankGamma  := Format('Bank:    %5.1f',[FGamma]);
+
   with StatusBar.Panels do
   begin
     BeginUpdate;
@@ -1608,6 +1433,7 @@ begin
       EndUpdate;
     end;
   end;
+
 end;
 
 procedure TRotationForm.ModusItemClick(Sender: TObject);
@@ -1625,6 +1451,7 @@ begin
     SHeadingPhi := '';
     SPitchTheta := '';
     SBankGamma  := '';
+
     with StatusBar.Panels do
     begin
       BeginUpdate;
@@ -1636,6 +1463,7 @@ begin
         EndUpdate;
       end;
     end;
+
   end;
   if Mode = True then
   begin
@@ -1761,12 +1589,9 @@ begin
     hPal := CreateRggPal32;
 
   Bitmap := TBitmap.Create;
-  with Bitmap do
-  begin
-    Width := wx;
-    Height := wy;
-    Palette := hPal;
-  end;
+  Bitmap.Width := wx;
+  Bitmap.Height := wy;
+  Bitmap.Palette := hPal;
 
   EraseBK := True;
   Draw;
@@ -1795,12 +1620,9 @@ begin
   hPal := CreateRggPal32;
 
   Bitmap := TBitmap.Create;
-  with Bitmap do
-  begin
-    Width := wx;
-    Height := wy;
-    Palette := hPal;
-  end;
+  Bitmap.Width := wx;
+  Bitmap.Height := wy;
+  Bitmap.Palette := hPal;
 
   EraseBK := True;
   Draw;
@@ -1822,13 +1644,12 @@ end;
 
 procedure TRotationForm.IndicatorLocalRotItemClick(Sender: TObject);
 begin
-  with IndicatorForm do
-    GlobalRot := not GlobalRot;
+  IndicatorForm.GlobalRot := not IndicatorForm.GlobalRot;
 end;
 
 procedure TRotationForm.IndicatorChanged(Sender: TObject);
 begin
-  RaumGrafik.Update;
+  RaumGraph.Update;
   Rotator.GetAngle(FPhi, FTheta, FGamma);
   SetAngleText;
   Draw;
@@ -1837,8 +1658,10 @@ end;
 procedure TRotationForm.PosiToolItemClick(Sender: TObject);
 begin
   PosiToolItem.Checked := not PosiToolItem.Checked;
-  if PosiToolItem.Checked then pnPositionTools.Visible := True
-  else pnPositionTools.Visible := False;
+  if PosiToolItem.Checked then
+    pnPositionTools.Visible := True
+  else
+    pnPositionTools.Visible := False;
 end;
 
 procedure TRotationForm.ChangeRotationHints;
@@ -1915,14 +1738,16 @@ begin
   R := Rect(0, 0, Image.Width, Image.Height);
   with Image.Canvas do
   begin
-    Brush.Color := clBtnFace;
+    Brush.Color := clGray;
     FillRect(R);
     if BackBmp <> nil then
+    begin
       if (BackBmp.Width < 100) and (BackBmp.Height < 100) then
         P := Point(30, FocusEdit.Top-PaintBox3D.Top)
       else
-        P := Point(0,0);
+        P := Point(0, 0);
       Draw(P.x,P.y,BackBmp);
+    end;
   end;
 end;
 
@@ -1958,7 +1783,10 @@ var
   end;
 
 begin
-  MainMenu := TMainMenu.Create(Self);
+  if Menu = nil then
+    MainMenu := TMainMenu.Create(Self);
+
+  MainMenu.Items.Clear;
 
   GrafikMenu := AddP('GrafikMenu');
   mi.Caption := '&3D Grafik';
@@ -2289,6 +2117,19 @@ begin
   mi.OnClick := MatrixItemClick;
 end;
 
+procedure TRotationForm.AngleTextItemClick(Sender: TObject);
+begin
+  AngleTextItemChecked := not AngleTextItemChecked;
+//  if AngleTextItem <> nil then
+//    AngleTextItem.Checked := AngleTextItemChecked;
+  Draw;
+end;
+
+procedure TRotationForm.PrintItemClick(Sender: TObject);
+begin
+  PrintIt;
+end;
+
 procedure TRotationForm.PreviewItemClick(Sender: TObject);
 var
   SL: TStrings;
@@ -2369,12 +2210,12 @@ begin
   PrintOffset.y := Round((Bitmap.Height div 2 + FYpos - RandY) * PrintZoom
                             - Preview.PagePos.Top);
 
-  SavedOffset := RaumGrafik.Offset;
+  SavedOffset := RaumGraph.Offset;
 
   HullGraph.Zoom := FZoom * PrintZoom;
-  RaumGrafik.Zoom := FZoom * PrintZoom;
+  RaumGraph.Zoom := FZoom * PrintZoom;
   HullGraph.Offset := PrintOffset;
-  RaumGrafik.Offset := PrintOffset;
+  RaumGraph.Offset := PrintOffset;
 
   Printer.Orientation := Preview.Orientierung;
   Printer.BeginDoc;
@@ -2384,20 +2225,194 @@ begin
   { SelectClipRgn() arbeitet mit Kopie von Rgn }
   SelectClipRgn(Printer.Canvas.Handle, Rgn);
   DeleteObject(Rgn);
-  RaumGrafik.Coloriert := True;
-  RaumGrafik.Draw(Printer.Canvas);
+  RaumGraph.Coloriert := True;
+  RaumGraph.Draw(Printer.Canvas);
   if FPaintRumpf = True then
   begin
     HullGraph.Coloriert := True;
-    HullGraph.FixPunkt := RaumGrafik.FixPunkt;
+    HullGraph.FixPunkt := RaumGraph.FixPunkt;
     HullGraph.Draw(Printer.Canvas);
   end;
   Printer.EndDoc;
 
   HullGraph.Zoom := FZoom;
-  RaumGrafik.Zoom := FZoom;
+  RaumGraph.Zoom := FZoom;
   HullGraph.Offset := SavedOffset;
-  RaumGrafik.Offset := SavedOffset;
+  RaumGraph.Offset := SavedOffset;
+end;
+
+{ Scroll left by one button. If no buttons are visible anymore, do nothing. }
+procedure TRotationForm.LeftButtonClick(Sender: TObject);
+var
+  Button: TControl;
+begin
+  { Scroll left }
+  Button := GetFirstVisibleButton;
+  if Button <> nil then
+  begin
+    if Buttons[Button.Tag+1] <> nil then
+      Panel.Left := -Buttons[Button.Tag+1].Left
+    else
+      Panel.Left := -(Button.Left + Button.Width);
+    Panel.Width := LeftButton.Left - Panel.Left;
+    RedoButtons;
+  end;
+end;
+
+{ Scroll right by one button. Do not scroll past the first button.
+  If no buttons are visible, then do nothing. }
+procedure TRotationForm.RightButtonClick(Sender: TObject);
+var
+  Button: TControl;
+begin
+  { Scroll right }
+  Button := GetFirstVisibleButton;
+  if (Button <> nil) and (Button.Tag > 0) then
+  begin
+    with Buttons[Button.Tag-1] do
+      Panel.Left := -Left;
+    Panel.Width := LeftButton.Left - Panel.Left;
+    RedoButtons;
+  end;
+end;
+
+{ After a resize, or after a scroll, determine which buttons are visible. }
+procedure TRotationForm.RedoButtons;
+var
+  I: Integer;
+begin
+  { make a partially obscured button completely invisible }
+  with Panel do
+    for I := 0 to ControlCount-1 do
+      if Controls[I].Tag >= 0 then
+        Controls[I].Visible := IsButtonVisible(Controls[I]);
+  EnableScrollButtons;
+end;
+
+{ Return the button whose tag property is Tag, or nil if no button matches. }
+function TRotationForm.GetButton(Tag: Integer): TControl;
+var
+  I: Integer;
+begin
+  for I := 0 to Panel.ControlCount-1 do
+    if Panel.Controls[I].Tag = Tag then
+    begin
+      result := Panel.Controls[I] as TControl;
+      Exit;
+    end;
+  result := nil;
+end;
+
+{ Return the number of toolbar buttons on the panel. }
+function TRotationForm.GetButtonCount: Integer;
+var
+  I: Integer;
+begin
+  Result := 0;
+  for I := 0 to Panel.ControlCount-1 do
+    if Panel.Controls[I].Tag >= 0 then
+      Inc(Result);
+end;
+
+{ Return whether a button is entirely visible. Scale the button's
+  bounds to the toolbar, and make sure the button lies entirely
+  within the bounds of the toolbar. }
+function TRotationForm.IsButtonVisible(Button: TControl): Boolean;
+var
+  TopLeft, BottomRight: TPoint;
+  Right: Integer;
+begin
+  TopLeft := ScreenToClient(Button.ClientToScreen(Button.ClientRect.TopLeft));
+  BottomRight := ScreenToClient(Button.ClientToScreen(Button.ClientRect.BottomRight));
+  if LeftButton.Visible then
+    Right := LeftButton.Left
+  else
+    Right := ClientWidth;
+  if (TopLeft.X < 0) or (TopLeft.Y < 0) then
+    Result := False
+  else if (BottomRight.Y > ClientHeight) or (BottomRight.X > Right) then
+    Result := False
+  else
+    Result := True;
+end;
+
+{ Return the first visible button, or nil if they are all invisible. }
+function TRotationForm.GetFirstVisibleButton: TControl;
+var
+  I: Integer;
+begin
+  with Panel do
+    for I := 0 to ControlCount-1 do
+      if Controls[I].Tag >= 0 then
+      begin
+        Result := Controls[I] as TControl;
+        if IsButtonVisible(Result) then
+          Exit;
+      end;
+  Result := nil;
+end;
+
+{ Return the last (rightmost) visible button, or nil if all the
+  buttons are invisible. }
+function TRotationForm.GetLastVisibleButton: TControl;
+var
+  I: Integer;
+begin
+  with Panel do
+    for I := ControlCount-1 downto 0 do
+      if Controls[I].Tag >= 0 then
+      begin
+        Result := Controls[I] as TControl;
+        if IsButtonVisible(Result) then
+          Exit;
+      end;
+  Result := nil;
+end;
+
+{ Enable or disable the toolbar scroll buttons. If the leftmost
+  button is visible then disable the right button. If the rightmost
+  button is visible then disable the left button. }
+procedure TRotationForm.EnableScrollButtons;
+begin
+  RightButton.Enabled := not IsButtonVisible(Buttons[0]);
+  LeftButton.Enabled  := not IsButtonVisible(Buttons[GetButtonCount-1]);
+end;
+
+{ When the toolbar changes size, move the scroll buttons so they stay
+  at the right edge of the toolbar. Reset the panel to show whichever
+  buttons are visible. }
+procedure TRotationForm.ToolbarPanelResize(Sender: TObject);
+var
+  I, Right: Integer;
+begin
+  LeftButton.Left := ClientWidth - LeftButton.Width - 4;
+  RightButton.Left := ClientWidth - RightButton.Width - 4;
+  { Is there enough room for every button? }
+  with Buttons[GetButtonCount-1] do
+    Right := Left + Width;
+  if ClientWidth >= Right then
+  begin
+    Panel.Left := 0; { unscroll }
+    Panel.Width := ClientWidth;
+    { Hide the scroll buttons. }
+    LeftButton.Visible := False;
+    RightButton.Visible := False;
+    { Make all the toolbar buttons visible. }
+    with Panel do
+      for I := 0 to ControlCount-1 do
+        if Controls[I].Tag >= 0 then
+          Controls[I].Visible := True
+  end
+  else
+  begin
+    { Make the scroll buttons visible. }
+    LeftButton.Visible := True;
+    RightButton.Visible := True;
+    { Set the panel width to leave room for the scroll buttons. }
+    Panel.Width := LeftButton.Left - Panel.Left;
+  end;
+  Panel.Height := ToolbarPanel.Height;
+  RedoButtons;
 end;
 
 end.

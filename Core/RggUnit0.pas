@@ -89,7 +89,7 @@ type
     LogList: TStringList;
     SchnittKK: TSchnittKK;
     TrimmTab: TTrimmTab;
-    GSB: TRggFactArray;
+    GSB: TRggFA;
     iP: TIntRiggPoints;
     rP: TRealRiggPoints;
 
@@ -132,7 +132,7 @@ uses
 constructor TGetriebe.Create;
 begin
   inherited Create;
-  GSB := TRggFactArray.Create;
+  GSB := TRggFA.Create;
   WantLogoData := false;
   LogList := TStringList.Create;
   SchnittKK := TSchnittKK.Create;

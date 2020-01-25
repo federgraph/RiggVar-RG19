@@ -2,7 +2,7 @@
 
 (*
 -
--     F            info: http://wwww.riggvar.de
+-     F
 -    * * *
 -   *   *   G
 -  *     * *   *
@@ -12,7 +12,7 @@
 -    * *     *             *
 -     D-------A---------------B
 -              *
--              (C) RiggVar Software UG (haftungsbeschränkt)
+-              (C) federgraph.de
 -
 *)
 
@@ -45,7 +45,7 @@ type
 
   TLineParser = class
   private
-    SL: TStringList; //helper object, Commatext used to parse line when loading
+    SL: TStringList; // helper object, Commatext used to parse line when loading
   protected
     function ParseKeyValue(Key, Value: string): Boolean; virtual;
   public

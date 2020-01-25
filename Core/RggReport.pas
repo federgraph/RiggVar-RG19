@@ -3,8 +3,8 @@
 interface
 
 uses
-  SysUtils,
-  Classes,
+  System.SysUtils,
+  System.Classes,
   RggTypes,
   RggFachwerk;
 

@@ -159,7 +159,7 @@ type
     FTrimmIndex :Integer;
     *)
 
-    FGSB : TRggFactArray;
+    FGSB : TRggFA;
     FiP: TIntRiggPoints;
     FRumpfCell: TPoint;
     FTrimmTabDaten: TTrimmTabDaten;

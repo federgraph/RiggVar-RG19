@@ -470,7 +470,9 @@ begin
 
   s := fp + fn;
   if IsSandboxed then
+  begin
     s := RiggModul.ViewModelMain.GetOpenFileName(fp, fn);
+  end;
 
   if s <> '' then
   begin
@@ -556,7 +558,9 @@ begin
 
   s := fp + fn;
   if IsSandboxed then
+  begin
     s := RiggModul.ViewModelMain.GetSaveFileName(fp, fn);
+  end;
 
   if s <> '' then
   begin
@@ -659,10 +663,10 @@ begin
     faFixpointF0: RggMain.FixPoint := ooF0;
     faFixpointF: RggMain.FixPoint := ooF;
 
-    faSalingTypFest,
-    faSalingTypDrehbar,
+    faSalingTypOhneStarr,
     faSalingTypOhne,
-    faSalingTypOhneStarr: RggMain.InitSalingTyp(fa);
+    faSalingTypDrehbar,
+    faSalingTypFest: RggMain.InitSalingTyp(fa);
 
     faWantRenderH,
     faWantRenderP,

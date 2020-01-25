@@ -57,21 +57,6 @@ type
     WPowerOS: TRggSB;
     T1: TRggSB;
     T2: TRggSB;
-
-    constructor Create;
-    destructor Destroy; override;
-
-    procedure Assign(Value: TRggFA);
-
-    function GetSB(sbn: TsbName): TRggSB;
-
-    procedure InitStepDefault;
-    procedure InitTinyStep(Value: Integer);
-    procedure InitBigStep(Value: Integer);
-  end;
-
-  TRggFactArray = class(TRggFA)
-  public
     SalingW: TRggSB;
     MastfallF0C: TRggSB;
     MastfallF0F: TRggSB;
@@ -82,9 +67,16 @@ type
     constructor Create;
     destructor Destroy; override;
 
+    procedure Assign(Value: TRggFA);
+
+    function GetSB(sbn: TsbName): TRggSB;
     function Find(Value: TFederParam): TRggSB;
 
-    procedure Assign(Value: TRggFactArray);
+    procedure InitStepDefault;
+    procedure InitTinyStep(Value: Integer);
+
+    procedure InitBigStep(Value: Integer);
+
     procedure SaveToStream(s: TStream);
     procedure LoadFromStream(s: TStream);
   end;
@@ -158,6 +150,12 @@ begin
   SalingL := TRggSB.Create;
   VorstagOS := TRggSB.Create;
   WPowerOS := TRggSB.Create;
+  SalingW := TRggSB.Create;
+  MastfallF0C := TRggSB.Create;
+  MastfallF0F := TRggSB.Create;
+  MastfallVorlauf := TRggSB.Create;
+  Biegung := TRggSB.Create;
+  D0X := TRggSB.Create;
   T1 := TRggSB.Create;
   T2 := TRggSB.Create;
   T2.Ist := 1;
@@ -175,6 +173,12 @@ begin
   SalingL.Free;
   VorstagOS.Free;
   WPowerOS.Free;
+  SalingW.Free;
+  MastfallF0C.Free;
+  MastfallF0F.Free;
+  MastfallVorlauf.Free;
+  Biegung.Free;
+  D0X.Free;
   T1.Free;
   T2.Free;
   inherited;
@@ -214,6 +218,12 @@ begin
   SalingL.Assign(Value.SalingL);
   VorstagOS.Assign(Value.VorstagOS);
   WPowerOS.Assign(Value.WPowerOS);
+  SalingW.Assign(Value.SalingW);
+  MastfallF0C.Assign(Value.MastfallF0C);
+  MastfallF0F.Assign(Value.MastfallF0F);
+  MastfallVorlauf.Assign(Value.MastfallVorlauf);
+  Biegung.Assign(Value.Biegung);
+  D0X.Assign(Value.D0X);
   T1.Assign(Value.T1);
   T2.Assign(Value.T2);
 end;
@@ -251,44 +261,7 @@ begin
   T2.BigStep := Value;
 end;
 
-{ TRggFactArray }
-
-constructor TRggFactArray.Create;
-begin
-  inherited Create;
-  SalingW := TRggSB.Create;
-  MastfallF0C := TRggSB.Create;
-  MastfallF0F := TRggSB.Create;
-  MastfallVorlauf := TRggSB.Create;
-  Biegung := TRggSB.Create;
-  D0X := TRggSB.Create;
-end;
-
-destructor TRggFactArray.Destroy;
-begin
-  SalingW.Free;
-  MastfallF0C.Free;
-  MastfallF0F.Free;
-  MastfallVorlauf.Free;
-  Biegung.Free;
-  D0X.Free;
-  inherited;
-end;
-
-procedure TRggFactArray.Assign(Value: TRggFactArray);
-begin
-  inherited Assign(Value);
-  SalingW.Assign(Value.SalingW);
-  MastfallF0C.Assign(Value.MastfallF0C);
-  MastfallF0F.Assign(Value.MastfallF0F);
-  MastfallVorlauf.Assign(Value.MastfallVorlauf);
-  Biegung.Assign(Value.Biegung);
-  D0X.Assign(Value.D0X);
-  T1.Assign(Value.T1);
-  T2.Assign(Value.T2);
-end;
-
-function TRggFactArray.Find(Value: TFederParam): TRggSB;
+function TRggFA.Find(Value: TFederParam): TRggSB;
 begin
   result := nil;
   case Value of
@@ -313,7 +286,7 @@ begin
   end;
 end;
 
-procedure TRggFactArray.LoadFromStream(s: TStream);
+procedure TRggFA.LoadFromStream(s: TStream);
 begin
   Controller.LoadFromStream(s);
   Winkel.LoadFromStream(s);
@@ -335,7 +308,7 @@ begin
   T2.LoadFromStream(s);
 end;
 
-procedure TRggFactArray.SaveToStream(s: TStream);
+procedure TRggFA.SaveToStream(s: TStream);
 begin
   Controller.SaveToStream(s);
   Winkel.SaveToStream(s);

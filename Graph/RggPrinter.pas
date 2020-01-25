@@ -56,6 +56,7 @@ initialization
   RiggPrinter.PageHeight := 3285;
   RiggPrinter.PixPerInX := 300;
   RiggPrinter.PixPerInY := 300;
+
 finalization
   RiggPrinter.Free;
 

@@ -109,7 +109,7 @@ type
     IstValCaption: string;
     ParamCaption: string;
 
-    FactArray: TRggFactArray;
+    FactArray: TRggFA;
 
     Rigg: TRigg;
 
@@ -1247,7 +1247,7 @@ end;
 
 procedure TRggMain0.HandleKey(KeyChar: Char);
 //var
-//  ah: TFederActionHandler;
+//  ah: TFederActionHandlerBase;
 //  fa: TFederAction;
 //  Key: Word;
 begin

@@ -92,7 +92,7 @@ type
     Modified: Boolean;
     WinkelSelStart, WinkelSelEnd: Integer;
 
-    procedure GetListBoxItems;
+    procedure InitListboxItems;
     function Param2Text(P: TsbName): String;
     function Text2Param(T: String): TsbName;
     procedure InitRigg; override;
@@ -155,9 +155,9 @@ begin
   WinkelSelStart := ParamPos[fpWinkel]-60;
   WinkelSelEnd := ParamPos[fpWinkel]+20;
 
-  RightPanel.Visible := False;
+  RightPanel.Visible := True;
   ListBox.ItemIndex := ListBox.Items.IndexOf('Vorstag');
-  GetListBoxItems; { Parameter := Vorstag; --> SetupTrackBar }
+  InitListboxItems; { Parameter := Vorstag; --> SetupTrackBar }
 
   AniRotationForm := Self;
   AnimationForm := TAnimationForm.Create(Self);
@@ -171,25 +171,25 @@ procedure TAniRotationForm.InitRigg;
 begin
  { overwritten virtual }
   Rigg := TRigg.Create;
-  with RaumGrafik do
+  with RaumGraph do
   begin
     Salingtyp := Rigg.Salingtyp;
     ControllerTyp := Rigg.ControllerTyp;
     Koordinaten := Rigg.rP;
     SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-    if RaumGrafik is TGetriebeGraph then
-      TGetriebeGraph(RaumGrafik).WanteGestrichelt := not Rigg.GetriebeOK;
+    if RaumGraph is TGetriebeGraph then
+      TGetriebeGraph(RaumGraph).WanteGestrichelt := not Rigg.GetriebeOK;
   end;
 end;
 
 procedure TAniRotationForm.UpdateGraph;
 begin
-{ overwritten virtual }
+  { overwritten virtual }
   Rigg.UpdateGetriebe;
-  RaumGrafik.Koordinaten := Rigg.rP;
-  RaumGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  if RaumGrafik is TGetriebeGraph then
-    TGetriebeGraph(RaumGrafik).WanteGestrichelt := not Rigg.GetriebeOK;
+  RaumGraph.Koordinaten := Rigg.rP;
+  RaumGraph.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  if RaumGraph is TGetriebeGraph then
+    TGetriebeGraph(RaumGraph).WanteGestrichelt := not Rigg.GetriebeOK;
   Draw;
 end;
 
@@ -383,16 +383,14 @@ begin
   bestimmt werden! }
   temp := ParamProp[Parameter];
   cr := Rigg.GSB.Find(Parameter);
-  with TrackBar do
-  begin
-    Min := 0;
-    Max := Round(cr.Max);
-    TrackBar.Position := Round(temp);
-    Min := Round(cr.Min);
-    LineSize := Round(cr.TinyStep);
-    PageSize := Round(cr.BigStep);
-    //Frequency := (Max-Min) div 10;
-  end;
+  TrackBar.Min := 0;
+  TrackBar.Max := Round(cr.Max);
+  TrackBar.Position := Round(temp);
+  TrackBar.Min := Round(cr.Min);
+  TrackBar.LineSize := Round(cr.TinyStep);
+  TrackBar.PageSize := Round(cr.BigStep);
+  //TrackBar.Frequency := (Max-Min) div 10;
+
   if Parameter = fpWinkel then
   begin
     lbMinVal.Caption := Format('%6.1f Grad',[cr.Min / 10]);
@@ -414,19 +412,10 @@ begin
     Parameter := Text2Param(ListBox.Items[ListBox.ItemIndex]);
 end;
 
-procedure TAniRotationForm.RiggTypItemClick(Sender: TObject);
-begin
-  { Animation gegebenenfalls ausschalten }
-  if AnimationItemChecked then
-    AnimationItemClick(Self);
-  ShowDialog;
-  TypeChanged;
-end;
-
-procedure TAniRotationForm.GetListBoxItems;
+procedure TAniRotationForm.InitListboxItems;
 var
   i: Integer;
-  S: String;
+  S: string;
 begin
   S := 'Vorstag';
   if ListBox.ItemIndex <> -1 then
@@ -478,30 +467,55 @@ begin
   end;
 end;
 
-function TAniRotationForm.Text2Param(T: String): TsbName;
+function TAniRotationForm.Text2Param(T: string): TsbName;
 begin
   result := fpWPowerOS;
-  if T = 'Controller' then result := fpController
-  else if T = 'Winkel' then result := fpWinkel
-  else if T = 'Vorstag' then result := fpVorstag
-  else if T = 'Wante' then result := fpWante
-  else if (T = 'Wante oben') or (T = 'Woben') then result := fpWoben
-  else if (T = 'Saling Höhe') or (T = 'SalingH') then result := fpSalingH
-  else if (T = 'Saling Abstand') or (T = 'SalingA') then result := fpSalingA
-  else if (T = 'Saling Länge') or (T = 'SalingL') then result := fpSalingL;
+  if T = 'Controller' then
+    result := fpController
+  else if T = 'Winkel' then
+    result := fpWinkel
+  else if T = 'Vorstag' then
+    result := fpVorstag
+  else if T = 'Wante' then
+    result := fpWante
+  else if (T = 'Wante oben') or (T = 'Woben') then
+    result := fpWoben
+  else if (T = 'Saling Höhe') or (T = 'SalingH') then
+    result := fpSalingH
+  else if (T = 'Saling Abstand') or (T = 'SalingA') then
+    result := fpSalingA
+  else if (T = 'Saling Länge') or (T = 'SalingL') then
+    result := fpSalingL;
 end;
 
-function TAniRotationForm.Param2Text(P: TsbName): String;
+function TAniRotationForm.Param2Text(P: TsbName): string;
 begin
   result := '';
-  if P = fpController then result := 'Controller'
-  else if P = fpWinkel then result := 'Winkel'
-  else if P = fpVorstag then result := 'Vorstag'
-  else if P = fpWante then result := 'Wante'
-  else if P = fpWoben then result := 'Want oben'
-  else if P = fpSalingH then result := 'Saling Höhe'
-  else if P = fpSalingA then result := 'Saling Abstand'
-  else if P = fpSalingL then result := 'Saling Länge';
+  if P = fpController then
+    result := 'Controller'
+  else if P = fpWinkel then
+    result := 'Winkel'
+  else if P = fpVorstag then
+    result := 'Vorstag'
+  else if P = fpWante then
+    result := 'Wante'
+  else if P = fpWoben then
+    result := 'Wante oben'
+  else if P = fpSalingH then
+    result := 'Saling Höhe'
+  else if P = fpSalingA then
+    result := 'Saling Abstand'
+  else if P = fpSalingL then
+    result := 'Saling Länge';
+end;
+
+procedure TAniRotationForm.RiggTypItemClick(Sender: TObject);
+begin
+  { Animation gegebenenfalls ausschalten }
+  if AnimationItemChecked then
+    AnimationItemClick(Self);
+  ShowDialog;
+  TypeChanged;
 end;
 
 procedure TAniRotationForm.OptionenMenuClick(Sender: TObject);
@@ -526,9 +540,9 @@ end;
 
 procedure TAniRotationForm.TypeChanged;
 begin
-  GetListBoxItems;
-  RaumGrafik.Salingtyp := Rigg.Salingtyp;
-  RaumGrafik.ControllerTyp := Rigg.ControllerTyp;
+  InitListboxItems;
+  RaumGraph.Salingtyp := Rigg.Salingtyp;
+  RaumGraph.ControllerTyp := Rigg.ControllerTyp;
   UpdateGraph;
 end;
 
@@ -606,17 +620,16 @@ begin
   if RightPanel.Visible and hasChanged then
   begin
     UpdateLocalRigg;
-    GetListBoxItems;
+    InitListboxItems;
   end;
 
-  with RaumGrafik do
+  with RaumGraph do
   begin
     Salingtyp := Rgg.Salingtyp;
     ControllerTyp := Rgg.ControllerTyp;
     Koordinaten := Rgg.rP;
     SetMastKurve(Rgg.MastLinie, Rgg.lc, Rgg.beta);
-    with RaumGrafik as TGetriebeGraph do
-      WanteGestrichelt := not Rgg.GetriebeOK;
+    WanteGestrichelt := not Rgg.GetriebeOK;
   end;
 end;
 

@@ -91,7 +91,7 @@ type
     rEA: TRiggLvektor; { N }
     EI: double; { Nmm^2 }
     { Grenzwerte und Istwerte }
-    GSB: TRggFactArray;
+    GSB: TRggFA;
     { Trimmtabelle }
     TrimmTabDaten: TTrimmTabDaten;
 
@@ -133,7 +133,7 @@ uses
 constructor TRggDocument.Create;
 begin
   inherited Create;
-  GSB := TRggFactArray.Create;
+  GSB := TRggFA.Create;
 end;
 
 destructor TRggDocument.Destroy;
