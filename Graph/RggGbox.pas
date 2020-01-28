@@ -158,7 +158,7 @@ begin
   OffsetX2 := cOffsetX2*FZoomFaktor; OffsetY2 := cOffsetY2*FZoomFaktor;
   OffsetX3 := cOffsetX3*FZoomFaktor; OffsetY3 := cOffsetY3*FZoomFaktor;
   OffsetX4 := cOffsetX4*FZoomFaktor; OffsetY4 := cOffsetY4*FZoomFaktor;
-  Offset := Point(OffsetX4, OffsetY4);
+  NOffset := Point(OffsetX4, OffsetY4);
   Updated := False;
 end;
 
@@ -345,10 +345,10 @@ begin
         else
           Pen.Color := FColor;
         Ellipse(
-          Offset.x - TransKreisRadius,
-          Offset.y - TransKreisRadius,
-          Offset.x + TransKreisRadius,
-          Offset.y + TransKreisRadius);
+          NOffset.x - TransKreisRadius,
+          NOffset.y - TransKreisRadius,
+          NOffset.x + TransKreisRadius,
+          NOffset.y + TransKreisRadius);
         { Rumpf }
         if Coloriert then
           Pen.Color := clRumpf
@@ -390,7 +390,8 @@ begin
           Pen.Color := clBlue;
           Pen.Style := psDot;
           SetBkMode(Handle, TRANSPARENT);
-          PolyLine(ZugWanteBb); PolyLine(ZugWanteStb);
+          PolyLine(ZugWanteBb);
+          PolyLine(ZugWanteStb);
           Pen.Style := psSolid;
           SetBkMode(Handle, OPAQUE);
         end;

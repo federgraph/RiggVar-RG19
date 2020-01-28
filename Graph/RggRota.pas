@@ -21,7 +21,6 @@ uses
   Vcl.ExtDlgs,
   Vector3D,
   RggTypes,
-  RggGBox,
   RggMatrix,
   RggUnit4,
   RggGraph,
@@ -31,23 +30,40 @@ uses
 
 type
   TRotaForm = class
-    procedure PaintBox3DPaint(Sender: TObject);
-    procedure ZoomInBtnClick(Sender: TObject);
-    procedure ZoomOutBtnClick(Sender: TObject);
-    procedure RumpfBtnClick(Sender: TObject);
-    procedure PaintBtnClick(Sender: TObject);
-    procedure KeepInsideItemClick(Sender: TObject);
+  private
     procedure PaintBox3DMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure PaintBox3DMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure PaintBox3DMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+  public
+    PaintItemChecked: Boolean;
+    MatrixItemChecked: Boolean;
+    KeepInsideItemChecked: Boolean;
+    RumpfItemChecked: Boolean;
     procedure PositionSaveItemClick(Sender: TObject);
+    procedure RumpfBtnClick(Sender: TObject);
+    procedure PaintBtnClick(Sender: TObject);
+    procedure KeepInsideItemClick(Sender: TObject);
     procedure PositionResetItemClick(Sender: TObject);
     procedure ModusItemClick(Sender: TObject);
     procedure DrawAlwaysItemClick(Sender: TObject);
     procedure MatrixItemClick(Sender: TObject);
-  private
+  public
+    procedure ZoomInBtnClick(Sender: TObject);
+    procedure ZoomOutBtnClick(Sender: TObject);
+    procedure UseDisplayListBtnClick(Sender: TObject);
+    procedure BogenBtnClick(Sender: TObject);
+  protected
+    MinTrackX, MinTrackY: Integer;
+    MaxTrackX, MaxTrackY: Integer;
     CreatedScreenWidth: Integer;
-
+    Bitmap: TBitmap;
+    procedure ChangeResolution;
+    procedure PaintBackGround(Image: TBitmap);
+    procedure DrawMatrix(Canvas: TCanvas);
+    procedure DrawAngleText(Canvas: TCanvas);
+    procedure DrawToBitmap;
+    procedure PaintBox3DPaint(Sender: TObject);
+  private
     FViewPoint: TViewPoint;
     FZoomBase: double;
     FZoom: double;
@@ -80,52 +96,49 @@ type
     MouseDownX, MouseDownY: Integer;
     SavedXPos, SavedYPos: Integer;
     AlwaysShowAngle: Boolean;
-    SHeadingPhi: String;
-    SPitchTheta: String;
-    SBankGamma: String;
     FFixPoint: TRiggPoint;
-    procedure ChangeResolution;
     procedure UpdateMinMax;
     procedure DoTrans;
     procedure SetViewPoint(const Value: TViewPoint);
     procedure SetFixPoint(const Value: TRiggPoint);
-  protected
-    Bitmap: TBitmap;
+  public
+    SHeadingPhi: string;
+    SPitchTheta: string;
+    SBankGamma: string;
+
+    MatrixTextU: string;
+    MatrixTextV: string;
+    MatrixTextW: string;
+//    procedure UpdateMatrixText;
+  private
     EraseBK: Boolean;
-    MinTrackX, MinTrackY: Integer;
-    MaxTrackX, MaxTrackY: Integer;
     procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
     procedure Translate(x, y: Integer);
     procedure SetAngleText;
     procedure SetZoomText;
-    procedure DrawMatrix(Canvas: TCanvas);
-    procedure DrawAngleText(Canvas: TCanvas);
-    procedure DrawToBitmap;
     procedure InitRotaData;
-    procedure PaintBackGround(Image: TBitmap);
-  public
-    Rigg: TRigg;
+  protected
     Rotator: TPolarKar;
-    HullGraph: TRggGraph;
-    RaumGrafik: TRaumGraph;
     Mode: Boolean;
-    procedure Draw;
     procedure InitGraph;
     procedure InitRaumGrafik;
     procedure InitHullGraph;
-    procedure InitRigg;
-    procedure UpdateGraph;
+    procedure UpdateGraphFromRigg;
   public
-    PaintItemChecked: Boolean;
-    MatrixItemChecked: Boolean;
-    KeepInsideItemChecked: Boolean;
-    RumpfItemChecked: Boolean;
-  public
-    PaintBox3D: TPaintBox;
+    Rigg: TRigg; // injected
+    PaintBox3D: TPaintBox; // replaced
+
+    HullGraph: TRggGraph;
+    RaumGraph: TRaumGraph;
     UseDisplayList: Boolean;
+
     constructor Create;
     destructor Destroy; override;
     procedure Init;
+    procedure Draw;
+
+    procedure UpdateGraph;
+
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
   end;
@@ -134,26 +147,29 @@ implementation
 
 uses
   RggModul,
-  RggPBox;
+  RggPBox,
+  RggTestData;
 
 { TRotaForm }
 
 constructor TRotaForm.Create;
 begin
-  { do nothing,
-    Paintbox3D reference needs to be injected,
-    then Init is called from outside.
-  }
   KeepInsideItemChecked := True;
+
+    { do almost nothing here,
+    - Rigg reference needs to be injected first,
+    - Image reference needs to be injected first,
+    later Init must be called, from the outside.
+  }
 end;
 
 destructor TRotaForm.Destroy;
 begin
-  RiggModul.RotaForm := nil;
+//  RiggModul.RotaForm := nil;
   Paintbox3D.Free;
   Paintbox3D := nil;
   Bitmap.Free;
-  RaumGrafik.Free;
+  RaumGraph.Free;
   HullGraph.Free;
   Rotator.Free;
   inherited;
@@ -211,7 +227,7 @@ begin
   InitGraph;
   InitRaumGrafik;
   InitHullGraph;
-  InitRigg;
+  UpdateGraph;
 
   SetViewPoint(FViewPoint);
 end;
@@ -225,15 +241,15 @@ end;
 
 procedure TRotaForm.InitRaumGrafik;
 begin
-  if UseDisplayList then
-    RaumGrafik := TRaumGraph.Create
-  else
-    RaumGrafik := TGetriebeGraph.Create;
-  RaumGrafik.Rotator := Rotator;
-  RaumGrafik.Offset := Point(1000,1000);
-  RaumGrafik.Zoom := FZoom;
-  Raumgrafik.FixPoint := FixPoint;
-  RaumGrafik.Ansicht := vp3D;
+  UseDisplayList := True;
+
+  RaumGraph := TRaumGraph.Create;
+  RaumGraph.Rotator := Rotator;
+  RaumGraph.NOffset := Point(1000,1000);
+  RaumGraph.Zoom := FZoom;
+  RaumGraph.FixPoint := FixPoint;
+  RaumGraph.Ansicht := vp3D;
+  RaumGraph.Bogen := True;
 end;
 
 procedure TRotaForm.InitHullGraph;
@@ -241,27 +257,30 @@ begin
   HullGraph := THullGraph.Create;
   HullGraph.Rotator := Rotator;
   HullGraph.Zoom := FZoom;
-  HullGraph.FixPunkt := Raumgrafik.FixPunkt;
+  HullGraph.FixPunkt := RaumGraph.FixPunkt;
 end;
 
-procedure TRotaForm.InitRigg;
+procedure TRotaForm.UpdateGraphFromRigg;
 begin
-  Rigg := RiggModul.Rigg;
-
-  RaumGrafik.Salingtyp := Rigg.Salingtyp;
-  RaumGrafik.ControllerTyp := Rigg.ControllerTyp;
-  RaumGrafik.Koordinaten := Rigg.rP;
-  RaumGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  RaumGrafik.WanteGestrichelt := not Rigg.GetriebeOK;
+  RaumGraph.Salingtyp := Rigg.Salingtyp;
+  RaumGraph.ControllerTyp := Rigg.ControllerTyp;
+  RaumGraph.Koordinaten := Rigg.rP;
+  RaumGraph.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  RaumGraph.WanteGestrichelt := not Rigg.GetriebeOK;
 end;
 
 procedure TRotaForm.UpdateGraph;
 begin
-  RaumGrafik.Salingtyp := Rigg.Salingtyp;
-  RaumGrafik.ControllerTyp := Rigg.ControllerTyp;
-  RaumGrafik.Koordinaten := Rigg.rP;
-  RaumGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  RaumGrafik.WanteGestrichelt := not Rigg.GetriebeOK;
+  if Rigg <> nil then
+    UpdateGraphFromRigg
+  else
+  begin
+    RaumGraph.Salingtyp := stFest;
+    RaumGraph.ControllerTyp := ctOhne;
+    RaumGraph.Koordinaten := TRggTestData.GetKoordinaten420;
+    RaumGraph.SetMastKurveFromTestData(TRggTestData.GetMastKurve420);
+    RaumGraph.WanteGestrichelt := False;
+  end;
   Draw;
 end;
 
@@ -322,11 +341,6 @@ begin
   end;
 end;
 
-procedure TRotaForm.PaintBox3DPaint(Sender: TObject);
-begin
-  Draw;
-end;
-
 procedure TRotaForm.DrawMatrix(Canvas: TCanvas);
 var
   S1, S2, S3: string;
@@ -372,8 +386,8 @@ begin
     EraseBK := False;
   end;
 
-  NullpunktOffset.x := -RaumGrafik.Offset.x + Bitmap.Width div 2 + FXpos;
-  NullpunktOffset.y := -RaumGrafik.Offset.y + Bitmap.Height div 2 + FYpos;
+  NullpunktOffset.x := -RaumGraph.NOffset.x + Bitmap.Width div 2 + FXpos;
+  NullpunktOffset.y := -RaumGraph.NOffset.y + Bitmap.Height div 2 + FYpos;
   DrawToBitmap;
 
   if MatrixItemChecked then
@@ -400,20 +414,20 @@ begin
     SetViewPortOrgEx(Handle, NullpunktOffset.x, NullpunktOffset.y, nil);
   end;
 
-  RaumGrafik.Coloriert := True;
+  RaumGraph.Coloriert := True;
   if UseDisplayList then
   begin
-    RaumGrafik.Update;
-    RaumGrafik.UpdateDisplayList;
-    RaumGrafik.DL.Draw(Bitmap.Canvas);
+    RaumGraph.Update;
+    RaumGraph.UpdateDisplayList;
+    RaumGraph.DL.Draw(Bitmap.Canvas);
   end
   else
-    RaumGrafik.Draw(Bitmap.Canvas);
+    RaumGraph.Draw(Bitmap.Canvas);
 
   if FPaintRumpf and (not MouseDown or (MouseDown and FDrawAlways)) then
   begin
     HullGraph.Coloriert := True;
-    HullGraph.FixPunkt := RaumGrafik.FixPunkt;
+    HullGraph.FixPunkt := RaumGraph.FixPunkt;
     HullGraph.Draw(Bitmap.Canvas);
   end;
 
@@ -440,7 +454,6 @@ begin
 
   if not PaintItemChecked then
     EraseBK := True;
-  Draw;
 end;
 
 procedure TRotaForm.UpdateMinMax;
@@ -472,7 +485,7 @@ begin
     Inc(FZoomIndex);
     FZoom := FZoomBase * LookUpRa10(FZoomIndex);
     HullGraph.Zoom := FZoom;
-    RaumGrafik.Zoom := FZoom;
+    RaumGraph.Zoom := FZoom;
     Draw;
     SetZoomText;
   end;
@@ -485,7 +498,7 @@ begin
     Dec(FZoomIndex);
     FZoom := FZoomBase * LookUpRa10(FZoomIndex);
     HullGraph.Zoom := FZoom;
-    RaumGrafik.Zoom := FZoom;
+    RaumGraph.Zoom := FZoom;
     Draw;
     SetZoomText;
   end;
@@ -494,8 +507,8 @@ end;
 procedure TRotaForm.SetFixPoint(const Value: TRiggPoint);
 begin
   FFixPoint := Value;
-  Raumgrafik.FixPoint := FixPoint;
-  HullGraph.FixPunkt := RaumGrafik.FixPunkt;
+  RaumGraph.FixPoint := FixPoint;
+  HullGraph.FixPunkt := RaumGraph.FixPunkt;
   Draw;
 end;
 
@@ -511,6 +524,18 @@ begin
   PaintItemChecked := not PaintItemChecked;
   if not PaintItemChecked then
     EraseBK := True;
+  Draw;
+end;
+
+procedure TRotaForm.UseDisplayListBtnClick(Sender: TObject);
+begin
+  UseDisplayList := not UseDisplayList;
+  Draw;
+end;
+
+procedure TRotaForm.BogenBtnClick(Sender: TObject);
+begin
+  RaumGraph.Bogen := not RaumGraph.Bogen;
   Draw;
 end;
 
@@ -536,12 +561,12 @@ begin
   FZoomIndex := RotaData.ZoomIndex;
   FZoom := FZoomBase * LookUpRa10(FZoomIndex);
   SetZoomText;
-  RaumGrafik.Zoom := FZoom;
+  RaumGraph.Zoom := FZoom;
   HullGraph.Zoom := FZoom;
   { Fixpunkt }
-  RaumGrafik.FixPoint := FixPoint;
-  RaumGrafik.Update; // Rotate;
-  HullGraph.FixPunkt := Raumgrafik.FixPunkt;
+  RaumGraph.FixPoint := FixPoint;
+  RaumGraph.Update; // Rotate;
+  HullGraph.FixPunkt := RaumGraph.FixPunkt;
   { Neuzeichnen }
   EraseBK := True;
   Draw;
@@ -618,12 +643,16 @@ procedure TRotaForm.PaintBox3DMouseDown(Sender: TObject;
 begin
   MouseDown := True;
   MouseButton := Button;
-  prevx := x; MouseDownX := x; SavedXPos := FXPos;
-  prevy := y; MouseDownY := y; SavedYPos := FYPos;
+  prevx := x;
+  MouseDownX := x;
+  SavedXPos := FXPos;
+  prevy := y;
+  MouseDownY := y;
+  SavedYPos := FYPos;
 
   FTranslation :=
-    (Abs(RaumGrafik.Offset.x + NullPunktOffset.x - X) < TransKreisRadius) and
-    (Abs(RaumGrafik.Offset.y + NullPunktOffset.y - Y) < TransKreisRadius);
+    (Abs(RaumGraph.NOffset.x + NullPunktOffset.x - X) < TransKreisRadius) and
+    (Abs(RaumGraph.NOffset.y + NullPunktOffset.y - Y) < TransKreisRadius);
 end;
 
 procedure TRotaForm.PaintBox3DMouseMove(Sender: TObject;
@@ -677,7 +706,7 @@ begin
   Rotator.XRot := Xrot;
   Rotator.YRot := Yrot;
   Rotator.ZRot := Zrot;
-  RaumGrafik.Update;
+  RaumGraph.Update;
   SetAngleText;
 end;
 
@@ -741,6 +770,11 @@ begin
   R := Rect(0, 0, Image.Width, Image.Height);
   Image.Canvas.Brush.Color := clGray;
   Image.Canvas.FillRect(R);
+end;
+
+procedure TRotaForm.PaintBox3DPaint(Sender: TObject);
+begin
+  Draw;
 end;
 
 end.

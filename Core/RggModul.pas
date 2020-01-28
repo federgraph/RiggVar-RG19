@@ -842,7 +842,7 @@ begin
   { Nullstellung hellblau zeichnen }
   if BtnBlauDown then
   begin
-    GetriebeGrafik.Farbe := clNull;
+    GetriebeGrafik.Farbe := clNullStellung;
     GetriebeGrafik.Coloriert := False;
     GetriebeGrafik.WanteGestrichelt := False;
     GetriebeGrafik.Koordinaten := RefPoints;
@@ -874,7 +874,7 @@ begin
   { Nullstellung hellblau zeichnen }
   if BtnBlauDown then
   begin
-    GetriebeGrafik.Farbe := clNull;
+    GetriebeGrafik.Farbe := clNullStellung;
     GetriebeGrafik.Coloriert := False;
     GetriebeGrafik.WanteGestrichelt := False;
     GetriebeGrafik.Koordinaten := RefPoints;

@@ -3,7 +3,6 @@
 interface
 
 uses
-  Winapi.Windows,
   System.SysUtils,
   System.Classes,
   System.Types,
@@ -96,7 +95,6 @@ type
 
   Linie = array [0 .. LineCount] of TPoint;
   TLineDataR100 = array [0 .. 100] of single;
-  TLine = array [0 .. 100] of TPoint;
   TChartLine = array [0 .. CLMax] of double;
   TChartLineData = array [0 .. CPMax] of double;
 
@@ -126,6 +124,8 @@ type
 
   TIntRiggPoints = array [TRiggPoint] of TIntPoint;
   TRealRiggPoints = array [TRiggPoint] of TRealPoint;
+  TMastKurve = array [0..BogenMax] of TRealPoint;
+  TRggPolyLine = array of TPoint;
 
   TRiggLvektor = array [0 .. 19] of double;
   TRiggLIndexRange = 0 .. 19;

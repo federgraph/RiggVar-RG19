@@ -3,7 +3,7 @@
 interface
 
 uses
-  Winapi.Windows,
+  System.Types,
   System.SysUtils,
   System.Classes,
   System.Math,
@@ -47,15 +47,6 @@ type
     function CompareSPY: Integer;
   end;
 
-//  TSchnittGG = class
-//  public
-//    A, B: TRealPoint;
-//    C, D: TRealPoint;
-//    SP: TRealPoint;
-//    Fall: TBemerkungGG;
-//    procedure Schnitt;
-//  end;
-
   TDisplayItem = class
   public
     ItemType: TDisplayItemType;
@@ -69,7 +60,7 @@ type
     CenterPoint: TPoint;
     Radius: Integer;
 
-    PolyArray: array of TPoint;
+    PolyArray: TRggPolyLine;
 
     procedure Draw(Canvas: TCanvas);
     procedure Assign(Value: TDisplayItem);
@@ -101,7 +92,7 @@ type
     procedure Clear;
     procedure Ellipse(P1, P2: TRealPoint; CenterPoint: TPoint; Radius: Integer = 10);
     procedure Line(P1, P2: TRealPoint; A, B: TPoint; Color: TColor);
-    procedure PolyLine(P1, P2: TRealPoint; A: array of TPoint);
+    procedure PolyLine(P1, P2: TRealPoint; A: TRggPolyLine);
     procedure Draw(Canvas: TCanvas);
     function CompareItems(i1, i2: Integer): Integer;
   end;
@@ -312,20 +303,15 @@ begin
   cr.LineEnd := B;
 end;
 
-procedure TRggDisplayList.PolyLine(P1, P2: TRealPoint; A: array of TPoint);
+procedure TRggDisplayList.PolyLine(P1, P2: TRealPoint; A: TRggPolyLine);
 var
   cr: TDisplayItem;
-  c: Integer;
-  i: Integer;
 begin
   cr := Add;
   cr.ItemType := diPolyLine;
   cr.P1 := P1;
   cr.P2 := P2;
-  c := Length(A);
-  SetLength(cr.PolyArray, c);
-  for i := 0 to c - 1 do
-    cr.PolyArray[i] := A[i];
+  cr.PolyArray := A;
 end;
 
 procedure TRggDisplayList.Draw(Canvas: TCanvas);

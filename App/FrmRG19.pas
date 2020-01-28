@@ -276,14 +276,15 @@ type
     ZoomInBtn: TSpeedButton;
     ZoomOutBtn: TSpeedButton;
 
+    UseDisplayListBtn: TSpeedButton;
+    BogenBtn: TSpeedButton;
+
     DisplayModeBtn: TSpeedButton;
 
     procedure SeiteBtnClick(Sender: TObject);
     procedure AchternBtnClick(Sender: TObject);
     procedure TopBtnClick(Sender: TObject);
     procedure NullBtnClick(Sender: TObject);
-
-//    procedure ToggleDisplayMode(Sender: TObject);
   private
     BtnTop: Integer;
     BtnLeft: Integer;
@@ -396,7 +397,8 @@ end;
 
 procedure TFormRG19.FormCreate1;
 var
-  rggm: TRggMain;
+  rm: TRggMain;
+  rf: TRotaForm;
 begin
   InputForm := TInputForm.Create(Application);
   OutputForm := TOutputForm.Create(Application);
@@ -409,9 +411,9 @@ begin
   RiggModul.BackgroundColor := TColors.Wheat; // call after RiggModul.Init
   RiggModul.PBG := GrafikForm.PaintBoxG;
 
-  rggm := TRggMain.Create(RiggModul.Rigg);
+  rm := TRggMain.Create(RiggModul.Rigg);
 
-  Main := TMain.Create(rggm);
+  Main := TMain.Create(rm);
   Main.Logger.Verbose := True;
 
   Left := 60;
@@ -430,11 +432,13 @@ begin
   OnClose := FormClose;
   OnCloseQuery := FormCloseQuery;
 
-  RiggModul.RotaForm := TRotaForm.Create;
-  RiggModul.RotaForm.PaintBox3D := PaintboxR;
-  RiggModul.RotaForm.UseDisplayList := True;
-  RiggModul.RotaForm.Init;
-  PaintboxR := RiggModul.RotaForm.PaintBox3D;
+  rf := TRotaForm.Create;
+  RiggModul.RotaForm := rf;
+  rf.Rigg := RiggModul.Rigg;
+  rf.PaintBox3D := PaintboxR;
+  rf.UseDisplayList := True;
+  rf.Init;
+  PaintboxR := rf.PaintBox3D;
 end;
 
 procedure TFormRG19.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1404,12 +1408,23 @@ begin
   sb.GroupIndex := 0;
   sb.OnClick := RiggModul.RotaForm.ZoomInBtnClick;
 
-//  sb := AddSpeedBtn('DisplayModeBtn', 0);
-//  DisplayModeBtn := sb;
-//  sb.Caption := 'DM';
-//  sb.Hint := 'Display Mode Toggle';
-//  sb.GroupIndex := 0;
-//  sb.OnClick := ToggleDisplayMode;
+  { Graph Option Buttons}
+
+  sb := AddSpeedBtn('UseDisplayListBtn', BtnGroupSpace);
+  UseDisplayListBtn := sb;
+  sb.Caption := 'DL';
+  sb.Hint := 'Toggle Use Display List ';
+  sb.AllowAllUp := True;
+  sb.GroupIndex := 14;
+  sb.OnClick := RiggModul.RotaForm.UseDisplayListBtnClick;
+
+  sb := AddSpeedBtn('Bogentn', 0);
+  BogenBtn := sb;
+  sb.Caption := 'B';
+  sb.Hint := 'Bogen';
+  sb.AllowAllUp := True;
+  sb.GroupIndex := 15;
+  sb.OnClick := RiggModul.RotaForm.BogenBtnClick;
 end;
 
 procedure TFormRG19.InitStatusBar;
@@ -1499,6 +1514,9 @@ begin
     }
   AutoLoadItem.Visible := False;
   LogoItem.Checked := WantLogoData;
+
+  UseDisplayListBtn.Down := RiggModul.RotaForm.UseDisplayList;
+  BogenBtn.Down := RiggModul.RotaForm.RaumGraph.Bogen;
 end;
 
 procedure TFormRG19.LayoutComponents;

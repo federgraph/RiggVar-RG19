@@ -5,17 +5,27 @@ interface
 uses
   System.SysUtils,
   System.Classes,
+  System.Types,
   System.Math,
   RggTypes,
   RggCalc;
 
 type
-  TBemerkungKK = (bmKonzentrisch, bmZwei, bmEinerAussen, bmEntfernt,
-    bmEinerK1inK2, bmEinerK2inK1, bmK1inK2, bmK2inK1, bmRadiusFalsch);
+  TBemerkungKK = (
+    bmKonzentrisch,
+    bmZwei,
+    bmEinerAussen,
+    bmEntfernt,
+    bmEinerK1inK2,
+    bmEinerK2inK1,
+    bmK1inK2,
+    bmK2inK1,
+    bmRadiusFalsch
+  );
 
   TSchnittEbene = (seXY, seYZ, seXZ);
 
-  TSchnittKK = class(TObject)
+  TSchnittKK = class
   private
     R1: double;
     R2: double;
@@ -31,26 +41,77 @@ type
     procedure SetRadius2(Value: double);
     procedure SetMittelPunkt1(Value: TRealPoint);
     procedure SetMittelPunkt2(Value: TRealPoint);
-    procedure Schnitt;
     function GetSchnittPunkt1: TRealPoint;
     function GetSchnittPunkt2: TRealPoint;
     function GetBem: TBemerkungKK;
     function GetBemerkung: string;
     function Vorhanden: Boolean;
+    procedure SetM1(const Value: TPointF);
+    procedure SetM2(const Value: TPointF);
+//    function GetM1: TPointF;
+//    function GetM2: TPointF;
+  protected
+    procedure Schnitt; virtual;
   public
     property Radius1: double read R1 write SetRadius1;
-    property Radius2: double read R1 write SetRadius2;
+    property Radius2: double read R2 write SetRadius2;
+    property M1: TPointF write SetM1;
+    property M2: TPointF write SetM2;
     property MittelPunkt1: TRealPoint read FM1 write SetMittelPunkt1;
     property MittelPunkt2: TRealPoint read FM2 write SetMittelPunkt2;
     property SchnittPunkt1: TRealPoint read GetSchnittPunkt1;
     property SchnittPunkt2: TRealPoint read GetSchnittPunkt2;
     property Status: TBemerkungKK read GetBem;
     property Bemerkung: string read GetBemerkung;
-    property SPvorhanden: Boolean read Vorhanden;
+    property SPVorhanden: Boolean read Vorhanden;
     property SchnittEbene: TSchnittEbene read Ebene write Ebene;
   end;
 
-  TSplitF = class(TObject)
+  TSchnittKKR = class(TSchnittKK)
+  protected
+    procedure Schnitt; override;
+  public
+    RectangleMode: Boolean;
+  end;
+
+  TSchnittGG = class
+  private
+    A, B: TRealPoint;
+    C, D: TRealPoint;
+    SP: TRealPoint;
+    Bem: TBemerkungGG;
+    NeedCalc: Boolean;
+    sv: Boolean;
+    function GetBemerkung: string;
+    procedure SetM1(const Value: TPointF);
+    procedure SetM2(const Value: TPointF);
+    procedure SetPA(const Value: TRealPoint);
+    procedure SetPB(const Value: TRealPoint);
+    procedure SetPC(const Value: TRealPoint);
+    function Vorhanden: Boolean;
+    procedure SetPD(const Value: TRealPoint);
+    function GetSchnittPunkt: TRealPoint;
+    procedure SetA1(const Value: double);
+    procedure SetA2(const Value: double);
+  public
+    constructor Create;
+    function Schnitt: Boolean;
+    property M1: TPointF write SetM1;
+    property M2: TPointF write SetM2;
+    property Angle1: double write SetA1;
+    property Angle2: double write SetA2;
+
+    property PA: TRealPoint read A write SetPA;
+    property PB: TRealPoint read B write SetPB;
+    property PC: TRealPoint read C write SetPC;
+    property PD: TRealPoint read D write SetPD;
+
+    property SchnittPunkt: TRealPoint read GetSchnittPunkt;
+    property SPVorhanden: Boolean read Vorhanden;
+    property Bemerkung: string read GetBemerkung;
+  end;
+
+  TSplitF = class
   public
     l1, l2, h: double;
     F, F1, F2: double;
@@ -58,7 +119,7 @@ type
     procedure SplitCalc;
   end;
 
-  TTetraF = class(TObject)
+  TTetraF = class
   public
     d1, d2, d3, d4: TRealPoint;
     l1, l2, l3, l4: double;
@@ -76,60 +137,86 @@ type
 
 implementation
 
+{ TSchnittKK }
+
 procedure TSchnittKK.SetRadius1(Value: double);
 begin
   if Value <> R1 then
+  begin
     R1 := Value;
-  NeedCalc := True;
+    NeedCalc := True;
+  end;
 end;
 
 procedure TSchnittKK.SetRadius2(Value: double);
 begin
   if Value <> R2 then
+  begin
     R2 := Value;
+    NeedCalc := True;
+  end;
+end;
+
+procedure TSchnittKK.SetM1(const Value: TPointF);
+begin
+  FM1[x] := Value.X;
+  FM1[y] := Value.Y;
+  FM1[z] := 0;
+  NeedCalc := True;
+end;
+
+procedure TSchnittKK.SetM2(const Value: TPointF);
+begin
+  FM2[x] := Value.X;
+  FM2[y] := Value.Y;
+  FM2[z] := 0;
   NeedCalc := True;
 end;
 
 procedure TSchnittKK.SetMittelPunkt1(Value: TRealPoint);
 begin
   if (Value[x] <> FM1[x]) or (Value[y] <> FM1[y]) or (Value[z] <> FM1[z]) then
+  begin
     FM1 := Value;
-  NeedCalc := True;
+    NeedCalc := True;
+  end;
 end;
 
 procedure TSchnittKK.SetMittelPunkt2(Value: TRealPoint);
 begin
   if (Value[x] <> FM2[x]) or (Value[y] <> FM2[y]) or (Value[z] <> FM2[z]) then
+  begin
     FM2 := Value;
-  NeedCalc := True;
+    NeedCalc := True;
+  end;
 end;
 
 function TSchnittKK.GetSchnittPunkt1: TRealPoint;
 begin
   if NeedCalc = True then
     Schnitt;
-  Result := S1;
+  result := S1;
 end;
 
 function TSchnittKK.GetSchnittPunkt2: TRealPoint;
 begin
   if NeedCalc = True then
     Schnitt;
-  Result := S2;
+  result := S2;
 end;
 
 function TSchnittKK.GetBem: TBemerkungKK;
 begin
   if NeedCalc = True then
     Schnitt;
-  Result := Bem;
+  result := Bem;
 end;
 
 function TSchnittKK.Vorhanden: Boolean;
 begin
   if NeedCalc = True then
     Schnitt;
-  Result := sv;
+  result := sv;
 end;
 
 function TSchnittKK.GetBemerkung: string;
@@ -138,38 +225,53 @@ begin
     Schnitt;
   case Bem of
     bmKonzentrisch:
-      Result := 'konzentrische Kreise';
+      result := 'konzentrische Kreise';
     bmZwei:
-      Result := 'zwei Schnittpunkte';
+      result := 'zwei Schnittpunkte';
     bmEntfernt:
-      Result := 'zwei entfernte Kreise';
+      result := 'zwei entfernte Kreise';
     bmEinerAussen:
-      Result := 'Berührung außen';
+      result := 'Berührung außen';
     bmEinerK1inK2:
-      Result := 'Berührung innen, K1 in K2';
+      result := 'Berührung innen, K1 in K2';
     bmEinerK2inK1:
-      Result := 'Berührung innen, K2 in K1';
+      result := 'Berührung innen, K2 in K1';
     bmK1inK2:
-      Result := 'K1 innerhalb K2';
+      result := 'K1 innerhalb K2';
     bmK2inK1:
-      Result := 'K2 innerhalb K1';
+      result := 'K2 innerhalb K1';
     bmRadiusFalsch:
-      Result := 'Radius Ungültig';
+      result := 'Radius Ungültig';
   end;
 end;
 
+//function TSchnittKK.GetM1: TPointF;
+//begin
+//  result.X := Mittelpunkt1[x];
+//  result.Y := Mittelpunkt1[y];
+//end;
+//
+//function TSchnittKK.GetM2: TPointF;
+//begin
+//  result.X := Mittelpunkt2[x];
+//  result.Y := Mittelpunkt2[y];
+//end;
+
 procedure TSchnittKK.Schnitt;
-label M;
+label
+  M;
 var
-  a, b, h1, h2, h3, p, q, Entfernung: extended;
+  a, b, h1, h2, h3, p, q, Entfernung: Extended;
   DeltaNullx, DeltaNully: Boolean;
   M1M2, M1S1, KreuzProd: TRealPoint;
   M1, M2, SP: TRealPoint;
 begin
   NeedCalc := False;
   sv := False;
+
   S1 := Null;
   S2 := Null;
+
   if Ebene = seXY then
   begin
     M1[x] := FM1[x];
@@ -214,8 +316,7 @@ begin
     Exit;
   end;
 
-  h1 := (R1 * R1 - R2 * R2) + (M2[x] * M2[x] - M1[x] * M1[x]) +
-    (M2[y] * M2[y] - M1[y] * M1[y]);
+  h1 := (R1 * R1 - R2 * R2) + (M2[x] * M2[x] - M1[x] * M1[x]) + (M2[y] * M2[y] - M1[y] * M1[y]);
   { Spezialfall Mittelpunkte auf gleicher Höhe }
   if DeltaNully then { Rechnung vermeidet Division durch Null }
   begin
@@ -248,8 +349,7 @@ begin
   a := (-1) * (M2[x] - M1[x]) / (M2[y] - M1[y]);
   b := h1 / (2 * (M2[y] - M1[y]));
   p := 2 * (a * b - M1[x] - a * M1[y]) / (1 + a * a);
-  q := (M1[x] * M1[x] + b * b - 2 * b * M1[y] + M1[y] * M1[y] - R1 * R1) /
-    (1 + a * a);
+  q := (M1[x] * M1[x] + b * b - 2 * b * M1[y] + M1[y] * M1[y] - R1 * R1) / (1 + a * a);
   h2 := p * p / 4 - q;
   if h2 >= 0 then
   begin
@@ -261,7 +361,7 @@ begin
     sv := True;
   end;
 
-M :
+M:
   Entfernung := Abstand(M1, M2);
 
   if sv = False then
@@ -363,15 +463,15 @@ end;
 
 function TTetraF.SkalarProduktPositiv: Boolean;
 begin
-  Result := False;
+  result := False;
   SkalarProdukt := FR[x] * d4[x] + FR[y] * d4[y] + FR[z] * d4[z];
   if SkalarProdukt >= 0 then
-    Result := True;
+    result := True;
 end;
 
 function TTetraF.Probe: Boolean;
 begin
-  Result := True;
+  result := True;
 
   d1[x] := d1[x] / l1;
   d2[x] := d2[x] / l2;
@@ -395,7 +495,216 @@ begin
   FR := vadd(FR, KnotenLast);
   ProbeErgebnis := Abstand(FR, Null);
   if ProbeErgebnis > Toleranz then
-    Result := False;
+    result := False;
+end;
+
+{ TSchnittKKR }
+
+procedure TSchnittKKR.Schnitt;
+var
+  t1, t2, t: TRect;
+  ret: Boolean;
+begin
+  if RectangleMode then
+  begin
+    S1 := Null; //vcopy(S1, Null);
+    S2 := Null; //vcopy(S2, Null);
+    try
+      t1.Left := Round(FM1[x] - R1);
+      t1.Right := Round(FM1[x] + R1);
+      t1.Top := Round(FM1[y] - R1);
+      t1.Bottom := Round(FM1[y] + R1);
+
+      t2.Left := Round(FM2[x] - R2);
+      t2.Right := Round(FM2[x] + R2);
+      t2.Top := Round(FM2[y] - R2);
+      t2.Bottom := Round(FM2[y] + R2);
+
+      ret := IntersectRect(t, t1, t2);
+      if ret then
+      begin
+        S1[x] := t.Left;
+        S1[y] := t.Top;
+        S2[x] := t.Right;
+        S2[y] := t.Bottom;
+      end;
+    except
+    end;
+  end
+  else
+    inherited Schnitt;
+end;
+
+{ TSchnittGG }
+
+constructor TSchnittGG.Create;
+begin
+  A := Null;
+  B := Null;
+  C := Null;
+  D := Null;
+  B[x] := 100.0;
+  D[x] := 200.0;
+  D[z] := 100.0;
+end;
+
+function TSchnittGG.GetBemerkung: string;
+begin
+  result := 'BemerkungGG';
+end;
+
+function TSchnittGG.GetSchnittPunkt: TRealPoint;
+begin
+  if NeedCalc = True then
+    Schnitt;
+  result := SP;
+end;
+
+function TSchnittGG.Schnitt: Boolean;
+var
+  a1, a2: double;
+  sx, sz, x1, z1, x3, z3: double;
+  Quotient: double;
+begin
+  NeedCalc := False;
+  result := True;
+  Bem := ggOK;
+  sv := False;
+
+  a1 := 0;
+  a2 := 0;
+  sx := 0;
+  sz := 0;
+  x1 := 0;
+  z1 := 0;
+  x3 := 0;
+  z3 := 0;
+
+  Quotient := B[x] - A[x];
+  if abs(Quotient) > 0.001 then
+    a1 := (B[z] - A[z]) / Quotient
+  else
+    Bem := g1Vertical;
+
+  Quotient := D[x] - C[x];
+  if abs(Quotient) > 0.001 then
+    a2 := (D[z] - C[z]) / Quotient
+  else
+    Bem := g2Vertical;
+
+  if (Bem = ggOK) and (abs(a2-a1) < 0.001) then
+    Bem := ggParallel;
+
+  case Bem of
+    ggParallel:
+    begin
+      sx := 0;
+      sz := 0;
+      result := False;
+    end;
+
+    ggOK:
+      begin
+        x1 := A[x];
+        z1 := A[z];
+        x3 := C[x];
+        z3 := C[z];
+        sx := (-a1 * x1 + a2 * x3 - z3 + z1) / (-a1 + a2);
+        sz := (-a2 * a1 * x1 + a2 * z1 + a2 * x3 * a1 - z3 * a1) / (-a1 + a2);
+      end;
+
+    g1Vertical:
+      begin
+        sz := a2 * x1 - a2 * x3 + z3;
+        sx := x1;
+      end;
+
+    g2Vertical:
+      begin
+        sz := a1 * x3 - a1 * x1 + z1;
+        sx := x3;
+      end;
+  end;
+
+  SP[x] := sx;
+  SP[y] := 0;
+  SP[z] := sz;
+  sv := Bem = ggOK;
+end;
+
+function TSchnittGG.Vorhanden: Boolean;
+begin
+  if NeedCalc = True then
+    Schnitt;
+  result := sv;
+end;
+
+procedure TSchnittGG.SetA1(const Value: double);
+var
+  w: single;
+  t: TRealPoint;
+begin
+  w := Value * 2 * PI / 360;
+  t[x] := cos(w);
+  t[y] := 0;
+  t[z] := sin(w);
+  t := SkalarMult(t, 100);
+  B := vadd(A, t);
+  NeedCalc := True;
+end;
+
+procedure TSchnittGG.SetA2(const Value: double);
+var
+  w: single;
+  t: TRealPoint;
+begin
+  w := Value * 2 * PI / 360;
+  t[x] := cos(w);
+  t[y] := 0;
+  t[z] := sin(w);
+  t := SkalarMult(t, 100);
+  D := vadd(C, t);
+  NeedCalc := True;
+end;
+
+procedure TSchnittGG.SetM1(const Value: TPointF);
+begin
+  A[x] := Value.X;
+  A[y] := 0;
+  A[z] := Value.Y;
+  NeedCalc := True;
+end;
+
+procedure TSchnittGG.SetM2(const Value: TPointF);
+begin
+  C[x] := Value.X;
+  C[y] := 0;
+  C[z] := Value.Y;
+  NeedCalc := True;
+end;
+
+procedure TSchnittGG.SetPA(const Value: TRealPoint);
+begin
+  A := Value;
+  NeedCalc := True;
+end;
+
+procedure TSchnittGG.SetPB(const Value: TRealPoint);
+begin
+  B := Value;
+  NeedCalc := True;
+end;
+
+procedure TSchnittGG.SetPC(const Value: TRealPoint);
+begin
+  C := Value;
+  NeedCalc := True;
+end;
+
+procedure TSchnittGG.SetPD(const Value: TRealPoint);
+begin
+  D := Value;
+  NeedCalc := True;
 end;
 
 end.

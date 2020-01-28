@@ -17,11 +17,12 @@ type
     procedure SetFixPoint(Value: TRiggPoint);
   protected
     rP: TRealRiggPoints;
-    Kurve: array [0 .. BogenMax] of TRealPoint;
+    Kurve: TMastKurve;
   public
     constructor Create; override;
     procedure LoadFromIniFile(FileName: string);
     procedure SetMastKurve(f: TLineDataR100; L, beta: double);
+    procedure SetMastKurveFromTestData(Value: TMastKurve);
 
     property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
     property SalingTyp: TSalingTyp read FSalingTyp write FSalingTyp;
@@ -72,6 +73,11 @@ begin
     Kurve[j, y] := 0;
     Kurve[j, z] := rP[ooD0, z] + tempL * temp3 + f[k] * temp4;
   end;
+end;
+
+procedure TBootGraph.SetMastKurveFromTestData(Value: TMastKurve);
+begin
+  Kurve := Value;
 end;
 
 procedure TBootGraph.LoadFromIniFile(FileName: string);

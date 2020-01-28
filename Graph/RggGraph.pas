@@ -34,7 +34,7 @@ type
     procedure GetPlotList(List: TStringList); virtual;
 
     property FixPunkt: TRealPoint read FFixPunkt write SetFixPunkt;
-    property Offset: TPoint read FOffset write SetOffset;
+    property NOffset: TPoint read FOffset write SetOffset;
     property Zoom: double read FZoom write SetZoom;
     property Coloriert: Boolean read FColored write FColored;
   end;

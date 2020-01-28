@@ -63,6 +63,7 @@ uses
   RggRota in 'Graph\RggRota.pas',
   RggDisplay in 'Graph\RggDisplay.pas',
   RggKraft in 'Graph\RggKraft.pas',
+  RggTestData in 'Graph\RggTestData.pas',
   RiggVar.App.Main0 in 'App\RiggVar.App.Main0.pas',
   RiggVar.App.Main1 in 'App\RiggVar.App.Main1.pas',
   RiggVar.App.Main in 'App\RiggVar.App.Main.pas',

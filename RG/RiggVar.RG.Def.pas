@@ -255,7 +255,7 @@ const
   clSaling: TColor = clLime;
   clController: TColor = clAqua;
   clEntspannt: TColor = clGray;
-  clNull: TColor = clAqua;
+  clNullStellung: TColor = clAqua;
   clKoppelKurve: TColor = clYellow;
 
 implementation

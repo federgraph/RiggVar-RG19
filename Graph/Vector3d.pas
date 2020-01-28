@@ -15,6 +15,7 @@ function Cross(v1, v2: vec3): vec3;
 function Divide(v :vec3; num: double): vec3;
 procedure Normalize(var v: vec3);
 function Dot(v1, v2: vec3): double;
+
 function LookUpRa10(Index: Integer): double;
 
 implementation

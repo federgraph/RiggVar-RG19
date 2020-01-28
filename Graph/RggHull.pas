@@ -153,7 +153,7 @@ begin
   mat.Multiply(Rotator.Matrix);
   { x und z werden abgebildet (siehe GBox3D) }
   mat.ScaleXYZ(Zoom, 20 / zfac, Zoom);
-  mat.Translate(Offset.x, 4, -Offset.y);
+  mat.Translate(NOffset.x, 4, -NOffset.y);
   mat.Transform(vert, tvert, nvert);
   Updated := True;
 end;

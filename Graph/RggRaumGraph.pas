@@ -3,7 +3,7 @@
 interface
 
 uses
-  Winapi.Windows,
+  System.Types,
   System.SysUtils,
   System.Classes,
   System.UITypes,
@@ -17,7 +17,7 @@ uses
 type
   TRaumGraph = class(TBootGraph)
   private
-    { coordinates, transformed }
+    { transformed coordinates }
     A0, B0, C0, D0, E0, F0: TRealPoint;
     A,  B,  C,  D,  E,  F:  TRealPoint;
   protected
@@ -25,20 +25,36 @@ type
     FGestrichelt: Boolean;
     FAnsicht: TViewPoint;
 
-    ZugRumpf: array [1 .. 8] of TPoint;
-    ZugMast: array [1 .. 4] of TPoint;
-    ZugMastKurve: array [1 .. BogenMax + 2] of TPoint;
-    ZugSalingFS: array [1 .. 4] of TPoint;
-    ZugSalingDS: array [1 .. 3] of TPoint;
-    ZugWanteStb: array [1 .. 3] of TPoint;
-    ZugWanteBb: array [1 .. 3] of TPoint;
-    ZugController: array [1 .. 2] of TPoint;
-    ZugVorstag: array [1 .. 2] of TPoint;
+    ZugRumpf: TRggPolyLine;
+    ZugMast: TRggPolyLine;
+    ZugMastKurve: TRggPolyLine;
+    ZugSalingFS: TRggPolyLine;
+    ZugSalingDS: TRggPolyLine;
+    ZugWanteStb: TRggPolyLine;
+    ZugWanteBb: TRggPolyLine;
+    ZugController: TRggPolyLine;
+    ZugVorstag: TRggPolyLine;
+
+    { no need to call SetLength for these, will be copied }
+    ZugMastKurveD0D: TRggPolyLine;
+    ZugMastKurveDC: TRggPolyLine;
+    ZugMastKurveCF: TRggPolyLine;
+
     procedure FillZug3D;
   public
+    WantFixPunkt: Boolean;
+    WantRumpf: Boolean;
+    WantSaling: Boolean;
+    WantController: Boolean;
+    WantWante: Boolean;
+    WantMast: Boolean;
+    WantVorstag: Boolean;
+
+    constructor Create; override;
+
     procedure Update; override;
     procedure UpdateDisplayList;
-    procedure Draw(Canvas: TCanvas); override;
+    procedure Draw(g: TCanvas); override;
     procedure GetPlotList(List: TStringList); override;
 
     property Ansicht: TViewPoint read FAnsicht write FAnsicht;
@@ -50,6 +66,29 @@ implementation
 
 uses
   RiggVar.RG.Def;
+
+constructor TRaumGraph.Create;
+begin
+  inherited;
+  WantFixPunkt := True;
+  WantRumpf := True;
+  WantSaling := True;
+  WantController := True;
+  WantWante := True;
+  WantMast := True;
+  WantVorstag := True;
+
+  SetLength(ZugRumpf, 8);
+  SetLength(ZugMast, 4);
+  SetLength(ZugMastKurve, BogenMax + 2);
+  SetLength(ZugSalingFS, 4);
+  SetLength(ZugSalingDS, 3);
+  SetLength(ZugWanteStb, 3);
+  SetLength(ZugWanteBb, 3);
+  SetLength(ZugController, 2);
+  SetLength(ZugVorstag, 2);
+
+end;
 
 procedure TRaumGraph.Update;
 begin
@@ -100,8 +139,8 @@ begin
   begin
     xA0 := Round(KurveRotiert[j, x] * Zoom);
     yA0 := Round(KurveRotiert[j, z] * Zoom);
-    ZugMastKurve[j + 1].x := xA0 + Offset.x;
-    ZugMastKurve[j + 1].y := -yA0 + Offset.y;
+    ZugMastKurve[j].x := xA0 + NOffset.x;
+    ZugMastKurve[j].y := -yA0 + NOffset.y;
   end;
 
   xA0 := Round(A0[x] * Zoom);
@@ -131,82 +170,86 @@ begin
   yF := Round(F[z]*Zoom);
 
   { Rumpf }
-  ZugRumpf[1].x := xA0 + Offset.x;
-  ZugRumpf[1].y := -yA0 + Offset.y;
-  ZugRumpf[2].x := xB0 + Offset.x;
-  ZugRumpf[2].y := -yB0 + Offset.y;
-  ZugRumpf[3].x := xC0 + Offset.x;
-  ZugRumpf[3].y := -yC0 + Offset.y;
-  ZugRumpf[4].x := xA0 + Offset.x;
-  ZugRumpf[4].y := -yA0 + Offset.y;
+  ZugRumpf[0].x := xA0 + NOffset.x;
+  ZugRumpf[0].y := -yA0 + NOffset.y;
+  ZugRumpf[1].x := xB0 + NOffset.x;
+  ZugRumpf[1].y := -yB0 + NOffset.y;
+  ZugRumpf[2].x := xC0 + NOffset.x;
+  ZugRumpf[2].y := -yC0 + NOffset.y;
+  ZugRumpf[3].x := xA0 + NOffset.x;
+  ZugRumpf[3].y := -yA0 + NOffset.y;
 
-  ZugRumpf[5].x := xD0 + Offset.x;
-  ZugRumpf[5].y := -yD0 + Offset.y;
-  ZugRumpf[6].x := xB0 + Offset.x;
-  ZugRumpf[6].y := -yB0 + Offset.y;
-  ZugRumpf[7].x := xC0 + Offset.x;
-  ZugRumpf[7].y := -yC0 + Offset.y;
-  ZugRumpf[8].x := xD0 + Offset.x;
-  ZugRumpf[8].y := -yD0 + Offset.y;
+  ZugRumpf[4].x := xD0 + NOffset.x;
+  ZugRumpf[4].y := -yD0 + NOffset.y;
+  ZugRumpf[5].x := xB0 + NOffset.x;
+  ZugRumpf[5].y := -yB0 + NOffset.y;
+  ZugRumpf[6].x := xC0 + NOffset.x;
+  ZugRumpf[6].y := -yC0 + NOffset.y;
+  ZugRumpf[7].x := xD0 + NOffset.x;
+  ZugRumpf[7].y := -yD0 + NOffset.y;
 
   { Mast }
-  ZugMast[1].x := xD0 + Offset.x;
-  ZugMast[1].y := -yD0 + Offset.y;
-  ZugMast[2].x := xD + Offset.x;
-  ZugMast[2].y := -yD + Offset.y;
-  ZugMast[3].x := xC + Offset.x;
-  ZugMast[3].y := -yC + Offset.y;
-  ZugMast[4].x := xF + Offset.x;
-  ZugMast[4].y := -yF + Offset.y;
+  ZugMast[0].x := xD0 + NOffset.x;
+  ZugMast[0].y := -yD0 + NOffset.y;
+  ZugMast[1].x := xD + NOffset.x;
+  ZugMast[1].y := -yD + NOffset.y;
+  ZugMast[2].x := xC + NOffset.x;
+  ZugMast[2].y := -yC + NOffset.y;
+  ZugMast[3].x := xF + NOffset.x;
+  ZugMast[3].y := -yF + NOffset.y;
 
-  ZugMastKurve[BogenMax + 2].x := xF + Offset.x;
-  ZugMastKurve[BogenMax + 2].y := -yF + Offset.y;
+  ZugMastKurve[BogenMax + 1].x := xF + NOffset.x;
+  ZugMastKurve[BogenMax + 1].y := -yF + NOffset.y;
 
   { WanteStb }
-  ZugWanteStb[1].x := xA0 + Offset.x;
-  ZugWanteStb[1].y := -yA0 + Offset.y;
-  ZugWanteStb[2].x := xA + Offset.x;
-  ZugWanteStb[2].y := -yA + Offset.y;
-  ZugWanteStb[3].x := xC + Offset.x;
-  ZugWanteStb[3].y := -yC + Offset.y;
+  ZugWanteStb[0].x := xA0 + NOffset.x;
+  ZugWanteStb[0].y := -yA0 + NOffset.y;
+  ZugWanteStb[1].x := xA + NOffset.x;
+  ZugWanteStb[1].y := -yA + NOffset.y;
+  ZugWanteStb[2].x := xC + NOffset.x;
+  ZugWanteStb[2].y := -yC + NOffset.y;
 
   { WanteBb }
-  ZugWanteBb[1].x := xB0 + Offset.x;
-  ZugWanteBb[1].y := -yB0 + Offset.y;
-  ZugWanteBb[2].x := xB + Offset.x;
-  ZugWanteBb[2].y := -yB + Offset.y;
-  ZugWanteBb[3].x := xC + Offset.x;
-  ZugWanteBb[3].y := -yC + Offset.y;
+  ZugWanteBb[0].x := xB0 + NOffset.x;
+  ZugWanteBb[0].y := -yB0 + NOffset.y;
+  ZugWanteBb[1].x := xB + NOffset.x;
+  ZugWanteBb[1].y := -yB + NOffset.y;
+  ZugWanteBb[2].x := xC + NOffset.x;
+  ZugWanteBb[2].y := -yC + NOffset.y;
 
   { SalingFS }
-  ZugSalingFS[1].x := xA + Offset.x;
-  ZugSalingFS[1].y := -yA + Offset.y;
-  ZugSalingFS[2].x := xD + Offset.x;
-  ZugSalingFS[2].y := -yD + Offset.y;
-  ZugSalingFS[3].x := xB + Offset.x;
-  ZugSalingFS[3].y := -yB + Offset.y;
-  ZugSalingFS[4].x := xA + Offset.x;
-  ZugSalingFS[4].y := -yA + Offset.y;
+  ZugSalingFS[0].x := xA + NOffset.x;
+  ZugSalingFS[0].y := -yA + NOffset.y;
+  ZugSalingFS[1].x := xD + NOffset.x;
+  ZugSalingFS[1].y := -yD + NOffset.y;
+  ZugSalingFS[2].x := xB + NOffset.x;
+  ZugSalingFS[2].y := -yB + NOffset.y;
+  ZugSalingFS[3].x := xA + NOffset.x;
+  ZugSalingFS[3].y := -yA + NOffset.y;
 
   { SalingDS }
-  ZugSalingDS[1].x := xA + Offset.x;
-  ZugSalingDS[1].y := -yA + Offset.y;
-  ZugSalingDS[2].x := xD + Offset.x;
-  ZugSalingDS[2].y := -yD + Offset.y;
-  ZugSalingDS[3].x := xB + Offset.x;
-  ZugSalingDS[3].y := -yB + Offset.y;
+  ZugSalingDS[0].x := xA + NOffset.x;
+  ZugSalingDS[0].y := -yA + NOffset.y;
+  ZugSalingDS[1].x := xD + NOffset.x;
+  ZugSalingDS[1].y := -yD + NOffset.y;
+  ZugSalingDS[2].x := xB + NOffset.x;
+  ZugSalingDS[2].y := -yB + NOffset.y;
 
   { Controller }
-  ZugController[1].x := xE0 + Offset.x;
-  ZugController[1].y := -yE0 + Offset.y;
-  ZugController[2].x := xE + Offset.x;
-  ZugController[2].y := -yE + Offset.y;
+  ZugController[0].x := xE0 + NOffset.x;
+  ZugController[0].y := -yE0 + NOffset.y;
+  ZugController[1].x := xE + NOffset.x;
+  ZugController[1].y := -yE + NOffset.y;
 
   { Vorstag }
-  ZugVorstag[1].x := xC0 + Offset.x;
-  ZugVorstag[1].y := -yC0 + Offset.y;
-  ZugVorstag[2].x := xC + Offset.x;
-  ZugVorstag[2].y := -yC + Offset.y;
+  ZugVorstag[0].x := xC0 + NOffset.x;
+  ZugVorstag[0].y := -yC0 + NOffset.y;
+  ZugVorstag[1].x := xC + NOffset.x;
+  ZugVorstag[1].y := -yC + NOffset.y;
+
+  ZugMastKurveD0D := Copy(ZugMastKurve, 0, 20);
+  ZugMastKurveDC := Copy(ZugMastKurve, 19, 21);
+  ZugMastKurveCF := Copy(ZugMastKurve, 39 );
 end;
 
 procedure TRaumGraph.UpdateDisplayList;
@@ -216,82 +259,109 @@ begin
   DL.Clear;
   DI := DL.DI;
 
-  DI.StrokeColor := clYellow;
-  DI.StrokeWidth := 1;
-  DL.Ellipse(FixPunkt, FixPunkt, Offset, TransKreisRadius);
+  if WantFixpunkt then
+  begin
+    DI.StrokeColor := clYellow;
+    DI.StrokeWidth := 1;
+    DL.Ellipse(FixPunkt, FixPunkt, NOffset, TransKreisRadius);
+  end;
 
   { Rumpf }
-  DI.StrokeColor := TColors.Lightgrey;
-  DI.StrokeWidth := 10;
-  DL.Line(A0, B0, ZugRumpf[1], ZugRumpf[2], clRed);
-  DL.Line(B0, C0, ZugRumpf[2], ZugRumpf[3], clGreen);
-  DL.Line(A0, C0, ZugRumpf[1], ZugRumpf[3], clBlue);
-  DL.Line(D0, A0, ZugRumpf[5], ZugRumpf[1], clAqua);
-  DL.Line(D0, B0, ZugRumpf[5], ZugRumpf[2], clFuchsia);
-  DL.Line(D0, C0, ZugRumpf[5], ZugRumpf[3], TColors.Orange);
+  if WantRumpf then
+  begin
+    DI.StrokeColor := TColors.Lightgray;
+    DI.StrokeWidth := 10;
+    DL.Line(A0, B0, ZugRumpf[0], ZugRumpf[1], clRed);
+    DL.Line(B0, C0, ZugRumpf[1], ZugRumpf[2], clGreen);
+    DL.Line(A0, C0, ZugRumpf[2], ZugRumpf[3], clBlue);
+
+    DL.Line(D0, A0, ZugRumpf[0], ZugRumpf[4], clAqua);
+    DL.Line(D0, B0, ZugRumpf[1], ZugRumpf[4], clFuchsia);
+    DL.Line(D0, C0, ZugRumpf[2], ZugRumpf[4], TColors.Orange);
+  end;
 
   { Mast }
-  DI.StrokeColor := TColors.Cornflowerblue;
-  DI.StrokeWidth := 8;
-  if FBogen then
-    DL.PolyLine(D0, D, ZugMastKurve)
-  else
+  if WantMast then
   begin
-    DL.Line(D0, D, ZugMast[1], ZugMast[2], TColors.Cornflowerblue);
-    DL.Line(D, C, ZugMast[2], ZugMast[3], TColors.Cornflowerblue);
-    DL.Line(C, F, ZugMast[3], ZugMast[4], TColors.Cornflowerblue);
+    DI.StrokeColor := TColors.Cornflowerblue;
+    DI.StrokeWidth := 8;
+    if FBogen then
+    begin
+      DL.PolyLine(D0, D, ZugMastKurveD0D);
+      DL.PolyLine(D, C, ZugMastKurveDC);
+      DL.PolyLine(C, F, ZugMastKurveCF);
+    end
+    else
+    begin
+      DL.Line(D0, D, ZugMast[0], ZugMast[1], TColors.Cornflowerblue);
+      DL.Line(D, C, ZugMast[1], ZugMast[2], TColors.Cornflowerblue);
+      DL.Line(C, F, ZugMast[2], ZugMast[3], TColors.Cornflowerblue);
+    end;
   end;
 
-  { Wante Stb }
-  DI.StrokeColor := clRed;
-  DI.StrokeWidth := 2;
-  DL.Line(A0, A, ZugWanteStb[1], ZugWanteStb[2], clRed);
-  DL.Line(A, C, ZugWanteStb[2], ZugWanteStb[3], clRed);
+  { Wanten }
+  if WantWante then
+  begin
+    { Wante Stb }
+    DI.StrokeColor := clRed;
+    DI.StrokeWidth := 2;
+    DL.Line(A0, A, ZugWanteStb[0], ZugWanteStb[1], clRed);
+    DL.Line(A, C, ZugWanteStb[1], ZugWanteStb[2], clRed);
 
-  { Wante Bb }
-  DI.StrokeColor := clGreen;
-  DI.StrokeWidth := 2;
-  DL.Line(B0, B, ZugWanteBb[1], ZugWanteBb[2], clGreen);
-  DL.Line(B, C, ZugWanteBb[2], ZugWanteBb[3], clGreen);
+    { Wante Bb }
+    DI.StrokeColor := clGreen;
+    DI.StrokeWidth := 2;
+    DL.Line(B0, B, ZugWanteBb[0], ZugWanteBb[1], clGreen);
+    DL.Line(B, C, ZugWanteBb[1], ZugWanteBb[2], clGreen);
+  end;
 
   { Saling }
-  DI.StrokeColor := clLime;
-  DI.StrokeWidth := 6;
-  if SalingTyp = stFest then
-  begin
-    DL.Line(A, D, ZugSalingFS[1], ZugSalingFS[2], clLime);
-    DL.Line(B, D, ZugSalingFS[3], ZugSalingFS[2], clLime);
-    DL.Line(A, B, ZugSalingFS[1], ZugSalingFS[3], clLime);
-  end;
-  if SalingTyp = stDrehbar then
+  if WantSaling then
   begin
     DI.StrokeColor := clLime;
-    DI.StrokeWidth := 2;
-    DL.Line(A, D, ZugSalingDS[1], ZugSalingDS[2], clLime);
-    DL.Line(B, D, ZugSalingDS[3], ZugSalingDS[2], clLime);
+    DI.StrokeWidth := 6;
+    if SalingTyp = stFest then
+    begin
+      DL.Line(A, D, ZugSalingFS[0], ZugSalingFS[1], clLime);
+      DL.Line(B, D, ZugSalingFS[2], ZugSalingFS[1], clLime);
+      DL.Line(A, B, ZugSalingFS[0], ZugSalingFS[2], clLime);
+    end;
+    if SalingTyp = stDrehbar then
+    begin
+      DI.StrokeColor := clLime;
+      DI.StrokeWidth := 2;
+      DL.Line(A, D, ZugSalingDS[0], ZugSalingDS[1], clLime);
+      DL.Line(B, D, ZugSalingDS[2], ZugSalingDS[1], clLime);
+    end;
   end;
 
   { Controller }
+  if WantController then
+  begin
   if ControllerTyp <> ctOhne then
   begin
-    DI.StrokeColor := clAqua;
-    DI.StrokeWidth := 4;
-    DL.Line(E0, E, ZugController[1], ZugController[2], clAqua);
+      DI.StrokeColor := clAqua;
+      DI.StrokeWidth := 4;
+      DL.Line(E0, E, ZugController[0], ZugController[1], clAqua);
+    end;
   end;
 
   { Vorstag }
-  DI.StrokeColor := clYellow;
-  DI.StrokeWidth := 4;
-  DL.Line(C0, C, ZugVorstag[1], ZugVorstag[2], clYellow);
+  if WantVorstag then
+  begin
+    DI.StrokeColor := clYellow;
+    DI.StrokeWidth := 4;
+    DL.Line(C0, C, ZugVorstag[0], ZugVorstag[1], clYellow);
+  end;
 end;
 
-procedure TRaumGraph.Draw(Canvas: TCanvas);
+procedure TRaumGraph.Draw(g: TCanvas);
 begin
   if GrafikOK then
   begin
     if not Updated then
       Update;
-    with Canvas do
+    with g do
     begin
       Pen.Color := clBtnFace;
       Pen.Width := 1;
@@ -300,10 +370,10 @@ begin
       if Coloriert then
         Pen.Color := clYellow;
       Ellipse(
-        Offset.x - TransKreisRadius,
-        Offset.y - TransKreisRadius,
-        Offset.x + TransKreisRadius,
-        Offset.y + TransKreisRadius);
+        NOffset.x - TransKreisRadius,
+        NOffset.y - TransKreisRadius,
+        NOffset.x + TransKreisRadius,
+        NOffset.y + TransKreisRadius);
 
       { Rumpf }
       if Coloriert then
@@ -336,10 +406,19 @@ begin
 
       { Wanten }
       if Coloriert then
+      begin
         Pen.Color := clGreen;
+        if FGestrichelt then
+          Pen.Color := TColors.Antiquewhite;
+      end;
       PolyLine(ZugWanteStb);
+
       if Coloriert then
+      begin
         Pen.Color := clRed;
+        if FGestrichelt then
+          Pen.Color := TColors.Antiquewhite;
+      end;
       PolyLine(ZugWanteBb);
 
       { Vorstag }

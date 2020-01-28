@@ -10,7 +10,12 @@ var
   Null: TRealPoint;
 
 type
-  TBemerkungGG = (g1Vertical, g2Vertical, ggParallel, ggOK);
+  TBemerkungGG = (
+    g1Vertical,
+    g2Vertical,
+    ggParallel,
+    ggOK
+  );
 
 function SchnittGG(P1, P2, P3, P4: TRealPoint; var SP: TRealPoint): Boolean;
 function Abstand(P1, P2: TRealPoint): double;
