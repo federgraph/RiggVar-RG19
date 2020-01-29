@@ -1394,6 +1394,8 @@ begin
   sb.GroupIndex := 13;
   sb.OnClick := NullBtnClick;
 
+  { Zoom Buttons }
+
   sb := AddSpeedBtn('ZoomOutBtn', BtnGroupSpace);
   ZoomOutBtn := sb;
   sb.Caption := 'Z-';
@@ -1481,8 +1483,6 @@ begin
 
   TrimmCombo.ItemIndex := 0;
   ParamCombo.ItemIndex := 0;
-//  ViewpointCombo.ItemIndex := 0;
-  FixpointCombo.ItemIndex := FixpointCombo.Items.IndexOf('D0');
 
   ListBox.ItemIndex := 0;
 
@@ -1610,7 +1610,6 @@ end;
 procedure TFormRG19.SetupComboBox(CB: TComboBox);
 begin
   CB.Style := csDropDownList;
-  CB.DropDownCount := Integer(High(TFederParam));
   CB.Font.Name := 'Consolas';
   CB.Font.Size := 11;
   CB.Font.Color := clRed;
@@ -1734,6 +1733,7 @@ begin
 //  cl.Add('Achtern');
 //  cl.Add('Top');
 //  cl.Add('3D');
+//  ViewpointCombo.DropDownCount := cl.Count;
 end;
 
 procedure TFormRG19.InitFixpointCombo;
@@ -1753,6 +1753,8 @@ begin
   cl.Add('E');
   cl.Add('F0');
   cl.Add('F');
+  FixpointCombo.ItemIndex := cl.IndexOf('D0');
+  FixpointCombo.DropDownCount := cl.Count;
 end;
 
 function TFormRG19.GetComboFixPoint: TRiggPoint;
@@ -1800,6 +1802,7 @@ begin
   ACI(fpMastfallVorlauf);
   ACI(fpBiegung);
   ACI(fpD0X);
+  ParamCombo.DropDownCount := ParamCombo.Items.Count;
 end;
 
 procedure TFormRG19.InitTrimmCombo;
@@ -1815,6 +1818,7 @@ begin
   cl.AddObject('Trimm6', TObject(6));
   cl.AddObject('Trimm7 (420)', TObject(7));
   cl.AddObject('Trimm8 (Logo)', TObject(8));
+  TrimmCombo.DropDownCount := cl.Count;
 end;
 
 procedure TFormRG19.TrimmComboChange(Sender: TObject);

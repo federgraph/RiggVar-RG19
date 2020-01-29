@@ -81,6 +81,7 @@ type
     BiegungGFD: single;
 
     TML: TStrings;
+    FOnUpdateGraph: TNotifyEvent;
 
     function FormatValue(Value: single): string;
     procedure DoBiegungGF;
@@ -100,6 +101,7 @@ type
     procedure SetVisible(const Value: Boolean);
     procedure AL(A: string; fp: TFederParam);
     procedure BL(A: string; C: string);
+    procedure SetOnUpdateGraph(const Value: TNotifyEvent);
   protected
     procedure InitFactArray;
     procedure RggSpecialDoOnTrackBarChange; override;
@@ -172,6 +174,7 @@ type
     property Mastfall: string read GetMastfall;
 
     property Visible: Boolean read FVisible write SetVisible;
+    property OnUpdateGraph: TNotifyEvent read FOnUpdateGraph write SetOnUpdateGraph;
   end;
 
 implementation
@@ -271,6 +274,11 @@ begin
   Draw;
 end;
 
+procedure TRggMain.SetOnUpdateGraph(const Value: TNotifyEvent);
+begin
+  FOnUpdateGraph := Value;
+end;
+
 procedure TRggMain.SetOption(fa: TFederAction);
 begin
   case fa of
@@ -335,6 +343,11 @@ begin
     sr.WanteGestrichelt := not Rigg.GetriebeOK;
     sr.Bogen := (FParam <> fpWinkel);
     Draw;
+  end;
+
+  if Assigned(FOnUpdateGraph) then
+  begin
+    OnUpdateGraph(nil);
   end;
 end;
 
@@ -1520,7 +1533,7 @@ begin
     ML.Add('Modus = Pro');
 
   ML.Add('CounterG = ' + IntToStr(Rigg.UpdateGetriebeCounter));
-  ML.Add('CounterT = ' + IntToStr(UpdateTextCounter));
+//  ML.Add('CounterT = ' + IntToStr(UpdateTextCounter));
 end;
 
 procedure TRggMain.UpdateDataText(ML: TStrings);

@@ -7,6 +7,7 @@ uses
   Vcl.Dialogs,
   System.SysUtils,
   System.UITypes,
+//  System.Types,
   Vcl.Graphics,
   Vector3D,
   ThreeD;

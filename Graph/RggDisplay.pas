@@ -92,7 +92,7 @@ type
     procedure Clear;
     procedure Ellipse(P1, P2: TRealPoint; CenterPoint: TPoint; Radius: Integer = 10);
     procedure Line(P1, P2: TRealPoint; A, B: TPoint; Color: TColor);
-    procedure PolyLine(P1, P2: TRealPoint; A: TRggPolyLine);
+    procedure PolyLine(P1, P2: TRealPoint; A: TRggPolyLine; Color: TColor);
     procedure Draw(Canvas: TCanvas);
     function CompareItems(i1, i2: Integer): Integer;
   end;
@@ -303,10 +303,12 @@ begin
   cr.LineEnd := B;
 end;
 
-procedure TRggDisplayList.PolyLine(P1, P2: TRealPoint; A: TRggPolyLine);
+procedure TRggDisplayList.PolyLine(P1, P2: TRealPoint; A: TRggPolyLine; Color: TColor);
 var
   cr: TDisplayItem;
 begin
+  if WantLineColors then
+    DI.StrokeColor := Color;
   cr := Add;
   cr.ItemType := diPolyLine;
   cr.P1 := P1;
@@ -339,75 +341,6 @@ function TDisplayItemComparer.Compare(const Left, Right: TDisplayItem): Integer;
 begin
   result := TDisplayItem.Compare(Left, Right);
 end;
-
-{ TSchnittGG }
-
-//procedure TSchnittGG.Schnitt;
-//var
-//  a1, a2: double;
-//  sx, sz, x1, z1, x3, z3: double;
-//  q: double;
-//begin
-//  Fall := ggOK;
-//
-//  a1 := 0;
-//  a2 := 0;
-//  sx := 0;
-//  sz := 0;
-//  x1 := 0;
-//  z1 := 0;
-//  x3 := 0;
-//  z3 := 0;
-//
-//  q := B[x] - A[x];
-//  if abs(q) > Eps then
-//    a1 := (B[z] - A[z]) / q
-//  else
-//    Fall := g1Vertical;
-//
-//  q := D[x] - C[x];
-//  if abs(q) > Eps then
-//    a2 := (D[z] - C[z]) / q
-//  else
-//    Fall := g2Vertical;
-//
-//  if (Fall = ggOK) and (a2-a1 < Eps) then
-//    Fall := ggParallel;
-//
-//  case Fall of
-//    ggParallel:
-//    begin
-//      sx := 0;
-//      sz := 0;
-//    end;
-//
-//    ggOK:
-//      begin
-//        x1 := A[x];
-//        z1 := A[z];
-//        x3 := C[x];
-//        z3 := C[z];
-//        sx := (-a1 * x1 + a2 * x3 - z3 + z1) / (-a1 + a2);
-//        sz := (-a2 * a1 * x1 + a2 * z1 + a2 * x3 * a1 - z3 * a1) / (-a1 + a2);
-//      end;
-//
-//    g1Vertical:
-//      begin
-//        sz := a2 * x1 - a2 * x3 + z3;
-//        sx := x1;
-//      end;
-//
-//    g2Vertical:
-//      begin
-//        sz := a1 * x3 - a1 * x1 + z1;
-//        sx := x3;
-//      end;
-//  end;
-//
-//  SP[x] := sx;
-//  SP[y] := 0;
-//  SP[z] := sz;
-//end;
 
 { TRggPoint }
 

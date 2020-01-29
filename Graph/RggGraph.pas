@@ -3,7 +3,6 @@
 interface
 
 uses
-  Winapi.Windows,
   System.Classes,
   System.Types,
   Vcl.Graphics,

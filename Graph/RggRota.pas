@@ -6,7 +6,6 @@ interface
 
 uses
   Winapi.Windows,
-  Winapi.Messages,
   System.SysUtils,
   System.Classes,
   System.Types,
@@ -24,8 +23,8 @@ uses
   RggMatrix,
   RggUnit4,
   RggGraph,
-  RggRaumGraph,
   RggHull,
+  RggRaumGraph,
   RggPolarKar;
 
 type
@@ -34,20 +33,20 @@ type
     procedure PaintBox3DMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure PaintBox3DMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure PaintBox3DMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-  public
-    PaintItemChecked: Boolean;
+  protected
     MatrixItemChecked: Boolean;
     KeepInsideItemChecked: Boolean;
-    RumpfItemChecked: Boolean;
     procedure PositionSaveItemClick(Sender: TObject);
-    procedure RumpfBtnClick(Sender: TObject);
-    procedure PaintBtnClick(Sender: TObject);
     procedure KeepInsideItemClick(Sender: TObject);
     procedure PositionResetItemClick(Sender: TObject);
     procedure ModusItemClick(Sender: TObject);
     procedure DrawAlwaysItemClick(Sender: TObject);
     procedure MatrixItemClick(Sender: TObject);
   public
+    PaintItemChecked: Boolean;
+    RumpfItemChecked: Boolean;
+    procedure PaintBtnClick(Sender: TObject);
+    procedure RumpfBtnClick(Sender: TObject);
     procedure ZoomInBtnClick(Sender: TObject);
     procedure ZoomOutBtnClick(Sender: TObject);
     procedure UseDisplayListBtnClick(Sender: TObject);
@@ -109,7 +108,6 @@ type
     MatrixTextU: string;
     MatrixTextV: string;
     MatrixTextW: string;
-//    procedure UpdateMatrixText;
   private
     EraseBK: Boolean;
     procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
@@ -126,7 +124,7 @@ type
     procedure UpdateGraphFromRigg;
   public
     Rigg: TRigg; // injected
-    PaintBox3D: TPaintBox; // replaced
+    PaintBox3D: TPaintBox; // injected and replaced
 
     HullGraph: TRggGraph;
     RaumGraph: TRaumGraph;
@@ -146,7 +144,6 @@ type
 implementation
 
 uses
-  RggModul,
   RggPBox,
   RggTestData;
 
@@ -165,7 +162,6 @@ end;
 
 destructor TRotaForm.Destroy;
 begin
-//  RiggModul.RotaForm := nil;
   Paintbox3D.Free;
   Paintbox3D := nil;
   Bitmap.Free;
@@ -206,7 +202,7 @@ begin
 
   FZoomBase := 0.05;
   FViewPoint := vp3D;
-  FFixPoint := ooD0;
+  FFixPoint := ooD;
 
   { PaintBox austauschen }
   NewPaintBox := TRggPaintBox.Create(PaintBox3D.Owner);
@@ -323,7 +319,7 @@ begin
     Ypos := -120;
     Matrix := GetMatrix(-90,90);
     ZoomIndex := 5;
-    FixPunktIndex := 7;
+    FixPunktIndex := 8;
     IncrementIndex := 3;
     IncrementT := 10;
     IncrementW := 5;
@@ -334,7 +330,7 @@ begin
     Ypos := -80;
     Matrix := GetMatrix(90,-87);
     ZoomIndex := 8;
-    FixPunktIndex := 7;
+    FixPunktIndex := 8;
     IncrementIndex := 3;
     IncrementT := 10;
     IncrementW := 5;

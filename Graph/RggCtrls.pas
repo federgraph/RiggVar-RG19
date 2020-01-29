@@ -4,9 +4,9 @@ interface
 
 uses
   Winapi.Windows,
-  Winapi.Messages,
   System.SysUtils,
   System.Classes,
+//  System.Types,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.ExtCtrls,

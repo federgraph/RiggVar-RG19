@@ -3,9 +3,9 @@
 interface
 
 uses
-  Winapi.Windows,
   System.Classes,
   System.SysUtils,
+  System.Types,
   Vcl.Graphics,
   Vector3D;
 

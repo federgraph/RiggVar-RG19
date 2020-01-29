@@ -20,6 +20,8 @@ type
     { transformed coordinates }
     A0, B0, C0, D0, E0, F0: TRealPoint;
     A,  B,  C,  D,  E,  F:  TRealPoint;
+    BogenIndexD: Integer;
+    function FindBogenIndexOf(P: TRealPoint): Integer;
   protected
     FBogen: Boolean;
     FGestrichelt: Boolean;
@@ -35,10 +37,9 @@ type
     ZugController: TRggPolyLine;
     ZugVorstag: TRggPolyLine;
 
-    { no need to call SetLength for these, will be copied }
+    { no need to call SetLength for these, will be copied via Copy }
     ZugMastKurveD0D: TRggPolyLine;
     ZugMastKurveDC: TRggPolyLine;
-    ZugMastKurveCF: TRggPolyLine;
 
     procedure FillZug3D;
   public
@@ -106,6 +107,8 @@ var
   xA0, xB0, xC0, xD0, xE0, { xF0, } xA, xB, xC, xD, xE, xF: Integer;
   yA0, yB0, yC0, yD0, yE0, { yF0, } yA, yB, yC, yD, yE, yF: Integer;
 begin
+  BogenIndexD := FindBogenIndexOf(rP[ooD]);
+
   { Graph drehen }
   if Assigned(Rotator) then
   begin
@@ -198,6 +201,7 @@ begin
   ZugMast[3].x := xF + NOffset.x;
   ZugMast[3].y := -yF + NOffset.y;
 
+  { no longer contains the segment C-F, it goes from D0 to C }
   ZugMastKurve[BogenMax + 1].x := xF + NOffset.x;
   ZugMastKurve[BogenMax + 1].y := -yF + NOffset.y;
 
@@ -247,9 +251,9 @@ begin
   ZugVorstag[1].x := xC + NOffset.x;
   ZugVorstag[1].y := -yC + NOffset.y;
 
-  ZugMastKurveD0D := Copy(ZugMastKurve, 0, 20);
-  ZugMastKurveDC := Copy(ZugMastKurve, 19, 21);
-  ZugMastKurveCF := Copy(ZugMastKurve, 39 );
+  { copy uses 1 based indices }
+  ZugMastKurveD0D := Copy(ZugMastKurve, 1, BogenIndexD);
+  ZugMastKurveDC := Copy(ZugMastKurve, BogenIndexD, Length(ZugMastKurve)-1);
 end;
 
 procedure TRaumGraph.UpdateDisplayList;
@@ -284,12 +288,12 @@ begin
   if WantMast then
   begin
     DI.StrokeColor := TColors.Cornflowerblue;
-    DI.StrokeWidth := 8;
+    DI.StrokeWidth := 6;
     if FBogen then
     begin
-      DL.PolyLine(D0, D, ZugMastKurveD0D);
-      DL.PolyLine(D, C, ZugMastKurveDC);
-      DL.PolyLine(C, F, ZugMastKurveCF);
+      DL.PolyLine(D0, D, ZugMastKurveD0D, TColors.Cornflowerblue);
+      DL.PolyLine(D, C, ZugMastKurveDC, TColors.Blue);
+      DL.Line(C, F, ZugMast[2], ZugMast[3], TColors.Navy);
     end
     else
     begin
@@ -392,9 +396,14 @@ begin
       if Coloriert then
         Pen.Color := clMast;
       if FBogen then
-         PolyLine(ZugMast)
-      else
+      begin
         PolyLine(ZugMastKurve);
+        Pen.Color := clNavy;
+        MoveTo(ZugMast[2].X, ZugMast[2].Y);
+        LineTo(ZugMast[3].X, ZugMast[3].Y);
+      end
+      else
+        PolyLine(ZugMast);
 
       { Controller }
       if ControllerTyp <> ctOhne then
@@ -427,6 +436,28 @@ begin
       PolyLine(ZugVorstag);
     end;
   end;
+end;
+
+function TRaumGraph.FindBogenIndexOf(P: TRealPoint): Integer;
+var
+  i, j: Integer;
+  MinIndex: Integer;
+  MinAbstand: double;
+  a: double;
+begin
+  j := Length(Kurve);
+  MinIndex := j div 2;
+  MinAbstand := 1000;
+  for i := 0 to j - 1 do
+  begin
+    a := Abstand(P, Kurve[i]);
+    if a < MinAbstand then
+    begin
+      MinAbstand := a;
+      MinIndex := i;
+    end;
+  end;
+  result := MinIndex;
 end;
 
 procedure TRaumGraph.GetPlotList(List: TStringList);

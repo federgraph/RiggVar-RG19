@@ -3,7 +3,6 @@
 interface
 
 uses
-  Winapi.Windows,
   System.SysUtils,
   System.Math,
   RggTypes,

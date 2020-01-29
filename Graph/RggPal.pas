@@ -3,11 +3,11 @@
 interface
 
 uses
-  Windows,
-  SysUtils,
-  Classes,
-  Controls,
-  Graphics;
+  Winapi.Windows,
+  System.SysUtils,
+  System.Classes,
+  Vcl.Controls,
+  Vcl.Graphics;
 
 type
   aRGBQuad = array [0 .. 255] of TRGBQuad;
