@@ -74,7 +74,6 @@ type
 
     procedure InitStepDefault;
     procedure InitTinyStep(Value: Integer);
-
     procedure InitBigStep(Value: Integer);
 
     procedure SaveToStream(s: TStream);

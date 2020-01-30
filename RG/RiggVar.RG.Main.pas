@@ -26,6 +26,8 @@ uses
   RiggVar.RG.Def,
   RiggVar.RG.Track,
   RiggVar.RG.Graph,
+  RggRaumGraph,
+  RggRota,
   RggScroll,
   RggTypes,
   RggUnit4,
@@ -75,13 +77,13 @@ type
   private
     FFixPoint: TRiggPoint;
     FixPunkt: TRealPoint;
+    FViewPoint: TViewPoint;
     FVisible: Boolean;
 
     BiegungGF: single;
-    BiegungGFD: single;
+    BiegungGFDiff: single;
 
     TML: TStrings;
-    FOnUpdateGraph: TNotifyEvent;
 
     function FormatValue(Value: single): string;
     procedure DoBiegungGF;
@@ -92,6 +94,7 @@ type
     procedure SetParamValue(idx: TFederParam; Value: single);
     function GetParamValue(idx: TFederParam): single;
     procedure SetFixPoint(const Value: TRiggPoint);
+    procedure SetViewPoint(const Value: TViewPoint);
     function GetCurrentValue: single;
     procedure SetCurrentValue(const Value: single);
     function GetParamValueString(fp: TFederParam): string;
@@ -101,7 +104,6 @@ type
     procedure SetVisible(const Value: Boolean);
     procedure AL(A: string; fp: TFederParam);
     procedure BL(A: string; C: string);
-    procedure SetOnUpdateGraph(const Value: TNotifyEvent);
   protected
     procedure InitFactArray;
     procedure RggSpecialDoOnTrackBarChange; override;
@@ -111,13 +113,14 @@ type
     IstValCaption: string;
     ParamCaption: string;
 
-    FactArray: TRggFA;
+    RaumGraph: TRaumGraph; // cached from StrokeRigg (RotaForm)
 
-    Rigg: TRigg;
+    Rigg: TRigg; // owned, passed in via constructor
+    FactArray: TRggFA; // not owned, cached from Rigg
 
     Demo: Boolean;
 
-    StrokeRigg: TStrokeRigg;
+    StrokeRigg: TRotaForm; // injected, not owned
 
     SofortBerechnen: Boolean;
     Grauzeichnen: Boolean;
@@ -140,6 +143,7 @@ type
 
     procedure Init;
     procedure InitStrokeRigg;
+    procedure UpdateStrokeRigg;
 
     procedure Init420;
     procedure InitLogo;
@@ -166,6 +170,7 @@ type
 
     property Action: TFederAction read FAction;
     property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
+    property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property Param: TFederParam read FParam write SetParam;
     property ParamValue[index: TFederParam]: single read GetParamValue write SetParamValue;
     property ParamValueString[index: TFederParam]: string read GetParamValueString;
@@ -174,7 +179,6 @@ type
     property Mastfall: string read GetMastfall;
 
     property Visible: Boolean read FVisible write SetVisible;
-    property OnUpdateGraph: TNotifyEvent read FOnUpdateGraph write SetOnUpdateGraph;
   end;
 
 implementation
@@ -205,7 +209,7 @@ end;
 
 destructor TRggMain.Destroy;
 begin
-  StrokeRigg.Free;
+//  StrokeRigg.Free; // not owned, do this in FormMain where RotaForm is owned
   Rigg.Free;
   inherited;
 end;
@@ -216,7 +220,7 @@ begin
     Exit;
 
   RggTrackbar.OnChange := TrackBarChange;
-  StrokeRigg := TStrokeRigg.Create(Rigg);
+//  StrokeRigg := TStrokeRigg.Create(Rigg);
 
   InitFactArray;
 
@@ -229,14 +233,31 @@ end;
 
 procedure TRggMain.InitStrokeRigg;
 var
-  cr: TStrokeRigg;
+  rg: TRaumGraph;
 begin
-  cr := StrokeRigg;
-  cr.SalingTyp := Rigg.SalingTyp;
-  cr.ControllerTyp := Rigg.ControllerTyp;
-  cr.Koordinaten := Rigg.rP;
-  cr.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  cr.WanteGestrichelt := not Rigg.GetriebeOK;
+  if StrokeRigg <> nil then
+  begin
+    rg := StrokeRigg.RaumGraph;
+    rg.SalingTyp := Rigg.SalingTyp;
+    rg.ControllerTyp := Rigg.ControllerTyp;
+    rg.Koordinaten := Rigg.rP;
+    rg.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+    rg.WanteGestrichelt := not Rigg.GetriebeOK;
+  end;
+end;
+
+procedure TRggMain.UpdateStrokeRigg;
+var
+  rg: TRaumGraph;
+begin
+  if StrokeRigg <> nil then
+  begin
+    rg := StrokeRigg.RaumGraph;
+    rg.Koordinaten := Rigg.rP;
+    rg.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+    rg.WanteGestrichelt := not Rigg.GetriebeOK;
+    rg.Bogen := (FParam <> fpWinkel);
+  end;
 end;
 
 procedure TRggMain.SetParameter(fa: TFederAction);
@@ -267,16 +288,19 @@ begin
   FactArray.Find(FParam).Ist := Value;
 end;
 
+procedure TRggMain.SetViewPoint(const Value: TViewPoint);
+begin
+  FViewPoint := Value;
+  if StrokeRigg <> nil then
+    StrokeRigg.ViewPoint := Value;
+end;
+
 procedure TRggMain.SetFixPoint(const Value: TRiggPoint);
 begin
   FFixPoint := Value;
   FixPunkt := Rigg.rP[Value];
-  Draw;
-end;
-
-procedure TRggMain.SetOnUpdateGraph(const Value: TNotifyEvent);
-begin
-  FOnUpdateGraph := Value;
+  if StrokeRigg <> nil then
+    StrokeRigg.FixPoint := Value;
 end;
 
 procedure TRggMain.SetOption(fa: TFederAction);
@@ -298,8 +322,6 @@ begin
 end;
 
 procedure TRggMain.UpdateGraph;
-var
-  sr: TStrokeRigg;
 begin
   ChangeRigg(CurrentValue);
   case FParam of
@@ -335,20 +357,8 @@ begin
     end;
   end;
 
-  if StrokeRigg <> nil then
-  begin
-    sr := StrokeRigg;
-    sr.Koordinaten := Rigg.rP;
-    sr.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-    sr.WanteGestrichelt := not Rigg.GetriebeOK;
-    sr.Bogen := (FParam <> fpWinkel);
-    Draw;
-  end;
-
-  if Assigned(FOnUpdateGraph) then
-  begin
-    OnUpdateGraph(nil);
-  end;
+  UpdateStrokeRigg;
+  Draw;
 end;
 
 procedure TRggMain.ChangeRigg(Value: single);
@@ -546,7 +556,7 @@ begin
 
   if Assigned(StrokeRigg) then
   begin
-    StrokeRigg.ControllerTyp := Rigg.ControllerTyp;
+    StrokeRigg.RaumGraph.ControllerTyp := Rigg.ControllerTyp;
   end;
 
   Rigg.ManipulatorMode := (Value = fpWinkel);
@@ -965,7 +975,8 @@ begin
 
   Rigg.ControllerTyp := TControllerTyp.ctOhne;
   InitFactArray();
-  StrokeRigg.SalingTyp := Rigg.SalingTyp;
+  if StrokeRigg <> nil then
+    StrokeRigg.RaumGraph.SalingTyp := Rigg.SalingTyp;
   SetParam(FParam);
   FixPoint := ooD;
 
@@ -985,7 +996,8 @@ begin
 
   Rigg.ControllerTyp := TControllerTyp.ctOhne;
   InitFactArray();
-  StrokeRigg.SalingTyp := Rigg.SalingTyp;
+  if StrokeRigg <> nil then
+    StrokeRigg.RaumGraph.SalingTyp := Rigg.SalingTyp;
   SetParam(FParam);
   FixPoint := ooD;
 
@@ -1001,7 +1013,8 @@ begin
     faSalingTypFest: Rigg.SalingTyp := stFest;
     faSalingTypOhneStarr: Rigg.SalingTyp := stOhne_2;
   end;
-  StrokeRigg.SalingTyp := Rigg.SalingTyp;
+  if StrokeRigg <> nil then
+    StrokeRigg.RaumGraph.SalingTyp := Rigg.SalingTyp;
   SetParam(FParam);
   RiggModul.DoOnUpdateSalingTyp(Rigg.SalingTyp);
 end;
@@ -1038,7 +1051,7 @@ begin
   ML.Add(ParamValueStringDiff[fpMastfallF0F]);
   ML.Add(ParamValueStringDiff[fpMastfallF0C]);
   ML.Add(ParamValueStringDiff[fpBiegung]);
-  ML.Add(''); //FormatValue(BiegungGFD));
+  ML.Add(''); //FormatValue(BiegungGFDiff));
 end;
 
 procedure TRggMain.AL(A: string; fp: TFederParam);
@@ -1134,13 +1147,15 @@ end;
 
 procedure TRggMain.ToggleRenderOption(fa: TFederAction);
 begin
-  case fa of
-    faWantRenderH: StrokeRigg.WantRenderH := not StrokeRigg.WantRenderH;
-    faWantRenderP: StrokeRigg.WantRenderP := not StrokeRigg.WantRenderP;
-    faWantRenderF: StrokeRigg.WantRenderF := not StrokeRigg.WantRenderF;
-    faWantRenderE: StrokeRigg.WantRenderE := not StrokeRigg.WantRenderE;
-    faWantRenderS: StrokeRigg.WantRenderS := not StrokeRigg.WantRenderS;
-  end;
+//  case fa of
+//    faWantRenderH: StrokeRigg.WantRenderH := not StrokeRigg.WantRenderH;
+//    faWantRenderP: StrokeRigg.WantRenderP := not StrokeRigg.WantRenderP;
+//    faWantRenderF: StrokeRigg.WantRenderF := not StrokeRigg.WantRenderF;
+//    faWantRenderE: StrokeRigg.WantRenderE := not StrokeRigg.WantRenderE;
+//    faWantRenderS: StrokeRigg.WantRenderS := not StrokeRigg.WantRenderS;
+//  end;
+  if StrokeRigg <> nil then
+    StrokeRigg.ToggleRenderOption(fa);
   Draw;
 end;
 
@@ -1412,9 +1427,9 @@ begin
     IndexH := 40;
     IndexC := 50;
 
-    kg := StrokeRigg.Kurve[IndexG];
-    kh := StrokeRigg.Kurve[IndexH];
-    kc := StrokeRigg.Kurve[IndexC];
+    kg := StrokeRigg.RaumGraph.Kurve[IndexG];
+    kh := StrokeRigg.RaumGraph.Kurve[IndexH];
+    kc := StrokeRigg.RaumGraph.Kurve[IndexC];
 
     a := Abstand(kg, pf);
     b := Abstand(pf, kh);
@@ -1422,12 +1437,12 @@ begin
 
     h := Hoehe(a-0.00001, b, c, k);
 
-    BiegungGFD := BiegungGF-h;
+    BiegungGFDiff := BiegungGF-h;
     BiegungGF := h;
   end
   else
   begin
-    BiegungGFD := 0;
+    BiegungGFDiff := 0;
     BiegungGF := 0;
   end;
 end;
@@ -1480,10 +1495,10 @@ begin
     ML.Add(Format('iC = %.2f', [IndexC]));
     ML.Add('IndexC := 50;');
 
-    kg := StrokeRigg.Kurve[Round(IndexG)];
-    kd := StrokeRigg.Kurve[Round(IndexD)];
-    kh := StrokeRigg.Kurve[Round(IndexH)];
-    kc := StrokeRigg.Kurve[Round(IndexC)];
+    kg := StrokeRigg.RaumGraph.Kurve[Round(IndexG)];
+    kd := StrokeRigg.RaumGraph.Kurve[Round(IndexD)];
+    kh := StrokeRigg.RaumGraph.Kurve[Round(IndexH)];
+    kc := StrokeRigg.RaumGraph.Kurve[Round(IndexC)];
 
 //    ML.Add('');
 //    t := Abstand(pd, kd);

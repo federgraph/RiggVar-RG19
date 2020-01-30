@@ -139,7 +139,6 @@ type
     ViewModelMain: TViewModelMain00;
     PBG: TPaintbox;
     RG19A: Boolean; { RG19A = MDI app }
-    RotaForm: TRotaForm;
 
     Rigg: TRigg;
     RiggReport: TRiggReport;
@@ -357,10 +356,10 @@ begin
   GetriebeGrafik.Rotator.DeltaPhi := 0;
   GetriebeGrafik.Rotator.DeltaTheta := -90;
   GetriebeGrafik.Rotator.XRot := -87;
-  GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  GetriebeGrafik.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
   GetriebeGrafik.Koordinaten := Rigg.rP;
   GetriebeGrafik.Koppelkurve := Rigg.Koppelkurve;
-  GetriebeGrafik.Ansicht := vpSeite;
+  GetriebeGrafik.ViewPoint := vpSeite;
 
   BitmapG := TBitmap.Create;
   BitmapG.Width := 293;
@@ -419,7 +418,6 @@ begin
   BitmapS.Free;
   BitmapC.Free;
 
-  RotaForm.Free;
   ViewModelMain.Free;
 
   RiggModul := nil;
@@ -691,12 +689,13 @@ begin
     end;
   end;
 
-  if RotaForm <> nil then
+  if (Main <> nil) and (Main.RggMain <> nil) and (Main.RggMain.StrokeRigg <> nil) then
   begin
-    RotaForm.UpdateGraph;
+    Main.RggMain.UpdateStrokeRigg;
+    Main.RggMain.StrokeRigg.Draw;
   end;
 
-  Getriebegrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  Getriebegrafik.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
 
   { ControllerPaintBox }
   if OutputForm.OutputPages.ActivePage = OutputForm.ControllerSheet then
@@ -1240,7 +1239,7 @@ begin
   if Value <> FViewPoint then
   begin
     FViewPoint := Value;
-    GetriebeGrafik.Ansicht := Value;
+    GetriebeGrafik.ViewPoint := Value;
     TextFlipFlop := True;
     ResetPaintBoxG;
     if RG19A and (GrafikForm <> nil) then
@@ -2556,7 +2555,7 @@ begin
   Rigg.Glieder := TrimmRec;
   Rigg.UpdateGetriebe;
   GetriebeGrafik.Koordinaten := Rigg.rP;
-  Getriebegrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  Getriebegrafik.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
   SalingCtrl.ControllerPos := Round(SalingCtrl.ParamXE0 - Rigg.MastPositionE);
   TrimmRec.Controller := SalingCtrl.ControllerPos;
   UpdateGCtrls(TrimmRec);
@@ -2576,9 +2575,9 @@ end;
 procedure TRiggModul.AdjustGrafik;
 begin
   ShowAdjustForm(GetriebeGrafik, AdjustGBox);
-  if ViewPoint <> GetriebeGrafik.Ansicht then
+  if ViewPoint <> GetriebeGrafik.ViewPoint then
     { Alles notwendige wird automatisch in SetViewPoint() erledigt. }
-    ViewPoint := GetriebeGrafik.Ansicht
+    ViewPoint := GetriebeGrafik.ViewPoint
   else
   begin
     TextFlipFlop := True;
@@ -2593,7 +2592,7 @@ begin
   { Koppelkurve }
   if (SalingTyp = stFest) and
     (KoppelBtnDown = True) and
-    (GetriebeGrafik.Ansicht = vpSeite) then
+    (GetriebeGrafik.ViewPoint = vpSeite) then
     GetriebeGrafik.Koppelkurve := Rigg.Koppelkurve;
   Draw;
 end;

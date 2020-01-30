@@ -15,14 +15,14 @@ type
   private
     FFixPunkt: TRealPoint;
     FOffset: TPoint;
-    FZoom: double;
+    FZoom: single;
     FColored: Boolean;
   protected
     GrafikOK: Boolean; // loaded
     Updated: Boolean; // transformed
     procedure SetFixPunkt(Value: TRealPoint);
     procedure SetOffset(Value: TPoint); virtual;
-    procedure SetZoom(Value: double); virtual;
+    procedure SetZoom(Value: single); virtual;
   public
     Rotator: TPolarKar;
     DL: TRggDisplayList;
@@ -34,7 +34,7 @@ type
 
     property FixPunkt: TRealPoint read FFixPunkt write SetFixPunkt;
     property NOffset: TPoint read FOffset write SetOffset;
-    property Zoom: double read FZoom write SetZoom;
+    property Zoom: single read FZoom write SetZoom;
     property Coloriert: Boolean read FColored write FColored;
   end;
 
@@ -66,7 +66,7 @@ begin
   Updated := False;
 end;
 
-procedure TRggGraph.SetZoom(Value: double);
+procedure TRggGraph.SetZoom(Value: single);
 begin
   FZoom := Value;
   Updated := False;

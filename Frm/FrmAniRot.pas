@@ -176,7 +176,7 @@ begin
     Salingtyp := Rigg.Salingtyp;
     ControllerTyp := Rigg.ControllerTyp;
     Koordinaten := Rigg.rP;
-    SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+    SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
     if RaumGraph is TGetriebeGraph then
       TGetriebeGraph(RaumGraph).WanteGestrichelt := not Rigg.GetriebeOK;
   end;
@@ -187,7 +187,7 @@ begin
   { overwritten virtual }
   Rigg.UpdateGetriebe;
   RaumGraph.Koordinaten := Rigg.rP;
-  RaumGraph.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  RaumGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
   if RaumGraph is TGetriebeGraph then
     TGetriebeGraph(RaumGraph).WanteGestrichelt := not Rigg.GetriebeOK;
   Draw;
@@ -628,7 +628,7 @@ begin
     Salingtyp := Rgg.Salingtyp;
     ControllerTyp := Rgg.ControllerTyp;
     Koordinaten := Rgg.rP;
-    SetMastKurve(Rgg.MastLinie, Rgg.lc, Rgg.beta);
+    SetMastLineData(Rgg.MastLinie, Rgg.lc, Rgg.beta);
     WanteGestrichelt := not Rgg.GetriebeOK;
   end;
 end;

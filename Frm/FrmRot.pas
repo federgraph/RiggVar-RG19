@@ -464,7 +464,7 @@ begin
   RaumGraph.NOffset := Point(1000, 1000);
   RaumGraph.Zoom := FZoom;
   RaumGraph.FixPoint := ComboFixPoint;
-  RaumGraph.Ansicht := vp3D;
+  RaumGraph.ViewPoint := vp3D;
 end;
 
 procedure TRotationForm.InitHullGraph;
@@ -485,7 +485,7 @@ begin
   RaumGraph.SalingTyp := Rigg.SalingTyp;
   RaumGraph.ControllerTyp := Rigg.ControllerTyp;
   RaumGraph.Koordinaten := Rigg.rP;
-  RaumGraph.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  RaumGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
   RaumGraph.WanteGestrichelt := not Rigg.GetriebeOK;
 end;
 
@@ -495,7 +495,7 @@ begin
   RaumGraph.Salingtyp := Rigg.Salingtyp;
   RaumGraph.ControllerTyp := Rigg.ControllerTyp;
   RaumGraph.Koordinaten := Rigg.rP;
-  RaumGraph.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  RaumGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
   RaumGraph.WanteGestrichelt := not Rigg.GetriebeOK;
   Draw;
 end;

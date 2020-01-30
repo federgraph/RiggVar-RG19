@@ -98,8 +98,11 @@ type
     FFixPoint: TRiggPoint;
     procedure UpdateMinMax;
     procedure DoTrans;
-    procedure SetViewPoint(const Value: TViewPoint);
+  public
     procedure SetFixPoint(const Value: TRiggPoint);
+    procedure SetViewPoint(const Value: TViewPoint);
+    procedure ToggleRenderOption(const fa: Integer);
+    function QueryRenderOption(const fa: Integer): Boolean;
   public
     SHeadingPhi: string;
     SPitchTheta: string;
@@ -115,15 +118,15 @@ type
     procedure SetAngleText;
     procedure SetZoomText;
     procedure InitRotaData;
-  protected
+  private
     Rotator: TPolarKar;
     Mode: Boolean;
     procedure InitGraph;
     procedure InitRaumGrafik;
     procedure InitHullGraph;
-    procedure UpdateGraphFromRigg;
+    procedure UpdateGraphFromTestData;
   public
-    Rigg: TRigg; // injected
+    IsUp: Boolean;
     PaintBox3D: TPaintBox; // injected and replaced
 
     HullGraph: TRggGraph;
@@ -134,8 +137,6 @@ type
     destructor Destroy; override;
     procedure Init;
     procedure Draw;
-
-    procedure UpdateGraph;
 
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
@@ -154,7 +155,6 @@ begin
   KeepInsideItemChecked := True;
 
     { do almost nothing here,
-    - Rigg reference needs to be injected first,
     - Image reference needs to be injected first,
     later Init must be called, from the outside.
   }
@@ -223,8 +223,7 @@ begin
   InitGraph;
   InitRaumGrafik;
   InitHullGraph;
-  UpdateGraph;
-
+  UpdateGraphFromTestData;
   SetViewPoint(FViewPoint);
 end;
 
@@ -244,7 +243,7 @@ begin
   RaumGraph.NOffset := Point(1000,1000);
   RaumGraph.Zoom := FZoom;
   RaumGraph.FixPoint := FixPoint;
-  RaumGraph.Ansicht := vp3D;
+  RaumGraph.ViewPoint := vp3D;
   RaumGraph.Bogen := True;
 end;
 
@@ -256,27 +255,13 @@ begin
   HullGraph.FixPunkt := RaumGraph.FixPunkt;
 end;
 
-procedure TRotaForm.UpdateGraphFromRigg;
+procedure TRotaForm.UpdateGraphFromTestData;
 begin
-  RaumGraph.Salingtyp := Rigg.Salingtyp;
-  RaumGraph.ControllerTyp := Rigg.ControllerTyp;
-  RaumGraph.Koordinaten := Rigg.rP;
-  RaumGraph.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  RaumGraph.WanteGestrichelt := not Rigg.GetriebeOK;
-end;
-
-procedure TRotaForm.UpdateGraph;
-begin
-  if Rigg <> nil then
-    UpdateGraphFromRigg
-  else
-  begin
-    RaumGraph.Salingtyp := stFest;
-    RaumGraph.ControllerTyp := ctOhne;
-    RaumGraph.Koordinaten := TRggTestData.GetKoordinaten420;
-    RaumGraph.SetMastKurveFromTestData(TRggTestData.GetMastKurve420);
-    RaumGraph.WanteGestrichelt := False;
-  end;
+  RaumGraph.Salingtyp := stFest;
+  RaumGraph.ControllerTyp := ctOhne;
+  RaumGraph.Koordinaten := TRggTestData.GetKoordinaten420;
+  RaumGraph.SetMastKurve(TRggTestData.GetMastKurve420);
+  RaumGraph.WanteGestrichelt := False;
   Draw;
 end;
 
@@ -771,6 +756,16 @@ end;
 procedure TRotaForm.PaintBox3DPaint(Sender: TObject);
 begin
   Draw;
+end;
+
+procedure TRotaForm.ToggleRenderOption(const fa: Integer);
+begin
+  ToggleRenderOption(fa);
+end;
+
+function TRotaForm.QueryRenderOption(const fa: Integer): Boolean;
+begin
+  result := False;
 end;
 
 end.

@@ -13,21 +13,23 @@ type
     FFixPoint: TRiggPoint;
     FSalingTyp: TSalingTyp;
     FControllerTyp: TControllerTyp;
-    procedure SetKoord(Value: TRealRiggPoints);
-    procedure SetFixPoint(Value: TRiggPoint);
+  protected
+    procedure SetKoordinaten(const Value: TRealRiggPoints);
+    procedure SetFixPoint(const Value: TRiggPoint);
   protected
     rP: TRealRiggPoints;
-    Kurve: TMastKurve;
   public
+    Kurve: TMastKurve;
+
     constructor Create; override;
     procedure LoadFromIniFile(FileName: string);
-    procedure SetMastKurve(f: TLineDataR100; L, beta: double);
-    procedure SetMastKurveFromTestData(Value: TMastKurve);
+    procedure SetMastLineData(const Value: TLineDataR100; L: double; Beta: double);
+    procedure SetMastKurve(const Value: TMastKurve);
 
     property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
     property SalingTyp: TSalingTyp read FSalingTyp write FSalingTyp;
     property ControllerTyp: TControllerTyp read FControllerTyp write FControllerTyp;
-    property Koordinaten: TRealRiggPoints read rP write SetKoord;
+    property Koordinaten: TRealRiggPoints read rP write SetKoordinaten;
   end;
 
 implementation
@@ -40,7 +42,7 @@ begin
   FControllerTyp := ctDruck;
 end;
 
-procedure TBootGraph.SetKoord(Value: TRealRiggPoints);
+procedure TBootGraph.SetKoordinaten(const Value: TRealRiggPoints);
 begin
   rP := Value;
   { Fixpunkt wird in TBootGraph nicht benötigt, aber er wird eventuell herauskopiert
@@ -50,32 +52,32 @@ begin
   Updated := False;
 end;
 
-procedure TBootGraph.SetFixPoint(Value: TRiggPoint);
+procedure TBootGraph.SetFixPoint(const Value: TRiggPoint);
 begin
   FFixPoint := Value;
   FixPunkt := rP[Value]; //--> Updated := False;
 end;
 
-procedure TBootGraph.SetMastKurve(f: TLineDataR100; L, beta: double);
+procedure TBootGraph.SetMastLineData(const Value: TLineDataR100; L: double; Beta: double);
 var
   temp1, temp2, temp3, temp4, tempL: double;
   j, k: Integer;
 begin
-  temp1 := cos(pi / 2 - beta);
+  temp1 := cos(pi / 2 - Beta);
   temp2 := cos(beta);
-  temp3 := sin(pi / 2 - beta);
+  temp3 := sin(pi / 2 - Beta);
   temp4 := sin(beta);
   for j := 0 to BogenMax do
   begin
     k := Round(100 / BogenMax * j);
     tempL := j * L / BogenMax;
-    Kurve[j, x] := rP[ooD0, x] - tempL * temp1 + f[k] * temp2;
+    Kurve[j, x] := rP[ooD0, x] - tempL * temp1 + Value[k] * temp2;
     Kurve[j, y] := 0;
-    Kurve[j, z] := rP[ooD0, z] + tempL * temp3 + f[k] * temp4;
+    Kurve[j, z] := rP[ooD0, z] + tempL * temp3 + Value[k] * temp4;
   end;
 end;
 
-procedure TBootGraph.SetMastKurveFromTestData(Value: TMastKurve);
+procedure TBootGraph.SetMastKurve(const Value: TMastKurve);
 begin
   Kurve := Value;
 end;

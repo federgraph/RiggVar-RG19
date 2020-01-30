@@ -25,6 +25,7 @@ uses
   System.Classes,
   RggTypes,
   RggReport,
+  RggRota,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
   Vcl.Graphics,
@@ -344,6 +345,8 @@ type
     function GetSaveFileName(dn, fn: string): string;
 
     property ReportLabelCaption: string read FReportLabelCaption write SetReportLabelCaption;
+  private
+    RotaForm: TRotaForm;
   end;
 
 var
@@ -358,7 +361,6 @@ uses
   RiggVar.VM.FormMainC,
   RiggVar.RG.Main,
   RggModul,
-  RggRota,
   FrmInfo,
   FrmConsole,
   FrmInput,
@@ -397,8 +399,7 @@ end;
 
 procedure TFormRG19.FormCreate1;
 var
-  rm: TRggMain;
-  rf: TRotaForm;
+  rggm: TRggMain;
 begin
   InputForm := TInputForm.Create(Application);
   OutputForm := TOutputForm.Create(Application);
@@ -411,10 +412,14 @@ begin
   RiggModul.BackgroundColor := TColors.Wheat; // call after RiggModul.Init
   RiggModul.PBG := GrafikForm.PaintBoxG;
 
-  rm := TRggMain.Create(RiggModul.Rigg);
+  rggm := TRggMain.Create(RiggModul.Rigg);
 
-  Main := TMain.Create(rm);
+  Main := TMain.Create(rggm);
   Main.Logger.Verbose := True;
+
+  rggm.InitLogo; // sets WantLogoData to true
+  rggm.Init420; // sets WantLogo to false
+  WantLogoData := False;
 
   Left := 60;
   Top := 105;
@@ -432,13 +437,12 @@ begin
   OnClose := FormClose;
   OnCloseQuery := FormCloseQuery;
 
-  rf := TRotaForm.Create;
-  RiggModul.RotaForm := rf;
-  rf.Rigg := RiggModul.Rigg;
-  rf.PaintBox3D := PaintboxR;
-  rf.UseDisplayList := True;
-  rf.Init;
-  PaintboxR := rf.PaintBox3D;
+  RotaForm := TRotaForm.Create;
+  rggm.StrokeRigg := RotaForm;
+  RotaForm.PaintBox3D := PaintboxR;
+  RotaForm.UseDisplayList := True;
+  RotaForm.Init;
+  PaintboxR := RotaForm.PaintBox3D;
 end;
 
 procedure TFormRG19.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -451,6 +455,8 @@ end;
 procedure TFormRG19.FormDestroy(Sender: TObject);
 begin
   ReportManager.Free;
+
+  RotaForm.Free;
 
   Main.Free;
   Main := nil;
@@ -1341,18 +1347,18 @@ begin
   sb.Caption := 'Hull';
   sb.Hint := 'Hull';
   sb.AllowAllUp := True;
-  sb.Down := RiggModul.RotaForm.RumpfItemChecked;
+  sb.Down := Main.RggMain.StrokeRigg.RumpfItemChecked;
   sb.GroupIndex := 12;
-  sb.OnClick := RiggModul.RotaForm.RumpfBtnClick;
+  sb.OnClick :=Main.RggMain.StrokeRigg.RumpfBtnClick;
 
   sb := AddSpeedBtn('BuntBtn', 0);
   BuntBtn := sb;
   sb.Caption := 'Bunt';
   sb.Hint := 'Paint Btn 2|Paint Button for RotaForm';
   sb.AllowAllUp := True;
-  sb.Down := RiggModul.RotaForm.PaintItemChecked;
+  sb.Down := RotaForm.PaintItemChecked;
   sb.GroupIndex := 12;
-  sb.OnClick := RiggModul.RotaForm.PaintBtnClick;
+  sb.OnClick := RotaForm.PaintBtnClick;
 
   BtnCounter := 0;
   BtnLeft := sb.Left + BtnWidth;
@@ -1363,7 +1369,7 @@ begin
   sb.Caption := 'S';
   sb.Hint := 'Side View|Viewpoint Seite';
   sb.AllowAllUp := True;
-  sb.Down := RiggModul.RotaForm.ViewPoint = vpSeite;
+  sb.Down := RotaForm.ViewPoint = vpSeite;
   sb.GroupIndex := 13;
   sb.OnClick := SeiteBtnClick;
 
@@ -1372,7 +1378,7 @@ begin
   sb.Caption := 'A';
   sb.Hint := 'Stern View|Viewpoint Achtern';
   sb.AllowAllUp := False;
-  sb.Down := RiggModul.RotaForm.ViewPoint = vpAchtern;
+  sb.Down := RotaForm.ViewPoint = vpAchtern;
   sb.GroupIndex := 13;
   sb.OnClick := AchternBtnClick;
 
@@ -1381,7 +1387,7 @@ begin
   sb.Caption := 'T';
   sb.Hint := 'Top View|Viewpoint Top';
   sb.AllowAllUp := False;
-  sb.Down := RiggModul.RotaForm.ViewPoint = vpTop;
+  sb.Down := RotaForm.ViewPoint = vpTop;
   sb.GroupIndex := 13;
   sb.OnClick := TopBtnClick;
 
@@ -1390,7 +1396,7 @@ begin
   sb.Caption := '3D';
   sb.Hint := 'Viewpoint 3D';
   sb.AllowAllUp := False;
-  sb.Down := RiggModul.RotaForm.ViewPoint = vp3D;
+  sb.Down := RotaForm.ViewPoint = vp3D;
   sb.GroupIndex := 13;
   sb.OnClick := NullBtnClick;
 
@@ -1401,14 +1407,14 @@ begin
   sb.Caption := 'Z-';
   sb.Hint := 'Zoom Out';
   sb.GroupIndex := 0;
-  sb.OnClick := RiggModul.RotaForm.ZoomOutBtnClick;
+  sb.OnClick := RotaForm.ZoomOutBtnClick;
 
   sb := AddSpeedBtn('ZoomInBtn', 0);
   ZoomInBtn := sb;
   sb.Caption := 'Z+';
   sb.Hint := 'Zoom In';
   sb.GroupIndex := 0;
-  sb.OnClick := RiggModul.RotaForm.ZoomInBtnClick;
+  sb.OnClick := RotaForm.ZoomInBtnClick;
 
   { Graph Option Buttons}
 
@@ -1418,7 +1424,7 @@ begin
   sb.Hint := 'Toggle Use Display List ';
   sb.AllowAllUp := True;
   sb.GroupIndex := 14;
-  sb.OnClick := RiggModul.RotaForm.UseDisplayListBtnClick;
+  sb.OnClick := RotaForm.UseDisplayListBtnClick;
 
   sb := AddSpeedBtn('Bogentn', 0);
   BogenBtn := sb;
@@ -1426,7 +1432,7 @@ begin
   sb.Hint := 'Bogen';
   sb.AllowAllUp := True;
   sb.GroupIndex := 15;
-  sb.OnClick := RiggModul.RotaForm.BogenBtnClick;
+  sb.OnClick := RotaForm.BogenBtnClick;
 end;
 
 procedure TFormRG19.InitStatusBar;
@@ -1515,8 +1521,8 @@ begin
   AutoLoadItem.Visible := False;
   LogoItem.Checked := WantLogoData;
 
-  UseDisplayListBtn.Down := RiggModul.RotaForm.UseDisplayList;
-  BogenBtn.Down := RiggModul.RotaForm.RaumGraph.Bogen;
+  UseDisplayListBtn.Down := RotaForm.UseDisplayList;
+  BogenBtn.Down := RotaForm.RaumGraph.Bogen;
 end;
 
 procedure TFormRG19.LayoutComponents;
@@ -1915,7 +1921,7 @@ end;
 
 procedure TFormRG19.FixpointComboChange(Sender: TObject);
 begin
-  RiggModul.RotaForm.FixPoint := GetComboFixPoint;
+  RotaForm.FixPoint := GetComboFixPoint;
 end;
 
 procedure TFormRG19.InitMenu;
@@ -2366,22 +2372,22 @@ end;
 
 procedure TFormRG19.SeiteBtnClick(Sender: TObject);
 begin
-  RiggModul.RotaForm.ViewPoint := vpSeite;
+  RotaForm.ViewPoint := vpSeite;
 end;
 
 procedure TFormRG19.AchternBtnClick(Sender: TObject);
 begin
-  RiggModul.RotaForm.ViewPoint := vpAchtern;
+  RotaForm.ViewPoint := vpAchtern;
 end;
 
 procedure TFormRG19.TopBtnClick(Sender: TObject);
 begin
-  RiggModul.RotaForm.ViewPoint := vpTop;
+  RotaForm.ViewPoint := vpTop;
 end;
 
 procedure TFormRG19.NullBtnClick(Sender: TObject);
 begin
-  RiggModul.RotaForm.ViewPoint := vp3D;
+  RotaForm.ViewPoint := vp3D;
 end;
 
 procedure TFormRG19.InitOutputForm;

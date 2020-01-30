@@ -25,7 +25,7 @@ type
   protected
     FBogen: Boolean;
     FGestrichelt: Boolean;
-    FAnsicht: TViewPoint;
+    FViewPoint: TViewPoint;
 
     ZugRumpf: TRggPolyLine;
     ZugMast: TRggPolyLine;
@@ -58,7 +58,7 @@ type
     procedure Draw(g: TCanvas); override;
     procedure GetPlotList(List: TStringList); override;
 
-    property Ansicht: TViewPoint read FAnsicht write FAnsicht;
+    property ViewPoint: TViewPoint read FViewPoint write FViewPoint;
     property Bogen: Boolean read FBogen write FBogen;
     property WanteGestrichelt: Boolean write FGestrichelt;
   end;
@@ -201,7 +201,6 @@ begin
   ZugMast[3].x := xF + NOffset.x;
   ZugMast[3].y := -yF + NOffset.y;
 
-  { no longer contains the segment C-F, it goes from D0 to C }
   ZugMastKurve[BogenMax + 1].x := xF + NOffset.x;
   ZugMastKurve[BogenMax + 1].y := -yF + NOffset.y;
 

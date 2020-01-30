@@ -59,7 +59,7 @@ type
     { procedure FillZug3D wird vererbt }
 
     procedure FillZug2D;
-    procedure SetZoom(Value: double); override;
+    procedure SetZoom(Value: single); override;
   public
     RelationZoom2D: double; // Verhältnis Zoom2D/Zoom. (Zoom = Zoom3D)
 
@@ -108,7 +108,7 @@ begin
   cOffsetX4 := 150; cOffsetY4 := 250;
   UpdateOffset;
 
-  FAnsicht := vp3D;
+  FViewPoint := vp3D;
   FColor := clEntspannt;
   FBogen := True;
 
@@ -131,7 +131,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TGetriebeGraph.SetZoom(Value: double);
+procedure TGetriebeGraph.SetZoom(Value: single);
 begin
   inherited SetZoom(Value);
   FZoom2D := RelationZoom2D * Zoom;
@@ -185,7 +185,7 @@ begin
     Update;
   with Canvas do
   begin
-    case FAnsicht of
+    case FViewPoint of
     vpSeite:
     begin
        if FKoppelBtnDown and Coloriert then
@@ -425,7 +425,7 @@ begin
     Update;
   with Canvas do
   begin
-    case FAnsicht of
+    case FViewPoint of
       vpSeite:
       begin
         { Koppelkurve und Kreisbogen mit Radius Vorstaglänge um C0 }

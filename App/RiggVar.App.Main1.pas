@@ -150,9 +150,9 @@ begin
 
   RggMain := rggm; //TRggMain.Create;
 
-  RggMain.Init420;
-  RggMain.InitLogo; // sets WantLogoData to true
-  WantLogoData := False;
+//  RggMain.InitLogo; // sets WantLogoData to true
+//  RggMain.Init420; // sets WantLogo to false
+//  WantLogoData := False;
 end;
 
 destructor TMain1.Destroy;
@@ -674,10 +674,10 @@ begin
     faWantRenderE,
     faWantRenderS: RggMain.ToggleRenderOption(fa);
 
-    faViewpointS: ViewpointS;
-    faViewpointA: ViewpointA;
-    faViewpointT: ViewpointT;
-    faViewpoint3: Viewpoint3;
+    faViewpointS: ViewPointS;
+    faViewpointA: ViewPointA;
+    faViewpointT: ViewPointT;
+    faViewpoint3: ViewPoint3;
 
     faHull: RggMain.SetOption(faHull);
     faDemo: RggMain.SetOption(faDemo);
@@ -718,7 +718,6 @@ end;
 
 function TMain1.GetChecked(fa: TFederAction): Boolean;
 begin
-  result := false;
   case fa of
     faController: result := RggMain.Param = fpController;
     faWinkel: result := RggMain.Param = fpWinkel;
@@ -764,11 +763,14 @@ begin
     fa420: result := Trimm = 7;
     faLogo: result := Trimm = 8;
 
-    faWantRenderH: result := RggMain.StrokeRigg.WantRenderH;
-    faWantRenderP: result := RggMain.StrokeRigg.WantRenderP;
-    faWantRenderF: result := RggMain.StrokeRigg.WantRenderF;
-    faWantRenderE: result := RggMain.StrokeRigg.WantRenderE;
-    faWantRenderS: result := RggMain.StrokeRigg.WantRenderS;
+    faWantRenderH, //: result := RggMain.StrokeRigg.WantRenderH;
+    faWantRenderP, //: result := RggMain.StrokeRigg.WantRenderP;
+    faWantRenderF, //: result := RggMain.StrokeRigg.WantRenderF;
+    faWantRenderE, //: result := RggMain.StrokeRigg.WantRenderE;
+    faWantRenderS: //result := RggMain.StrokeRigg.WantRenderS;
+    begin
+      result := RggMain.StrokeRigg.QueryRenderOption(fa);
+    end;
 
     faHull: result := RggMain.HullVisible;
     faDemo: result := RggMain.Demo;
@@ -778,7 +780,7 @@ begin
 //    faToggleTrimmText: result := Main.FederText.TrimmVisible;
 
     else
-      inherited;
+      result := False;
   end;
 end;
 

@@ -25,6 +25,7 @@ uses
   System.Classes,
   RggTypes,
   RggReport,
+  RggRota,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
   Vcl.Graphics,
@@ -355,6 +356,8 @@ type
     function GetSaveFileName(dn, fn: string): string;
 
     property ReportLabelCaption: string read FReportLabelCaption write SetReportLabelCaption;
+  private
+    RotaForm: TRotaForm;
   end;
 
 var
@@ -369,7 +372,6 @@ uses
   RiggVar.VM.FormMainB,
   RiggVar.RG.Main,
   RggModul,
-  RggRota,
   FrmInfo,
   FrmConsole,
   FrmInput,
@@ -442,10 +444,10 @@ begin
   OnClose := FormClose;
   OnCloseQuery := FormCloseQuery;
 
-  RiggModul.RotaForm := TRotaForm.Create;
-  RiggModul.RotaForm.PaintBox3D := PaintboxR;
-  RiggModul.RotaForm.Init;
-  PaintboxR := RiggModul.RotaForm.PaintBox3D;
+  RotaForm := TRotaForm.Create;
+  RotaForm.PaintBox3D := PaintboxR;
+  RotaForm.Init;
+  PaintboxR := RotaForm.PaintBox3D;
   RiggModul.DoGraphics;
 end;
 
@@ -459,6 +461,8 @@ end;
 procedure TFormRG19B.FormDestroy(Sender: TObject);
 begin
   ReportManager.Free;
+
+  RotaForm.Free;
 
   Main.Free;
   Main := nil;
@@ -1360,7 +1364,7 @@ begin
   sb.Caption := 'S';
   sb.Hint := 'Viewpoint Seite';
   sb.AllowAllUp := True;
-  sb.Down := RiggModul.RotaForm.ViewPoint = vpSeite;
+  sb.Down := RotaForm.ViewPoint = vpSeite;
   sb.GroupIndex := 13;
   sb.OnClick := SeiteBtnClick;
 
@@ -1369,7 +1373,7 @@ begin
   sb.Caption := 'A';
   sb.Hint := 'Viewpoint Achtern';
   sb.AllowAllUp := False;
-  sb.Down := RiggModul.RotaForm.ViewPoint = vpAchtern;
+  sb.Down := RotaForm.ViewPoint = vpAchtern;
   sb.GroupIndex := 13;
   sb.OnClick := AchternBtnClick;
 
@@ -1378,7 +1382,7 @@ begin
   sb.Caption := 'T';
   sb.Hint := 'Viewpoint Top';
   sb.AllowAllUp := False;
-  sb.Down := RiggModul.RotaForm.ViewPoint = vpTop;
+  sb.Down := RotaForm.ViewPoint = vpTop;
   sb.GroupIndex := 13;
   sb.OnClick := TopBtnClick;
 
@@ -1387,7 +1391,7 @@ begin
   sb.Caption := '3D';
   sb.Hint := 'Viewpoint 3D';
   sb.AllowAllUp := False;
-  sb.Down := RiggModul.RotaForm.ViewPoint = vp3D;
+  sb.Down := RotaForm.ViewPoint = vp3D;
   sb.GroupIndex := 13;
   sb.OnClick := NullBtnClick;
 
@@ -1396,14 +1400,14 @@ begin
   sb.Caption := 'Z-';
   sb.Hint := 'Zoom Out';
   sb.GroupIndex := 0;
-  sb.OnClick := RiggModul.RotaForm.ZoomOutBtnClick;
+  sb.OnClick := RotaForm.ZoomOutBtnClick;
 
   sb := AddSpeedBtn('ZoomInBtn', 0);
   ZoomInBtn := sb;
   sb.Caption := 'Z+';
   sb.Hint := 'Zoom In';
   sb.GroupIndex := 0;
-  sb.OnClick := RiggModul.RotaForm.ZoomInBtnClick;
+  sb.OnClick := RotaForm.ZoomInBtnClick;
 end;
 
 procedure TFormRG19B.InitStatusBar;
@@ -1886,7 +1890,7 @@ end;
 
 procedure TFormRG19B.FixpointComboChange(Sender: TObject);
 begin
-  RiggModul.RotaForm.FixPoint := GetComboFixPoint;
+  RotaForm.FixPoint := GetComboFixPoint;
 end;
 
 procedure TFormRG19B.InitMenu;
@@ -2337,22 +2341,22 @@ end;
 
 procedure TFormRG19B.SeiteBtnClick(Sender: TObject);
 begin
-  RiggModul.RotaForm.ViewPoint := vpSeite;
+  RotaForm.ViewPoint := vpSeite;
 end;
 
 procedure TFormRG19B.AchternBtnClick(Sender: TObject);
 begin
-  RiggModul.RotaForm.ViewPoint := vpAchtern;
+  RotaForm.ViewPoint := vpAchtern;
 end;
 
 procedure TFormRG19B.TopBtnClick(Sender: TObject);
 begin
-  RiggModul.RotaForm.ViewPoint := vpTop;
+  RotaForm.ViewPoint := vpTop;
 end;
 
 procedure TFormRG19B.NullBtnClick(Sender: TObject);
 begin
-  RiggModul.RotaForm.ViewPoint := vp3D;
+  RotaForm.ViewPoint := vp3D;
 end;
 
 procedure TFormRG19B.InitOutputForm;

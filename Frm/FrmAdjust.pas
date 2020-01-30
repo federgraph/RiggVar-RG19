@@ -51,7 +51,7 @@ var
 begin
   if not Assigned(Grafik) then
     Exit;
-  case Grafik.Ansicht of
+  case Grafik.ViewPoint of
     vpSeite: temp := Point(Grafik.cOffsetX1,Grafik.cOffsetY1);
     vpAchtern: temp := Point(Grafik.cOffsetX2,Grafik.cOffsetY2);
     vpTop: temp := Point(Grafik.cOffsetX3,Grafik.cOffsetY3);
@@ -65,7 +65,7 @@ begin
     temp.y := temp.y - 10;
   if Sender = DownBtn then
     temp.y := temp.y + 10;
-  case Grafik.Ansicht of
+  case Grafik.ViewPoint of
     vpSeite:
     begin
       Grafik.cOffsetX1 := temp.x;
@@ -110,11 +110,11 @@ procedure TAdjustForm.ViewBtnClick(Sender: TObject);
 begin
   if not Assigned(Grafik) then
     Exit;
-  case Grafik.Ansicht of
-    vpSeite: Grafik.Ansicht := vpAchtern;
-    vpAchtern: Grafik.Ansicht := vpTop;
-    vpTop: Grafik.Ansicht := vp3D;
-    vp3D: Grafik.Ansicht := vpSeite;
+  case Grafik.ViewPoint of
+    vpSeite: Grafik.ViewPoint := vpAchtern;
+    vpAchtern: Grafik.ViewPoint := vpTop;
+    vpTop: Grafik.ViewPoint := vp3D;
+    vp3D: Grafik.ViewPoint := vpSeite;
   end;
   Change;
 end;
