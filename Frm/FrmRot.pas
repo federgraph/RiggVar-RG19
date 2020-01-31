@@ -647,13 +647,13 @@ begin
     SetViewPortOrgEx(Handle, NullpunktOffset.x, NullpunktOffset.y, nil);
   end;
   RaumGraph.Coloriert := True;
-  RaumGraph.Draw(Bitmap.Canvas);
+  RaumGraph.DrawToCanvas(Bitmap.Canvas);
 
   if FPaintRumpf and (not MouseDown or (MouseDown and FDrawAlways)) then
   begin
     HullGraph.Coloriert := True;
     HullGraph.FixPunkt := RaumGraph.FixPunkt;
-    HullGraph.Draw(Bitmap.Canvas);
+    HullGraph.DrawToCanvas(Bitmap.Canvas);
   end;
 
   with Bitmap.Canvas do
@@ -672,12 +672,12 @@ begin
     if not PaintItemChecked then
       MetaCanvas.Draw(0,0,MetaFile);
     RaumGraph.Coloriert := True;
-    RaumGraph.Draw(MetaCanvas);
+    RaumGraph.DrawToCanvas(MetaCanvas);
     if FPaintRumpf = True then
     begin
       HullGraph.Coloriert := True;
       HullGraph.FixPunkt := RaumGraph.FixPunkt;
-      HullGraph.Draw(MetaCanvas);
+      HullGraph.DrawToCanvas(MetaCanvas);
     end;
   finally
     MetaCanvas.Free;
@@ -688,12 +688,12 @@ begin
   MetaCanvas := TMetaFileCanvas.Create(MetaFile, 0);
   try
     RaumGraph.Coloriert := False;
-    RaumGraph.Draw(MetaCanvas);
+    RaumGraph.DrawToCanvas(MetaCanvas);
     if FPaintRumpf = True then
     begin
       HullGraph.Coloriert := False;
       HullGraph.FixPunkt := RaumGraph.FixPunkt;
-      HullGraph.Draw(MetaCanvas);
+      HullGraph.DrawToCanvas(MetaCanvas);
     end;
   finally
     MetaCanvas.Free;
@@ -2226,12 +2226,12 @@ begin
   SelectClipRgn(Printer.Canvas.Handle, Rgn);
   DeleteObject(Rgn);
   RaumGraph.Coloriert := True;
-  RaumGraph.Draw(Printer.Canvas);
+  RaumGraph.DrawToCanvas(Printer.Canvas);
   if FPaintRumpf = True then
   begin
     HullGraph.Coloriert := True;
     HullGraph.FixPunkt := RaumGraph.FixPunkt;
-    HullGraph.Draw(Printer.Canvas);
+    HullGraph.DrawToCanvas(Printer.Canvas);
   end;
   Printer.EndDoc;
 

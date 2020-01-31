@@ -16,19 +16,22 @@ type
   protected
     procedure SetKoordinaten(const Value: TRealRiggPoints);
     procedure SetFixPoint(const Value: TRiggPoint);
-  protected
-    rP: TRealRiggPoints;
+    procedure SetSalingTyp(const Value: TSalingTyp);
+    procedure SetControllerTyp(const Value: TControllerTyp);
   public
+    rP: TRealRiggPoints;
     Kurve: TMastKurve;
 
     constructor Create; override;
     procedure LoadFromIniFile(FileName: string);
     procedure SetMastLineData(const Value: TLineDataR100; L: double; Beta: double);
     procedure SetMastKurve(const Value: TMastKurve);
+    procedure SetKoppelKurve(const Value: TKoordLine); virtual;
+    function GetMastKurvePoint(const Index: Integer): TRealPoint;
 
     property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
-    property SalingTyp: TSalingTyp read FSalingTyp write FSalingTyp;
-    property ControllerTyp: TControllerTyp read FControllerTyp write FControllerTyp;
+    property SalingTyp: TSalingTyp read FSalingTyp write SetSalingTyp;
+    property ControllerTyp: TControllerTyp read FControllerTyp write SetControllerTyp;
     property Koordinaten: TRealRiggPoints read rP write SetKoordinaten;
   end;
 
@@ -50,6 +53,16 @@ begin
   FixPunkt := rP[FixPoint];
   GrafikOK := True;
   Updated := False;
+end;
+
+procedure TBootGraph.SetKoppelKurve(const Value: TKoordLine);
+begin
+  // not implemented
+end;
+
+procedure TBootGraph.SetControllerTyp(const Value: TControllerTyp);
+begin
+  FControllerTyp := Value;
 end;
 
 procedure TBootGraph.SetFixPoint(const Value: TRiggPoint);
@@ -80,6 +93,23 @@ end;
 procedure TBootGraph.SetMastKurve(const Value: TMastKurve);
 begin
   Kurve := Value;
+end;
+
+procedure TBootGraph.SetSalingTyp(const Value: TSalingTyp);
+begin
+  FSalingTyp := Value;
+end;
+
+function TBootGraph.GetMastKurvePoint(const Index: Integer): TRealPoint;
+begin
+  if (Index >= 0) and (Index < Length(Kurve)) then
+    result := Kurve[Index]
+  else
+  begin
+    result[x] := 0;
+    result[y] := 0;
+    result[z] := 0;
+  end;
 end;
 
 procedure TBootGraph.LoadFromIniFile(FileName: string);

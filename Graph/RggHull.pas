@@ -50,7 +50,7 @@ type
     destructor Destroy; override;
     procedure Load;
     procedure Update; override;
-    procedure Draw(Canvas: TCanvas); override;
+    procedure DrawToCanvas(Canvas: TCanvas); override;
     procedure GetPlotList(List: TStringList); override;
   end;
 
@@ -158,7 +158,7 @@ begin
   Updated := True;
 end;
 
-procedure THullGraph.Draw(Canvas: TCanvas);
+procedure THullGraph.DrawToCanvas(Canvas: TCanvas);
 begin
   if not GrafikOK then
     Exit;

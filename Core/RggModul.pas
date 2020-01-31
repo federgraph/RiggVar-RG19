@@ -153,7 +153,7 @@ type
     lbMastfall, lbSpannung, lbBiegung: string;
     Modified: Boolean;
 
-    GetriebeGrafik: TGetriebeGraph;
+    GetriebeGraph: TGetriebeGraph;
     BitmapG: TBitmap;
     MetaFileG: TRiggMetaFile;
     DataInMeta: Boolean;
@@ -351,15 +351,15 @@ begin
   RefPoints := Rigg.rP;
 
   { GetriebeGrafik }
-  GetriebeGrafik := TGetriebeGraph.Create;
-  GetriebeGrafik.Rotator := TPolarKar.Create;
-  GetriebeGrafik.Rotator.DeltaPhi := 0;
-  GetriebeGrafik.Rotator.DeltaTheta := -90;
-  GetriebeGrafik.Rotator.XRot := -87;
-  GetriebeGrafik.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  GetriebeGrafik.Koordinaten := Rigg.rP;
-  GetriebeGrafik.Koppelkurve := Rigg.Koppelkurve;
-  GetriebeGrafik.ViewPoint := vpSeite;
+  GetriebeGraph := TGetriebeGraph.Create;
+  GetriebeGraph.Rotator := TPolarKar.Create;
+  GetriebeGraph.Rotator.DeltaPhi := 0;
+  GetriebeGraph.Rotator.DeltaTheta := -90;
+  GetriebeGraph.Rotator.XRot := -87;
+  GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  GetriebeGraph.Koordinaten := Rigg.rP;
+  GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
+  GetriebeGraph.ViewPoint := vpSeite;
 
   BitmapG := TBitmap.Create;
   BitmapG.Width := 293;
@@ -408,8 +408,8 @@ end;
 
 destructor TRiggModul.Destroy;
 begin
-  GetriebeGrafik.Rotator.Free;
-  GetriebeGrafik.Free;
+  GetriebeGraph.Rotator.Free;
+  GetriebeGraph.Free;
   SalingCtrl.Free;
   RiggReport.Free;
   FWReport.Free;
@@ -673,7 +673,7 @@ var
 begin
   { Koppelkurve }
   if (SalingTyp = stFest) and (KoppelBtnDown = True) then
-    GetriebeGrafik.Koppelkurve := Rigg.Koppelkurve;
+    GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
 
   { 3D Grafik - AniRotationForm muß erzeugt sein! }
   if RotaFormActive then
@@ -695,7 +695,7 @@ begin
     Main.RggMain.StrokeRigg.Draw;
   end;
 
-  Getriebegrafik.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
 
   { ControllerPaintBox }
   if OutputForm.OutputPages.ActivePage = OutputForm.ControllerSheet then
@@ -813,11 +813,11 @@ begin
       end
       else
         DataInMetaCounter := 0;
-      GetriebeGrafik.ZoomFaktor := 10;
+      GetriebeGraph.ZoomFaktor := 10;
       DrawToMetaG(MetaCanvas);
     finally
       MetaCanvas.Free;
-      GetriebeGrafik.ZoomFaktor := 1;
+      GetriebeGraph.ZoomFaktor := 1;
       Inc(MetaGPaintCount);
     end;
   end;
@@ -826,67 +826,67 @@ end;
 
 procedure TRiggModul.DrawPaintBoxG(Canvas: TCanvas);
 begin
-  GetriebeGrafik.ZeichneKoppel := KoppelBtnDown;
+  GetriebeGraph.ZeichneKoppel := KoppelBtnDown;
 
   { entspanntes Rigg grau zeichnen }
   if Grauzeichnen and BtnGrauDown then
   begin
-    GetriebeGrafik.Farbe := clEntspannt;
-    GetriebeGrafik.Coloriert := False;
-    GetriebeGrafik.WanteGestrichelt := not Rigg.GetriebeOK;
-    GetriebeGrafik.Koordinaten := Rigg.rPe;
-    GetriebeGrafik.Draw(Canvas);
+    GetriebeGraph.Farbe := clEntspannt;
+    GetriebeGraph.Coloriert := False;
+    GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
+    GetriebeGraph.Koordinaten := Rigg.rPe;
+    GetriebeGraph.DrawToCanvas(Canvas);
   end;
 
   { Nullstellung hellblau zeichnen }
   if BtnBlauDown then
   begin
-    GetriebeGrafik.Farbe := clNullStellung;
-    GetriebeGrafik.Coloriert := False;
-    GetriebeGrafik.WanteGestrichelt := False;
-    GetriebeGrafik.Koordinaten := RefPoints;
-    GetriebeGrafik.Draw(Canvas);
+    GetriebeGraph.Farbe := clNullStellung;
+    GetriebeGraph.Coloriert := False;
+    GetriebeGraph.WanteGestrichelt := False;
+    GetriebeGraph.Koordinaten := RefPoints;
+    GetriebeGraph.DrawToCanvas(Canvas);
   end;
 
   { gespanntes Rigg farbig zeichnen}
 //  GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta); // see above
-  GetriebeGrafik.Coloriert := True;
-  GetriebeGrafik.WanteGestrichelt := not Rigg.GetriebeOK;
-  GetriebeGrafik.Koordinaten := Rigg.rP;
-  GetriebeGrafik.Draw(Canvas);
+  GetriebeGraph.Coloriert := True;
+  GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
+  GetriebeGraph.Koordinaten := Rigg.rP;
+  GetriebeGraph.DrawToCanvas(Canvas);
 end;
 
 procedure TRiggModul.DrawToMetaG(Canvas: TMetaFileCanvas);
 begin
-  GetriebeGrafik.ZeichneKoppel := KoppelBtnDown;
+  GetriebeGraph.ZeichneKoppel := KoppelBtnDown;
 
   { entspanntes Rigg grau zeichnen }
   if Grauzeichnen and BtnGrauDown then
   begin
-    GetriebeGrafik.Farbe := clBlack;
-    GetriebeGrafik.Coloriert := False;
-    GetriebeGrafik.WanteGestrichelt := not Rigg.GetriebeOK;
-    GetriebeGrafik.Koordinaten := Rigg.rPe;
-    GetriebeGrafik.DrawToMeta(Canvas);
+    GetriebeGraph.Farbe := clBlack;
+    GetriebeGraph.Coloriert := False;
+    GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
+    GetriebeGraph.Koordinaten := Rigg.rPe;
+    GetriebeGraph.DrawToMeta(Canvas);
   end;
 
   { Nullstellung hellblau zeichnen }
   if BtnBlauDown then
   begin
-    GetriebeGrafik.Farbe := clNullStellung;
-    GetriebeGrafik.Coloriert := False;
-    GetriebeGrafik.WanteGestrichelt := False;
-    GetriebeGrafik.Koordinaten := RefPoints;
-    GetriebeGrafik.DrawToMeta(Canvas);
+    GetriebeGraph.Farbe := clNullStellung;
+    GetriebeGraph.Coloriert := False;
+    GetriebeGraph.WanteGestrichelt := False;
+    GetriebeGraph.Koordinaten := RefPoints;
+    GetriebeGraph.DrawToMeta(Canvas);
   end;
 
   { gespanntes Rigg farbig zeichnen}
   // GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta); // see above
-  GetriebeGrafik.Coloriert := True;
-  GetriebeGrafik.WanteGestrichelt := not Rigg.GetriebeOK;
-  GetriebeGrafik.Koordinaten := Rigg.rP;
+  GetriebeGraph.Coloriert := True;
+  GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
+  GetriebeGraph.Koordinaten := Rigg.rP;
   Canvas.Pen.Width := ThickPenWidth;
-  GetriebeGrafik.DrawToMeta(Canvas);
+  GetriebeGraph.DrawToMeta(Canvas);
 
   DataInMeta := True;
 end;
@@ -1239,7 +1239,7 @@ begin
   if Value <> FViewPoint then
   begin
     FViewPoint := Value;
-    GetriebeGrafik.ViewPoint := Value;
+    GetriebeGraph.ViewPoint := Value;
     TextFlipFlop := True;
     ResetPaintBoxG;
     if RG19A and (GrafikForm <> nil) then
@@ -1299,9 +1299,9 @@ begin
   if FKoppelBtnDown <> Value then
   begin
     FKoppelBtnDown := Value;
-    Getriebegrafik.ZeichneKoppel := Value;
+    GetriebeGraph.ZeichneKoppel := Value;
     if Value then
-      GetriebeGrafik.Koppelkurve := Rigg.Koppelkurve;
+      GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
     Draw;
   end;
 end;
@@ -1311,7 +1311,7 @@ begin
   if FZweischlagBtnDown <> Value then
   begin
     FZweischlagBtnDown := Value;
-    GetriebeGrafik.Bogen := not Value;
+    GetriebeGraph.Bogen := not Value;
     Draw;
   end;
 end;
@@ -1331,7 +1331,7 @@ begin
   begin
     FControllerTyp := Value;
     Rigg.ControllerTyp := Value;
-    GetriebeGrafik.ControllerTyp := Value;
+    GetriebeGraph.ControllerTyp := Value;
     SalingCtrl.ControllerTyp := Value;
   end;
 end;
@@ -1460,7 +1460,7 @@ begin
   begin
     FSalingTyp := Value;
 //    Rigg.SalingTyp := Value;
-    Getriebegrafik.SalingTyp := Value;
+    GetriebeGraph.SalingTyp := Value;
     if ChartFormActive then
       ChartForm.SalingTyp := Value;
 
@@ -1841,8 +1841,8 @@ begin
   { Metafile schreiben; mit Pen.Width = Zoom, wenn Box gecheckt }
   if not PaintBtnDown then
   begin
-    SavedZoomFaktor := GetriebeGrafik.ZoomFaktor;
-    GetriebeGrafik.ZoomFaktor := Zoom;
+    SavedZoomFaktor := GetriebeGraph.ZoomFaktor;
+    GetriebeGraph.ZoomFaktor := Zoom;
     MetaCanvas := TMetaFileCanvas.Create(MetaFileG, 0);
     try
       if PreviewGForm.cbThickLines.Checked then
@@ -1850,7 +1850,7 @@ begin
       DrawToMetaG(MetaCanvas);
     finally
       MetaCanvas.Free;
-      GetriebeGrafik.ZoomFaktor := SavedZoomFaktor;
+      GetriebeGraph.ZoomFaktor := SavedZoomFaktor;
     end;
   end;
 
@@ -1881,8 +1881,8 @@ begin
       falls Box gecheckt mit Pen.Width = 4 * Zoom }
   if not PaintBtnDown then
   begin
-    SavedZoomFaktor := GetriebeGrafik.ZoomFaktor;
-    GetriebeGrafik.ZoomFaktor := Zoom;
+    SavedZoomFaktor := GetriebeGraph.ZoomFaktor;
+    GetriebeGraph.ZoomFaktor := Zoom;
     MetaCanvas := TMetaFileCanvas.Create(MetaFileG, 0);
     try
       if PreviewGForm.cbThickLines.Checked then
@@ -1890,7 +1890,7 @@ begin
       DrawToMetaG(MetaCanvas);
     finally
       MetaCanvas.Free;
-      GetriebeGrafik.ZoomFaktor := SavedZoomFaktor;
+      GetriebeGraph.ZoomFaktor := SavedZoomFaktor;
     end;
   end;
 
@@ -2554,8 +2554,8 @@ begin
   TrimmRec.Controller := 50;
   Rigg.Glieder := TrimmRec;
   Rigg.UpdateGetriebe;
-  GetriebeGrafik.Koordinaten := Rigg.rP;
-  Getriebegrafik.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  GetriebeGraph.Koordinaten := Rigg.rP;
+  GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
   SalingCtrl.ControllerPos := Round(SalingCtrl.ParamXE0 - Rigg.MastPositionE);
   TrimmRec.Controller := SalingCtrl.ControllerPos;
   UpdateGCtrls(TrimmRec);
@@ -2574,10 +2574,10 @@ end;
 
 procedure TRiggModul.AdjustGrafik;
 begin
-  ShowAdjustForm(GetriebeGrafik, AdjustGBox);
-  if ViewPoint <> GetriebeGrafik.ViewPoint then
+  ShowAdjustForm(GetriebeGraph, AdjustGBox);
+  if ViewPoint <> GetriebeGraph.ViewPoint then
     { Alles notwendige wird automatisch in SetViewPoint() erledigt. }
-    ViewPoint := GetriebeGrafik.ViewPoint
+    ViewPoint := GetriebeGraph.ViewPoint
   else
   begin
     TextFlipFlop := True;
@@ -2592,14 +2592,14 @@ begin
   { Koppelkurve }
   if (SalingTyp = stFest) and
     (KoppelBtnDown = True) and
-    (GetriebeGrafik.ViewPoint = vpSeite) then
-    GetriebeGrafik.Koppelkurve := Rigg.Koppelkurve;
+    (GetriebeGraph.ViewPoint = vpSeite) then
+    GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
   Draw;
 end;
 
 procedure TRiggModul.GetGBoxOffset;
 begin
-  GetriebeGrafik.CalcOffset(PBG.ClientRect);
+  GetriebeGraph.CalcOffset(PBG.ClientRect);
   AdjustGbox(Self);
 end;
 

@@ -29,7 +29,8 @@ type
     FKoppelkurveNeedFill: Boolean;
 
     procedure SetZoomFaktor(Value: Integer);
-    procedure SetKoppelKurve(Kurve: TKoordLine);
+  public
+    procedure SetKoppelKurve(const Kurve: TKoordLine); override;
   protected
     MP: TPoint; // Mittelpunkt für Kreis um C0
     IntR: Integer; // Radius für Kreis um C0
@@ -76,7 +77,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
     procedure Update; override;
-    procedure Draw(Canvas: TCanvas); override;
+    procedure DrawToCanvas(Canvas: TCanvas); override;
     procedure DrawToMeta(Canvas: TMetaFileCanvas);
     procedure UpdateOffset;
     procedure CalcOffset(R: TRect);
@@ -162,7 +163,7 @@ begin
   Updated := False;
 end;
 
-procedure TGetriebeGraph.SetKoppelKurve(Kurve: TKoordLine);
+procedure TGetriebeGraph.SetKoppelKurve(const Kurve: TKoordLine);
 begin
   FKoppelKurve := Kurve;
   FKoppelkurveNeedFill := True;
@@ -177,7 +178,7 @@ begin
   end;
 end;
 
-procedure TGetriebeGraph.Draw(Canvas: TCanvas);
+procedure TGetriebeGraph.DrawToCanvas(Canvas: TCanvas);
 begin
   if not GrafikOK then
     Exit;

@@ -23,6 +23,10 @@ type
     BogenIndexD: Integer;
     function FindBogenIndexOf(P: TRealPoint): Integer;
   protected
+    procedure SetViewPoint(const Value: TViewPoint);
+    procedure SetWanteGestrichelt(const Value: Boolean);
+    procedure SetBogen(const Value: Boolean);
+  protected
     FBogen: Boolean;
     FGestrichelt: Boolean;
     FViewPoint: TViewPoint;
@@ -55,12 +59,16 @@ type
 
     procedure Update; override;
     procedure UpdateDisplayList;
-    procedure Draw(g: TCanvas); override;
-    procedure GetPlotList(List: TStringList); override;
+    procedure DrawToCanvas(g: TCanvas); override;
+    procedure Draw;
 
-    property ViewPoint: TViewPoint read FViewPoint write FViewPoint;
-    property Bogen: Boolean read FBogen write FBogen;
-    property WanteGestrichelt: Boolean write FGestrichelt;
+    procedure GetPlotList(List: TStringList); override;
+    procedure ToggleRenderOption(const fa: Integer);
+    function QueryRenderOption(const fa: Integer): Boolean;
+
+    property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
+    property Bogen: Boolean read FBogen write SetBogen;
+    property WanteGestrichelt: Boolean write SetWanteGestrichelt;
   end;
 
 implementation
@@ -156,21 +164,21 @@ begin
   yD0 := Round(D0[z] * Zoom);
   xE0 := Round(E0[x] * Zoom);
   yE0 := Round(E0[z] * Zoom);
-//xF0 := Round(F0[x]*Zoom);
-//yF0 := Round(F0[z]*Zoom);
+//xF0 := Round(F0[x] * Zoom);
+//yF0 := Round(F0[z] * Zoom);
 
-  xA := Round(A[x]*Zoom);
-  yA := Round(A[z]*Zoom);
+  xA := Round(A[x] * Zoom);
+  yA := Round(A[z] * Zoom);
   xB := Round(B[x] * Zoom);
   yB := Round(B[z] * Zoom);
-  xC := Round(C[x]*Zoom);
-  yC := Round(C[z]*Zoom);
+  xC := Round(C[x] * Zoom);
+  yC := Round(C[z] * Zoom);
   xD := Round(D[x] * Zoom);
   yD := Round(D[z] * Zoom);
   xE := Round(E[x] * Zoom);
   yE := Round(E[z] * Zoom);
-  xF := Round(F[x]*Zoom);
-  yF := Round(F[z]*Zoom);
+  xF := Round(F[x] * Zoom);
+  yF := Round(F[z] * Zoom);
 
   { Rumpf }
   ZugRumpf[0].x := xA0 + NOffset.x;
@@ -358,7 +366,7 @@ begin
   end;
 end;
 
-procedure TRaumGraph.Draw(g: TCanvas);
+procedure TRaumGraph.DrawToCanvas(g: TCanvas);
 begin
   if GrafikOK then
   begin
@@ -519,6 +527,36 @@ begin
     end;
     Zoom := SavedZoom;
   end;
+end;
+
+procedure TRaumGraph.SetBogen(const Value: Boolean);
+begin
+  FBogen := Value;
+end;
+
+procedure TRaumGraph.SetViewPoint(const Value: TViewPoint);
+begin
+  FViewPoint := Value;
+end;
+
+procedure TRaumGraph.SetWanteGestrichelt(const Value: Boolean);
+begin
+  FGestrichelt := Value;
+end;
+
+function TRaumGraph.QueryRenderOption(const fa: Integer): Boolean;
+begin
+  result := False;
+end;
+
+procedure TRaumGraph.Draw;
+begin
+
+end;
+
+procedure TRaumGraph.ToggleRenderOption(const fa: Integer);
+begin
+
 end;
 
 end.

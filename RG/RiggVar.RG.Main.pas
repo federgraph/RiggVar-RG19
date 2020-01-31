@@ -1140,7 +1140,8 @@ end;
 
 procedure TRggMain.Draw;
 begin
-  // ...
+  if StrokeRigg <> nil then
+    StrokeRigg.Draw;
   UpdateFactArrayFromRigg;
   UpdateText;
 end;

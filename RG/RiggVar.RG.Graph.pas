@@ -15,7 +15,7 @@ type
     procedure SetKoordinaten(const Value: TRealRiggPoints);
     procedure SetMastKurve(const Value: TMastKurve);
     procedure SetMastLineData(const Value: TLineDataR100; L: double; Beta: double);
-    procedure SetKoppelKurve(const Value: TLineDataR100);
+    procedure SetKoppelKurve(const Value: TKoordLine);
 
     procedure SetWanteGestrichelt(const Value: Boolean);
     procedure SetBogen(const Value: Boolean);
@@ -23,10 +23,12 @@ type
     procedure SetFixPoint(const Value: TRiggPoint);
     procedure SetViewPoint(const Value: TViewPoint);
 
-    function GetMastKurvePoint(Index: Integer): TRealPoint;
+    function GetMastKurvePoint(const Index: Integer): TRealPoint;
 
     procedure ToggleRenderOption(const fa: Integer);
     function QueryRenderOption(const fa: Integer): Boolean;
+
+    procedure Draw;
   end;
 
   TStrokeRigg = class
@@ -52,6 +54,8 @@ type
 
     constructor Create(rgg: TRigg);
 
+    procedure Draw;
+
     procedure SetMastLineData(const Value: TLineDataR100; L: double; Beta: double);
 
     procedure ToggleRenderOption(const fa: Integer);
@@ -68,6 +72,11 @@ uses
 constructor TStrokeRigg.Create(rgg: TRigg);
 begin
   FRigg := rgg;
+end;
+
+procedure TStrokeRigg.Draw;
+begin
+
 end;
 
 function TStrokeRigg.QueryRenderOption(const fa: Integer): Boolean;

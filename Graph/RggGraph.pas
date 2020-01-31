@@ -29,7 +29,7 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Update; virtual;
-    procedure Draw(Canvas: TCanvas); virtual;
+    procedure DrawToCanvas(Canvas: TCanvas); virtual;
     procedure GetPlotList(List: TStringList); virtual;
 
     property FixPunkt: TRealPoint read FFixPunkt write SetFixPunkt;
@@ -78,7 +78,7 @@ begin
   //virtual
 end;
 
-procedure TRggGraph.Draw(Canvas: TCanvas);
+procedure TRggGraph.DrawToCanvas(Canvas: TCanvas);
 begin
   //if GrafikOK then ...
   //virtual

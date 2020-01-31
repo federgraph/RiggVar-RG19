@@ -403,13 +403,13 @@ begin
     RaumGraph.DL.Draw(Bitmap.Canvas);
   end
   else
-    RaumGraph.Draw(Bitmap.Canvas);
+    RaumGraph.DrawToCanvas(Bitmap.Canvas);
 
   if FPaintRumpf and (not MouseDown or (MouseDown and FDrawAlways)) then
   begin
     HullGraph.Coloriert := True;
     HullGraph.FixPunkt := RaumGraph.FixPunkt;
-    HullGraph.Draw(Bitmap.Canvas);
+    HullGraph.DrawToCanvas(Bitmap.Canvas);
   end;
 
   with Bitmap.Canvas do
@@ -760,7 +760,7 @@ end;
 
 procedure TRotaForm.ToggleRenderOption(const fa: Integer);
 begin
-  ToggleRenderOption(fa);
+  RaumGraph.ToggleRenderOption(fa);
 end;
 
 function TRotaForm.QueryRenderOption(const fa: Integer): Boolean;

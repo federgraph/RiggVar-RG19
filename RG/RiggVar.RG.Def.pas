@@ -257,6 +257,8 @@ const
   clEntspannt: TColor = clGray;
   clNullStellung: TColor = clAqua;
   clKoppelKurve: TColor = clYellow;
+  clGestrichelt: TColor = clWhite;
+  clFixPont: TColor = clYellow;
 
 implementation
 
