@@ -1182,7 +1182,7 @@ begin
   sb.Caption := 'C';
   sb.Hint := 'Controller|Umschalter für Controller-Modus';
   sb.AllowAllUp := True;
-  sb.Down := True;
+  sb.Down := False;
   sb.GroupIndex := 6;
   sb.OnClick := ControllerBtnClick;
 
@@ -1503,26 +1503,31 @@ begin
   if WantConsole then
     InitOutputForm;
 
-  {
-    ControllerItem.Checked := True;
-    ControllerBtn.Down := ControllerItem.Checked;
-    WinkelItem.Checked := False;
-    WinkelBtn.Down := WinkelItem.Checked;
-    SofortItem.Checked := True;
-    SofortBtn.Down := SofortItem.Checked;
-    DifferenzItem.Checked := True;
-    DiffBtn.Down := DiffItem.Checked;
-    KoppelkurveItem.Checked := True;
-    KoppelBtn.Down := KoppelKurveItem.Checked;
-    rFItem.Checked := True;
-    FestItem.Checked := True;
-    AutoLoadItem := False;
-    }
+{
+  ControllerItem.Checked := RiggModul.Rigg.ControllerTyp <> ctOhne;
+  ControllerBtn.Down := ControllerItem.Checked;
+
+  WinkelItem.Checked := False;
+  WinkelBtn.Down := WinkelItem.Checked;
+
+  SofortItem.Checked := True;
+  SofortBtn.Down := SofortItem.Checked;
+  DifferenzItem.Checked := True;
+  DiffBtn.Down := DiffItem.Checked;
+
+  KoppelkurveItem.Checked := True;
+  KoppelBtn.Down := KoppelKurveItem.Checked;
+
+  rFItem.Checked := True;
+  FestItem.Checked := True;
+  AutoLoadItem := False;
+
   AutoLoadItem.Visible := False;
   LogoItem.Checked := WantLogoData;
 
   UseDisplayListBtn.Down := RotaForm.UseDisplayList;
   BogenBtn.Down := RotaForm.RaumGraph.Bogen;
+}
 end;
 
 procedure TFormRG19.LayoutComponents;

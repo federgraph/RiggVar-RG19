@@ -327,7 +327,7 @@ begin
   FSBName := fpVorstag;
   FCursorSB := fpVorstag;
   FSalingTyp := stFest;
-  FControllerTyp := ctDruck;
+  FControllerTyp := ctOhne;
 
   { Grauzeichnen := False; }
   { TextFlipFlop := False; }
@@ -700,6 +700,7 @@ begin
   { ControllerPaintBox }
   if OutputForm.OutputPages.ActivePage = OutputForm.ControllerSheet then
   begin
+    SalingCtrl.ControllerTyp := Rigg.ControllerTyp;
     TrimmRec := Rigg.Glieder;
     { Abstand(iP[ooE0,x], iP[ooE,x]) in mm}
     SalingCtrl.ControllerPos := TrimmRec.Controller;
@@ -1193,9 +1194,9 @@ begin
   Modified := False;
 
   SalingTyp := Rigg.SalingTyp;
+  ControllerTyp := Rigg.ControllerTyp;
   CalcTyp := Rigg.CalcTyp;
-  ControllerBtnDown := Rigg.ControllerTyp <> ctOhne;
-  // ControllerTyp := Rigg.ControllerTyp; // see SetControllerBtnDown
+  FControllerBtnDown := FControllerTyp <> ctOhne;
 
   { 'TakeOver' }
   ViewModelMain.ControllerDown := ControllerBtnDown;
@@ -2530,6 +2531,7 @@ begin
       begin
         TrimmRec := Rigg.Glieder;
         { ControllerParameter }
+        SalingCtrl.ControllerTyp := Rigg.ControllerTyp;
         SalingCtrl.ControllerPos := TrimmRec.Controller;
         SalingCtrl.ParamXE := Round(Rigg.MastPositionE);
         SalingCtrl.ParamXE0 := Round(Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x]);

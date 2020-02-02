@@ -17,10 +17,10 @@ type
 
   TSalingCtrl = class
   private
-    OffsetX,
+    OffsetX: Integer;
     OffsetY: Integer;
     Lage: TLage;
-    SalingZoom,
+    SalingZoom: Integer;
     ControllerZoom: Integer;
     procedure DrawProfile(Canvas: TCanvas);
 
@@ -29,17 +29,19 @@ type
     ControllerTyp: TControllerTyp;
     PBSize: TPoint; { PaintBox-Size }
 
-    EdgePos, { Abstand von E0 zur Anschlagkante Deck + Klotzdicke }
-    ControllerPos,     { Abstand(iP[ooE0,x],iP[ooE ,x]) in mm }
-    ParamXE,           { Abstand(iP[ooD0,x],iP[ooE ,x]) in mm }
-    ParamXE0: Integer; { Abstand(iP[ooD0,x],iP[ooE0,x]) in mm }
+    EdgePos: Integer; { Abstand von E0 zur Anschlagkante Deck + Klotzdicke }
+    ControllerPos: Integer; { Abstand(iP[ooE0,x], iP[ooE ,x]) in mm }
+    ParamXE: Integer; { Abstand(iP[ooD0,x], iP[ooE,x]) in mm }
+    ParamXE0: Integer; { Abstand(iP[ooD0,x], iP[ooE0,x]) in mm }
 
-    SalingA, { Abstand(iP[ooA ,x],iP[ooB ,x]) in mm }
-    SalingH, { Abstand Verbindungslinie Salinge zu Hinterkante Mast in mm }
-    SalingL, { Salinglänge in mm - außerhalb berechnen }
+    SalingA: Integer; { Abstand(iP[ooA,x], iP[ooB,x]) in mm }
+    SalingH: Integer; { Abstand Verbindungslinie Salinge zu Hinterkante Mast in mm }
+    SalingL: Integer; { Salinglänge in mm - außerhalb berechnen }
     SalingHOffset: Integer; { Abstand Hinterkante Mast zur neutrale Faser in mm }
     SalingDetail: Boolean; { Umschalten zwischen den beiden SalingViews }
+
     constructor Create;
+
     procedure DrawSalingAll(Canvas: TCanvas);
     procedure DrawSalingDetail(Canvas: TCanvas);
     procedure DrawController(Canvas: TCanvas);
@@ -55,11 +57,13 @@ begin
   ControllerZoom := 1;
   SalingZoom := 5;
   ControllerTyp := ctDruck;
+
   { Properties für ControllerGrafik in mm }
   EdgePos := 25;
   ControllerPos := 80;
   ParamXE := -20;
   ParamXE0 := 110;
+
   { Properties für SalingGrafik in mm }
   SalingHOffset := 37;
   SalingH := 80;
@@ -69,78 +73,78 @@ end;
 
 procedure TSalingCtrl.DrawProfile(Canvas: TCanvas);
 
-procedure MetaLINE(x1, y1, x2, y2: Integer);
-begin
-  if Lage = quer then
+  procedure MetaLINE(x1, y1, x2, y2: Integer);
   begin
-    x1 := x1 + OffsetX;
-    y1 := y1 + OffsetY;
-    x2 := x2 + OffsetX;
-    y2 := y2 + OffsetY;
-    x1 := x1 div ControllerZoom;
-    y1 := y1 div ControllerZoom;
-    x2 := x2 div ControllerZoom;
-    y2 := y2 div ControllerZoom;
-    Canvas.MoveTo(y1, x1);
-    Canvas.LineTo(y2, x2);
-  end
-  else if Lage = hoch then
-  begin
-    x1 := x1 + OffsetX;
-    y1 := y1 + OffsetY;
-    x2 := x2 + OffsetX;
-    y2 := y2 + OffsetY;
-    x1 := x1 div SalingZoom;
-    y1 := y1 div SalingZoom;
-    x2 := x2 div SalingZoom;
-    y2 := y2 div SalingZoom;
-    Canvas.MoveTo(x1, y1);
-    Canvas.LineTo(x2, y2);
+    if Lage = quer then
+    begin
+      x1 := x1 + OffsetX;
+      y1 := y1 + OffsetY;
+      x2 := x2 + OffsetX;
+      y2 := y2 + OffsetY;
+      x1 := x1 div ControllerZoom;
+      y1 := y1 div ControllerZoom;
+      x2 := x2 div ControllerZoom;
+      y2 := y2 div ControllerZoom;
+      Canvas.MoveTo(y1, x1);
+      Canvas.LineTo(y2, x2);
+    end
+    else if Lage = hoch then
+    begin
+      x1 := x1 + OffsetX;
+      y1 := y1 + OffsetY;
+      x2 := x2 + OffsetX;
+      y2 := y2 + OffsetY;
+      x1 := x1 div SalingZoom;
+      y1 := y1 div SalingZoom;
+      x2 := x2 div SalingZoom;
+      y2 := y2 div SalingZoom;
+      Canvas.MoveTo(x1, y1);
+      Canvas.LineTo(x2, y2);
+    end;
   end;
-end;
 
-procedure MetaARC(xm, ym, Radius: Integer; phi1, phi2: double);
-var
-  temp: Integer;
-begin
-  if Lage = quer then
+  procedure MetaARC(xm, ym, Radius: Integer; phi1, phi2: double);
+  var
+    temp: Integer;
   begin
-    xm := xm + OffsetX;
-    ym := ym + OffsetY;
-    xm := xm div ControllerZoom;
-    ym := ym div ControllerZoom;
-    Radius := Radius div ControllerZoom;
-    temp := xm; xm := ym; ym := temp;
-    Canvas.Arc(
-      xm - Radius,
-      ym - Radius,
-      xm + Radius,
-      ym + Radius,
-      xm + Round(sin(phi2*pi/180)*Radius),
-      ym + Round(cos(phi2*pi/180)*Radius),
-      xm + Round(sin(phi1*pi/180)*Radius),
-      ym + Round(cos(phi1*pi/180)*Radius)
-    );
-  end
-  else if Lage = hoch then
-  begin
-    xm := xm + OffsetX;
-    ym := ym + OffsetY;
-    xm := xm div SalingZoom;
-    ym := ym div SalingZoom;
-    Radius := Radius div SalingZoom;
-    Canvas.Arc(
-      xm - Radius,
-      ym - Radius,
-      xm + Radius,
-      ym + Radius,
-      xm + Round(cos(phi1*pi/180)*Radius),
-      ym + Round(sin(phi1*pi/180)*Radius),
-      xm + Round(cos(phi2*pi/180)*Radius),
-      ym + Round(sin(phi2*pi/180)*Radius)
-    );
+    if Lage = quer then
+    begin
+      xm := xm + OffsetX;
+      ym := ym + OffsetY;
+      xm := xm div ControllerZoom;
+      ym := ym div ControllerZoom;
+      Radius := Radius div ControllerZoom;
+      temp := xm; xm := ym; ym := temp;
+      Canvas.Arc(
+        xm - Radius,
+        ym - Radius,
+        xm + Radius,
+        ym + Radius,
+        xm + Round(sin(phi2*pi/180)*Radius),
+        ym + Round(cos(phi2*pi/180)*Radius),
+        xm + Round(sin(phi1*pi/180)*Radius),
+        ym + Round(cos(phi1*pi/180)*Radius)
+      );
+    end
+    else if Lage = hoch then
+    begin
+      xm := xm + OffsetX;
+      ym := ym + OffsetY;
+      xm := xm div SalingZoom;
+      ym := ym div SalingZoom;
+      Radius := Radius div SalingZoom;
+      Canvas.Arc(
+        xm - Radius,
+        ym - Radius,
+        xm + Radius,
+        ym + Radius,
+        xm + Round(cos(phi1*pi/180)*Radius),
+        ym + Round(sin(phi1*pi/180)*Radius),
+        xm + Round(cos(phi2*pi/180)*Radius),
+        ym + Round(sin(phi2*pi/180)*Radius)
+      );
+    end;
   end;
-end;
 
 begin
 { MetaLINE(    x1,   y1,    x2,     y2); }
@@ -183,8 +187,11 @@ end;
 
 procedure TSalingCtrl.DrawSalingAll(Canvas: TCanvas);
 var
-  SalingX, SalingY: Integer;
+  SalingX: Integer;
+  SalingY: Integer;
+  t: Integer;
 begin
+  t := Canvas.Font.Size; // = -375 in debugger
   Lage := hoch;
   OffsetX := 0; { 0 * 100; }
   OffsetY := (SalingH-SalingHOffset) * 100;
@@ -237,8 +244,11 @@ procedure TSalingCtrl.DrawSalingDetail(Canvas: TCanvas);
 var
   SalingX, SalingY: Integer;
   PosX, PosY: Integer;
-  S: String;
+  s: string;
+//  t: Integer;
 begin
+//  t := Canvas.Font.Size; // = 8 in debugger
+
   Lage := hoch;
   OffsetX := 0; { 0 * 100; }
   OffsetY := (SalingH-SalingHOffset) * 100;
@@ -262,7 +272,7 @@ begin
   Canvas.MoveTo( -100, SalingY);
   Canvas.LineTo( -100, 0);
   { SalingA }
-  SalingX := (SalingA *  50) div SalingZoom; { SalingA/2 gezoomt }
+  SalingX := (SalingA * 50) div SalingZoom; { SalingA/2 gezoomt }
   SalingY := ((SalingH)*100) div SalingZoom;
   Canvas.Pen.Width := 2*100 div SalingZoom;
   Canvas.Pen.Color := clBlue;
@@ -296,8 +306,8 @@ begin
   SetTextAlign(Canvas.Handle, TA_CENTER or TA_TOP);
   PosX := 0;
   PosY := -700 div SalingZoom;
-  S := Format('Salingabstand = %d mm',[SalingA]);
-  Canvas.TextOut(PosX, PosY, S);
+  s := Format('Salingabstand = %d mm',[SalingA]);
+  Canvas.TextOut(PosX, PosY, s);
 
   Canvas.Font.Color := clGreen;
   // Canvas.Brush.Color := clWhite;
@@ -305,8 +315,8 @@ begin
   SetTextAlign(Canvas.Handle, TA_LEFT or TA_BOTTOM);
   PosX := -220*100 div SalingZoom;
   PosY :=   70*100 div SalingZoom;
-  S := Format('Salinglänge = %d mm',[SalingL]);
-  Canvas.TextOut(PosX, PosY, S);
+  s := Format('Salinglänge = %d mm',[SalingL]);
+  Canvas.TextOut(PosX, PosY, s);
 
   Canvas.Font.Color := clBlack;
   // Canvas.Brush.Color := clSilver;
@@ -314,8 +324,8 @@ begin
   // SetTextAlign(Canvas.Handle, TA_LEFT or TA_BOTTOM);
   PosX := 1000 div SalingZoom;
   PosY := 3000 div SalingZoom;
-  S := Format('Salinghöhe = %d mm',[SalingH]);
-  Canvas.TextOut(PosX, PosY, S);
+  s := Format('Salinghöhe = %d mm',[SalingH]);
+  Canvas.TextOut(PosX, PosY, s);
 
   Canvas.Font.Color := clFuchsia;
   // Canvas.Brush.Color := clWhite;
@@ -323,8 +333,8 @@ begin
   SetTextAlign(Canvas.Handle, TA_RIGHT or TA_BOTTOM);
   PosX := -1500 div SalingZoom;
   PosY := 1000 div SalingZoom;
-  S := Format('Salinghöhe - Offset = %d mm',[SalingH - SalingHOffset]);
-  Canvas.TextOut(PosX, PosY, S);
+  s := Format('Salinghöhe - Offset = %d mm',[SalingH - SalingHOffset]);
+  Canvas.TextOut(PosX, PosY, s);
 
   Canvas.Font.Color := clBlack;
   // Canvas.Brush.Color := clWhite;
@@ -332,8 +342,8 @@ begin
   SetTextAlign(Canvas.Handle, TA_LEFT or TA_BOTTOM);
   PosX := 35*100 div SalingZoom;
   PosY := 180*100 div SalingZoom;
-  S := Format('SalingHOffset = %d mm',[SalingHOffset]);
-  Canvas.TextOut(PosX, PosY, S);
+  s := Format('SalingHOffset = %d mm',[SalingHOffset]);
+  Canvas.TextOut(PosX, PosY, s);
 
   SetWindowOrgEx(Canvas.Handle, 0, 0, nil);
   SetViewPortOrgEx(Canvas.Handle, 0, 0, nil);
@@ -346,11 +356,19 @@ var
   KlotzX1, KlotzX2, PosXE0,StrichX: Integer;
   PositionXE0, PositionXE, ProfilPosMastfuss, ProfilPosXE,
   EdgePosition: Integer;
-  S: String;
+  s: string;
   clDeck: TColor;
   clMarke: TColor;
   clMassband: TColor;
+  tmpFontSize: Integer;
+  txtHeight: Integer;
+  t: Integer;
+  ct: TControllerTyp;
 begin
+  tmpFontSize := Canvas.Font.Size;
+  Canvas.Font.Size := tmpFontSize * 50;
+  ct := ControllerTyp;
+
   clDeck := clTeal;
   clMarke := clYellow;
   clMassband := clGray;
@@ -421,7 +439,9 @@ begin
       Canvas.MoveTo(StrichX, -500);
       Canvas.LineTo(StrichX, 500);
       S := IntToStr(i);
-      Canvas.TextOut(StrichX, 250, S);
+      txtHeight := Canvas.Font.Height;
+      t := -500 + (1000 - txtHeight) div 2;
+      Canvas.TextOut(StrichX, t, S);
     end;
 
     { Ablesemarke an Stelle EO }
@@ -429,8 +449,8 @@ begin
     Canvas.Brush.Style := bsClear;
     Canvas.Rectangle( PosXE0-250, -1000, PosXE0+250, 1000);
     Canvas.Font.Color := clMarke;
-    // Canvas.TextOut(PosXE0, 2000, 'E0');
-    Canvas.TextOut(6000, -4300, 'Ablesemarke an Position E0 + Offset');
+    Canvas.TextOut(PosXE0, 2000, 'E0');
+    Canvas.TextOut(5000, -4200, 'Ablesemarke an Position E0 + Offset');
 
     { ButtonRechteck }
     { wirkt in Verbindung mit Shape oder Region }
@@ -466,6 +486,7 @@ begin
   SetViewPortExtEx(Canvas.Handle, 1, 1, nil);
   SetViewPortOrgEx(Canvas.Handle, 0, 0, nil);
   *)
+  Canvas.Font.Size := tmpFontSize;
 end;
 
 end.

@@ -110,6 +110,8 @@ begin
 
   FormRG19.ControllerItem.Enabled := ControllerEnabled;
   FormRG19.ControllerBtn.Enabled := ControllerEnabled;
+  FormRG19.ControllerItem.Checked := ControllerDown;
+  FormRG19.ControllerBtn.Down := ControllerDown;
 
   FormRG19.KoppelkurveItem.Checked := KoppelKurveEnabled;
 
