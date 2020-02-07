@@ -155,9 +155,9 @@ begin
   MetaLINE(   500,    0,   200,      0);
   MetaLINE(  2600, 3185,  2600,   4900);
 
-  MetaLINE(  -485, 1002, -1044,    520); { verändert }
+  MetaLINE(  -485, 1002, -1044,    520);
   MetaLINE(     0, 1300,  -350,   1300);
-  MetaLINE(  -350, 1300, -1155,    604); { verändert }
+  MetaLINE(  -350, 1300, -1155,    604);
   MetaLINE( -2850, 4350, -2850,   4070);
   MetaLINE(  -500,    0,  -200,      0);
   MetaLINE( -2600, 4900, -2600,   3185);
@@ -174,6 +174,7 @@ begin
   MetaARC(   1100, 3185,  1500,  -16.71,    0.00);
   MetaARC(   1100, 4900,  1500,    0.00,   26.58);
 
+{ MetaARC(     xm,   ym,     r,    phi1,    phi2); }
   MetaARC(  -1100, 4900,  1500,  153.42, -180.00);
   MetaARC(  -1100, 3185,  1500, -180.00, -163.29);
   MetaARC(   -350,    0,   150,    0.00,  132.53);
@@ -298,7 +299,7 @@ begin
   DrawProfile(Canvas);
 
   { Texte }
-  Canvas.Font.Height := 25*100 div SalingZoom;
+  Canvas.Font.Height := 25 * 100 div SalingZoom;
 
   Canvas.Font.Color := clNavy;
   { Canvas.Brush.Color := clSilver; }
@@ -353,8 +354,14 @@ end;
 procedure TSalingCtrl.DrawController(Canvas: TCanvas);
 var
   i: Integer;
-  KlotzX1, KlotzX2, PosXE0,StrichX: Integer;
-  PositionXE0, PositionXE, ProfilPosMastfuss, ProfilPosXE,
+  KlotzX1: Integer;
+  KlotzX2: Integer;
+  PosXE0: Integer;
+  StrichX: Integer;
+  PositionXE0: Integer;
+  PositionXE: Integer;
+  ProfilPosMastfuss: Integer;
+  ProfilPosXE: Integer;
   EdgePosition: Integer;
   s: string;
   clDeck: TColor;
@@ -363,11 +370,9 @@ var
   tmpFontSize: Integer;
   txtHeight: Integer;
   t: Integer;
-  ct: TControllerTyp;
 begin
   tmpFontSize := Canvas.Font.Size;
   Canvas.Font.Size := tmpFontSize * 50;
-  ct := ControllerTyp;
 
   clDeck := clTeal;
   clMarke := clYellow;
@@ -438,7 +443,7 @@ begin
       StrichX := StrichX + 1000;
       Canvas.MoveTo(StrichX, -500);
       Canvas.LineTo(StrichX, 500);
-      S := IntToStr(i);
+      s := IntToStr(i);
       txtHeight := Canvas.Font.Height;
       t := -500 + (1000 - txtHeight) div 2;
       Canvas.TextOut(StrichX, t, S);

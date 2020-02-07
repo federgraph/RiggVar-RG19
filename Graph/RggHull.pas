@@ -21,13 +21,13 @@ type
     { Koordinaten }
     vert: TVertArrayF; { Gleitkomma-Koordinaten }
     tvert: TVertArrayI; { Integer-Koordinaten - transformed }
-    nvert: Integer; // maxvert: Integer;
+    nvert: Integer;
     { Connections }
     con: TConArray;
-    ncon: Integer; // maxcon: Integer;
+    ncon: Integer;
     gr: TConColors;
     { Matrix }
-    mat: Tmatrix4x4;
+    mat: TMatrix4x4;
     xmin, xmax, ymin, ymax, zmin, zmax: double;
     zfac: double;
     procedure ReadVertex;
@@ -231,7 +231,7 @@ end;
 procedure THullGraph.FindBB;
 var
   v: TVertArrayF;
-  xmin, ymin, zmin, xmax, ymax, zmax: single;
+  lxmin, lymin, lzmin, lxmax, lymax, lzmax: single;
   x, y, z: single;
   i, j: Integer;
 begin
@@ -239,39 +239,39 @@ begin
     Exit;
 
   v := vert;
-  xmin := v[0];
-  xmax := xmin;
-  ymin := v[1];
-  ymax := ymin;
-  zmin := v[2];
-  zmax := zmin;
+  lxmin := v[0];
+  lxmax := lxmin;
+  lymin := v[1];
+  lymax := lymin;
+  lzmin := v[2];
+  lzmax := lzmin;
   for j := nvert downto 0 do
   begin
     i := j * 3;
     x := v[i];
-    if (x < xmin) then
-      xmin := x;
-    if (x > xmax) then
-      xmax := x;
+    if (x < lxmin) then
+      lxmin := x;
+    if (x > lxmax) then
+      lxmax := x;
 
     y := v[i + 1];
-    if (y < ymin) then
-      ymin := y;
-    if (y > ymax) then
-      ymax := y;
+    if (y < lymin) then
+      lymin := y;
+    if (y > lymax) then
+      lymax := y;
 
     z := v[i + 2];
-    if (z < zmin) then
-      zmin := z;
-    if (z > zmax) then
-      zmax := z;
+    if (z < lzmin) then
+      lzmin := z;
+    if (z > lzmax) then
+      lzmax := z;
   end;
-  self.xmax := xmax;
-  self.xmin := xmin;
-  self.ymax := ymax;
-  self.ymin := ymin;
-  self.zmax := zmax;
-  self.zmin := zmin;
+  xmax := lxmax;
+  xmin := lxmin;
+  ymax := lymax;
+  ymin := lymin;
+  zmax := lzmax;
+  zmin := lzmin;
 end;
 
 procedure THullGraph.GetPlotList(List: TStringList);

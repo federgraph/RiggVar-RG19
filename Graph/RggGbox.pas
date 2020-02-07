@@ -19,16 +19,9 @@ uses
 type
   TGetriebeGraph = class(TRaumGraph)
   private
-    FKoppelkurve: TKoordLine; // Daten für Koppelkurve
-
-    FZoom2D: double; // eventuell von Zoom unterschiedlicher Faktor für 2D
-    FZoomFaktor: Integer; // Faktor für 'Auflösung' (typisch 0 oder 10)
-
-    FColor: TColor;
+    FKoppelKurve: TKoordLine; // Daten für Koppelkurve
     FKoppelBtnDown: Boolean;
-    FKoppelkurveNeedFill: Boolean;
-
-    procedure SetZoomFaktor(Value: Integer);
+    FKoppelKurveNeedFill: Boolean;
   public
     procedure SetKoppelKurve(const Kurve: TKoordLine); override;
   protected
@@ -57,11 +50,14 @@ type
     Zug3SalingDS: array[1..3] of TPoint;
 
     { TPoint-arrays für 3D werden vererbt }
-    { procedure FillZug3D wird vererbt }
 
+    { procedure FillZug3D wird vererbt }
     procedure FillZug2D;
     procedure SetZoom(Value: single); override;
   public
+    FColor: TColor;
+    FZoom2D: double; // eventuell von Zoom unterschiedlicher Faktor für 2D
+    FZoomFaktor: Integer; // Faktor für 'Auflösung' (typisch 0 oder 10)
     RelationZoom2D: double; // Verhältnis Zoom2D/Zoom. (Zoom = Zoom3D)
 
     cOffsetX1, cOffsetY1: Integer;
@@ -73,14 +69,16 @@ type
     OffsetX2, OffsetY2: Integer;
     OffsetX3, OffsetY3: Integer;
     OffsetX4, OffsetY4: Integer;
-
+    procedure SetZoomFaktor(Value: Integer);
+    procedure UpdateOffset;
+    procedure CalcOffset(R: TRect);
+  public
     constructor Create; override;
     destructor Destroy; override;
+
     procedure Update; override;
     procedure DrawToCanvas(Canvas: TCanvas); override;
     procedure DrawToMeta(Canvas: TMetaFileCanvas);
-    procedure UpdateOffset;
-    procedure CalcOffset(R: TRect);
 
     property Farbe: TColor read FColor write FColor;
     property ZoomFaktor: Integer read FZoomFaktor write SetZoomFaktor;
@@ -136,7 +134,7 @@ procedure TGetriebeGraph.SetZoom(Value: single);
 begin
   inherited SetZoom(Value);
   FZoom2D := RelationZoom2D * Zoom;
-  FKoppelkurveNeedFill := True;
+  FKoppelKurveNeedFill := True;
 end;
 
 { mit ZoomFaktor kann in die 'höhere Auflösung' umgeschaltet werden }
@@ -166,7 +164,7 @@ end;
 procedure TGetriebeGraph.SetKoppelKurve(const Kurve: TKoordLine);
 begin
   FKoppelKurve := Kurve;
-  FKoppelkurveNeedFill := True;
+  FKoppelKurveNeedFill := True;
 end;
 
 procedure TGetriebeGraph.Update;
@@ -677,7 +675,7 @@ begin
   FixPunkt2D := rP[FixPoint];
 
   { Koppelkurve }
-  if FKoppelkurveNeedFill then
+  if FKoppelKurveNeedFill then
   begin
     for j := 0 to 100 do
     begin
@@ -687,7 +685,7 @@ begin
       Zug1KoppelKurve[j+1].X :=  xTemp + OffsetX1;
       Zug1KoppelKurve[j+1].Y := -zTemp + OffsetY1;
     end;
-    FKoppelkurveNeedFill := False;
+    FKoppelKurveNeedFill := False;
   end;
 
   { Mastkurve }

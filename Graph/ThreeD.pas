@@ -13,8 +13,8 @@ const
   EM_FILEOPENERROR = -100;
   EM_FILETOOBIG = -101;
   EM_TOOMANYCOLORS = -102;
-  NUMCONNECTIONS = 905; { An object can have this many vertices }
-  NUMVERTICES = 125; { An object can have this many connections }
+  NUMCONNECTIONS = 905; { An object can have this many connections }
+  NUMVERTICES = 125; { An object can have this many vertices }
   NUMCOLORS = 16; { in Unit Windows definiert zu 24 }
   NUMSHADES = 32;
   NUM_SHADES = 255;
@@ -24,9 +24,9 @@ const
   BOTTOMEDGE: Integer = $04;
   TOPEDGE: Integer = $08;
   VLL = 0; { Borders of viewing region on the screen }
-  VRR = 1000; { vorher 1000 }
+  VRR = 1000;
   VTT = 0;
-  VBB = 1000; { vorher 1000 }
+  VBB = 1000;
   TOL = 0.001;
   PiD180 = 0.017453293;
 
@@ -40,9 +40,20 @@ type
 
   { A three dimensional viewing class }
   TThreeD = class
+  protected
+    procedure MinMax;
+    procedure WORLDtoPC(xw, yw: double; var pc: TPoint);
+    function Code(x, y, z: double): Integer;
+    procedure SetEye;
+    procedure View(Canvas: TCanvas); virtual;
+    procedure TransformSeg(Canvas: TCanvas; v1, v2: VECTOR; var pc1, pc2: TPoint);
+    procedure Clip3D(Canvas: TCanvas; x1, y1, z1, x2, y2, z2: double; var pc1, pc2: TPoint); virtual;
   public
-    A, B, C, D, DVal: double;
     From, At, Up: VECTOR; { Viewing parameters }
+    procedure SetAt;
+    procedure SetFrom; virtual;
+  protected
+    A, B, C, D, DVal: double;
     Angle: double; { The viewing angle }
     A1, A2, A3: VECTOR; { Used in three-dimensional transform }
     Connect: array [0 .. NUMCONNECTIONS] of Integer; { Vertex connections }
@@ -58,19 +69,13 @@ type
     { neue Felder: }
     ColorPal: array [0 .. NUMCOLORS] of RGBColor;
     NumColor: Integer;
+  public
     constructor Create;
+
     procedure Display(Canvas: TCanvas); { High-level display routine }
-    function Read3DObject(filename: string): Integer; virtual;
+
     function Read3DModel: Integer; virtual;
-    procedure MinMax;
-    procedure WORLDtoPC(xw, yw: double; var pc: TPoint);
-    function Code(x, y, z: double): Integer;
-    procedure SetAt;
-    procedure SetFrom; virtual;
-    procedure SetEye;
-    procedure View(Canvas: TCanvas); virtual;
-    procedure TransformSeg(Canvas: TCanvas; v1, v2: VECTOR; var pc1, pc2: TPoint);
-    procedure Clip3D(Canvas: TCanvas; x1, y1, z1, x2, y2, z2: double; var pc1, pc2: TPoint); virtual;
+    function Read3DObject(filename: string): Integer; virtual;
   end;
 
 procedure PaintBackGround(Image: TBitmap);
@@ -79,9 +84,9 @@ implementation
 
 procedure PaintBackGround(Image: TBitmap);
 var
-  r: TRect;
+  R: TRect;
 begin
-  r := Rect(0, 0, Image.Width, Image.Height);
+  R := Rect(0, 0, Image.Width, Image.Height);
   with Image.Canvas do
   begin
     Brush.Color := clWhite;
@@ -338,26 +343,25 @@ end;
   object and display them as you go. This will draw out the object. }
 procedure TThreeD.View(Canvas: TCanvas);
 var
-  i, startOfSide: Integer;
+  i: Integer;
+  startOfSide: Integer;
   pc1, pc2: TPoint;
 begin
   i := 1;
   while (i < Length) do
   begin
     startOfSide := i;
-    i := i + 1;
+    Inc(i);
     while (Connect[i] > 0) do
     begin
-      TransformSeg(Canvas, Points[Connect[i - 1]], Points[Connect[i]], pc1,
-        pc2);
-      i := i + 1;
+      TransformSeg(Canvas, Points[Connect[i - 1]], Points[Connect[i]], pc1, pc2);
+      Inc(i);
     end;
     { Close off the polygon }
-    TransformSeg(Canvas, Points[Connect[i - 1]], Points[Connect[startOfSide]],
-      pc1, pc2);
-    { Skip the negative value in the Connect array; it'll be
-      used in Chapter 16 to specify the polygon's color. }
-    i := i + 1;
+    TransformSeg(Canvas, Points[Connect[i - 1]], Points[Connect[startOfSide]], pc1, pc2);
+    { Skip the negative value in the Connect array;
+      it'll be used in Chapter 16 to specify the polygon's color. }
+    Inc(i);
   end;
 end;
 

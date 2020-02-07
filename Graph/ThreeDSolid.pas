@@ -48,19 +48,14 @@ type
   end;
 
   TThreeDSolid = class(TThreeD)
-  public
-    TriList: TTriangle; // permanente Dreiecksliste
-    BSPTree: TBSPNode; // BSP Tree
+  private
+    TriList: TTriangle;
+    BSPTree: TBSPNode;
     Ambient: double;
     Diffuse: double;
     Light: Vector;
-    WireFrame: Boolean;
     Shading: Boolean;
-    constructor Create;
-    destructor Destroy; override;
-    function Read3DObject(filename: string): Integer; override;
-    function Read3DModel: Integer; override;
-    function BuildModel: Integer;
+  private
     procedure CalcPlaneEqs;
     procedure DisposeBSP(tree: TBSPNode);
     procedure DisposeTriList;
@@ -76,8 +71,18 @@ type
     procedure PrecomputeCentroids;
     function ComputeColor(var p: Point; var Normal: Vector; colorNdx: Integer): TColor;
     procedure DisplayTriangle(Canvas: TCanvas; Tri: TTriangle);
-    procedure View(Canvas: TCanvas); override;
     procedure TraverseTree(Canvas: TCanvas; tree: TBSPNode);
+  protected
+    procedure View(Canvas: TCanvas); override;
+  public
+    WireFrame: Boolean;
+
+    constructor Create;
+    destructor Destroy; override;
+
+    function Read3DObject(filename: string): Integer; override;
+    function Read3DModel: Integer; override;
+    function BuildModel: Integer;
   end;
 
 implementation
