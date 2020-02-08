@@ -233,30 +233,30 @@ end;
 
 procedure TRggMain.InitStrokeRigg;
 var
-  rg: TRaumGraph;
+  sr: TRaumGraph;
 begin
   if StrokeRigg <> nil then
   begin
-    rg := StrokeRigg.RaumGraph;
-    rg.SalingTyp := Rigg.SalingTyp;
-    rg.ControllerTyp := Rigg.ControllerTyp;
-    rg.Koordinaten := Rigg.rP;
-    rg.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-    rg.WanteGestrichelt := not Rigg.GetriebeOK;
+    sr := StrokeRigg.RaumGraph;
+    sr.SalingTyp := Rigg.SalingTyp;
+    sr.ControllerTyp := Rigg.ControllerTyp;
+    sr.Koordinaten := Rigg.rP;
+    sr.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+    sr.WanteGestrichelt := not Rigg.GetriebeOK;
   end;
 end;
 
 procedure TRggMain.UpdateStrokeRigg;
 var
-  rg: TRaumGraph;
+  sr: TRaumGraph;
 begin
   if StrokeRigg <> nil then
   begin
-    rg := StrokeRigg.RaumGraph;
-    rg.Koordinaten := Rigg.rP;
-    rg.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-    rg.WanteGestrichelt := not Rigg.GetriebeOK;
-    rg.Bogen := (FParam <> fpWinkel);
+    sr := StrokeRigg.RaumGraph;
+    sr.Koordinaten := Rigg.rP;
+    sr.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+    sr.WanteGestrichelt := not Rigg.GetriebeOK;
+    sr.Bogen := (FParam <> fpWinkel);
   end;
 end;
 

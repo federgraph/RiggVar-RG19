@@ -24,7 +24,7 @@ type
     procedure SetOffset(Value: TPoint); virtual;
     procedure SetZoom(Value: single); virtual;
   public
-    Rotator: TPolarKar;
+    Rotator: TPolarKar; // injected, not owned
     DL: TRggDisplayList;
     constructor Create; virtual;
     destructor Destroy; override;

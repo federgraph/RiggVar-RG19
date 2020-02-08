@@ -347,8 +347,8 @@ begin
   MaxTrackY := 768;
 
   CreatedScreenWidth := Screen.Width;
-  wx := GetSystemMetrics(SM_CXSCREEN); { Width := Screen.Width }
-  wy := GetSystemMetrics(SM_CYSCREEN); { Height := Screen.Height }
+  wx := GetSystemMetrics(SM_CXSCREEN);
+  wy := GetSystemMetrics(SM_CYSCREEN);
   if wx > MaxTrackX then
     wx := MaxTrackX;
   if wy > MaxTrackY then
