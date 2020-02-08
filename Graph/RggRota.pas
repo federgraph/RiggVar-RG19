@@ -21,10 +21,9 @@ uses
   Vector3D,
   RggTypes,
   RggMatrix,
-  RggUnit4,
+  RggRaumGraph,
   RggGraph,
   RggHull,
-  RggRaumGraph,
   RggPolarKar;
 
 type
@@ -59,7 +58,6 @@ type
     procedure ChangeResolution;
     procedure PaintBackGround(Image: TBitmap);
     procedure DrawAngleText(Canvas: TCanvas);
-    procedure DrawToBitmap(g: TCanvas);
     procedure PaintBox3DPaint(Sender: TObject);
   private
     FViewPoint: TViewPoint;
@@ -138,6 +136,8 @@ type
     destructor Destroy; override;
     procedure Init;
     procedure Draw;
+    procedure DrawToCanvas(g: TCanvas);
+    procedure DrawToImage(g: TCanvas);
 
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
@@ -146,7 +146,7 @@ type
 implementation
 
 uses
-  RggPBox,
+  RggPBox, // special paintbox which captures the mouse properly
   RggTestData;
 
 { TRotaForm }
@@ -164,7 +164,6 @@ end;
 destructor TRotaForm.Destroy;
 begin
   Paintbox3D.Free;
-  Paintbox3D := nil;
   Bitmap.Free;
   RaumGraph.Free;
   HullGraph.Free;
@@ -357,29 +356,11 @@ begin
   end;
 end;
 
-procedure TRotaForm.Draw;
+procedure TRotaForm.DrawToImage(g: TCanvas);
 begin
   Painted := False;
 
-  { Nach Änderung der Auflösung Probleme mit dem Grau-Überschreiben. Deshalb: }
-  if Screen.Width <> CreatedScreenWidth then
-    ChangeResolution;
-
-  if not PaintItemChecked or EraseBK then
-  begin
-    PaintBackGround(Bitmap);
-    EraseBK := False;
-  end;
-
-  NullpunktOffset.x := -RaumGraph.NOffset.x + Bitmap.Width div 2 + FXpos;
-  NullpunktOffset.y := -RaumGraph.NOffset.y + Bitmap.Height div 2 + FYpos;
-  DrawToBitmap(Bitmap.Canvas);
-
-  if MatrixItemChecked then
-  begin
-    UpdateMatrixText;
-    DrawMatrix(Bitmap.Canvas);
-  end;
+  DrawToCanvas(g);
 
   { Bitmap auf den Bildschirm kopieren }
   with PaintBox3D.Canvas do
@@ -391,8 +372,23 @@ begin
   Painted := True;
 end;
 
-procedure TRotaForm.DrawToBitmap(g: TCanvas);
+procedure TRotaForm.DrawToCanvas(g: TCanvas);
 begin
+  if not PaintItemChecked or EraseBK then
+  begin
+    PaintBackGround(Bitmap);
+    EraseBK := False;
+  end;
+
+  NullpunktOffset.x := -RaumGraph.NOffset.x + Bitmap.Width div 2 + FXpos;
+  NullpunktOffset.y := -RaumGraph.NOffset.y + Bitmap.Height div 2 + FYpos;
+
+  if MatrixItemChecked then
+  begin
+    UpdateMatrixText;
+    DrawMatrix(g);
+  end;
+
   with g do
   begin
     SetMapMode(Handle, MM_ANISOTROPIC);
@@ -747,6 +743,16 @@ begin
     EraseBK := True;
     Draw;
   end;
+end;
+
+procedure TRotaForm.Draw;
+begin
+  { Nach Änderung der Auflösung Probleme mit dem Grau-Überschreiben. Deshalb: }
+  if Screen.Width <> CreatedScreenWidth then
+    ChangeResolution;
+
+  if IsUp then
+    DrawToImage(Bitmap.Canvas);
 end;
 
 procedure TRotaForm.DrawAlwaysItemClick(Sender: TObject);
