@@ -384,20 +384,16 @@ begin
   for j := nvert downto 0 do
   begin
     i := j * 3;
-    x := v[i];
+    x := v[i + 0];
     y := v[i + 1];
     z := v[i + 2];
-    tv[i] := Round(FMat[1, 1] * x + FMat[1, 2] * y + FMat[1, 3] * z + FMat[1, 4]
-      );
-    tv[i + 1] := Round(FMat[2, 1] * x + FMat[2, 2] * y + FMat[2, 3] * z + FMat
-        [2, 4]);
-    tv[i + 2] := Round(FMat[3, 1] * x + FMat[3, 2] * y + FMat[3, 3] * z + FMat
-        [3, 4]);
+    tv[i + 0] := Round(FMat[1, 1] * x + FMat[1, 2] * y + FMat[1, 3] * z + FMat[1, 4]);
+    tv[i + 1] := Round(FMat[2, 1] * x + FMat[2, 2] * y + FMat[2, 3] * z + FMat[2, 4]);
+    tv[i + 2] := Round(FMat[3, 1] * x + FMat[3, 2] * y + FMat[3, 3] * z + FMat[3, 4]);
   end;
 end;
 
-procedure TMatrix4x4.TransformF(var v: TVertArrayF; var tv: TVertArrayF;
-  nvert: Integer);
+procedure TMatrix4x4.TransformF(var v: TVertArrayF; var tv: TVertArrayF; nvert: Integer);
 var
   i, j: Integer;
   x, y, z: single;
@@ -408,7 +404,7 @@ begin
     x := v[i];
     y := v[i + 1];
     z := v[i + 2];
-    tv[i] := FMat[1, 1] * x + FMat[1, 2] * y + FMat[1, 3] * z + FMat[1, 4];
+    tv[i + 0] := FMat[1, 1] * x + FMat[1, 2] * y + FMat[1, 3] * z + FMat[1, 4];
     tv[i + 1] := FMat[2, 1] * x + FMat[2, 2] * y + FMat[2, 3] * z + FMat[2, 4];
     tv[i + 2] := FMat[3, 1] * x + FMat[3, 2] * y + FMat[3, 3] * z + FMat[3, 4];
   end;
@@ -476,7 +472,8 @@ begin
     9: FixPunkt := ooE;
    10: FixPunkt := ooF0;
    11: FixPunkt := ooF;
-   else FixPunkt := ooD0;
+   else
+     FixPunkt := ooD0;
   end;
 end;
 

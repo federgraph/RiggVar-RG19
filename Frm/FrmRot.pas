@@ -1526,7 +1526,7 @@ procedure TRotationForm.FaktorDlgItemClick(Sender: TObject);
 begin
   RumpfFaktorDlg := TRumpfFaktorDlg.Create(Self);
   try
-    with HullGraph as THullGraph do
+    with HullGraph as THullGraph0 do
     begin
       RumpfFaktorDlg.Caption := 'Rumpf skalieren';
       RumpfFaktorDlg.GroupBox.Caption := 'Faktor in %';

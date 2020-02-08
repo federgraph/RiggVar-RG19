@@ -34,17 +34,17 @@ type
     procedure PaintBox3DMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure PaintBox3DMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   protected
-    MatrixItemChecked: Boolean;
     KeepInsideItemChecked: Boolean;
     procedure PositionSaveItemClick(Sender: TObject);
     procedure KeepInsideItemClick(Sender: TObject);
     procedure PositionResetItemClick(Sender: TObject);
     procedure ModusItemClick(Sender: TObject);
     procedure DrawAlwaysItemClick(Sender: TObject);
-    procedure MatrixItemClick(Sender: TObject);
   public
+    MatrixItemChecked: Boolean;
     PaintItemChecked: Boolean;
     RumpfItemChecked: Boolean;
+    procedure MatrixItemClick(Sender: TObject);
     procedure PaintBtnClick(Sender: TObject);
     procedure RumpfBtnClick(Sender: TObject);
     procedure ZoomInBtnClick(Sender: TObject);
@@ -58,9 +58,8 @@ type
     Bitmap: TBitmap;
     procedure ChangeResolution;
     procedure PaintBackGround(Image: TBitmap);
-    procedure DrawMatrix(Canvas: TCanvas);
     procedure DrawAngleText(Canvas: TCanvas);
-    procedure DrawToBitmap;
+    procedure DrawToBitmap(g: TCanvas);
     procedure PaintBox3DPaint(Sender: TObject);
   private
     FViewPoint: TViewPoint;
@@ -85,7 +84,6 @@ type
     RotaData4: TRotaData;
 
     NullpunktOffset: TPoint;
-    FPaintRumpf: Boolean;
     FDrawAlways: Boolean;
     FTranslation: Boolean;
     MouseDown: Boolean;
@@ -101,6 +99,7 @@ type
   public
     procedure SetFixPoint(const Value: TRiggPoint);
     procedure SetViewPoint(const Value: TViewPoint);
+    procedure SetHullVisible(const Value: Boolean);
     procedure ToggleRenderOption(const fa: Integer);
     function QueryRenderOption(const fa: Integer): Boolean;
   public
@@ -111,6 +110,8 @@ type
     MatrixTextU: string;
     MatrixTextV: string;
     MatrixTextW: string;
+    procedure UpdateMatrixText;
+    procedure DrawMatrix(g: TCanvas);
   private
     EraseBK: Boolean;
     procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
@@ -204,7 +205,7 @@ begin
   FViewPoint := vp3D;
   FFixPoint := ooD;
 
-  { PaintBox austauschen }
+  { PaintBox }
   NewPaintBox := TRggPaintBox.Create(PaintBox3D.Owner);
   try
     NewPaintBox.Parent := PaintBox3D.Parent;
@@ -236,7 +237,7 @@ end;
 
 procedure TRotaForm.InitRaumGrafik;
 begin
-  UseDisplayList := True;
+  UseDisplayList := False;
 
   RaumGraph := TRaumGraph.Create;
   RaumGraph.Rotator := Rotator;
@@ -322,25 +323,6 @@ begin
   end;
 end;
 
-procedure TRotaForm.DrawMatrix(Canvas: TCanvas);
-var
-  S1, S2, S3: string;
-  m4x4: Matrix4x4;
-begin
-  m4x4 := Rotator.Mat.Mat;
-  S1 := Format('%8.4f %8.4f %8.4f',[m4x4[1,1],m4x4[1,2], m4x4[1,3]]);
-  S2 := Format('%8.4f %8.4f %8.4f',[m4x4[2,1],m4x4[2,2], m4x4[2,3]]);
-  S3 := Format('%8.4f %8.4f %8.4f',[m4x4[3,1],m4x4[3,2], m4x4[3,3]]);
-  with Canvas do
-  begin
-    Font.Name := 'Courier New';
-    Font.Size := 10;
-    TextOut(20,40, S1);
-    TextOut(20,60, S2);
-    TextOut(20,80, S3);
-  end;
-end;
-
 procedure TRotaForm.DrawAngleText(Canvas: TCanvas);
 begin
   with Canvas do
@@ -350,6 +332,28 @@ begin
     TextOut(20,120, SHeadingPhi);
     TextOut(20,140, SPitchtheta);
     TextOut(20,160, SBankGamma);
+  end;
+end;
+
+procedure TRotaForm.UpdateMatrixText;
+var
+  m4x4: Matrix4x4;
+begin
+  m4x4 := Rotator.Mat.Mat;
+  MatrixTextU := Format('%8.4f %8.4f %8.4f',[m4x4[1,1],m4x4[1,2], m4x4[1,3]]);
+  MatrixTextV := Format('%8.4f %8.4f %8.4f',[m4x4[2,1],m4x4[2,2], m4x4[2,3]]);
+  MatrixTextW := Format('%8.4f %8.4f %8.4f',[m4x4[3,1],m4x4[3,2], m4x4[3,3]]);
+end;
+
+procedure TRotaForm.DrawMatrix(g: TCanvas);
+begin
+  with g do
+  begin
+    Font.Name := 'Courier New';
+    Font.Size := 10;
+    TextOut(20,40, MatrixTextU);
+    TextOut(20,60, MatrixTextU);
+    TextOut(20,80, MatrixTextU);
   end;
 end;
 
@@ -369,10 +373,13 @@ begin
 
   NullpunktOffset.x := -RaumGraph.NOffset.x + Bitmap.Width div 2 + FXpos;
   NullpunktOffset.y := -RaumGraph.NOffset.y + Bitmap.Height div 2 + FYpos;
-  DrawToBitmap;
+  DrawToBitmap(Bitmap.Canvas);
 
   if MatrixItemChecked then
+  begin
+    UpdateMatrixText;
     DrawMatrix(Bitmap.Canvas);
+  end;
 
   { Bitmap auf den Bildschirm kopieren }
   with PaintBox3D.Canvas do
@@ -384,9 +391,9 @@ begin
   Painted := True;
 end;
 
-procedure TRotaForm.DrawToBitmap;
+procedure TRotaForm.DrawToBitmap(g: TCanvas);
 begin
-  with Bitmap.Canvas do
+  with g do
   begin
     SetMapMode(Handle, MM_ANISOTROPIC);
     SetWindowExtEx(Handle, 1000, 1000, nil);
@@ -400,19 +407,22 @@ begin
   begin
     RaumGraph.Update;
     RaumGraph.UpdateDisplayList;
-    RaumGraph.DL.Draw(Bitmap.Canvas);
+    RaumGraph.DL.Draw(g);
   end
   else
-    RaumGraph.DrawToCanvas(Bitmap.Canvas);
+  begin
+    RaumGraph.DrawToCanvas(g);
+  end;
 
-  if FPaintRumpf and (not MouseDown or (MouseDown and FDrawAlways)) then
+  if RumpfItemChecked
+    and (not MouseDown or (MouseDown and FDrawAlways)) then
   begin
     HullGraph.Coloriert := True;
     HullGraph.FixPunkt := RaumGraph.FixPunkt;
-    HullGraph.DrawToCanvas(Bitmap.Canvas);
+    HullGraph.DrawToCanvas(g);
   end;
 
-  with Bitmap.Canvas do
+  with g do
   begin
     SetWindowOrgEx(Handle, 0, 0, nil);
     SetViewPortOrgEx(Handle, 0, 0, nil);
@@ -493,10 +503,15 @@ begin
   Draw;
 end;
 
+procedure TRotaForm.SetHullVisible(const Value: Boolean);
+begin
+  RumpfItemChecked := Value;
+  Draw;
+end;
+
 procedure TRotaForm.RumpfBtnClick(Sender: TObject);
 begin
   RumpfItemChecked := not RumpfItemChecked;
-  FPaintRumpf := RumpfItemChecked;
   Draw;
 end;
 
@@ -529,6 +544,7 @@ begin
     vpTop: RotaData := RotaData3;
     vp3D: RotaData := RotaData4;
   end;
+  RaumGraph.Viewpoint := Value; // for GetriebeGraph
 
   FXpos := RotaData.Xpos;
   FYpos := RotaData.Ypos;

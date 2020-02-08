@@ -190,9 +190,7 @@ procedure TSalingCtrl.DrawSalingAll(Canvas: TCanvas);
 var
   SalingX: Integer;
   SalingY: Integer;
-  t: Integer;
 begin
-  t := Canvas.Font.Size; // = -375 in debugger
   Lage := hoch;
   OffsetX := 0; { 0 * 100; }
   OffsetY := (SalingH-SalingHOffset) * 100;

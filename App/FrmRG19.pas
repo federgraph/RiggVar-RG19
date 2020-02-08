@@ -268,6 +268,7 @@ type
 
     BuntBtn: TSpeedButton;
     HullBtn: TSpeedButton;
+    MatrixBtn: TSpeedButton;
 
     SeiteBtn: TSpeedButton;
     TopBtn: TSpeedButton;
@@ -440,7 +441,7 @@ begin
   RotaForm := TRotaForm.Create;
   rggm.StrokeRigg := RotaForm;
   RotaForm.PaintBox3D := PaintboxR;
-  RotaForm.UseDisplayList := True;
+  RotaForm.UseDisplayList := False;
   RotaForm.Init;
   PaintboxR := RotaForm.PaintBox3D;
 end;
@@ -1359,6 +1360,15 @@ begin
   sb.Down := RotaForm.PaintItemChecked;
   sb.GroupIndex := 12;
   sb.OnClick := RotaForm.PaintBtnClick;
+
+  sb := AddSpeedBtn('MatrixBtn', 0);
+  MatrixBtn := sb;
+  sb.Caption := 'Mat';
+  sb.Hint := 'Matrix Btn|Toggle display of Matrix';
+  sb.AllowAllUp := True;
+  sb.Down := RotaForm.MatrixItemChecked;
+  sb.GroupIndex := 12;
+  sb.OnClick := RotaForm.MatrixItemClick;
 
   BtnCounter := 0;
   BtnLeft := sb.Left + BtnWidth;

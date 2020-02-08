@@ -281,7 +281,7 @@ begin
   if WantRumpf then
   begin
     DI.StrokeColor := TColors.Lightgray;
-    DI.StrokeWidth := 10;
+    DI.StrokeWidth := 3;
     DL.Line(A0, B0, ZugRumpf[0], ZugRumpf[1], clRed);
     DL.Line(B0, C0, ZugRumpf[1], ZugRumpf[2], clGreen);
     DL.Line(A0, C0, ZugRumpf[2], ZugRumpf[3], clBlue);
@@ -295,7 +295,7 @@ begin
   if WantMast then
   begin
     DI.StrokeColor := TColors.Cornflowerblue;
-    DI.StrokeWidth := 6;
+    DI.StrokeWidth := 5;
     if FBogen then
     begin
       DL.PolyLine(D0, D, ZugMastKurveD0D, TColors.Cornflowerblue);

@@ -16,9 +16,11 @@ uses
   RggRaumGraph;
 
 type
-  THullGraph = class(TRggGraph)
+  THullGraph0 = class(TRggGraph)
+  private
+    procedure MessageBeep(Value: Integer);
   protected
-    { Koordinaten }
+    { Vertices }
     vert: TVertArrayF; { Gleitkomma-Koordinaten }
     tvert: TVertArrayI; { Integer-Koordinaten - transformed }
     nvert: Integer;
@@ -30,48 +32,64 @@ type
     mat: TMatrix4x4;
     xmin, xmax, ymin, ymax, zmin, zmax: double;
     zfac: double;
-    procedure ReadVertex;
-    procedure ReadVertex1;
-    procedure ReadVertex2(Memo: TStrings);
-    procedure ReadCons;
-    procedure ReadCons1;
-    procedure ReadCons2(k, l: Integer);
     function AddVert(x, y, z: single): Integer;
     procedure AddLine(p1, p2: Integer);
     procedure Paint(g: TCanvas);
     procedure FindBB;
     function GetColor(i: Integer): TColor;
+  protected
+    procedure ReadVerts420;
+    procedure ReadCons420(k, l: Integer);
+  protected
+    procedure ReadVertices; virtual;
+    procedure ReadConnections; virtual;
   public
     Factor: vec3; // FaktorX, FaktorY, FaktorZ: double;
     ModelFactor: vec3;
-    VertexFileName: string;
-    VertexMemo: TStrings;
+
     constructor Create; override;
     destructor Destroy; override;
+
     procedure Load;
     procedure Update; override;
+
     procedure DrawToCanvas(Canvas: TCanvas); override;
+  end;
+
+  THullGraph = class(THullGraph0)
+  protected
+    procedure ReadCons1;
+    procedure ReadVertices; override;
+    procedure ReadConnections; override;
+  public
+    VertexFileName: string;
+    VertexMemo: TStrings;
+    procedure ReadVertexFromMemo(Memo: TStrings);
     procedure GetPlotList(List: TStringList); override;
   end;
 
+
 var
-  HullGraph: THullGraph;
+  HullGraph: THullGraph0;
 
 implementation
 
 uses
   RiggVar.FB.Classes;
 
-constructor THullGraph.Create;
+constructor THullGraph0.Create;
 var
   xw, yw, zw: double;
 begin
   inherited Create;
+
   Factor.x := 1;
   Factor.y := 1;
   Factor.z := 1;
   ModelFactor := Factor;
+
   Load;
+
   mat := TMatrix4x4.Create;
   mat.XRot(20);
   mat.YRot(30);
@@ -87,23 +105,33 @@ begin
     zfac := zw;
 end;
 
-destructor THullGraph.Destroy;
+destructor THullGraph0.Destroy;
 begin
   mat.Free;
   inherited Destroy;
 end;
 
-procedure THullGraph.Load;
+procedure THullGraph0.Load;
 begin
   nvert := 0;
   ncon := 0;
-  ReadVertex;
-  ReadCons;
+  ReadVertices; // virtual
+  ReadConnections; // virtual
   GrafikOK := True;
 end;
 
+procedure THullGraph0.ReadVertices;
+begin
+  ReadVerts420;
+end;
+
+procedure THullGraph0.ReadConnections;
+begin
+  ReadCons420(10, 7);
+end;
+
 { Add a vertex to the Model }
-function THullGraph.AddVert(x, y, z: single): Integer;
+function THullGraph0.AddVert(x, y, z: single): Integer;
 var
   i: Integer;
 begin
@@ -114,7 +142,7 @@ begin
     Exit;
   end;
   i := i * 3;
-  vert[i] := Factor.x * ModelFactor.x * x;
+  vert[i + 0] := Factor.x * ModelFactor.x * x;
   vert[i + 1] := Factor.y * ModelFactor.y * y;
   vert[i + 2] := Factor.z * ModelFactor.z * z;
   Inc(nvert);
@@ -122,7 +150,7 @@ begin
 end;
 
 { Add a line from vertex p1 to vertex p2 }
-procedure THullGraph.AddLine(p1, p2: Integer);
+procedure THullGraph0.AddLine(p1, p2: Integer);
 var
   i, t: Integer;
 begin
@@ -142,7 +170,7 @@ begin
   ncon := i + 1;
 end;
 
-procedure THullGraph.Update;
+procedure THullGraph0.Update;
 begin
   if not GrafikOK then
     Exit;
@@ -151,14 +179,14 @@ begin
   mat.Identity;
   mat.Translate(-FixPunkt[x], -FixPunkt[y], -FixPunkt[z]);
   mat.Multiply(Rotator.Matrix);
-  { x und z werden abgebildet (siehe GBox3D) }
+  { x und z werden abgebildet }
   mat.ScaleXYZ(Zoom, 20 / zfac, Zoom);
   mat.Translate(NOffset.x, 4, -NOffset.y);
   mat.Transform(vert, tvert, nvert);
   Updated := True;
 end;
 
-procedure THullGraph.DrawToCanvas(Canvas: TCanvas);
+procedure THullGraph0.DrawToCanvas(Canvas: TCanvas);
 begin
   if not GrafikOK then
     Exit;
@@ -167,7 +195,7 @@ begin
   Paint(Canvas);
 end;
 
-procedure THullGraph.Paint(g: TCanvas);
+procedure THullGraph0.Paint(g: TCanvas);
 var
   i, lim, t, p1, p2, grey: Integer;
   c: TConArray;
@@ -215,7 +243,7 @@ begin
   end;
 end;
 
-function THullGraph.GetColor(i: Integer): TColor;
+function THullGraph0.GetColor(i: Integer): TColor;
 var
   idx: Word;
   R, G, B: Byte;
@@ -228,7 +256,7 @@ begin
 end;
 
 { Find the bounding box of this model }
-procedure THullGraph.FindBB;
+procedure THullGraph0.FindBB;
 var
   v: TVertArrayF;
   lxmin, lymin, lzmin, lxmax, lymax, lzmax: single;
@@ -274,120 +302,7 @@ begin
   zmin := lzmin;
 end;
 
-procedure THullGraph.GetPlotList(List: TStringList);
-var
-  i, t, p1, p2: Integer;
-  c: TConArray;
-  v: TVertArrayI;
-  s: string;
-  SavedZoom: double;
-begin
-  if (ncon <= 0) or (nvert <= 0) then
-    Exit;
-  if not GrafikOK then
-    Exit;
-  SavedZoom := Zoom;
-  Zoom := 10;
-  if not Updated then
-    Update;
-  List.add('SP 1;');
-  c := con;
-  v := tvert;
-  for i := 0 to ncon - 1 do
-  begin
-    { Indizes in das Vertice-array bestimmen }
-    t := c[i]; //T  wie Temp
-    p1 := ((t shr 16) and $FFFF) * 3; // Index Punkt1
-    p2 := (t and $FFFF) * 3; // Index Punkt2
-    // g.MoveTo(v[p1], -v[p1 + 2]);
-    S := Format('PU %d %d;', [v[p1], -v[p1 + 2]]);
-    List.Add(S);
-    // g.LineTo(v[p2], -v[p2 + 2]);
-    s := Format('PD %d %d;', [ v[p2], -v[p2 + 2] ]);
-    List.Add(s);
-  end;
-  Zoom := SavedZoom;
-end;
-
-procedure THullGraph.ReadVertex2(Memo: TStrings);
-var
-  i, Code: Integer;
-  Zeile, Wort: string;
-  a, b, c: Integer;
-
-  { local procedure }
-  procedure GetReal(var RealValue: double);
-  begin
-    Zeile := Trim(Zeile);
-    Wort := TUtils.StripFirstWord(Zeile);
-    if Wort = '' then
-      Wort := Zeile;
-    Val(Wort, RealValue, Code);
-    if Code <> 0 then
-      MessageBeep(0);
-  end;
-
-  { local procedure }
-  procedure GetInteger(var IntValue: Integer);
-  begin
-    Zeile := Trim(Zeile);
-    Wort := TUtils.StripFirstWord(Zeile);
-    if Wort = '' then
-      Wort := Zeile;
-    Val(Wort, IntValue, Code);
-    if Code <> 0 then
-      MessageBeep(0);
-  end;
-
-begin
-  { in Zeile 0 stehen die Faktoren * 100 }
-  for i := 0 to Memo.Count - 1 do
-  begin
-    Zeile := Memo[i];
-    if Zeile = '' then
-      Continue;
-    GetInteger(a);
-    GetInteger(b);
-    GetInteger(c);
-    ModelFactor.x := a / 100;
-    ModelFactor.y := b / 100;
-    ModelFactor.z := c / 100;
-    Break;
-  end;
-
-  for i := 1 to Memo.Count - 1 do
-  begin
-    Zeile := Memo[i];
-    if Zeile = '' then
-      Continue;
-    GetInteger(a);
-    GetInteger(b);
-    GetInteger(c);
-    AddVert(a, b, c);
-  end;
-end;
-
-procedure THullGraph.ReadVertex;
-var
-  Memo: TStringList;
-begin
-  if VertexMemo <> nil then
-    ReadVertex2(VertexMemo)
-  else if VertexFileName <> '' then
-  begin
-    Memo := TStringList.Create;
-    try
-      Memo.LoadFromFile(VertexFileName);
-      ReadVertex2(Memo);
-    finally
-      Memo.Free;
-    end;
-  end
-  else
-    ReadVertex1;
-end;
-
-procedure THullGraph.ReadVertex1;
+procedure THullGraph0.ReadVerts420;
 begin
   ModelFactor.x := 1;
   ModelFactor.y := 1;
@@ -528,81 +443,7 @@ begin
   AddVert(0, 580, 250);
 end;
 
-procedure THullGraph.ReadCons;
-begin
-  // ReadCons1;
-  ReadCons2(10, 7);
-end;
-
-procedure THullGraph.ReadCons1;
-  procedure addcon7(a1, a2, a3, a4, a5, a6, a7: Integer);
-  begin
-    AddLine(a1 - 1, a2 - 1);
-    AddLine(a2 - 1, a3 - 1);
-    AddLine(a3 - 1, a4 - 1);
-    AddLine(a4 - 1, a5 - 1);
-    AddLine(a5 - 1, a6 - 1);
-    AddLine(a6 - 1, a7 - 1);
-  end;
-  procedure addcon10(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10: Integer);
-  begin
-    AddLine(a1 - 1, a2 - 1);
-    AddLine(a2 - 1, a3 - 1);
-    AddLine(a3 - 1, a4 - 1);
-    AddLine(a4 - 1, a5 - 1);
-    AddLine(a5 - 1, a6 - 1);
-    AddLine(a6 - 1, a7 - 1);
-    AddLine(a7 - 1, a8 - 1);
-    AddLine(a8 - 1, a9 - 1);
-    AddLine(a9 - 1, a10 - 1);
-  end;
-
-begin
-  addcon7(1, 2, 3, 4, 5, 6, 7);
-
-  addcon7(8, 9, 10, 11, 12, 13, 14);
-  addcon7(14, 15, 16, 17, 18, 19, 20);
-
-  addcon7(21, 22, 23, 24, 25, 26, 27);
-  addcon7(27, 28, 29, 30, 31, 32, 33);
-
-  addcon7(34, 35, 36, 37, 38, 39, 40);
-  addcon7(40, 41, 42, 43, 44, 45, 46);
-
-  addcon7(47, 48, 49, 50, 51, 52, 53);
-  addcon7(53, 54, 55, 56, 57, 58, 59);
-
-  addcon7(60, 61, 62, 63, 64, 65, 66);
-  addcon7(66, 67, 68, 69, 70, 71, 72);
-
-  addcon7(73, 74, 75, 76, 77, 78, 79);
-  addcon7(79, 80, 81, 82, 83, 84, 85);
-
-  addcon7(86, 87, 88, 89, 90, 91, 92);
-  addcon7(92, 93, 94, 95, 96, 97, 98);
-
-  addcon7(99, 100, 101, 102, 103, 104, 105);
-  addcon7(105, 106, 107, 108, 109, 110, 111);
-
-  addcon7(112, 113, 114, 115, 116, 117, 118);
-  addcon7(118, 119, 120, 121, 122, 123, 124);
-
-  addcon10(1, 8, 21, 34, 47, 60, 73, 86, 99, 112);
-  addcon10(2, 9, 22, 35, 48, 61, 74, 87, 100, 113);
-  addcon10(3, 10, 23, 36, 49, 62, 75, 88, 101, 114);
-  addcon10(4, 11, 24, 37, 50, 63, 76, 89, 102, 115);
-  addcon10(5, 12, 25, 38, 51, 64, 77, 90, 103, 116);
-  addcon10(6, 13, 26, 39, 52, 65, 78, 91, 104, 117);
-  addcon10(7, 14, 27, 40, 53, 66, 79, 92, 105, 118);
-  addcon10(6, 15, 28, 41, 54, 67, 80, 93, 106, 119);
-  addcon10(5, 16, 29, 42, 55, 68, 81, 94, 107, 120);
-  addcon10(4, 17, 30, 43, 56, 69, 82, 95, 108, 121);
-  addcon10(3, 18, 31, 44, 57, 70, 83, 96, 109, 122);
-  addcon10(2, 19, 32, 45, 58, 71, 84, 97, 110, 123);
-  addcon10(1, 20, 33, 46, 59, 72, 85, 98, 111, 124);
-end;
-
-procedure THullGraph.ReadCons2(k, l: Integer);
+procedure THullGraph0.ReadCons420(k, l: Integer);
 
   procedure AddSection(a, b, c, n: Integer);
   { a = 1.Punkt
@@ -613,12 +454,14 @@ procedure THullGraph.ReadCons2(k, l: Integer);
   var
     i: Integer;
   begin
-    AddLine(a-1, b-1);
-    if n = 1 then Exit;
-    for i := 2 to n do begin
+    AddLine(a - 1, b - 1);
+    if n = 1 then
+      Exit;
+    for i := 2 to n do
+    begin
       a := b;
       b := b + c;
-      AddLine(a-1, b-1);
+      AddLine(a - 1, b - 1);
     end;
   end;
 
@@ -632,7 +475,7 @@ begin
   // l := 7; // Anzahl der Linien
 
   SpantenZahl := k - 1; // Anzahl Spanten = 9
-  LinienZahl := 2*l-1; // Anzahl Linien = 13
+  LinienZahl := 2 * l - 1; // Anzahl Linien = 13
   vs := l - 1; // Anzahl Verbindungen eines Spantes = 6
   vl := k - 1; // Anzahl Verbindungen einer Linie = 9
 
@@ -659,6 +502,201 @@ begin
     a := a - 1;
     b := b + 1;
   end;
+end;
+
+procedure THullGraph0.MessageBeep(Value: Integer);
+begin
+
+end;
+
+{ THullGraph }
+
+procedure THullGraph.ReadConnections;
+begin
+//  ReadCons1;
+  ReadCons420(10, 7);
+end;
+
+procedure THullGraph.ReadVertices;
+var
+  ML: TStringList;
+begin
+  if VertexMemo <> nil then
+    ReadVertexFromMemo(VertexMemo)
+  else if VertexFileName <> '' then
+  begin
+    ML := TStringList.Create;
+    try
+      ML.LoadFromFile(VertexFileName);
+      ReadVertexFromMemo(ML);
+    finally
+      ML.Free;
+    end;
+  end
+  else
+    ReadVerts420;
+end;
+
+procedure THullGraph.ReadVertexFromMemo(Memo: TStrings);
+var
+  i, Code: Integer;
+  Zeile, Wort: string;
+  a, b, c: Integer;
+
+  { local procedure }
+  procedure GetReal(var RealValue: double);
+  begin
+    Zeile := Trim(Zeile);
+    Wort := TUtils.StripFirstWord(Zeile);
+    if Wort = '' then
+      Wort := Zeile;
+    Val(Wort, RealValue, Code);
+    if Code <> 0 then
+      MessageBeep(0);
+  end;
+
+  { local procedure }
+  procedure GetInteger(var IntValue: Integer);
+  begin
+    Zeile := Trim(Zeile);
+    Wort := TUtils.StripFirstWord(Zeile);
+    if Wort = '' then
+      Wort := Zeile;
+    Val(Wort, IntValue, Code);
+    if Code <> 0 then
+      MessageBeep(0);
+  end;
+
+begin
+  { in Zeile 0 stehen die Faktoren * 100 }
+  for i := 0 to Memo.Count - 1 do
+  begin
+    Zeile := Memo[i];
+    if Zeile = '' then
+      Continue;
+    GetInteger(a);
+    GetInteger(b);
+    GetInteger(c);
+    ModelFactor.x := a / 100;
+    ModelFactor.y := b / 100;
+    ModelFactor.z := c / 100;
+    Break;
+  end;
+
+  for i := 1 to Memo.Count - 1 do
+  begin
+    Zeile := Memo[i];
+    if Zeile = '' then
+      Continue;
+    GetInteger(a);
+    GetInteger(b);
+    GetInteger(c);
+    AddVert(a, b, c);
+  end;
+end;
+
+procedure THullGraph.ReadCons1;
+
+  procedure AddCon7(a1, a2, a3, a4, a5, a6, a7: Integer);
+  begin
+    AddLine(a1 - 1, a2 - 1);
+    AddLine(a2 - 1, a3 - 1);
+    AddLine(a3 - 1, a4 - 1);
+    AddLine(a4 - 1, a5 - 1);
+    AddLine(a5 - 1, a6 - 1);
+    AddLine(a6 - 1, a7 - 1);
+  end;
+  procedure AddCon10(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10: Integer);
+  begin
+    AddLine(a1 - 1, a2 - 1);
+    AddLine(a2 - 1, a3 - 1);
+    AddLine(a3 - 1, a4 - 1);
+    AddLine(a4 - 1, a5 - 1);
+    AddLine(a5 - 1, a6 - 1);
+    AddLine(a6 - 1, a7 - 1);
+    AddLine(a7 - 1, a8 - 1);
+    AddLine(a8 - 1, a9 - 1);
+    AddLine(a9 - 1, a10 - 1);
+  end;
+
+begin
+  AddCon7(1, 2, 3, 4, 5, 6, 7);
+
+  AddCon7(8, 9, 10, 11, 12, 13, 14);
+  AddCon7(14, 15, 16, 17, 18, 19, 20);
+
+  AddCon7(21, 22, 23, 24, 25, 26, 27);
+  AddCon7(27, 28, 29, 30, 31, 32, 33);
+
+  AddCon7(34, 35, 36, 37, 38, 39, 40);
+  AddCon7(40, 41, 42, 43, 44, 45, 46);
+
+  AddCon7(47, 48, 49, 50, 51, 52, 53);
+  AddCon7(53, 54, 55, 56, 57, 58, 59);
+
+  AddCon7(60, 61, 62, 63, 64, 65, 66);
+  AddCon7(66, 67, 68, 69, 70, 71, 72);
+
+  AddCon7(73, 74, 75, 76, 77, 78, 79);
+  AddCon7(79, 80, 81, 82, 83, 84, 85);
+
+  AddCon7(86, 87, 88, 89, 90, 91, 92);
+  AddCon7(92, 93, 94, 95, 96, 97, 98);
+
+  AddCon7(99, 100, 101, 102, 103, 104, 105);
+  AddCon7(105, 106, 107, 108, 109, 110, 111);
+
+  AddCon7(112, 113, 114, 115, 116, 117, 118);
+  AddCon7(118, 119, 120, 121, 122, 123, 124);
+
+  AddCon10(1, 8, 21, 34, 47, 60, 73, 86, 99, 112);
+  AddCon10(2, 9, 22, 35, 48, 61, 74, 87, 100, 113);
+  AddCon10(3, 10, 23, 36, 49, 62, 75, 88, 101, 114);
+  AddCon10(4, 11, 24, 37, 50, 63, 76, 89, 102, 115);
+  AddCon10(5, 12, 25, 38, 51, 64, 77, 90, 103, 116);
+  AddCon10(6, 13, 26, 39, 52, 65, 78, 91, 104, 117);
+  AddCon10(7, 14, 27, 40, 53, 66, 79, 92, 105, 118);
+  AddCon10(6, 15, 28, 41, 54, 67, 80, 93, 106, 119);
+  AddCon10(5, 16, 29, 42, 55, 68, 81, 94, 107, 120);
+  AddCon10(4, 17, 30, 43, 56, 69, 82, 95, 108, 121);
+  AddCon10(3, 18, 31, 44, 57, 70, 83, 96, 109, 122);
+  AddCon10(2, 19, 32, 45, 58, 71, 84, 97, 110, 123);
+  AddCon10(1, 20, 33, 46, 59, 72, 85, 98, 111, 124);
+end;
+
+procedure THullGraph.GetPlotList(List: TStringList);
+var
+  i, t, p1, p2: Integer;
+  c: TConArray;
+  v: TVertArrayI;
+  s: string;
+  SavedZoom: double;
+begin
+  if (ncon <= 0) or (nvert <= 0) then
+    Exit;
+  if not GrafikOK then
+    Exit;
+  SavedZoom := Zoom;
+  Zoom := 10;
+  if not Updated then
+    Update;
+  List.add('SP 1;');
+  c := con;
+  v := tvert;
+  for i := 0 to ncon - 1 do
+  begin
+    { Indizes in das Vertice-array bestimmen }
+    t := c[i]; //T  wie Temp
+    p1 := ((t shr 16) and $FFFF) * 3; // Index Punkt1
+    p2 := (t and $FFFF) * 3; // Index Punkt2
+    // g.MoveTo(v[p1], -v[p1 + 2]);
+    S := Format('PU %d %d;', [v[p1], -v[p1 + 2]]);
+    List.Add(S);
+    // g.LineTo(v[p2], -v[p2 + 2]);
+    s := Format('PD %d %d;', [ v[p2], -v[p2 + 2] ]);
+    List.Add(s);
+  end;
+  Zoom := SavedZoom;
 end;
 
 end.
