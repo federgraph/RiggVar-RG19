@@ -130,6 +130,7 @@ begin
 
   { den Fixpunkt des gedrehten Graphen in den Nullpunkt verschieben }
   FixPunkt := tempRP[FixPoint];
+
   A0 := vsub(tempRP[ooA0], FixPunkt);
   B0 := vsub(tempRP[ooB0], FixPunkt);
   C0 := vsub(tempRP[ooC0], FixPunkt);
@@ -142,6 +143,7 @@ begin
   D := vsub(tempRP[ooD], FixPunkt);
   E := vsub(tempRP[ooE], FixPunkt);
   F := vsub(tempRP[ooF],FixPunkt);
+
   for j := 0 to BogenMax do
     KurveRotiert[j] := vsub(KurveRotiert[j], FixPunkt);
 
@@ -258,8 +260,7 @@ begin
   ZugVorstag[1].x := xC + NOffset.x;
   ZugVorstag[1].y := -yC + NOffset.y;
 
-  { copy uses 1 based indices }
-  ZugMastKurveD0D := Copy(ZugMastKurve, 1, BogenIndexD);
+  ZugMastKurveD0D := Copy(ZugMastKurve, 0, BogenIndexD + 1);
   ZugMastKurveDC := Copy(ZugMastKurve, BogenIndexD, Length(ZugMastKurve)-1);
 end;
 
@@ -280,7 +281,7 @@ begin
   { Rumpf }
   if WantRumpf then
   begin
-    DI.StrokeColor := TColors.Lightgray;
+    DI.StrokeColor := clSilver;
     DI.StrokeWidth := 3;
     DL.Line(A0, B0, ZugRumpf[0], ZugRumpf[1], clRed);
     DL.Line(B0, C0, ZugRumpf[1], ZugRumpf[2], clGreen);

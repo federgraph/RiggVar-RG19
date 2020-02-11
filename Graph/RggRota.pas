@@ -120,10 +120,13 @@ type
   private
     Rotator: TPolarKar;
     Mode: Boolean;
+    FOnDebugDisplayList: TNotifyEvent;
     procedure InitGraph;
-    procedure InitRaumGrafik;
+    procedure InitRaumGraph;
     procedure InitHullGraph;
     procedure UpdateGraphFromTestData;
+    procedure SetZoomIndex(const Value: Integer);
+    procedure SetOnDebugDisplayList(const Value: TNotifyEvent);
   public
     IsUp: Boolean;
     PaintBox3D: TPaintBox; // injected and replaced
@@ -139,8 +142,10 @@ type
     procedure DrawToCanvas(g: TCanvas);
     procedure DrawToImage(g: TCanvas);
 
+    property ZoomIndex: Integer read FZoomIndex write SetZoomIndex;
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
+    property OnDebugDisplayList: TNotifyEvent read FOnDebugDisplayList write SetOnDebugDisplayList;
   end;
 
 implementation
@@ -221,7 +226,7 @@ begin
   end;
 
   InitGraph;
-  InitRaumGrafik;
+  InitRaumGraph;
   InitHullGraph;
   UpdateGraphFromTestData;
   SetViewPoint(FViewPoint);
@@ -234,16 +239,13 @@ begin
   InitRotaData;
 end;
 
-procedure TRotaForm.InitRaumGrafik;
+procedure TRotaForm.InitRaumGraph;
 begin
   UseDisplayList := False;
 
   RaumGraph := TRaumGraph.Create;
   RaumGraph.Rotator := Rotator;
-  RaumGraph.NOffset := Point(1000,1000);
-  RaumGraph.Zoom := FZoom;
   RaumGraph.FixPoint := FixPoint;
-  RaumGraph.ViewPoint := vp3D;
   RaumGraph.Bogen := True;
 end;
 
@@ -401,8 +403,15 @@ begin
   RaumGraph.Coloriert := True;
   if UseDisplayList then
   begin
-    RaumGraph.Update;
-    RaumGraph.UpdateDisplayList;
+
+      { this cannot be done from within DrawToCanvas
+        when it is issued from OnPaint,
+        now moved to Draw; }
+//    RaumGraph.Update;
+//    RaumGraph.UpdateDisplayList;
+//    if Assigned(OnDebugDisplayList) then
+//      OnDebugDisplayList(Self);
+
     RaumGraph.DL.Draw(g);
   end
   else
@@ -467,28 +476,12 @@ end;
 
 procedure TRotaForm.ZoomInBtnClick(Sender: TObject);
 begin
-  if FZoomIndex < 11 then
-  begin
-    Inc(FZoomIndex);
-    FZoom := FZoomBase * LookUpRa10(FZoomIndex);
-    HullGraph.Zoom := FZoom;
-    RaumGraph.Zoom := FZoom;
-    Draw;
-    SetZoomText;
-  end;
+  ZoomIndex := FZoomIndex + 1;
 end;
 
 procedure TRotaForm.ZoomOutBtnClick(Sender: TObject);
 begin
-  if FZoomIndex > 1 then
-  begin
-    Dec(FZoomIndex);
-    FZoom := FZoomBase * LookUpRa10(FZoomIndex);
-    HullGraph.Zoom := FZoom;
-    RaumGraph.Zoom := FZoom;
-    Draw;
-    SetZoomText;
-  end;
+  ZoomIndex := FZoomIndex - 1;
 end;
 
 procedure TRotaForm.SetFixPoint(const Value: TRiggPoint);
@@ -503,6 +496,11 @@ procedure TRotaForm.SetHullVisible(const Value: Boolean);
 begin
   RumpfItemChecked := Value;
   Draw;
+end;
+
+procedure TRotaForm.SetOnDebugDisplayList(const Value: TNotifyEvent);
+begin
+  FOnDebugDisplayList := Value;
 end;
 
 procedure TRotaForm.RumpfBtnClick(Sender: TObject);
@@ -533,6 +531,9 @@ end;
 
 procedure TRotaForm.SetViewPoint(const Value: TViewPoint);
 begin
+  if not IsUp then
+    Exit;
+
   FViewPoint := Value;
   case FViewPoint of
     vpSeite: RotaData := RotaData1;
@@ -560,6 +561,7 @@ begin
   RaumGraph.FixPoint := FixPoint;
   RaumGraph.Update; // Rotate;
   HullGraph.FixPunkt := RaumGraph.FixPunkt;
+  HullGraph.Update; // Rotate;
   { Neuzeichnen }
   EraseBK := True;
   Draw;
@@ -752,7 +754,16 @@ begin
     ChangeResolution;
 
   if IsUp then
+  begin
+    if UseDisplayList then
+    begin
+      RaumGraph.Update;
+      RaumGraph.UpdateDisplayList;
+      if Assigned(OnDebugDisplayList) then
+        OnDebugDisplayList(Self);
+    end;
     DrawToImage(Bitmap.Canvas);
+  end;
 end;
 
 procedure TRotaForm.DrawAlwaysItemClick(Sender: TObject);
@@ -788,6 +799,24 @@ end;
 function TRotaForm.QueryRenderOption(const fa: Integer): Boolean;
 begin
   result := False;
+end;
+
+procedure TRotaForm.SetZoomIndex(const Value: Integer);
+begin
+  if (Value < 1) then
+    FZoomIndex := 1
+  else if Value > 11 then
+    FZoomIndex := 11
+  else
+    FZoomIndex := Value;
+
+  FZoom := FZoomBase * LookUpRa10(FZoomIndex);
+  if HullGraph <> nil then
+    HullGraph.Zoom := FZoom;
+  if RaumGraph <> nil then
+    RaumGraph.Zoom := FZoom;
+  Draw;
+  SetZoomText;
 end;
 
 end.

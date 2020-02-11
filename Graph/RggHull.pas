@@ -56,7 +56,7 @@ type
     procedure DrawToCanvas(Canvas: TCanvas); override;
   end;
 
-  THullGraph = class(THullGraph0)
+  THullGraph2 = class(THullGraph0)
   protected
     procedure ReadCons1;
     procedure ReadVertices; override;
@@ -68,6 +68,9 @@ type
     procedure GetPlotList(List: TStringList); override;
   end;
 
+  THullGraph = class(THullGraph2)
+
+  end;
 
 var
   HullGraph: THullGraph0;
@@ -179,9 +182,8 @@ begin
   mat.Identity;
   mat.Translate(-FixPunkt[x], -FixPunkt[y], -FixPunkt[z]);
   mat.Multiply(Rotator.Matrix);
-  { x und z werden abgebildet }
-  mat.ScaleXYZ(Zoom, 20 / zfac, Zoom);
-  mat.Translate(NOffset.x, 4, -NOffset.y);
+  mat.ScaleXYZ(Zoom, Zoom, Zoom);
+  mat.Translate(NOffset.x, 0, -NOffset.y);
   mat.Transform(vert, tvert, nvert);
   Updated := True;
 end;
@@ -456,7 +458,9 @@ procedure THullGraph0.ReadCons420(k, l: Integer);
   begin
     AddLine(a - 1, b - 1);
     if n = 1 then
-      Exit;
+    begin
+      Exit; // does not happen
+    end;
     for i := 2 to n do
     begin
       a := b;
@@ -468,7 +472,7 @@ procedure THullGraph0.ReadCons420(k, l: Integer);
 var
   SpantenZahl: Integer;
   LinienZahl: Integer;
-  i, a, b, vs, vl: Integer;
+  i, a, b, conCountS, conCountL: Integer;
 begin
   { Beispiel-Eingaben }
   // k := 10; // Anzahl der Spanten einschließlich Steven
@@ -476,15 +480,15 @@ begin
 
   SpantenZahl := k - 1; // Anzahl Spanten = 9
   LinienZahl := 2 * l - 1; // Anzahl Linien = 13
-  vs := l - 1; // Anzahl Verbindungen eines Spantes = 6
-  vl := k - 1; // Anzahl Verbindungen einer Linie = 9
+  conCountS := l - 1; // Anzahl Verbindungen eines Spantes = 6
+  conCountL := k - 1; // Anzahl Verbindungen einer Linie = 9
 
   a := 1;
-  AddSection(a, a + 1, 1, vs); { der Steven }
+  AddSection(a, a + 1, 1, conCountS); { der Steven }
   a := l;
   for i := 1 to SpantenZahl do
   begin
-    AddSection(a + 1, a + 2, 1, 2 * vs); { die Spanten }
+    AddSection(a + 1, a + 2, 1, 2 * conCountS); { die Spanten }
     a := a + LinienZahl;
   end;
 
@@ -492,13 +496,13 @@ begin
   b := l + 1;
   for i := 1 to l - 1 do
   begin
-    AddSection(a, b, LinienZahl, vl); { Linien links und Kiel }
+    AddSection(a, b, LinienZahl, conCountL); { Linien links und Kiel }
     a := a + 1;
     b := b + 1;
   end;
   for i := l to LinienZahl do
   begin
-    AddSection(a, b, LinienZahl, vl); { Linien rechts }
+    AddSection(a, b, LinienZahl, conCountL); { Linien rechts }
     a := a - 1;
     b := b + 1;
   end;
@@ -509,15 +513,15 @@ begin
 
 end;
 
-{ THullGraph }
+{ THullGraph2 }
 
-procedure THullGraph.ReadConnections;
+procedure THullGraph2.ReadConnections;
 begin
 //  ReadCons1;
   ReadCons420(10, 7);
 end;
 
-procedure THullGraph.ReadVertices;
+procedure THullGraph2.ReadVertices;
 var
   ML: TStringList;
 begin
@@ -537,7 +541,7 @@ begin
     ReadVerts420;
 end;
 
-procedure THullGraph.ReadVertexFromMemo(Memo: TStrings);
+procedure THullGraph2.ReadVertexFromMemo(Memo: TStrings);
 var
   i, Code: Integer;
   Zeile, Wort: string;
@@ -595,7 +599,7 @@ begin
   end;
 end;
 
-procedure THullGraph.ReadCons1;
+procedure THullGraph2.ReadCons1;
 
   procedure AddCon7(a1, a2, a3, a4, a5, a6, a7: Integer);
   begin
@@ -664,7 +668,7 @@ begin
   AddCon10(1, 20, 33, 46, 59, 72, 85, 98, 111, 124);
 end;
 
-procedure THullGraph.GetPlotList(List: TStringList);
+procedure THullGraph2.GetPlotList(List: TStringList);
 var
   i, t, p1, p2: Integer;
   c: TConArray;

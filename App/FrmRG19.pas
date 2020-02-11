@@ -445,6 +445,8 @@ begin
   RotaForm.Init;
   PaintboxR := RotaForm.PaintBox3D;
   RotaForm.IsUp := True;
+//  RotaForm.ViewPoint := vp3D;
+  RotaForm.ZoomIndex := 8;
 end;
 
 procedure TFormRG19.FormClose(Sender: TObject; var Action: TCloseAction);

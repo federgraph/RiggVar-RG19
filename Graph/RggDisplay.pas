@@ -15,6 +15,25 @@ uses
   RggCalc;
 
 type
+  TLineSegmentCompareCase = (
+    ccNone,
+    ccNil,
+    ccEllipse,
+    ccParallel,
+    ccNoVisibleCrossing,
+    ccTotallyAbove,
+    ccTotallyBelow,
+    ccTotallySame,
+    ccCommonNone,
+    ccCommonAbove,
+    ccCommonBelow,
+    ccCommonSame,
+    ccAbove,
+    ccBelow,
+    ccSame,
+    ccUnknown
+  );
+
   TDisplayItemType = (
     diLine,
     diPolyLine,
@@ -33,7 +52,7 @@ type
     function IsTotallyAbove(Other: TRggLine): Boolean;
     function IsTotallyBelow(Other: TRggLine): Boolean;
     function IsSame(Other: TRggLine): Boolean;
-  private
+    function HasVisibleCrossing(SP: TRealPoint): Boolean;
     function ComputeSPY(SP: TRealPoint): double;
   end;
 
@@ -44,6 +63,7 @@ type
     function HasCommonPoint: Boolean;
     function CompareCommon: Integer;
     function IsParallel: Boolean;
+    function DoesNotHaveVisibleCrossing: Boolean;
     function CompareSPY: Integer;
   end;
 
@@ -62,7 +82,9 @@ type
 
     PolyArray: TRggPolyLine;
 
-    procedure Draw(Canvas: TCanvas);
+    Bemerkung: TLineSegmentCompareCase;
+
+    procedure Draw(g: TCanvas);
     procedure Assign(Value: TDisplayItem);
     class function Compare(const Left, Right: TDisplayItem): Integer;
   end;
@@ -110,26 +132,26 @@ begin
   StrokeColor := Value.StrokeColor;
 end;
 
-procedure TDisplayItem.Draw(Canvas: TCanvas);
+procedure TDisplayItem.Draw(g: TCanvas);
 begin
-  Canvas.Pen.Width := StrokeWidth;
-  Canvas.Pen.Color := StrokeColor;
+  g.Pen.Width := StrokeWidth;
+  g.Pen.Color := StrokeColor;
 
   case ItemType of
     diLine:
     begin
-      Canvas.MoveTo(LineStart.X, LineStart.Y);
-      Canvas.LineTo(LineEnd.X, LineEnd.Y);
+      g.MoveTo(LineStart.X, LineStart.Y);
+      g.LineTo(LineEnd.X, LineEnd.Y);
     end;
 
     diPolyLine:
     begin
-      Canvas.Polyline(PolyArray);
+      g.Polyline(PolyArray);
     end;
 
     diEllipse:
     begin
-      Canvas.Ellipse(
+      g.Ellipse(
         CenterPoint.x - Radius, CenterPoint.y - Radius,
         CenterPoint.x + Radius, CenterPoint.y + Radius);
     end;
@@ -144,12 +166,14 @@ var
 begin
   if Left = nil then
   begin
+    Left.Bemerkung := ccNil;
     result := 0;
     Exit;
   end;
 
   if Right = nil then
   begin
+    Right.Bemerkung := ccNil;
     result := 0;
     Exit;
   end;
@@ -163,42 +187,68 @@ begin
 
   else if Left.ItemType = diEllipse then
   begin
+    Left.Bemerkung := ccEllipse;
     r := -1;
   end
 
   else if Right.ItemType = diEllipse then
   begin
+    Right.Bemerkung := ccEllipse;
     r := 1;
   end
 
   else if LP.L1.IsSame(LP.L2) then
   begin
+    Left.Bemerkung := ccTotallySame;
     r := 0;
   end
 
   else if LP.L1.IsTotallyAbove(LP.L2) then
   begin
+    Left.Bemerkung := ccTotallyAbove;
     r := -1;
   end
 
   else if LP.L1.IsTotallyBelow(LP.L2) then
   begin
+    Left.Bemerkung := ccTotallyBelow;
     r := 1;
   end
 
   else if LP.HasCommonPoint then
   begin
     r := LP.CompareCommon;
+    case r of
+      0: Left.Bemerkung := ccCommonSame;
+      1: Left.Bemerkung := ccCommonAbove;
+      -1: Left.Bemerkung := ccCommonBelow;
+      else
+        Left.Bemerkung := ccCommonNone;
+    end;
   end
 
   else if LP.IsParallel then
   begin
+    Left.Bemerkung := ccParallel;
+    r := 0;
+  end
+
+  else if LP.DoesNotHaveVisibleCrossing then
+  begin
+    Left.Bemerkung := ccNoVisibleCrossing;
     r := 0;
   end
 
   else
   begin
     r := LP.CompareSPY;
+    case r of
+      0: Left.Bemerkung := ccSame;
+      1: Left.Bemerkung := ccAbove;
+      -1: Left.Bemerkung := ccBelow;
+      else
+        Left.Bemerkung := ccNone;
+    end;
   end;
 
   result := r;
@@ -391,62 +441,87 @@ begin
     (B.P[y] < Other.B.P[y]);
 end;
 
+function TRggLine.HasVisibleCrossing(SP: TRealPoint): Boolean;
+var
+  vSP: TRealPoint;
+  vAB: TRealPoint; // Rgg Vector 3D
+
+  vABxz: TVector;
+  vSPxz: TVector; // Delphi 2D Vectors
+  lengthABxz, lengthSPxz: double;
+  RatioSPtoAB, g: double;
+begin
+  result := False;
+
+  vSP := vsub(SP, A.P);
+  vAB := vsub(B.P, A.P);
+
+  vABxz := TVector.Create(vAB[x], vAB[z]);
+  lengthABxz := vABxz.Length;
+
+  vSPxz := TVector.Create(vSP[x], vSP[z]);
+  lengthSPxz := vSPxz.Length;
+
+  if lengthABxz < Eps then
+  begin
+    Exit;
+  end;
+
+  RatioSPtoAB := lengthSPxz / lengthABxz;
+
+  g := Abs(RatioSPtoAB);
+
+  result := (g > 0.1) and (g < 0.9);
+end;
+
 function TRggLine.ComputeSPY(SP: TRealPoint): double;
 var
-  vs: TRealPoint;
-  vv: TRealPoint; // Rgg Vector 3D
-  vx: double;
-  vy: double;
-  vz: double;
+  vSP: TRealPoint;
+  vAB: TRealPoint; // Rgg Vector 3D
 
-  v, w: TVector; // Delphi 2D Vectors
-  lv, lw: double;
-  f, g: double;
+  vABxz: TVector;
+  vSPxz: TVector; // Delphi 2D Vectors
+  lengthABxz, lengthSPxz: double;
+  RatioSPtoAB, g: double;
 begin
   result := (A.P[y] + B.P[y]) / 2;
 
-  vs := vsub(SP, A.P);
-  vv := vsub(B.P, A.P);
-  vx := vv[x];
-  vy := vv[y];
-  vz := vv[z];
+  vSP := vsub(SP, A.P);
+  vAB := vsub(B.P, A.P);
 
-  v := TVector.Create(vx, vz);
-  lv := v.Length;
-  w := TVector.Create(vs[x], vs[z]);
-  lw := w.Length;
+  vABxz := TVector.Create(vAB[x], vAB[z]);
+  lengthABxz := vABxz.Length;
 
-//  if lv < Eps then
-//  begin
-//    result := (A.P[y] + B.P[y]) / 2;
-//    Exit;
-//  end;
+  vSPxz := TVector.Create(vSP[x], vSP[z]);
+  lengthSPxz := vSPxz.Length;
 
-  f := lw / lv;
-
-  if Sign(vv[x]) <> Sign(vs[x]) then
-    g := -f
-  else
-    g := f;
-
-  if f > 10000 then
+  if lengthABxz < Eps then
   begin
+    Exit;
+  end;
+
+  RatioSPtoAB := lengthSPxz / lengthABxz;
+
+  g := RatioSPtoAB;
+
+  if Sign(vAB[x]) <> Sign(vSP[x]) then
+    g := -RatioSPtoAB;
+
+  if Abs(g) > 10000 then
+  begin
+    { does not come in here }
     result := A.P[y];
     Exit;
   end;
 
-  if f < 1 then
+  if A.P[y] > B.P[y] then
   begin
-    result := A.P[y] + g * vy;
-    Exit;
-  end;
-
-  if f > 1 then
+    result := A.P[y] - g * vAB[y];
+  end
+  else
   begin
-    result := A.P[y] + g * vy;
-    Exit;
+    result := A.P[y] + g * vAB[y];
   end;
-
 end;
 
 { TRggLinePair }
@@ -476,7 +551,12 @@ end;
 
 function TRggLinePair.IsParallel: Boolean;
 begin
-  result := SchnittGG(L1.A.P, L1.B.P, L2.A.P, L2.B.P, SP);
+  result := not SchnittGG(L1.A.P, L1.B.P, L2.A.P, L2.B.P, SP);
+end;
+
+function TRggLinePair.DoesNotHaveVisibleCrossing: Boolean;
+begin
+  result := not L1.HasVisibleCrossing(SP);
 end;
 
 function TRggLinePair.CompareSPY: Integer;

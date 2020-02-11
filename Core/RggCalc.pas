@@ -146,7 +146,7 @@ begin
   else
     Fall := g2Vertical;
 
-  if (Fall = ggOK) and (a2-a1 < 0.001) then
+  if (Fall = ggOK) and (abs(a2-a1) < 0.001) then
     Fall := ggParallel;
 
   case Fall of

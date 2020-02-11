@@ -44,7 +44,7 @@ constructor TRggGraph.Create;
 begin
   DL := TRggDisplayList.Create;
   FColored := True;
-  FOffset := Point(1000, 1000);
+  FOffset := Point(0, 0);
   FZoom := 0.05;
 end;
 

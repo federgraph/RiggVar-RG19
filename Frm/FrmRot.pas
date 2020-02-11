@@ -205,7 +205,7 @@ type
   public
     Rigg: TRigg;
     Rotator: TPolarKar;
-    HullGraph: TRggGraph;
+    HullGraph: THullGraph;
     RaumGraph: TRaumGraph;
     BackBmp: TBitmap;
     Preview: TPreview;

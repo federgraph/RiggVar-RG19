@@ -668,18 +668,26 @@ begin
 end;
 
 procedure TSchnittGG.SetM1(const Value: TPointF);
+var
+  T: TRealPoint;
 begin
+  T := vsub(B, A);
   A[x] := Value.X;
   A[y] := 0;
   A[z] := Value.Y;
+  B := vadd(A, T);
   NeedCalc := True;
 end;
 
 procedure TSchnittGG.SetM2(const Value: TPointF);
+var
+  T: TRealPoint;
 begin
+  T := vsub(D, C);
   C[x] := Value.X;
   C[y] := 0;
   C[z] := Value.Y;
+  D := vadd(C, T);
   NeedCalc := True;
 end;
 

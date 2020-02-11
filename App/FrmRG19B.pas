@@ -448,6 +448,10 @@ begin
   RotaForm.PaintBox3D := PaintboxR;
   RotaForm.Init;
   PaintboxR := RotaForm.PaintBox3D;
+  RotaForm.IsUp := True;
+  RotaForm.ViewPoint := vp3D;
+//  RotaForm.ZoomIndex := 8;
+
   RiggModul.DoGraphics;
 end;
 
