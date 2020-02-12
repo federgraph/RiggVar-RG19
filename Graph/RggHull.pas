@@ -30,12 +30,11 @@ type
     gr: TConColors;
     { Matrix }
     mat: TMatrix4x4;
-    xmin, xmax, ymin, ymax, zmin, zmax: double;
-    zfac: double;
     function AddVert(x, y, z: single): Integer;
     procedure AddLine(p1, p2: Integer);
     procedure Paint(g: TCanvas);
-    procedure FindBB;
+  protected
+    {Palette}
     function GetColor(i: Integer): TColor;
   protected
     procedure ReadVerts420;
@@ -54,6 +53,15 @@ type
     procedure Update; override;
 
     procedure DrawToCanvas(Canvas: TCanvas); override;
+  end;
+
+  THullGraph1 = class(THullGraph0)
+  protected
+    xmin, xmax, ymin, ymax, zmin, zmax: double;
+    zfac: double;
+    procedure FindBB;
+  public
+    constructor Create; override;
   end;
 
   THullGraph2 = class(THullGraph0)
@@ -81,8 +89,6 @@ uses
   RiggVar.FB.Classes;
 
 constructor THullGraph0.Create;
-var
-  xw, yw, zw: double;
 begin
   inherited Create;
 
@@ -96,16 +102,6 @@ begin
   mat := TMatrix4x4.Create;
   mat.XRot(20);
   mat.YRot(30);
-  FindBB();
-  //compress();
-  xw := xmax - xmin;
-  yw := ymax - ymin;
-  zw := zmax - zmin;
-  zfac := xw;
-  if (yw > xw) then
-    zfac := yw;
-  if (zw > xw) then
-    zfac := zw;
 end;
 
 destructor THullGraph0.Destroy;
@@ -183,7 +179,6 @@ begin
   mat.Translate(-FixPunkt[x], -FixPunkt[y], -FixPunkt[z]);
   mat.Multiply(Rotator.Matrix);
   mat.ScaleXYZ(Zoom, Zoom, Zoom);
-  mat.Translate(NOffset.x, 0, -NOffset.y);
   mat.Transform(vert, tvert, nvert);
   Updated := True;
 end;
@@ -255,53 +250,6 @@ begin
   B := 1;
   idx := Round(R * 32 + G * 64 + B * 96 + i * 2);
   result := PaletteIndex(idx);
-end;
-
-{ Find the bounding box of this model }
-procedure THullGraph0.FindBB;
-var
-  v: TVertArrayF;
-  lxmin, lymin, lzmin, lxmax, lymax, lzmax: single;
-  x, y, z: single;
-  i, j: Integer;
-begin
-  if (nvert <= 0) then
-    Exit;
-
-  v := vert;
-  lxmin := v[0];
-  lxmax := lxmin;
-  lymin := v[1];
-  lymax := lymin;
-  lzmin := v[2];
-  lzmax := lzmin;
-  for j := nvert downto 0 do
-  begin
-    i := j * 3;
-    x := v[i];
-    if (x < lxmin) then
-      lxmin := x;
-    if (x > lxmax) then
-      lxmax := x;
-
-    y := v[i + 1];
-    if (y < lymin) then
-      lymin := y;
-    if (y > lymax) then
-      lymax := y;
-
-    z := v[i + 2];
-    if (z < lzmin) then
-      lzmin := z;
-    if (z > lzmax) then
-      lzmax := z;
-  end;
-  xmax := lxmax;
-  xmin := lxmin;
-  ymax := lymax;
-  ymin := lymin;
-  zmax := lzmax;
-  zmin := lzmin;
 end;
 
 procedure THullGraph0.ReadVerts420;
@@ -701,6 +649,72 @@ begin
     List.Add(s);
   end;
   Zoom := SavedZoom;
+end;
+
+{ THullGraph1 }
+
+constructor THullGraph1.Create;
+var
+  xw, yw, zw: double;
+begin
+  inherited;
+  FindBB();
+  xw := xmax - xmin;
+  yw := ymax - ymin;
+  zw := zmax - zmin;
+  zfac := xw;
+  if (yw > xw) then
+    zfac := yw;
+  if (zw > xw) then
+    zfac := zw;
+end;
+
+procedure THullGraph1.FindBB;
+var
+  v: TVertArrayF;
+  lxmin, lymin, lzmin, lxmax, lymax, lzmax: single;
+  x, y, z: single;
+  i, j: Integer;
+begin
+  { Find the bounding box of this model }
+
+  if (nvert <= 0) then
+    Exit;
+
+  v := vert;
+  lxmin := v[0];
+  lxmax := lxmin;
+  lymin := v[1];
+  lymax := lymin;
+  lzmin := v[2];
+  lzmax := lzmin;
+  for j := nvert downto 0 do
+  begin
+    i := j * 3;
+    x := v[i];
+    if (x < lxmin) then
+      lxmin := x;
+    if (x > lxmax) then
+      lxmax := x;
+
+    y := v[i + 1];
+    if (y < lymin) then
+      lymin := y;
+    if (y > lymax) then
+      lymax := y;
+
+    z := v[i + 2];
+    if (z < lzmin) then
+      lzmin := z;
+    if (z > lzmax) then
+      lzmax := z;
+  end;
+  xmax := lxmax;
+  xmin := lxmin;
+  ymax := lymax;
+  ymin := lymin;
+  zmax := lzmax;
+  zmin := lzmin;
 end;
 
 end.

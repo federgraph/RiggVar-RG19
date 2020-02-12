@@ -382,8 +382,8 @@ begin
     EraseBK := False;
   end;
 
-  NullpunktOffset.x := -RaumGraph.NOffset.x + Bitmap.Width div 2 + FXpos;
-  NullpunktOffset.y := -RaumGraph.NOffset.y + Bitmap.Height div 2 + FYpos;
+  NullpunktOffset.x := Bitmap.Width div 2 + FXpos;
+  NullpunktOffset.y := Bitmap.Height div 2 + FYpos;
 
   if MatrixItemChecked then
   begin
@@ -403,15 +403,6 @@ begin
   RaumGraph.Coloriert := True;
   if UseDisplayList then
   begin
-
-      { this cannot be done from within DrawToCanvas
-        when it is issued from OnPaint,
-        now moved to Draw; }
-//    RaumGraph.Update;
-//    RaumGraph.UpdateDisplayList;
-//    if Assigned(OnDebugDisplayList) then
-//      OnDebugDisplayList(Self);
-
     RaumGraph.DL.Draw(g);
   end
   else
@@ -646,8 +637,8 @@ begin
   SavedYPos := FYPos;
 
   FTranslation :=
-    (Abs(RaumGraph.NOffset.x + NullPunktOffset.x - X) < TransKreisRadius) and
-    (Abs(RaumGraph.NOffset.y + NullPunktOffset.y - Y) < TransKreisRadius);
+    (Abs(NullPunktOffset.x - X) < TransKreisRadius) and
+    (Abs(NullPunktOffset.y - Y) < TransKreisRadius);
 end;
 
 procedure TRotaForm.PaintBox3DMouseMove(Sender: TObject;

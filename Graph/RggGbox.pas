@@ -153,11 +153,14 @@ end;
 
 procedure TGetriebeGraph.UpdateOffset;
 begin
-  OffsetX1 := cOffsetX1*FZoomFaktor; OffsetY1 := cOffsetY1*FZoomFaktor;
-  OffsetX2 := cOffsetX2*FZoomFaktor; OffsetY2 := cOffsetY2*FZoomFaktor;
-  OffsetX3 := cOffsetX3*FZoomFaktor; OffsetY3 := cOffsetY3*FZoomFaktor;
-  OffsetX4 := cOffsetX4*FZoomFaktor; OffsetY4 := cOffsetY4*FZoomFaktor;
-  NOffset := Point(OffsetX4, OffsetY4);
+  OffsetX1 := cOffsetX1 * FZoomFaktor;
+  OffsetY1 := cOffsetY1 * FZoomFaktor;
+  OffsetX2 := cOffsetX2 * FZoomFaktor;
+  OffsetY2 := cOffsetY2 * FZoomFaktor;
+  OffsetX3 := cOffsetX3 * FZoomFaktor;
+  OffsetY3 := cOffsetY3 * FZoomFaktor;
+  OffsetX4 := cOffsetX4 * FZoomFaktor;
+  OffsetY4 := cOffsetY4 * FZoomFaktor;
   Updated := False;
 end;
 
@@ -172,7 +175,7 @@ begin
   FillZug2D;
   if Assigned(Rotator) then
   begin
-    FillZug3D;
+    inherited Update;
   end;
 end;
 
@@ -344,10 +347,10 @@ begin
         else
           Pen.Color := FColor;
         Ellipse(
-          NOffset.x - TransKreisRadius,
-          NOffset.y - TransKreisRadius,
-          NOffset.x + TransKreisRadius,
-          NOffset.y + TransKreisRadius);
+          -TransKreisRadius,
+          -TransKreisRadius,
+          TransKreisRadius,
+          TransKreisRadius);
         { Rumpf }
         if Coloriert then
           Pen.Color := clRumpf

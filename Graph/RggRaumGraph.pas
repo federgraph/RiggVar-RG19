@@ -17,11 +17,17 @@ uses
 type
   TRaumGraph = class(TBootGraph)
   private
-    { transformed coordinates }
-    A0, B0, C0, D0, E0, F0: TRealPoint;
-    A,  B,  C,  D,  E,  F:  TRealPoint;
+    xA0, xB0, xC0, xD0, xE0, { xF0, } xA, xB, xC, xD, xE, xF: Integer;
+    yA0, yB0, yC0, yD0, yE0, { yF0, } yA, yB, yC, yD, yE, yF: Integer;
+//    xX, yX, xY, yY, xZ, yZ, xN, yN: Integer;
     BogenIndexD: Integer;
     function FindBogenIndexOf(P: TRealPoint): Integer;
+    procedure UpdateZug;
+    procedure UpdateFixPunkt;
+  private
+    { transformed coordinates Rigg }
+    A0, B0, C0, D0, E0, F0: TRealPoint;
+    A,  B,  C,  D,  E,  F:  TRealPoint;
   protected
     procedure SetViewPoint(const Value: TViewPoint);
     procedure SetWanteGestrichelt(const Value: Boolean);
@@ -44,8 +50,6 @@ type
     { no need to call SetLength for these, will be copied via Copy }
     ZugMastKurveD0D: TRggPolyLine;
     ZugMastKurveDC: TRggPolyLine;
-
-    procedure FillZug3D;
   public
     WantFixPunkt: Boolean;
     WantRumpf: Boolean;
@@ -96,27 +100,24 @@ begin
   SetLength(ZugWanteBb, 3);
   SetLength(ZugController, 2);
   SetLength(ZugVorstag, 2);
+end;
 
+procedure TRaumGraph.UpdateFixPunkt;
+var
+  fp: TRealPoint;
+begin
+  { FixPunkt is the rotated FixPoint, not scaled or translated }
+  fp := rP[FixPoint];
+  FixPunkt := Rotator.Rotiere(fp);
 end;
 
 procedure TRaumGraph.Update;
-begin
-  FillZug3D;
-end;
-
-procedure TRaumGraph.FillZug3D;
 var
+  KurveRotiert: array [0 .. BogenMax] of TRealPoint;
   tempRP: TRealRiggPoints;
   i: TRiggPoint;
   j: Integer;
-  { temporäre Koordinaten Mastkurve double transformed }
-  KurveRotiert: array [0 .. BogenMax] of TRealPoint;
-  { temporäre Koordinaten Integer transformed }
-  xA0, xB0, xC0, xD0, xE0, { xF0, } xA, xB, xC, xD, xE, xF: Integer;
-  yA0, yB0, yC0, yD0, yE0, { yF0, } yA, yB, yC, yD, yE, yF: Integer;
 begin
-  BogenIndexD := FindBogenIndexOf(rP[ooD]);
-
   { Graph drehen }
   if Assigned(Rotator) then
   begin
@@ -128,8 +129,7 @@ begin
       KurveRotiert[j] := Rotator.Rotiere(Kurve[j]);
   end;
 
-  { den Fixpunkt des gedrehten Graphen in den Nullpunkt verschieben }
-  FixPunkt := tempRP[FixPoint];
+  UpdateFixPunkt; // gedrehter FixPunkt
 
   A0 := vsub(tempRP[ooA0], FixPunkt);
   B0 := vsub(tempRP[ooB0], FixPunkt);
@@ -147,13 +147,13 @@ begin
   for j := 0 to BogenMax do
     KurveRotiert[j] := vsub(KurveRotiert[j], FixPunkt);
 
-  { Skalieren und um den Offset verschieben }
+  { Skalieren }
   for j := 0 to BogenMax do
   begin
     xA0 := Round(KurveRotiert[j, x] * Zoom);
     yA0 := Round(KurveRotiert[j, z] * Zoom);
-    ZugMastKurve[j].x := xA0 + NOffset.x;
-    ZugMastKurve[j].y := -yA0 + NOffset.y;
+    ZugMastKurve[j].x := xA0;
+    ZugMastKurve[j].y := -yA0;
   end;
 
   xA0 := Round(A0[x] * Zoom);
@@ -182,86 +182,7 @@ begin
   xF := Round(F[x] * Zoom);
   yF := Round(F[z] * Zoom);
 
-  { Rumpf }
-  ZugRumpf[0].x := xA0 + NOffset.x;
-  ZugRumpf[0].y := -yA0 + NOffset.y;
-  ZugRumpf[1].x := xB0 + NOffset.x;
-  ZugRumpf[1].y := -yB0 + NOffset.y;
-  ZugRumpf[2].x := xC0 + NOffset.x;
-  ZugRumpf[2].y := -yC0 + NOffset.y;
-  ZugRumpf[3].x := xA0 + NOffset.x;
-  ZugRumpf[3].y := -yA0 + NOffset.y;
-
-  ZugRumpf[4].x := xD0 + NOffset.x;
-  ZugRumpf[4].y := -yD0 + NOffset.y;
-  ZugRumpf[5].x := xB0 + NOffset.x;
-  ZugRumpf[5].y := -yB0 + NOffset.y;
-  ZugRumpf[6].x := xC0 + NOffset.x;
-  ZugRumpf[6].y := -yC0 + NOffset.y;
-  ZugRumpf[7].x := xD0 + NOffset.x;
-  ZugRumpf[7].y := -yD0 + NOffset.y;
-
-  { Mast }
-  ZugMast[0].x := xD0 + NOffset.x;
-  ZugMast[0].y := -yD0 + NOffset.y;
-  ZugMast[1].x := xD + NOffset.x;
-  ZugMast[1].y := -yD + NOffset.y;
-  ZugMast[2].x := xC + NOffset.x;
-  ZugMast[2].y := -yC + NOffset.y;
-  ZugMast[3].x := xF + NOffset.x;
-  ZugMast[3].y := -yF + NOffset.y;
-
-  ZugMastKurve[BogenMax + 1].x := xF + NOffset.x;
-  ZugMastKurve[BogenMax + 1].y := -yF + NOffset.y;
-
-  { WanteStb }
-  ZugWanteStb[0].x := xA0 + NOffset.x;
-  ZugWanteStb[0].y := -yA0 + NOffset.y;
-  ZugWanteStb[1].x := xA + NOffset.x;
-  ZugWanteStb[1].y := -yA + NOffset.y;
-  ZugWanteStb[2].x := xC + NOffset.x;
-  ZugWanteStb[2].y := -yC + NOffset.y;
-
-  { WanteBb }
-  ZugWanteBb[0].x := xB0 + NOffset.x;
-  ZugWanteBb[0].y := -yB0 + NOffset.y;
-  ZugWanteBb[1].x := xB + NOffset.x;
-  ZugWanteBb[1].y := -yB + NOffset.y;
-  ZugWanteBb[2].x := xC + NOffset.x;
-  ZugWanteBb[2].y := -yC + NOffset.y;
-
-  { SalingFS }
-  ZugSalingFS[0].x := xA + NOffset.x;
-  ZugSalingFS[0].y := -yA + NOffset.y;
-  ZugSalingFS[1].x := xD + NOffset.x;
-  ZugSalingFS[1].y := -yD + NOffset.y;
-  ZugSalingFS[2].x := xB + NOffset.x;
-  ZugSalingFS[2].y := -yB + NOffset.y;
-  ZugSalingFS[3].x := xA + NOffset.x;
-  ZugSalingFS[3].y := -yA + NOffset.y;
-
-  { SalingDS }
-  ZugSalingDS[0].x := xA + NOffset.x;
-  ZugSalingDS[0].y := -yA + NOffset.y;
-  ZugSalingDS[1].x := xD + NOffset.x;
-  ZugSalingDS[1].y := -yD + NOffset.y;
-  ZugSalingDS[2].x := xB + NOffset.x;
-  ZugSalingDS[2].y := -yB + NOffset.y;
-
-  { Controller }
-  ZugController[0].x := xE0 + NOffset.x;
-  ZugController[0].y := -yE0 + NOffset.y;
-  ZugController[1].x := xE + NOffset.x;
-  ZugController[1].y := -yE + NOffset.y;
-
-  { Vorstag }
-  ZugVorstag[0].x := xC0 + NOffset.x;
-  ZugVorstag[0].y := -yC0 + NOffset.y;
-  ZugVorstag[1].x := xC + NOffset.x;
-  ZugVorstag[1].y := -yC + NOffset.y;
-
-  ZugMastKurveD0D := Copy(ZugMastKurve, 0, BogenIndexD + 1);
-  ZugMastKurveDC := Copy(ZugMastKurve, BogenIndexD, Length(ZugMastKurve)-1);
+  UpdateZug;
 end;
 
 procedure TRaumGraph.UpdateDisplayList;
@@ -275,7 +196,7 @@ begin
   begin
     DI.StrokeColor := clYellow;
     DI.StrokeWidth := 1;
-    DL.Ellipse(FixPunkt, FixPunkt, NOffset, TransKreisRadius);
+    DL.Ellipse(FixPunkt, FixPunkt, Point(0, 0), TransKreisRadius);
   end;
 
   { Rumpf }
@@ -382,10 +303,10 @@ begin
       if Coloriert then
         Pen.Color := clYellow;
       Ellipse(
-        NOffset.x - TransKreisRadius,
-        NOffset.y - TransKreisRadius,
-        NOffset.x + TransKreisRadius,
-        NOffset.y + TransKreisRadius);
+        -TransKreisRadius,
+        -TransKreisRadius,
+        TransKreisRadius,
+        TransKreisRadius);
 
       { Rumpf }
       if Coloriert then
@@ -558,6 +479,92 @@ end;
 procedure TRaumGraph.ToggleRenderOption(const fa: Integer);
 begin
 
+end;
+
+procedure TRaumGraph.UpdateZug;
+begin
+  { Rumpf }
+  ZugRumpf[0].x := xA0;
+  ZugRumpf[0].y := -yA0;
+  ZugRumpf[1].x := xB0;
+  ZugRumpf[1].y := -yB0;
+  ZugRumpf[2].x := xC0;
+  ZugRumpf[2].y := -yC0;
+  ZugRumpf[3].x := xA0;
+  ZugRumpf[3].y := -yA0;
+
+  ZugRumpf[4].x := xD0;
+  ZugRumpf[4].y := -yD0;
+  ZugRumpf[5].x := xB0;
+  ZugRumpf[5].y := -yB0;
+  ZugRumpf[6].x := xC0;
+  ZugRumpf[6].y := -yC0;
+  ZugRumpf[7].x := xD0;
+  ZugRumpf[7].y := -yD0;
+
+  { Mast }
+  ZugMast[0].x := xD0;
+  ZugMast[0].y := -yD0;
+  ZugMast[1].x := xD;
+  ZugMast[1].y := -yD;
+  ZugMast[2].x := xC;
+  ZugMast[2].y := -yC;
+  ZugMast[3].x := xF;
+  ZugMast[3].y := -yF;
+
+  { WanteStb }
+  ZugWanteStb[0].x := xA0;
+  ZugWanteStb[0].y := -yA0;
+  ZugWanteStb[1].x := xA;
+  ZugWanteStb[1].y := -yA;
+  ZugWanteStb[2].x := xC;
+  ZugWanteStb[2].y := -yC;
+
+  { WanteBb }
+  ZugWanteBb[0].x := xB0;
+  ZugWanteBb[0].y := -yB0;
+  ZugWanteBb[1].x := xB;
+  ZugWanteBb[1].y := -yB;
+  ZugWanteBb[2].x := xC;
+  ZugWanteBb[2].y := -yC;
+
+  { SalingFS }
+  ZugSalingFS[0].x := xA;
+  ZugSalingFS[0].y := -yA;
+  ZugSalingFS[1].x := xD;
+  ZugSalingFS[1].y := -yD;
+  ZugSalingFS[2].x := xB;
+  ZugSalingFS[2].y := -yB;
+  ZugSalingFS[3].x := xA;
+  ZugSalingFS[3].y := -yA;
+
+  { SalingDS }
+  ZugSalingDS[0].x := xA;
+  ZugSalingDS[0].y := -yA;
+  ZugSalingDS[1].x := xD;
+  ZugSalingDS[1].y := -yD;
+  ZugSalingDS[2].x := xB;
+  ZugSalingDS[2].y := -yB;
+
+  { Controller }
+  ZugController[0].x := xE0;
+  ZugController[0].y := -yE0;
+  ZugController[1].x := xE;
+  ZugController[1].y := -yE;
+
+  { Vorstag }
+  ZugVorstag[0].x := xC0;
+  ZugVorstag[0].y := -yC0;
+  ZugVorstag[1].x := xC;
+  ZugVorstag[1].y := -yC;
+
+  { MastKurve }
+  ZugMastKurve[BogenMax + 1].x := xF;
+  ZugMastKurve[BogenMax + 1].y := -yF;
+
+  BogenIndexD := FindBogenIndexOf(rP[ooD]);
+  ZugMastKurveD0D := Copy(ZugMastKurve, 0, BogenIndexD + 1);
+  ZugMastKurveDC := Copy(ZugMastKurve, BogenIndexD, Length(ZugMastKurve)-1);
 end;
 
 end.

@@ -5,6 +5,7 @@ interface
 uses
   System.SysUtils,
   System.Math,
+  System.Math.Vectors,
   RggTypes,
   Vcl.Graphics,
   Vector3D;
@@ -24,7 +25,7 @@ type
 
   Matrix4x4 = array [1 .. 4, 1 .. 4] of double;
 
-  TMatrix4x4 = class(TObject)
+  TMatrix4x4 = class
   private
     FMat: Matrix4x4;
   public
@@ -48,6 +49,7 @@ type
     procedure Transform(var v: TVertArrayF; var tv: TVertArrayI; nvert: Integer);
     procedure TransformF(var v: TVertArrayF; var tv: TVertArrayF; nvert: Integer);
     procedure CopyFrom(m: TMatrix4x4);
+    function GetDelphiMatrix3D: TMatrix3D;
     property Mat: Matrix4x4 read FMat write FMat;
   end;
 
@@ -371,10 +373,11 @@ begin
   point := tmp;
 end;
 
-{ Transform nvert points from v into tv.  v contains the input
-  coordinates in floating point.  Three successive entries in
-  the array constitute a point.  tv ends up holding the transformed
-  points as integers; three successive entries per point }
+{ Transform nvert points from v into tv.
+  v contains the input coordinates in floating point.
+  Three successive entries in the array constitute a point.
+  tv ends up holding the transformed points as integers;
+  three successive entries per point }
 procedure TMatrix4x4.Transform(var v: TVertArrayF; var tv: TVertArrayI;
   nvert: Integer);
 var
@@ -421,6 +424,16 @@ begin
   uz.x := FMat[1, 3];
   uz.y := FMat[2, 3];
   uz.z := FMat[3, 3];
+end;
+
+function TMatrix4x4.GetDelphiMatrix3D: TMatrix3D;
+begin
+  result := TMatrix3D.Create(
+    FMat[1, 1], FMat[2, 1], FMat[3, 1], FMat[4, 1],
+    FMat[1, 2], FMat[2, 2], FMat[3, 2], FMat[4, 2],
+    FMat[1, 3], FMat[2, 3], FMat[3, 3], FMat[4, 3],
+    FMat[1, 4], FMat[2, 4], FMat[3, 4], FMat[4, 4]
+  );
 end;
 
 { TRotaParams }

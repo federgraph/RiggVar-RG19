@@ -836,7 +836,7 @@ begin
     ConsoleForm.Close;
     Exit;
   end;
-  ConsoleForm := TConsoleForm.Create(nil);
+  ConsoleForm := TConsoleForm.Create(Self);
 end;
 
 procedure TFormMain.SpeedBarItemClick(Sender: TObject);

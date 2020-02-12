@@ -248,7 +248,7 @@ const
   nOffsetY = 28;
   nOffsetZ = 29;
 
-  clRumpf: TColor = clBlack;
+  clRumpf: TColor = clSilver;
   clMast: TColor = clBlue;
   clWanten: TColor = clRed;
   clVorstag: TColor = clYellow;

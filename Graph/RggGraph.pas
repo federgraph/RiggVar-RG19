@@ -14,14 +14,12 @@ type
   TRggGraph = class
   private
     FFixPunkt: TRealPoint;
-    FOffset: TPoint;
     FZoom: single;
     FColored: Boolean;
   protected
     GrafikOK: Boolean; // loaded
     Updated: Boolean; // transformed
     procedure SetFixPunkt(Value: TRealPoint);
-    procedure SetOffset(Value: TPoint); virtual;
     procedure SetZoom(Value: single); virtual;
   public
     Rotator: TPolarKar; // injected, not owned
@@ -33,7 +31,6 @@ type
     procedure GetPlotList(List: TStringList); virtual;
 
     property FixPunkt: TRealPoint read FFixPunkt write SetFixPunkt;
-    property NOffset: TPoint read FOffset write SetOffset;
     property Zoom: single read FZoom write SetZoom;
     property Coloriert: Boolean read FColored write FColored;
   end;
@@ -44,7 +41,6 @@ constructor TRggGraph.Create;
 begin
   DL := TRggDisplayList.Create;
   FColored := True;
-  FOffset := Point(0, 0);
   FZoom := 0.05;
 end;
 
@@ -57,12 +53,6 @@ end;
 procedure TRggGraph.SetFixPunkt(Value: TRealPoint);
 begin
   FFixPunkt := Value;
-  Updated := False;
-end;
-
-procedure TRggGraph.SetOffset(Value: TPoint);
-begin
-  FOffset := Value;
   Updated := False;
 end;
 

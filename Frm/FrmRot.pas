@@ -461,7 +461,7 @@ begin
   { virtual }
   RaumGraph := TGetriebeGraph.Create;
   RaumGraph.Rotator := Rotator;
-  RaumGraph.NOffset := Point(1000, 1000);
+//  RaumGraph.NOffset := Point(1000, 1000);
   RaumGraph.Zoom := FZoom;
   RaumGraph.FixPoint := ComboFixPoint;
   RaumGraph.ViewPoint := vp3D;
@@ -613,8 +613,8 @@ begin
     EraseBK := False;
   end;
 
-  NullpunktOffset.x := -RaumGraph.NOffset.x + Bitmap.Width div 2 + FXpos;
-  NullpunktOffset.y := -RaumGraph.NOffset.y + Bitmap.Height div 2 + FYpos;
+  NullpunktOffset.x := Bitmap.Width div 2 + FXpos;
+  NullpunktOffset.y := Bitmap.Height div 2 + FYpos;
   DrawToBitmap1;
 
   if MatrixItemChecked then
@@ -1236,8 +1236,8 @@ begin
   SavedYPos := FYPos;
 
   FTranslation :=
-    (Abs(RaumGraph.NOffset.x + NullPunktOffset.x - X) < TransKreisRadius) and
-    (Abs(RaumGraph.NOffset.y + NullPunktOffset.y - Y) < TransKreisRadius);
+    (Abs(NullPunktOffset.x - X) < TransKreisRadius) and
+    (Abs(NullPunktOffset.y - Y) < TransKreisRadius);
 end;
 
 procedure TRotationForm.PaintBox3DMouseMove(Sender: TObject;
@@ -2181,7 +2181,8 @@ end;
 
 procedure TRotationForm.PrintIt;
 var
-  PrintOffset, SavedOffset: TPoint;
+  PrintOffset: TPoint;
+//  SavedOffset: TPoint;
   PrintZoom: double;
   RandX, RandY: Integer;
   Rgn: THandle;
@@ -2210,12 +2211,12 @@ begin
   PrintOffset.y := Round((Bitmap.Height div 2 + FYpos - RandY) * PrintZoom
                             - Preview.PagePos.Top);
 
-  SavedOffset := RaumGraph.NOffset;
+//  SavedOffset := RaumGraph.NOffset;
 
   HullGraph.Zoom := FZoom * PrintZoom;
   RaumGraph.Zoom := FZoom * PrintZoom;
-  HullGraph.NOffset := PrintOffset;
-  RaumGraph.NOffset := PrintOffset;
+//  HullGraph.NOffset := PrintOffset;
+//  RaumGraph.NOffset := PrintOffset;
 
   Printer.Orientation := Preview.Orientierung;
   Printer.BeginDoc;
@@ -2237,8 +2238,8 @@ begin
 
   HullGraph.Zoom := FZoom;
   RaumGraph.Zoom := FZoom;
-  HullGraph.NOffset := SavedOffset;
-  RaumGraph.NOffset := SavedOffset;
+//  HullGraph.NOffset := SavedOffset;
+//  RaumGraph.NOffset := SavedOffset;
 end;
 
 { Scroll left by one button. If no buttons are visible anymore, do nothing. }
