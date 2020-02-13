@@ -212,7 +212,7 @@ type
     procedure GetGBoxOffset;
 
     { former event handlers }
-    procedure UpdateGUI;
+    procedure UpdateUI;
     procedure Neu(Doc: TRggDocument);
     procedure Open(FileName: string);
     procedure Save;
@@ -360,6 +360,7 @@ begin
   GetriebeGraph.Koordinaten := Rigg.rP;
   GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
   GetriebeGraph.ViewPoint := vpSeite;
+  GetriebeGraph.ControllerTyp := Rigg.ControllerTyp;
 
   BitmapG := TBitmap.Create;
   BitmapG.Width := 293;
@@ -1189,7 +1190,7 @@ begin
   Memo.SelStart := 0;
 end;
 
-procedure TRiggModul.UpdateGUI;
+procedure TRiggModul.UpdateUI;
 begin
   Modified := False;
 
@@ -1199,6 +1200,7 @@ begin
   FControllerBtnDown := FControllerTyp <> ctOhne;
 
   { 'TakeOver' }
+  ViewModelMain.ControllerEnabled := ControllerEnabled;
   ViewModelMain.ControllerDown := ControllerBtnDown;
   ViewModelMain.UpdateView;
 end;
@@ -1210,7 +1212,7 @@ begin
     Rigg.SetDefaultDocument { --> Rigg.SetDocument }
   else
     Rigg.SetDocument(Doc);
-  UpdateGUI;
+  UpdateUI;
 end;
 
 procedure TRiggModul.Open(FileName: string);
@@ -1218,7 +1220,7 @@ begin
   try
     Rigg.LoadFromDocFile(FileName); { --> Rigg.SetDocument }
     IniFileName := FileName;
-    UpdateGUI;
+    UpdateUI;
   except
     on EFileFormatError do { eat ecxeption }
       if IniFileName = '' then
@@ -1317,7 +1319,7 @@ begin
   end;
 end;
 
-function TRiggModul.GetControllerEnabled;
+function TRiggModul.GetControllerEnabled: Boolean;
 begin
   Result := True;
   if CalcTyp = ctKraftGemessen then
@@ -1332,9 +1334,9 @@ begin
   begin
     FControllerTyp := Value;
     Rigg.ControllerTyp := Value;
-    GetriebeGraph.ControllerTyp := Value;
-    SalingCtrl.ControllerTyp := Value;
   end;
+  GetriebeGraph.ControllerTyp := Value;
+  SalingCtrl.ControllerTyp := Value;
 end;
 
 procedure TRiggModul.SetConsoleActive(const Value: Boolean);

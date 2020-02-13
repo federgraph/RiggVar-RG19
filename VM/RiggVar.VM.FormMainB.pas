@@ -1,4 +1,4 @@
-unit RiggVar.VM.FormMainB;
+﻿unit RiggVar.VM.FormMainB;
 
 interface
 
@@ -110,6 +110,8 @@ begin
 
   FormRG19B.ControllerItem.Enabled := ControllerEnabled;
   FormRG19B.ControllerBtn.Enabled := ControllerEnabled;
+  FormRG19B.ControllerItem.Checked := ControllerDown;
+  FormRG19B.ControllerBtn.Down := ControllerDown;
 
   FormRG19B.KoppelkurveItem.Checked := KoppelKurveEnabled;
   FormRG19B.KoppelBtn.Down := KoppelKurveEnabled;

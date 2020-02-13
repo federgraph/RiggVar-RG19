@@ -300,25 +300,12 @@ begin
   StatusBar.Panels[0].Text := '';
   Application.OnHint := ShowHint;
 
-  Main.IsUp := True;
-
-  {
-    ControllerItem.Checked := True;
-    ControllerBtn.Down := ControllerItem.Checked;
-    WinkelItem.Checked := False;
-    WinkelBtn.Down := WinkelItem.Checked;
-    SofortItem.Checked := True;
-    SofortBtn.Down := SofortItem.Checked;
-    DifferenzItem.Checked := True;
-    DiffBtn.Down := DiffItem.Checked;
-    KoppelkurveItem.Checked := True;
-    KoppelBtn.Down := KoppelKurveItem.Checked;
-    rFItem.Checked := True;
-    FestItem.Checked := True;
-    AutoLoadItem := False;
-    }
   AutoLoadItem.Visible := False;
   LogoItem.Checked := WantLogoData;
+
+  Main.IsUp := True;
+  RiggModul.ViewModelMain.IsUp := True;
+  RiggModul.UpdateUI;
 end;
 
 procedure TFormMain.FormClose(Sender: TObject; var Action: TCloseAction);

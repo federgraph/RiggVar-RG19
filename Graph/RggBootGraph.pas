@@ -42,7 +42,7 @@ begin
   inherited Create;
   FFixPoint := ooD0;
   FSalingTyp := stFest;
-  FControllerTyp := ctDruck;
+  FControllerTyp := ctOhne;
 end;
 
 procedure TBootGraph.SetKoordinaten(const Value: TRealRiggPoints);

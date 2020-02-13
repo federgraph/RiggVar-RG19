@@ -28,7 +28,7 @@ type
     destructor Destroy; override;
     procedure Update; virtual;
     procedure DrawToCanvas(Canvas: TCanvas); virtual;
-    procedure GetPlotList(List: TStringList); virtual;
+    procedure GetPlotList(ML: TStrings); virtual;
 
     property FixPunkt: TRealPoint read FFixPunkt write SetFixPunkt;
     property Zoom: single read FZoom write SetZoom;
@@ -74,7 +74,7 @@ begin
   //virtual
 end;
 
-procedure TRggGraph.GetPlotList(List: TStringList);
+procedure TRggGraph.GetPlotList(ML: TStrings);
 begin
   //if GrafikOK then ...
   //virtual

@@ -16,15 +16,15 @@ uses
 
 type
   TRaumGraph = class(TBootGraph)
-  private
-    xA0, xB0, xC0, xD0, xE0, { xF0, } xA, xB, xC, xD, xE, xF: Integer;
-    yA0, yB0, yC0, yD0, yE0, { yF0, } yA, yB, yC, yD, yE, yF: Integer;
+  protected
+    xA0, xB0, xC0, xD0, xE0, xF0, xA, xB, xC, xD, xE, xF: Integer;
+    yA0, yB0, yC0, yD0, yE0, yF0, yA, yB, yC, yD, yE, yF: Integer;
 //    xX, yX, xY, yY, xZ, yZ, xN, yN: Integer;
     BogenIndexD: Integer;
     function FindBogenIndexOf(P: TRealPoint): Integer;
-    procedure UpdateZug;
     procedure UpdateFixPunkt;
-  private
+    procedure FillZug3D; virtual;
+  protected
     { transformed coordinates Rigg }
     A0, B0, C0, D0, E0, F0: TRealPoint;
     A,  B,  C,  D,  E,  F:  TRealPoint;
@@ -66,7 +66,7 @@ type
     procedure DrawToCanvas(g: TCanvas); override;
     procedure Draw;
 
-    procedure GetPlotList(List: TStringList); override;
+    procedure GetPlotList(ML: TStrings); override;
     procedure ToggleRenderOption(const fa: Integer);
     function QueryRenderOption(const fa: Integer): Boolean;
 
@@ -182,7 +182,7 @@ begin
   xF := Round(F[x] * Zoom);
   yF := Round(F[z] * Zoom);
 
-  UpdateZug;
+  FillZug3D;
 end;
 
 procedure TRaumGraph.UpdateDisplayList;
@@ -389,13 +389,13 @@ begin
   result := MinIndex;
 end;
 
-procedure TRaumGraph.GetPlotList(List: TStringList);
+procedure TRaumGraph.GetPlotList(ML: TStrings);
   procedure Plot(L: array of TPoint);
   var
     s: string;
     i: Integer;
   begin
-    with List do
+    with ML do
     begin
       s := Format('PU %d %d;', [L[0].x, L[0].y]);
       Add(s);
@@ -415,7 +415,7 @@ begin
   begin
     if not Updated then
       Update;
-    with List do
+    with ML do
     begin
       { Rumpf }
       Add('SP 1;');
@@ -481,7 +481,7 @@ begin
 
 end;
 
-procedure TRaumGraph.UpdateZug;
+procedure TRaumGraph.FillZug3D;
 begin
   { Rumpf }
   ZugRumpf[0].x := xA0;

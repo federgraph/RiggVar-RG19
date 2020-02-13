@@ -18,7 +18,11 @@ uses
 
 type
   TGetriebeGraph = class(TRaumGraph)
-  private
+  protected
+//    xA0,xB0,xC0,xD0,xE0,xF0,xA,xB,xC,xD,xE,xF: Integer;
+//    yA0,yB0,yC0,yD0,yE0,yF0,yA,yB,yC,yD,yE,yF: Integer;
+    zA0,zB0,zC0,zD0,zE0,zF0,zA,zB,zC,zD,zE,zF: Integer;
+
     FKoppelKurve: TKoordLine; // Daten für Koppelkurve
     FKoppelBtnDown: Boolean;
     FKoppelKurveNeedFill: Boolean;
@@ -51,8 +55,9 @@ type
 
     { TPoint-arrays für 3D werden vererbt }
 
-    { procedure FillZug3D wird vererbt }
     procedure FillZug2D;
+    procedure FillZug3D; override;
+
     procedure SetZoom(Value: single); override;
   public
     FColor: TColor;
@@ -69,6 +74,7 @@ type
     OffsetX2, OffsetY2: Integer;
     OffsetX3, OffsetY3: Integer;
     OffsetX4, OffsetY4: Integer;
+
     procedure SetZoomFaktor(Value: Integer);
     procedure UpdateOffset;
     procedure CalcOffset(R: TRect);
@@ -101,10 +107,18 @@ begin
   FZoom2D := RelationZoom2D * Zoom;
 
   { Offset }
-  cOffsetX1 := 130; cOffsetY1 := 410;
-  cOffsetX2 := 130; cOffsetY2 := 410;
-  cOffsetX3 := 130; cOffsetY3 := 150;
-  cOffsetX4 := 150; cOffsetY4 := 250;
+  cOffsetX1 := 130;
+  cOffsetY1 := 410;
+
+  cOffsetX2 := 130;
+  cOffsetY2 := 410;
+
+  cOffsetX3 := 130;
+  cOffsetY3 := 150;
+
+  cOffsetX4 := 150;
+  cOffsetY4 := 250;
+
   UpdateOffset;
 
   FViewPoint := vp3D;
@@ -660,13 +674,10 @@ var
   FixPunkt2D: TRealPoint;
   { temporäre Koordinaten double transformed }
   Temp: TRealPoint;
-  A0, B0, C0, D0, E0, F0: TRealPoint;
-  A,  B,  C,  D,  E,  F:  TRealPoint;
+//  A0, B0, C0, D0, E0, F0: TRealPoint;
+//  A,  B,  C,  D,  E,  F:  TRealPoint;
   { temporäre Koordinaten Integer transformed }
   xTemp, zTemp: Integer;
-  xA0,xB0,xC0,xD0,xE0,xF0,xA,xB,xC,xD,xE,xF: Integer;
-  yA0,yB0,yC0,yD0,yE0,yF0,yA,yB,yC,yD,yE,yF: Integer;
-  zA0,zB0,zC0,zD0,zE0,zF0,zA,zB,zC,zD,zE,zF: Integer;
 begin
   // 1. Koordinate verschieben mit Vektor '-FixPunkt'
   // 2. Skalieren
@@ -725,9 +736,12 @@ begin
   yB0 := -yA0;
   zB0 := zA0;
 
-  xC0 := Round(C0[x]*FZoom2D); MP.x := xC0 + OffsetX1;
+  xC0 := Round(C0[x]*FZoom2D);
   yC0 := 0;
-  zC0 := Round(C0[z]*FZoom2D); MP.y := OffsetY1 - zC0;
+  zC0 := Round(C0[z]*FZoom2D);
+
+  MP.x := xC0 + OffsetX1;
+  MP.y := -zC0 + OffsetY1;
 
   xD0 := Round(D0[x]*FZoom2D);
   yD0 := 0;
@@ -928,6 +942,99 @@ begin
   Zug3Mast[ 4].Y := -xF + OffsetY3;
 end;
 
+procedure TGetriebeGraph.FillZug3D;
+var
+  j: Integer;
+begin
+  { Rumpf 3D }
+  ZugRumpf[0].x := xA0 + OffsetX4;
+  ZugRumpf[0].y := -yA0 + OffsetY4;
+  ZugRumpf[1].x := xB0 + OffsetX4;
+  ZugRumpf[1].y := -yB0 + OffsetY4;
+  ZugRumpf[2].x := xC0 + OffsetX4;
+  ZugRumpf[2].y := -yC0 + OffsetY4;
+  ZugRumpf[3].x := xA0 + OffsetX4;
+  ZugRumpf[3].y := -yA0 + OffsetY4;
+
+  ZugRumpf[4].x := xD0 + OffsetX4;
+  ZugRumpf[4].y := -yD0 + OffsetY4;
+  ZugRumpf[5].x := xB0 + OffsetX4;
+  ZugRumpf[5].y := -yB0 + OffsetY4;
+  ZugRumpf[6].x := xC0 + OffsetX4;
+  ZugRumpf[6].y := -yC0 + OffsetY4;
+  ZugRumpf[7].x := xD0 + OffsetX4;
+  ZugRumpf[7].y := -yD0 + OffsetY4;
+
+  { Mast 3D }
+  ZugMast[0].x := xD0 + OffsetX4;
+  ZugMast[0].y := -yD0 + OffsetY4;
+  ZugMast[1].x := xD + OffsetX4;
+  ZugMast[1].y := -yD + OffsetY4;
+  ZugMast[2].x := xC + OffsetX4;
+  ZugMast[2].y := -yC + OffsetY4;
+  ZugMast[3].x := xF + OffsetX4;
+  ZugMast[3].y := -yF + OffsetY4;
+
+  { WanteStb 3D }
+  ZugWanteStb[0].x := xA0 + OffsetX4;
+  ZugWanteStb[0].y := -yA0 + OffsetY4;
+  ZugWanteStb[1].x := xA + OffsetX4;
+  ZugWanteStb[1].y := -yA + OffsetY4;
+  ZugWanteStb[2].x := xC + OffsetX4;
+  ZugWanteStb[2].y := -yC + OffsetY4;
+
+  { WanteBb 3D }
+  ZugWanteBb[0].x := xB0 + OffsetX4;
+  ZugWanteBb[0].y := -yB0 + OffsetY4;
+  ZugWanteBb[1].x := xB + OffsetX4;
+  ZugWanteBb[1].y := -yB + OffsetY4;
+  ZugWanteBb[2].x := xC + OffsetX4;
+  ZugWanteBb[2].y := -yC + OffsetY4;
+
+  { SalingFS 3D }
+  ZugSalingFS[0].x := xA + OffsetX4;
+  ZugSalingFS[0].y := -yA + OffsetY4;
+  ZugSalingFS[1].x := xD + OffsetX4;
+  ZugSalingFS[1].y := -yD + OffsetY4;
+  ZugSalingFS[2].x := xB + OffsetX4;
+  ZugSalingFS[2].y := -yB + OffsetY4;
+  ZugSalingFS[3].x := xA + OffsetX4;
+  ZugSalingFS[3].y := -yA + OffsetY4;
+
+  { SalingDS 3D }
+  ZugSalingDS[0].x := xA + OffsetX4;
+  ZugSalingDS[0].y := -yA + OffsetY4;
+  ZugSalingDS[1].x := xD + OffsetX4;
+  ZugSalingDS[1].y := -yD + OffsetY4;
+  ZugSalingDS[2].x := xB + OffsetX4;
+  ZugSalingDS[2].y := -yB + OffsetY4;
+
+  { Controller 3D }
+  ZugController[0].x := xE0 + OffsetX4;
+  ZugController[0].y := -yE0 + OffsetY4;
+  ZugController[1].x := xE + OffsetX4;
+  ZugController[1].y := -yE + OffsetY4;
+
+  { Vorstag 3D }
+  ZugVorstag[0].x := xC0 + OffsetX4;
+  ZugVorstag[0].y := -yC0 + OffsetY4;
+  ZugVorstag[1].x := xC + OffsetX4;
+  ZugVorstag[1].y := -yC + OffsetY4;
+
+  { MastKurve 3D }
+  for j := 0 to BogenMax do
+  begin
+    ZugMastKurve[j].x := ZugMastKurve[j].x + OffsetX4;
+    ZugMastKurve[j].y := ZugMastKurve[j].y + OffsetY4;
+  end;
+  ZugMastKurve[BogenMax + 1].x := xF + OffsetX4;
+  ZugMastKurve[BogenMax + 1].y := -yF + OffsetY4;
+
+//  BogenIndexD := FindBogenIndexOf(rP[ooD]);
+//  ZugMastKurveD0D := Copy(ZugMastKurve, 0, BogenIndexD + 1);
+//  ZugMastKurveDC := Copy(ZugMastKurve, BogenIndexD, Length(ZugMastKurve)-1);
+end;
+
 procedure TGetriebeGraph.CalcOffset(R: TRect);
 var
   k: TRiggPoint;
@@ -975,10 +1082,18 @@ begin
     Zoom := 0.95 * Zoom / tempf1;
 
     { Offset festlegen }
-    cOffsetX1 := Round(0.44*w); cOffsetY1 := Round(0.98*h);
-    cOffsetX2 := cOffsetX1;     cOffsetY2 := cOffsetY1;
-    cOffsetX3 := cOffsetX1;     cOffsetY3 := Round(0.35*h);
-    cOffsetX4 := Round(0.52*w); cOffsetY4 := Round(0.59*h);
+    cOffsetX1 := Round(0.44 * w);
+    cOffsetY1 := Round(0.98 * h);
+
+    cOffsetX2 := cOffsetX1;
+    cOffsetY2 := cOffsetY1;
+
+    cOffsetX3 := cOffsetX1;
+    cOffsetY3 := Round(0.35 * h);
+
+    cOffsetX4 := Round(0.52 * w);
+    cOffsetY4 := Round(0.59 * h);
+
     UpdateOffset;
   except
     ShowMessage('Offset kann nicht berechnet werden.');

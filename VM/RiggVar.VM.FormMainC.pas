@@ -1,4 +1,4 @@
-unit RiggVar.VM.FormMainC;
+﻿unit RiggVar.VM.FormMainC;
 
 interface
 
@@ -114,14 +114,7 @@ begin
   FormRG19.ControllerBtn.Down := ControllerDown;
 
   FormRG19.KoppelkurveItem.Checked := KoppelKurveEnabled;
-
-  if FormRG19.KoppelBtn <> nil then
-  begin
-    { Condition strictly no longer necessary because of IsUp guard. }
-    { KoppelBtn is created at runtime,
-      and may not be ready when UpdateView is called.}
-    FormRG19.KoppelBtn.Down := KoppelKurveEnabled;
-  end;
+  FormRG19.KoppelBtn.Down := KoppelKurveEnabled;
 
   FormRG19.QuerKraftItem.Checked := QuerKraftItemChecked;
   FormRG19.KnickenItem.Checked := KnickenItemChecked;

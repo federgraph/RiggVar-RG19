@@ -396,6 +396,7 @@ begin
   FormCreate2;
   Main.IsUp := True;
   RiggModul.ViewModelMain.IsUp := True;
+  RiggModul.UpdateUI;
 end;
 
 procedure TFormRG19.FormCreate1;
@@ -753,6 +754,9 @@ begin
   ControllerItem.Checked := Value;
   ControllerBtn.Down := Value;
   RiggModul.ControllerBtnDown := Value;
+  RotaForm.RaumGraph.ControllerTyp := Main.RggMain.Rigg.ControllerTyp;
+//  RotaForm.RaumGraph.ControllerTyp := RiggModul.ControllerTyp;
+  RotaForm.Draw;
 end;
 
 procedure TFormRG19.ControllerBtnClick(Sender: TObject);
@@ -1515,32 +1519,6 @@ begin
   InitMenu;
   if WantConsole then
     InitOutputForm;
-
-{
-  ControllerItem.Checked := RiggModul.Rigg.ControllerTyp <> ctOhne;
-  ControllerBtn.Down := ControllerItem.Checked;
-
-  WinkelItem.Checked := False;
-  WinkelBtn.Down := WinkelItem.Checked;
-
-  SofortItem.Checked := True;
-  SofortBtn.Down := SofortItem.Checked;
-  DifferenzItem.Checked := True;
-  DiffBtn.Down := DiffItem.Checked;
-
-  KoppelkurveItem.Checked := True;
-  KoppelBtn.Down := KoppelKurveItem.Checked;
-
-  rFItem.Checked := True;
-  FestItem.Checked := True;
-  AutoLoadItem := False;
-
-  AutoLoadItem.Visible := False;
-  LogoItem.Checked := WantLogoData;
-
-  UseDisplayListBtn.Down := RotaForm.UseDisplayList;
-  BogenBtn.Down := RotaForm.RaumGraph.Bogen;
-}
 end;
 
 procedure TFormRG19.LayoutComponents;

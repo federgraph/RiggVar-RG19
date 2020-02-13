@@ -1,4 +1,4 @@
-unit RiggVar.VM.FormMainA;
+﻿unit RiggVar.VM.FormMainA;
 
 interface
 
@@ -67,6 +67,9 @@ procedure TViewModelMainA.UpdateView;
 begin
   inherited;
 
+  if not IsUp then
+    Exit;
+
   FormMain.LEDShape.Brush.Color := LEDColor;
   FormMain.Statusbar.Panels[1].Text := StatusPanelText1;
   FormMain.Caption := Caption;
@@ -93,6 +96,8 @@ begin
 
   FormMain.ControllerItem.Enabled := ControllerEnabled;
   FormMain.ControllerBtn.Enabled := ControllerEnabled;
+  FormMain.ControllerItem.Checked := ControllerDown;
+  FormMain.ControllerBtn.Down := ControllerDown;
 
   FormMain.KoppelkurveItem.Checked := KoppelKurveEnabled;
   FormMain.KoppelBtn.Down := KoppelKurveEnabled;

@@ -73,7 +73,7 @@ type
     VertexFileName: string;
     VertexMemo: TStrings;
     procedure ReadVertexFromMemo(Memo: TStrings);
-    procedure GetPlotList(List: TStringList); override;
+    procedure GetPlotList(ML: TStrings); override;
   end;
 
   THullGraph = class(THullGraph2)
@@ -616,7 +616,7 @@ begin
   AddCon10(1, 20, 33, 46, 59, 72, 85, 98, 111, 124);
 end;
 
-procedure THullGraph2.GetPlotList(List: TStringList);
+procedure THullGraph2.GetPlotList(ML: TStrings);
 var
   i, t, p1, p2: Integer;
   c: TConArray;
@@ -632,7 +632,7 @@ begin
   Zoom := 10;
   if not Updated then
     Update;
-  List.add('SP 1;');
+  ML.add('SP 1;');
   c := con;
   v := tvert;
   for i := 0 to ncon - 1 do
@@ -643,10 +643,10 @@ begin
     p2 := (t and $FFFF) * 3; // Index Punkt2
     // g.MoveTo(v[p1], -v[p1 + 2]);
     S := Format('PU %d %d;', [v[p1], -v[p1 + 2]]);
-    List.Add(S);
+    ML.Add(S);
     // g.LineTo(v[p2], -v[p2 + 2]);
     s := Format('PD %d %d;', [ v[p2], -v[p2 + 2] ]);
-    List.Add(s);
+    ML.Add(s);
   end;
   Zoom := SavedZoom;
 end;

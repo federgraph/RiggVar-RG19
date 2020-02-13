@@ -9,6 +9,7 @@ uses
   System.Types,
   System.Inifiles,
   System.Math,
+  Vector3D,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.StdCtrls,
@@ -23,20 +24,70 @@ const
   AnzahlKurvenPunkte = 100; { AnzahlKurvenPunkte + 1 KurvenPunkte }
 
 type
+  { for TTabellenTyp, see RggTypes }
   { TTabellenTyp = (itKonstante, itGerade, itParabel, itBezier); }
-  { siehe RggTypes }
+
   TBezier = class;
 
-  TTrimmTab = class(TObject)
+  ITrimmTab = interface
+  ['{B3EE7E6D-ED13-4F90-A4F9-ABFFD56D0A95}']
+
+    function EvalY(x: double): double;
+    function EvalX(y: double): double;
+
+    function GetEvalDirection: Boolean;
+    procedure SetEvalDirection(const Value: Boolean);
+
+    function GetTabellenTyp: TTabellenTyp;
+    procedure SetTabellenTyp(Value: TTabellenTyp);
+
+    function GetEndwertKraft: Integer;
+    procedure SetEndwertKraft(Value: Integer);
+
+    function GetEndwertWeg: Integer;
+    procedure SetEndwertWeg(Value: Integer);
+
+    function GetMittelPunkt: TPoint;
+    procedure SetMittelPunkt(Value: TPoint);
+
+    function GetTrimmTabDaten: TTrimmTabDaten;
+    procedure SetTrimmTabDaten(Value: TTrimmTabDaten);
+
+    procedure GetMemoLines(ML: TStrings);
+    procedure ProcessTrimmTab(ML: TStrings);
+
+    procedure Draw(Canvas: TCanvas; Rect: TRect);
+
+    procedure LoadFromIniFile(IniFile: TIniFile);
+    procedure WriteToIniFile(IniFile: TIniFile);
+
+    procedure LoadFromStream(S: TStream);
+    procedure SaveToStream(S: TStream);
+
+    property EvalDirection: Boolean read GetEvalDirection write SetEvalDirection;
+    property MittelPunkt: TPoint read GetMittelPunkt write SetMittelPunkt;
+    property TabellenTyp: TTabellenTyp read GetTabellenTyp write SetTabellenTyp;
+    property EndwertKraft: Integer read GetEndwertKraft write SetEndwertKraft;
+    property EndwertWeg: Integer read GetEndwertKraft write SetEndwertWeg;
+    property TrimmtabDaten: TTrimmTabDaten read GetTrimmTabDaten write SetTrimmTabDaten;
+  end;
+
+  TTrimmTab = class(TInterfacedObject, ITrimmTab)
   private
     FTabellenTyp: TTabellenTyp;
     FValid: Boolean;
     Fry1: double; { immer y2/2 im Fall itParabel }
+    FEvalDirection: Boolean;
+    function GetEndwertKraft: Integer;
+    function GetEndwertWeg: Integer;
+    procedure SetEvalDirection(const Value: Boolean);
+    function GetEvalDirection: Boolean;
   protected
     a1, a2: double;
     procedure SetTabellenTyp(Value: TTabellenTyp);
-    procedure SetMitte(Value: TPoint); virtual;
-    function GetMitte: TPoint; virtual;
+    function GetTabellenTyp: TTabellenTyp;
+    procedure SetMittelPunkt(Value: TPoint); virtual;
+    function GetMittelPunkt: TPoint; virtual;
     procedure SetEndPunkt(Value: TPoint);
     function GetEndPunkt: TPoint;
     procedure SetEndwertKraft(Value: Integer); virtual;
@@ -44,7 +95,6 @@ type
     procedure SetTrimmTabDaten(Value: TTrimmTabDaten); virtual;
     function GetTrimmTabDaten: TTrimmTabDaten; virtual;
   public
-    EvalDirection: Boolean;
     Kurve: array [1 .. PunkteMax] of TPoint; { Punkt 0 ist der NullPunkt }
     PunkteAnzahl: Integer; { tatsächliche Anzahl Punkte entsprechend Memo }
     EndKraftMin, EndWegMin, KraftMax, WegMax: Integer;
@@ -60,34 +110,35 @@ type
     procedure WriteToIniFile(IniFile: TIniFile);
     procedure LoadFromStream(S: TStream);
     procedure SaveToStream(S: TStream);
-    procedure GetMemoLines(MemoLines: TStrings);
+    procedure GetMemoLines(ML: TStrings);
     procedure Draw(Canvas: TCanvas; Rect: TRect); virtual;
-    procedure ProcessTrimmTab(Tabelle: TStrings);
+    procedure ProcessTrimmTab(ML: TStrings);
     function EvalY(x: double): double; virtual;
     function EvalX(y: double): double; virtual;
 
-    property TabellenTyp: TTabellenTyp read FTabellenTyp write SetTabellenTyp;
+    property EvalDirection: Boolean read GetEvalDirection write SetEvalDirection;
+    property TabellenTyp: TTabellenTyp read GetTabellenTyp write SetTabellenTyp;
     property Valid: Boolean read FValid write FValid;
-    property MittelPunkt: TPoint read GetMitte write SetMitte;
+    property MittelPunkt: TPoint read GetMittelPunkt write SetMittelPunkt;
     property EndPunkt: TPoint read GetEndPunkt write SetEndPunkt;
-    property EndwertKraft: Integer read x2 write SetEndwertKraft;
-    property EndwertWeg: Integer read y2 write SetEndwertWeg;
+    property EndwertKraft: Integer read GetEndwertKraft write SetEndwertKraft;
+    property EndwertWeg: Integer read GetEndwertWeg write SetEndwertWeg;
     property TrimmtabDaten: TTrimmTabDaten read GetTrimmTabDaten write SetTrimmTabDaten;
   end;
 
-  vec3 = record
-    x, y, z: double;
-  end;
+//  vec3 = record
+//    x, y, z: double;
+//  end;
 
   TControlPunkte = array [1 .. BezierKurveVomGrad + 1] of vec3;
   TBezierKurve = array [1 .. AnzahlKurvenPunkte + 1] of vec3;
   TKoeffizientenArray = array [1 .. BezierKurveVomGrad + 1] of Integer;
 
-  TBezier = class(TObject)
+  TBezier = class
   private
     c: TKoeffizientenArray; { n+1 }
     n: Integer; { there are n+1 Control Points }
-    m: Integer; { there are m+1 points along the interval of 0<= u <= 1 }
+    m: Integer; { there are m+1 points along the interval of 0 <= u <= 1 }
     function BlendingValue(u: double; k: Integer): double;
     procedure ComputePoint(u: double; var pt: vec3);
   public
@@ -115,18 +166,6 @@ implementation
   itBezier: Kurve durch Nullpunkt und Endpunkt. Die Tangente an die Kurve in
   diesen Punkten geht durch den Kontrollpunkt (x1,y1).
 }
-
-procedure PaintBackGround(Image: TBitMap);
-var
-  R: TRect;
-begin
-  R := Rect(0, 0, Image.Width, Image.Height);
-  with Image.Canvas do
-  begin
-    Brush.Color := clBtnFace;
-    FillRect(R);
-  end;
-end;
 
 { TTrimmTab }
 
@@ -177,13 +216,18 @@ begin
   GetPolynom;
 end;
 
+function TTrimmTab.GetTabellenTyp: TTabellenTyp;
+begin
+  result := FTabellenTyp;
+end;
+
 function TTrimmTab.GetTrimmTabDaten: TTrimmTabDaten;
 begin
   if not Valid then
     GetPolynom;
   result.TabellenTyp := TabellenTyp;
-  result.a0 := 0; // ergänzt
-  result.x0 := 0; // ergänzt
+  result.a0 := 0;
+  result.x0 := 0;
   case TabellenTyp of
     itKonstante:
       begin
@@ -255,9 +299,9 @@ begin
           Controls[3].x := x2;
           Controls[3].y := y2;
         end;
-      end; { itBezier }
-  end; { case }
-  TabellenTyp := Value.TabellenTyp; // SetTabellenTyp() aufrufen!
+      end;
+  end;
+  TabellenTyp := Value.TabellenTyp; // SetTabellenTyp() aufrufen
 end;
 
 procedure TTrimmTab.WriteToIniFile(IniFile: TIniFile);
@@ -330,9 +374,9 @@ begin
   TrimmtabDaten := T;
 end;
 
-procedure TTrimmTab.GetMemoLines(MemoLines: TStrings);
+procedure TTrimmTab.GetMemoLines(ML: TStrings);
 begin
-  with MemoLines do
+  with ML do
   begin
     Clear;
     Add('[X/mm = Y/N]');
@@ -364,13 +408,28 @@ begin
             Add(Format('%d=%d', [y2, x2]));
           end;
         end;
-    end; { case }
-  end; { with Memo.Lines do }
+    end;
+  end;
 end;
 
 function TTrimmTab.GetEndPunkt;
 begin
   result := Point(x2, y2);
+end;
+
+function TTrimmTab.GetEndwertKraft: Integer;
+begin
+  result := x2;
+end;
+
+function TTrimmTab.GetEndwertWeg: Integer;
+begin
+  result := y2;
+end;
+
+function TTrimmTab.GetEvalDirection: Boolean;
+begin
+  result := FEvalDirection;
 end;
 
 procedure TTrimmTab.SetEndPunkt(Value: TPoint);
@@ -429,7 +488,12 @@ begin
   end;
 end;
 
-procedure TTrimmTab.SetMitte(Value: TPoint);
+procedure TTrimmTab.SetEvalDirection(const Value: Boolean);
+begin
+  FEvalDirection := Value;
+end;
+
+procedure TTrimmTab.SetMittelPunkt(Value: TPoint);
 var
   rTemp, min, max: double;
   iTemp: Integer;
@@ -478,23 +542,19 @@ begin
   end;
 end;
 
-function TTrimmTab.GetMitte: TPoint;
+function TTrimmTab.GetMittelPunkt: TPoint;
 begin
   result := Point(x1, y1);
   (*
     case TabellenTyp of
-    itKonstante: begin
-    result := Point(x1,0);
-    end;
-    itGerade: begin
-    result := Point(x1,y1);
-    end;
-    itParabel: begin
-    result := Point(x1,Round(Fry1));
-    end;
-    itBezier: begin
-    result := Point(Round(Bezier.Controls[2].x),Round(Bezier.Controls[2].y));
-    end;
+    itKonstante: result := Point(x1, 0);
+    itGerade: result := Point(x1, y1);
+    itParabel: result := Point(x1, Round(Fry1));
+    itBezier:
+      result := Point(
+        Round(Bezier.Controls[2].x),
+        Round(Bezier.Controls[2].y)
+      );
     end;
   *)
 end;
@@ -512,8 +572,8 @@ begin
       end;
     itParabel:
       begin
-        a1 := (Fry1) / (x1);
-        a2 := ((y2 - Fry1) / (x2 - x1) - a1) / (x2);
+        a1 := Fry1 / x1;
+        a2 := ( (y2 - Fry1)/(x2 - x1) - a1 ) / (x2);
       end;
     itBezier:
       begin
@@ -531,7 +591,7 @@ begin
           ComputeCoefficients;
         end;
       end;
-  end; { case }
+  end;
   Valid := True;
 end;
 
@@ -570,7 +630,7 @@ begin
       end;
     itParabel:
       begin
-        { result := a1*(x-x0) + a2*(x-x0)*(x-x1); }
+      { result := a1 * (x-x0) + a2 * (x-x0) * (x-x1); }
         result := a1 * x + a2 * x * (x - x1);
       end;
     itBezier:
@@ -589,7 +649,8 @@ begin
             uA := uIst
           else
             uB := uIst;
-        until (abs(Diff) < 0.1) or (Zaehler = 100);
+        until
+          (abs(Diff) < 0.1) or (Zaehler = 100);
         if Zaehler < 100 then
           result := Temp.y
         else
@@ -635,7 +696,8 @@ begin
       end;
 
     itParabel:
-      begin { Umkehrfunktion zu y = a1*(x-x0) + a2*(x-x0)*(x-x1); }
+      begin
+        { Umkehrfunktion zu y = a1*(x-x0) + a2*(x-x0)*(x-x1); }
         { Normalfall: Kraft zwischen Null und KraftEnde }
         WegSoll := y; { nur der Lesbarkeit halber }
         KraftA := 0; { KraftA := KraftAnfang; }
@@ -650,7 +712,8 @@ begin
             KraftA := KraftIst
           else
             KraftB := KraftIst;
-        until (abs(Diff) < 0.01) or (Zaehler = 100);
+        until
+          (abs(Diff) < 0.01) or (Zaehler = 100);
         result := KraftIst;
       end;
 
@@ -670,7 +733,8 @@ begin
             uA := uIst
           else
             uB := uIst;
-        until (abs(Diff) < 0.01) or (Zaehler = 100);
+        until
+          (abs(Diff) < 0.01) or (Zaehler = 100);
         if Zaehler < 100 then
           result := Temp.x
         else
@@ -679,7 +743,7 @@ begin
   end;
 end;
 
-procedure TTrimmTab.ProcessTrimmTab(Tabelle: TStrings);
+procedure TTrimmTab.ProcessTrimmTab(ML: TStrings);
 var
   i, Code1, Code2: Integer;
   Punkt: TPoint;
@@ -690,41 +754,52 @@ begin
   { Achtung: Endweg wird nicht richtig erfaßt, wenn EndKraftMin zu klein ist! }
   EndPunkt := Point(EndKraftMin, EndWegMin);
   { später Nebenwirkung über Eigenschaft }
-  for i := 0 to Tabelle.Count - 1 do
+  for i := 0 to ML.Count - 1 do
   begin
-    S := Tabelle[i];
+    S := ML[i];
 
     if S = '' then
+    begin
       Continue; { Daher niemals Zugriff auf S[1] }
+    end;
+
+    { '*' steht für ungültigen Eintrag }
     if Pos('*', S) <> 0 then
+    begin
       Continue; { vermeidet Zugriff auf S[1] }
-    { Zugriff auf S[1] verursacht Exception, wenn String leer! }
-    { if S[1] = '*' then Continue; } { '*' steht für ungültigen Eintrag }
+    end;
+
+    { Zugriff auf S[1] verursacht Exception, wenn String leer. }
+    { if S[1] = '*' then
+        Continue;
+    }
 
     { String ohne '=' überspringen }
     if Pos('=', S) = 0 then
     begin
-      Tabelle[i] := Concat('***', S);
+      ML[i] := Concat('***', S);
       Continue;
     end;
 
     { Negative Zahlen nicht erlaubt }
     if Pos('-', S) <> 0 then
     begin
-      Tabelle[i] := Concat('***', S);
+      ML[i] := Concat('***', S);
       Continue;
     end;
 
-    S1 := Tabelle.Names[i]; { String vor dem '=' }
-    S2 := Tabelle.Values[S1]; { String nach dem '=' }
+    S1 := ML.Names[i]; { String vor dem '=' }
+    S2 := ML.Values[S1]; { String nach dem '=' }
     Val(Trim(S1), Punkt.y, Code1); { Weg y }
     Val(Trim(S2), Punkt.x, Code2); { Kraft x }
+
     { Fehler bei der Umwandlung in Integerwert? }
     if (Code1 <> 0) or (Code2 <> 0) then
     begin
-      Tabelle[i] := Concat('***', S);
+      ML[i] := Concat('***', S);
       Continue;
     end;
+
     if PunkteAnzahl < PunkteMax then
     begin
       Inc(PunkteAnzahl);
@@ -733,7 +808,9 @@ begin
         EndPunkt := Punkt;
     end;
   end;
-  MittelPunkt := MittelPunkt; { Mittelpunkt auf Gültigkeit kontrollieren }
+
+  { Mittelpunkt auf Gültigkeit kontrollieren }
+  MittelPunkt := MittelPunkt;
 end;
 
 procedure TTrimmTab.Draw(Canvas: TCanvas; Rect: TRect);
@@ -822,18 +899,17 @@ begin
               case TabellenTyp of
                 itParabel:
                   begin
-                    { EndwertWeg = EvalY(i/100*EndwertKraft) }
-                    tempX := PlotExtX * EvalY(i / 100 * EndwertKraft) /
-                      (EndwertWeg); { Weg }
-                    tempY := PlotExtY * (i / 100);
+                    { Weg }
+                    tempX := PlotExtX * EvalY(i / 100 * EndwertKraft) / (EndwertWeg);
                     { Kraft als Argument auf y-Achse }
+                    tempY := PlotExtY * (i / 100);
                   end;
                 itBezier:
                   begin
-                    tempX := PlotExtX * Bezier.curve[i + 1].y / EndwertWeg;
                     { Weg }
-                    tempY := PlotExtY * Bezier.curve[i + 1].x / EndwertKraft;
+                    tempX := PlotExtX * Bezier.curve[i + 1].y / EndwertWeg;
                     { Kraft }
+                    tempY := PlotExtY * Bezier.curve[i + 1].x / EndwertKraft;
                   end;
               end;
               pt.x := Round(Limit(tempX));
@@ -853,7 +929,10 @@ begin
         tempY := PlotExtY * Kurve[i].x / EndwertKraft;
         pt.x := Round(Limit(tempX));
         pt.y := Round(Limit(tempY));
-        Rectangle(pt.x - RadiusX, pt.y - RadiusY, pt.x + RadiusX,
+        Rectangle(
+          pt.x - RadiusX,
+          pt.y - RadiusY,
+          pt.x + RadiusX,
           pt.y + RadiusY);
       end;
 
@@ -867,7 +946,10 @@ begin
         tempY := PlotExtY * x1 / EndwertKraft;
         pt.x := Round(Limit(tempX));
         pt.y := Round(Limit(tempY));
-        Rectangle(pt.x - RadiusX, pt.y - RadiusY, pt.x + RadiusX,
+        Rectangle(
+          pt.x - RadiusX,
+          pt.y - RadiusY,
+          pt.x + RadiusX,
           pt.y + RadiusY);
       end;
 
@@ -918,7 +1000,7 @@ begin
         Brush.Style := bsClear;
         Rectangle( 0, 0, Bitmap.Width, Bitmap.Height);
         }
-    end; { with Bitmap.Canvas do begin }
+    end;
 
     with Canvas do
     begin
@@ -935,9 +1017,11 @@ end;
 
 constructor TBezier.Create;
 begin
-  n := BezierKurveVomGrad; { there are n+1 Control Points }
-  m := AnzahlKurvenPunkte;
+  { there are n+1 Control Points }
+  n := BezierKurveVomGrad;
+
   { there are m+1 points along the interval of 0<= u <= 1 }
+  m := AnzahlKurvenPunkte;
 end;
 
 procedure TBezier.ComputeCoefficients;
@@ -974,9 +1058,10 @@ var
   k: Integer;
   b: double;
 begin
+ { pt := Null; }
   pt.x := 0.0;
   pt.y := 0.0;
-  pt.z := 0.0; { pt := Null; }
+  pt.z := 0.0;
   for k := 1 to n + 1 do
   begin
     { add in influence of each control point }
@@ -988,8 +1073,8 @@ begin
 end;
 
 procedure TBezier.GenerateCurve;
-{ Uses n+1 control points. Generates curve by  finding m+1 points along
-  the interval of 0 <= u <= 1 }
+{ Uses n+1 control points.
+  Generates curve by  finding m+1 points along the interval of 0 <= u <= 1 }
 var
   k: Integer;
 begin

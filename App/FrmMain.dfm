@@ -305,7 +305,6 @@ object FormMain: TFormMain
       Hint = 'Umschalter f'#252'r Controller-Modus|'
       AllowAllUp = True
       GroupIndex = 6
-      Down = True
       Caption = 'C'
       OnClick = ControllerBtnClick
     end
