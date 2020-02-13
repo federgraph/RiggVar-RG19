@@ -23,7 +23,7 @@ uses
   Vcl.ExtDlgs,
   Vector3D,
   RggTypes,
-  RggGBox,
+  RggGetriebeGraph,
   RggMatrix,
   Rggunit4,
   RggPrinter,

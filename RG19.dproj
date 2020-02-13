@@ -202,7 +202,7 @@
         <DCCReference Include="Graph\RggCtrls.pas"/>
         <DCCReference Include="Graph\RggMatrix.pas"/>
         <DCCReference Include="Core\RggScroll.pas"/>
-        <DCCReference Include="Graph\RggGbox.pas"/>
+        <DCCReference Include="Graph\RggGetriebeGraph.pas"/>
         <DCCReference Include="Graph\RggPBox.pas"/>
         <DCCReference Include="Graph\RggHull.pas"/>
         <DCCReference Include="Graph\RggPal.pas"/>

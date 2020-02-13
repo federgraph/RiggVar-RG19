@@ -133,7 +133,7 @@ uses
   FrmAni,
   FrmCmd,
   Math,
-  RggGBox,
+  RggGetriebeGraph,
   FrmModel,
   RggScroll,
   RggDoc,

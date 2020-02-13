@@ -49,7 +49,7 @@ uses
   RggScroll in 'Core\RggScroll.pas',
   RggCtrls in 'Graph\RggCtrls.pas',
   RggMatrix in 'Graph\RggMatrix.pas',
-  RggGbox in 'Graph\RggGbox.pas',
+  RggGetriebeGraph in 'Graph\RggGetriebeGraph.pas',
   RggPBox in 'Graph\RggPBox.pas',
   RggHull in 'Graph\RggHull.pas',
   RggPal in 'Graph\RggPal.pas',

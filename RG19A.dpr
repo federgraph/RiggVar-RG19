@@ -46,7 +46,7 @@ uses
   RggModul in 'Core\RggModul.pas',
   RggMatrix in 'Graph\RggMatrix.pas',
   RggDoc in 'Core\RggDoc.pas',
-  RggGbox in 'Graph\RggGbox.pas',
+  RggGetriebeGraph in 'Graph\RggGetriebeGraph.pas',
   RggHull in 'Graph\RggHull.pas',
   RggPal in 'Graph\RggPal.pas',
   RggPreview in 'Graph\RggPreview.pas',

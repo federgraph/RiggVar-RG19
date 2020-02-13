@@ -14,7 +14,7 @@ uses
   Vcl.Dialogs,
   Vcl.StdCtrls,
   Vcl.Buttons,
-  RggGBox;
+  RggGetriebeGraph;
 
 type
   TAdjustForm = class(TForm)

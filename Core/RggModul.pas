@@ -24,7 +24,7 @@ uses
   Vcl.Clipbrd,
   RggRota,
   RggTypes,
-  RggGBox,
+  RggGetriebeGraph,
   RggUnit4,
   RggReport,
   RggCalc,

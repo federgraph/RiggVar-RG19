@@ -1,4 +1,4 @@
-﻿unit RggGbox;
+﻿unit RggGetriebeGraph;
 
 interface
 
@@ -19,8 +19,8 @@ uses
 type
   TGetriebeGraph = class(TRaumGraph)
   protected
-//    xA0,xB0,xC0,xD0,xE0,xF0,xA,xB,xC,xD,xE,xF: Integer;
-//    yA0,yB0,yC0,yD0,yE0,yF0,yA,yB,yC,yD,yE,yF: Integer;
+//    xA0,xB0,xC0,xD0,xE0,xF0,xA,xB,xC,xD,xE,xF: Integer; // inherited
+//    yA0,yB0,yC0,yD0,yE0,yF0,yA,yB,yC,yD,yE,yF: Integer; // inherited
     zA0,zB0,zC0,zD0,zE0,zF0,zA,zB,zC,zD,zE,zF: Integer;
 
     FKoppelKurve: TKoordLine; // Daten für Koppelkurve
