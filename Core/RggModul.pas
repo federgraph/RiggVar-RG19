@@ -828,12 +828,12 @@ end;
 
 procedure TRiggModul.DrawPaintBoxG(Canvas: TCanvas);
 begin
-  GetriebeGraph.ZeichneKoppel := KoppelBtnDown;
+  GetriebeGraph.Koppel := KoppelBtnDown;
 
   { entspanntes Rigg grau zeichnen }
   if Grauzeichnen and BtnGrauDown then
   begin
-    GetriebeGraph.Farbe := clEntspannt;
+    GetriebeGraph.Color := clEntspannt;
     GetriebeGraph.Coloriert := False;
     GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
     GetriebeGraph.Koordinaten := Rigg.rPe;
@@ -843,7 +843,7 @@ begin
   { Nullstellung hellblau zeichnen }
   if BtnBlauDown then
   begin
-    GetriebeGraph.Farbe := clNullStellung;
+    GetriebeGraph.Color := clNullStellung;
     GetriebeGraph.Coloriert := False;
     GetriebeGraph.WanteGestrichelt := False;
     GetriebeGraph.Koordinaten := RefPoints;
@@ -860,12 +860,12 @@ end;
 
 procedure TRiggModul.DrawToMetaG(Canvas: TMetaFileCanvas);
 begin
-  GetriebeGraph.ZeichneKoppel := KoppelBtnDown;
+  GetriebeGraph.Koppel := KoppelBtnDown;
 
   { entspanntes Rigg grau zeichnen }
   if Grauzeichnen and BtnGrauDown then
   begin
-    GetriebeGraph.Farbe := clBlack;
+    GetriebeGraph.Color := clBlack;
     GetriebeGraph.Coloriert := False;
     GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
     GetriebeGraph.Koordinaten := Rigg.rPe;
@@ -875,7 +875,7 @@ begin
   { Nullstellung hellblau zeichnen }
   if BtnBlauDown then
   begin
-    GetriebeGraph.Farbe := clNullStellung;
+    GetriebeGraph.Color := clNullStellung;
     GetriebeGraph.Coloriert := False;
     GetriebeGraph.WanteGestrichelt := False;
     GetriebeGraph.Koordinaten := RefPoints;
@@ -1302,7 +1302,7 @@ begin
   if FKoppelBtnDown <> Value then
   begin
     FKoppelBtnDown := Value;
-    GetriebeGraph.ZeichneKoppel := Value;
+    GetriebeGraph.Koppel := Value;
     if Value then
       GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
     Draw;

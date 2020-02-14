@@ -46,7 +46,7 @@ type
     Factor: vec3; // FaktorX, FaktorY, FaktorZ: double;
     ModelFactor: vec3;
 
-    constructor Create; override;
+    constructor Create;
     destructor Destroy; override;
 
     procedure Load;
@@ -61,7 +61,7 @@ type
     zfac: double;
     procedure FindBB;
   public
-    constructor Create; override;
+    constructor Create;
   end;
 
   THullGraph2 = class(THullGraph0)

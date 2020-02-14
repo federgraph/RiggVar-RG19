@@ -4,6 +4,7 @@ interface
 
 uses
   System.IniFiles,
+  RggCalc,
   RggTypes,
   RggGraph;
 
@@ -13,26 +14,45 @@ type
     FFixPoint: TRiggPoint;
     FSalingTyp: TSalingTyp;
     FControllerTyp: TControllerTyp;
+    FKoppelKurve: TKoordLine;
+    FKoppel: Boolean;
+    FBogen: Boolean;
+    FGestrichelt: Boolean;
+    FViewPoint: TViewPoint;
   protected
+    BogenIndexD: Integer;
+    function FindBogenIndexOf(P: TRealPoint): Integer;
+  private
+    procedure SetKoppel(const Value: Boolean);
     procedure SetKoordinaten(const Value: TRealRiggPoints);
     procedure SetFixPoint(const Value: TRiggPoint);
     procedure SetSalingTyp(const Value: TSalingTyp);
     procedure SetControllerTyp(const Value: TControllerTyp);
+    procedure SetViewPoint(const Value: TViewPoint);
+    procedure SetWanteGestrichelt(const Value: Boolean);
+    procedure SetBogen(const Value: Boolean);
   public
     rP: TRealRiggPoints;
     Kurve: TMastKurve;
 
-    constructor Create; override;
+    constructor Create;
+
     procedure LoadFromIniFile(FileName: string);
+
     procedure SetMastLineData(const Value: TLineDataR100; L: double; Beta: double);
     procedure SetMastKurve(const Value: TMastKurve);
-    procedure SetKoppelKurve(const Value: TKoordLine); virtual;
+    procedure SetKoppelKurve(const Value: TKoordLine);
     function GetMastKurvePoint(const Index: Integer): TRealPoint;
 
     property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
-    property SalingTyp: TSalingTyp read FSalingTyp write SetSalingTyp;
-    property ControllerTyp: TControllerTyp read FControllerTyp write SetControllerTyp;
     property Koordinaten: TRealRiggPoints read rP write SetKoordinaten;
+    property KoppelKurve: TKoordLine read FKoppelKurve write SetKoppelKurve;
+    property Koppel: Boolean read FKoppel write SetKoppel;
+    property ControllerTyp: TControllerTyp read FControllerTyp write SetControllerTyp;
+    property SalingTyp: TSalingTyp read FSalingTyp write SetSalingTyp;
+    property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
+    property Bogen: Boolean read FBogen write SetBogen;
+    property WanteGestrichelt: Boolean read FGestrichelt write SetWanteGestrichelt;
   end;
 
 implementation
@@ -55,14 +75,22 @@ begin
   Updated := False;
 end;
 
+procedure TBootGraph.SetKoppel(const Value: Boolean);
+begin
+  FKoppel := Value;
+  RaumGraphProps.Koppel := True;
+end;
+
 procedure TBootGraph.SetKoppelKurve(const Value: TKoordLine);
 begin
-  // not implemented
+  FKoppelKurve := Value;
+  KoppelKurveNeedFill := True;
 end;
 
 procedure TBootGraph.SetControllerTyp(const Value: TControllerTyp);
 begin
   FControllerTyp := Value;
+  RaumGraphProps.ControllerTyp := Value;
 end;
 
 procedure TBootGraph.SetFixPoint(const Value: TRiggPoint);
@@ -98,6 +126,25 @@ end;
 procedure TBootGraph.SetSalingTyp(const Value: TSalingTyp);
 begin
   FSalingTyp := Value;
+  RaumGraphProps.SalingTyp := Value;
+end;
+
+procedure TBootGraph.SetBogen(const Value: Boolean);
+begin
+  FBogen := Value;
+  RaumGraphProps.Bogen := Value;
+  Updated := False;
+end;
+
+procedure TBootGraph.SetViewPoint(const Value: TViewPoint);
+begin
+  FViewPoint := Value;
+end;
+
+procedure TBootGraph.SetWanteGestrichelt(const Value: Boolean);
+begin
+  FGestrichelt := Value;
+  RaumGraphProps.Gestrichelt := Value;
 end;
 
 function TBootGraph.GetMastKurvePoint(const Index: Integer): TRealPoint;
@@ -110,6 +157,28 @@ begin
     result[y] := 0;
     result[z] := 0;
   end;
+end;
+
+function TBootGraph.FindBogenIndexOf(P: TRealPoint): Integer;
+var
+  i, j: Integer;
+  MinIndex: Integer;
+  MinAbstand: double;
+  a: double;
+begin
+  j := Length(Kurve);
+  MinIndex := j div 2;
+  MinAbstand := 1000;
+  for i := 0 to j - 1 do
+  begin
+    a := Abstand(P, Kurve[i]);
+    if a < MinAbstand then
+    begin
+      MinAbstand := a;
+      MinIndex := i;
+    end;
+  end;
+  result := MinIndex;
 end;
 
 procedure TBootGraph.LoadFromIniFile(FileName: string);

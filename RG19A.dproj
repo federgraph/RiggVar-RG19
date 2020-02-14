@@ -233,6 +233,7 @@
         <DCCReference Include="Util\RiggVar.Util.InfoMemo.pas"/>
         <DCCReference Include="VM\RiggVar.VM.FormMain.pas"/>
         <DCCReference Include="VM\RiggVar.VM.FormMainA.pas"/>
+        <DCCReference Include="Graph\RggZug.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

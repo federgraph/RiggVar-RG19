@@ -7,47 +7,70 @@ uses
   System.Types,
   Vcl.Graphics,
   RggTypes,
-  RggDisplay,
+  RggZug,
   RggPolarKar;
 
 type
   TRggGraph = class
-  private
+  protected
     FFixPunkt: TRealPoint;
     FZoom: single;
+    KoppelKurveNeedFill: Boolean;
+    FColor: TColor;
     FColored: Boolean;
+    procedure SetColor(const Value: TColor);
+    procedure SetColored(const Value: Boolean);
+    procedure SetFixPunkt(Value: TRealPoint);
+    procedure SetZoom(Value: single); virtual;
   protected
     GrafikOK: Boolean; // loaded
     Updated: Boolean; // transformed
-    procedure SetFixPunkt(Value: TRealPoint);
-    procedure SetZoom(Value: single); virtual;
   public
+    RaumGraphData: TRaumGraphData;
+    RaumGraphProps: TRaumGraphProps;
     Rotator: TPolarKar; // injected, not owned
-    DL: TRggDisplayList;
-    constructor Create; virtual;
+
+    constructor Create;
     destructor Destroy; override;
+
     procedure Update; virtual;
     procedure DrawToCanvas(Canvas: TCanvas); virtual;
     procedure GetPlotList(ML: TStrings); virtual;
 
     property FixPunkt: TRealPoint read FFixPunkt write SetFixPunkt;
     property Zoom: single read FZoom write SetZoom;
-    property Coloriert: Boolean read FColored write FColored;
+    property Coloriert: Boolean read FColored write SetColored;
+    property Color: TColor read FColor write SetColor;
   end;
 
 implementation
 
 constructor TRggGraph.Create;
 begin
-  DL := TRggDisplayList.Create;
+  RaumGraphData := TRaumGraphData.Create;
+  RaumGraphProps := TRaumGraphProps.Create;
+  FColor := clGray;
   FColored := True;
   FZoom := 0.05;
 end;
 
 destructor TRggGraph.Destroy;
 begin
-  DL.Free;
+  RaumGraphData.Free;
+  RaumGraphProps.Free;
   inherited;
+end;
+
+procedure TRggGraph.SetColor(const Value: TColor);
+begin
+  FColor := Value;
+  RaumGraphProps.Color := Value;
+end;
+
+procedure TRggGraph.SetColored(const Value: Boolean);
+begin
+  FColored := Value;
+  RaumGraphProps.Coloriert := FColored;
 end;
 
 procedure TRggGraph.SetFixPunkt(Value: TRealPoint);
@@ -60,6 +83,7 @@ procedure TRggGraph.SetZoom(Value: single);
 begin
   FZoom := Value;
   Updated := False;
+  KoppelKurveNeedFill := True;
 end;
 
 procedure TRggGraph.Update;

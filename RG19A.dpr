@@ -78,7 +78,8 @@ uses
   RiggVar.Util.Logger in 'Util\RiggVar.Util.Logger.pas',
   RiggVar.Util.InfoMemo in 'Util\RiggVar.Util.InfoMemo.pas',
   RiggVar.VM.FormMain in 'VM\RiggVar.VM.FormMain.pas',
-  RiggVar.VM.FormMainA in 'VM\RiggVar.VM.FormMainA.pas';
+  RiggVar.VM.FormMainA in 'VM\RiggVar.VM.FormMainA.pas',
+  RggZug in 'Graph\RggZug.pas';
 
 {$R *.res}
 
