@@ -18,6 +18,7 @@ uses
   Vcl.ExtCtrls,
   Vcl.ComCtrls,
   Vcl.ExtDlgs,
+  RiggVar.RG.Graph,
   Vector3D,
   RggTypes,
   RggMatrix,
@@ -27,7 +28,15 @@ uses
   RggPolarKar;
 
 type
-  TRotaForm = class
+  TRotaForm = class(TInterfacedObject, IStrokeRigg)
+  private
+    RPN: TRealRiggPoints;
+    RPE: TRealRiggPoints;
+    RPR: TRealRiggPoints;
+    SkipOnceFlag: Boolean;
+    procedure DrawToCanvasEx(g: TCanvas);
+    procedure DrawToCanvas(g: TCanvas);
+    procedure DrawToImage(g: TCanvas);
   private
     procedure PaintBox3DMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure PaintBox3DMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -37,7 +46,6 @@ type
     procedure PositionSaveItemClick(Sender: TObject);
     procedure KeepInsideItemClick(Sender: TObject);
     procedure PositionResetItemClick(Sender: TObject);
-    procedure ModusItemClick(Sender: TObject);
     procedure DrawAlwaysItemClick(Sender: TObject);
   public
     MatrixItemChecked: Boolean;
@@ -55,9 +63,7 @@ type
     MaxTrackX, MaxTrackY: Integer;
     CreatedScreenWidth: Integer;
     Bitmap: TBitmap;
-    procedure ChangeResolution;
     procedure PaintBackGround(Image: TBitmap);
-    procedure DrawAngleText(Canvas: TCanvas);
     procedure PaintBox3DPaint(Sender: TObject);
   private
     FViewPoint: TViewPoint;
@@ -75,6 +81,7 @@ type
     FIncrementW: double;
     FIncrementT: Integer;
     FZoomIndex: Integer;
+
     RotaData: TRotaData;
     RotaData1: TRotaData;
     RotaData2: TRotaData;
@@ -95,16 +102,32 @@ type
     procedure UpdateMinMax;
     procedure DoTrans;
   public
+    { interface IStrokeRigg }
+    procedure SetKoordinaten(const Value: TRealRiggPoints);
+    procedure SetKoordinatenE(const Value: TRealRiggPoints);
+    procedure SetKoordinatenR(const Value: TRealRiggPoints);
+    procedure SetMastKurve(const Value: TMastKurve);
+    procedure SetKoppelKurve(const Value: TKoordLine);
+
+    procedure SetHullVisible(const Value: Boolean);
+
     procedure SetFixPoint(const Value: TRiggPoint);
     procedure SetViewPoint(const Value: TViewPoint);
-    procedure SetHullVisible(const Value: Boolean);
+    procedure SetSalingTyp(const Value: TSalingTyp);
+    procedure SetControllerTyp(const Value: TControllerTyp);
+    procedure SetWanteGestrichelt(const Value: Boolean);
+    procedure SetBogen(const Value: Boolean);
+    procedure SetBtnBlauDown(const Value: Boolean);
+    procedure SetBtnGrauDown(const Value: Boolean);
+    procedure SetGrauZeichnen(const Value: Boolean);
+    procedure SetRiggLED(const Value: Boolean);
+    procedure SetSofortBerechnen(const Value: Boolean);
+
+    procedure SetMastLineData(const Value: TLineDataR100; L: double; Beta: double);
+    function GetMastKurvePoint(const Index: Integer): TRealPoint;
     procedure ToggleRenderOption(const fa: Integer);
     function QueryRenderOption(const fa: Integer): Boolean;
   public
-    SHeadingPhi: string;
-    SPitchTheta: string;
-    SBankGamma: string;
-
     MatrixTextU: string;
     MatrixTextV: string;
     MatrixTextW: string;
@@ -114,13 +137,17 @@ type
     EraseBK: Boolean;
     procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
     procedure Translate(x, y: Integer);
-    procedure SetAngleText;
-    procedure SetZoomText;
     procedure InitRotaData;
   private
     Rotator: TPolarKar;
-    Mode: Boolean;
     FOnDebugDisplayList: TNotifyEvent;
+    FBtnGrauDown: Boolean;
+    FGrauZeichnen: Boolean;
+    FBtnBlauDown: Boolean;
+    FRiggLED: Boolean;
+    FSofortBerechnen: Boolean;
+    FWanteGestrichelt: Boolean;
+    FBogen: Boolean;
     procedure InitGraph;
     procedure InitRaumGraph;
     procedure InitHullGraph;
@@ -131,26 +158,44 @@ type
     IsUp: Boolean;
     PaintBox3D: TPaintBox; // injected and replaced
 
-    HullGraph: TRggGraph;
+    HullGraph: THullGraph0;
     RaumGraph: TRaumGraph;
     UseDisplayList: Boolean;
+    WantOverlayedRiggs: Boolean;
 
     constructor Create;
     destructor Destroy; override;
     procedure Init;
     procedure Draw;
-    procedure DrawToCanvas(g: TCanvas);
-    procedure DrawToImage(g: TCanvas);
 
     property ZoomIndex: Integer read FZoomIndex write SetZoomIndex;
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
+
+    property HullVisible: Boolean write SetHullVisible;
+    property SalingTyp: TSalingTyp write SetSalingTyp;
+    property ControllerTyp: TControllerTyp write SetControllerTyp;
+    property Koordinaten: TRealRiggPoints write SetKoordinaten;
+    property KoordinatenE: TRealRiggPoints write SetKoordinatenE;
+    property KoordinatenR: TRealRiggPoints write SetKoordinatenR;
+    property MastKurve: TMastKurve write SetMastKurve;
+    property KoppelKurve: TKoordLine write SetKoppelKurve;
+    property WanteGestrichelt: Boolean read FWanteGestrichelt write SetWanteGestrichelt;
+    property Bogen: Boolean read FBogen write SetBogen;
+
+    property RiggLED: Boolean read FRiggLED write SetRiggLED;
+    property SofortBerechnen: Boolean read FSofortBerechnen write SetSofortBerechnen;
+    property GrauZeichnen: Boolean read FGrauZeichnen write SetGrauZeichnen;
+    property BtnGrauDown: Boolean read FBtnGrauDown write SetBtnGrauDown;
+    property BtnBlauDown: Boolean read FBtnBlauDown write SetBtnBlauDown;
+
     property OnDebugDisplayList: TNotifyEvent read FOnDebugDisplayList write SetOnDebugDisplayList;
   end;
 
 implementation
 
 uses
+  RiggVar.RG.Def,
   RggPBox, // special paintbox which captures the mouse properly
   RggTestData;
 
@@ -190,19 +235,16 @@ begin
   MaxTrackY := 768;
 
   CreatedScreenWidth := Screen.Width;
-  wx := GetSystemMetrics(SM_CXSCREEN); { Width := Screen.Width }
-  wy := GetSystemMetrics(SM_CYSCREEN); { Height := Screen.Height }
+  wx := GetSystemMetrics(SM_CXSCREEN);
+  wy := GetSystemMetrics(SM_CYSCREEN);
   if wx > MaxTrackX then
     wx := MaxTrackX;
   if wy > MaxTrackY then
     wy := MaxTrackY;
 
   Bitmap := TBitmap.Create;
-  with Bitmap do
-  begin
-    Width := wx;
-    Height := wy;
-  end;
+  Bitmap.Width := wx;
+  Bitmap.Height := wy;
   PaintBackGround(Bitmap);
 
   FZoomBase := 0.05;
@@ -241,8 +283,6 @@ end;
 
 procedure TRotaForm.InitRaumGraph;
 begin
-  UseDisplayList := False;
-
   RaumGraph := TRaumGraph.Create;
   RaumGraph.Rotator := Rotator;
   RaumGraph.FixPoint := FixPoint;
@@ -324,18 +364,6 @@ begin
   end;
 end;
 
-procedure TRotaForm.DrawAngleText(Canvas: TCanvas);
-begin
-  with Canvas do
-  begin
-    Font.Name := 'Courier New';
-    Font.Size := 10;
-    TextOut(20,120, SHeadingPhi);
-    TextOut(20,140, SPitchtheta);
-    TextOut(20,160, SBankGamma);
-  end;
-end;
-
 procedure TRotaForm.UpdateMatrixText;
 var
   m4x4: Matrix4x4;
@@ -362,7 +390,17 @@ procedure TRotaForm.DrawToImage(g: TCanvas);
 begin
   Painted := False;
 
-  DrawToCanvas(g);
+  if WantOverlayedRiggs then
+  begin
+    DrawToCanvasEx(g)
+  end
+  else
+  begin
+    RaumGraph.Coloriert := True;
+    WanteGestrichelt := WanteGestrichelt;
+    RaumGraph.Koordinaten := RPN;
+    DrawToCanvas(g);
+  end;
 
   { Bitmap auf den Bildschirm kopieren }
   with PaintBox3D.Canvas do
@@ -374,13 +412,60 @@ begin
   Painted := True;
 end;
 
+procedure TRotaForm.DrawToCanvasEx(g: TCanvas);
+begin
+  if not SofortBerechnen or UseDisplayList then
+  begin
+    RaumGraph.Coloriert := True;
+    WanteGestrichelt := WanteGestrichelt;
+    RaumGraph.Koordinaten := RPN;
+    DrawToCanvas(g);
+  end
+  else
+  begin
+    { entspanntes Rigg grau zeichnen }
+    if Grauzeichnen and BtnGrauDown then
+    begin
+      RaumGraph.Color := clEntspannt;
+      RaumGraph.Coloriert := False;
+      WanteGestrichelt := False; //WanteGestrichelt;
+      RaumGraph.Koordinaten := RPE;
+      DrawToCanvas(g);
+      SkipOnceFlag := True;
+    end;
+
+    { Nullstellung hellblau zeichnen }
+//    if BtnBlauDown then
+//    begin
+//      RaumGraph.Color := clNullStellung;
+//      RaumGraph.Coloriert := False;
+//      RaumGraph.WanteGestrichelt := False;
+//      RaumGraph.Koordinaten := RPR;
+//      DrawToCanvas(g);
+//      SkipOnceFlag := True;
+//    end;
+
+    { gespanntes Rigg farbig zeichnen}
+    RaumGraph.Coloriert := True;
+    WanteGestrichelt := WanteGestrichelt;
+    RaumGraph.Koordinaten := RPN;
+    DrawToCanvas(g);
+  end;
+end;
+
 procedure TRotaForm.DrawToCanvas(g: TCanvas);
 begin
-  if not PaintItemChecked or EraseBK then
+  if SkipOnceFlag then
+  begin
+    { do not clear background }
+  end
+  else if not PaintItemChecked or EraseBK then
   begin
     PaintBackGround(Bitmap);
     EraseBK := False;
   end;
+
+  SkipOnceFlag := False;
 
   NullpunktOffset.x := Bitmap.Width div 2 + FXpos;
   NullpunktOffset.y := Bitmap.Height div 2 + FYpos;
@@ -400,7 +485,6 @@ begin
     SetViewPortOrgEx(Handle, NullpunktOffset.x, NullpunktOffset.y, nil);
   end;
 
-  RaumGraph.Coloriert := True;
   if UseDisplayList then
   begin
     RaumGraph.DL.Draw(g);
@@ -411,6 +495,7 @@ begin
   end;
 
   if RumpfItemChecked
+    and not UseDisplayList
     and (not MouseDown or (MouseDown and FDrawAlways)) then
   begin
     HullGraph.Coloriert := True;
@@ -475,6 +560,16 @@ begin
   ZoomIndex := FZoomIndex - 1;
 end;
 
+procedure TRotaForm.SetBtnBlauDown(const Value: Boolean);
+begin
+  FBtnBlauDown := Value;
+end;
+
+procedure TRotaForm.SetBtnGrauDown(const Value: Boolean);
+begin
+  FBtnGrauDown := Value;
+end;
+
 procedure TRotaForm.SetFixPoint(const Value: TRiggPoint);
 begin
   FFixPoint := Value;
@@ -483,10 +578,26 @@ begin
   Draw;
 end;
 
+procedure TRotaForm.SetGrauZeichnen(const Value: Boolean);
+begin
+  FGrauZeichnen := Value;
+end;
+
 procedure TRotaForm.SetHullVisible(const Value: Boolean);
 begin
   RumpfItemChecked := Value;
   Draw;
+end;
+
+procedure TRotaForm.SetRiggLED(const Value: Boolean);
+begin
+  FRiggLED := Value;
+  RaumGraph.RiggLED := Value;
+end;
+
+procedure TRotaForm.SetSofortBerechnen(const Value: Boolean);
+begin
+  FSofortBerechnen := Value;
 end;
 
 procedure TRotaForm.SetOnDebugDisplayList(const Value: TNotifyEvent);
@@ -536,23 +647,26 @@ begin
 
   FXpos := RotaData.Xpos;
   FYpos := RotaData.Ypos;
+
   FIncrementT := RotaData.IncrementT;
   FIncrementW := RotaData.IncrementW;
+
   { Rotationmatrix }
   Rotator.Matrix := RotaData.Matrix;
   Rotator.GetAngle(FPhi, FTheta, FGamma);
-  SetAngleText; // Rotate() hier nicht aufrufen, um Matrix nicht zu verändern!
+
   { Zoom }
   FZoomIndex := RotaData.ZoomIndex;
   FZoom := FZoomBase * LookUpRa10(FZoomIndex);
-  SetZoomText;
   RaumGraph.Zoom := FZoom;
   HullGraph.Zoom := FZoom;
+
   { Fixpunkt }
   RaumGraph.FixPoint := FixPoint;
   RaumGraph.Update; // Rotate;
   HullGraph.FixPunkt := RaumGraph.FixPunkt;
   HullGraph.Update; // Rotate;
+
   { Neuzeichnen }
   EraseBK := True;
   Draw;
@@ -572,7 +686,6 @@ begin
     Ypos := FYpos;
     Matrix := Rotator.Matrix;
     ZoomIndex := FZoomIndex;
-//    FixPunktIndex := FixPunktCombo.ItemIndex;
     IncrementT := FIncrementT;
     IncrementW := FIncrementW;
   end;
@@ -590,39 +703,12 @@ begin
   SetViewPoint(FViewPoint);
 end;
 
-procedure TRotaForm.ChangeResolution;
-var
-  wx, wy: Integer;
-begin
-  CreatedScreenWidth := Screen.Width;
-  wx := GetSystemMetrics(SM_CXSCREEN); { Width := Screen.Width }
-  wy := GetSystemMetrics(SM_CYSCREEN); { Height := Screen.Height }
-  if wx > 1024 then
-    wx := 1024;
-  if wy > 768 then
-    wy := 768;
-
-  Bitmap.Palette := 0;
-  Bitmap.Free;
-  Bitmap := TBitmap.Create;
-  with Bitmap do
-  begin
-    Width := wx;
-    Height := wy;
-  end;
-  PaintBackGround(Bitmap);
-
-  SetViewPoint(FViewPoint);
-end;
-
 procedure TRotaForm.KeepInsideItemClick(Sender: TObject);
 begin
   KeepInsideItemChecked := not KeepInsideItemChecked;
   if KeepInsideItemChecked then
     Draw;
 end;
-
-{ Ergänzung für das Drehen mit der Maus. }
 
 procedure TRotaForm.PaintBox3DMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -648,8 +734,6 @@ var
 begin
   if not MouseDown then
     Exit;
-  if Mode then
-    Exit;
   if MouseButton = mbLeft then
   begin
     wx := (x - prevx) * 0.15;
@@ -662,6 +746,7 @@ begin
     wy := 0;
     wz := (x - prevx) * 0.3;
   end;
+
   if Painted then
   begin
     Painted := False;
@@ -693,7 +778,6 @@ begin
   Rotator.YRot := Yrot;
   Rotator.ZRot := Zrot;
   RaumGraph.Update;
-  SetAngleText;
 end;
 
 procedure TRotaForm.Translate(x, y: Integer);
@@ -703,53 +787,23 @@ begin
   DoTrans;
 end;
 
-procedure TRotaForm.SetZoomText;
-begin
-end;
-
-procedure TRotaForm.SetAngleText;
-begin
-end;
-
-procedure TRotaForm.ModusItemClick(Sender: TObject);
-begin
-  Mode := not Mode;
-  Rotator.Mode := Mode;
-
-  if AlwaysShowAngle then
-    Exit;
-
-  if Mode = False then
-  begin
-    { Increment - Modus }
-    SHeadingPhi := '';
-    SPitchTheta := '';
-    SBankGamma  := '';
-  end;
-  if Mode = True then
-  begin
-    { Absolut - Modus }
-    { wenn Ereignis Rotator.OnCalcAngle nicht zugewiesen wurde, dann
-      werden FPhi, FTheta und FGamma auf Null gesetzt }
-    Rotator.GetAngle(FPhi, FTheta, FGamma);
-    Rotate(FPhi, FTheta, FGamma, 0, 0, 0);
-    EraseBK := True;
-    Draw;
-  end;
-end;
-
 procedure TRotaForm.Draw;
 begin
-  { Nach Änderung der Auflösung Probleme mit dem Grau-Überschreiben. Deshalb: }
-  if Screen.Width <> CreatedScreenWidth then
-    ChangeResolution;
-
   if IsUp then
   begin
     if UseDisplayList then
     begin
       RaumGraph.Update;
       RaumGraph.UpdateDisplayList;
+
+      if RumpfItemChecked then
+      begin
+        HullGraph.Coloriert := True;
+        HullGraph.FixPunkt := RaumGraph.FixPunkt;
+        HullGraph.Update;
+        HullGraph.AddToDisplayList(RaumGraph.DL);
+      end;
+
       if Assigned(OnDebugDisplayList) then
         OnDebugDisplayList(Self);
     end;
@@ -784,12 +838,70 @@ end;
 
 procedure TRotaForm.ToggleRenderOption(const fa: Integer);
 begin
-  RaumGraph.ToggleRenderOption(fa);
+
 end;
 
 function TRotaForm.QueryRenderOption(const fa: Integer): Boolean;
 begin
   result := False;
+end;
+
+function TRotaForm.GetMastKurvePoint(const Index: Integer): TRealPoint;
+begin
+  result := RaumGraph.GetMastKurvePoint(Index);
+end;
+
+procedure TRotaForm.SetMastLineData(const Value: TLineDataR100; L,
+  Beta: double);
+begin
+  RaumGraph.SetMastLineData(Value, L, Beta);
+end;
+
+procedure TRotaForm.SetSalingTyp(const Value: TSalingTyp);
+begin
+  RaumGraph.SalingTyp := Value;
+end;
+
+procedure TRotaForm.SetBogen(const Value: Boolean);
+begin
+  RaumGraph.Bogen := Value;
+end;
+
+procedure TRotaForm.SetControllerTyp(const Value: TControllerTyp);
+begin
+  RaumGraph.ControllerTyp := Value;
+end;
+
+procedure TRotaForm.SetKoordinaten(const Value: TRealRiggPoints);
+begin
+  RPN := Value;
+//  RaumGraph.Koordinaten := Value;
+end;
+
+procedure TRotaForm.SetKoordinatenE(const Value: TRealRiggPoints);
+begin
+  RPE := Value;
+end;
+
+procedure TRotaForm.SetKoordinatenR(const Value: TRealRiggPoints);
+begin
+  RPR := Value;
+end;
+
+procedure TRotaForm.SetKoppelKurve(const Value: TKoordLine);
+begin
+  RaumGraph.SetKoppelKurve(Value);
+end;
+
+procedure TRotaForm.SetMastKurve(const Value: TMastKurve);
+begin
+  RaumGraph.SetMastKurve(Value);
+end;
+
+procedure TRotaForm.SetWanteGestrichelt(const Value: Boolean);
+begin
+  FWanteGestrichelt := Value;
+  RaumGraph.WanteGestrichelt := Value;
 end;
 
 procedure TRotaForm.SetZoomIndex(const Value: Integer);
@@ -807,7 +919,6 @@ begin
   if RaumGraph <> nil then
     RaumGraph.Zoom := FZoom;
   Draw;
-  SetZoomText;
 end;
 
 end.

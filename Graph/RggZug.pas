@@ -30,6 +30,7 @@ type
     Color: TColor;
     Koppel: Boolean;
     Gestrichelt: Boolean;
+    RiggLED: Boolean;
   end;
 
   TZug0 = class
@@ -53,6 +54,8 @@ type
     { no need to call SetLength for these, will be copied via Copy }
     ZugMastKurveD0D: TRggPolyLine;
     ZugMastKurveDC: TRggPolyLine;
+
+    ZugAchsen: TRggPolyLine;
 
     constructor Create;
     procedure FillZug;
@@ -143,6 +146,8 @@ uses
 
 constructor TZug3D.Create;
 begin
+  inherited;
+  SetLength(ZugAchsen, 4);
   SetLength(ZugRumpf, 8);
   SetLength(ZugMast, 4);
   SetLength(ZugMastKurve, BogenMax + 2);
@@ -154,84 +159,20 @@ begin
   SetLength(ZugVorstag, 2);
 end;
 
-procedure TZug3D.DrawToCanvas(g: TCanvas);
-begin
-  with g do
-  begin
-    Pen.Color := clBtnFace;
-    Pen.Width := 1;
-
-    { FixPunkt }
-    if Props.Coloriert then
-      Pen.Color := clYellow;
-    Ellipse(
-      -TransKreisRadius,
-      -TransKreisRadius,
-      TransKreisRadius,
-      TransKreisRadius);
-
-    { Rumpf }
-    if Props.Coloriert then
-      Pen.Color := clRumpf;
-    PolyLine(ZugRumpf);
-
-    { Saling }
-    if Props.Coloriert then
-      Pen.Color := clSaling;
-    if Props.SalingTyp = stFest then
-      PolyLine(ZugSalingFS)
-    else if Props.SalingTyp = stDrehbar then
-      PolyLine(ZugSalingDS);
-
-    { Mast }
-    if Props.Coloriert then
-      Pen.Color := clMast;
-    if Props.Bogen then
-    begin
-      PolyLine(ZugMastKurve);
-      Pen.Color := clNavy;
-      MoveTo(ZugMast[2].X, ZugMast[2].Y);
-      LineTo(ZugMast[3].X, ZugMast[3].Y);
-    end
-    else
-      PolyLine(ZugMast);
-
-    { Controller }
-    if Props.ControllerTyp <> ctOhne then
-    begin
-      if Props.Coloriert then
-        Pen.Color := clController;
-      PolyLine(ZugController);
-    end;
-
-    { Wanten }
-    if Props.Coloriert then
-    begin
-      Pen.Color := clGreen;
-      if Props.Gestrichelt then
-        Pen.Color := TColors.Antiquewhite;
-    end;
-    PolyLine(ZugWanteStb);
-
-    if Props.Coloriert then
-    begin
-      Pen.Color := clRed;
-      if Props.Gestrichelt then
-        Pen.Color := TColors.Antiquewhite;
-    end;
-    PolyLine(ZugWanteBb);
-
-    { Vorstag }
-    if Props.Coloriert then
-      Pen.Color := clVorstag;
-    PolyLine(ZugVorstag);
-  end;
-end;
-
 procedure TZug3D.FillZug;
 begin
   with Data do
   begin
+    { Achsen }
+    ZugAchsen[0].x := xN;
+    ZugAchsen[0].y := -yN;
+    ZugAchsen[1].x := xX;
+    ZugAchsen[1].y := -yX;
+    ZugAchsen[2].x := xY;
+    ZugAchsen[2].y := -yY;
+    ZugAchsen[3].x := xZ;
+    ZugAchsen[3].y := -yZ;
+
     { Rumpf }
     ZugRumpf[0].x := xA0;
     ZugRumpf[0].y := -yA0;
@@ -314,6 +255,91 @@ begin
 
   ZugMastKurveD0D := Copy(ZugMastKurve, 0, Props.BogenIndexD + 1);
   ZugMastKurveDC := Copy(ZugMastKurve, Props.BogenIndexD, Length(ZugMastKurve)-1);
+end;
+
+procedure TZug3D.DrawToCanvas(g: TCanvas);
+begin
+  with g do
+  begin
+    Pen.Width := 1;
+
+    { FixPunkt }
+    if Props.RiggLED then
+      Pen.Color := clLime
+    else
+      Pen.Color := clYellow;
+    Ellipse(
+      -TransKreisRadius,
+      -TransKreisRadius,
+      TransKreisRadius,
+      TransKreisRadius);
+
+    Pen.Color := Props.Color;
+
+    { Rumpf }
+    if Props.Coloriert then
+      Pen.Color := clRumpf;
+    PolyLine(ZugRumpf);
+
+    { Saling }
+    if Props.Coloriert then
+      Pen.Color := clSaling;
+    if Props.SalingTyp = stFest then
+      PolyLine(ZugSalingFS)
+    else if Props.SalingTyp = stDrehbar then
+      PolyLine(ZugSalingDS);
+
+    { Mast }
+    if Props.Coloriert then
+    begin
+      Pen.Color := clMast;
+      if Props.Bogen then
+      begin
+        PolyLine(ZugMastKurve);
+        Pen.Color := clNavy;
+        MoveTo(ZugMast[2].X, ZugMast[2].Y);
+        LineTo(ZugMast[3].X, ZugMast[3].Y);
+      end
+      else
+      begin
+        PolyLine(ZugMast);
+      end;
+    end
+    else
+    begin
+      PolyLine(ZugMast);
+    end;
+
+    { Controller }
+    if Props.ControllerTyp <> ctOhne then
+    begin
+      if Props.Coloriert then
+        Pen.Color := clController;
+      PolyLine(ZugController);
+    end;
+
+    { Wanten }
+    if Props.Coloriert then
+    begin
+      Pen.Color := clGreen;
+      if Props.Gestrichelt then
+        Pen.Color := TColors.Antiquewhite;
+    end;
+    PolyLine(ZugWanteStb);
+
+    if Props.Coloriert then
+    begin
+      Pen.Color := clRed;
+      if Props.Gestrichelt then
+        Pen.Color := TColors.Antiquewhite;
+    end;
+    PolyLine(ZugWanteBb);
+
+    { Vorstag }
+    if Props.Coloriert then
+      Pen.Color := clVorstag;
+    PolyLine(ZugVorstag);
+  end;
 end;
 
 procedure TZug3D.GetPlotList(ML: TStrings);
@@ -753,6 +779,21 @@ procedure TZug4.DrawToCanvas(g: TCanvas);
 begin
   with g do
   begin
+
+    Pen.Color := clBtnFace;
+    Pen.Width := 1;
+
+    { FixPunkt }
+    if Props.RiggLED then
+      Pen.Color := clLime
+    else
+      Pen.Color := clYellow;
+    Ellipse(
+      -TransKreisRadius,
+      -TransKreisRadius,
+      TransKreisRadius,
+      TransKreisRadius);
+
     { Rumpf }
     if Props.Coloriert then
       Pen.Color := clRumpf

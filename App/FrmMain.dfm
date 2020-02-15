@@ -271,7 +271,6 @@ object FormMain: TFormMain
       Hint = 'Umschalter Rigg sofort berechnen (Automatik)|'
       AllowAllUp = True
       GroupIndex = 8
-      Down = True
       Caption = 'A'
       OnClick = SofortItemClick
     end
@@ -674,7 +673,6 @@ object FormMain: TFormMain
       end
       object SofortItem: TMenuItem
         Caption = 'Rigg automatisch berechnen ( A )'
-        Checked = True
         GroupIndex = 1
         Hint = '  Rigg (Kr'#228'fte) automatisch berechnen'
         OnClick = SofortItemClick
@@ -757,9 +755,14 @@ object FormMain: TFormMain
         Hint = '  Hilfesystem starten'
       end
       object AboutItem: TMenuItem
-        Caption = '&Info...'
-        Hint = '  Infofenster anzeigen'
+        Caption = '&About...'
+        Hint = '  Aboutfenster anzeigen'
         OnClick = AboutItemClick
+      end
+      object InfoItem: TMenuItem
+        Caption = '&Info'
+        Hint = '  Infofenster anzeigen'
+        OnClick = InfoItemClick
       end
       object LogoItem: TMenuItem
         Caption = 'Logo'

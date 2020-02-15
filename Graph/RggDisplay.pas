@@ -258,7 +258,7 @@ end;
 
 constructor TRggDisplayList.Create;
 begin
-  FCapacity := 100;
+  FCapacity := 300;
   FList := TDisplayList.Create;
   DI := TDisplayItem.Create;
   Clear;

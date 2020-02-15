@@ -154,6 +154,7 @@ type
 
     { StatusBar }
     StatusBar: TStatusBar;
+    InfoItem: TMenuItem;
 
     procedure UpdateMenuItems(Sender: TObject);
     procedure WindowCascadeItemClick(Sender: TObject);
@@ -184,10 +185,6 @@ type
 
     procedure VonDerSeiteItemClick(Sender: TObject);
 
-    procedure FestItemClick(Sender: TObject);
-    procedure DrehbarItemClick(Sender: TObject);
-    procedure OhneItemClick(Sender: TObject);
-    procedure OSDlgItemClick(Sender: TObject);
     procedure WinkelItemClick(Sender: TObject);
     procedure SofortItemClick(Sender: TObject);
     procedure DifferenzItemClick(Sender: TObject);
@@ -195,6 +192,7 @@ type
     procedure KorrigiertItemClick(Sender: TObject);
     procedure AutoLoadItemClick(Sender: TObject);
     procedure AboutItemClick(Sender: TObject);
+    procedure InfoItemClick(Sender: TObject);
 
     procedure UpdateBtnClick(Sender: TObject);
     procedure BtnGrauClick(Sender: TObject);
@@ -242,6 +240,7 @@ uses
   FrmInfo,
   FrmConsole,
   FrmInput,
+  FrmKreis,
   FrmOutput,
   FrmGrafik,
   FrmText,
@@ -278,10 +277,10 @@ begin
   RiggModul.RG19A := True;
   RiggModul.ViewModelMain := TViewModelMainA.Create;
   RiggModul.Init;
+  RiggModul.BackgroundColor := TColors.Wheat; // call after RiggModul.Init
+  RiggModul.PBG := GrafikForm.PaintBoxG;
 
   rggm := TRggMain.Create(RiggModul.Rigg);
-  RiggModul.PBG := GrafikForm.PaintboxG;
-  RiggModul.RG19A := True;
 
   Main := TMain.Create(rggm);
   Main.Logger.Verbose := True;
@@ -668,32 +667,20 @@ begin
   RiggModul.MemoryRecallBtnClick;
 end;
 
-procedure TFormMain.OhneItemClick(Sender: TObject);
-begin
-  RiggModul.OhneItemClick;
-end;
-
-procedure TFormMain.DrehbarItemClick(Sender: TObject);
-begin
-  RiggModul.DrehbarItemClick;
-end;
-
-procedure TFormMain.FestItemClick(Sender: TObject);
-begin
-  RiggModul.FestItemClick;
-end;
-
-procedure TFormMain.OSDlgItemClick(Sender: TObject);
-begin
-  RiggModul.OSDlgItemClick;
-end;
-
 procedure TFormMain.OptionItemClick(Sender: TObject);
 begin
   RiggModul.OptionItemClick;
 end;
 
 procedure TFormMain.AboutItemClick(Sender: TObject);
+begin
+  if KreisForm = nil then
+    KreisForm := TKreisForm.Create(Application);
+
+  KreisForm.ShowModal;
+end;
+
+procedure TFormMain.InfoItemClick(Sender: TObject);
 begin
   FrmInfo.ShowInfo;
 end;

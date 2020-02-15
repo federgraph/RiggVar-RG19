@@ -10,6 +10,7 @@ uses
   System.UIConsts,
   Vcl.Graphics,
   RggCalc,
+  RggMatrix,
   RggTypes,
   RggDisplay,
   RggZug,
@@ -18,6 +19,18 @@ uses
 type
   TRaumGraph = class(TBootGraph)
   protected
+    { original definition of Achsen }
+    AchseN: TRealPoint;
+    AchseX: TRealPoint;
+    AchseY: TRealPoint;
+    AchseZ: TRealPoint;
+
+    { transformed coordinates Achsen }
+    AchseNT: TRealPoint;
+    AchseXT: TRealPoint;
+    AchseYT: TRealPoint;
+    AchseZT: TRealPoint;
+
     { transformed coordinates of Rigg }
     A0, B0, C0, D0, E0, F0: TRealPoint;
     A,  B,  C,  D,  E,  F:  TRealPoint;
@@ -25,9 +38,13 @@ type
     Zug3D: TZug3D;
     Zug4: TZug4;
   protected
+    mat44: TMatrix4x4;
     procedure UpdateZugProps;
     procedure UpdateFixPunkt;
     procedure Update1;
+    procedure Update2;
+    procedure BuildMatrix;
+    function TransformPoint(p: TRealPoint): TRealPoint;
   public
     DL: TRggDisplayList;
 
@@ -38,6 +55,7 @@ type
     WantWante: Boolean;
     WantMast: Boolean;
     WantVorstag: Boolean;
+    WantAchsen: Boolean;
 
     constructor Create;
     destructor Destroy; override;
@@ -45,21 +63,20 @@ type
     procedure Update; override;
     procedure UpdateDisplayList;
     procedure DrawToCanvas(g: TCanvas); override;
-    procedure Draw;
 
     procedure GetPlotList(ML: TStrings); override;
-    procedure ToggleRenderOption(const fa: Integer);
-    function QueryRenderOption(const fa: Integer): Boolean;
   end;
 
 implementation
 
 uses
+  Vector3D,
   RiggVar.RG.Def;
 
 constructor TRaumGraph.Create;
 begin
   inherited;
+  mat44 := TMatrix4x4.Create;
 
   WantFixPunkt := True;
   WantRumpf := True;
@@ -68,6 +85,7 @@ begin
   WantWante := True;
   WantMast := True;
   WantVorstag := True;
+  WantAchsen := False;
 
   Zug3D := TZug3D.Create;
   Zug3D.Data := RaumGraphData;
@@ -78,6 +96,26 @@ begin
   Zug4.Props := RaumGraphProps;
 
   DL := TRggDisplayList.Create;
+
+  AchseN[x] := 0;
+  AchseN[y] := 0;
+  AchseN[z] := 0;
+
+  AchseX[x] := 1;
+  AchseX[y] := 0;
+  AchseX[z] := 0;
+
+  AchseY[x] := 0;
+  AchseY[y] := 1;
+  AchseY[z] := 0;
+
+  AchseZ[x] := 0;
+  AchseZ[y] := 0;
+  AchseZ[z] := 1;
+
+  AchseX := SkalarMult(AchseX, 1000);
+  AchseY := SkalarMult(AchseY, 1000);
+  AchseZ := SkalarMult(AchseZ, 1000);
 end;
 
 destructor TRaumGraph.Destroy;
@@ -85,6 +123,7 @@ begin
   Zug3D.Free;
   Zug4.Free;
   DL.Free;
+  mat44.Free;
   inherited;
 end;
 
@@ -97,12 +136,108 @@ begin
   FixPunkt := Rotator.Rotiere(fp);
 end;
 
+procedure TRaumGraph.BuildMatrix;
+begin
+  UpdateFixPunkt;
+  mat44.Identity;
+  mat44.Translate(-FixPunkt[x], -FixPunkt[y], -FixPunkt[z]);
+  mat44.Multiply(Rotator.Matrix);
+  mat44.ScaleXYZ(Zoom, Zoom, Zoom);
+end;
+
+function TRaumGraph.TransformPoint(p: TRealPoint): TRealPoint;
+var
+  pt: vec3;
+begin
+  pt.x := p[x];
+  pt.y := p[y];
+  pt.z := p[z];
+  mat44.TransformPoint(pt);
+  result[x] := pt.x;
+  result[y] := pt.y;
+  result[z] := pt.z;
+end;
+
 procedure TRaumGraph.Update;
 begin
-  Update1;
+  Update2;
   UpdateZugProps;
   Zug3D.FillZug; // needs updated Props (BogenIndex)
   Updated := True;
+end;
+
+procedure TRaumGraph.Update2;
+var
+  i: TRiggPoint;
+  j: Integer;
+  RPT: TRealRiggPoints;
+  MKT: array [0 .. BogenMax] of TRealPoint;
+begin
+  BuildMatrix;
+
+  { Graph drehen }
+  if Assigned(Rotator) then
+  begin
+    for i := ooA0 to ooF0 do
+      RPT[i] := TransformPoint(rP[i]);
+    for i := ooA to ooF do
+      RPT[i] := TransformPoint(rP[i]);
+    for j := 0 to BogenMax do
+      MKT[j] := TransformPoint(Kurve[j]);
+  end;
+
+  AchseNT := TransformPoint(AchseN);
+  AchseXT := TransformPoint(AchseX);
+  AchseYT := TransformPoint(AchseY);
+  AchseZT := TransformPoint(AchseZ);
+
+  { Es wurde nicht nur rotiert,
+    sondern bereits auch verschoben und skaliert }
+
+  with RaumGraphData do
+  begin
+    xA0 := Round(RPT[ooA0, x]);
+    yA0 := Round(RPT[ooA0, z]);
+    xB0 := Round(RPT[ooB0, x]);
+    yB0 := Round(RPT[ooB0, z]);
+    xC0 := Round(RPT[ooC0, x]);
+    yC0 := Round(RPT[ooC0, z]);
+    xD0 := Round(RPT[ooD0, x]);
+    yD0 := Round(RPT[ooD0, z]);
+    xE0 := Round(RPT[ooE0, x]);
+    yE0 := Round(RPT[ooE0, z]);
+    xF0 := Round(RPT[ooF0, x]);
+    yF0 := Round(RPT[ooF0, z]);
+
+    xA := Round(RPT[ooA, x]);
+    yA := Round(RPT[ooA, z]);
+    xB := Round(RPT[ooB, x]);
+    yB := Round(RPT[ooB, z]);
+    xC := Round(RPT[ooC, x]);
+    yC := Round(RPT[ooC, z]);
+    xD := Round(RPT[ooD, x]);
+    yD := Round(RPT[ooD, z]);
+    xE := Round(RPT[ooE, x]);
+    yE := Round(RPT[ooE, z]);
+    xF := Round(RPT[ooF, x]);
+    yF := Round(RPT[ooF, z]);
+
+    xN := Round(AchseNT[x]);
+    yN := Round(AchseNT[z]);
+    xX := Round(AchseXT[x]);
+    yX := Round(AchseXT[z]);
+    xY := Round(AchseYT[x]);
+    yY := Round(AchseYT[z]);
+    xZ := Round(AchseZT[x]);
+    yZ := Round(AchseZT[z]);
+  end;
+
+  { MastKurve }
+  for j := 0 to BogenMax do
+  begin
+    Zug3D.ZugMastKurve[j].x := Round(MKT[j, x]);
+    Zug3D.ZugMastKurve[j].y := -Round(MKT[j, z]);
+  end;
 end;
 
 procedure TRaumGraph.Update1;
@@ -193,22 +328,13 @@ begin
 end;
 
 procedure TRaumGraph.GetPlotList(ML: TStrings);
-//var
-//  SavedZoom: double;
 begin
-//  SavedZoom := Zoom;
-//  Zoom := 10;
   if not GrafikOK then
     Exit;
   if not Updated then
       Update;
 
   Zug3D.GetPlotList(ML);
-end;
-
-function TRaumGraph.QueryRenderOption(const fa: Integer): Boolean;
-begin
-  result := False;
 end;
 
 procedure TRaumGraph.UpdateZugProps;
@@ -230,16 +356,8 @@ begin
 
   cr.Coloriert := Coloriert;
   cr.Color := Color;
-end;
 
-procedure TRaumGraph.Draw;
-begin
-
-end;
-
-procedure TRaumGraph.ToggleRenderOption(const fa: Integer);
-begin
-
+  cr.RiggLED := RiggLED;
 end;
 
 procedure TRaumGraph.UpdateDisplayList;
@@ -346,6 +464,18 @@ begin
       DI.StrokeWidth := 4;
       DL.Line(C0, C, ZugVorstag[0], ZugVorstag[1], clYellow);
     end;
+
+  { Achsen }
+  if WantAchsen then
+  begin
+    DI.StrokeWidth := 1;
+    DI.StrokeColor := clFuchsia;
+    DL.Line(AchseNT, AchseXT, ZugAchsen[0], ZugAchsen[1], clRed);
+    DI.StrokeColor := clLime;
+    DL.Line(AchseNT, AchseYT, ZugAchsen[0], ZugAchsen[2], clGreen);
+    DI.StrokeColor := clAqua;
+    DL.Line(AchseNT, AchseZT, ZugAchsen[0], ZugAchsen[3], clBlue);
+  end;
 
   end;
 end;

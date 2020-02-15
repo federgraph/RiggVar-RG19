@@ -6,10 +6,12 @@ uses
   Winapi.Windows,
   System.SysUtils,
   System.Classes,
-  Vcl.Graphics,
+  System.Types,
+  vcl.Graphics,
   RggTypes,
   RggCalc,
   RggMatrix,
+  RggDisplay,
   Vector3D,
   RggGraph,
   RggBootGraph,
@@ -52,6 +54,7 @@ type
     procedure Load;
     procedure Update; override;
 
+    procedure AddToDisplayList(DL: TRggDisplayList);
     procedure DrawToCanvas(Canvas: TCanvas); override;
   end;
 
@@ -237,6 +240,72 @@ begin
     { Linie zeichnen }
     g.MoveTo(v[p1], -v[p1 + 2]);
     g.LineTo(v[p2], -v[p2 + 2]);
+  end;
+end;
+
+procedure THullGraph0.AddToDisplayList(DL: TRggDisplayList);
+var
+  ConCount: Integer;
+  i, t, p1, p2: Integer;
+  yVal: Integer;
+  c: TConArray;
+  v: TVertArrayI;
+  StartPoint, EndPoint: TPoint;
+  rp1, rp2: TRealPoint;
+  cla: TColor;
+//  s: string;
+begin
+  if nvert <= 0 then
+    Exit;
+
+  ConCount := ncon;
+  c := con;
+  v := tvert;
+  if (ConCount <= 0) or (nvert <= 0) then
+    Exit;
+
+  for i := 0 to ConCount - 1 do
+  begin
+    { Indizes in das Vertice-array bestimmen }
+    t := c[i]; // t wie Temp
+    p1 := ((t shr 16) and $FFFF) * 3; // Index Punkt1
+    p2 := (t and $FFFF) * 3; // Index Punkt2
+
+    { Farbe bestimmen Variante 1 }
+    if Coloriert then
+    begin
+      yVal := v[p1 + 1] + v[p2 + 1]; // Summe der y-Werte
+      { yVal zwischen 0 und 15 }
+      if (yVal < 0) then
+        yVal := 0;
+      if (yVal > 15) then
+        yVal := 15;
+      cla := GetColor(yVal);
+    end
+    else
+      cla := clRed;
+
+    { Farbe bestimmen, Varinate 2 }
+    // if Coloriert then
+    //   cla := GetColor(i)
+    // else
+    //   cla := clBtnFace;
+
+    StartPoint := Point(v[p1], -v[p1 + 2]);
+    EndPoint := Point(v[p2], -v[p2 + 2]);
+
+    rp1[x] := v[p1 + 0];
+    rp1[y] := v[p1 + 1];
+    rp1[z] := v[p1 + 2];
+
+    rp2[x] := v[p2 + 0];
+    rp2[y] := v[p2 + 1];
+    rp2[z] := v[p2 + 2];
+
+    DL.DI.StrokeWidth := 3;
+    DL.DI.StrokeColor := cla;
+//    s := Format('con-%d',  [i]);
+    DL.Line(rp1, rp2, StartPoint, EndPoint, clRed);
   end;
 end;
 

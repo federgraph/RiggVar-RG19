@@ -254,7 +254,7 @@ const
   clVorstag: TColor = clYellow;
   clSaling: TColor = clLime;
   clController: TColor = clAqua;
-  clEntspannt: TColor = clGray;
+  clEntspannt: TColor = clSilver;
   clNullStellung: TColor = clAqua;
   clKoppelKurve: TColor = clYellow;
   clGestrichelt: TColor = clWhite;

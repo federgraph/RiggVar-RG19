@@ -238,7 +238,7 @@ begin
   end;
 
   { Radius für Kreisbogen um C0 }
-  Zug1.IntR := Round( Abstand(rP[ooC],rP[ooC0]) * FZoom2D );
+  Zug1.IntR := Round( Abstand(rP[ooC], rP[ooC0]) * FZoom2D );
 
   A0 := vsub(rP[ooA0], FixPunkt2D);
   B0 := vsub(rP[ooB0], FixPunkt2D);
@@ -255,9 +255,9 @@ begin
 
   with RaumGraphData do
   begin
-    xA0 := Round(A0[x]*FZoom2D);
-    yA0 := Round(A0[y]*FZoom2D);
-    zA0 := Round(A0[z]*FZoom2D);
+    xA0 := Round(A0[x] * FZoom2D);
+    yA0 := Round(A0[y] * FZoom2D);
+    zA0 := Round(A0[z] * FZoom2D);
 
     xB0 := xA0;
     yB0 := -yA0;

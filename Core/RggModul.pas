@@ -59,7 +59,6 @@ type
   TRiggModul = class(TComponent)
   private
     FBackgroundColor: TColor;
-    FSofortBerechnen: Boolean;
     FKorrigiertItem: Boolean;
     FPaintBtnDown: Boolean;
     FBtnBlauDown: Boolean;
@@ -83,7 +82,7 @@ type
 
     { private variables, not properties }
     NeedPaint: Boolean;
-    Grauzeichnen: Boolean;
+    FGrauZeichnen: Boolean;
     TextFlipFlop: Boolean;
 
     { Diagram.Begin }
@@ -262,7 +261,8 @@ type
     property CursorSB: TSBName read FCursorSB write FCursorSB;
     property SalingTyp: TSalingTyp read FSalingTyp write SetSalingTyp;
     property ControllerTyp: TControllerTyp read FControllerTyp write SetControllerTyp;
-    property SofortBerechnen: Boolean read FSofortBerechnen write FSofortBerechnen;
+    property SofortBerechnen: Boolean read FSofortBtnDown;
+    property GrauZeichnen: Boolean read FGrauZeichnen;
 
     property BackgroundColor: TColor read FBackgroundColor write SetBackgroundColor;
     property ConsoleActive: Boolean read FConsoleActive write SetConsoleActive;
@@ -307,7 +307,6 @@ end;
 
 procedure TRiggModul.Init;
 begin
-  FSofortBerechnen := True;
   FKorrigiertItem := True;
   FPaintBtnDown := False;
   FBtnBlauDown := False;
@@ -317,7 +316,7 @@ begin
   FControllerBtnDown := True;
   FWinkelBtnDown := False;
   FDiffBtnDown := False;
-  FSofortBtnDown := True;
+  FSofortBtnDown := False;
   FReportItem := rF_Item;
   FCalcTyp := ctBiegeKnicken;
   FKurveValid := False;
@@ -329,7 +328,7 @@ begin
   FSalingTyp := stFest;
   FControllerTyp := ctOhne;
 
-  { Grauzeichnen := False; }
+  { FGrauZeichnen := False; }
   { TextFlipFlop := False; }
   IniFileName := '';
 
@@ -676,26 +675,6 @@ begin
   if (SalingTyp = stFest) and (KoppelBtnDown = True) then
     GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
 
-  { 3D Grafik - AniRotationForm muß erzeugt sein! }
-  if RotaFormActive then
-  begin
-    if AniRotationForm.Visible then
-    begin
-      { Trackbar und Labels flackern zu sehr, daher nicht immer aktualisieren }
-      //if SofortBerechnen then
-      //  Modified := True;
-      AniRotationForm.UpdateAll(Rigg);
-      AniRotationForm.Draw;
-      AniRotationForm.Invalidate;
-    end;
-  end;
-
-  if (Main <> nil) and (Main.RggMain <> nil) and (Main.RggMain.StrokeRigg <> nil) then
-  begin
-    Main.RggMain.UpdateStrokeRigg;
-    Main.RggMain.StrokeRigg.Draw;
-  end;
-
   GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
 
   { ControllerPaintBox }
@@ -737,7 +716,7 @@ begin
   { Grafik aktualisieren, aber nicht zweimal!}
   if not (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK) then
   begin
-    Grauzeichnen := False;
+    FGrauZeichnen := False;
     if Rigg.GetriebeOK then
       LEDShape := True
     else
@@ -752,6 +731,27 @@ begin
     end;
   end;
   ViewModelMain.UpdateView;
+
+  { 3D Grafik - AniRotationForm muß erzeugt sein! }
+  if RotaFormActive then
+  begin
+    if AniRotationForm.Visible then
+    begin
+      { Trackbar und Labels flackern zu sehr, daher nicht immer aktualisieren }
+      //if SofortBerechnen then
+      //  Modified := True;
+      AniRotationForm.UpdateAll(Rigg);
+      AniRotationForm.Draw;
+//      AniRotationForm.Invalidate;
+    end;
+  end;
+
+  if (Main <> nil) and (Main.RggMain <> nil) and (Main.RggMain.StrokeRigg <> nil) then
+  begin
+    Main.RggMain.UpdateStrokeRigg;
+    Main.RggMain.StrokeRigg.Draw;
+  end;
+
 end;
 
 procedure TRiggModul.UpdateRigg;
@@ -760,12 +760,12 @@ begin
   ViewModelMain.StatusPanelText1 := Rigg.RiggStatusText;
   if Rigg.RiggOK then
   begin
-    Grauzeichnen := True;
+    FGrauZeichnen := True;
     LEDShape := True;
   end
   else
   begin
-    Grauzeichnen := False;
+    FGrauZeichnen := False;
     LEDShape := False;
   end;
   if OutputForm.OutputPages.ActivePage = OutputForm.ChartSheet then
@@ -1430,11 +1430,8 @@ begin
   if FSofortBtnDown <> Value then
   begin
     FSofortBtnDown := Value;
-    SofortBerechnen := Value;
-    if Value then
-      UpdateGetriebe
-    else
-      PaintBtnDown := False;
+    PaintBtnDown := False;
+    UpdateGetriebe;
   end;
 end;
 

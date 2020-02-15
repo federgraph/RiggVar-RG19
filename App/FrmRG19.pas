@@ -281,8 +281,6 @@ type
     UseDisplayListBtn: TSpeedButton;
     BogenBtn: TSpeedButton;
 
-    DisplayModeBtn: TSpeedButton;
-
     procedure SeiteBtnClick(Sender: TObject);
     procedure AchternBtnClick(Sender: TObject);
     procedure TopBtnClick(Sender: TObject);
@@ -413,6 +411,8 @@ begin
   RiggModul.Init;
   RiggModul.BackgroundColor := TColors.Wheat; // call after RiggModul.Init
   RiggModul.PBG := GrafikForm.PaintBoxG;
+  RiggModul.SofortBtnDown := False;
+  RiggModul.BtnGrauDown := True;
 
   rggm := TRggMain.Create(RiggModul.Rigg);
 
@@ -747,6 +747,7 @@ begin
     PaintBtn.Down := False;
     PaintBtn.Enabled := False;
   end;
+  Main.RggMain.Draw;
 end;
 
 procedure TFormRG19.SetControllerChecked(Value: Boolean);
@@ -1217,7 +1218,7 @@ begin
   sb.Caption := 'A';
   sb.Hint := 'Automatik|Umschalter Rigg sofort berechnen (Automatik)';
   sb.AllowAllUp := True;
-  sb.Down := True;
+  sb.Down := False;
   sb.GroupIndex := 9;
   sb.OnClick := SofortItemClick;
 
@@ -1448,6 +1449,7 @@ begin
   sb.Caption := 'B';
   sb.Hint := 'Bogen';
   sb.AllowAllUp := True;
+  sb.Down := RotaForm.Bogen;
   sb.GroupIndex := 15;
   sb.OnClick := RotaForm.BogenBtnClick;
 end;
@@ -2289,7 +2291,7 @@ begin
 
   SofortItem := AddI('SofortItem');
   mi.Caption := 'Rigg automatisch berechnen ( A )';
-  mi.Checked := True;
+  mi.Checked := False;
   mi.GroupIndex := 1;
   mi.Hint := '  Rigg (Kräfte) automatisch berechnen';
   mi.OnClick := SofortItemClick;

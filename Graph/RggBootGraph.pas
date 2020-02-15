@@ -19,10 +19,7 @@ type
     FBogen: Boolean;
     FGestrichelt: Boolean;
     FViewPoint: TViewPoint;
-  protected
-    BogenIndexD: Integer;
-    function FindBogenIndexOf(P: TRealPoint): Integer;
-  private
+    FRiggLED: Boolean;
     procedure SetKoppel(const Value: Boolean);
     procedure SetKoordinaten(const Value: TRealRiggPoints);
     procedure SetFixPoint(const Value: TRiggPoint);
@@ -31,6 +28,10 @@ type
     procedure SetViewPoint(const Value: TViewPoint);
     procedure SetWanteGestrichelt(const Value: Boolean);
     procedure SetBogen(const Value: Boolean);
+    procedure SetRiggLED(const Value: Boolean);
+  protected
+    BogenIndexD: Integer;
+    function FindBogenIndexOf(P: TRealPoint): Integer;
   public
     rP: TRealRiggPoints;
     Kurve: TMastKurve;
@@ -53,6 +54,7 @@ type
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property Bogen: Boolean read FBogen write SetBogen;
     property WanteGestrichelt: Boolean read FGestrichelt write SetWanteGestrichelt;
+    property RiggLED: Boolean read FRiggLED write SetRiggLED;
   end;
 
 implementation
@@ -116,6 +118,11 @@ begin
     Kurve[j, y] := 0;
     Kurve[j, z] := rP[ooD0, z] + tempL * temp3 + Value[k] * temp4;
   end;
+end;
+
+procedure TBootGraph.SetRiggLED(const Value: Boolean);
+begin
+  FRiggLED := Value;
 end;
 
 procedure TBootGraph.SetMastKurve(const Value: TMastKurve);

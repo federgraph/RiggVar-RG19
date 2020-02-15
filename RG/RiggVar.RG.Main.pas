@@ -37,12 +37,9 @@ type
   TFederAction = Integer;
 
   TRggMain0 = class
-  private
-    procedure SetHullVisible(const Value: Boolean);
   protected
     FAction: TFederAction;
     FParam: TFederParam;
-    FHullVisible: Boolean;
 
     function GetBigStep: single;
     function GetSmallStep: single;
@@ -56,8 +53,6 @@ type
 
     procedure TestStream;
 
-    procedure ToggleHullVisible; virtual;
-
     procedure UpdateText(ClearFlash: Boolean = False);
     procedure HandleKey(KeyChar: Char);
 
@@ -70,7 +65,6 @@ type
     procedure DoRasterWheel(Delta: single);
 
     procedure ViewportChanged(Sender: TObject);
-    property HullVisible: Boolean read FHullVisible write SetHullVisible;
   end;
 
   TRggMain = class(TRggMain0)
@@ -84,6 +78,7 @@ type
     BiegungGFDiff: single;
 
     TML: TStrings;
+    FHullVisible: Boolean;
 
     function FormatValue(Value: single): string;
     procedure DoBiegungGF;
@@ -104,6 +99,8 @@ type
     procedure SetVisible(const Value: Boolean);
     procedure AL(A: string; fp: TFederParam);
     procedure BL(A: string; C: string);
+    procedure SetHullVisible(const Value: Boolean);
+    function GetHullVisible: Boolean;
   protected
     procedure InitFactArray;
     procedure RggSpecialDoOnTrackBarChange; override;
@@ -113,8 +110,6 @@ type
     IstValCaption: string;
     ParamCaption: string;
 
-    RaumGraph: TRaumGraph; // cached from StrokeRigg (RotaForm)
-
     Rigg: TRigg; // owned, passed in via constructor
     FactArray: TRggFA; // not owned, cached from Rigg
 
@@ -122,9 +117,7 @@ type
 
     StrokeRigg: TRotaForm; // injected, not owned
 
-    SofortBerechnen: Boolean;
-    Grauzeichnen: Boolean;
-    LEDShape: Boolean;
+    RiggLED: Boolean;
     StatusText: string;
 
     InitialFixPoint: TRiggPoint;
@@ -178,6 +171,7 @@ type
     property CurrentValue: single read GetCurrentValue write SetCurrentValue;
     property Mastfall: string read GetMastfall;
 
+    property HullVisible: Boolean read GetHullVisible write SetHullVisible;
     property Visible: Boolean read FVisible write SetVisible;
   end;
 
@@ -228,35 +222,39 @@ begin
   FixPoint := InitialFixPoint;
 
   InitStrokeRigg;
-  Draw;
+//  Draw;
 end;
 
 procedure TRggMain.InitStrokeRigg;
-var
-  sr: TRaumGraph;
 begin
   if StrokeRigg <> nil then
   begin
-    sr := StrokeRigg.RaumGraph;
-    sr.SalingTyp := Rigg.SalingTyp;
-    sr.ControllerTyp := Rigg.ControllerTyp;
-    sr.Koordinaten := Rigg.rP;
-    sr.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-    sr.WanteGestrichelt := not Rigg.GetriebeOK;
+    StrokeRigg.SalingTyp := Rigg.SalingTyp;
+    StrokeRigg.ControllerTyp := Rigg.ControllerTyp;
+    StrokeRigg.Koordinaten := Rigg.rP;
+    StrokeRigg.Koordinaten := Rigg.rPE;
+    StrokeRigg.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+    StrokeRigg.WanteGestrichelt := not Rigg.GetriebeOK;
   end;
 end;
 
 procedure TRggMain.UpdateStrokeRigg;
-var
-  sr: TRaumGraph;
 begin
   if StrokeRigg <> nil then
   begin
-    sr := StrokeRigg.RaumGraph;
-    sr.Koordinaten := Rigg.rP;
-    sr.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-    sr.WanteGestrichelt := not Rigg.GetriebeOK;
-    sr.Bogen := (FParam <> fpWinkel);
+    StrokeRigg.SofortBerechnen := RiggModul.SofortBerechnen;
+    StrokeRigg.GrauZeichnen := RiggModul.GrauZeichnen;
+    StrokeRigg.BtnGrauDown := RiggModul.BtnGrauDown;
+    StrokeRigg.BtnBlauDown := RiggModul.BtnBlauDown;
+    StrokeRigg.RiggLED := RiggModul.LEDShape; //RiggLED;
+
+    StrokeRigg.Koordinaten := Rigg.rP;
+    StrokeRigg.KoordinatenE := Rigg.rPe;
+    StrokeRigg.SetKoppelKurve(Rigg.KoppelKurve);
+    StrokeRigg.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+
+    StrokeRigg.WanteGestrichelt := not Rigg.GetriebeOK;
+    StrokeRigg.Bogen := (FParam <> fpWinkel);
   end;
 end;
 
@@ -303,10 +301,23 @@ begin
     StrokeRigg.FixPoint := Value;
 end;
 
+procedure TRggMain.SetHullVisible(const Value: Boolean);
+begin
+  if Value <> FHullVisible then
+  begin
+    FHullVisible := Value;
+    StrokeRigg.HullVisible := Value;
+    Draw;
+  end;
+end;
+
 procedure TRggMain.SetOption(fa: TFederAction);
 begin
   case fa of
-    faHull: ToggleHullVisible;
+    faHull:
+    begin
+      HullVisible := not HullVisible;
+    end;
     faDemo:
     begin
       Demo := not Demo;
@@ -357,8 +368,8 @@ begin
     end;
   end;
 
-  UpdateStrokeRigg;
-  Draw;
+//  UpdateStrokeRigg;
+//  Draw;
 end;
 
 procedure TRggMain.ChangeRigg(Value: single);
@@ -486,6 +497,17 @@ begin
   result := FactArray.Find(FParam).Ist;
 end;
 
+function TRggMain.GetHullVisible: Boolean;
+begin
+  result := FHullVisible;
+  if StrokeRigg <> nil then
+  begin
+    result := StrokeRigg.QueryRenderOption(faHull);
+    if result <> FHullVisible then
+      FHullVisible := result;
+  end;
+end;
+
 function TRggMain.GetMastfall: string;
 begin
   result := Format('%.0f', [FactArray.MastfallF0F.Ist - FactArray.MastfallVorlauf.Ist]);
@@ -556,7 +578,7 @@ begin
 
   if Assigned(StrokeRigg) then
   begin
-    StrokeRigg.RaumGraph.ControllerTyp := Rigg.ControllerTyp;
+    StrokeRigg.ControllerTyp := Rigg.ControllerTyp;
   end;
 
   Rigg.ManipulatorMode := (Value = fpWinkel);
@@ -820,6 +842,11 @@ begin
   end;
 end;
 
+//function TRggMain.GetSofortBerechnen: Boolean;
+//begin
+//  result := RiggModul.SofortBerechnen;
+//end;
+
 procedure TRggMain.LoadTrimm(fd: TRggData);
 var
   temp, tempH, tempA: single;
@@ -976,7 +1003,7 @@ begin
   Rigg.ControllerTyp := TControllerTyp.ctOhne;
   InitFactArray();
   if StrokeRigg <> nil then
-    StrokeRigg.RaumGraph.SalingTyp := Rigg.SalingTyp;
+    StrokeRigg.SalingTyp := Rigg.SalingTyp;
   SetParam(FParam);
   FixPoint := ooD;
 
@@ -997,7 +1024,7 @@ begin
   Rigg.ControllerTyp := TControllerTyp.ctOhne;
   InitFactArray();
   if StrokeRigg <> nil then
-    StrokeRigg.RaumGraph.SalingTyp := Rigg.SalingTyp;
+    StrokeRigg.SalingTyp := Rigg.SalingTyp;
   SetParam(FParam);
   FixPoint := ooD;
 
@@ -1014,7 +1041,7 @@ begin
     faSalingTypOhneStarr: Rigg.SalingTyp := stOhne_2;
   end;
   if StrokeRigg <> nil then
-    StrokeRigg.RaumGraph.SalingTyp := Rigg.SalingTyp;
+    StrokeRigg.SalingTyp := Rigg.SalingTyp;
   SetParam(FParam);
   RiggModul.DoOnUpdateSalingTyp(Rigg.SalingTyp);
 end;
@@ -1141,7 +1168,10 @@ end;
 procedure TRggMain.Draw;
 begin
   if StrokeRigg <> nil then
+  begin
+    UpdateStrokeRigg;
     StrokeRigg.Draw;
+  end;
   UpdateFactArrayFromRigg;
   UpdateText;
 end;
@@ -1169,7 +1199,6 @@ end;
 
 constructor TRggMain0.Create;
 begin
-  FHullVisible := True;
   RggTrackbar := TFederTrackbar.Create;
 end;
 
@@ -1177,16 +1206,6 @@ destructor TRggMain0.Destroy;
 begin
   RggTrackbar.Free;
   inherited;
-end;
-
-procedure TRggMain0.SetHullVisible(const Value: Boolean);
-begin
-  FHullVisible := Value;
-end;
-
-procedure TRggMain0.ToggleHullVisible;
-begin
-  HullVisible := not HullVisible;
 end;
 
 procedure TRggMain0.TrackBarChange(Sender: TObject);
@@ -1428,9 +1447,9 @@ begin
     IndexH := 40;
     IndexC := 50;
 
-    kg := StrokeRigg.RaumGraph.Kurve[IndexG];
-    kh := StrokeRigg.RaumGraph.Kurve[IndexH];
-    kc := StrokeRigg.RaumGraph.Kurve[IndexC];
+    kg := StrokeRigg.GetMastKurvePoint(IndexG);
+    kh := StrokeRigg.GetMastKurvePoint(IndexH);
+    kc := StrokeRigg.GetMastKurvePoint(IndexC);
 
     a := Abstand(kg, pf);
     b := Abstand(pf, kh);
@@ -1496,10 +1515,10 @@ begin
     ML.Add(Format('iC = %.2f', [IndexC]));
     ML.Add('IndexC := 50;');
 
-    kg := StrokeRigg.RaumGraph.Kurve[Round(IndexG)];
-    kd := StrokeRigg.RaumGraph.Kurve[Round(IndexD)];
-    kh := StrokeRigg.RaumGraph.Kurve[Round(IndexH)];
-    kc := StrokeRigg.RaumGraph.Kurve[Round(IndexC)];
+    kg := StrokeRigg.GetMastKurvePoint(Round(IndexG));
+    kd := StrokeRigg.GetMastKurvePoint(Round(IndexD));
+    kh := StrokeRigg.GetMastKurvePoint(Round(IndexH));
+    kc := StrokeRigg.GetMastKurvePoint(Round(IndexC));
 
 //    ML.Add('');
 //    t := Abstand(pd, kd);
@@ -1528,7 +1547,7 @@ begin
   ML.Clear;
   ML.Add('Trimm = ' + IntToStr(Main.Trimm));
   ML.Add('Name = ' + Main.CurrentTrimm.Name);
-  if Main.RggMain.Action = faPan then
+  if Action = faPan then
   begin
     ML.Add('Param = Pan');
     ML.Add('Min = ');
@@ -1537,13 +1556,13 @@ begin
   end
   else
   begin
-    ML.Add('Param = ' + Main.RggMain.ParamCaption);
-    ML.Add('Min = ' + Main.RggMain.MinValCaption);
-    ML.Add('Pos = ' + Main.RggMain.IstValCaption);
-    ML.Add('Max = ' + Main.RggMain.MaxValCaption);
+    ML.Add('Param = ' + ParamCaption);
+    ML.Add('Min = ' + MinValCaption);
+    ML.Add('Pos = ' + IstValCaption);
+    ML.Add('Max = ' + MaxValCaption);
   end;
 
-  if Main.RggMain.Demo then
+  if Demo then
     ML.Add('Modus = Demo')
   else
     ML.Add('Modus = Pro');
@@ -1560,6 +1579,8 @@ end;
 procedure TRggMain.UpdateGetriebe;
 begin
   RiggModul.UpdateGetriebe;
+  RiggLED := Rigg.RiggOK;
+  Draw;
 end;
 
 end.

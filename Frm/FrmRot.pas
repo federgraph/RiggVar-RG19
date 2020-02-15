@@ -392,7 +392,7 @@ begin
     { ZoomOutItem.ShortCut := VK_SUBTRACT; } { '-' auf Zehnertastatur }
   end;
 
-  { PaintBox austauschen }
+  { PaintBox }
   NewPaintBox := TRggPaintBox.Create(PaintBox3D.Owner);
   try
     NewPaintBox.Parent := PaintBox3D.Parent;
@@ -459,12 +459,14 @@ end;
 procedure TRotationForm.InitRaumGraph;
 begin
   { virtual }
-  RaumGraph := TGetriebeGraph.Create;
+  RaumGraph := TRaumGraph.Create;
+//  RaumGraph := TGetriebeGraph.Create;
   RaumGraph.Rotator := Rotator;
 //  RaumGraph.NOffset := Point(1000, 1000);
   RaumGraph.Zoom := FZoom;
   RaumGraph.FixPoint := ComboFixPoint;
   RaumGraph.ViewPoint := vp3D;
+  RaumGraph.Bogen := True;
 end;
 
 procedure TRotationForm.InitHullGraph;
@@ -613,8 +615,15 @@ begin
     EraseBK := False;
   end;
 
+//  NullpunktOffset.x := -NOffset.X + Bitmap.Width div 2 + FXpos;
+//  NullpunktOffset.y := -NOffset.Y + Bitmap.Height div 2 + FYpos;
+
+//  NullpunktOffset.x := -RaumGraph.Zug4.OffsetX4 + Bitmap.Width div 2 + FXpos;
+//  NullpunktOffset.y := -RaumGraph.Zug4.OffsetY4 + Bitmap.Height div 2 + FYpos;
+
   NullpunktOffset.x := Bitmap.Width div 2 + FXpos;
   NullpunktOffset.y := Bitmap.Height div 2 + FYpos;
+
   DrawToBitmap1;
 
   if MatrixItemChecked then
@@ -646,6 +655,7 @@ begin
     SetViewPortExtEx(Handle, 1000, 1000, nil);
     SetViewPortOrgEx(Handle, NullpunktOffset.x, NullpunktOffset.y, nil);
   end;
+
   RaumGraph.Coloriert := True;
   RaumGraph.DrawToCanvas(Bitmap.Canvas);
 
@@ -1102,6 +1112,7 @@ begin
 
   FXpos := RotaData.Xpos;
   FYpos := RotaData.Ypos;
+
   { Increment }
   case RotaData.IncrementIndex of
     1: Btn01Grad.Down := true;
@@ -1112,6 +1123,7 @@ begin
   end;
   FIncrementT := RotaData.IncrementT;
   FIncrementW := RotaData.IncrementW;
+
   { Rotationmatrix }
   Rotator.Matrix := RotaData.Matrix;
   Rotator.GetAngle(FPhi, FTheta, FGamma);
@@ -1122,11 +1134,13 @@ begin
   SetZoomText;
   RaumGraph.Zoom := FZoom;
   HullGraph.Zoom := FZoom;
+
   { Fixpunkt }
   FixPunktCombo.ItemIndex := RotaData.FixpunktIndex;
   RaumGraph.FixPoint := ComboFixPoint;
   RaumGraph.Update;
   HullGraph.FixPunkt := RaumGraph.FixPunkt;
+
   { Neuzeichnen }
   EraseBK := True;
   Draw;
@@ -1226,11 +1240,9 @@ procedure TRotationForm.PaintBox3DMouseDown(Sender: TObject;
 begin
   MouseDown := True;
   MouseButton := Button;
-
   prevx := x;
   MouseDownX := x;
   SavedXPos := FXPos;
-
   prevy := y;
   MouseDownY := y;
   SavedYPos := FYPos;

@@ -697,6 +697,7 @@ begin
   EntlastetItem.Checked := not EntlastetItem.Checked;
   BtnGrau.Down := EntlastetItem.Checked;
   RiggModul.BtnGrauDown := BtnGrau.Down;
+  Main.RggMain.Draw;
 end;
 
 procedure TFormRG19B.SetKoppelChecked(Value: Boolean);
@@ -756,6 +757,7 @@ begin
     PaintBtn.Down := False;
     PaintBtn.Enabled := False;
   end;
+  Main.RggMain.Draw;
 end;
 
 procedure TFormRG19B.SetControllerChecked(Value: Boolean);
@@ -764,7 +766,6 @@ begin
   ControllerBtn.Down := Value;
   RiggModul.ControllerBtnDown := Value;
   RotaForm.RaumGraph.ControllerTyp := Main.RggMain.Rigg.ControllerTyp;
-//  RotaForm.RaumGraph.ControllerTyp := RiggModul.ControllerTyp;
   RotaForm.Draw;
 end;
 
@@ -1215,7 +1216,7 @@ begin
   sb.Caption := 'A';
   sb.Hint := 'Umschalter Rigg sofort berechnen (Automatik)';
   sb.AllowAllUp := True;
-  sb.Down := True;
+  sb.Down := False;
   sb.GroupIndex := 9;
   sb.OnClick := SofortItemClick;
 
@@ -2246,7 +2247,7 @@ begin
 
   SofortItem := AddI('SofortItem');
   mi.Caption := 'Rigg automatisch berechnen ( A )';
-  mi.Checked := True;
+  mi.Checked := False;
   mi.GroupIndex := 1;
   mi.Hint := '  Rigg (Kräfte) automatisch berechnen';
   mi.OnClick := SofortItemClick;
