@@ -32,6 +32,7 @@ uses
   RggDoc,
   RggPrinter,
   RggPolarKar,
+  RggTransformer,
   RiggVar.RG.Def,
   RiggVar.VM.FormMain;
 
@@ -351,10 +352,10 @@ begin
 
   { GetriebeGrafik }
   GetriebeGraph := TGetriebeGraph.Create;
-  GetriebeGraph.Rotator := TPolarKar.Create;
-  GetriebeGraph.Rotator.DeltaPhi := 0;
-  GetriebeGraph.Rotator.DeltaTheta := -90;
-  GetriebeGraph.Rotator.XRot := -87;
+  GetriebeGraph.Transformer := TRggTransformer.Create;
+  GetriebeGraph.Transformer.Rotator := TPolarKar.Create;
+  GetriebeGraph.InitZoom;
+  GetriebeGraph.InitRotation;
   GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
   GetriebeGraph.Koordinaten := Rigg.rP;
   GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
@@ -408,7 +409,8 @@ end;
 
 destructor TRiggModul.Destroy;
 begin
-  GetriebeGraph.Rotator.Free;
+  GetriebeGraph.Transformer.Rotator.Free;
+  GetriebeGraph.Transformer.Free;
   GetriebeGraph.Free;
   SalingCtrl.Free;
   RiggReport.Free;

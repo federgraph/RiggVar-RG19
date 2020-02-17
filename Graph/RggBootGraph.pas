@@ -11,7 +11,6 @@ uses
 type
   TBootGraph = class(TRggGraph)
   private
-    FFixPoint: TRiggPoint;
     FSalingTyp: TSalingTyp;
     FControllerTyp: TControllerTyp;
     FKoppelKurve: TKoordLine;
@@ -22,7 +21,6 @@ type
     FRiggLED: Boolean;
     procedure SetKoppel(const Value: Boolean);
     procedure SetKoordinaten(const Value: TRealRiggPoints);
-    procedure SetFixPoint(const Value: TRiggPoint);
     procedure SetSalingTyp(const Value: TSalingTyp);
     procedure SetControllerTyp(const Value: TControllerTyp);
     procedure SetViewPoint(const Value: TViewPoint);
@@ -45,7 +43,6 @@ type
     procedure SetKoppelKurve(const Value: TKoordLine);
     function GetMastKurvePoint(const Index: Integer): TRealPoint;
 
-    property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
     property Koordinaten: TRealRiggPoints read rP write SetKoordinaten;
     property KoppelKurve: TKoordLine read FKoppelKurve write SetKoppelKurve;
     property Koppel: Boolean read FKoppel write SetKoppel;
@@ -62,7 +59,6 @@ implementation
 constructor TBootGraph.Create;
 begin
   inherited Create;
-  FFixPoint := ooD0;
   FSalingTyp := stFest;
   FControllerTyp := ctOhne;
 end;
@@ -70,9 +66,7 @@ end;
 procedure TBootGraph.SetKoordinaten(const Value: TRealRiggPoints);
 begin
   rP := Value;
-  { Fixpunkt wird in TBootGraph nicht benötigt, aber er wird eventuell herauskopiert
-    z.Bsp. nach HullGraph - und muß deshalb aktuell sein. }
-  FixPunkt := rP[FixPoint];
+  Transformer.FixPunkt := rP[FixPoint];
   GrafikOK := True;
   Updated := False;
 end;
@@ -93,12 +87,6 @@ procedure TBootGraph.SetControllerTyp(const Value: TControllerTyp);
 begin
   FControllerTyp := Value;
   RaumGraphProps.ControllerTyp := Value;
-end;
-
-procedure TBootGraph.SetFixPoint(const Value: TRiggPoint);
-begin
-  FFixPoint := Value;
-  FixPunkt := rP[Value]; //--> Updated := False;
 end;
 
 procedure TBootGraph.SetMastLineData(const Value: TLineDataR100; L: double; Beta: double);
@@ -146,6 +134,7 @@ end;
 procedure TBootGraph.SetViewPoint(const Value: TViewPoint);
 begin
   FViewPoint := Value;
+  Updated := False;
 end;
 
 procedure TBootGraph.SetWanteGestrichelt(const Value: Boolean);

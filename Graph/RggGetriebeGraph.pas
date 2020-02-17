@@ -46,6 +46,9 @@ type
     constructor Create;
     destructor Destroy; override;
 
+    procedure InitZoom;
+    procedure InitRotation;
+
     procedure Update; override;
     procedure DrawToCanvas(g: TCanvas); override;
     procedure DrawToMeta(Canvas: TCanvas);
@@ -61,11 +64,8 @@ uses
 constructor TGetriebeGraph.Create;
 begin
   inherited Create;
-  { Zoom }
-  RelationZoom2D := 5.5/12;
-  FZoomFaktor := 1; { wird z.Bsp. für höhere Auflösung auf 10 umgeschaltet }
-  Zoom := 1/5.5; { als allgemeiner Skalierungsfaktor benutzt }
-  FZoom2D := RelationZoom2D * Zoom;
+
+//  InitZoom; // needs injected Transformer
 
   Zug1 := TZug1.Create;
   Zug2 := TZug2.Create;
@@ -194,6 +194,32 @@ end;
 procedure TGetriebeGraph.DrawToMeta(Canvas: TCanvas);
 begin
   DrawToCanvas(Canvas);
+end;
+
+procedure TGetriebeGraph.InitZoom;
+begin
+  if Transformer <> nil then
+  begin
+    { Zoom }
+    RelationZoom2D := 5.5 / 12;
+    FZoomFaktor := 1;
+    { wird z.Bsp. für höhere Auflösung auf 10 umgeschaltet }
+    Zoom := 1 / 5.5;
+    { als allgemeiner Skalierungsfaktor benutzt }
+    FZoom2D := RelationZoom2D * Zoom;
+
+    UpdateOffset;
+  end;
+end;
+
+procedure TGetriebeGraph.InitRotation;
+begin
+  if (Transformer <> nil) and (Transformer.Rotator <> nil) then
+  begin
+    Transformer.Rotator.DeltaPhi := 0;
+    Transformer.Rotator.DeltaTheta := -90;
+    Transformer.Rotator.XRot := -87;
+  end;
 end;
 
 procedure TGetriebeGraph.Update2D;

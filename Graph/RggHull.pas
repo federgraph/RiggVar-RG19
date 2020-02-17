@@ -7,12 +7,12 @@ uses
   System.SysUtils,
   System.Classes,
   System.Types,
+  System.Math.Vectors,
   vcl.Graphics,
   RggTypes,
   RggCalc,
   RggMatrix,
   RggDisplay,
-  Vector3D,
   RggGraph,
   RggBootGraph,
   RggRaumGraph;
@@ -31,7 +31,6 @@ type
     ncon: Integer;
     gr: TConColors;
     { Matrix }
-    mat: TMatrix4x4;
     function AddVert(x, y, z: single): Integer;
     procedure AddLine(p1, p2: Integer);
     procedure Paint(g: TCanvas);
@@ -45,8 +44,8 @@ type
     procedure ReadVertices; virtual;
     procedure ReadConnections; virtual;
   public
-    Factor: vec3; // FaktorX, FaktorY, FaktorZ: double;
-    ModelFactor: vec3;
+    Factor: TPoint3D;
+    ModelFactor: TPoint3D;
 
     constructor Create;
     destructor Destroy; override;
@@ -95,21 +94,14 @@ constructor THullGraph0.Create;
 begin
   inherited Create;
 
-  Factor.x := 1;
-  Factor.y := 1;
-  Factor.z := 1;
+  Factor := TPoint3D.Create(1.0, 1.0, 1.0);
   ModelFactor := Factor;
 
   Load;
-
-  mat := TMatrix4x4.Create;
-  mat.XRot(20);
-  mat.YRot(30);
 end;
 
 destructor THullGraph0.Destroy;
 begin
-  mat.Free;
   inherited Destroy;
 end;
 
@@ -144,9 +136,9 @@ begin
     Exit;
   end;
   i := i * 3;
-  vert[i + 0] := Factor.x * ModelFactor.x * x;
-  vert[i + 1] := Factor.y * ModelFactor.y * y;
-  vert[i + 2] := Factor.z * ModelFactor.z * z;
+  vert[i + 0] := Factor.X * ModelFactor.X * x;
+  vert[i + 1] := Factor.Y * ModelFactor.Y * y;
+  vert[i + 2] := Factor.Z * ModelFactor.Z * z;
   Inc(nvert);
   result := nvert;
 end;
@@ -178,11 +170,7 @@ begin
     Exit;
   if nvert <= 0 then
     Exit;
-  mat.Identity;
-  mat.Translate(-FixPunkt[x], -FixPunkt[y], -FixPunkt[z]);
-  mat.Multiply(Rotator.Matrix);
-  mat.ScaleXYZ(Zoom, Zoom, Zoom);
-  mat.Transform(vert, tvert, nvert);
+  Transformer.Mat.Transform(vert, tvert, nvert);
   Updated := True;
 end;
 
@@ -323,9 +311,9 @@ end;
 
 procedure THullGraph0.ReadVerts420;
 begin
-  ModelFactor.x := 1;
-  ModelFactor.y := 1;
-  ModelFactor.z := 1;
+  ModelFactor.X := 1;
+  ModelFactor.Y := 1;
+  ModelFactor.Z := 1;
 
   AddVert(4200, 0, 328); // Steven Spant 1, Koord 1..7
   AddVert(4194, 0, 260);
@@ -598,9 +586,9 @@ begin
     GetInteger(a);
     GetInteger(b);
     GetInteger(c);
-    ModelFactor.x := a / 100;
-    ModelFactor.y := b / 100;
-    ModelFactor.z := c / 100;
+    ModelFactor.X := a / 100;
+    ModelFactor.Y := b / 100;
+    ModelFactor.Z := c / 100;
     Break;
   end;
 

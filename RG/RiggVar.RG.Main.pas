@@ -232,7 +232,8 @@ begin
     StrokeRigg.SalingTyp := Rigg.SalingTyp;
     StrokeRigg.ControllerTyp := Rigg.ControllerTyp;
     StrokeRigg.Koordinaten := Rigg.rP;
-    StrokeRigg.Koordinaten := Rigg.rPE;
+    StrokeRigg.KoordinatenE := Rigg.rPE;
+    StrokeRigg.KoordinatenR := Rigg.rP;
     StrokeRigg.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
     StrokeRigg.WanteGestrichelt := not Rigg.GetriebeOK;
   end;
@@ -368,8 +369,8 @@ begin
     end;
   end;
 
-//  UpdateStrokeRigg;
-//  Draw;
+  { Notwendig nur einmal bei Programmstart. Sonst verzichtbar. }
+//  Draw; //jetzt als letzter Aufruf in FormCreate
 end;
 
 procedure TRggMain.ChangeRigg(Value: single);
@@ -841,11 +842,6 @@ begin
       result := 0;
   end;
 end;
-
-//function TRggMain.GetSofortBerechnen: Boolean;
-//begin
-//  result := RiggModul.SofortBerechnen;
-//end;
 
 procedure TRggMain.LoadTrimm(fd: TRggData);
 var

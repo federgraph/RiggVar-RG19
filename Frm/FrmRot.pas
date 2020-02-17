@@ -32,7 +32,8 @@ uses
   RggGraph,
   RggRaumGraph,
   RggHull,
-  RggPolarKar;
+  RggPolarKar,
+  RggTransformer;
 
 type
   TRotationForm = class(TForm)
@@ -205,6 +206,7 @@ type
   public
     Rigg: TRigg;
     Rotator: TPolarKar;
+    Transformer: TRggTransformer;
     HullGraph: THullGraph;
     RaumGraph: TRaumGraph;
     BackBmp: TBitmap;
@@ -378,6 +380,7 @@ begin
 
   FZoomBase := 0.05;
   FViewPoint := vp3D;
+//  RaumGraph.FixPoint := ooD;
 
   if MainMenu <> nil then
   begin
@@ -430,6 +433,7 @@ begin
   RaumGraph.Free;
   HullGraph.Free;
   Rotator.Free;
+  Transformer.Free;
   Preview.Free;
   Preview := nil;
   if hPal <> 0 then
@@ -454,17 +458,17 @@ begin
   Rotator := TPolarKar.Create;
   Rotator.OnCalcAngle := Rotator.GetAngle2;
   InitRotaData;
+  Transformer := TRggTransformer.Create;
+  Transformer.Rotator := Rotator;
 end;
 
 procedure TRotationForm.InitRaumGraph;
 begin
   { virtual }
   RaumGraph := TRaumGraph.Create;
-//  RaumGraph := TGetriebeGraph.Create;
-  RaumGraph.Rotator := Rotator;
-//  RaumGraph.NOffset := Point(1000, 1000);
-  RaumGraph.Zoom := FZoom;
+  RaumGraph.Transformer := Transformer;
   RaumGraph.FixPoint := ComboFixPoint;
+  RaumGraph.Zoom := FZoom;
   RaumGraph.ViewPoint := vp3D;
   RaumGraph.Bogen := True;
 end;
@@ -473,9 +477,7 @@ procedure TRotationForm.InitHullGraph;
 begin
   { virtual }
   HullGraph := THullGraph.Create;
-  HullGraph.Rotator := Rotator;
-  HullGraph.Zoom := FZoom;
-  HullGraph.FixPunkt := RaumGraph.FixPunkt;
+  HullGraph.Transformer := Transformer;
 end;
 
 procedure TRotationForm.InitRigg;
@@ -662,7 +664,6 @@ begin
   if FPaintRumpf and (not MouseDown or (MouseDown and FDrawAlways)) then
   begin
     HullGraph.Coloriert := True;
-    HullGraph.FixPunkt := RaumGraph.FixPunkt;
     HullGraph.DrawToCanvas(Bitmap.Canvas);
   end;
 
@@ -686,7 +687,6 @@ begin
     if FPaintRumpf = True then
     begin
       HullGraph.Coloriert := True;
-      HullGraph.FixPunkt := RaumGraph.FixPunkt;
       HullGraph.DrawToCanvas(MetaCanvas);
     end;
   finally
@@ -702,7 +702,6 @@ begin
     if FPaintRumpf = True then
     begin
       HullGraph.Coloriert := False;
-      HullGraph.FixPunkt := RaumGraph.FixPunkt;
       HullGraph.DrawToCanvas(MetaCanvas);
     end;
   finally
@@ -860,7 +859,6 @@ end;
 procedure TRotationForm.FixPunktComboChange(Sender: TObject);
 begin
   RaumGraph.FixPoint := ComboFixPoint;
-  HullGraph.FixPunkt := RaumGraph.FixPunkt;
   Draw;
 end;
 
@@ -1132,14 +1130,14 @@ begin
   FZoomIndex := RotaData.ZoomIndex;
   FZoom := FZoomBase * LookUpRa10(FZoomIndex);
   SetZoomText;
-  RaumGraph.Zoom := FZoom;
-  HullGraph.Zoom := FZoom;
+  Transformer.Zoom := FZoom;
 
   { Fixpunkt }
   FixPunktCombo.ItemIndex := RotaData.FixpunktIndex;
-  RaumGraph.FixPoint := ComboFixPoint;
+  RaumGraph.FixPoint := ComboFixPoint; // -> Transformer.FixPoint
+
   RaumGraph.Update;
-  HullGraph.FixPunkt := RaumGraph.FixPunkt;
+  HullGraph.Update;
 
   { Neuzeichnen }
   EraseBK := True;
@@ -2243,7 +2241,6 @@ begin
   if FPaintRumpf = True then
   begin
     HullGraph.Coloriert := True;
-    HullGraph.FixPunkt := RaumGraph.FixPunkt;
     HullGraph.DrawToCanvas(Printer.Canvas);
   end;
   Printer.EndDoc;

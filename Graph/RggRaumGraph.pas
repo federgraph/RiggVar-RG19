@@ -10,7 +10,6 @@ uses
   System.UIConsts,
   Vcl.Graphics,
   RggCalc,
-  RggMatrix,
   RggTypes,
   RggDisplay,
   RggZug,
@@ -37,14 +36,11 @@ type
   protected
     Zug3D: TZug3D;
     Zug4: TZug4;
+  private
+    function GetFixPunkt: TRealPoint;
   protected
-    mat44: TMatrix4x4;
     procedure UpdateZugProps;
-    procedure UpdateFixPunkt;
-    procedure Update1;
     procedure Update2;
-    procedure BuildMatrix;
-    function TransformPoint(p: TRealPoint): TRealPoint;
   public
     DL: TRggDisplayList;
 
@@ -65,18 +61,17 @@ type
     procedure DrawToCanvas(g: TCanvas); override;
 
     procedure GetPlotList(ML: TStrings); override;
+    property FixPunkt: TRealPoint read GetFixPunkt;
   end;
 
 implementation
 
 uses
-  Vector3D,
   RiggVar.RG.Def;
 
 constructor TRaumGraph.Create;
 begin
   inherited;
-  mat44 := TMatrix4x4.Create;
 
   WantFixPunkt := True;
   WantRumpf := True;
@@ -123,39 +118,7 @@ begin
   Zug3D.Free;
   Zug4.Free;
   DL.Free;
-  mat44.Free;
   inherited;
-end;
-
-procedure TRaumGraph.UpdateFixPunkt;
-var
-  fp: TRealPoint;
-begin
-  { FixPunkt is the rotated FixPoint, not scaled or translated }
-  fp := rP[FixPoint];
-  FixPunkt := Rotator.Rotiere(fp);
-end;
-
-procedure TRaumGraph.BuildMatrix;
-begin
-  UpdateFixPunkt;
-  mat44.Identity;
-  mat44.Translate(-FixPunkt[x], -FixPunkt[y], -FixPunkt[z]);
-  mat44.Multiply(Rotator.Matrix);
-  mat44.ScaleXYZ(Zoom, Zoom, Zoom);
-end;
-
-function TRaumGraph.TransformPoint(p: TRealPoint): TRealPoint;
-var
-  pt: vec3;
-begin
-  pt.x := p[x];
-  pt.y := p[y];
-  pt.z := p[z];
-  mat44.TransformPoint(pt);
-  result[x] := pt.x;
-  result[y] := pt.y;
-  result[z] := pt.z;
 end;
 
 procedure TRaumGraph.Update;
@@ -173,23 +136,23 @@ var
   RPT: TRealRiggPoints;
   MKT: array [0 .. BogenMax] of TRealPoint;
 begin
-  BuildMatrix;
+  Transformer.UpdateTransformedFixPunkt;
 
   { Graph drehen }
-  if Assigned(Rotator) then
+  if Assigned(Transformer) then
   begin
     for i := ooA0 to ooF0 do
-      RPT[i] := TransformPoint(rP[i]);
+      RPT[i] := Transformer.TransformPoint(rP[i]);
     for i := ooA to ooF do
-      RPT[i] := TransformPoint(rP[i]);
+      RPT[i] := Transformer.TransformPoint(rP[i]);
     for j := 0 to BogenMax do
-      MKT[j] := TransformPoint(Kurve[j]);
+      MKT[j] := Transformer.TransformPoint(Kurve[j]);
   end;
 
-  AchseNT := TransformPoint(AchseN);
-  AchseXT := TransformPoint(AchseX);
-  AchseYT := TransformPoint(AchseY);
-  AchseZT := TransformPoint(AchseZ);
+  AchseNT := Transformer.TransformPoint(AchseN);
+  AchseXT := Transformer.TransformPoint(AchseX);
+  AchseYT := Transformer.TransformPoint(AchseY);
+  AchseZT := Transformer.TransformPoint(AchseZ);
 
   { Es wurde nicht nur rotiert,
     sondern bereits auch verschoben und skaliert }
@@ -237,82 +200,8 @@ begin
   begin
     Zug3D.ZugMastKurve[j].x := Round(MKT[j, x]);
     Zug3D.ZugMastKurve[j].y := -Round(MKT[j, z]);
-  end;
-end;
-
-procedure TRaumGraph.Update1;
-var
-  KurveRotiert: array [0 .. BogenMax] of TRealPoint;
-  KoordRotiert: TRealRiggPoints;
-  i: TRiggPoint;
-  j: Integer;
-begin
-  { Graph drehen }
-  if Assigned(Rotator) then
-  begin
-    for i := ooA0 to ooF0 do
-      KoordRotiert[i] := Rotator.Rotiere(rP[i]);
-    for i := ooA to ooF do
-      KoordRotiert[i] := Rotator.Rotiere(rP[i]);
-    for j := 0 to BogenMax do
-      KurveRotiert[j] := Rotator.Rotiere(Kurve[j]);
-  end;
-
-  UpdateFixPunkt; // gedrehter FixPunkt
-
-  A0 := vsub(KoordRotiert[ooA0], FixPunkt);
-  B0 := vsub(KoordRotiert[ooB0], FixPunkt);
-  C0 := vsub(KoordRotiert[ooC0], FixPunkt);
-  D0 := vsub(KoordRotiert[ooD0], FixPunkt);
-  E0 := vsub(KoordRotiert[ooE0], FixPunkt);
-  F0 := vsub(KoordRotiert[ooF0], FixPunkt);
-  A := vsub(KoordRotiert[ooA],FixPunkt);
-  B := vsub(KoordRotiert[ooB], FixPunkt);
-  C := vsub(KoordRotiert[ooC],FixPunkt);
-  D := vsub(KoordRotiert[ooD], FixPunkt);
-  E := vsub(KoordRotiert[ooE], FixPunkt);
-  F := vsub(KoordRotiert[ooF],FixPunkt);
-
-  for j := 0 to BogenMax do
-    KurveRotiert[j] := vsub(KurveRotiert[j], FixPunkt);
-
-  with RaumGraphData do
-  begin
-    for j := 0 to BogenMax do
-    begin
-      xA0 := Round(KurveRotiert[j, x] * Zoom);
-      yA0 := Round(KurveRotiert[j, z] * Zoom);
-      Zug3D.ZugMastKurve[j].x := xA0;
-      Zug3D.ZugMastKurve[j].y := -yA0;
-      Zug4.ZugMastKurve[j].x := xA0;
-      Zug4.ZugMastKurve[j].y := -yA0;
-    end;
-
-    xA0 := Round(A0[x] * Zoom);
-    yA0 := Round(A0[z] * Zoom);
-    xB0 := Round(B0[x] * Zoom);
-    yB0 := Round(B0[z] * Zoom);
-    xC0 := Round(C0[x] * Zoom);
-    yC0 := Round(C0[z] * Zoom);
-    xD0 := Round(D0[x] * Zoom);
-    yD0 := Round(D0[z] * Zoom);
-    xE0 := Round(E0[x] * Zoom);
-    yE0 := Round(E0[z] * Zoom);
-    xF0 := Round(F0[x] * Zoom);
-    yF0 := Round(F0[z] * Zoom);
-
-    xA := Round(A[x] * Zoom);
-    yA := Round(A[z] * Zoom);
-    xB := Round(B[x] * Zoom);
-    yB := Round(B[z] * Zoom);
-    xC := Round(C[x] * Zoom);
-    yC := Round(C[z] * Zoom);
-    xD := Round(D[x] * Zoom);
-    yD := Round(D[z] * Zoom);
-    xE := Round(E[x] * Zoom);
-    yE := Round(E[z] * Zoom);
-    xF := Round(F[x] * Zoom);
-    yF := Round(F[z] * Zoom);
+    Zug4.ZugMastKurve[j].x := Zug3D.ZugMastKurve[j].x;
+    Zug4.ZugMastKurve[j].y := Zug3D.ZugMastKurve[j].y;
   end;
 end;
 
@@ -325,6 +214,11 @@ begin
       Update;
 
   Zug3D.DrawToCanvas(g);
+end;
+
+function TRaumGraph.GetFixPunkt: TRealPoint;
+begin
+  result := Transformer.TransformedFixPunkt;
 end;
 
 procedure TRaumGraph.GetPlotList(ML: TStrings);

@@ -8,27 +8,28 @@ uses
   Vcl.Graphics,
   RggTypes,
   RggZug,
-  RggPolarKar;
+  RggTransformer;
 
 type
   TRggGraph = class
   protected
-    FFixPunkt: TRealPoint;
-    FZoom: single;
-    KoppelKurveNeedFill: Boolean;
     FColor: TColor;
     FColored: Boolean;
     procedure SetColor(const Value: TColor);
     procedure SetColored(const Value: Boolean);
-    procedure SetFixPunkt(Value: TRealPoint);
+    procedure SetFixPoint(const Value: TRiggPoint);
     procedure SetZoom(Value: single); virtual;
+    function GetFixPoint: TRiggPoint;
+    function GetZoom: single;
   protected
-    GrafikOK: Boolean; // loaded
+    GrafikOK: Boolean; // loaded with data
     Updated: Boolean; // transformed
+    KoppelKurveNeedFill: Boolean;
   public
     RaumGraphData: TRaumGraphData;
     RaumGraphProps: TRaumGraphProps;
-    Rotator: TPolarKar; // injected, not owned
+
+    Transformer: TRggTransformer; // injected, not owned
 
     constructor Create;
     destructor Destroy; override;
@@ -37,8 +38,8 @@ type
     procedure DrawToCanvas(Canvas: TCanvas); virtual;
     procedure GetPlotList(ML: TStrings); virtual;
 
-    property FixPunkt: TRealPoint read FFixPunkt write SetFixPunkt;
-    property Zoom: single read FZoom write SetZoom;
+    property FixPoint: TRiggPoint read GetFixPoint write SetFixPoint;
+    property Zoom: single read GetZoom write SetZoom;
     property Coloriert: Boolean read FColored write SetColored;
     property Color: TColor read FColor write SetColor;
   end;
@@ -51,7 +52,6 @@ begin
   RaumGraphProps := TRaumGraphProps.Create;
   FColor := clGray;
   FColored := True;
-  FZoom := 0.05;
 end;
 
 destructor TRggGraph.Destroy;
@@ -73,15 +73,16 @@ begin
   RaumGraphProps.Coloriert := FColored;
 end;
 
-procedure TRggGraph.SetFixPunkt(Value: TRealPoint);
+procedure TRggGraph.SetFixPoint(const Value: TRiggPoint);
 begin
-  FFixPunkt := Value;
+  Transformer.FixPoint := Value;
   Updated := False;
 end;
 
 procedure TRggGraph.SetZoom(Value: single);
 begin
-  FZoom := Value;
+  if Transformer <> nil then
+    Transformer.Zoom := Value;
   Updated := False;
   KoppelKurveNeedFill := True;
 end;
@@ -98,10 +99,20 @@ begin
   //virtual
 end;
 
+function TRggGraph.GetFixPoint: TRiggPoint;
+begin
+  result := Transformer.FixPoint;
+end;
+
 procedure TRggGraph.GetPlotList(ML: TStrings);
 begin
   //if GrafikOK then ...
   //virtual
+end;
+
+function TRggGraph.GetZoom: single;
+begin
+  result := Transformer.Zoom;
 end;
 
 end.

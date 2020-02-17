@@ -18,14 +18,15 @@ uses
   Vcl.ExtCtrls,
   Vcl.ComCtrls,
   Vcl.ExtDlgs,
-  RiggVar.RG.Graph,
   Vector3D,
+  RiggVar.RG.Graph,
   RggTypes,
   RggMatrix,
   RggRaumGraph,
   RggGraph,
   RggHull,
-  RggPolarKar;
+  RggPolarKar,
+  RggTransformer;
 
 type
   TRotaForm = class(TInterfacedObject, IStrokeRigg)
@@ -140,7 +141,7 @@ type
     procedure InitRotaData;
   private
     Rotator: TPolarKar;
-    FOnDebugDisplayList: TNotifyEvent;
+    Transformer: TRggTransformer;
     FBtnGrauDown: Boolean;
     FGrauZeichnen: Boolean;
     FBtnBlauDown: Boolean;
@@ -151,9 +152,10 @@ type
     procedure InitGraph;
     procedure InitRaumGraph;
     procedure InitHullGraph;
+    procedure DrawHullNormal(g: TCanvas);
     procedure UpdateGraphFromTestData;
+    procedure UpdateDisplayListForBoth(WithKoord: Boolean);
     procedure SetZoomIndex(const Value: Integer);
-    procedure SetOnDebugDisplayList(const Value: TNotifyEvent);
   public
     IsUp: Boolean;
     PaintBox3D: TPaintBox; // injected and replaced
@@ -188,8 +190,6 @@ type
     property GrauZeichnen: Boolean read FGrauZeichnen write SetGrauZeichnen;
     property BtnGrauDown: Boolean read FBtnGrauDown write SetBtnGrauDown;
     property BtnBlauDown: Boolean read FBtnBlauDown write SetBtnBlauDown;
-
-    property OnDebugDisplayList: TNotifyEvent read FOnDebugDisplayList write SetOnDebugDisplayList;
   end;
 
 implementation
@@ -218,6 +218,7 @@ begin
   RaumGraph.Free;
   HullGraph.Free;
   Rotator.Free;
+  Transformer.Free;
   inherited;
 end;
 
@@ -279,22 +280,24 @@ begin
   Rotator := TPolarKar.Create;
   Rotator.OnCalcAngle := Rotator.GetAngle2;
   InitRotaData;
+  Transformer := TRggTransformer.Create;
+  Transformer.Rotator := Rotator;
 end;
 
 procedure TRotaForm.InitRaumGraph;
 begin
   RaumGraph := TRaumGraph.Create;
-  RaumGraph.Rotator := Rotator;
+  RaumGraph.Transformer := Transformer;
   RaumGraph.FixPoint := FixPoint;
+  RaumGraph.Zoom := FZoom;
+  RaumGraph.ViewPoint := vp3D;
   RaumGraph.Bogen := True;
 end;
 
 procedure TRotaForm.InitHullGraph;
 begin
   HullGraph := THullGraph.Create;
-  HullGraph.Rotator := Rotator;
-  HullGraph.Zoom := FZoom;
-  HullGraph.FixPunkt := RaumGraph.FixPunkt;
+  HullGraph.Transformer := Transformer;
 end;
 
 procedure TRotaForm.UpdateGraphFromTestData;
@@ -435,15 +438,15 @@ begin
     end;
 
     { Nullstellung hellblau zeichnen }
-//    if BtnBlauDown then
-//    begin
-//      RaumGraph.Color := clNullStellung;
-//      RaumGraph.Coloriert := False;
-//      RaumGraph.WanteGestrichelt := False;
-//      RaumGraph.Koordinaten := RPR;
-//      DrawToCanvas(g);
-//      SkipOnceFlag := True;
-//    end;
+    if BtnBlauDown then
+    begin
+      RaumGraph.Color := clNullStellung;
+      RaumGraph.Coloriert := False;
+      RaumGraph.WanteGestrichelt := False;
+      RaumGraph.Koordinaten := RPR;
+      DrawToCanvas(g);
+      SkipOnceFlag := True;
+    end;
 
     { gespanntes Rigg farbig zeichnen}
     RaumGraph.Coloriert := True;
@@ -487,6 +490,7 @@ begin
 
   if UseDisplayList then
   begin
+    UpdateDisplayListForBoth(False);
     RaumGraph.DL.Draw(g);
   end
   else
@@ -494,14 +498,8 @@ begin
     RaumGraph.DrawToCanvas(g);
   end;
 
-  if RumpfItemChecked
-    and not UseDisplayList
-    and (not MouseDown or (MouseDown and FDrawAlways)) then
-  begin
-    HullGraph.Coloriert := True;
-    HullGraph.FixPunkt := RaumGraph.FixPunkt;
-    HullGraph.DrawToCanvas(g);
-  end;
+  { This method will first check whether this should be done at all. }
+  DrawHullNormal(g);
 
   with g do
   begin
@@ -574,7 +572,6 @@ procedure TRotaForm.SetFixPoint(const Value: TRiggPoint);
 begin
   FFixPoint := Value;
   RaumGraph.FixPoint := FixPoint;
-  HullGraph.FixPunkt := RaumGraph.FixPunkt;
   Draw;
 end;
 
@@ -598,11 +595,6 @@ end;
 procedure TRotaForm.SetSofortBerechnen(const Value: Boolean);
 begin
   FSofortBerechnen := Value;
-end;
-
-procedure TRotaForm.SetOnDebugDisplayList(const Value: TNotifyEvent);
-begin
-  FOnDebugDisplayList := Value;
 end;
 
 procedure TRotaForm.RumpfBtnClick(Sender: TObject);
@@ -645,8 +637,8 @@ begin
   end;
   RaumGraph.Viewpoint := Value; // for GetriebeGraph
 
-  FXpos := RotaData.Xpos;
-  FYpos := RotaData.Ypos;
+//  FXpos := RotaData.Xpos;
+//  FYpos := RotaData.Ypos;
 
   FIncrementT := RotaData.IncrementT;
   FIncrementW := RotaData.IncrementW;
@@ -658,14 +650,13 @@ begin
   { Zoom }
   FZoomIndex := RotaData.ZoomIndex;
   FZoom := FZoomBase * LookUpRa10(FZoomIndex);
-  RaumGraph.Zoom := FZoom;
-  HullGraph.Zoom := FZoom;
+  Transformer.Zoom := FZoom;
 
-  { Fixpunkt }
-  RaumGraph.FixPoint := FixPoint;
-  RaumGraph.Update; // Rotate;
-  HullGraph.FixPunkt := RaumGraph.FixPunkt;
-  HullGraph.Update; // Rotate;
+  { FixPoint }
+  RaumGraph.FixPoint := FixPoint; // --> Transformer.FixPoint
+
+  RaumGraph.Update;
+  HullGraph.Update;
 
   { Neuzeichnen }
   EraseBK := True;
@@ -753,7 +744,7 @@ begin
     if FTranslation or (Shift = [ssLeft, ssRight]) then
       Translate(x,y)
     else
-      Rotate(0,0,0,wx,wy,wz);
+      Rotate(0, 0, 0, wx, wy, wz);
     Draw;
     prevx := x;
     prevy := y;
@@ -777,7 +768,6 @@ begin
   Rotator.XRot := Xrot;
   Rotator.YRot := Yrot;
   Rotator.ZRot := Zrot;
-  RaumGraph.Update;
 end;
 
 procedure TRotaForm.Translate(x, y: Integer);
@@ -791,22 +781,8 @@ procedure TRotaForm.Draw;
 begin
   if IsUp then
   begin
-    if UseDisplayList then
-    begin
-      RaumGraph.Update;
-      RaumGraph.UpdateDisplayList;
-
-      if RumpfItemChecked then
-      begin
-        HullGraph.Coloriert := True;
-        HullGraph.FixPunkt := RaumGraph.FixPunkt;
-        HullGraph.Update;
-        HullGraph.AddToDisplayList(RaumGraph.DL);
-      end;
-
-      if Assigned(OnDebugDisplayList) then
-        OnDebugDisplayList(Self);
-    end;
+//    if UseDisplayList then
+//      UpdateDisplayListForBoth(True);
     DrawToImage(Bitmap.Canvas);
   end;
 end;
@@ -875,7 +851,6 @@ end;
 procedure TRotaForm.SetKoordinaten(const Value: TRealRiggPoints);
 begin
   RPN := Value;
-//  RaumGraph.Koordinaten := Value;
 end;
 
 procedure TRotaForm.SetKoordinatenE(const Value: TRealRiggPoints);
@@ -914,11 +889,43 @@ begin
     FZoomIndex := Value;
 
   FZoom := FZoomBase * LookUpRa10(FZoomIndex);
-  if HullGraph <> nil then
-    HullGraph.Zoom := FZoom;
   if RaumGraph <> nil then
     RaumGraph.Zoom := FZoom;
   Draw;
+end;
+
+procedure TRotaForm.UpdateDisplayListForBoth(WithKoord: Boolean);
+begin
+  if not UseDisplayList then
+    Exit;
+
+  if WithKoord then
+  begin
+    { Koordinaten may be assigned by DawToCanvasEx }
+    RaumGraph.Koordinaten := RPN;
+  end;
+
+  RaumGraph.Update;
+  RaumGraph.UpdateDisplayList;
+
+  if RumpfItemChecked then
+  begin
+    HullGraph.Coloriert := True;
+    HullGraph.Update;
+    HullGraph.AddToDisplayList(RaumGraph.DL);
+  end;
+end;
+
+procedure TRotaForm.DrawHullNormal(g: TCanvas);
+begin
+  if RumpfItemChecked
+    and not UseDisplayList
+    and (not MouseDown or (MouseDown and FDrawAlways)) then
+  begin
+    HullGraph.Coloriert := True;
+    HullGraph.Update;
+    HullGraph.DrawToCanvas(g);
+  end;
 end;
 
 end.
