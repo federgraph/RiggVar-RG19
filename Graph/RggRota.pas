@@ -59,6 +59,7 @@ type
     procedure ZoomOutBtnClick(Sender: TObject);
     procedure UseDisplayListBtnClick(Sender: TObject);
     procedure BogenBtnClick(Sender: TObject);
+    procedure KoppelBtnClick(Sender: TObject);
   protected
     MinTrackX, MinTrackY: Integer;
     MaxTrackX, MaxTrackY: Integer;
@@ -701,6 +702,12 @@ begin
     Draw;
 end;
 
+procedure TRotaForm.KoppelBtnClick(Sender: TObject);
+begin
+  RaumGraph.Koppel := not RaumGraph.Koppel;
+  Draw;
+end;
+
 procedure TRotaForm.PaintBox3DMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
@@ -781,8 +788,6 @@ procedure TRotaForm.Draw;
 begin
   if IsUp then
   begin
-//    if UseDisplayList then
-//      UpdateDisplayListForBoth(True);
     DrawToImage(Bitmap.Canvas);
   end;
 end;

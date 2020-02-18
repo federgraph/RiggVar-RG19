@@ -247,7 +247,7 @@ begin
     StrokeRigg.GrauZeichnen := RiggModul.GrauZeichnen;
     StrokeRigg.BtnGrauDown := RiggModul.BtnGrauDown;
     StrokeRigg.BtnBlauDown := RiggModul.BtnBlauDown;
-    StrokeRigg.RiggLED := RiggModul.LEDShape; //RiggLED;
+    StrokeRigg.RiggLED := RiggModul.LEDShape;
 
     StrokeRigg.Koordinaten := Rigg.rP;
     StrokeRigg.KoordinatenE := Rigg.rPe;

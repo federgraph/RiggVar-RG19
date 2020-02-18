@@ -135,6 +135,7 @@ var
   j: Integer;
   RPT: TRealRiggPoints;
   MKT: array [0 .. BogenMax] of TRealPoint;
+  KKT: TKoordLine;
 begin
   Transformer.UpdateTransformedFixPunkt;
 
@@ -147,6 +148,10 @@ begin
       RPT[i] := Transformer.TransformPoint(rP[i]);
     for j := 0 to BogenMax do
       MKT[j] := Transformer.TransformPoint(Kurve[j]);
+
+    if Koppel then
+    for j := 0 to 100 do
+      KKT[j] := Transformer.TransformPoint(KoppelKurve[j]);
   end;
 
   AchseNT := Transformer.TransformPoint(AchseN);
@@ -202,6 +207,16 @@ begin
     Zug3D.ZugMastKurve[j].y := -Round(MKT[j, z]);
     Zug4.ZugMastKurve[j].x := Zug3D.ZugMastKurve[j].x;
     Zug4.ZugMastKurve[j].y := Zug3D.ZugMastKurve[j].y;
+  end;
+
+  { Koppelkurve }
+  if Koppel then
+  begin
+    for j := 0 to 100 do
+    begin
+      Zug3D.ZugKoppelKurve[j].X := Round(KKT[j, x]);
+      Zug3D.ZugKoppelKurve[j].Y := -Round(KKT[j, z]);
+    end;
   end;
 end;
 

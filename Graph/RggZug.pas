@@ -55,6 +55,8 @@ type
     ZugMastKurveD0D: TRggPolyLine;
     ZugMastKurveDC: TRggPolyLine;
 
+    ZugKoppelKurve: TRggPolyLine;
+
     ZugAchsen: TRggPolyLine;
 
     constructor Create;
@@ -142,6 +144,8 @@ implementation
 uses
   RiggVar.RG.Def;
 
+{ TZug0 }
+
 { TZug3D }
 
 constructor TZug3D.Create;
@@ -157,6 +161,7 @@ begin
   SetLength(ZugWanteBb, 3);
   SetLength(ZugController, 2);
   SetLength(ZugVorstag, 2);
+  SetLength(ZugKoppelKurve, 101);
 end;
 
 procedure TZug3D.FillZug;
@@ -275,6 +280,13 @@ begin
       TransKreisRadius);
 
     Pen.Color := Props.Color;
+
+  { Koppelkurve }
+  if Props.Koppel then
+  begin
+    Pen.Color := clKoppelKurve;
+    PolyLine(ZugKoppelkurve);
+  end;
 
     { Rumpf }
     if Props.Coloriert then

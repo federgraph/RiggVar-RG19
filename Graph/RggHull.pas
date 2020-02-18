@@ -8,7 +8,7 @@ uses
   System.Classes,
   System.Types,
   System.Math.Vectors,
-  vcl.Graphics,
+  Vcl.Graphics,
   RggTypes,
   RggCalc,
   RggMatrix,

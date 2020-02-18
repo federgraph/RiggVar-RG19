@@ -81,8 +81,7 @@ end;
 
 procedure TRggGraph.SetZoom(Value: single);
 begin
-  if Transformer <> nil then
-    Transformer.Zoom := Value;
+  Transformer.Zoom := Value;
   Updated := False;
   KoppelKurveNeedFill := True;
 end;

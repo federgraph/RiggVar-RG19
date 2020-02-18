@@ -448,6 +448,8 @@ begin
   RotaForm.IsUp := True;
 //  RotaForm.ViewPoint := vp3D;
   RotaForm.ZoomIndex := 8;
+//  RotaForm.RaumGraph.Koppel := True;
+//  RotaForm.FixPoint := ooD0;
 end;
 
 procedure TFormRG19.FormClose(Sender: TObject; var Action: TCloseAction);
