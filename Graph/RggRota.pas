@@ -35,6 +35,7 @@ type
     RPE: TRealRiggPoints;
     RPR: TRealRiggPoints;
     SkipOnceFlag: Boolean;
+    function OnGetFixPunkt: TRealPoint;
     procedure DrawToCanvasEx(g: TCanvas);
     procedure DrawToCanvas(g: TCanvas);
     procedure DrawToImage(g: TCanvas);
@@ -171,6 +172,9 @@ type
     procedure Init;
     procedure Draw;
 
+    procedure RotateZ(Delta: double);
+    procedure Zoom(Delta: double);
+
     property ZoomIndex: Integer read FZoomIndex write SetZoomIndex;
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
@@ -283,6 +287,7 @@ begin
   InitRotaData;
   Transformer := TRggTransformer.Create;
   Transformer.Rotator := Rotator;
+  Transformer.OnGetFixPunkt := OnGetFixPunkt;
 end;
 
 procedure TRotaForm.InitRaumGraph;
@@ -803,6 +808,11 @@ begin
   Draw;
 end;
 
+function TRotaForm.OnGetFixPunkt: TRealPoint;
+begin
+  result := RPN[FFixPoint];
+end;
+
 procedure TRotaForm.PaintBackGround(Image: TBitmap);
 var
   R: TRect;
@@ -894,8 +904,20 @@ begin
     FZoomIndex := Value;
 
   FZoom := FZoomBase * LookUpRa10(FZoomIndex);
-  if RaumGraph <> nil then
-    RaumGraph.Zoom := FZoom;
+  RaumGraph.Zoom := FZoom;
+  Draw;
+end;
+
+procedure TRotaForm.Zoom(Delta: double);
+begin
+  FZoom := FZoom + FZoom * FZoomBase * Delta * 0.3;
+  RaumGraph.Zoom := FZoom;
+  Draw;
+end;
+
+procedure TRotaForm.RotateZ(Delta: double);
+begin
+  Rotate(0, 0, 0, 0, 0, Delta);
   Draw;
 end;
 

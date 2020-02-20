@@ -150,10 +150,11 @@ type
     YAchseSortedList: TYAchseSortedList;
     YAchseSet: TYAchseSet;
     TopTitel, LeftTitel, BottomTitel, RightTitel: string;
-    Xmin, Xmax, Ymin, Ymax, YGap: Single;
+    Xmin, Xmax, Ymin, Ymax, YGap: single;
     ParamCount: Integer;
     APWidth: Integer;
-    f, TestF: TLineDataR100;
+    f: TLineDataR100;
+    TestF: TLineDataR100;
     af: array[0..PNr-1] of yArray;
     bf: array[0..PNr-1] of TLineDataR100;
     cf: array[0..PNr-1] of TColor;
@@ -441,7 +442,7 @@ begin
           YAchseRecordList[YAV].ComboIndex := i;
           { umgekehrt auch Reihenfolge festhalten: (sortierte Liste) }
           YAchseSortedList[i] := YAV;
-          Break;
+          break;
         end;
     end;
 end;
@@ -812,16 +813,16 @@ begin
 
       Application.ProcessMessages;
       if ProgressDlg.Aborted then
-        Break;
-    end; { i-Schleife }
+        break;
+    end;
     if ProgressDlg.Aborted then
     begin
       Reset;
-      Break;
+      break;
     end;
-  end; { p-Schleife }
+  end;
 
-  finally { EOutOfMemory }
+  finally
     { Getriebe wiederherstellen }
     Rigg.ProofRequired := True;
     Rigg.Glieder := InputRec;
@@ -1086,7 +1087,7 @@ begin
     end;
   end;
 
-  p := PSpinner.Position-1; {Index für Parameter}
+  p := PSpinner.Position - 1; {Index für Parameter}
   j := ComboIndexToCurve(YComboBox.ItemIndex); {Index für Kurve}
   if not Valid then
   begin
@@ -1440,7 +1441,8 @@ begin
   PLED.Brush.Color := clRed;
   PSpinner.Position := 1;
   PSpinner.Max := ParamCount;
-  if PSpinner.Max = 1 then PSpinner.Max := 2;
+  if PSpinner.Max = 1 then
+    PSpinner.Max := 2;
   KurvenZahlSpinner.Position := ParamCount;
   RebuildYCombo;
   YComboBoxChange(Self);
@@ -1448,7 +1450,8 @@ end;
 
 procedure TChartForm.SaveItemClick(Sender: TObject);
 begin
-  if not SaveDialog.Execute then Exit;
+  if not SaveDialog.Execute then
+    Exit;
   SaveToFile(SaveDialog.FileName);
 end;
 
@@ -1789,9 +1792,9 @@ begin
   end else if name = xpSalingW then
   begin
     SalingDreieck.CopyFromRigg(RiggModul.Rigg);
-    tempMin := Ceil(SalingDreieck.Saling_WMin*180/pi);
-    tempMax := Floor(SalingDreieck.Saling_WMax*180/pi);
-    tempIst := Round(SalingDreieck.Saling_W*180/pi);
+    tempMin := Ceil(SalingDreieck.Saling_WMin * 180/pi);
+    tempMax := Floor(SalingDreieck.Saling_WMax * 180/pi);
+    tempIst := Round(SalingDreieck.Saling_W * 180/pi);
   end
   else
   begin
@@ -2020,7 +2023,8 @@ end;
 
 procedure TChartForm.UpdateRiggItemClick(Sender: TObject);
 begin
-  if not Assigned(RggDocument) then Exit;
+  if not Assigned(RggDocument) then
+    Exit;
   if (csGeladen in FStatus) or (csBerechnet in FStatus)then
   begin
     RiggModul.Neu(RggDocument);
@@ -2126,4 +2130,3 @@ begin
 end;
 
 end.
-

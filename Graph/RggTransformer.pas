@@ -1,4 +1,4 @@
-unit RggTransformer;
+﻿unit RggTransformer;
 
 interface
 
@@ -10,6 +10,8 @@ uses
   RggPolarKar;
 
 type
+  TRggGetFixPunkt = function: TRealPoint of object;
+
   TRggTransformer = class
   private
     Updated: Boolean;
@@ -17,10 +19,12 @@ type
     FZoom: double;
     FFixPunkt: TRealPoint;
     FTransformedFixPunkt: TRealPoint;
+    FOnGetFixPunkt: TRggGetFixPunkt;
     procedure BuildMatrix;
     procedure SetFixPoint(const Value: TRiggPoint);
     procedure SetZoom(const Value: double);
     procedure SetFixPunkt(const Value: TRealPoint);
+    procedure SetOnGetFixPunkt(const Value: TRggGetFixPunkt);
   public
     Mat: TMatrix4x4;
     Rotator: TPolarKar; // injected, not owned
@@ -32,6 +36,7 @@ type
     property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
     property FixPunkt: TRealPoint read FFixPunkt write SetFixPunkt;
     property TransformedFixPunkt: TRealPoint read FTransformedFixPunkt;
+    property OnGetFixPunkt: TRggGetFixPunkt read FOnGetFixPunkt write SetOnGetFixPunkt;
   end;
 
 implementation
@@ -41,7 +46,11 @@ uses
 
 procedure TRggTransformer.BuildMatrix;
 begin
+  if Assigned(OnGetFixPunkt) then
+    FFixPunkt := OnGetFixPunkt;
+
   FTransformedFixPunkt := Rotator.Rotiere(FFixPunkt);
+
   Mat.Identity;
   Mat.Translate(
     -FTransformedFixPunkt[x],
@@ -75,6 +84,11 @@ procedure TRggTransformer.SetFixPunkt(const Value: TRealPoint);
 begin
   FFixPunkt := Value;
   Updated := False;
+end;
+
+procedure TRggTransformer.SetOnGetFixPunkt(const Value: TRggGetFixPunkt);
+begin
+  FOnGetFixPunkt := Value;
 end;
 
 procedure TRggTransformer.SetZoom(const Value: double);
