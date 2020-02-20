@@ -228,7 +228,7 @@ end;
 
 procedure TDummyStrokeRigg.SetKoordinaten(const Value: TRealRiggPoints);
 begin
-  Koordinaten := Value;
+  FKoordinaten := Value;
 end;
 
 procedure TDummyStrokeRigg.SetKoordinatenE(const Value: TRealRiggPoints);
