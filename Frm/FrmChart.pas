@@ -19,6 +19,7 @@ uses
   Vcl.Buttons,
   Vcl.ComCtrls,
   FrmProgress,
+  RggUnit4,
   RggTypes,
   RggDoc,
   RggSaling3Eck;
@@ -46,7 +47,7 @@ type
   TChartStatus = (csBerechnet, csGeladen);
   yArray = array[0..ANr-1] of TLineDataR100;
   TYAchseSortedList = array[0..VNr-1] of TYAchseValue;
-  TYAchseSet = Set of TYAchseValue; {die berechneten Kurven}
+  TYAchseSet = Set of TYAchseValue; { die berechneten Kurven }
   TYAchseStringArray = array[0..PNr-1] of string;
 
   TChartForm = class(TForm)
@@ -142,6 +143,7 @@ type
     procedure SetSalingTyp(Value: TSalingTyp);
     { procedure SetControllerTyp(Value: TSalingTyp); }
     { procedure SetCalcTyp(Value: TSalingTyp); }
+  protected
     function ValidateInput(Input: TMaskEdit): Boolean;
     procedure TakeOver;
   protected
@@ -220,6 +222,10 @@ type
     N2: TMenuItem;
     N3: TMenuItem;
     procedure InitMenu; virtual;
+  private
+    Rigg: TRigg;
+    SofortBerechnen: Boolean;
+    procedure UpdateGetriebe;
   end;
 
 var
@@ -233,16 +239,18 @@ uses
   RiggVar.RG.Def,
   RggModul,
   RggCalc,
-  RggUnit4,
   RggScroll,
   FrmAuswahl,
   FrmMemo;
 
 procedure TChartForm.FormCreate(Sender: TObject);
 begin
+  ChartForm := self; { wird schon in AchsForm.Create benötigt }
   HorzScrollBar.Position := 0;
 
-  ChartForm := Self; { wird schon in AchsForm.Create benötigt }
+  Rigg := RiggModul.Rigg;
+  SofortBerechnen := True;
+
   ProgressDlg := TProgressDlg.Create(Self);
   ProgressDlg.OnStart := Calc;
   RggDocument := TRggDocument.Create;
@@ -253,11 +261,14 @@ begin
   FLegend := True;
   ParamCount := 3;
   APWidth := 30;
+
   APSpinner.Position := 30;
   YLED.Brush.Color := clRed;
   XLED.Brush.Color := clRed;
   PLED.Brush.Color := clRed;
+
   TakeOver;
+
   UpdateXCombo(SalingTyp);
   UpdatePCombo(SalingTyp);
   FXTextClicked := 'Vorstag';
@@ -277,11 +288,13 @@ begin
   cf[2] := clLime;
   cf[3] := clWhite;
   cf[4] := clYellow;
+
   PColorText[0] := 'Blau';
   PColorText[1] := 'Rot';
   PColorText[2] := 'Grün';
   PColorText[3] := 'Weiß';
   PColorText[4] := 'Gelb';
+
   PText := PColorText;
 
   YComboBox.Items.Assign(YAuswahlDlg.DstList.Items);
@@ -368,15 +381,16 @@ end;
 
 procedure TChartForm.TakeOver;
 begin
-  RiggModul.Rigg.UpdateGSB;
-  SalingTyp := RiggModul.Rigg.SalingTyp;
-  { ControllerTyp := RiggModul.Rigg.ControllerTyp; }
-  { CalcTyp := RiggModul.Rigg.CalcTyp; }
+  Rigg.UpdateGSB;
+  SalingTyp := Rigg.SalingTyp;
+  { ControllerTyp := Rigg.ControllerTyp; }
+  { CalcTyp := Rigg.CalcTyp; }
 end;
 
 procedure TChartForm.SetSalingTyp(Value: TSalingTyp);
 begin
-  if FSalingTyp <> Value then begin
+  if FSalingTyp <> Value then
+  begin
     FSalingTyp := Value;
     FValid := False;
     YLED.Brush.Color := clRed;
@@ -430,21 +444,20 @@ begin
   for YAV := Low(TYAchseValue) to High(TYAchseValue) do
     YAchseRecordList[YAV].ComboIndex := -1;
   { ComboIndex neu bestimmen. Nicht ausgewählte Einträge bleiben auf -1 }
-  with YComboBox do
-    for i := 0 to Items.Count-1 do {ComboBox iterieren}
-    begin
-      S := Items[i];
-      for YAV := Low(TYAchseValue) to High(TYAchseValue) do
-        { Position j des Eintrag finden durch  Textvergleich }
-        if S = YAchseRecordList[YAV].ComboText then
-        begin
-          { Position in der ComboBox festhalten }
-          YAchseRecordList[YAV].ComboIndex := i;
-          { umgekehrt auch Reihenfolge festhalten: (sortierte Liste) }
-          YAchseSortedList[i] := YAV;
-          break;
-        end;
-    end;
+  for i := 0 to YComboBox.Items.Count-1 do
+  begin
+    S := YComboBox.Items[i];
+    for YAV := Low(TYAchseValue) to High(TYAchseValue) do
+      { Position j des Eintrag finden durch  Textvergleich }
+      if S = YAchseRecordList[YAV].ComboText then
+      begin
+        { Position in der ComboBox festhalten }
+        YAchseRecordList[YAV].ComboIndex := i;
+        { Reihenfolge in Liste festhalten }
+        YAchseSortedList[i] := YAV;
+        break;
+      end;
+  end;
 end;
 
 { Wird nur bei NeuBerechnung aufgerufen }
@@ -455,21 +468,21 @@ var
   YAV: TYAchseValue;
 begin
   YAchseSet := [];
-  with YComboBox do
-    for i := 0 to Items.Count-1 do
-    begin
-      S := Items[i];
-      for YAV := Low(TYAchseValue) to High(TYAchseValue) do
-        { Position j des Eintrag finden durch  Textvergleich }
-        if S = YAchseRecordList[YAV].ComboText then
-        begin
-          { Position in der ComboBox festhalten }
-          YAchseRecordList[YAV].ArrayIndex := i;
-          { festhalten, welche Kurven existieren }
-          if i <= ANr-1 then Include(YAchseSet, YAV);
-          Break;
-        end;
-    end;
+  for i := 0 to YComboBox.Items.Count-1 do
+  begin
+    S := YComboBox.Items[i];
+    for YAV := Low(TYAchseValue) to High(TYAchseValue) do
+      { Position j des Eintrag finden durch  Textvergleich }
+      if S = YAchseRecordList[YAV].ComboText then
+      begin
+        { Position in der ComboBox festhalten }
+        YAchseRecordList[YAV].ArrayIndex := i;
+        { festhalten, welche Kurven existieren }
+        if i <= ANr-1 then
+          Include(YAchseSet, YAV);
+        Break;
+      end;
+  end;
 end;
 
 function TChartForm.ComboIndexToCurve(ComboIndex: Integer): Integer;
@@ -477,11 +490,14 @@ var
   YAV: TYAchseValue;
 begin
   YAV := YAchseSortedList[ComboIndex];
-  if YAV in YAchseSet then begin
-    if (csBerechnet in FStatus) or (csGeladen in FStatus) then FValid := True;
+  if YAV in YAchseSet then
+  begin
+    if (csBerechnet in FStatus) or (csGeladen in FStatus) then
+      FValid := True;
     result := YAchseRecordList[YAV].ArrayIndex;
   end
-  else begin
+  else
+  begin
     FValid := False;
     result := ErrorIndex; { ev. hier Exception auslösen }
   end;
@@ -514,9 +530,12 @@ begin
   if not FBuissy then
   begin
     { Berechnen }
-    FBuissy := True;
+
     if not CheckBeforeCalc then
       Exit;
+
+    FBuissy := True;
+
     { Parameterzahl bearbeiten }
     if PComboBox.Text = ('kein Parameter') then
     begin
@@ -528,6 +547,7 @@ begin
     if PSpinner.Position > ParamCount then
       PSpinner.Position := ParamCount;
     PSpinner.Max := ParamCount;
+
     { MaxValue muß größer MinValue sein! }
     if PSpinner.Max = 1 then
       PSpinner.Max := 2;
@@ -548,11 +568,12 @@ begin
     end;
 
     DoAfterCalc;
-    RiggModul.Rigg.GetDocument(RggDocument);
+    Rigg.GetDocument(RggDocument);
     GetMemoText;
     Include(FStatus, csBerechnet);
     YLED.Brush.Color := clLime;
     FBuissy := False;
+
     { Anzeigen }
     j := ComboIndexToCurve(YComboBox.ItemIndex);
     for p := 0 to ParamCount-1 do
@@ -577,126 +598,86 @@ var
   Anfang, Ende, PAnfang, PEnde: double;
   InputRec: TTrimmControls;
   PunktOK: Boolean;
-  Rigg: TRigg;
   S: string;
   temp, tempL, tempH, tempA: double;
 begin
-  Rigg := RiggModul.Rigg;
-
   { Getriebezustand sichern und verfügbar machen }
   InputRec := Rigg.Glieder;
-  with InputRec do
-  begin
-    TopTitel := Format('(Co%dVo%dWi%dWo%dWa%dSh%dSa%dSl%d',
-    [Controller,Vorstag,Winkel,Woben,Wanten,SalingH,SalingA,SalingL]);
-    if SalingTyp = stFest then TopTitel := TopTitel + '/fest)';
-    if SalingTyp = stDrehbar then TopTitel := TopTitel + '/drehbar)';
-    if SalingTyp = stOhne_2 then TopTitel := TopTitel + '/ohne Saling (BK))';
-    if SalingTyp = stOhne then TopTitel := TopTitel + '/ohne Saling)';
-    TopTitel := 'Riggchart - ' + DateToStr(Date) + ' - ' + TopTitel;
+
+  TopTitel := Format(
+    '(Co%dVo%dWi%dWo%dWa%dSh%dSa%dSl%d',
+    [InputRec.Controller,
+     InputRec.Vorstag,
+     InputRec.Winkel,
+     InputRec.Woben,
+     InputRec.Wanten,
+     InputRec.SalingH,
+     InputRec.SalingA,
+     InputRec.SalingL]);
+
+  case SalingTyp of
+    stFest: TopTitel := TopTitel + '/fest)';
+    stDrehbar: TopTitel := TopTitel + '/drehbar)';
+    stOhne: TopTitel := TopTitel + '/ohne Saling)';
+    stOhne_2: TopTitel := TopTitel + '/ohne Saling (BK))';
   end;
+
+    TopTitel := 'Riggchart - ' + DateToStr(Date) + ' - ' + TopTitel;
+
   Rigg.ProofRequired := False;
 
   try
-
-  { Parameterbereich bestimmen und Schleife starten }
-  PAnfang := StrToInt(PminEdit.Text);
-  PEnde := StrToInt(PmaxEdit.Text);
-  PAntrieb := (PEnde+PAnfang) / 2;
-  for p := 0 to ParamCount-1 do
-  begin
-    with ProgressDlg.ParamLabel do
+    { Parameterbereich bestimmen und Schleife starten }
+    PAnfang := StrToInt(PminEdit.Text);
+    PEnde := StrToInt(PmaxEdit.Text);
+    PAntrieb := (PEnde+PAnfang) / 2;
+    for p := 0 to ParamCount-1 do
     begin
       if ParamCount > 1 then
-        Caption := Format('Parameter %d von %d', [p+1, ParamCount])
+        ProgressDlg.ParamLabel.Caption := Format('Parameter %d von %d', [p+1, ParamCount])
       else
-        Caption := 'Kurve wird berechnet';
-      Update;
-    end;
+        ProgressDlg.ParamLabel.Caption := 'Kurve wird berechnet';
+      ProgressDlg.ParamLabel.Update;
 
-    if ParamCount > 1 then
-    begin
-      PAntrieb := PAnfang+(PEnde-PAnfang)*p/(ParamCount-1);
-      PText[p] := Format('%6.2f', [PAntrieb]);
-    end;
+      if ParamCount > 1 then
+      begin
+          PAntrieb := PAnfang + (PEnde-PAnfang) * p/(ParamCount-1);
+        PText[p] := Format('%6.2f', [PAntrieb]);
+      end;
 
-    { Parameter ansteuern }
-    S := PComBoBox.Text;
-    if ParamCount < 2 then
-    begin
-     { do nothing }
-    end
-    else if (S = 'Controller') then
-        Rigg.RealGlied[fpController] := PAntrieb
-    else if (S = 'Winkel') then
-      Rigg.RealGlied[fpWinkel] := PAntrieb/10*pi/180
-    else if (S = 'Vorstag') then
-      Rigg.RealGlied[fpVorstag] := PAntrieb
-    else if (S = 'Wante') then
-      Rigg.RealGlied[fpWante] := PAntrieb
-    else if (S = 'Wante oben') then
-      Rigg.RealGlied[fpWoben] := PAntrieb
-    else if (S = 'Saling Höhe') then
-      Rigg.RealGlied[fpSalingH] := PAntrieb
-    else if (S = 'Saling Abstand') then
-      Rigg.RealGlied[fpSalingA] := PAntrieb
-    else if (S = 'Saling Länge') and (SalingTyp = stDrehbar) then
-      Rigg.RealGlied[fpSalingL] := PAntrieb
-    else if (S = 'Saling Länge') and (SalingTyp = stFest) then begin
-      tempL := Rigg.RealGlied[fpSalingL];
-      temp := PAntrieb/tempL;
-      tempH := temp * Rigg.RealGlied[fpSalingH];
-      tempA := temp * Rigg.RealGlied[fpSalingA];
-      Rigg.RealGlied[fpSalingH] := tempH;
-      Rigg.RealGlied[fpSalingA] := tempA;
-    end else if (S = 'Saling Winkel') then begin
-      temp := PAntrieb*pi/180;
-      tempL := Rigg.RealGlied[fpSalingL];
-      tempH := tempL * sin(temp);
-      tempA := 2 * tempL * cos(temp);
-      Rigg.RealGlied[fpSalingH] := tempH;
-      Rigg.RealGlied[fpSalingA] := tempA;
-    end;
-
-    { Definitionsbereich bestimmen und Berechnungsschleife starten }
-    Anfang := StrToInt(XminEdit.Text);
-    Ende := StrToInt(XmaxEdit.Text);
-    for i := 0 to 100 do
-    begin
-      if i mod 5 = 0 then
-        ProgressDlg.Gauge.Position := i;
-
-      Antrieb := Anfang + (Ende-Anfang)*i/100;
-
-      { Antrieb ansteuern }
-      S := XComboBox.Text;
-      if (S = 'Controller') then
-        Rigg.RealGlied[fpController] := Antrieb
+      { Parameter ansteuern }
+      S := PComBoBox.Text;
+      if ParamCount < 2 then
+      begin
+       { do nothing }
+      end
+      else if (S = 'Controller') then
+          Rigg.RealGlied[fpController] := PAntrieb
       else if (S = 'Winkel') then
-        Rigg.RealGlied[fpWinkel] := Antrieb/10 * pi/180
+        Rigg.RealGlied[fpWinkel] := PAntrieb/10*pi/180
       else if (S = 'Vorstag') then
-        Rigg.RealGlied[fpVorstag] := Antrieb
+        Rigg.RealGlied[fpVorstag] := PAntrieb
       else if (S = 'Wante') then
-        Rigg.RealGlied[fpWante] := Antrieb
+        Rigg.RealGlied[fpWante] := PAntrieb
       else if (S = 'Wante oben') then
-        Rigg.RealGlied[fpWoben] := Antrieb
+        Rigg.RealGlied[fpWoben] := PAntrieb
       else if (S = 'Saling Höhe') then
-        Rigg.RealGlied[fpSalingH] := Antrieb
+        Rigg.RealGlied[fpSalingH] := PAntrieb
       else if (S = 'Saling Abstand') then
-        Rigg.RealGlied[fpSalingA] := Antrieb
+        Rigg.RealGlied[fpSalingA] := PAntrieb
       else if (S = 'Saling Länge') and (SalingTyp = stDrehbar) then
-        Rigg.RealGlied[fpSalingL] := Antrieb
+        Rigg.RealGlied[fpSalingL] := PAntrieb
       else if (S = 'Saling Länge') and (SalingTyp = stFest) then
       begin
         tempL := Rigg.RealGlied[fpSalingL];
-        temp := Antrieb/tempL;
+        temp := PAntrieb/tempL;
         tempH := temp * Rigg.RealGlied[fpSalingH];
         tempA := temp * Rigg.RealGlied[fpSalingA];
         Rigg.RealGlied[fpSalingH] := tempH;
         Rigg.RealGlied[fpSalingA] := tempA;
       end else if (S = 'Saling Winkel') then
       begin
-        temp := Antrieb*pi/180;
+        temp := PAntrieb*pi/180;
         tempL := Rigg.RealGlied[fpSalingL];
         tempH := tempL * sin(temp);
         tempA := 2 * tempL * cos(temp);
@@ -704,129 +685,182 @@ begin
         Rigg.RealGlied[fpSalingA] := tempA;
       end;
 
-      { Berechnen }
-      if SalingTyp = stFest then
-        if (XComboBox.Text = 'Winkel') or
-           (PComboBox.Text = 'Winkel') then
-          Rigg.UpdateGetriebeFS
-        else
-          Rigg.BerechneWinkel
-      else
-        Rigg.UpdateGetriebe;
-      Rigg.UpdateRigg;
-      PunktOK := Rigg.GetriebeOK and Rigg.MastOK and Rigg.RiggOK;
+      { Definitionsbereich bestimmen und Berechnungsschleife starten }
+      Anfang := StrToInt(XminEdit.Text);
+      Ende := StrToInt(XmaxEdit.Text);
+      for i := 0 to 100 do
+      begin
+        if i mod 5 = 0 then
+          ProgressDlg.Gauge.Position := i;
 
-      { Ergebnisse einspeichern }
-      if yavVorstagSpannung in YAchseSet then
-      begin
-        j := YAchseRecordList[yavVorstagSpannung].ArrayIndex;
-        if PunktOK then af[p,j,i] := Rigg.rF[14]
-        else af[p,j,i] := 0;
-      end;
-      if yavWantenSpannung in YAchseSet then
-      begin
-        j := YAchseRecordList[yavWantenSpannung].ArrayIndex;
-        if PunktOK then
-          af[p,j,i] := Rigg.rF[8]
-        else
-          af[p,j,i] := 0;
-      end;
-      if yavMastfallF0F in YAchseSet then
-      begin
-        j := YAchseRecordList[yavMastfallF0F].ArrayIndex;
-        af[p,j,i] := Abstand(Rigg.rP[ooF0],Rigg.rP[ooF]);
-      end;
-      if yavMastfallF0C in YAchseSet then
-      begin
-        j := YAchseRecordList[yavMastfallF0C].ArrayIndex;
-        af[p,j,i] := Abstand(Rigg.rP[ooF0],Rigg.rP[ooC]);
-      end;
-      if yavAuslenkungC in YAchseSet then
-      begin
-        j := YAchseRecordList[yavAuslenkungC].ArrayIndex;
-        if PunktOK then
-          af[p,j,i] := Abstand(Rigg.rP[ooC],Rigg.rPe[ooC])
-        else
-          af[p,j,i] := 0;
-      end;
-      if yavDurchbiegungHD in YAchseSet then
-      begin
-        j := YAchseRecordList[yavDurchbiegungHD].ArrayIndex;
-        af[p,j,i] := Rigg.hd;
-      end;
-      if yavRF00 in YAchseSet then
-      begin
-        j := YAchseRecordList[yavRF00].ArrayIndex;
-        if PunktOK then
-          af[p,j,i] := Rigg.rF[0]
-        else
-          af[p,j,i] := 0;
-      end;
-      if yavRF01 in YAchseSet then
-      begin
-        j := YAchseRecordList[yavRF01].ArrayIndex;
-        if PunktOK then
-          af[p,j,i] := Rigg.rF[1]
-        else
-          af[p,j,i] := 0;
-      end;
-      if yavRF03 in YAchseSet then
-      begin
-        j := YAchseRecordList[yavRF03].ArrayIndex;
-        if PunktOK then
-          af[p,j,i] := Rigg.rF[3]
-        else
-          af[p,j,i] := 0;
-      end;
-      if yavRF05 in YAchseSet then
-      begin
-        j := YAchseRecordList[yavRF05].ArrayIndex;
-        if PunktOK then
-          af[p,j,i] := Rigg.rF[5]
-        else
-          af[p,j,i] := 0;
-      end;
-      if yavRF10 in YAchseSet then
-      begin
-        j := YAchseRecordList[yavRF10].ArrayIndex;
-        if PunktOK then
-          af[p,j,i] := Rigg.rF[10]
-        else
-          af[p,j,i] := 0;
-      end;
-      if yavRF11 in YAchseSet then
-      begin
-        j := YAchseRecordList[yavRF11].ArrayIndex;
-        if PunktOK then
-          af[p,j,i] := Rigg.rF[11]
-        else
-          af[p,j,i] := 0;
-      end;
-      if yavRF13 in YAchseSet then
-      begin
-        j := YAchseRecordList[yavRF13].ArrayIndex;
-        if PunktOK then
-          af[p,j,i] := Rigg.rF[13]
-        else
-          af[p,j,i] := 0;
-      end;
+        Antrieb := Anfang + (Ende-Anfang)*i/100;
 
-      Application.ProcessMessages;
+        { Antrieb ansteuern }
+        S := XComboBox.Text;
+        if (S = 'Controller') then
+          Rigg.RealGlied[fpController] := Antrieb
+        else if (S = 'Winkel') then
+          Rigg.RealGlied[fpWinkel] := Antrieb/10 * pi/180
+        else if (S = 'Vorstag') then
+          Rigg.RealGlied[fpVorstag] := Antrieb
+        else if (S = 'Wante') then
+          Rigg.RealGlied[fpWante] := Antrieb
+        else if (S = 'Wante oben') then
+          Rigg.RealGlied[fpWoben] := Antrieb
+        else if (S = 'Saling Höhe') then
+          Rigg.RealGlied[fpSalingH] := Antrieb
+        else if (S = 'Saling Abstand') then
+          Rigg.RealGlied[fpSalingA] := Antrieb
+        else if (S = 'Saling Länge') and (SalingTyp = stDrehbar) then
+          Rigg.RealGlied[fpSalingL] := Antrieb
+        else if (S = 'Saling Länge') and (SalingTyp = stFest) then
+        begin
+          tempL := Rigg.RealGlied[fpSalingL];
+          temp := Antrieb/tempL;
+          tempH := temp * Rigg.RealGlied[fpSalingH];
+          tempA := temp * Rigg.RealGlied[fpSalingA];
+          Rigg.RealGlied[fpSalingH] := tempH;
+          Rigg.RealGlied[fpSalingA] := tempA;
+        end
+        else if (S = 'Saling Winkel') then
+        begin
+          temp := Antrieb*pi/180;
+          tempL := Rigg.RealGlied[fpSalingL];
+          tempH := tempL * sin(temp);
+          tempA := 2 * tempL * cos(temp);
+          Rigg.RealGlied[fpSalingH] := tempH;
+          Rigg.RealGlied[fpSalingA] := tempA;
+        end;
+
+        { Berechnen }
+        if SalingTyp = stFest then
+        begin
+          if (XComboBox.Text = 'Winkel') or
+             (PComboBox.Text = 'Winkel') then
+            Rigg.UpdateGetriebeFS
+          else
+            Rigg.BerechneWinkel;
+        end
+        else
+        begin
+          Rigg.UpdateGetriebe;
+        end;
+        Rigg.UpdateRigg;
+        PunktOK := Rigg.GetriebeOK and Rigg.MastOK and Rigg.RiggOK;
+
+        { Ergebnisse einspeichern }
+        if yavVorstagSpannung in YAchseSet then
+        begin
+          j := YAchseRecordList[yavVorstagSpannung].ArrayIndex;
+          if PunktOK then
+            af[p,j,i] := Rigg.rF[14]
+          else
+            af[p,j,i] := 0;
+        end;
+        if yavWantenSpannung in YAchseSet then
+        begin
+          j := YAchseRecordList[yavWantenSpannung].ArrayIndex;
+          if PunktOK then
+            af[p,j,i] := Rigg.rF[8]
+          else
+            af[p,j,i] := 0;
+        end;
+        if yavMastfallF0F in YAchseSet then
+        begin
+          j := YAchseRecordList[yavMastfallF0F].ArrayIndex;
+          af[p,j,i] := Abstand(Rigg.rP[ooF0],Rigg.rP[ooF]);
+        end;
+        if yavMastfallF0C in YAchseSet then
+        begin
+          j := YAchseRecordList[yavMastfallF0C].ArrayIndex;
+          af[p,j,i] := Abstand(Rigg.rP[ooF0],Rigg.rP[ooC]);
+        end;
+        if yavAuslenkungC in YAchseSet then
+        begin
+          j := YAchseRecordList[yavAuslenkungC].ArrayIndex;
+          if PunktOK then
+            af[p,j,i] := Abstand(Rigg.rP[ooC],Rigg.rPe[ooC])
+          else
+            af[p,j,i] := 0;
+        end;
+        if yavDurchbiegungHD in YAchseSet then
+        begin
+          j := YAchseRecordList[yavDurchbiegungHD].ArrayIndex;
+          af[p,j,i] := Rigg.hd;
+        end;
+        if yavRF00 in YAchseSet then
+        begin
+          j := YAchseRecordList[yavRF00].ArrayIndex;
+          if PunktOK then
+            af[p,j,i] := Rigg.rF[0]
+          else
+            af[p,j,i] := 0;
+        end;
+        if yavRF01 in YAchseSet then
+        begin
+          j := YAchseRecordList[yavRF01].ArrayIndex;
+          if PunktOK then
+            af[p,j,i] := Rigg.rF[1]
+          else
+            af[p,j,i] := 0;
+        end;
+        if yavRF03 in YAchseSet then
+        begin
+          j := YAchseRecordList[yavRF03].ArrayIndex;
+          if PunktOK then
+            af[p,j,i] := Rigg.rF[3]
+          else
+            af[p,j,i] := 0;
+        end;
+        if yavRF05 in YAchseSet then
+        begin
+          j := YAchseRecordList[yavRF05].ArrayIndex;
+          if PunktOK then
+            af[p,j,i] := Rigg.rF[5]
+          else
+            af[p,j,i] := 0;
+        end;
+        if yavRF10 in YAchseSet then
+        begin
+          j := YAchseRecordList[yavRF10].ArrayIndex;
+          if PunktOK then
+            af[p,j,i] := Rigg.rF[10]
+          else
+            af[p,j,i] := 0;
+        end;
+        if yavRF11 in YAchseSet then
+        begin
+          j := YAchseRecordList[yavRF11].ArrayIndex;
+          if PunktOK then
+            af[p,j,i] := Rigg.rF[11]
+          else
+            af[p,j,i] := 0;
+        end;
+        if yavRF13 in YAchseSet then
+        begin
+          j := YAchseRecordList[yavRF13].ArrayIndex;
+          if PunktOK then
+            af[p,j,i] := Rigg.rF[13]
+          else
+            af[p,j,i] := 0;
+        end;
+
+        Application.ProcessMessages;
+        if ProgressDlg.Aborted then
+          break;
+      end;
       if ProgressDlg.Aborted then
+      begin
+        Reset;
         break;
+      end;
     end;
-    if ProgressDlg.Aborted then
-    begin
-      Reset;
-      break;
-    end;
-  end;
 
   finally
     { Getriebe wiederherstellen }
     Rigg.ProofRequired := True;
     Rigg.Glieder := InputRec;
-    RiggModul.UpdateGetriebe;
+    UpdateGetriebe;
   end;
 end;
 
@@ -867,13 +901,15 @@ begin
   YGap := Round((Ymax-Ymin)/10)+1;
   if YGap = 0 then
     YGap := 0.2;
-  {Ymax-Ymin darf nicht Null sein - sonst Abbruch nach VBX-Exception!}
+
+  { Ymax-Ymin darf nicht Null sein - sonst Abbruch nach VBX-Exception! }
   if (Ymax-Ymin < 0.1) then
   begin
     Ymin := Ymin-0.1;
     Ymax := Ymax+0.1;
   end;
-  {Xmax-Xmin darf nicht Null sein - sonst Abbruch nach VBX-Exception!}
+
+  { Xmax-Xmin darf nicht Null sein - sonst Abbruch nach VBX-Exception! }
   if (Xmax-Xmin < 0.1) then
   begin
     Xmin := Xmin-0.1;
@@ -1087,8 +1123,8 @@ begin
     end;
   end;
 
-  p := PSpinner.Position - 1; {Index für Parameter}
-  j := ComboIndexToCurve(YComboBox.ItemIndex); {Index für Kurve}
+  p := PSpinner.Position - 1; { Index für Parameter }
+  j := ComboIndexToCurve(YComboBox.ItemIndex); { Index für Kurve }
   if not Valid then
   begin
     { MessageBeep(MB_ICONEXCLAMATION); }
@@ -1119,12 +1155,16 @@ begin
   begin
     if not (DstList.ItemIndex = -1) then
     begin
-      { In DstList den gleichen Eintrag wie in YComboBox selektieren }
+      { clear selection if any }
       for i := 0 to DstList.Items.Count-1 do
+      begin
         DstList.Selected[i] := False;
+      end;
+      { In DstList den gleichen Eintrag wie in YComboBox selektieren }
       DstList.ItemIndex := YComboBox.ItemIndex;
       DstList.Selected[YComboBox.ItemIndex] := True;
     end;
+
     if ShowModal = mrOK then
     begin
       if (DstList.Items.Count = 0) then
@@ -1209,7 +1249,7 @@ begin
       stOhne: Add('SalingTyp: Ohne Salinge (Mast starr)');
     end;
     { ControllerTyp }
-    case RiggModul.ControllerTyp of
+    case Rigg.ControllerTyp of
       ctDruck: Add('ControllerTyp: Controller überträgt Druck');
       ctOhne: Add('ControllerTyp: kein Controller');
     end;
@@ -1217,14 +1257,14 @@ begin
     if SalingTyp = stOhne then
       Add('BerechnungsTyp: Wantenkraft vorgegeben');
     if SalingTyp <> stOhne then
-    case RiggModul.CalcTyp of
+    case Rigg.CalcTyp of
       ctQuerKraftBiegung: Add('BerechnungsTyp: nur Quekraftbiegung');
       ctBiegeKnicken: Add('BerechnungsTyp: Biegeknicken');
       ctKraftGemessen: begin
         Add('BerechnungsTyp: Trimmtabelle verwendet');
         Add('');
         Add('Trimmtabelle:');
-        T := RiggModul.Rigg.TrimmTab.TrimmTabDaten;
+        T := Rigg.TrimmTab.TrimmTabDaten;
         case T.TabellenTyp of
           itKonstante:
           begin
@@ -1286,7 +1326,7 @@ begin
     xpName := GetTsbName(PComboText);
     Add('');
     Add('Rigg: Einstellwerte');
-    with RiggModul.Rigg do
+    with Rigg do
     begin
       if (ControllerTyp = ctDruck) and (xpName <> xpController) then
         Add(Format('  Controller: %g mm',[RealGlied[fpController]]));
@@ -1323,7 +1363,7 @@ begin
     { Koordinaten }
     Add('');
     Add('Rumpf: Koordinaten (x,y,z) [mm]');
-    with RiggModul.Rigg do
+    with Rigg do
     begin
       Add(Format('  A0(%g,%g,%g)',[rP[ooA0,x],rP[ooA0,y],rP[ooA0,z]]));
       Add(Format('  B0(%g,%g,%g)',[rP[ooB0,x],rP[ooB0,y],rP[ooB0,z]]));
@@ -1335,7 +1375,7 @@ begin
     { Mast }
     Add('');
     Add('Mast:');
-    with RiggModul.Rigg do
+    with Rigg do
     begin
       Add(Format('  D0D: %d mm (Saling)',[Round(MastUnten)]));
       Add(Format('  D0C: %d mm (Vorstag)',[Round(MastUnten + MastOben)]));
@@ -1785,20 +1825,20 @@ begin
 
   if (SalingTyp = stFest) and (name = xpSalingL) then
   begin
-    SalingDreieck.CopyFromRigg(RiggModul.Rigg);
+    SalingDreieck.CopyFromRigg(Rigg);
     tempMin := Ceil(SalingDreieck.Saling_LMin);
     tempMax := Floor(SalingDreieck.Saling_LMax);
     tempIst := Round(SalingDreieck.Saling_L);
   end else if name = xpSalingW then
   begin
-    SalingDreieck.CopyFromRigg(RiggModul.Rigg);
+    SalingDreieck.CopyFromRigg(Rigg);
     tempMin := Ceil(SalingDreieck.Saling_WMin * 180/pi);
     tempMax := Floor(SalingDreieck.Saling_WMax * 180/pi);
     tempIst := Round(SalingDreieck.Saling_W * 180/pi);
   end
   else
   begin
-    f := RiggModul.Rigg.GSB.GetSB(TsbName(name));
+    f := Rigg.GSB.GetSB(TsbName(name));
     tempMin := Round(f.Min);
     tempMax := Round(f.Max);
     tempIst := Round(f.Ist);
@@ -1879,21 +1919,21 @@ begin
 
   if (SalingTyp = stFest) and (name = xpSalingL) then
   begin
-    SalingDreieck.CopyFromRigg(RiggModul.Rigg);
+    SalingDreieck.CopyFromRigg(Rigg);
     tempMin := Ceil(SalingDreieck.Saling_LMin);
     tempMax := Floor(SalingDreieck.Saling_LMax);
     tempIst := Round(SalingDreieck.Saling_L);
   end
   else if name = xpSalingW then
   begin
-    SalingDreieck.CopyFromRigg(RiggModul.Rigg);
+    SalingDreieck.CopyFromRigg(Rigg);
     tempMin := Ceil(SalingDreieck.Saling_WMin*180/pi);
     tempMax := Floor(SalingDreieck.Saling_WMax*180/pi);
     tempIst := Round(SalingDreieck.Saling_W*180/pi);
   end
   else
   begin
-    f := RiggModul.Rigg.GSB.GetSB(TsbName(name));
+    f := Rigg.GSB.GetSB(TsbName(name));
     tempMin := Round(f.Min);
     tempMax := Round(f.Max);
     tempIst := Round(f.Ist);
@@ -2127,6 +2167,23 @@ begin
   mi.Caption := '&Speichern...';
   mi.Hint := '  Diagramm speichern';
   mi.OnClick := SaveItemClick;
+end;
+
+procedure TChartForm.UpdateGetriebe;
+begin
+  Rigg.UpdateGetriebe;
+
+  if not (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK) then
+  begin
+    if Rigg.GetriebeOK and not Rigg.MastOK then
+    begin
+    end;
+  end;
+
+  if (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK) then
+  begin
+    Rigg.UpdateRigg;
+  end;
 end;
 
 end.

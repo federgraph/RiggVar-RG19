@@ -209,6 +209,7 @@ uses
 constructor TRotaForm.Create;
 begin
   KeepInsideItemChecked := True;
+  FBogen := True;
 
     { do almost nothing here,
     - Image reference needs to be injected first,
@@ -297,7 +298,7 @@ begin
   RaumGraph.FixPoint := FixPoint;
   RaumGraph.Zoom := FZoom;
   RaumGraph.ViewPoint := vp3D;
-  RaumGraph.Bogen := True;
+  RaumGraph.Bogen := FBogen;
 end;
 
 procedure TRotaForm.InitHullGraph;
@@ -625,7 +626,7 @@ end;
 
 procedure TRotaForm.BogenBtnClick(Sender: TObject);
 begin
-  RaumGraph.Bogen := not RaumGraph.Bogen;
+  Bogen := not Bogen;
   Draw;
 end;
 
@@ -855,6 +856,7 @@ end;
 
 procedure TRotaForm.SetBogen(const Value: Boolean);
 begin
+  FBogen := Value;
   RaumGraph.Bogen := Value;
 end;
 

@@ -230,7 +230,14 @@ begin
   result := 0;
   case Index of
     fpController: result := FrController;
-    fpWinkel: result := FrWinkel;
+    fpWinkel:
+    begin
+      result := FrWinkel;
+      if result > 2 * PI then
+        result := result - 2 * PI;
+      if result < 0 then
+        result := result + 2 * PI;
+    end;
     fpVorstag: result := FrVorstag;
     fpWante: result := FrWunten3d + FrWoben3d;
     fpWoben: result := FrWoben3d;

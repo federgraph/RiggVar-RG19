@@ -281,12 +281,12 @@ begin
 
     Pen.Color := Props.Color;
 
-  { Koppelkurve }
-  if Props.Koppel then
-  begin
-    Pen.Color := clKoppelKurve;
-    PolyLine(ZugKoppelkurve);
-  end;
+    { Koppelkurve }
+    if Props.Koppel then
+    begin
+      Pen.Color := clKoppelKurve;
+      PolyLine(ZugKoppelkurve);
+    end;
 
     { Rumpf }
     if Props.Coloriert then

@@ -144,7 +144,7 @@ type
 
     procedure Draw;
 
-    function GetPlotValue(PlotID: Integer; x, y: single): single;
+//    function GetPlotValue(PlotID: Integer; x, y: single): single;
 
     procedure DebugBiegungGF(ML: TStrings);
     procedure UpdateColumnC(ML: TStrings);
@@ -255,7 +255,7 @@ begin
     StrokeRigg.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
 
     StrokeRigg.WanteGestrichelt := not Rigg.GetriebeOK;
-    StrokeRigg.Bogen := (FParam <> fpWinkel);
+//    StrokeRigg.Bogen := (FParam <> fpWinkel);
   end;
 end;
 
@@ -371,6 +371,10 @@ begin
 
   { Notwendig nur einmal bei Programmstart. Sonst verzichtbar. }
 //  Draw; //jetzt als letzter Aufruf in FormCreate
+
+  { because Draw is no longer called }
+  if not RiggModul.AllreadyUpdatedGetriebeFlag then
+    UpdateFactArrayFromRigg;
 end;
 
 procedure TRggMain.ChangeRigg(Value: single);
@@ -582,6 +586,8 @@ begin
     StrokeRigg.ControllerTyp := Rigg.ControllerTyp;
   end;
 
+  { WinkelBtnDow must be synchron chaos, and Hysterese ! }
+  RiggModul.WinkelBtnDown := (Value = fpWinkel);
   Rigg.ManipulatorMode := (Value = fpWinkel);
   FParam := Value;
   CurrentValue := FactArray.Find(FParam).Ist;
@@ -816,32 +822,38 @@ begin
     end;
   end;
 
+  if Param <> fpWinkel then
+  begin
+    sb := FactArray.Find(fpWinkel);
+    sb.Ist := Rigg.RealGlied[fpWinkel] * 180 / pi;
+  end;
+
 end;
 
-function TRggMain.GetPlotValue(PlotID: Integer; x, y: single): single;
-var
-  tx, ty: single;
-begin
-  case PlotID of
-    1..12:
-    begin
-      tx := FactArray.Vorstag.Ist;
-      ty := FactArray.SalingL.Ist;
-      Rigg.RealGlied[fpVorstag] := tx + x;
-      Rigg.RealGlied[fpSalingA] := ty + y / 10;
-      Rigg.UpdateGetriebe;
-      if Rigg.GetriebeOK then
-      begin
-        result := Abstand(Rigg.rP[ooF0], Rigg.rP[ooF]); // - 5000;
-        UpdateFactArrayFromRigg;
-      end
-      else
-        result := 0;
-    end;
-    else
-      result := 0;
-  end;
-end;
+//function TRggMain.GetPlotValue(PlotID: Integer; x, y: single): single;
+//var
+//  tx, ty: single;
+//begin
+//  case PlotID of
+//    1..12:
+//    begin
+//      tx := FactArray.Vorstag.Ist;
+//      ty := FactArray.SalingL.Ist;
+//      Rigg.RealGlied[fpVorstag] := tx + x;
+//      Rigg.RealGlied[fpSalingA] := ty + y / 10;
+//      Rigg.UpdateGetriebe;
+//      if Rigg.GetriebeOK then
+//      begin
+//        result := Abstand(Rigg.rP[ooF0], Rigg.rP[ooF]); // - 5000;
+//        UpdateFactArrayFromRigg;
+//      end
+//      else
+//        result := 0;
+//    end;
+//    else
+//      result := 0;
+//  end;
+//end;
 
 procedure TRggMain.LoadTrimm(fd: TRggData);
 var
@@ -1163,6 +1175,7 @@ end;
 
 procedure TRggMain.Draw;
 begin
+  { Note: Draw is not called when going through RiggModul }
   if StrokeRigg <> nil then
   begin
     UpdateStrokeRigg;

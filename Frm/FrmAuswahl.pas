@@ -25,19 +25,16 @@ type
     IncAllBtn: TSpeedButton;
     ExcludeBtn: TSpeedButton;
     ExAllBtn: TSpeedButton;
+    procedure FormCreate(Sender: TObject);
     procedure IncludeBtnClick(Sender: TObject);
     procedure ExcludeBtnClick(Sender: TObject);
     procedure IncAllBtnClick(Sender: TObject);
     procedure ExcAllBtnClick(Sender: TObject);
     procedure MoveSelected(List: TCustomListBox; Items: TStrings);
-    procedure SetItem(List: TListBox; Index: Integer);
+    procedure SetItem(List: TListBox; const Idx: Integer);
     function GetFirstSelection(List: TCustomListBox): Integer;
     procedure SetButtons;
-    procedure FormCreate(Sender: TObject);
-  private
-    { Private declarations }
   public
-    { Public declarations }
     procedure GetEntries(const RecordList: TYAchseRecordList);
   end;
 
@@ -122,22 +119,26 @@ end;
 function TYAuswahlDlg.GetFirstSelection(List: TCustomListBox): Integer;
 begin
   for Result := 0 to List.Items.Count - 1 do
-    if List.Selected[Result] then Exit;
+  begin
+    if List.Selected[Result] then
+      Exit;
+  end;
   Result := LB_ERR;
 end;
 
-procedure TYAuswahlDlg.SetItem(List: TListBox; Index: Integer);
+procedure TYAuswahlDlg.SetItem(List: TListBox; const Idx: Integer);
 var
   MaxIndex: Integer;
+  i: Integer;
 begin
-  with List do
-  begin
-    SetFocus;
-    MaxIndex := List.Items.Count - 1;
-    if Index = LB_ERR then Index := 0
-    else if Index > MaxIndex then Index := MaxIndex;
-    Selected[Index] := True;
-  end;
+  List.SetFocus;
+  MaxIndex := List.Items.Count - 1;
+  i := Idx;
+  if i = LB_ERR then
+    i := 0
+  else if i > MaxIndex then
+    i := MaxIndex;
+  List.Selected[i] := True;
   SetButtons;
 end;
 

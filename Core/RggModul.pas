@@ -1204,6 +1204,7 @@ begin
   { 'TakeOver' }
   ViewModelMain.ControllerEnabled := ControllerEnabled;
   ViewModelMain.ControllerDown := ControllerBtnDown;
+//  ViewModelMain.BogenBtnDown := ZweischlagBtnDown;
   ViewModelMain.UpdateView;
 end;
 

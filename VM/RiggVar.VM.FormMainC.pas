@@ -99,6 +99,8 @@ begin
   FormRG19.WinkelItem.Enabled := WinkelEnabled;
   FormRG19.WinkelBtn.Enabled := WinkelEnabled;
 
+//  FormRG19.BogenBtn.Down := BogenBtnDown;
+
   FormRG19.BiegeNeigeItem.Enabled := BiegeNeigeItemEnabled;
   FormRG19.ReglerItem.Enabled := ReglerItemEnabled;
   FormRG19.ReglerBtn.Enabled := ReglerBtnEnabled;

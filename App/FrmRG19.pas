@@ -1450,9 +1450,9 @@ begin
   BogenBtn := sb;
   sb.Caption := 'B';
   sb.Hint := 'Bogen';
+  sb.GroupIndex := 15;
   sb.AllowAllUp := True;
   sb.Down := RotaForm.Bogen;
-  sb.GroupIndex := 15;
   sb.OnClick := RotaForm.BogenBtnClick;
 end;
 

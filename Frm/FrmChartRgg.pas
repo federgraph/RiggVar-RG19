@@ -3,8 +3,19 @@
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  Menus, StdCtrls, Mask, Buttons, ExtCtrls, ComCtrls,
+  Winapi.Windows,
+  System.SysUtils,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.Menus,
+  Vcl.StdCtrls,
+  Vcl.Mask,
+  Vcl.Buttons,
+  Vcl.ExtCtrls,
+  Vcl.ComCtrls,
   FrmChart;
 
 type
@@ -218,7 +229,8 @@ begin
           Pen.Color := clBlack;
           Brush.Color := cf[p];
           Brush.Style := bsSolid;
-          for i := 0 to 100 do begin
+          for i := 0 to 100 do
+          begin
             tempX := PlotExtX * (i/100);
             tempY := PlotExtY * (bf[p,i]-Ymin)/(Ymax-Ymin);
             Pt.x := Round(Limit(tempX));

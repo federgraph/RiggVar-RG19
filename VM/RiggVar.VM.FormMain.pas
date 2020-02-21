@@ -24,6 +24,8 @@ type
     WinkelEnabled: Boolean;
     WinkelDown: Boolean;
 
+//    BogenBtnDown: Boolean;
+
     BiegeNeigeItemEnabled: Boolean;
     ReglerItemEnabled: Boolean;
     ReglerBtnEnabled: Boolean;

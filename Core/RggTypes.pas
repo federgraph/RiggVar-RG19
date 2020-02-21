@@ -49,8 +49,8 @@ type
   TYAchseRecord = record
     ComboIndex: Integer; { ComboIndex: TYAchseValue; }
     ArrayIndex: Integer; { ArrayIndex: 0..ANr-1 }
-    ComboText: string; // string[30];
-    Text: string; // string[30];
+    ComboText: string;
+    Text: string;
   end;
 
   TYAchseRecordList = array [TYAchseValue] of TYAchseRecord;
