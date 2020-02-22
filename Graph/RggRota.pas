@@ -202,6 +202,7 @@ implementation
 uses
   RiggVar.RG.Def,
   RggPBox, // special paintbox which captures the mouse properly
+  RggZug3D,
   RggTestData;
 
 { TRotaForm }
@@ -293,7 +294,7 @@ end;
 
 procedure TRotaForm.InitRaumGraph;
 begin
-  RaumGraph := TRaumGraph.Create;
+  RaumGraph := TRaumGraph.Create(TZug3D.Create);
   RaumGraph.Transformer := Transformer;
   RaumGraph.FixPoint := FixPoint;
   RaumGraph.Zoom := FZoom;

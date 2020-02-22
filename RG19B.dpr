@@ -79,7 +79,9 @@ uses
   RiggVar.VM.FormMain in 'VM\RiggVar.VM.FormMain.pas',
   RiggVar.VM.FormMainB in 'VM\RiggVar.VM.FormMainB.pas',
   RggZug in 'Graph\RggZug.pas',
-  RggTransformer in 'Graph\RggTransformer.pas';
+  RggTransformer in 'Graph\RggTransformer.pas',
+  RggZug3D in 'Graph\RggZug3D.pas',
+  RggZug2D in 'Graph\RggZug2D.pas';
 
 {$R *.res}
 

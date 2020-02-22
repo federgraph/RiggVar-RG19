@@ -12,6 +12,7 @@ uses
   RggCalc,
   RggTypes,
   RggDisplay,
+  RggZug3D,
   RggZug,
   RggBootGraph;
 
@@ -34,8 +35,7 @@ type
     A0, B0, C0, D0, E0, F0: TRealPoint;
     A,  B,  C,  D,  E,  F:  TRealPoint;
   protected
-    Zug3D: TZug3D;
-    Zug4: TZug4;
+    Zug3D: TZug3DBase; // injected via constructor
   private
     function GetFixPunkt: TRealPoint;
   protected
@@ -53,7 +53,7 @@ type
     WantVorstag: Boolean;
     WantAchsen: Boolean;
 
-    constructor Create;
+    constructor Create(AZug3D: TZug3DBase);
     destructor Destroy; override;
 
     procedure Update; override;
@@ -69,9 +69,9 @@ implementation
 uses
   RiggVar.RG.Def;
 
-constructor TRaumGraph.Create;
+constructor TRaumGraph.Create(AZug3D: TZug3DBase);
 begin
-  inherited;
+  inherited Create;
 
   WantFixPunkt := True;
   WantRumpf := True;
@@ -82,13 +82,9 @@ begin
   WantVorstag := True;
   WantAchsen := False;
 
-  Zug3D := TZug3D.Create;
+  Zug3D := AZug3D;
   Zug3D.Data := RaumGraphData;
   Zug3D.Props := RaumGraphProps;
-
-  Zug4 := TZug4.Create;
-  Zug4.Data := RaumGraphData;
-  Zug4.Props := RaumGraphProps;
 
   DL := TRggDisplayList.Create;
 
@@ -116,7 +112,6 @@ end;
 destructor TRaumGraph.Destroy;
 begin
   Zug3D.Free;
-  Zug4.Free;
   DL.Free;
   inherited;
 end;
@@ -205,8 +200,6 @@ begin
   begin
     Zug3D.ZugMastKurve[j].x := Round(MKT[j, x]);
     Zug3D.ZugMastKurve[j].y := -Round(MKT[j, z]);
-    Zug4.ZugMastKurve[j].x := Zug3D.ZugMastKurve[j].x;
-    Zug4.ZugMastKurve[j].y := Zug3D.ZugMastKurve[j].y;
   end;
 
   { Koppelkurve }
@@ -241,7 +234,7 @@ begin
   if not GrafikOK then
     Exit;
   if not Updated then
-      Update;
+    Update;
 
   Zug3D.GetPlotList(ML);
 end;

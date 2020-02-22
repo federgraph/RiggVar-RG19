@@ -13,6 +13,7 @@ uses
   RggCalc,
   RggMatrix,
   RggZug,
+  RggZug2D,
   RggRaumGraph;
 
 type
@@ -21,6 +22,7 @@ type
     Zug1: TZug1;
     Zug2: TZug2;
     Zug3: TZug3;
+
     procedure Update2D;
 
     procedure SetZoom(Value: single); override;
@@ -43,7 +45,7 @@ type
     procedure UpdateOffset;
     procedure CalcOffset(R: TRect);
   public
-    constructor Create;
+    constructor Create(AZug3D: TZug3DBase);
     destructor Destroy; override;
 
     procedure InitZoom;
@@ -61,9 +63,9 @@ implementation
 uses
   RiggVar.RG.Def;
 
-constructor TGetriebeGraph.Create;
+constructor TGetriebeGraph.Create(AZug3D: TZug3DBase);
 begin
-  inherited Create;
+  inherited Create(AZug3D);
 
 //  InitZoom; // needs injected Transformer
 
@@ -73,8 +75,10 @@ begin
 
   Zug1.Data := RaumGraphData;
   Zug1.Props := RaumGraphProps;
+
   Zug2.Data := RaumGraphData;
   Zug2.Props := RaumGraphProps;
+
   Zug3.Data := RaumGraphData;
   Zug3.Props := RaumGraphProps;
 
@@ -141,35 +145,30 @@ begin
 
   Zug1.ZoomFaktor := FZoomFaktor;
 
-  Zug1.OffsetX1 := OffsetX1;
-  Zug1.OffsetY1 := OffsetY1;
+  Zug1.OffsetX := OffsetX1;
+  Zug1.OffsetY := OffsetY1;
 
-  Zug2.OffsetX2 := OffsetX2;
-  Zug2.OffsetY2 := OffsetY2;
+  Zug2.OffsetX := OffsetX2;
+  Zug2.OffsetY := OffsetY2;
 
-  Zug3.OffsetX3 := OffsetX3;
-  Zug3.OffsetY3 := OffsetY3;
+  Zug3.OffsetX := OffsetX3;
+  Zug3.OffsetY := OffsetY3;
 
-  Zug4.OffsetX4 := OffsetX4;
-  Zug4.OffsetY4 := OffsetY4;
+  Zug3D.OffsetX := OffsetX4;
+  Zug3D.OffsetY := OffsetY4;
 
   Updated := False;
 end;
 
 procedure TGetriebeGraph.Update;
 begin
-  UpdateZugProps;
   Update2D;
+  UpdateZugProps;
   case ViewPoint of
     vpSeite: Zug1.FillZug;
     vpAchtern: Zug2.FillZug;
     vpTop: Zug3.FillZug;
-  end;
-
-  if Viewpoint = vp3D then
-  begin
-    inherited Update;
-    Zug4.FillZug;
+    vp3D: inherited Update;
   end;
 end;
 
@@ -186,7 +185,7 @@ begin
       vpSeite: Zug1.DrawToCanvas(g);
       vpAchtern: Zug2.DrawToCanvas(g);
       vpTop: Zug3.DrawToCanvas(g);
-      vp3D: Zug4.DrawToCanvas(g);
+      vp3D: Zug3D.DrawToCanvas(g);
     end;
   end;
 end;

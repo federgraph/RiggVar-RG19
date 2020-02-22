@@ -282,6 +282,7 @@ uses
   RggFachwerk,
   RggScroll,
   RggMatrix,
+  RggZug2D,
   FrmConsole,
   FrmInput,
   FrmOutput,
@@ -351,7 +352,7 @@ begin
   RefPoints := Rigg.rP;
 
   { GetriebeGrafik }
-  GetriebeGraph := TGetriebeGraph.Create;
+  GetriebeGraph := TGetriebeGraph.Create(TZug4.Create);
   GetriebeGraph.Transformer := TRggTransformer.Create;
   GetriebeGraph.Transformer.Rotator := TPolarKar.Create;
   GetriebeGraph.InitZoom;

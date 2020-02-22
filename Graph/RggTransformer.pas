@@ -54,7 +54,7 @@ type
   end;
 
   { version with TMatrix3D }
-  TRggTransformer3D = class(TRggTransformer01)
+  TRggTransformer3D = class(TRggTransformer00)
   private
     procedure BuildMatrix;
   public
@@ -119,9 +119,10 @@ var
   mr: TMatrix3D;
 begin
   if Assigned(OnGetFixPunkt) then
+  begin
     FFixPunkt := OnGetFixPunkt;
-
-  FTransformedFixPunkt := Rotator.Rotiere(FFixPunkt);
+    FTransformedFixPunkt := Rotator.Rotiere(FFixPunkt);
+  end;
 
   pt := TPoint3D.Create(
     -FTransformedFixPunkt[x],

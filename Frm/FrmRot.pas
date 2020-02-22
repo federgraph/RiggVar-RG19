@@ -319,6 +319,7 @@ implementation
 
 uses
   FrmScale,
+  RggZug2D,
   RggCalc,
   RggPal,
   RggPBox;
@@ -465,7 +466,7 @@ end;
 procedure TRotationForm.InitRaumGraph;
 begin
   { virtual }
-  RaumGraph := TRaumGraph.Create;
+  RaumGraph := TRaumGraph.Create(TZug4.Create);
   RaumGraph.Transformer := Transformer;
   RaumGraph.FixPoint := ComboFixPoint;
   RaumGraph.Zoom := FZoom;
