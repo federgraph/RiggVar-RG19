@@ -12,7 +12,6 @@ uses
   RggCalc,
   RggTypes,
   RggDisplay,
-  RggZug3D,
   RggZug,
   RggBootGraph;
 

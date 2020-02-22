@@ -550,7 +550,12 @@ end;
 
 function TSchnittGG.GetBemerkung: string;
 begin
-  result := 'BemerkungGG';
+  case Bem of
+    g1Vertical: result := 'g1Vertical';
+    g2Vertical: result := 'g2Vertical';
+    ggParallel: result := 'ggParallel';
+    ggOK: result := 'ggOK';
+  end;
 end;
 
 function TSchnittGG.GetSchnittPunkt: TRealPoint;
@@ -575,10 +580,11 @@ begin
   a2 := 0;
   sx := 0;
   sz := 0;
-  x1 := 0;
-  z1 := 0;
-  x3 := 0;
-  z3 := 0;
+
+  x1 := A[x];
+  z1 := A[z];
+  x3 := C[x];
+  z3 := C[z];
 
   Quotient := B[x] - A[x];
   if abs(Quotient) > 0.001 then
@@ -605,10 +611,6 @@ begin
 
     ggOK:
       begin
-        x1 := A[x];
-        z1 := A[z];
-        x3 := C[x];
-        z3 := C[z];
         sx := (-a1 * x1 + a2 * x3 - z3 + z1) / (-a1 + a2);
         sz := (-a2 * a1 * x1 + a2 * z1 + a2 * x3 * a1 - z3 * a1) / (-a1 + a2);
       end;
@@ -629,7 +631,7 @@ begin
   SP[x] := sx;
   SP[y] := 0;
   SP[z] := sz;
-  sv := Bem = ggOK;
+  sv := Bem <> ggParallel;
 end;
 
 function TSchnittGG.Vorhanden: Boolean;

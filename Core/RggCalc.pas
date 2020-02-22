@@ -129,10 +129,11 @@ begin
   a2 := 0;
   sx := 0;
   sz := 0;
-  x1 := 0;
-  z1 := 0;
-  x3 := 0;
-  z3 := 0;
+
+  x1 := P1[x];
+  z1 := P1[z];
+  x3 := P3[x];
+  z3 := P3[z];
 
   Quotient := P2[x] - P1[x];
   if abs(Quotient) > 0.001 then
@@ -159,10 +160,6 @@ begin
 
     ggOK:
       begin
-        x1 := P1[x];
-        z1 := P1[z];
-        x3 := P3[x];
-        z3 := P3[z];
         sx := (-a1 * x1 + a2 * x3 - z3 + z1) / (-a1 + a2);
         sz := (-a2 * a1 * x1 + a2 * z1 + a2 * x3 * a1 - z3 * a1) / (-a1 + a2);
       end;
