@@ -117,6 +117,7 @@ type
     procedure PolyLine(P1, P2: TRealPoint; A: TRggPolyLine; Color: TColor);
     procedure Draw(Canvas: TCanvas);
     function CompareItems(i1, i2: Integer): Integer;
+    function CheckLinePairs: Boolean;
   end;
 
 implementation
@@ -178,6 +179,7 @@ begin
     Exit;
   end;
 
+  LP.SP := Null;
   LP.L1.A.P := Left.P1;
   LP.L1.B.P := Left.P2;
   LP.L2.A.P := Right.P1;
@@ -227,6 +229,7 @@ begin
     end;
   end
 
+  { As a side effect, this callto IsParallel will set SP }
   else if LP.IsParallel then
   begin
     Left.Bemerkung := ccParallel;
@@ -282,6 +285,24 @@ procedure TRggDisplayList.Clear;
 begin
   FIndex := -1;
   FNeedSort := True;
+end;
+
+function TRggDisplayList.CheckLinePairs: Boolean;
+var
+  i: Integer;
+  i1, i2: Integer;
+  r: Integer;
+begin
+  result := False;
+  for i := 1 to FList.Count-1 do
+  begin
+    i1 := i-1;
+    i2 := i;
+    r := CompareItems(i1, i2);
+    if r = -1 then
+      break;
+    result := True;
+  end;
 end;
 
 function TRggDisplayList.CompareItems(i1, i2: Integer): Integer;
@@ -514,14 +535,7 @@ begin
     Exit;
   end;
 
-  if A.P[y] > B.P[y] then
-  begin
-    result := A.P[y] - g * vAB[y];
-  end
-  else
-  begin
-    result := A.P[y] + g * vAB[y];
-  end;
+  result := A.P[y] + g * vAB[y];
 end;
 
 { TRggLinePair }

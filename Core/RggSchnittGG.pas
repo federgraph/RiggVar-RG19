@@ -223,7 +223,11 @@ begin
   FA1 := Value;
   while FA1 > 360 do
   begin
-    FA1 := Value - 360;
+    FA1 := FA1 - 360;
+  end;
+  while FA1 < 0 do
+  begin
+    FA1 := FA1 + 360;
   end;
 
   w := FA1 * 2 * PI / 360;
@@ -243,7 +247,11 @@ begin
   FA2 := Value;
   while FA2 > 360 do
   begin
-    FA2 := Value - 360;
+    FA2 := FA2 - 360;
+  end;
+  while FA2 < 0 do
+  begin
+    FA2 := FA2 + 360;
   end;
 
   w := FA2 * 2 * PI / 360;

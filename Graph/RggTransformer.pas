@@ -119,10 +119,9 @@ var
   mr: TMatrix3D;
 begin
   if Assigned(OnGetFixPunkt) then
-  begin
     FFixPunkt := OnGetFixPunkt;
-    FTransformedFixPunkt := Rotator.Rotiere(FFixPunkt);
-  end;
+
+  FTransformedFixPunkt := Rotator.Rotiere(FFixPunkt);
 
   pt := TPoint3D.Create(
     -FTransformedFixPunkt[x],

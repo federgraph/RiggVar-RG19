@@ -153,6 +153,20 @@ begin
   AchseYT := Transformer.TransformPoint(AchseY);
   AchseZT := Transformer.TransformPoint(AchseZ);
 
+  A0 := RPT[ooA0];
+  B0 := RPT[ooB0];
+  C0 := RPT[ooC0];
+  D0 := RPT[ooD0];
+  E0 := RPT[ooE0];
+  F0 := RPT[ooF0];
+
+  A := RPT[ooA];
+  B := RPT[ooB];
+  C := RPT[ooC];
+  D := RPT[ooD];
+  E := RPT[ooE];
+  F := RPT[ooF];
+
   { Es wurde nicht nur rotiert,
     sondern bereits auch verschoben und skaliert }
 
