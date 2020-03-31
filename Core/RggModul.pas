@@ -1987,13 +1987,13 @@ begin
     Rigg.ProofRequired := False;
 
     { Definitionsbereich bestimmen und Berechnungsschleife starten }
-    Anfang := Rigg.GSB.Find(SBname).Min;
+    Anfang := Rigg.GSB.Find(SBName).Min;
     Ende := Rigg.GSB.Find(SBName).Max;
     for i := 0 to CPMax do
     begin
       Antrieb := Anfang + (Ende - Anfang) * i / CPMax;
       { Antrieb ansteuern }
-      case SBname of
+      case SBName of
         fpController: Rigg.RealGlied[fpController] := Antrieb;
         fpWinkel: Rigg.RealGlied[fpWinkel] := Antrieb / 10 * pi / 180;
         fpVorstag: Rigg.RealGlied[fpVorstag] := Antrieb;
@@ -2149,7 +2149,7 @@ begin
       // MessageBeep(MB_ICONASTERISK); { debugging }
     end;
     f := af[i];
-    case SBname of
+    case SBName of
       fpController: ChartPunktX := sbPuffer.Controller;
       fpWinkel: ChartPunktX := sbPuffer.Winkel / 10;
       fpVorstag: ChartPunktX := sbPuffer.Vorstag;
@@ -2246,9 +2246,9 @@ begin
     begin
       tempX := PlotExtX * (i / CPMax);
       tempY := PlotExtY * (f[i] - Ymin) / (YMax - Ymin);
-      P.x := Round(Limit(tempX));
-      P.y := Round(Limit(tempY));
-      c.LineTo(P.x, P.y);
+      P.X := Round(Limit(tempX));
+      P.Y := Round(Limit(tempY));
+      c.LineTo(P.X, P.Y);
     end;
 
     { Aktueller Punkt bzw. X-Position }
@@ -2262,27 +2262,27 @@ begin
 
     tempX := PlotExtX * (ChartPunktX - Xmin) / (XMax - Xmin);
     tempY := PlotExtY * (ChartPunktY - Ymin) / (YMax - Ymin);
-    P.x := Round(Limit(tempX));
-    P.y := Round(Limit(tempY));
-    if (P.y <> 0) and KurveValid then
+    P.X := Round(Limit(tempX));
+    P.Y := Round(Limit(tempY));
+    if (P.Y <> 0) and KurveValid then
     begin
       { aktueller Punkt }
       c.Brush.Color := PunktColor;
       c.Brush.Style := bsSolid;
-      c.Ellipse(P.x - RadiusX, P.y - RadiusY, P.x + RadiusX, P.y + RadiusY);
+      c.Ellipse(P.X - RadiusX, P.Y - RadiusY, P.X + RadiusX, P.Y + RadiusY);
     end
     else if ShowTriangle then
     begin
       { Positionsdreieck X }
       c.Pen.Color := clBlack;
-      P.y := 0;
+      P.Y := 0;
       RadiusX := RadiusX;
       RadiusY := RadiusY * 2;
       c.Polyline(
-        [Point(P.x, P.y),
-         Point(P.x - RadiusX, P.y - RadiusY),
-         Point(P.x + RadiusX, P.y - RadiusY),
-         Point(P.x, P.y)]);
+        [Point(P.X, P.Y),
+         Point(P.X - RadiusX, P.Y - RadiusY),
+         Point(P.X + RadiusX, P.Y - RadiusY),
+         Point(P.X, P.Y)]);
     end;
 
     SetMapMode(h, MM_TEXT);
@@ -2343,7 +2343,7 @@ begin
   if not FChartValid then
     Exit;
   { Koordinaten des Punktes }
-  case SBname of
+  case SBName of
     fpController: ChartPunktX := sbPuffer.Controller;
     fpWinkel: ChartPunktX := sbPuffer.Winkel / 10;
     fpVorstag: ChartPunktX := sbPuffer.Vorstag;
@@ -2489,11 +2489,11 @@ procedure TRiggModul.KurveBtnClick;
 var
   cr: TRggSB;
 begin
-  BottomTitel := GetXText(SBname);
-  cr := Rigg.GSB.Find(SBname);
+  BottomTitel := GetXText(SBName);
+  cr := Rigg.GSB.Find(SBName);
   Xmin := cr.Min;
   Xmax := cr.Max;
-  if SBname = fpWinkel then
+  if SBName = fpWinkel then
   begin
     Xmin := Xmin / 10;
     Xmax := Xmax / 10;

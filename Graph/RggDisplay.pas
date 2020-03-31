@@ -58,6 +58,7 @@ type
     CounterParallel: Integer;
     CounterNoVisibleCrossing: Integer;
     CounterSPY: Integer;
+    CounterZero: Integer;
     NullpunktOffset: TPoint;
     class function CounterSum: Integer;
     class procedure ResetCounter;
@@ -188,6 +189,7 @@ begin
   CounterParallel := 0;
   CounterNoVisibleCrossing := 0;
   CounterSPY := 0;
+  CounterZero := 0;
 end;
 
 class function TDisplayItem.Compare(const Left, Right: TDisplayItem): Integer;
@@ -226,6 +228,7 @@ begin
     Inc(CounterSame);
     Left.Bemerkung := ccTotallySame;
     r := 0;
+    Dec(CounterZero);
   end
 
   else if Left.ItemType = diEllipse then
@@ -277,12 +280,12 @@ begin
     r := 0;
   end
 
-  else if LP.DoesNotHaveVisibleCrossing then
-  begin
-    Inc(CounterNoVisibleCrossing);
-    Left.Bemerkung := ccNoVisibleCrossing;
-    r := 0;
-  end
+//  else if LP.DoesNotHaveVisibleCrossing then
+//  begin
+//    Inc(CounterNoVisibleCrossing);
+//    Left.Bemerkung := ccNoVisibleCrossing;
+//    r := 0;
+//  end
 
   else
   begin
@@ -295,6 +298,11 @@ begin
       else
         Left.Bemerkung := ccNone;
     end;
+  end;
+
+  if r = 0 then
+  begin
+    Inc(CounterZero);
   end;
 
   result := r;
@@ -467,6 +475,7 @@ begin
   ML.Add(Format('C SP Y NVC = %d', [TDisplayItem.CounterNoVisibleCrossing]));
   ML.Add(Format('C SP Y = %d', [TDisplayItem.CounterSPY]));
   ML.Add(Format('C Sum = %d', [TDisplayItem.CounterSum]));
+  ML.Add(Format('C Zero = %d', [TDisplayItem.CounterZero]));
 end;
 
 procedure TRggDisplayList.DoLinePairReport(ML: TStrings);

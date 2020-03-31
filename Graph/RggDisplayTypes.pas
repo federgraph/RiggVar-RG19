@@ -1,4 +1,4 @@
-unit RggDisplayTypes;
+﻿unit RggDisplayTypes;
 
 interface
 
@@ -328,19 +328,19 @@ end;
 function TRggLine.IsTotallyAbove(Other: TRggLine): Boolean;
 begin
   result :=
-    (A.P[y] > Other.A.P[y]) and
-    (A.P[y] > Other.B.P[y]) and
-    (B.P[y] > Other.A.P[y]) and
-    (B.P[y] > Other.B.P[y]);
+    (A.P[y] < Other.A.P[y]) and
+    (A.P[y] < Other.B.P[y]) and
+    (B.P[y] < Other.A.P[y]) and
+    (B.P[y] < Other.B.P[y]);
 end;
 
 function TRggLine.IsTotallyBelow(Other: TRggLine): Boolean;
 begin
   result :=
-    (A.P[y] < Other.A.P[y]) and
-    (A.P[y] < Other.B.P[y]) and
-    (B.P[y] < Other.A.P[y]) and
-    (B.P[y] < Other.B.P[y]);
+    (A.P[y] > Other.A.P[y]) and
+    (A.P[y] > Other.B.P[y]) and
+    (B.P[y] > Other.A.P[y]) and
+    (B.P[y] > Other.B.P[y]);
 end;
 
 function TRggLine.HasVisibleCrossing(SP: TRealPoint): Boolean;
