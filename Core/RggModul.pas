@@ -33,6 +33,7 @@ uses
   RggPrinter,
   RggPolarKar,
   RggTransformer,
+  RiggVar.FB.ActionConst,
   RiggVar.RG.Def,
   RiggVar.VM.FormMain;
 

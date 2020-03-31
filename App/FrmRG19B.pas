@@ -26,6 +26,7 @@ uses
   RggTypes,
   RggReport,
   RggRota,
+  RiggVar.FB.ActionConst,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
   Vcl.Graphics,

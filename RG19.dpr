@@ -81,7 +81,10 @@ uses
   RggZug2D in 'Graph\RggZug2D.pas',
   RggTransformer in 'Graph\RggTransformer.pas',
   RggZug3D in 'Graph\RggZug3D.pas',
-  RggZug in 'Graph\RggZug.pas';
+  RggZug in 'Graph\RggZug.pas',
+  RggDisplayOrder in 'Graph\RggDisplayOrder.pas',
+  RggDisplayTypes in 'Graph\RggDisplayTypes.pas',
+  RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas';
 
 {$R *.res}
 

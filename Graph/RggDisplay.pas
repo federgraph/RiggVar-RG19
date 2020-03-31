@@ -10,65 +10,19 @@ uses
   System.Math.Vectors,
   System.Generics.Collections,
   System.Generics.Defaults,
+  System.UITypes,
+  System.UIConsts,
   Vcl.Graphics,
   RggTypes,
-  RggCalc;
+  RggCalc,
+  RggDisplayTypes,
+  RggDisplayOrder;
 
 type
-  TLineSegmentCompareCase = (
-    ccNone,
-    ccNil,
-    ccEllipse,
-    ccParallel,
-    ccNoVisibleCrossing,
-    ccTotallyAbove,
-    ccTotallyBelow,
-    ccTotallySame,
-    ccCommonNone,
-    ccCommonAbove,
-    ccCommonBelow,
-    ccCommonSame,
-    ccAbove,
-    ccBelow,
-    ccSame,
-    ccUnknown
-  );
-
-  TDisplayItemType = (
-    diLine,
-    diPolyLine,
-    diEllipse
-  );
-
-  TRggPoint = record
-    P: TRealPoint;
-    function IsEqual(B: TRggPoint): Boolean;
-    function Compare(Q: TRggPoint): Integer;
-  end;
-
-  TRggLine = record
-    A: TRggPoint;
-    B: TRggPoint;
-    function IsTotallyAbove(Other: TRggLine): Boolean;
-    function IsTotallyBelow(Other: TRggLine): Boolean;
-    function IsSame(Other: TRggLine): Boolean;
-    function HasVisibleCrossing(SP: TRealPoint): Boolean;
-    function ComputeSPY(SP: TRealPoint): double;
-  end;
-
-  TRggLinePair = record
-    L1: TRggLine;
-    L2: TRggLine;
-    SP: TRealPoint;
-    function HasCommonPoint: Boolean;
-    function CompareCommon: Integer;
-    function IsParallel: Boolean;
-    function DoesNotHaveVisibleCrossing: Boolean;
-    function CompareSPY: Integer;
-  end;
-
   TDisplayItem = class
   public
+    Name: string;
+    Edge: TDisplayEdge;
     ItemType: TDisplayItemType;
     P1: TRealPoint;
     P2: TRealPoint;
@@ -76,7 +30,9 @@ type
     StrokeWidth: Integer;
     StrokeColor: TColor;
 
-    LineStart, LineEnd: TPoint;
+    LineStart: TPoint;
+    LineEnd: TPoint;
+
     CenterPoint: TPoint;
     Radius: Integer;
 
@@ -84,8 +40,27 @@ type
 
     Bemerkung: TLineSegmentCompareCase;
 
+    IsRod: Boolean;
+
+    procedure DrawLegend(g: TCanvas; j: Integer);
     procedure Draw(g: TCanvas);
     procedure Assign(Value: TDisplayItem);
+  public
+    class var
+    CounterLeftNil: Integer;
+    CounterRightNil: Integer;
+    CounterHardCodedAbove: Integer;
+    CounterHardCodedBelow: Integer;
+    CounterSame: Integer;
+    CounterTotallyAbove: Integer;
+    CounterTotallyBelow: Integer;
+    CounterCommon: Integer;
+    CounterParallel: Integer;
+    CounterNoVisibleCrossing: Integer;
+    CounterSPY: Integer;
+    NullpunktOffset: TPoint;
+    class function CounterSum: Integer;
+    class procedure ResetCounter;
     class function Compare(const Left, Right: TDisplayItem): Integer;
   end;
 
@@ -107,23 +82,36 @@ type
   protected
     DisplayItemComparer: IComparer<TDisplayItem>;
   public
+    IL: TStringList;
     DI: TDisplayItem;
+    DF: TRggFrame; // injected
     WantLineColors: Boolean;
+    CounterDraw: Integer;
+    CounterCompareItems: Integer;
+    FReportList: TStringList;
+    WantLegend: Boolean;
+    Verbose: Boolean;
+    UseQuickSort: Boolean;
+    ErrorCode: Integer;
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
-    procedure Ellipse(P1, P2: TRealPoint; CenterPoint: TPoint; Radius: Integer = 10);
-    procedure Line(P1, P2: TRealPoint; A, B: TPoint; Color: TColor);
-    procedure PolyLine(P1, P2: TRealPoint; A: TRggPolyLine; Color: TColor);
+    procedure Ellipse(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; CenterPoint: TPoint; Radius: Integer = 10);
+    procedure Line(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; A, B: TPoint; Color: TColor);
+    procedure PolyLine(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; A: TRggPolyLine; Color: TColor);
     procedure Draw(Canvas: TCanvas);
+    procedure Draw1(Canvas: TCanvas);
+    procedure Draw2(Canvas: TCanvas);
     function CompareItems(i1, i2: Integer): Integer;
     function CheckLinePairs: Boolean;
+    procedure DoCounterReport(ML: TStrings);
+    procedure DoLinePairReport(ML: TStrings);
+    procedure GetItemNameList(ML: TStrings);
+    function FindItem(const AName: string): TDisplayItem;
+    function FindItemByEdge(const Value: TDisplayEdge): TDisplayItem;
   end;
 
 implementation
-
-const
-  Eps = 0.0001;
 
 { TDisplayItem }
 
@@ -133,10 +121,37 @@ begin
   StrokeColor := Value.StrokeColor;
 end;
 
+procedure TDisplayItem.DrawLegend(g: TCanvas; j: Integer);
+var
+  x, y, w, h: Integer;
+  R: TRect;
+begin
+  w := 100;
+  h := 30;
+  x := 4;
+  y := 4 + j * h;
+  if IsRod then
+    x := x + 20;
+
+  R := Rect(x, y, x + w, (j + 1) * h);
+  R.Offset(-NullpunktOffset.X, -NullpunktOffset.Y);
+
+  g.Pen.Width := 3;
+  g.Pen.Color := TColors.Beige;
+  g.Brush.Color := StrokeColor;
+  g.Rectangle(R);
+
+  g.Pen.Color := StrokeColor;
+  g.Font.Name := 'Consolas';
+  g.Font.Size := 12;
+  g.TextOut(x - NullpunktOffset.X + 10, y - NullpunktOffset.Y + 3, Name);
+end;
+
 procedure TDisplayItem.Draw(g: TCanvas);
 begin
   g.Pen.Width := StrokeWidth;
   g.Pen.Color := StrokeColor;
+  g.Brush.Style := bsClear;
 
   case ItemType of
     diLine:
@@ -160,6 +175,21 @@ begin
   end;
 end;
 
+class procedure TDisplayItem.ResetCounter;
+begin
+  CounterLeftNil := 0;
+  CounterRightNil := 0;
+  CounterHardcodedAbove := 0;
+  CounterHardcodedBelow := 0;
+  CounterSame := 0;
+  CounterTotallyAbove := 0;
+  CounterTotallyBelow := 0;
+  CounterCommon := 0;
+  CounterParallel := 0;
+  CounterNoVisibleCrossing := 0;
+  CounterSPY := 0;
+end;
+
 class function TDisplayItem.Compare(const Left, Right: TDisplayItem): Integer;
 var
   LP: TRggLinePair;
@@ -168,13 +198,15 @@ begin
   if Left = nil then
   begin
     Left.Bemerkung := ccNil;
+    Inc(CounterLeftNil);
     result := 0;
     Exit;
   end;
 
   if Right = nil then
   begin
-    Right.Bemerkung := ccNil;
+    Left.Bemerkung := ccNil;
+    Inc(CounterRightNil);
     result := 0;
     Exit;
   end;
@@ -182,43 +214,51 @@ begin
   LP.SP := Null;
   LP.L1.A.P := Left.P1;
   LP.L1.B.P := Left.P2;
+  LP.L1.Name := Left.Name;
   LP.L2.A.P := Right.P1;
   LP.L2.B.P := Right.P2;
+  LP.L2.Name := Right.Name;
 
   if False then
 
+  else if LP.L1.IsSame(LP.L2) then
+  begin
+    Inc(CounterSame);
+    Left.Bemerkung := ccTotallySame;
+    r := 0;
+  end
+
   else if Left.ItemType = diEllipse then
   begin
-    Left.Bemerkung := ccEllipse;
+    Inc(CounterHardCodedBelow);
+    Left.Bemerkung := ccHardcodedBelow;
     r := -1;
   end
 
   else if Right.ItemType = diEllipse then
   begin
-    Right.Bemerkung := ccEllipse;
+    Inc(CounterHardCodedAbove);
+    Left.Bemerkung := ccHardcodedAbove;
     r := 1;
-  end
-
-  else if LP.L1.IsSame(LP.L2) then
-  begin
-    Left.Bemerkung := ccTotallySame;
-    r := 0;
   end
 
   else if LP.L1.IsTotallyAbove(LP.L2) then
   begin
+    Inc(CounterTotallyAbove);
     Left.Bemerkung := ccTotallyAbove;
-    r := -1;
+    r := 1;
   end
 
   else if LP.L1.IsTotallyBelow(LP.L2) then
   begin
+    Inc(CounterTotallyBelow);
     Left.Bemerkung := ccTotallyBelow;
-    r := 1;
+    r := -1;
   end
 
   else if LP.HasCommonPoint then
   begin
+    Inc(CounterCommon);
     r := LP.CompareCommon;
     case r of
       0: Left.Bemerkung := ccCommonSame;
@@ -229,21 +269,24 @@ begin
     end;
   end
 
-  { As a side effect, this callto IsParallel will set SP }
+  { As a side effect, this call to IsParallel will set SP }
   else if LP.IsParallel then
   begin
+    Inc(CounterParallel);
     Left.Bemerkung := ccParallel;
     r := 0;
   end
 
   else if LP.DoesNotHaveVisibleCrossing then
   begin
+    Inc(CounterNoVisibleCrossing);
     Left.Bemerkung := ccNoVisibleCrossing;
     r := 0;
   end
 
   else
   begin
+    Inc(CounterSPY);
     r := LP.CompareSPY;
     case r of
       0: Left.Bemerkung := ccSame;
@@ -257,6 +300,22 @@ begin
   result := r;
 end;
 
+class function TDisplayItem.CounterSum: Integer;
+begin
+  result :=
+    CounterLeftNil +
+    CounterRightNil +
+    CounterHardCodedAbove +
+    CounterHardCodedBelow +
+    CounterSame +
+    CounterTotallyAbove +
+    CounterTotallyBelow +
+    CounterCommon +
+    CounterParallel +
+    CounterNoVisibleCrossing +
+    CounterSPY;
+end;
+
 { TRggDisplayList }
 
 constructor TRggDisplayList.Create;
@@ -264,9 +323,13 @@ begin
   FCapacity := 300;
   FList := TDisplayList.Create;
   DI := TDisplayItem.Create;
+  IL := TStringList.Create;
   Clear;
 
   DisplayItemComparer := TDisplayItemComparer.Create;
+  FReportList := TStringList.Create;
+
+  UseQuickSort := False;
 end;
 
 destructor TRggDisplayList.Destroy;
@@ -278,6 +341,8 @@ begin
   FList.Clear;
   FList.Free;
   DI.Free;
+  IL.Free;
+  FReportList.Free;
   inherited;
 end;
 
@@ -285,6 +350,7 @@ procedure TRggDisplayList.Clear;
 begin
   FIndex := -1;
   FNeedSort := True;
+  IL.Clear;
 end;
 
 function TRggDisplayList.CheckLinePairs: Boolean;
@@ -299,7 +365,7 @@ begin
     i1 := i-1;
     i2 := i;
     r := CompareItems(i1, i2);
-    if r = -1 then
+    if r = 1 then
       break;
     result := True;
   end;
@@ -308,10 +374,130 @@ end;
 function TRggDisplayList.CompareItems(i1, i2: Integer): Integer;
 var
   cr1, cr2: TDisplayItem;
+  LP: TRggLinePair;
+
+  procedure Add(verb: string);
+  begin
+    FReportList.Add(Format('  %s "%s" %s.', [cr1.Name, verb, cr2.Name]));
+  end;
+
 begin
+  result := 0;
+  Inc(CounterCompareItems);
+
+  TDisplayItem.ResetCounter;
+  if (i1 < 0) or (i2 < 0) then
+  begin
+    { Can happen when Hull Visiblility is toggled and UI not updated }
+    Exit;
+  end;
+
+  if (i1 > FList.Count-1) or (i2 > FList.Count-1) then
+  begin
+    Exit;
+  end;
+
   cr1 := FList.Items[i1];
   cr2 := FList.Items[i2];
   result := TDisplayItem.Compare(cr1, cr2);
+
+  FReportList.Clear;
+  if Verbose then
+  begin
+    FReportList.Add('Bemerkung:');
+    FReportList.Add('');
+  end;
+  case cr1.Bemerkung of
+    ccNone: Add('has none');
+    ccNil: Add('is nil');
+    ccHardcodedAbove: Add('hardcoded above');
+    ccHardcodedBelow: Add('hardcoded below');
+    ccParallel: Add('is parallel to');
+    ccNoVisibleCrossing: Add('no visible crossing');
+    ccTotallyAbove: Add('totally above');
+    ccTotallyBelow: Add('totally below');
+    ccTotallySame: Add('totally same');
+    ccCommonNone: Add('common none');
+    ccCommonAbove: Add('common above');
+    ccCommonBelow: Add('common below');
+    ccCommonSame: Add('common same');
+    ccAbove: Add('sp above');
+    ccBelow: Add('sp below');
+    ccSame: Add('sp same');
+    ccUnknown: Add('unknown');
+  end;
+
+  LP.L1.A.P := cr1.P1;
+  LP.L1.B.P := cr1.P2;
+  LP.L1.Name := cr1.Name;
+  LP.L2.A.P := cr2.P1;
+  LP.L2.B.P := cr2.P2;
+  LP.L2.Name := cr2.Name;
+
+  FReportList.Add('');
+
+  if Verbose then
+  begin
+    FReportList.Add('LinePair.ReportData:');
+  end;
+  LP.ReportData(FReportList);
+end;
+
+procedure TRggDisplayList.DoCounterReport(ML: TStrings);
+begin
+  if Verbose then
+  begin
+    ML.Add('--- DL.DoCounterReport ---');
+    ML.Add(Format('DrawCoutner = %d', [CounterDraw]));
+    ML.Add(Format('FList.Count = %d', [FList.Count]));
+  end;
+
+  if TDisplayItem.CounterLeftNil > 0 then
+    ML.Add(Format('C LeftNil = %d', [TDisplayItem.CounterLeftNil]));
+  if TDisplayItem.CounterRightNil > 0 then
+    ML.Add(Format('C RightNil = %d', [TDisplayItem.CounterRightNil]));
+
+  ML.Add(Format('C EllipseAbove = %d', [TDisplayItem.CounterHardCodedAbove]));
+  ML.Add(Format('C EllipseBelow = %d', [TDisplayItem.CounterHardCodedBelow]));
+  ML.Add(Format('C Same = %d', [TDisplayItem.CounterSame]));
+  ML.Add(Format('C Totally Above = %d', [TDisplayItem.CounterTotallyAbove]));
+  ML.Add(Format('C Totally Below = %d', [TDisplayItem.CounterTotallyBelow]));
+  ML.Add(Format('C Common = %d', [TDisplayItem.CounterCommon]));
+  ML.Add(Format('C Parallel = %d', [TDisplayItem.CounterParallel]));
+  ML.Add(Format('C SP Y NVC = %d', [TDisplayItem.CounterNoVisibleCrossing]));
+  ML.Add(Format('C SP Y = %d', [TDisplayItem.CounterSPY]));
+  ML.Add(Format('C Sum = %d', [TDisplayItem.CounterSum]));
+end;
+
+procedure TRggDisplayList.DoLinePairReport(ML: TStrings);
+var
+  i: Integer;
+begin
+  if Verbose then
+  begin
+    ML.Add('--- DL.DoLinePairReport ---');
+    ML.Add(Format('DrawCoutner = %d', [CounterDraw]));
+    ML.Add(Format('CompareItemsCounter = %d', [CounterCompareItems]));
+    ML.Add('');
+    if TDisplayItem.CounterNoVisibleCrossing = 1 then
+      ML.Add('  No visible crossing')
+    else if TDisplayItem.CounterTotallyAbove = 1 then
+      ML.Add('  Totally Above')
+    else if TDisplayItem.CounterTotallyBelow = 1 then
+      ML.Add('  Totally Below')
+    else if TDisplayItem.CounterSPY = 1 then
+      ML.Add('  SPY')
+    else if TDisplayItem.CounterSame = 1 then
+      ML.Add('  Same')
+    else if TDisplayItem.CounterParallel = 1 then
+      ML.Add('  Parallel');
+  end;
+
+  ML.Add('');
+  for i := 0 to FReportList.Count-1 do
+  begin
+    ML.Add(FReportList[i]);
+  end;
 end;
 
 procedure TRggDisplayList.CheckCount;
@@ -346,11 +532,14 @@ begin
   result.Assign(DI);
 end;
 
-procedure TRggDisplayList.Ellipse(P1, P2: TRealPoint; CenterPoint: TPoint; Radius: Integer = 10);
+procedure TRggDisplayList.Ellipse(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; CenterPoint: TPoint; Radius: Integer = 10);
 var
   cr: TDisplayItem;
 begin
+  IL.Add(Name);
   cr := Add;
+  cr.Name := Name;
+  cr.Edge := EdgeName;
   cr.ItemType := diEllipse;
   cr.P1 := P1;
   cr.P2 := P2;
@@ -360,42 +549,159 @@ begin
   cr.Radius := Radius;
 end;
 
-procedure TRggDisplayList.Line(P1, P2: TRealPoint; A, B: TPoint; Color: TColor);
+procedure TRggDisplayList.Line(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; A, B: TPoint; Color: TColor);
 var
   cr: TDisplayItem;
 begin
+  IL.Add(Name);
   if WantLineColors then
     DI.StrokeColor := Color;
   cr := Add;
+  cr.Name := Name;
+  cr.Edge := EdgeName;
   cr.ItemType := diLine;
   cr.P1 := P1;
   cr.P2 := P2;
   cr.LineStart := A;
   cr.LineEnd := B;
+
+  case EdgeName of
+    deA0A, deB0B, deC0C, deD0D, deE0E, deCF:
+      cr.IsRod := True;
+    else
+      cr.IsRod := False;
+  end;
 end;
 
-procedure TRggDisplayList.PolyLine(P1, P2: TRealPoint; A: TRggPolyLine; Color: TColor);
+procedure TRggDisplayList.PolyLine(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; A: TRggPolyLine; Color: TColor);
 var
   cr: TDisplayItem;
 begin
+  IL.Add(Name);
   if WantLineColors then
     DI.StrokeColor := Color;
   cr := Add;
+  cr.Name := Name;
+  cr.Edge := EdgeName;
   cr.ItemType := diPolyLine;
   cr.P1 := P1;
   cr.P2 := P2;
   cr.PolyArray := A;
+
+  cr.IsRod := False;
+  if EdgeName = deD0D then
+    cr.IsRod := True;
 end;
 
-procedure TRggDisplayList.Draw(Canvas: TCanvas);
+procedure TRggDisplayList.GetItemNameList(ML: TStrings);
 var
   cr: TDisplayItem;
 begin
+  for cr in FList do
+  begin
+    ML.Add(cr.Name);
+  end;
+end;
+
+function TRggDisplayList.FindItem(const AName: string): TDisplayItem;
+var
+  i: Integer;
+begin
+  result := nil;
+  for i := 0 to FList.Count-1 do
+  begin
+     if FList[i].Name = AName then
+     begin
+       result := FList[i];
+       break;
+     end;
+  end;
+end;
+
+function TRggDisplayList.FindItemByEdge(const Value: TDisplayEdge): TDisplayItem;
+var
+  i: Integer;
+begin
+  result := nil;
+  for i := 0 to FList.Count-1 do
+  begin
+    if FList[i].Edge = Value then
+    begin
+      result := FList[i];
+      break;
+    end;
+  end;
+end;
+
+procedure TRggDisplayList.Draw(Canvas: TCanvas);
+begin
+  if DF = nil then
+  begin
+    Draw1(Canvas)
+  end
+  else
+  begin
+    if UseQuickSort then
+      Draw1(Canvas)
+    else
+      Draw2(Canvas);
+  end;
+end;
+
+procedure TRggDisplayList.Draw2(Canvas: TCanvas);
+var
+  de: TDisplayEdge;
+  cr: TDisplayItem;
+  j: Integer;
+begin
+  Inc(CounterDraw);
   CheckCount;
 
   if FNeedSort then
   begin
+    TDisplayItem.ResetCounter;
+  end;
+
+  j := 0;
+  for de in DF.TempList do
+  begin
+    cr := FindItemByEdge(de);
+    if cr <> nil then
+    begin
+      if WantLegend then
+      begin
+        cr.DrawLegend(Canvas, j);
+        Inc(j);
+      end;
+      cr.Draw(Canvas);
+    end;
+  end;
+
+  FNeedSort := False;
+end;
+
+procedure TRggDisplayList.Draw1(Canvas: TCanvas);
+var
+  cr: TDisplayItem;
+  j: Integer;
+begin
+  Inc(CounterDraw);
+  CheckCount;
+
+  if FNeedSort then
+  begin
+    TDisplayItem.ResetCounter;
     FList.Sort(DisplayItemComparer);
+  end;
+
+  if WantLegend then
+  begin
+    j := 0;
+    for cr in FList do
+    begin
+      cr.DrawLegend(Canvas, j);
+      Inc(j);
+    end;
   end;
 
   for cr in FList do
@@ -411,183 +717,6 @@ end;
 function TDisplayItemComparer.Compare(const Left, Right: TDisplayItem): Integer;
 begin
   result := TDisplayItem.Compare(Left, Right);
-end;
-
-{ TRggPoint }
-
-function TRggPoint.Compare(Q: TRggPoint): Integer;
-begin
-  if P[y] > Q.P[y] then
-    result := -1
-  else if P[y] < Q.P[y] then
-    result := 1
-  else
-    result := 0;
-end;
-
-function TRggPoint.IsEqual(B: TRggPoint): Boolean;
-begin
-  result :=
-    (P[x] = B.P[x]) and
-    (P[y] = B.P[y]) and
-    (P[z] = B.P[z]);
-end;
-
-{ TRggLine }
-
-function TRggLine.IsSame(Other: TRggLine): Boolean;
-begin
-  result := False;
-  if A.IsEqual(Other.A) and B.IsEqual(Other.B) then
-    result := True
-  else if A.IsEqual(Other.B) and B.IsEqual(Other.A) then
-    result := True;
-end;
-
-function TRggLine.IsTotallyAbove(Other: TRggLine): Boolean;
-begin
-  result :=
-    (A.P[y] > Other.A.P[y]) and
-    (A.P[y] > Other.B.P[y]) and
-    (B.P[y] > Other.A.P[y]) and
-    (B.P[y] > Other.B.P[y]);
-end;
-
-function TRggLine.IsTotallyBelow(Other: TRggLine): Boolean;
-begin
-  result :=
-    (A.P[y] < Other.A.P[y]) and
-    (A.P[y] < Other.B.P[y]) and
-    (B.P[y] < Other.A.P[y]) and
-    (B.P[y] < Other.B.P[y]);
-end;
-
-function TRggLine.HasVisibleCrossing(SP: TRealPoint): Boolean;
-var
-  vSP: TRealPoint;
-  vAB: TRealPoint; // Rgg Vector 3D
-
-  vABxz: TVector;
-  vSPxz: TVector; // Delphi 2D Vectors
-  lengthABxz, lengthSPxz: double;
-  RatioSPtoAB, g: double;
-begin
-  result := False;
-
-  vSP := vsub(SP, A.P);
-  vAB := vsub(B.P, A.P);
-
-  vABxz := TVector.Create(vAB[x], vAB[z]);
-  lengthABxz := vABxz.Length;
-
-  vSPxz := TVector.Create(vSP[x], vSP[z]);
-  lengthSPxz := vSPxz.Length;
-
-  if lengthABxz < Eps then
-  begin
-    Exit;
-  end;
-
-  RatioSPtoAB := lengthSPxz / lengthABxz;
-
-  g := Abs(RatioSPtoAB);
-
-  result := (g > 0.1) and (g < 0.9);
-end;
-
-function TRggLine.ComputeSPY(SP: TRealPoint): double;
-var
-  vSP: TRealPoint;
-  vAB: TRealPoint; // Rgg Vector 3D
-
-  vABxz: TVector;
-  vSPxz: TVector; // Delphi 2D Vectors
-  lengthABxz, lengthSPxz: double;
-  RatioSPtoAB, g: double;
-begin
-  result := (A.P[y] + B.P[y]) / 2;
-
-  vSP := vsub(SP, A.P);
-  vAB := vsub(B.P, A.P);
-
-  vABxz := TVector.Create(vAB[x], vAB[z]);
-  lengthABxz := vABxz.Length;
-
-  vSPxz := TVector.Create(vSP[x], vSP[z]);
-  lengthSPxz := vSPxz.Length;
-
-  if lengthABxz < Eps then
-  begin
-    Exit;
-  end;
-
-  RatioSPtoAB := lengthSPxz / lengthABxz;
-
-  g := RatioSPtoAB;
-
-  if Sign(vAB[x]) <> Sign(vSP[x]) then
-    g := -RatioSPtoAB;
-
-  if Abs(g) > 10000 then
-  begin
-    { does not come in here }
-    result := A.P[y];
-    Exit;
-  end;
-
-  result := A.P[y] + g * vAB[y];
-end;
-
-{ TRggLinePair }
-
-function TRggLinePair.CompareCommon: Integer;
-begin
-  result := 0;
-  if L1.A.IsEqual(L2.A) then
-    result := L1.B.Compare(L2.B)
-  else if L1.A.IsEqual(L2.B) then
-    result := L1.B.Compare(L2.A)
-
-  else if L1.B.IsEqual(L2.A) then
-    result := -L1.A.Compare(L2.B)
-  else if L1.B.IsEqual(L2.B) then
-    result := -L1.A.Compare(L2.A);
-end;
-
-function TRggLinePair.HasCommonPoint: Boolean;
-begin
-  result :=
-    L1.A.IsEqual(L2.A) or
-    L1.A.IsEqual(L2.B) or
-    L1.B.IsEqual(L2.A) or
-    L1.B.IsEqual(L2.B);
-end;
-
-function TRggLinePair.IsParallel: Boolean;
-begin
-  result := not SchnittGG(L1.A.P, L1.B.P, L2.A.P, L2.B.P, SP);
-end;
-
-function TRggLinePair.DoesNotHaveVisibleCrossing: Boolean;
-begin
-  result := not L1.HasVisibleCrossing(SP);
-end;
-
-function TRggLinePair.CompareSPY: Integer;
-var
-  ya, yb, dy: double;
-begin
-  ya := L1.ComputeSPY(SP);
-  yb := L2.ComputeSPY(SP);
-
-  dy := ya - yb;
-
-  if dy > 0 then
-    result := 1
-  else if dy < 0 then
-    result := -1
-  else
-    result := 0;
 end;
 
 end.

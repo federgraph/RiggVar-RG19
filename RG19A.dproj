@@ -237,6 +237,9 @@
         <DCCReference Include="Graph\RggTransformer.pas"/>
         <DCCReference Include="Graph\RggZug3D.pas"/>
         <DCCReference Include="Graph\RggZug2D.pas"/>
+        <DCCReference Include="Graph\RggDisplayOrder.pas"/>
+        <DCCReference Include="Graph\RggDisplayTypes.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.ActionConst.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

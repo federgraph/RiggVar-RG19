@@ -95,6 +95,7 @@ type
 
   Linie = array [0 .. LineCount] of TPoint;
   TLineDataR100 = array [0 .. 100] of single;
+  TLineDataR50 = array [0 .. 50] of single;
   TChartLine = array [0 .. CLMax] of double;
   TChartLineData = array [0 .. CPMax] of double;
 

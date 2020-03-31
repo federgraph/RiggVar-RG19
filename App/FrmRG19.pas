@@ -26,6 +26,7 @@ uses
   RggTypes,
   RggReport,
   RggRota,
+  RiggVar.FB.ActionConst,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
   Vcl.Graphics,
@@ -47,7 +48,7 @@ type
     ParamCombo: TComboBox;
     FixpointCombo: TComboBox;
     TrimmMemo: TMemo;
-    Listbox: TListBox;
+    ReportListbox: TListBox;
     ReportMemo: TMemo;
     PaintBoxR: TPaintBox;
     OpenDialog: TOpenDialog;
@@ -321,7 +322,7 @@ type
 
     procedure LayoutComponents;
     procedure InitOutputForm;
-    procedure InitListBox;
+    procedure InitReportListBox;
     procedure InitToolbar;
     procedure InitOpenDialog;
     procedure InitSaveDialog;
@@ -1493,16 +1494,16 @@ begin
 //  SetupComboBox(ViewpointCombo);
   SetupComboBox(FixpointCombo);
 
-  SetupListBox(ListBox);
+  SetupListBox(ReportListbox);
   SetupMemo(TrimmMemo);
   SetupMemo(ReportMemo);
 
   TrimmMemo.ScrollBars := TScrollStyle.ssNone;
-  TrimmMemo.Width := ListBox.Width;
+  TrimmMemo.Width := ReportListbox.Width;
 
   ReportManager := TRggReportManager.Create(ReportMemo);
 
-  InitListBox;
+  InitReportListBox;
   InitTrimmCombo;
   InitParamCombo;
   InitViewpointCombo;
@@ -1511,7 +1512,7 @@ begin
   TrimmCombo.ItemIndex := 0;
   ParamCombo.ItemIndex := 0;
 
-  ListBox.ItemIndex := 0;
+  ReportListbox.ItemIndex := 0;
 
   Main.Trimm := 1;
   MT0BtnClick(nil);
@@ -1552,11 +1553,11 @@ begin
 //  ViewpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
   FixpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
 
-  Listbox.Left := TrimmMemo.Left;
-  Listbox.Top := FixpointCombo.Top + ComboHeight + Margin;
-  Listbox.Width := TrimmMemo.Width;
-  Listbox.Height := StatusBar.Top - Listbox.top - Margin;
-  Listbox.Anchors := Listbox.Anchors + [akBottom];
+  ReportListbox.Left := TrimmMemo.Left;
+  ReportListbox.Top := FixpointCombo.Top + ComboHeight + Margin;
+  ReportListbox.Width := TrimmMemo.Width;
+  ReportListbox.Height := StatusBar.Top - ReportListbox.Top - Margin;
+  ReportListbox.Anchors := ReportListbox.Anchors + [akBottom];
 
   if WantConsole then
   begin
@@ -1569,8 +1570,8 @@ begin
     ConsoleHeight := 0;
   end;
 
-  ReportMemo.Left := Listbox.Left + Listbox.Width + Margin;
-  ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + ConsoleHeight;
+  ReportMemo.Left := ReportListbox.Left + ReportListbox.Width + Margin;
+  ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + Margin + ConsoleHeight;
   ReportMemo.Height := StatusBar.Top - ReportMemo.Top - Margin;
   ReportMemo.Width := ConsoleWidth;
   ReportMemo.Anchors := ReportMemo.Anchors + [akBottom];
@@ -1584,7 +1585,7 @@ end;
 
 procedure TFormRG19.InitEventHandlers;
 begin
-  ListBox.OnClick := ListBoxClick;
+  ReportListbox.OnClick := ListBoxClick;
   Self.OnMouseWheel := FormMouseWheel;
 
   M1Btn.OnClick := M1BtnClick;
@@ -1706,17 +1707,17 @@ begin
   IsSandboxed := SandboxedBtn.Down;
 end;
 
-procedure TFormRG19.InitListBox;
+procedure TFormRG19.InitReportListBox;
 begin
-  Listbox.Clear;
-  ReportManager.InitLB(ListBox.Items);
+  ReportListbox.Clear;
+  ReportManager.InitLB(ReportListbox.Items);
 end;
 
 procedure TFormRG19.ListBoxClick(Sender: TObject);
 var
   ii: Integer;
 begin
-  ii := Listbox.ItemIndex;
+  ii := ReportListbox.ItemIndex;
   if ii > -1 then
   begin
     ReportManager.CurrentIndex := ii;

@@ -46,7 +46,7 @@ object FormRG19: TFormRG19
     ShowHint = True
     TabOrder = 1
   end
-  object Listbox: TListBox
+  object ReportListbox: TListBox
     Left = 8
     Top = 397
     Width = 169

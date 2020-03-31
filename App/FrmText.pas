@@ -31,6 +31,7 @@ uses
   Vcl.Dialogs,
   Vcl.ExtCtrls,
   Vcl.ComCtrls,
+  RiggVar.FB.ActionConst,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
   RggReport,

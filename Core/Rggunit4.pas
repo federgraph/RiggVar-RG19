@@ -16,7 +16,9 @@ type
   private
     function GetRealTrimm(Index: TTrimmIndex): double;
   public
+{$ifdef MSWindows}
     procedure WriteXml(ML: TStrings; AllTags: Boolean = False);
+{$endif}
     procedure SaveToFederData(fd: TRggData);
     procedure LoadFromFederData(fd: TRggData);
     procedure WriteToDocFile(FileName: String);
@@ -60,6 +62,7 @@ implementation
   end;
 }
 
+{$ifdef MSWindows}
 procedure TRigg.WriteXml(ML: TStrings; AllTags: Boolean);
 var
   Document: TRggDocument;
@@ -74,6 +77,7 @@ begin
     Document.Free;
   end;
 end;
+{$endif}
 
 procedure TRigg.WriteToDocFile(FileName: String);
 var

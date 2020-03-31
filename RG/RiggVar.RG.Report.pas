@@ -42,6 +42,7 @@ type
     procedure InitRD;
     procedure SetCurrentIndex(const Value: Integer);
     procedure SetXmlAllTags(const Value: Boolean);
+    procedure SetCurrentReport(const Value: TRggReport);
   public
     constructor Create(Memo: TMemo);
     destructor Destroy; override;
@@ -51,7 +52,7 @@ type
     function GetReportCaption(r: TRggReport): string;
     function GetCurrentCaption: string;
     property CurrentIndex: Integer read FCurrentIndex write SetCurrentIndex;
-    property CurrentReport: TRggReport read FCurrentReport;
+    property CurrentReport: TRggReport read FCurrentReport write SetCurrentReport;
     property XmlAllTags: Boolean read FXmlAllTags write SetXmlAllTags;
   end;
 
@@ -118,6 +119,11 @@ begin
     FCurrentIndex := Value;
     FCurrentReport := r;
   end;
+end;
+
+procedure TRggReportManager.SetCurrentReport(const Value: TRggReport);
+begin
+  FCurrentReport := Value;
 end;
 
 procedure TRggReportManager.SetXmlAllTags(const Value: Boolean);

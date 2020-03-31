@@ -22,6 +22,7 @@ uses
   System.SysUtils,
   System.Classes,
   RiggVar.App.Main0,
+  RiggVar.FB.ActionConst,
   RiggVar.RG.Def,
   RiggVar.RG.Data,
   RiggVar.RG.Main;

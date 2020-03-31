@@ -12,6 +12,7 @@ uses
   RggTypes,
   RggCalc,
   RggMatrix,
+  RggDisplayTypes,
   RggDisplay,
   RggGraph,
   RggBootGraph,
@@ -241,7 +242,7 @@ var
   StartPoint, EndPoint: TPoint;
   rp1, rp2: TRealPoint;
   cla: TColor;
-//  s: string;
+  s: string;
 begin
   if nvert <= 0 then
     Exit;
@@ -292,8 +293,8 @@ begin
 
     DL.DI.StrokeWidth := 3;
     DL.DI.StrokeColor := cla;
-//    s := Format('con-%d',  [i]);
-    DL.Line(rp1, rp2, StartPoint, EndPoint, clRed);
+    s := Format('con-%d',  [i]);
+    DL.Line(s, deHullEdge, rp1, rp2, StartPoint, EndPoint, clRed);
   end;
 end;
 

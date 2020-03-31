@@ -9,8 +9,8 @@ uses
   RggFachwerk;
 
 const
-  LinkerRand: String[10] = ' ';
-  Unterstrich: String = '-------------------------------------------------';
+  LinkerRand: string[10] = ' ';
+  Unterstrich: string = '-------------------------------------------------';
 
 type
   TFWReport = class

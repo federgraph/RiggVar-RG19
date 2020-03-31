@@ -50,15 +50,18 @@ type
     procedure PositionResetItemClick(Sender: TObject);
     procedure DrawAlwaysItemClick(Sender: TObject);
   public
+    LegendItemChecked: Boolean;
     MatrixItemChecked: Boolean;
     PaintItemChecked: Boolean;
     RumpfItemChecked: Boolean;
+    procedure LegendItemClick(Sender: TObject);
     procedure MatrixItemClick(Sender: TObject);
     procedure PaintBtnClick(Sender: TObject);
     procedure RumpfBtnClick(Sender: TObject);
     procedure ZoomInBtnClick(Sender: TObject);
     procedure ZoomOutBtnClick(Sender: TObject);
     procedure UseDisplayListBtnClick(Sender: TObject);
+    procedure UseQuickSortBtnClick(Sender: TObject);
     procedure BogenBtnClick(Sender: TObject);
     procedure KoppelBtnClick(Sender: TObject);
   protected
@@ -142,6 +145,8 @@ type
     procedure Translate(x, y: Integer);
     procedure InitRotaData;
   private
+    FOnBeforeDraw: TNotifyEvent;
+    FOnAfterDraw: TNotifyEvent;
     Rotator: TPolarKar;
     Transformer: TRggTransformer;
     FBtnGrauDown: Boolean;
@@ -158,6 +163,8 @@ type
     procedure UpdateGraphFromTestData;
     procedure UpdateDisplayListForBoth(WithKoord: Boolean);
     procedure SetZoomIndex(const Value: Integer);
+    procedure SetOnBeforeDraw(const Value: TNotifyEvent);
+    procedure SetOnAfterDraw(const Value: TNotifyEvent);
   public
     IsUp: Boolean;
     PaintBox3D: TPaintBox; // injected and replaced
@@ -195,11 +202,15 @@ type
     property GrauZeichnen: Boolean read FGrauZeichnen write SetGrauZeichnen;
     property BtnGrauDown: Boolean read FBtnGrauDown write SetBtnGrauDown;
     property BtnBlauDown: Boolean read FBtnBlauDown write SetBtnBlauDown;
+
+    property OnBeforeDraw: TNotifyEvent read FOnBeforeDraw write SetOnBeforeDraw;
+    property OnAfterDraw: TNotifyEvent read FOnAfterDraw write SetOnAfterDraw;
   end;
 
 implementation
 
 uses
+  RggDisplay,
   RiggVar.RG.Def,
   RggPBox, // special paintbox which captures the mouse properly
   RggZug3D,
@@ -498,7 +509,8 @@ begin
 
   if UseDisplayList then
   begin
-    UpdateDisplayListForBoth(False);
+    TDisplayItem.NullpunktOffset := NullpunktOffset;;
+    RaumGraph.DL.WantLegend := LegendItemChecked; // not RumpfItemChecked;
     RaumGraph.DL.Draw(g);
   end
   else
@@ -605,6 +617,16 @@ begin
   FSofortBerechnen := Value;
 end;
 
+procedure TRotaForm.SetOnAfterDraw(const Value: TNotifyEvent);
+begin
+  FOnAfterDraw := Value;
+end;
+
+procedure TRotaForm.SetOnBeforeDraw(const Value: TNotifyEvent);
+begin
+  FOnBeforeDraw := Value;
+end;
+
 procedure TRotaForm.RumpfBtnClick(Sender: TObject);
 begin
   RumpfItemChecked := not RumpfItemChecked;
@@ -622,6 +644,13 @@ end;
 procedure TRotaForm.UseDisplayListBtnClick(Sender: TObject);
 begin
   UseDisplayList := not UseDisplayList;
+  Draw;
+end;
+
+procedure TRotaForm.UseQuickSortBtnClick(Sender: TObject);
+begin
+  RaumGraph.DL.UseQuickSort := not RaumGraph.DL.UseQuickSort;
+  RaumGraph.Update;
   Draw;
 end;
 
@@ -795,13 +824,23 @@ procedure TRotaForm.Draw;
 begin
   if IsUp then
   begin
+    if UseDisplayList then
+      UpdateDisplayListForBoth(True);
     DrawToImage(Bitmap.Canvas);
+    if Assigned(OnAfterDraw) then
+      OnAfterDraw(Self);
   end;
 end;
 
 procedure TRotaForm.DrawAlwaysItemClick(Sender: TObject);
 begin
   FDrawAlways := not FDrawAlways;
+end;
+
+procedure TRotaForm.LegendItemClick(Sender: TObject);
+begin
+  LegendItemChecked := not LegendItemChecked;
+  Draw;
 end;
 
 procedure TRotaForm.MatrixItemClick(Sender: TObject);
@@ -944,6 +983,9 @@ begin
     HullGraph.Update;
     HullGraph.AddToDisplayList(RaumGraph.DL);
   end;
+
+  if Assigned(OnBeforeDraw) then
+    OnBeforeDraw(Self);
 end;
 
 procedure TRotaForm.DrawHullNormal(g: TCanvas);
