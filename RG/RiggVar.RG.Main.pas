@@ -80,6 +80,7 @@ type
 
     TML: TStrings;
     FHullVisible: Boolean;
+    FOnUpdateGraph: TNotifyEvent;
 
     function FormatValue(Value: single): string;
     procedure DoBiegungGF;
@@ -102,6 +103,7 @@ type
     procedure BL(A: string; C: string);
     procedure SetHullVisible(const Value: Boolean);
     function GetHullVisible: Boolean;
+    procedure SetOnUpdateGraph(const Value: TNotifyEvent);
   protected
     procedure InitFactArray;
     procedure RggSpecialDoOnTrackBarChange; override;
@@ -174,6 +176,7 @@ type
 
     property HullVisible: Boolean read GetHullVisible write SetHullVisible;
     property Visible: Boolean read FVisible write SetVisible;
+    property OnUpdateGraph: TNotifyEvent read FOnUpdateGraph write SetOnUpdateGraph;
   end;
 
 implementation
@@ -311,6 +314,11 @@ begin
     StrokeRigg.HullVisible := Value;
     Draw;
   end;
+end;
+
+procedure TRggMain.SetOnUpdateGraph(const Value: TNotifyEvent);
+begin
+  FOnUpdateGraph := Value;
 end;
 
 procedure TRggMain.SetOption(fa: TFederAction);
@@ -587,7 +595,7 @@ begin
     StrokeRigg.ControllerTyp := Rigg.ControllerTyp;
   end;
 
-  { WinkelBtnDow must be synchron chaos, and Hysterese ! }
+  { WinkelBtnDow must in sync, otherwise hysteresis ? }
   RiggModul.WinkelBtnDown := (Value = fpWinkel);
   Rigg.ManipulatorMode := (Value = fpWinkel);
   FParam := Value;
@@ -1181,6 +1189,10 @@ begin
   begin
     UpdateStrokeRigg;
     StrokeRigg.Draw;
+    if Assigned(FOnUpdateGraph) then
+    begin
+      OnUpdateGraph(nil);
+    end;
   end;
   UpdateFactArrayFromRigg;
   UpdateText;
@@ -1188,13 +1200,6 @@ end;
 
 procedure TRggMain.ToggleRenderOption(fa: TFederAction);
 begin
-//  case fa of
-//    faWantRenderH: StrokeRigg.WantRenderH := not StrokeRigg.WantRenderH;
-//    faWantRenderP: StrokeRigg.WantRenderP := not StrokeRigg.WantRenderP;
-//    faWantRenderF: StrokeRigg.WantRenderF := not StrokeRigg.WantRenderF;
-//    faWantRenderE: StrokeRigg.WantRenderE := not StrokeRigg.WantRenderE;
-//    faWantRenderS: StrokeRigg.WantRenderS := not StrokeRigg.WantRenderS;
-//  end;
   if StrokeRigg <> nil then
     StrokeRigg.ToggleRenderOption(fa);
   Draw;

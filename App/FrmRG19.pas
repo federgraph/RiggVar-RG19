@@ -280,6 +280,7 @@ type
     ZoomOutBtn: TSpeedButton;
 
     UseDisplayListBtn: TSpeedButton;
+    UseQuickSortBtn: TSpeedButton;
     BogenBtn: TSpeedButton;
 
     procedure SeiteBtnClick(Sender: TObject);
@@ -428,7 +429,7 @@ begin
   Top := 105;
   Height := 768;
   if Screen.Width > 1800 then
-    Width := 1500
+    Width := 1600
   else
     Width := 1024;
 
@@ -1442,16 +1443,24 @@ begin
   sb := AddSpeedBtn('UseDisplayListBtn', BtnGroupSpace);
   UseDisplayListBtn := sb;
   sb.Caption := 'DL';
-  sb.Hint := 'Toggle Use Display List ';
+  sb.Hint := 'Toggle Use Display List';
   sb.AllowAllUp := True;
   sb.GroupIndex := 14;
   sb.OnClick := RotaForm.UseDisplayListBtnClick;
+
+  sb := AddSpeedBtn('UseQuickSortBtn');
+  UseQuickSortBtn := sb;
+  sb.Caption := 'QS';
+  sb.Hint := 'Toggle Use Quick Sort';
+  sb.AllowAllUp := True;
+  sb.GroupIndex := 15;
+  sb.OnClick := RotaForm.UseQuickSortBtnClick;
 
   sb := AddSpeedBtn('Bogentn', 0);
   BogenBtn := sb;
   sb.Caption := 'B';
   sb.Hint := 'Bogen';
-  sb.GroupIndex := 15;
+  sb.GroupIndex := 16;
   sb.AllowAllUp := True;
   sb.Down := RotaForm.Bogen;
   sb.OnClick := RotaForm.BogenBtnClick;

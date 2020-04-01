@@ -122,7 +122,10 @@ begin
   end;
 
   ZugMastKurveD0D := Copy(ZugMastKurve, 0, Props.BogenIndexD + 1);
-  ZugMastKurveDC := Copy(ZugMastKurve, Props.BogenIndexD, Length(ZugMastKurve)-1);
+  { not including Point F }
+  ZugMastKurveDC := Copy(ZugMastKurve, Props.BogenIndexD, Length(ZugMastKurve)-2-Props.BogenIndexD);
+  { including Point F }
+//  ZugMastKurveDC := Copy(ZugMastKurve, Props.BogenIndexD, Length(ZugMastKurve)-1-Props.BogenIndexD);
 end;
 
 procedure TZug3D.DrawToCanvas(g: TCanvas);

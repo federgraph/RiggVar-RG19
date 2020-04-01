@@ -133,6 +133,7 @@ type
 implementation
 
 uses
+  RiggVar.FB.ActionConst,
   RiggVar.App.Main;
 
 { TStrokeRigg }
@@ -248,13 +249,13 @@ end;
 
 procedure TDummyStrokeRigg.ToggleRenderOption(const fa: Integer);
 begin
-//  case fa of
-//    faWantRenderH: WantRenderH := not WantRenderH;
-//    faWantRenderP: WantRenderP := not WantRenderP;
-//    faWantRenderF: WantRenderF := not WantRenderF;
-//    faWantRenderE: WantRenderE := not WantRenderE;
-//    faWantRenderS: WantRenderS := not WantRenderS;
-//  end;
+  case fa of
+    faWantRenderH: WantRenderH := not WantRenderH;
+    faWantRenderP: WantRenderP := not WantRenderP;
+    faWantRenderF: WantRenderF := not WantRenderF;
+    faWantRenderE: WantRenderE := not WantRenderE;
+    faWantRenderS: WantRenderS := not WantRenderS;
+  end;
 end;
 
 procedure TDummyStrokeRigg.Draw;
@@ -276,17 +277,15 @@ end;
 
 function TDummyStrokeRigg.QueryRenderOption(const fa: Integer): Boolean;
 begin
+  case fa of
+    faWantRenderH: result := WantRenderH;
+    faWantRenderP: result := WantRenderP;
+    faWantRenderF: result := WantRenderF;
+    faWantRenderE: result := WantRenderE;
+    faWantRenderS: result := WantRenderS;
+    else
   result := False;
-
-//  case fa of
-//    faWantRenderH: result := WantRenderH;
-//    faWantRenderP: result := WantRenderP;
-//    faWantRenderF: result := WantRenderF;
-//    faWantRenderE: result := WantRenderE;
-//    faWantRenderS: result := WantRenderS;
-//    else
-//      result := False;
-//  end;
+  end;
 end;
 
 end.

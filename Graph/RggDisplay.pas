@@ -228,7 +228,7 @@ begin
     Inc(CounterSame);
     Left.Bemerkung := ccTotallySame;
     r := 0;
-    Dec(CounterZero);
+    Dec(CounterZero); // compensate for Inc below
   end
 
   else if Left.ItemType = diEllipse then
@@ -280,6 +280,7 @@ begin
     r := 0;
   end
 
+  { returning r = 0 does help at all with sort algorithm }
 //  else if LP.DoesNotHaveVisibleCrossing then
 //  begin
 //    Inc(CounterNoVisibleCrossing);

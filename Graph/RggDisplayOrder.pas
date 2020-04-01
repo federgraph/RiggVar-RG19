@@ -178,7 +178,7 @@ type
     Edges: array[TRiggEdge] of TRggEdge;
     Faces: array[TRiggFace] of TRggFace;
 
-    TempList: array[0..31] of TDisplayEdge;
+    TempList: array[0..40] of TDisplayEdge;
 
     WantController: Boolean;
     WantAchsen: Boolean;
@@ -1017,10 +1017,10 @@ begin
   LookingFromBehind := Faces[BAC].IsFrontFacing;
 
   BackIndex := 1;
-  BackTetraIndex := 5;
-  MiddleIndex := 14;
-  FrontTetraIndex := 19;
-  FrontIndex := 27;
+  BackTetraIndex := 7;
+  MiddleIndex := 16;
+  FrontTetraIndex := 21;
+  FrontIndex := 29;
 
   TempList[0] := deFixPunkt;
 
@@ -1071,7 +1071,7 @@ begin
     else if LookingFromAbove then
     begin
       TempList[MiddleIndex + 3] := deC0C;
-      TempList[MiddleIndex + 4] := deCF;
+      TempList[FrontIndex + 5] := deCF;
     end
     else
     begin
@@ -1113,8 +1113,8 @@ begin
     end
     else
     begin
-      TempList[FrontIndex + 1] := deC0C;
-      TempList[FrontIndex + 2] := deCF;
+      TempList[BackIndex + 4] := deCF;
+      TempList[BackIndex + 5] := deC0C;
     end;
   end;
 

@@ -321,6 +321,7 @@ begin
       begin
         DL.PolyLine('D0-D', deD0D, D0, D, ZugMastKurveD0D, TColors.Cornflowerblue);
         DL.PolyLine('D-C', deCD, D, C, ZugMastKurveDC, TColors.Plum);
+        DL.Line('C-F', deCF, C, F, ZugMast[2], ZugMast[3], TColors.Navy);
       end
       else
       begin
