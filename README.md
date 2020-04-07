@@ -21,7 +21,7 @@ This project is now public under the GPL license.
 > Delphi development will now continue in RiggVar-RG38 (FMX).
 
 I have been working recently on RG19 with the goal of getting old and new sources (VCL and FMX) in sync as much as possible (including bug fixes).
-This will help me to rescue some goodies that have been lost in between, during my attempt to build a (tablet) version for the store.
+This will help me to rescue some goodies that have been lost in between, during my attempt to build a tablet version for the store.
 
 Note that this is why - here in this project - we have two competing User Interfaces, which is certainly confusing when you look at the code.
 In terms of Model View Controller, there are two controllers, which try to drive old and new views, respectively.
@@ -29,7 +29,7 @@ In terms of Model View Controller, there are two controllers, which try to drive
 How everything is supposed to work will be more clear in the new repo.
 Note that the FMX app (over there) will have better graphics.
 Here we still have GDI graphics which is based on Integer coordinates with no antialiasing.
-If you want to see textual rReports in a TMemo, the VCL application (here) is still of good use.
+But if you want to see textual output in a TMemo, the VCL application (here) is still of good use.
 
 ## Building
 
@@ -50,12 +50,11 @@ And much more.
 ## Notes
 
 - Most of the existing documentation pieces, e.g drawings, relate most directly to this project.
-- Where and how to publish documentation still to be decided.
-- Over the years I have ported parts of the code to java, c#, and 
-typescript.
+- Where and how to publish documentation is still to be decided.
+- Note that over the years I have ported parts of the code to java, c#, and typescript, so there is more, but it is basically the same.
 - The old Delphi project contains features that have not yet been surfaced in any of the newer apps.
 - The new Delphi project is currently the most advanced.
 - The new data format should be usable on all platforms.
 - No dependency on any third party components in this project.
-- Hit F9 in the Delphi IDE and go.
+- Just hit F9 in the Delphi IDE and have a look.
 
