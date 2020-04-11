@@ -7,6 +7,7 @@ uses
   System.Generics.Collections,
   Vcl.StdCtrls,
   RiggVar.RG.Def,
+  RiggVar.FB.ActionConst,
   RggReport;
 
 type
@@ -35,6 +36,7 @@ type
     ML: TStrings;
     RiggReport: TRiggReport;
     RD: TDictionary<Integer, TRggReport>;
+    RDI: TDictionary<TRggReport, Integer>;
     rs: set of TRggReport;
     FCurrentIndex: Integer;
     FCurrentReport: TRggReport;
@@ -47,8 +49,10 @@ type
     constructor Create(Memo: TMemo);
     destructor Destroy; override;
     procedure InitLB(LB: TStrings);
-
+    procedure HA(fa: Integer);
+    function GetChecked(fa: Integer): Boolean;
     procedure ShowCurrentReport;
+    function GetItemIndexOfReport(const Value: TRggReport): Integer;
     function GetReportCaption(r: TRggReport): string;
     function GetCurrentCaption: string;
     property CurrentIndex: Integer read FCurrentIndex write SetCurrentIndex;
@@ -69,6 +73,7 @@ begin
   ML := Memo.Lines;
   RiggReport := TRiggReport.Create;
   RD := TDictionary<Integer, TRggReport>.Create;
+  RDI := TDictionary<TRggReport, Integer>.Create;
   InitRD;
 end;
 
@@ -76,6 +81,7 @@ destructor TRggReportManager.Destroy;
 begin
   ML := nil; // not owned
   RD.Free;
+  RDI.Free;
   RiggReport.Free;
   inherited;
 end;
@@ -89,8 +95,8 @@ function TRggReportManager.GetReportCaption(r: TRggReport): string;
 begin
   case r of
     rgLog: result := 'Log';
-    rgJson: result := 'WriteJson'; // 'Main.RggData.WriteJson'
-    rgData: result := 'WriteReport'; // 'Main.RggData.WriteReport'
+    rgJson: result := 'RggData.WriteJson';
+    rgData: result := 'RggData.WriteReport';
     rgTrimmText: result := 'Trimm Text';
     rgDataText: result := 'Data Text';
     rgDiffText: result := 'Diff Text';
@@ -106,6 +112,69 @@ begin
     rgNone: result := 'Do Nothing';
     else
       result := 'Unknown';
+  end;
+end;
+
+procedure TRggReportManager.HA(fa: Integer);
+var
+  rg: TRggReport;
+begin
+  case fa of
+    faReportNone: rg := rgNone;
+    faReportLog: rg := rgLog;
+    faReportJson: rg := rgJson;
+    faReportData: rg := rgData;
+    faReportTrimmText: rg := rgTrimmText;
+    faReportDataText: rg := rgDataText;
+    faReportDiffText: rg := rgDiffText;
+    faReportAusgabeRL: rg := rgAusgabeRL;
+    faReportAusgabeRP: rg := rgAusgabeRP;
+    faReportAusgabeRLE: rg := rgAusgabeRLE;
+    faReportAusgabeRPE: rg := rgAusgabeRPE;
+    faReportAusgabeDiffL: rg := rgAusgabeDiffL;
+    faReportAusgabeDiffP: rg := rgAusgabeDiffP;
+    faReportXML: rg := rgXML;
+    faReportDebugReport: rg := rgDebugReport;
+    faReportReadme: rg := rgReadme;
+    else
+      rg := FCurrentReport;
+  end;
+  if rg <> FCurrentReport then
+  begin
+    FCurrentReport := rg;
+//    ShowCurrentReport;
+  end;
+end;
+
+function TRggReportManager.GetChecked(fa: Integer): Boolean;
+begin
+  case fa of
+    faReportNone: result := CurrentReport = rgNone;
+    faReportLog: result := CurrentReport = rgLog;
+    faReportJson: result := CurrentReport = rgJson;
+    faReportData: result := CurrentReport = rgData;
+    faReportTrimmText: result := CurrentReport = rgTrimmText;
+    faReportDataText: result := CurrentReport = rgDataText;
+    faReportDiffText: result := CurrentReport = rgDiffText;
+    faReportAusgabeRL: result := CurrentReport = rgAusgabeRL;
+    faReportAusgabeRP: result := CurrentReport = rgAusgabeRP;
+    faReportAusgabeRLE: result := CurrentReport = rgAusgabeRLE;
+    faReportAusgabeRPE: result := CurrentReport = rgAusgabeRPE;
+    faReportAusgabeDiffL: result := CurrentReport = rgAusgabeDiffL;
+    faReportAusgabeDiffP: result := CurrentReport = rgAusgabeDiffP;
+    faReportXML: result := CurrentReport = rgXML;
+    faReportDebugReport: result := CurrentReport = rgDebugReport;
+    faReportReadme: result := CurrentReport = rgReadme;
+    else
+      result := False;
+  end;
+end;
+
+function TRggReportManager.GetItemIndexOfReport(const Value: TRggReport): Integer;
+begin
+  if not RDI.TryGetValue(Value, result) then
+  begin
+    result := -1;
   end;
 end;
 
@@ -143,11 +212,11 @@ begin
       rgNone: ;
       rgReadme:
       begin
-        ML.Add('Use the Scroll Wheel of the Mouse!');
+        ML.Add('On the desktop - use the scroll wheel of the mouse!');
         ML.Add('');
-        ML.Add('Scroll Wheel will scroll the text if text is long.');
-        ML.Add('Shift Wheel will change current param value (small step)');
-        ML.Add('Ctrl Wheel will change current param value (big step)');
+        ML.Add('Wheel by itself will scroll the text if too long.');
+        ML.Add('Shift-Wheel will change current param value (small step)');
+        ML.Add('Ctrl-Wheel will change current param value (big step)');
         ML.Add('The "mouse" must be over this window (Form Text).');
         ML.Add('');
         ML.Add('- Form Text was added on top of the "old" application.');
@@ -246,6 +315,7 @@ begin
   for r in rs do
   begin
     RD.Add(i, r);
+    RDI.Add(r, i);
     Inc(i);
   end;
 end;

@@ -22,178 +22,293 @@ type
   TFederAction = Integer;
 
 const
+// --- generated code snippet ---
+// Note that some of the defined actions
+//   may not be implemented in this version of the app.
 
-  faController = 1;
-  faWinkel = 2;
-  faVorstag = 3;
-  faWante = 4;
-  faWoben = 5;
-  faSalingH = 6;
-  faSalingA = 7;
-  faSalingL = 8;
-  faVorstagOS = 9;
-  faWPowerOS = 10;
-  faSalingW = 11;
-  faMastfallF0C = 12;
-  faMastfallF0F = 13;
-  faMastfallVorlauf = 14;
-  faBiegung= 15;
-  faMastfussD0X = 16;
-  faParamT1 = 17;
-  faParamT2 = 18;
 
-  faSalingTypOhne = 19;
-  faSalingTypDrehbar = 20;
-  faSalingTypFest = 21;
+{ EmptyAction }
+faNoop = 0;
 
-  faFixpointA0 = 22;
-  faFixpointA = 23;
-  faFixpointB0 = 24;
-  faFixpointB = 25;
-  faFixpointC0 = 26;
-  faFixpointC = 27;
-  faFixpointD0 = 28;
-  faFixpointD = 29;
-  faFixpointE0 = 30;
-  faFixpointE = 31;
-  faFixpointF0 = 32;
-  faFixpointF = 33;
+{ Pages }
+faActionPageM = 1;
+faActionPageP = 2;
 
-  faViewpointS = 34;
-  faViewpointA = 35;
-  faViewpointT = 36;
-  faViewpoint3 = 37;
+{ Forms }
+faShowActi = 3;
+faShowMemo = 4;
 
-  faWantRenderH = 38;
-  faWantRenderP = 39;
-  faWantRenderF = 40;
-  faWantRenderE = 41;
-  faWantRenderS = 42;
+{ TouchLayout }
+faTouchTablet = 5;
+faTouchPhone = 6;
+faTouchDesk = 7;
 
-  faHull = 43;
-  faDemo = 44;
+{ Format }
+faMemeGotoLandscape = 8;
+faMemeGotoSquare = 9;
+faMemeGotoPortrait = 10;
+faMemeFormat0 = 11;
+faMemeFormat1 = 12;
+faMemeFormat2 = 13;
+faMemeFormat3 = 14;
+faMemeFormat4 = 15;
+faMemeFormat5 = 16;
+faMemeFormat6 = 17;
+faMemeFormat7 = 18;
+faMemeFormat8 = 19;
+faMemeFormat9 = 20;
 
-  faParamValueMinus1 = 45;
-  faParamValuePlus1 = 46;
-  faParamValuePlus10 = 47;
-  faParamValueMinus10 = 48;
+{ Wheel }
+faWheelLeft = 21;
+faWheelRight = 22;
+faWheelDown = 23;
+faWheelUp = 24;
+faParamValuePlus1 = 25;
+faParamValueMinus1 = 26;
+faParamValuePlus10 = 27;
+faParamValueMinus10 = 28;
 
-  faWheelLeft = 49;
-  faWheelRight = 50;
-  faWheelUp = 51;
-  faWheelDown = 52;
+{ ColorScheme }
+faCycleColorSchemeM = 29;
+faCycleColorSchemeP = 30;
 
-  faTrimm0 = 53;
-  faTrimm1 = 54;
-  faTrimm2 = 55;
-  faTrimm3 = 56;
-  faTrimm4 = 57;
-  faTrimm5 = 58;
-  faTrimm6 = 59;
-  fa420 = 60;
-  faLogo = 61;
+{ ViewParams }
+faPan = 31;
 
-  faUpdateTrimm0 = 62;
-  faCopyAndPaste = 63;
-  faCopyTrimmItem = 64;
-  faPasteTrimmItem = 65;
+{ ViewFlags }
+faToggleAllText = 32;
+faToggleTouchFrame = 33;
 
-  faReadTrimmFile = 66;
-  faCopyTrimmFile = 67;
-  faSaveTrimmFile = 68;
+{ ViewType }
+faToggleViewType = 34;
 
-  faToggleTrimmText = 69;
-  faToggleDiffText = 70;
-  faToggleDataText = 71;
+{ Texture Param }
+faParamT1 = 35;
+faParamT2 = 36;
 
-  faToggleViewType = 72;
-  faPan = 73;
+{ RggControls }
+faController = 37;
+faWinkel = 38;
+faVorstag = 39;
+faWante = 40;
+faWoben = 41;
+faSalingH = 42;
+faSalingA = 43;
+faSalingL = 44;
+faSalingW = 45;
+faMastfallF0C = 46;
+faMastfallF0F = 47;
+faMastfallVorlauf = 48;
+faBiegung = 49;
+faMastfussD0X = 50;
+faVorstagOS = 51;
+faWPowerOS = 52;
 
-  faUpdateReportText = 74;
-  faToggleDebugText = 75;
+{ RggFixPoints }
+faFixpointA0 = 53;
+faFixpointA = 54;
+faFixpointB0 = 55;
+faFixpointB = 56;
+faFixpointC0 = 57;
+faFixpointC = 58;
+faFixpointD0 = 59;
+faFixpointD = 60;
+faFixpointE0 = 61;
+faFixpointE = 62;
+faFixpointF0 = 63;
+faFixpointF = 64;
 
-  faSalingTypOhneStarr = 76;
+{ RggViewPoint }
+faViewpointS = 65;
+faViewpointA = 66;
+faViewpointT = 67;
+faViewpoint3 = 68;
 
-  //Pages
-  faActionPageM = 103;
-  faActionPageP = 104;
+{ RggSalingType }
+faSalingTypOhne = 69;
+faSalingTypDrehbar = 70;
+faSalingTypFest = 71;
+faSalingTypOhneStarr = 72;
 
-  //ViewFlags
-  faToggleAllText = 323;
-  faToggleTouchFrame = 324;
+{ RggAppMode }
+faDemo = 73;
+faSofortBtn = 74;
+faGrauBtn = 75;
+faBlauBtn = 76;
+faMultiBtn = 77;
+faMemoryBtn = 78;
+faKoppelBtn = 79;
+faHull = 80;
 
-  //ColorScheme
-  faCycleColorSchemeM = 653;
-  faCycleColorSchemeP = 654;
+{ RggReport }
+faReportNone = 81;
+faReportLog = 82;
+faReportJson = 83;
+faReportData = 84;
+faReportTrimmText = 85;
+faReportDataText = 86;
+faReportDiffText = 87;
+faReportAusgabeRL = 88;
+faReportAusgabeRP = 89;
+faReportAusgabeRLE = 90;
+faReportAusgabeRPE = 91;
+faReportAusgabeDiffL = 92;
+faReportAusgabeDiffP = 93;
+faReportXML = 94;
+faReportDebugReport = 95;
+faReportReadme = 96;
 
-  //TouchLayout
-  faTouchTablet = 662;
-  faTouchPhone = 663;
-  faTouchDesk = 664;
+{ RggChart }
+faChartRect = 97;
+faChartTextRect = 98;
+faChartLegend = 99;
+faChartAP = 100;
+faChartBP = 101;
+faChartGroup = 102;
+faParamCountPlus = 103;
+faParamCountMinus = 104;
+faPComboPlus = 105;
+faPComboMinus = 106;
+faXComboPlus = 107;
+faXComboMinus = 108;
+faYComboPlus = 109;
+faYComboMinus = 110;
+faChartReset = 111;
 
-  //EmptyAction
-  faNoop = 871;
+{ RggGraph }
+faToggleLineColor = 112;
+faToggleUseDisplayList = 113;
+faToggleUseQuickSort = 114;
+faToggleShowLegend = 115;
+faRggBogen = 116;
+faRggZoomIn = 117;
+faRggZoomOut = 118;
+faToggleSalingGraph = 119;
+faToggleControllerGraph = 120;
+faToggleChartGraph = 121;
+faToggleMatrixText = 122;
 
-  faButtonFrameReport = 1070;
+{ RggSegment }
+faToggleSegmentF = 123;
+faToggleSegmentR = 124;
+faToggleSegmentS = 125;
+faToggleSegmentM = 126;
+faToggleSegmentV = 127;
+faToggleSegmentW = 128;
+faToggleSegmentC = 129;
+faToggleSegmentA = 130;
 
-  //MemeBuilder
-  faMemeNoop = 1071;
-  faMemeToggleHelp = 1086;
-  faMemeToggleReport = 1087;
-  faMemeGotoLandscape = 1100;
-  faMemeGotoSquare = 1101;
-  faMemeGotoPortrait = 1102;
-  faMemeFormat0 = 1103;
-  faMemeFormat1 = 1104;
-  faMemeFormat2 = 1105;
-  faMemeFormat3 = 1106;
-  faMemeFormat4 = 1107;
-  faMemeFormat5 = 1108;
-  faMemeFormat6 = 1109;
-  faMemeFormat7 = 1110;
-  faMemeFormat8 = 1111;
-  faMemeFormat9 = 1112;
+{ RggRenderOptions }
+faWantRenderH = 131;
+faWantRenderP = 132;
+faWantRenderF = 133;
+faWantRenderE = 134;
+faWantRenderS = 135;
 
-  // new Actions for Rgg Chart
-  faChartRect = 2200;
-  faChartTextRect = 2201;
-  faChartLegend = 2202;
-  faChartAP = 2203;
-  faChartBP = 2204;
-  faChartGroup = 2205;
+{ RggTrimms }
+faTrimm0 = 136;
+faTrimm1 = 137;
+faTrimm2 = 138;
+faTrimm3 = 139;
+faTrimm4 = 140;
+faTrimm5 = 141;
+faTrimm6 = 142;
+fa420 = 143;
+faLogo = 144;
 
-  faParamCountPlus = 2206;
-  faParamCountMinus = 2207;
+{ RggTrimmFile }
+faCopyTrimmItem = 145;
+faPasteTrimmItem = 146;
+faCopyAndPaste = 147;
+faUpdateTrimm0 = 148;
+faReadTrimmFile = 149;
+faSaveTrimmFile = 150;
+faCopyTrimmFile = 151;
 
-  faPComboPlus = 2208;
-  faPComboMinus = 2209;
+{ RggTrimmText }
+faToggleTrimmText = 152;
+faToggleDiffText = 153;
+faToggleDataText = 154;
+faToggleDebugText = 155;
+faUpdateReportText = 156;
 
-  faXComboPlus = 2210;
-  faXComboMinus = 2211;
+{ RggSonstiges }
+faMemeToggleHelp = 157;
+faMemeToggleReport = 158;
+faButtonFrameReport = 159;
+faToggleFontColor = 160;
+faToggleSandboxed = 161;
+faToggleAllTags = 162;
 
-  faYComboPlus = 2212;
-  faYComboMinus = 2213;
+faTL01 = 163;
+faTL02 = 164;
+faTL03 = 165;
+faTL04 = 166;
+faTL05 = 167;
+faTL06 = 168;
 
-  faChartReset = 2214;
+faTR01 = 169;
+faTR02 = 170;
+faTR03 = 171;
+faTR04 = 172;
+faTR05 = 173;
+faTR06 = 174;
+faTR07 = 175;
+faTR08 = 176;
 
-  faToggleFontColor = 3000;
+faBL01 = 177;
+faBL02 = 178;
+faBL03 = 179;
+faBL04 = 180;
+faBL05 = 181;
+faBL06 = 182;
+faBL07 = 183;
+faBL08 = 184;
 
-  faReportNone = 3001;
-  faReportLog = 3002;
-  faReportJson = 3003;
-  faReportData = 3004;
-  faReportTrimmText = 3005;
-  faReportDataText = 3006;
-  faReportDiffText = 3007;
-  faReportAusgabeRL = 3008;
-  faReportAusgabeRP = 3009;
-  faReportAusgabeRLE = 3010;
-  faReportAusgabeRPE = 3011;
-  faReportAusgabeDiffL = 3012;
-  faReportAusgabeDiffP = 3013;
-  faReportXML = 3014;
-  faReportDebugReport = 3015;
-  faReportReadme = 3016;
+faBR01 = 185;
+faBR02 = 186;
+faBR03 = 187;
+faBR04 = 188;
+faBR05 = 189;
+faBR06 = 190;
+
+faMB01 = 191;
+faMB02 = 192;
+faMB03 = 193;
+faMB04 = 194;
+faMB05 = 195;
+faMB06 = 196;
+faMB07 = 197;
+faMB08 = 198;
+
+faCirclesReset = 199;
+
+faCirclesSelectC0 = 200;
+faCirclesSelectC1 = 201;
+faCirclesSelectC2 = 202;
+faCircleParamR1 = 203;
+faCircleParamR2 = 204;
+faCircleParamM1X = 205;
+faCircleParamM1Y = 206;
+faCircleParamM2X = 207;
+faCircleParamM2Y = 208;
+
+faLineParamA1 = 209; // Line Segment 1 Angle (Azimuth)
+faLineParamA2 = 210; // Line Segment 2 Angle (Azimuth)
+
+{ extending line segment to 3D, vertical angle: Elevation }
+faLineParamE1 = 211; // Line Segment 1 Elevation (Altitude)
+faLineParamE2 = 212; // Line Segment 2 Elevation (Altitude)
+
+{ extending circle center to 3D, sphere center }
+faCircleParamM1Z = 213;
+faCircleParamM2Z = 214;
+
+faMax = 215;
+
+ParamsRange = [faController .. faMastfussD0X];
+ReportsRange = [faReportNone .. faReportReadme];
+TrimmsRange = [faTrimm0 .. faLogo];
 
 implementation
 
