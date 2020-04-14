@@ -44,7 +44,9 @@ type
     deNZ,
 
     deFixPunkt,
-    deHullEdge
+    deHullEdge,
+    deMastFall,
+    deHullFrame
   );
 
   TDisplayGroup = (
@@ -228,7 +230,9 @@ const
     'NZ',
 
     'FixPunkt',
-    'HullEdge'
+    'HullEdge',
+    'MastFall',
+    'HullFrame'
   );
 
 type

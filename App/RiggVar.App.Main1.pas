@@ -48,16 +48,22 @@ type
     procedure InitTrimmData;
     procedure PasteTrimm;
   public
-    RggData: TRggData;
-    RggMain: TRggMain;
+    RggMain: TRggMain; // RggMain.Rigg is the model of the app
 
+    RggData: TRggData; // temp object for data transfer
+
+    { slot used as reference for diffing }
     Trimm0: TRggData;
-    Trimm1: TRggData;
-    Trimm2: TRggData;
+
+    { user data slots }
+    Trimm1: TRggData; // selected with button T1
+    Trimm2: TRggData; // selected with button T2
     Trimm3: TRggData;
     Trimm4: TRggData;
     Trimm5: TRggData;
     Trimm6: TRggData;
+
+    { example data slots }
     Trimm7: TRggData; // 420
     Trimm8: TRggData; // Logo
 
@@ -74,7 +80,9 @@ type
     procedure DoSmallWheel(Delta: single);
 
     function GetTrimmItem(i: Integer): TRggData;
-    function GetTrimmItemReport: string;
+    function GetTrimmItemReport(WantJson: Boolean): string;
+    function GetTrimmItemReportData: string;
+    function GetTrimmItemReportJson: string;
 
     procedure WriteTrimmItem;
     procedure WriteTrimmFile;
@@ -102,7 +110,8 @@ type
     property TrimmNoChange: Integer read FTrimm write SetTrimmNoChange;
     property Trimm: Integer read FTrimm write SetTrimm;
     property CurrentTrimm: TRggData read GetCurrentTrimm;
-    property TrimmData: string read GetTrimmItemReport;
+    property TrimmData: string read GetTrimmItemReportData;
+    property TrimmJson: string read GetTrimmItemReportJson;
 
     property ShowTrimmText: Boolean read GetShowTrimmText write SetShowTrimmText;
     property ShowDiffText: Boolean read GetShowDiffText write SetShowDiffText;
@@ -210,16 +219,29 @@ begin
 //  result := FederText.DataVisible;
 end;
 
-function TMain1.GetTrimmItemReport: string;
+function TMain1.GetTrimmItemReport(WantJson: Boolean): string;
 begin
   if Assigned(RggMain) and Assigned(RggMain.Rigg) and Assigned(RggData) and Assigned(FL) then
   begin
     RggMain.Rigg.SaveToFederData(RggData);
     FL.Clear;
-    RggData.WriteReport(FL);
+    if WantJson then
+      RggData.WriteJSon(FL)
+    else
+      RggData.WriteReport(FL);
     result := FL.Text;
     FL.Clear;
   end;
+end;
+
+function TMain1.GetTrimmItemReportJson: string;
+begin
+  result := GetTrimmItemReport(True);
+end;
+
+function TMain1.GetTrimmItemReportData: string;
+begin
+  result := GetTrimmItemReport(False);
 end;
 
 procedure TMain1.WriteTrimmItem;
@@ -627,6 +649,7 @@ end;
 
 procedure TMain1.HandleAction(fa: TFederAction);
 begin
+  if IsUp then
   case fa of
     faUpdateReportText: DoCleanReport;
     faToggleDebugText: ShowDebugData;

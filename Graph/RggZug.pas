@@ -13,7 +13,14 @@ type
     xA0, xB0, xC0, xD0, xE0, xF0, xA, xB, xC, xD, xE, xF: Integer;
     yA0, yB0, yC0, yD0, yE0, yF0, yA, yB, yC, yD, yE, yF: Integer;
     zA0, zB0, zC0, zD0, zE0, zF0, zA, zB, zC, zD, zE, zF: Integer;
-    xX, yX, xY, yY, xZ, yZ, xN, yN: Integer;
+
+    xP0, yP0: Integer;
+    xX, yX: Integer;
+    xY, yY: Integer;
+    xZ, yZ: Integer;
+    xM, yM: Integer;
+    xN, yN: Integer;
+    xP, yP: Integer;
   end;
 
   TRaumGraphProps = class
@@ -50,6 +57,8 @@ type
     ZugVorstag: TRggPolyLine;
     ZugKoppelKurve: TRggPolyLine;
     ZugAchsen: TRggPolyLine;
+    ZugMastfall: TRggPolyLine;
+    ZugRP: TRggPolyLine;
 
     { no need to call SetLength for these, will be copied via Copy }
     ZugMastKurveD0D: TRggPolyLine;
@@ -78,6 +87,8 @@ begin
   SetLength(ZugController, 2);
   SetLength(ZugVorstag, 2);
   SetLength(ZugAchsen, 4);
+  SetLength(ZugMastfall, 3);
+  SetLength(ZugRP, 4);
   SetLength(ZugKoppelKurve, 101);
 //  SetLength(ZugMastKurveD0D, ...);
 //  SetLength(ZugMastKurveDC, ...);

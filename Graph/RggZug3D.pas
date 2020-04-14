@@ -31,6 +31,24 @@ procedure TZug3D.FillZug;
 begin
   with Data do
   begin
+    { ZugMastfall }
+    ZugMastfall[0].x := xF;
+    ZugMastfall[0].y := -yF;
+    ZugMastfall[1].x := xM;
+    ZugMastfall[1].y := -yM;
+    ZugMastfall[2].x := xF0;
+    ZugMastfall[2].y := -yF0;
+
+    { ZugRP }
+    ZugRP[0].x := xN;
+    ZugRP[0].y := -yN;
+    ZugRP[1].x := xD0;
+    ZugRP[1].y := -yD0;
+    ZugRP[2].x := xP0;
+    ZugRP[2].y := -yP0;
+    ZugRP[3].x := xF0;
+    ZugRP[3].y := -yF0;
+
     { Achsen }
     ZugAchsen[0].x := xN;
     ZugAchsen[0].y := -yN;
@@ -122,10 +140,12 @@ begin
   end;
 
   ZugMastKurveD0D := Copy(ZugMastKurve, 0, Props.BogenIndexD + 1);
-  { not including Point F }
-  ZugMastKurveDC := Copy(ZugMastKurve, Props.BogenIndexD, Length(ZugMastKurve)-2-Props.BogenIndexD);
-  { including Point F }
-//  ZugMastKurveDC := Copy(ZugMastKurve, Props.BogenIndexD, Length(ZugMastKurve)-1-Props.BogenIndexD);
+
+  ZugMastKurveDC := Copy(
+    ZugMastKurve, // string or dynamic array
+    Props.BogenIndexD, // start index
+    Length(ZugMastKurve) - (Props.BogenIndexD + 1) // count of elements
+  );
 end;
 
 procedure TZug3D.DrawToCanvas(g: TCanvas);

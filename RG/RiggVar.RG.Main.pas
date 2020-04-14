@@ -153,6 +153,7 @@ type
     procedure UpdateColumnC(ML: TStrings);
     procedure UpdateColumnD(ML: TStrings);
     procedure UpdateTrimmText(ML: TStrings);
+    procedure UpdateJsonText(ML: TStrings);
     procedure UpdateDataText(ML: TStrings);
     procedure UpdateDiffText(ML: TStrings);
     procedure UpdateFactArrayFromRigg;
@@ -1124,7 +1125,7 @@ begin
   ML.Clear;
   TML := ML;
 
-  AL('VA', fpVorstag);
+  AL('VO', fpVorstag);
   AL('WA', fpWante);
   AL('WO', fpWoben);
   AL('SH', fpSalingH);
@@ -1584,6 +1585,11 @@ begin
 
   ML.Add('CounterG = ' + IntToStr(Rigg.UpdateGetriebeCounter));
 //  ML.Add('CounterT = ' + IntToStr(UpdateTextCounter));
+end;
+
+procedure TRggMain.UpdateJsonText(ML: TStrings);
+begin
+  ML.Text := Main.TrimmJson;
 end;
 
 procedure TRggMain.UpdateDataText(ML: TStrings);

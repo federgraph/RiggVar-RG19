@@ -33,12 +33,14 @@ type
     AchseZT: TRealPoint;
 
     { transformed coordinates of Rigg }
-    A0, B0, C0, D0, E0, F0: TRealPoint;
-    A,  B,  C,  D,  E,  F:  TRealPoint;
+    A0, B0, C0, D0, E0, F0, P0: TRealPoint;
+    A,  B,  C,  D,  E,  F,  P:  TRealPoint;
+    M, N: TRealPoint;
   protected
     Zug3D: TZug3DBase; // injected via constructor
   private
     function GetFixPunkt: TRealPoint;
+    function GetStrokeWidthS: Integer;
   protected
     procedure UpdateZugProps;
     procedure Update2;
@@ -55,6 +57,12 @@ type
     WantVorstag: Boolean;
     WantAchsen: Boolean;
 
+    WantRenderE: Boolean;
+    WantRenderF: Boolean;
+//    WantRenderH: Boolean;
+    WantRenderP: Boolean;
+    WantRenderS: Boolean;
+
     constructor Create(AZug3D: TZug3DBase);
     destructor Destroy; override;
 
@@ -62,13 +70,18 @@ type
     procedure UpdateDisplayList;
     procedure DrawToCanvas(g: TCanvas); override;
 
+    function GetChecked(fa: Integer): Boolean;
     procedure GetPlotList(ML: TStrings); override;
     property FixPunkt: TRealPoint read GetFixPunkt;
+
+    property WantRenderH: Boolean read WantRumpf write WantRumpf;
+    property StrokeWidthS: Integer read GetStrokeWidthS;
   end;
 
 implementation
 
 uses
+  RiggVar.FB.ActionConst,
   RiggVar.RG.Def;
 
 constructor TRaumGraph.Create(AZug3D: TZug3DBase);
@@ -83,6 +96,9 @@ begin
   WantMast := True;
   WantVorstag := True;
   WantAchsen := False;
+
+  WantRenderF := True;
+  WantRenderP := True;
 
   Zug3D := AZug3D;
   Zug3D.Data := RaumGraphData;
@@ -165,6 +181,7 @@ begin
   D0 := RPT[ooD0];
   E0 := RPT[ooE0];
   F0 := RPT[ooF0];
+  P0 := RPT[ooP0];
 
   A := RPT[ooA];
   B := RPT[ooB];
@@ -172,6 +189,9 @@ begin
   D := RPT[ooD];
   E := RPT[ooE];
   F := RPT[ooF];
+  P := RPT[ooP];
+
+  M := RPT[ooM];
 
   { Es wurde nicht nur rotiert,
     sondern bereits auch verschoben und skaliert }
@@ -204,8 +224,15 @@ begin
     xF := Round(RPT[ooF, x]);
     yF := Round(RPT[ooF, z]);
 
+    xP0 := Round(RPT[ooP0, x]);
+    yP0 := Round(RPT[ooP0, z]);
+    xP := Round(RPT[ooP, x]);
+    yP := Round(RPT[ooP, z]);
+    xM := Round(RPT[ooM, x]);
+    yM := Round(RPT[ooM, z]);
     xN := Round(AchseNT[x]);
     yN := Round(AchseNT[z]);
+
     xX := Round(AchseXT[x]);
     yX := Round(AchseXT[z]);
     xY := Round(AchseYT[x]);
@@ -256,6 +283,14 @@ begin
       Update;
 
   Zug3D.GetPlotList(ML);
+end;
+
+function TRaumGraph.GetStrokeWidthS: Integer;
+begin
+  if WantRenderS then
+    result := 5
+  else
+    result := 2;
 end;
 
 procedure TRaumGraph.UpdateZugProps;
@@ -336,13 +371,13 @@ begin
     begin
       { Wante Stb }
       DI.StrokeColor := clRed;
-      DI.StrokeWidth := 2;
+      DI.StrokeWidth := StrokeWidthS;
       DL.Line('A0-A', deA0A, A0, A, ZugWanteStb[0], ZugWanteStb[1], clRed);
       DL.Line('A-C', deAC, A, C, ZugWanteStb[1], ZugWanteStb[2], clLime);
 
       { Wante Bb }
       DI.StrokeColor := clGreen;
-      DI.StrokeWidth := 2;
+      DI.StrokeWidth := StrokeWidthS;
       DL.Line('B0-B', deB0B, B0, B, ZugWanteBb[0], ZugWanteBb[1], clGreen);
       DL.Line('B-C', deBC, B, C, ZugWanteBb[1], ZugWanteBb[2], clLime);
     end;
@@ -382,7 +417,7 @@ begin
     if WantVorstag then
     begin
       DI.StrokeColor := clYellow;
-      DI.StrokeWidth := 4;
+      DI.StrokeWidth := StrokeWidthS;
       DL.Line('C0-C', deC0C, C0, C, ZugVorstag[0], ZugVorstag[1], clYellow);
     end;
 
@@ -398,11 +433,48 @@ begin
       DL.Line('N-Z', deNZ, AchseNT, AchseZT, ZugAchsen[0], ZugAchsen[3], clBlue);
   end;
 
+    if WantRenderF then
+    begin
+      DI.StrokeColor := TColors.Goldenrod;
+      DI.StrokeWidth := 1;
+      DL.Line('F-M', deMastFall, F, M, ZugMastfall[0], ZugMastfall[1], TColors.Goldenrod);
+      DI.StrokeWidth := 4;
+      DL.Line('M-F0', deMastFall, M, F0, ZugMastfall[1], ZugMastfall[2], clYellow);
+    end;
+
+    if WantRenderP then
+    begin
+      DI.StrokeColor := clSilver;
+      DI.StrokeWidth := 1;
+      DL.Line('N-D0', deHullFrame, N, D0, ZugRP[0], ZugRP[1], clFuchsia);
+      DL.Line('D0-P0', deHullFrame, D0, P0, ZugRP[1], ZugRP[2], clLime);
+      DL.Line('P0-F0', deHullFrame, P0, F0, ZugRP[2], ZugRP[3], clAqua);
+      DL.Line('F0-N', deHullFrame, F0, N, ZugRP[3], ZugRP[0], clSilver);
+    end;
+
   end;
 
   DF.WantController := WantController;
   DF.WantAchsen := WantAchsen;
   DF.Sort;
+end;
+
+function TRaumGraph.GetChecked(fa: Integer): Boolean;
+begin
+  case fa of
+    faToggleSegmentF: result := WantFixPunkt;
+    faToggleSegmentR: result := WantRumpf;
+    faToggleSegmentS: result := WantSaling;
+    faToggleSegmentM: result := WantMast;
+    faToggleSegmentV: result := WantVorstag;
+    faToggleSegmentW: result := WantWante;
+    faToggleSegmentC: result := WantController;
+    faToggleSegmentA: result := WantAchsen;
+
+    faKoppelBtn: result := Koppel;
+    else
+      result := False;
+  end;
 end;
 
 end.
