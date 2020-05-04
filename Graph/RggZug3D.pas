@@ -216,7 +216,7 @@ begin
       PolyLine(ZugController);
     end;
 
-    { Wanten }
+    { Wante Stb }
     if Props.Coloriert then
     begin
       Pen.Color := clGreen;
@@ -225,6 +225,7 @@ begin
     end;
     PolyLine(ZugWanteStb);
 
+    { Wante Bb }
     if Props.Coloriert then
     begin
       Pen.Color := clRed;

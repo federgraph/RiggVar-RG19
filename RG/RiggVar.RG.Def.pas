@@ -1,11 +1,47 @@
 ﻿unit RiggVar.RG.Def;
 
+(*
+-
+-     F
+-    * * *
+-   *   *   G
+-  *     * *   *
+- E - - - H - - - I
+-  *     * *         *
+-   *   *   *           *
+-    * *     *             *
+-     D-------A---------------B
+-              *
+-              (C) federgraph.de
+-
+*)
+
 interface
 
 uses
   Vcl.Graphics;
 
 type
+  TSelectedCircle = (
+    scC1,
+    scC2
+  );
+
+  TCircleParam = (
+    fpR1,
+    fpR2,
+    fpM1X,
+    fpM1Y,
+    fpM1Z,
+    fpM2X,
+    fpM2Y,
+    fpM2Z,
+    fpA1,
+    fpA2,
+    fpE1,
+    fpE2
+  );
+
   TFederParam = (
     fpController,
     fpWinkel,
@@ -103,18 +139,18 @@ const
   cWL = 'wl';
   cWO = 'wo';
 
-// gespeicherte Basiswerte
+  { saved base values }
   ch0 = 'h0';
-  cl2 = 'l2'; //schon in FC
+  cl2 = 'l2';
   ch2 = 'h2';
 
-  //nicht gespeichert
+  { not persisted }
   ch1 = 'h1';
   ch3 = 'h3';
-  cl3 = 'l3'; //schon in FC
+  cl3 = 'l3';
   cw3 = 'w3';
 
-  //Delphi code format strings
+  { Delphi code format strings }
   dsg = '%s := %g;';
   dsd = '%s := %d;';
   dss = '%s := %s;';
@@ -125,7 +161,7 @@ const
   dbs = '%d := %s;';
   dbf = '%d := %2.2f;';
 
-  //Java code format strings
+  { Java code format strings }
   jsg = '%s = %g;';
   jsd = '%s = %d;';
   jss = '%s = %s;';
@@ -136,7 +172,7 @@ const
   jbs = '%d = %s;';
   jbf = '%d = %2.2f;';
 
-  //normal properties file format strings
+  { normal 'properties file' format strings }
   fsg = '%s=%g';
   fsd = '%s=%d';
   fss = '%s=%s';

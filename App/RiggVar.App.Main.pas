@@ -18,10 +18,6 @@
 
 interface
 
-{$ifdef FPC}
-{$mode delphi}
-{$endif}
-
 uses
   System.Classes,
 //  RiggVar.FB.Scheme,

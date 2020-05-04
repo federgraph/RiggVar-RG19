@@ -165,6 +165,7 @@ type
     procedure SetZoomIndex(const Value: Integer);
     procedure SetOnBeforeDraw(const Value: TNotifyEvent);
     procedure SetOnAfterDraw(const Value: TNotifyEvent);
+    function SingleDraw: Boolean;
   public
     IsUp: Boolean;
     PaintBox3D: TPaintBox; // injected and replaced
@@ -436,7 +437,7 @@ end;
 
 procedure TRotaForm.DrawToCanvasEx(g: TCanvas);
 begin
-  if not SofortBerechnen or UseDisplayList then
+  if SingleDraw then
   begin
     RaumGraph.Coloriert := True;
     WanteGestrichelt := WanteGestrichelt;
@@ -997,6 +998,35 @@ begin
     HullGraph.Coloriert := True;
     HullGraph.Update;
     HullGraph.DrawToCanvas(g);
+  end;
+end;
+
+function TRotaForm.SingleDraw: Boolean;
+begin
+  result := True;
+
+  if UseDisplayList then
+  begin
+    { DisplayList cannot draw multiple situations }
+    Exit;
+  end;
+
+  if not WantOverlayedRiggs then
+  begin
+    { not wanted }
+    Exit;
+  end;
+
+  if BtnBlauDown then
+  begin
+    { ok, draw refernce position in blue }
+    result := False;
+  end;
+
+  if BtnGrauDown and SofortBerechnen then
+  begin
+    { ok, MultiDraw, draw relaxed position in gray }
+    result := False;
   end;
 end;
 

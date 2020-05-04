@@ -73,16 +73,18 @@ type
     constructor Create(rggm: TRggMain);
     destructor Destroy; override;
 
-    procedure HandleAction(fa: TFederAction);
-    function GetChecked(fa: TFederAction): Boolean;
+    procedure HandleAction(fa: TFederAction); override;
+    function GetChecked(fa: TFederAction): Boolean; override;
 
     procedure DoBigWheel(Delta: single);
     procedure DoSmallWheel(Delta: single);
 
     function GetTrimmItem(i: Integer): TRggData;
-    function GetTrimmItemReport(WantJson: Boolean): string;
+    function GetTrimmItemReport(ReportID: Integer): string;
     function GetTrimmItemReportData: string;
     function GetTrimmItemReportJson: string;
+    function GetTrimmItemReportShort: string;
+    function GetTrimmItemReportLong: string;
 
     procedure WriteTrimmItem;
     procedure WriteTrimmFile;
@@ -101,7 +103,7 @@ type
 
     procedure ReadText(ML: TStrings);
 
-    procedure DropTargetDropped(fn: string); override;
+    procedure DropTargetDropped(fn: string);
     procedure DoReport;
     procedure DoCleanReport;
     procedure ShowDebugData;
@@ -112,6 +114,8 @@ type
     property CurrentTrimm: TRggData read GetCurrentTrimm;
     property TrimmData: string read GetTrimmItemReportData;
     property TrimmJson: string read GetTrimmItemReportJson;
+    property TrimmShort: string read GetTrimmItemReportShort;
+    property TrimmLong: string read GetTrimmItemReportLong;
 
     property ShowTrimmText: Boolean read GetShowTrimmText write SetShowTrimmText;
     property ShowDiffText: Boolean read GetShowDiffText write SetShowDiffText;
@@ -159,8 +163,9 @@ begin
 
   InitTrimmData;
 
-  RggMain := rggm; //TRggMain.Create;
+  RggMain := rggm;
 
+  { this should be done after or when calling RggMain.Init }
 //  RggMain.InitLogo; // sets WantLogoData to true
 //  RggMain.Init420; // resets WantLogo to false
 //  WantLogoData := False;
@@ -219,29 +224,52 @@ begin
 //  result := FederText.DataVisible;
 end;
 
-function TMain1.GetTrimmItemReport(WantJson: Boolean): string;
+function TMain1.GetTrimmItemReport(ReportID: Integer): string;
 begin
   if Assigned(RggMain) and Assigned(RggMain.Rigg) and Assigned(RggData) and Assigned(FL) then
   begin
     RggMain.Rigg.SaveToFederData(RggData);
     FL.Clear;
-    if WantJson then
-      RggData.WriteJSon(FL)
-    else
-      RggData.WriteReport(FL);
+    case ReportID of
+      0: RggData.WriteReport(FL);
+      1: RggData.WriteJSon(FL);
+      2:
+      begin
+        RggData.WantAll := False;
+        RggData.SaveTrimmItem(FL);
+      end;
+      3:
+      begin
+        RggData.WantAll := True;
+        RggData.SaveTrimmItem(FL);
+      end;
+
+      else
+        RggData.WriteReport(FL);
+    end;
     result := FL.Text;
     FL.Clear;
   end;
 end;
 
+function TMain1.GetTrimmItemReportLong: string;
+begin
+  result := GetTrimmItemReport(3);
+end;
+
+function TMain1.GetTrimmItemReportShort: string;
+begin
+  result := GetTrimmItemReport(2);
+end;
+
 function TMain1.GetTrimmItemReportJson: string;
 begin
-  result := GetTrimmItemReport(True);
+  result := GetTrimmItemReport(1);
 end;
 
 function TMain1.GetTrimmItemReportData: string;
 begin
-  result := GetTrimmItemReport(False);
+  result := GetTrimmItemReport(0);
 end;
 
 procedure TMain1.WriteTrimmItem;
@@ -251,10 +279,8 @@ begin
   FL.Clear;
   fd := RggData;
   RggMain.SaveTrimm(fd);
-//    fd.WriteJSon(FL);
   fd.WantAll := True;
   fd.SaveTrimmItem(FL);
-//  FederText.FlashCaption := 'RggCopy';
 end;
 
 procedure TMain1.CopyTrimmItem;
@@ -286,7 +312,6 @@ begin
   { copy }
   fd := RggData;
   RggMain.SaveTrimm(fd);
-  //fd.WriteJSon(FL);
   fd.WantAll := True;
   fd.SaveTrimmItem(FL);
   s := FL.Text;
@@ -300,8 +325,8 @@ procedure TMain1.PasteTrimmItem;
 begin
   Logger.Info('in PasteTrimmItem');
   PasteTrimm;
-  // note: there is just one paste button (pti), named after the item,
-  // but you can paste a Trimm-Item OR a Trimm-File
+  { Note: There is just one paste button (pti), named after the item, }
+  { but you can paste a Trimm-Item OR a Trimm-File. }
 end;
 
 procedure TMain1.PasteTrimm;
@@ -356,7 +381,6 @@ begin
       if IsTrimmItem then
       begin
         RggData.LoadTrimmItem(ML);
-        //RggMain.LoadTrimm(RggData);
         CurrentTrimm.Assign(RggData);
         Trimm := FTrimm;
         Logger.Info(Format('  Trimm %d assigned', [Trimm]));
@@ -477,15 +501,21 @@ begin
   Logger.Info('in ReadTrimmFile');
   fp := GetTrimmFilePath;
 
-// By default you try and load the 'manually edited' Trimm-File.txt;
-// this should make sense on the Desktop,
-// or on any device where you have access to the Documents folder.
+{ By default you try and load the 'manually edited' Trimm-File.txt; }
+{ this should make sense on the Desktop, }
+{ or on any device where you have access to the Documents folder. }
   fn := TrimmFileName;
 
-// On Android and iOS the Trimm-File in the known location cannot be edited,
-// so it does not make sense to read a 'manually edited' Trimm-File.txt,
-// but you can manualy read a Trimm-File-Auto.txt if already saved,
-// e.g. by clicking on a button.
+{ Maybe you want to have the same behaviour on Windows and iOS }
+{ for debugging purpose only... }
+{$ifdef MSWINDOWS}
+//  fn := TrimmFileNameAuto;
+{$endif}
+
+{ On Android and iOS the Trimm-File in the known location cannot be edited, }
+{ so it does not make sense to read a 'manually edited' Trimm-File.txt, }
+{ but you can manualy read a Trimm-File-Auto.txt if already saved, }
+{ e.g. by clicking on a button. }
 {$ifdef IOS}
   fn := TrimmFileNameAuto;
 {$endif}
@@ -673,8 +703,6 @@ begin
     faMastfallVorlauf: RggMain.SetParameter(faMastfallVorlauf);
     faBiegung: RggMain.SetParameter(faBiegung);
     faMastfussD0X: RggMain.SetParameter(faMastfussD0X);
-    faParamT1: RggMain.SetParameter(faParamT1);
-    faParamT2: RggMain.SetParameter(faParamT2);
 
     faFixpointA0: RggMain.FixPoint := ooA0;
     faFixpointA: RggMain.FixPoint := ooA;
@@ -735,10 +763,8 @@ begin
       ShowDataText := not ShowDataText;
     end;
 
-    faToggleViewType: IsOrthoProjection := not IsOrthoProjection;
-
     else
-      inherited;
+      inherited HandleAction(fa);
   end;
 end;
 
@@ -759,8 +785,6 @@ begin
     faMastfallVorlauf: result := RggMain.Param = fpMastfallVorlauf;
     faBiegung: result := RggMain.Param = fpBiegung;
     faMastfussD0X: result := RggMain.Param = fpD0X;
-    faParamT1: result := RggMain.Param = fpT1;
-    faParamT2: result := RggMain.Param = fpT2;
 
     faFixpointA0: result := RggMain.FixPoint = ooA0;
     faFixpointA: result := RggMain.FixPoint = ooA;
@@ -801,12 +825,8 @@ begin
     faHull: result := RggMain.HullVisible;
     faDemo: result := RggMain.Demo;
 
-//    faToggleDataText: result := Main.FederText.DataVisible;
-//    faToggleDiffText: result := Main.FederText.DiffVisible;
-//    faToggleTrimmText: result := Main.FederText.TrimmVisible;
-
     else
-      result := False;
+      result := inherited;
   end;
 end;
 
@@ -841,6 +861,7 @@ begin
   ML.Add('  Sandboxed = ' + BoolStr[IsSandboxed]);
   ML.Add('  WantOnResize = ' + BoolStr[MainVar.WantOnResize]);
   ML.Add('  ResizeCounter = ' + IntToStr(ResizeCounter));
+  ML.Add(Format('  ClientSize = (%d, %d)', [MainVar.ClientWidth, MainVar.ClientHeight]));
   ML.Add('---');
   ShowDataText := true;
 end;

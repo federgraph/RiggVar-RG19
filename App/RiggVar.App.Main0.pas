@@ -18,10 +18,6 @@
 
 interface
 
-{$ifdef FPC}
-{$mode delphi}
-{$endif}
-
 uses
   System.SysUtils,
   System.Classes,
@@ -43,9 +39,10 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    procedure DoMouseWheel(Shift: TShiftState; WheelDelta: Integer);
+    procedure HandleAction(fa: Integer); virtual;
+    function GetChecked(fa: Integer): Boolean; virtual;
 
-    procedure DropTargetDropped(fn: string); virtual;
+    procedure DoMouseWheel(Shift: TShiftState; WheelDelta: Integer);
   end;
 
 implementation
@@ -70,11 +67,6 @@ begin
   Logger.Free;
   FL.Free;
   inherited;
-end;
-
-procedure TMain0.DropTargetDropped(fn: string);
-begin
-
 end;
 
 procedure TMain0.CopyText;
@@ -113,6 +105,16 @@ begin
   begin
     Main.DoSmallWheel(WheelDelta);
   end
+end;
+
+function TMain0.GetChecked(fa: Integer): Boolean;
+begin
+  result := False;
+end;
+
+procedure TMain0.HandleAction(fa: Integer);
+begin
+
 end;
 
 end.

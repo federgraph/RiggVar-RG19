@@ -74,6 +74,10 @@ begin
   rp[ooP0, y] := 0;
   rp[ooP0, z] := 430;
 
+  rp[ooM, x] := 0;
+  rp[ooM, y] := 0;
+  rp[ooM, z] := 0;
+
   result := rp;
 end;
 

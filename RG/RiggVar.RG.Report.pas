@@ -4,7 +4,6 @@ interface
 
 uses
   System.Classes,
-  System.Generics.Collections,
   Vcl.StdCtrls,
   RiggVar.RG.Def,
   RiggVar.FB.ActionConst,
@@ -15,16 +14,21 @@ type
     rgLog,
     rgJson,
     rgData,
+    rgShort,
+    rgLong,
+
     rgTrimmText,
     rgJsonText,
     rgDataText,
     rgDiffText,
+
     rgAusgabeRL,
     rgAusgabeRP,
     rgAusgabeRLE,
     rgAusgabeRPE,
     rgAusgabeDiffL,
     rgAusgabeDiffP,
+
     rgXML,
     rgDebugReport,
     rgReadme,
@@ -36,8 +40,8 @@ type
     FMemo: TMemo;
     ML: TStrings;
     RiggReport: TRiggReport;
-    RD: TDictionary<Integer, TRggReport>;
-    RDI: TDictionary<TRggReport, Integer>;
+    RDR: array[0..Integer(High(TRggReport))] of TRggReport; //TDictionary<Integer, TRggReport>;
+    RDI: array[TRggReport] of Integer; //TDictionary<TRggReport, Integer>;
     rs: set of TRggReport;
     FCurrentIndex: Integer;
     FCurrentReport: TRggReport;
@@ -50,7 +54,7 @@ type
     constructor Create(Memo: TMemo);
     destructor Destroy; override;
     procedure InitLB(LB: TStrings);
-    procedure HA(fa: Integer);
+    procedure HandleAction(fa: Integer);
     function GetChecked(fa: Integer): Boolean;
     procedure ShowCurrentReport;
     function GetItemIndexOfReport(const Value: TRggReport): Integer;
@@ -68,21 +72,19 @@ uses
   Winapi.Messages,
   RiggVar.App.Main;
 
+{ TRggReportManager }
+
 constructor TRggReportManager.Create(Memo: TMemo);
 begin
   FMemo := Memo;
   ML := Memo.Lines;
   RiggReport := TRiggReport.Create;
-  RD := TDictionary<Integer, TRggReport>.Create;
-  RDI := TDictionary<TRggReport, Integer>.Create;
   InitRD;
 end;
 
 destructor TRggReportManager.Destroy;
 begin
   ML := nil; // not owned
-  RD.Free;
-  RDI.Free;
   RiggReport.Free;
   inherited;
 end;
@@ -98,6 +100,8 @@ begin
     rgLog: result := 'Log';
     rgJson: result := 'RggData.WriteJson';
     rgData: result := 'RggData.WriteReport';
+    rgShort: result := 'Trimm-Item Short';
+    rgLong: result := 'Trimm-Item Long';
     rgTrimmText: result := 'Trimm Text';
     rgJsonText: result := 'Json Text';
     rgDataText: result := 'Data Text';
@@ -117,7 +121,7 @@ begin
   end;
 end;
 
-procedure TRggReportManager.HA(fa: Integer);
+procedure TRggReportManager.HandleAction(fa: Integer);
 var
   rg: TRggReport;
 begin
@@ -126,6 +130,8 @@ begin
     faReportLog: rg := rgLog;
     faReportJson: rg := rgJson;
     faReportData: rg := rgData;
+    faReportShort: rg := rgShort;
+    faReportLong: rg := rgLong;
     faReportTrimmText: rg := rgTrimmText;
     faReportJsonText: rg := rgJsonText;
     faReportDataText: rg := rgDataText;
@@ -156,6 +162,8 @@ begin
     faReportLog: result := CurrentReport = rgLog;
     faReportJson: result := CurrentReport = rgJson;
     faReportData: result := CurrentReport = rgData;
+    faReportShort: result := CurrentReport = rgShort;
+    faReportLong: result := CurrentReport = rgLong;
     faReportTrimmText: result := CurrentReport = rgTrimmText;
     faReportJsonText: result := CurrentReport = rgJsonText;
     faReportDataText: result := CurrentReport = rgDataText;
@@ -176,22 +184,23 @@ end;
 
 function TRggReportManager.GetItemIndexOfReport(const Value: TRggReport): Integer;
 begin
-  if not RDI.TryGetValue(Value, result) then
-  begin
-    result := -1;
-  end;
+  result := RDI[Value];
 end;
 
 procedure TRggReportManager.SetCurrentIndex(const Value: Integer);
 var
   r: TRggReport;
 begin
+  if Value < 0 then
+    Exit;
+  if Value > Integer(High(TRggReport)) then
+    Exit;
+
 //  FCurrentReport := RD.Items[Value];
-  if RD.TryGetValue(Value, r) then
-  begin
-    FCurrentIndex := Value;
-    FCurrentReport := r;
-  end;
+
+  r := RDR[Value];
+  FCurrentIndex := Value;
+  FCurrentReport := r;
 end;
 
 procedure TRggReportManager.SetCurrentReport(const Value: TRggReport);
@@ -216,11 +225,11 @@ begin
       rgNone: ;
       rgReadme:
       begin
-        ML.Add('On the desktop - use the scroll wheel of the mouse!');
+        ML.Add('On the desktop - use scroll Wheel of the mouse!');
         ML.Add('');
-        ML.Add('Wheel by itself will scroll the text if too long.');
-        ML.Add('Shift-Wheel will change current param value (small step)');
-        ML.Add('Ctrl-Wheel will change current param value (big step)');
+        ML.Add('Wheel by itself will scroll Text in Controls.');
+        ML.Add('Shift-Wheel changes current param value (small step)');
+        ML.Add('Ctrl-Wheel changes current param value (big step)');
         ML.Add('The "mouse" must be over this window (Form Text).');
         ML.Add('');
         ML.Add('- Form Text was added on top of the "old" application.');
@@ -271,6 +280,8 @@ begin
         Main.RggMain.Rigg.WriteXml(ML, XmlAllTags);
         SendMessage(FMemo.Handle, EM_LINESCROLL, 0, MemoPosY);
       end;
+      rgShort: ML.Text := Main.TrimmShort;
+      rgLong: ML.Text := Main.TrimmLong;
       rgDiffText: Main.RggMain.UpdateDiffText(ML);
       rgJsonText: Main.RggMain.UpdateJsonText(ML);
       rgDataText: Main.RggMain.UpdateDataText(ML);
@@ -293,34 +304,36 @@ var
   i: Integer;
   r: TRggReport;
 begin
-  for r := Low(TRggReport) to High(TRggReport) do
-    Include(rs, r);
+  rs := [];
 
-  Exclude(rs, rgTrimmText);
-  Exclude(rs, rgAusgabeDiffL);
-  Exclude(rs, rgAusgabeDiffP);
-  Exclude(rs, rgDebugReport);
+  Include(rs, rgLog);
+//  Include(rs, rgJson);
+//  Include(rs, rgData);
+  Include(rs, rgShort);
+//  Include(rs, rgLong);
 
-//    rgLog,
-//    rgJson,
-//    rgData,
-//    rgTrimmText,
-//    rgDataText,
-//    rgDiffText,
-//    rgAusgabeRL,
-//    rgAusgabeRP,
-//    rgAusgabeRLE,
-//    rgAusgabeRPE,
-//    rgAusgabeDiffL,
-//    rgAusgabeDiffP,
-//    rgXML,
-//    rgDebugReport
+  Include(rs, rgTrimmText);
+  Include(rs, rgJsonText);
+  Include(rs, rgDataText);
+  Include(rs, rgDiffText);
+
+  Include(rs, rgAusgabeRL);
+  Include(rs, rgAusgabeRP);
+//  Include(rs, rgAusgabeRLE);
+//  Include(rs, rgAusgabeRPE);
+  Include(rs, rgAusgabeDiffL);
+//  Include(rs, rgAusgabeDiffP);
+
+  Include(rs, rgXML);
+  Include(rs, rgDebugReport);
+  Include(rs, rgReadme);
+  Include(rs, rgNone);
 
   i := 0;
   for r in rs do
   begin
-    RD.Add(i, r);
-    RDI.Add(r, i);
+    RDR[i] := r;
+    RDI[r] := i;
     Inc(i);
   end;
 end;

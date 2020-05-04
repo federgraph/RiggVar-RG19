@@ -107,6 +107,53 @@ begin
   FTransformedFixPunkt := Rotator.Rotiere(FFixPunkt);
 end;
 
+{ TRggTransformer4x4 }
+
+constructor TRggTransformer4x4.Create;
+begin
+  inherited;
+  Mat := TMatrix4x4.Create;
+end;
+
+destructor TRggTransformer4x4.Destroy;
+begin
+  Mat.Free;
+  inherited;
+end;
+
+procedure TRggTransformer4x4.BuildMatrix;
+begin
+  if Assigned(OnGetFixPunkt) then
+    FFixPunkt := OnGetFixPunkt;
+
+  FTransformedFixPunkt := Rotator.Rotiere(FFixPunkt);
+
+  Mat.Identity;
+  Mat.Translate(
+    -FTransformedFixPunkt[x],
+    -FTransformedFixPunkt[y],
+    -FTransformedFixPunkt[z]
+  );
+  Mat.Multiply(Rotator.Matrix);
+  Mat.ScaleXYZ(Zoom, Zoom, Zoom);
+end;
+
+function TRggTransformer4x4.TransformPoint(p: TRealPoint): TRealPoint;
+var
+  pt: vec3;
+begin
+  if not Updated then
+    BuildMatrix;
+
+  pt.x := p[x];
+  pt.y := p[y];
+  pt.z := p[z];
+  Mat.TransformPoint(pt);
+  result[x] := pt.x;
+  result[y] := pt.y;
+  result[z] := pt.z;
+end;
+
 { TRggTransformer3D }
 
 procedure TRggTransformer3D.BuildMatrix;
@@ -153,53 +200,6 @@ begin
   result[x] := p2.X;
   result[y] := p2.Y;
   result[z] := p2.Z;
-end;
-
-{ TRggTransformer4x4 }
-
-constructor TRggTransformer4x4.Create;
-begin
-  inherited;
-  Mat := TMatrix4x4.Create;
-end;
-
-destructor TRggTransformer4x4.Destroy;
-begin
-  Mat.Free;
-  inherited;
-end;
-
-procedure TRggTransformer4x4.BuildMatrix;
-begin
-  if Assigned(OnGetFixPunkt) then
-    FFixPunkt := OnGetFixPunkt;
-
-  FTransformedFixPunkt := Rotator.Rotiere(FFixPunkt);
-
-  Mat.Identity;
-  Mat.Translate(
-    -FTransformedFixPunkt[x],
-    -FTransformedFixPunkt[y],
-    -FTransformedFixPunkt[z]
-  );
-  Mat.Multiply(Rotator.Matrix);
-  Mat.ScaleXYZ(Zoom, Zoom, Zoom);
-end;
-
-function TRggTransformer4x4.TransformPoint(p: TRealPoint): TRealPoint;
-var
-  pt: vec3;
-begin
-  if not Updated then
-    BuildMatrix;
-
-  pt.x := p[x];
-  pt.y := p[y];
-  pt.z := p[z];
-  Mat.TransformPoint(pt);
-  result[x] := pt.x;
-  result[y] := pt.y;
-  result[z] := pt.z;
 end;
 
 end.
