@@ -314,6 +314,7 @@ procedure TMast.LoadFromStream(S: TStream);
 var
   temp: Integer;
 begin
+  temp := 0;
   inherited LoadFromStream(S);
   S.ReadBuffer(temp, SizeOf(Integer));
   ControllerTyp := TControllerTyp(temp);

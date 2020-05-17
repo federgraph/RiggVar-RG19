@@ -30,9 +30,9 @@ type
     FMat: Matrix4x4;
   public
     constructor Create;
-    procedure GetLocals(var ux, uy, uz: vec3);
+    procedure GetLocals(out ux, uy, uz: vec3);
     procedure Identity;
-    procedure SetIdentity(var m: Matrix4x4);
+    procedure SetIdentity(out m: Matrix4x4);
     procedure Multiply(m: Matrix4x4);
     procedure PreMultiply(m: Matrix4x4);
     procedure Transpose;
@@ -108,7 +108,7 @@ begin
   SetIdentity(FMat);
 end;
 
-procedure TMatrix4x4.SetIdentity(var m: Matrix4x4);
+procedure TMatrix4x4.SetIdentity(out m: Matrix4x4);
 var
   r, c: Integer;
 begin
@@ -413,7 +413,7 @@ begin
   end;
 end;
 
-procedure TMatrix4x4.GetLocals(var ux, uy, uz: vec3);
+procedure TMatrix4x4.GetLocals(out ux, uy, uz: vec3);
 begin
   ux.x := FMat[1, 1];
   ux.y := FMat[2, 1];
