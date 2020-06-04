@@ -6,7 +6,6 @@ uses
   Winapi.Windows,
   System.SysUtils,
   System.Classes,
-//  System.Types,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.ExtCtrls,

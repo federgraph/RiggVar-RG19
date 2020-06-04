@@ -29,7 +29,6 @@ uses
   FrmScale in 'Frm\FrmScale.pas' {RumpfFaktorDlg},
   FrmIndicator in 'Frm\FrmIndicator.pas' {IndicatorForm},
   FrmKreis in 'Frm\FrmKreis.pas' {Kreisform},
-  Vector3D in 'Graph\Vector3D.pas',
   ThreeD in 'Graph\ThreeD.pas',
   ThreeDSolid in 'Graph\ThreeDSolid.pas',
   RggDoc in 'Core\RggDoc.pas',
@@ -84,7 +83,8 @@ uses
   RggZug2D in 'Graph\RggZug2D.pas',
   RggDisplayOrder in 'Graph\RggDisplayOrder.pas',
   RggDisplayTypes in 'Graph\RggDisplayTypes.pas',
-  RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas';
+  RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas',
+  RggVector in 'Graph\RggVector.pas';
 
 {$R *.res}
 

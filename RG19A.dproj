@@ -187,7 +187,6 @@
         </DCCReference>
         <DCCReference Include="Graph\ThreeD.pas"/>
         <DCCReference Include="Graph\ThreeDSolid.pas"/>
-        <DCCReference Include="Graph\Vector3D.pas"/>
         <DCCReference Include="Core\RggReport.pas"/>
         <DCCReference Include="Core\RggTypes.pas"/>
         <DCCReference Include="Core\RggUnit0.pas"/>
@@ -240,6 +239,7 @@
         <DCCReference Include="Graph\RggDisplayOrder.pas"/>
         <DCCReference Include="Graph\RggDisplayTypes.pas"/>
         <DCCReference Include="FB\RiggVar.FB.ActionConst.pas"/>
+        <DCCReference Include="Graph\RggVector.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

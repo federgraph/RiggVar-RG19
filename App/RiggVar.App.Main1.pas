@@ -306,7 +306,6 @@ end;
 
 procedure TMain1.CopyAndPaste;
 var
-  s: string;
   fd: TRggData;
 begin
   { copy }
@@ -314,7 +313,6 @@ begin
   RggMain.SaveTrimm(fd);
   fd.WantAll := True;
   fd.SaveTrimmItem(FL);
-  s := FL.Text;
 
   { paste }
   ReadText(FL);
@@ -819,7 +817,10 @@ begin
     faWantRenderE,
     faWantRenderS:
     begin
-      result := RggMain.StrokeRigg.QueryRenderOption(fa);
+      if RggMain.StrokeRigg <> nil then
+        result := RggMain.StrokeRigg.QueryRenderOption(fa)
+      else
+        result := False;
     end;
 
     faHull: result := RggMain.HullVisible;

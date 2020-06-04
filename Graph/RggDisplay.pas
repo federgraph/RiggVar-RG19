@@ -3,6 +3,9 @@
 interface
 
 uses
+  Vcl.Graphics,
+  System.UITypes,
+  System.UIConsts,
   System.Types,
   System.SysUtils,
   System.Classes,
@@ -10,9 +13,6 @@ uses
   System.Math.Vectors,
   System.Generics.Collections,
   System.Generics.Defaults,
-  System.UITypes,
-  System.UIConsts,
-  Vcl.Graphics,
   RggTypes,
   RggCalc,
   RggDisplayTypes,

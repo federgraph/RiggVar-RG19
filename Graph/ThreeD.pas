@@ -7,7 +7,7 @@ uses
   System.SysUtils,
   System.Types,
   Vcl.Graphics,
-  Vector3D;
+  RggVector;
 
 const
   EM_FILEOPENERROR = -100;
@@ -204,15 +204,15 @@ begin
   Dist := Subtract(At, From);
 
   temp := Dist;
-  tempmag := Mag(Dist);
+  tempmag := Mag3D(Dist);
   A3 := Divide(temp, tempmag); // Einheitsvektor in Blickrichtung (z)
 
   temp := Cross(Dist, Up);
-  tempmag := Mag(temp);
+  tempmag := Mag3D(temp);
   A1 := Divide(temp, tempmag); // Einheitsvektor auf x-Achse des Bildes
 
   temp := Cross(A1, A3);
-  tempmag := Mag(temp);
+  tempmag := Mag3D(temp);
   A2 := Divide(temp, tempmag); // Einheitsvektor auf y-Achse des Bildes (UP)
 
   Offsx := -(A1.x * From.x + A1.y * From.y + A1.z * From.z);

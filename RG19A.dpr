@@ -33,7 +33,6 @@ uses
   FrmText in 'App\FrmText.pas' {TextForm},
   ThreeD in 'Graph\ThreeD.pas',
   ThreeDSolid in 'Graph\ThreeDSolid.pas',
-  Vector3D in 'Graph\Vector3D.pas',
   RggReport in 'Core\RggReport.pas',
   RggTypes in 'Core\RggTypes.pas',
   RggUnit0 in 'Core\RggUnit0.pas',
@@ -85,7 +84,8 @@ uses
   RggZug2D in 'Graph\RggZug2D.pas',
   RggDisplayOrder in 'Graph\RggDisplayOrder.pas',
   RggDisplayTypes in 'Graph\RggDisplayTypes.pas',
-  RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas';
+  RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas',
+  RggVector in 'Graph\RggVector.pas';
 
 {$R *.res}
 

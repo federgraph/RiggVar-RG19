@@ -18,8 +18,6 @@
 
 interface
 
-{$SCOPEDENUMS ON}
-
 uses
   Winapi.Windows,
   Winapi.Messages,
@@ -621,28 +619,28 @@ begin
     end;
 
   { zutreffende Knickkurve bestimmen }
-  Kurve := TKurvenTyp.KurveOhneController;
+  Kurve := KurveOhneController;
   case FControllerTyp of
     ctOhne:
-      Kurve := TKurvenTyp.KurveOhneController;
+      Kurve := KurveOhneController;
     ctDruck:
       begin
-        Kurve := TKurvenTyp.KurveOhneController;
+        Kurve := KurveOhneController;
         if FSalingWegKnick < hd then
-          Kurve := TKurvenTyp.KurveMitController;
+          Kurve := KurveMitController;
     end;
     ctZugDruck:
-      Kurve := TKurvenTyp.KurveMitController;
+      Kurve := KurveMitController;
   end;
 
   { FwSchnittOffset für Knickkurve festlegen }
-  if Kurve = TKurvenTyp.KurveOhneController then
+  if Kurve = KurveOhneController then
     FwSchnittOffset := 0
-  else if Kurve = TKurvenTyp.KurveMitController then
+  else if Kurve = KurveMitController then
   begin
     FwSchnittOhne := FSalingWegKnick;
-    FSchnittPunktKraft := FvonW(FwSchnittOhne, TKurvenTyp.KurveOhneController, FKorrigiert);
-    FwSchnittMit := WvonF(FSchnittPunktKraft, TKurvenTyp.KurveMitController, False);
+    FSchnittPunktKraft := FvonW(FwSchnittOhne, KurveOhneController, FKorrigiert);
+    FwSchnittMit := WvonF(FSchnittPunktKraft, KurveMitController, False);
     FwSchnittOffset := FwSchnittOhne - FwSchnittMit;
   end;
 
@@ -653,13 +651,13 @@ begin
     FMastOK := False;
     Include(FMastStatus, msZugKraftimMast);
   end;
-  if Kurve = TKurvenTyp.KurveOhneController then
+  if Kurve = KurveOhneController then
     MastDruck := FvonW(WSoll, Kurve, FKorrigiert)
   else
     MastDruck := FvonW(WSoll, Kurve, False);
 
   { Controllerkraft ermitteln }
-  if Kurve = TKurvenTyp.KurveOhneController then
+  if Kurve = KurveOhneController then
     ControllerKraft := 0
   else
   begin
@@ -712,7 +710,7 @@ begin
   { Die Kraft numerisch ermitteln, da die Umkehrfunktion zu WvonF noch nicht
     explizit vorliegt. }
   Knicklaenge := FKnicklaenge;
-  if Kurve = TKurvenTyp.KurveMitController then
+  if Kurve = KurveMitController then
     Knicklaenge := FKorrekturFaktor * FKnicklaenge;
 
   Zaehler := 0;
@@ -739,7 +737,7 @@ var
   Knicklaenge: double;
 begin
   Knicklaenge := FKnicklaenge;
-  if Kurve = TKurvenTyp.KurveMitController then
+  if Kurve = KurveMitController then
     Knicklaenge := FKorrekturFaktor * FKnicklaenge;
 
   k := sqrt(f / EI); { k in mm^-1, F in N, EI in Nmm^2 }
@@ -787,7 +785,7 @@ var
   DX3, DY3, W3: double;
   D, D1, D2: double;
   BekanntFX, BekanntFY: double;
-  S: String;
+  s: string;
 begin
   W1 := -1;
   W2 := -1;
@@ -812,6 +810,13 @@ begin
     BekanntFY := -FB * DY3 / W3;
     { Ausrechnen der Stabkräfte }
     D := DX1 * DY2 - DX2 * DY1;
+    if D = 0 then
+    begin
+      { we do not want exceptions when running in the debugger }
+      FU1 := 0;
+      FU2 := 0;
+      Exit;
+    end;
     D1 := BekanntFX * DY2 - BekanntFY * DX2;
     D2 := BekanntFY * DX1 - BekanntFX * DY1;
     FU1 := D1 / D * W1; { 1. neu ermittelte Stabkraft }
@@ -822,17 +827,17 @@ begin
       { D ist Null, wenn FU1 und FU2 auf einer Geraden liegen. }
       FU1 := 0;
       FU2 := 0;
-      S := 'SolveKG21: EZeroDivide;';
+      s := 'SolveKG21: EZeroDivide;';
       if W1 = 0 then
-        S := ' W1';
+        s := ' W1';
       if W2 = 0 then
-        S := S + ' W2';
+        s := S + ' W2';
       if W3 = 0 then
-        S := S + ' W3';
+        s := S + ' W3';
       if D = 0 then
-        S := S + ' W2';
-      S := S + 'sind Null!';
-      Main.Logger.Info(S);
+        s := S + ' W2';
+      s := s + 'sind Null!';
+      Main.Logger.Info(s);
     end;
   end;
 end; { KG21 }

@@ -31,7 +31,6 @@ uses
   FrmKreis in 'Frm\FrmKreis.pas' {KreisForm},
   ThreeD in 'Graph\ThreeD.pas',
   ThreeDSolid in 'Graph\ThreeDSolid.pas',
-  Vector3D in 'Graph\Vector3D.pas',
   RggDoc in 'Core\RggDoc.pas',
   RggFachwerk in 'Core\RggFachwerk.pas',
   RggModul in 'Core\RggModul.pas',
@@ -84,7 +83,8 @@ uses
   RggZug in 'Graph\RggZug.pas',
   RggDisplayOrder in 'Graph\RggDisplayOrder.pas',
   RggDisplayTypes in 'Graph\RggDisplayTypes.pas',
-  RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas';
+  RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas',
+  RggVector in 'Graph\RggVector.pas';
 
 {$R *.res}
 

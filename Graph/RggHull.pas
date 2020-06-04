@@ -19,6 +19,8 @@ uses
   RggRaumGraph;
 
 type
+  TConColors = array [0 .. 15] of TColor;
+
   THullGraph0 = class(TRggGraph)
   private
     procedure MessageBeep(Value: Integer);
@@ -31,7 +33,7 @@ type
     con: TConArray;
     ncon: Integer;
     gr: TConColors;
-    { Matrix }
+
     function AddVert(x, y, z: single): Integer;
     procedure AddLine(p1, p2: Integer);
     procedure Paint(g: TCanvas);
@@ -218,12 +220,6 @@ begin
     end
     else
       g.Pen.Color := clBtnFace;
-
-    { Farbe bestimmen, Varinate 2 }
-    // if Coloriert then
-    //   g.Pen.Color := GetColor(i)
-    // else
-    //   g.Pen.Color := clBtnFace;
 
     g.Pen.Width := 1;
     { Linie zeichnen }
@@ -566,7 +562,7 @@ var
   end;
 
   { local procedure }
-  procedure GetInteger(var IntValue: Integer);
+  procedure GetInteger(out IntValue: Integer);
   begin
     Zeile := Trim(Zeile);
     Wort := TUtils.StripFirstWord(Zeile);

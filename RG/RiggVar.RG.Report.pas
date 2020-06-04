@@ -3,9 +3,9 @@
 interface
 
 uses
+  System.SysUtils,
   System.Classes,
   Vcl.StdCtrls,
-  RiggVar.RG.Def,
   RiggVar.FB.ActionConst,
   RggReport;
 
@@ -195,8 +195,6 @@ begin
     Exit;
   if Value > Integer(High(TRggReport)) then
     Exit;
-
-//  FCurrentReport := RD.Items[Value];
 
   r := RDR[Value];
   FCurrentIndex := Value;

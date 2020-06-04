@@ -7,9 +7,8 @@ uses
   Vcl.Dialogs,
   System.SysUtils,
   System.UITypes,
-//  System.Types,
   Vcl.Graphics,
-  Vector3D,
+  RggVector,
   ThreeD;
 
 type
@@ -101,7 +100,7 @@ begin
   d1 := Subtract(V1, V2);
   d2 := Subtract(V1, V3);
   Normal := Cross(d1, d2);
-  Normalize(Normal);
+  Normalize3D(Normal);
 end;
 
 procedure TTriangle.ComputeD;
@@ -585,7 +584,7 @@ begin
   begin
     { zunächst den diffusen Anteil in lDotN ermitteln }
     l := Subtract(Light, p);
-    Normalize(l);
+    Normalize3D(l);
     lDotN := Dot(l, Normal);
     temp := lDotN * Diffuse * NUM_SHADES;
     if lDotN <= 0 then
@@ -659,7 +658,7 @@ begin
   s.x := From.x - tree.Tri.V1.x;
   s.y := From.y - tree.Tri.V1.y;
   s.z := From.z - tree.Tri.V1.z;
-  Normalize(s);
+  Normalize3D(s);
   if Dot(s, tree.Tri.Normal) > 0 then
   begin // The eye is in front of the polygon
     TraverseTree(Canvas, tree.Inside);

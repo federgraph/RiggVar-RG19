@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils,
   System.Math,
-  Vector3D,
+  RggVector,
   RggTypes,
   RggMatrix;
 
@@ -429,9 +429,9 @@ begin
     else
     begin
       tempY := Cross(zVec, ux);
-      Normalize(tempY);
+      Normalize3D(tempY);
       tempZ := Cross(ux, tempY);
-      Normalize(tempZ);
+      Normalize3D(tempZ);
       tempcos := dot(uz, tempZ);
       tempsin := -dot(uz, tempY);
       wg := ArcCos(CheckSinCos(tempcos));
@@ -443,7 +443,7 @@ begin
     if Theta90 then
     begin
       tempVec := Cross(uy, zVec);
-      Normalize(tempVec);
+      Normalize3D(tempVec);
       tempcos := tempVec.x; //tempcos := -uz.x;
       tempsin := tempVec.y; //tempsin := -uz.y;
     end
@@ -451,7 +451,7 @@ begin
     begin
       tempVec := ux;
       tempVec.z := 0;
-      Normalize(tempVec); //d := Hypot(ux.x,ux.y);
+      Normalize3D(tempVec); //d := Hypot(ux.x,ux.y);
       tempcos := dot(xVec, tempVec); //tempcos := ux.x/d;
       tempsin := dot(yVec, tempVec); //tempsin := ux.y/d;
     end;

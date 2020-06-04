@@ -18,7 +18,7 @@ uses
   Vcl.ExtCtrls,
   Vcl.ComCtrls,
   Vcl.ExtDlgs,
-  Vector3D,
+  RggVector,
   RiggVar.RG.Graph,
   RggTypes,
   RggMatrix,
@@ -29,6 +29,9 @@ uses
   RggTransformer;
 
 type
+
+  { TRotaForm }
+
   TRotaForm = class(TInterfacedObject, IStrokeRigg)
   private
     RPN: TRealRiggPoints;
@@ -54,7 +57,7 @@ type
     MatrixItemChecked: Boolean;
     PaintItemChecked: Boolean;
     RumpfItemChecked: Boolean;
-    procedure LegendItemClick(Sender: TObject);
+    procedure LegendBtnClick(Sender: TObject);
     procedure MatrixItemClick(Sender: TObject);
     procedure PaintBtnClick(Sender: TObject);
     procedure RumpfBtnClick(Sender: TObject);
@@ -835,7 +838,7 @@ begin
   FDrawAlways := not FDrawAlways;
 end;
 
-procedure TRotaForm.LegendItemClick(Sender: TObject);
+procedure TRotaForm.LegendBtnClick(Sender: TObject);
 begin
   LegendItemChecked := not LegendItemChecked;
   Draw;

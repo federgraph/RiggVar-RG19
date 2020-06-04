@@ -63,7 +63,7 @@ type
 implementation
 
 uses
-  Vector3D,
+  RggVector,
   RggPBox;
 
 {$r *.DFM}
@@ -230,7 +230,7 @@ begin
   begin
     { Kamera und Lichtquelle um den At-Point drehen, dadurch entsteht der
       Eindruck, daß das Model um die lokalen Achsen gedreht wird. }
-    tempDist := Mag(Subtract(From, At));
+    tempDist := Mag3D(Subtract(From, At));
     { From - At }
     vert1.X := 0;
     vert1.Y := -tempDist;

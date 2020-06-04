@@ -21,7 +21,7 @@ uses
   Vcl.Printers,
   Vcl.ComCtrls,
   Vcl.ExtDlgs,
-  Vector3D,
+  RggVector,
   RggTypes,
   RggGetriebeGraph,
   RggMatrix,

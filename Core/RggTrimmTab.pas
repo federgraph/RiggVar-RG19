@@ -25,12 +25,12 @@ uses
   System.Types,
   System.Inifiles,
   System.Math,
-  Vector3D,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.StdCtrls,
   Vcl.ExtCtrls,
   Vcl. Buttons,
+  RggVector,
   RggTypes;
 
 const
@@ -141,10 +141,6 @@ type
     property EndwertWeg: Integer read GetEndwertWeg write SetEndwertWeg;
     property TrimmtabDaten: TTrimmTabDaten read GetTrimmTabDaten write SetTrimmTabDaten;
   end;
-
-//  vec3 = record
-//    x, y, z: double;
-//  end;
 
   TControlPunkte = array [1 .. BezierKurveVomGrad + 1] of vec3;
   TBezierKurve = array [1 .. AnzahlKurvenPunkte + 1] of vec3;
