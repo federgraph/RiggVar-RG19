@@ -914,32 +914,32 @@ begin
   { Geometrie für Mastsystem }
   case SalingTyp of
     stFest, stDrehbar, stOhne_2:
-      begin
+    begin
       SchnittGG(rP[ooD0], rP[ooC], rP[ooP], rP[ooD], SPSaling);
-      SchnittGG(rP[ooD0], rP[ooC], rP[ooE], rP[ooC0], SPController);
+      SchnittGG(rP[ooD0], rP[ooC], rP[ooE], rP[ooE0], SPController);
       ld := Abstand(rP[ooD0], SPSaling);
       le := Abstand(rP[ooD0], SPController);
       lc := rL[0];
-        EC := Abstand(rP[ooC], rP[ooE]);
-        hd := Hoehe(lc - 0.0001, rL[16], rL[15], k2);
-        he := Hoehe(lc - 0.0001, rL[18], EC, k1);
-        if SPSaling[x] - rP[ooD, x] > 0 then
-          hd := -hd;
-        if SPController[x] - rP[ooE, x] > 0 then
-          he := -he;
+      EC := Abstand(rP[ooC], rP[ooE]);
+      hd := Hoehe(lc - 0.0001, rL[16], rL[15], k2);
+      he := Hoehe(lc - 0.0001, rL[18], EC, k1);
+      if SPSaling[x] - rP[ooD, x] > 0 then
+        hd := -hd;
+      if SPController[x] - rP[ooE, x] > 0 then
+        he := -he;
     end;
 
     stOhne:
-      begin
-      SchnittGG(rP[ooD0], rP[ooC], rP[ooE], rP[ooC0], SPController);
+    begin
+      SchnittGG(rP[ooD0], rP[ooC], rP[ooE], rP[ooE0], SPController);
       ld := rL[16];
       le := Abstand(rP[ooD0], SPController);
       lc := rL[0];
-        EC := Abstand(rP[ooC], rP[ooE]);
-        hd := 0; { Null gesetzt, da nicht relevant }
-        he := Hoehe(lc - 0.0001, rL[18], EC, k1);
-        if SPController[x] - rP[ooE, x] > 0 then
-          he := -he;
+      EC := Abstand(rP[ooC], rP[ooE]);
+      hd := 0; { Null gesetzt, da nicht relevant }
+      he := Hoehe(lc - 0.0001, rL[18], EC, k1);
+      if SPController[x] - rP[ooE, x] > 0 then
+        he := -he;
     end;
   end;
 

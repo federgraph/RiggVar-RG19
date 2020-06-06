@@ -305,7 +305,7 @@ end;
 
 procedure TRggMain.SetHullVisible(const Value: Boolean);
 begin
-  if Value <> FHullVisible then
+  if (Value <> FHullVisible) and (StrokeRigg <> nil) then
   begin
     FHullVisible := Value;
     StrokeRigg.HullVisible := Value;

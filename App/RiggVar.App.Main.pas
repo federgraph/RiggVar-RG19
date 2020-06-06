@@ -20,8 +20,6 @@ interface
 
 uses
   System.Classes,
-//  RiggVar.FB.Scheme,
-//  RiggVar.FB.Transform,
   RiggVar.App.Main1;
 
 type
@@ -66,10 +64,6 @@ type
     ShouldRecycleSocket: Boolean;
     AppTitle: string;
     ShowDebugData: Boolean;
-
-//    ColorScheme: TColorScheme;
-    //Transform2D: TTransform2D;
-//    Transform3D: TTransform3D;
 
     Raster: Integer;
     WheelFrequency: single;
@@ -123,14 +117,6 @@ begin
   ShouldRecycleSocket := False;
   AppTitle := '';
 
-//  ColorScheme := TColorScheme.Create(1, 4, 5);
-
-//  Transform2D := TTransform2D.Create;
-//  Transform2D.Init;
-
-//  Transform3D := TTransform3D.Create;
-//  Transform3D.Init;
-
   Raster := 70;
   WheelFrequency := 1;
   ShiftState := [];
@@ -143,8 +129,6 @@ end;
 
 class destructor MainVar.Destroy;
 begin
-//  Transform2D.Free;
-//  Transform3D.Free;
   inherited;
 end;
 
