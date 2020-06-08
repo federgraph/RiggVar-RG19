@@ -26,7 +26,7 @@ object OptionForm: TOptionForm
     Top = 3
     Width = 521
     Height = 265
-    ActivePage = tsRumpf
+    ActivePage = tsTrimm
     TabOrder = 0
     object tsTrimm: TTabSheet
       Caption = 'Trimm'
@@ -119,36 +119,33 @@ object OptionForm: TOptionForm
         Font.Style = [fsItalic]
         ParentFont = False
       end
-      object MinEdit: TMaskEdit
+      object MinEdit: TEdit
         Left = 56
         Top = 88
         Width = 41
         Height = 21
-        EditMask = '!9999;1; '
         MaxLength = 4
         TabOrder = 0
         Text = '    '
         OnExit = MinEditExit
         OnKeyDown = MinEditKeyDown
       end
-      object PosEdit: TMaskEdit
+      object PosEdit: TEdit
         Left = 120
         Top = 88
         Width = 41
         Height = 21
-        EditMask = '!9999;1; '
         MaxLength = 4
         TabOrder = 1
         Text = '    '
         OnExit = MinEditExit
         OnKeyDown = MinEditKeyDown
       end
-      object MaxEdit: TMaskEdit
+      object MaxEdit: TEdit
         Left = 184
         Top = 88
         Width = 41
         Height = 21
-        EditMask = '!9999;1; '
         MaxLength = 4
         TabOrder = 2
         Text = '    '
@@ -156,8 +153,8 @@ object OptionForm: TOptionForm
         OnKeyDown = MinEditKeyDown
       end
       object TrimmCombo: TComboBox
-        Left = 56
-        Top = 144
+        Left = 61
+        Top = 151
         Width = 169
         Height = 21
         Style = csDropDownList
@@ -469,7 +466,7 @@ object OptionForm: TOptionForm
       end
       object MastMassCombo: TComboBox
         Left = 56
-        Top = 152
+        Top = 156
         Width = 145
         Height = 21
         Style = csDropDownList
@@ -482,7 +479,7 @@ object OptionForm: TOptionForm
           'Top')
       end
       object EIEdit: TEdit
-        Left = 216
+        Left = 217
         Top = 80
         Width = 73
         Height = 21
@@ -492,15 +489,13 @@ object OptionForm: TOptionForm
         TabOrder = 2
         Text = 'EIEdit'
       end
-      object MastMassEdit: TMaskEdit
-        Left = 216
+      object MastMassEdit: TEdit
+        Left = 217
         Top = 152
         Width = 73
         Height = 21
-        EditMask = '!9999;1; '
         MaxLength = 4
         TabOrder = 3
-        Text = '    '
         OnExit = MastMassEditExit
         OnKeyDown = MastMassEditKeyDown
       end

@@ -347,7 +347,7 @@ object ChartForm: TChartForm
       Height = 13
       Caption = 'Bereich'
     end
-    object YComboBox: TComboBox
+    object YCombo: TComboBox
       Left = 416
       Top = 32
       Width = 145
@@ -357,7 +357,7 @@ object ChartForm: TChartForm
       ParentShowHint = False
       ShowHint = True
       TabOrder = 6
-      OnChange = YComboBoxChange
+      OnChange = YComboChange
       Items.Strings = (
         'Durchbiegung hd'
         'Elastizit'#228't Punkt C'
@@ -441,14 +441,14 @@ object ChartForm: TChartForm
       TabOrder = 11
       OnChanging = PSpinnerChanging
     end
-    object XComboBox: TComboBox
+    object XCombo: TComboBox
       Left = 24
       Top = 32
       Width = 145
       Height = 21
       Style = csDropDownList
       TabOrder = 0
-      OnChange = XComboBoxChange
+      OnChange = XComboChange
       Items.Strings = (
         'Controller'
         'Winkel'
@@ -484,20 +484,20 @@ object ChartForm: TChartForm
     end
     object PMinEdit: TMaskEdit
       Left = 200
-      Top = 104
+      Top = 105
       Width = 73
       Height = 21
       TabOrder = 4
       Text = 'PMinEdit'
     end
-    object PComboBox: TComboBox
-      Left = 24
-      Top = 104
+    object PCombo: TComboBox
+      Left = 23
+      Top = 105
       Width = 145
       Height = 21
       Style = csDropDownList
       TabOrder = 3
-      OnChange = PComboBoxChange
+      OnChange = PComboChange
       Items.Strings = (
         'Saling Abstand'
         'Saling H'#246'he')

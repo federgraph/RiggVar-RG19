@@ -32,9 +32,9 @@ type
     LabelMin: TLabel;
     LabelPos: TLabel;
     LabelMax: TLabel;
-    MinEdit: TMaskEdit;
-    PosEdit: TMaskEdit;
-    MaxEdit: TMaskEdit;
+    MinEdit: TEdit;
+    PosEdit: TEdit;
+    MaxEdit: TEdit;
     Label15: TLabel;
     TrimmVarLabel: TLabel;
     TrimmCombo: TComboBox;
@@ -65,7 +65,7 @@ type
     Label14: TLabel;
     MastMassCombo: TComboBox;
     EIEdit: TEdit;
-    MastMassEdit: TMaskEdit;
+    MastMassEdit: TEdit;
     Label5: TLabel;
     Label17: TLabel;
     tsRumpf: TTabSheet;
@@ -166,8 +166,6 @@ type
     FTrimmTabelle: TTrimmTab;
     FTabellenTyp: TTabellenTyp;
     FTabChanging: Boolean;
-    function StripBlanks(S: String): String;
-    function GetInteger(S: String): Integer;
     procedure GetKeyList(Source, Dest: TStringList);
     procedure FillInifileLists;
     procedure FillRiggLists;
@@ -175,7 +173,7 @@ type
     procedure LoadRiggCombos;
     procedure CheckTabelle;
   public
-    IniFileName: String;
+    IniFileName: string;
     procedure LoadFromIniFile;
     procedure WriteToIniFile;
   end;
@@ -205,35 +203,14 @@ begin
   WritePrivateProfileString(nil, nil, nil, PChar(FileName));
 end;
 
-function TOptionForm.StripBlanks(S: String): String;
-{ entfernt auch die Leerzeichen in der Mitte!,
-  sonst könnte Trim() verwendet werden }
-var
-  i: Integer;
-  S1, S2: String;
-begin
-  S1 := '';
-  for i := 1 to Length(S) do begin
-    S2 := S[i];
-    if S2 <> ' ' then S2 := S1 + S2;
-  end;
-  Result := S1;
-end;
-
-function TOptionForm.GetInteger(S: String): Integer;
-begin
-  if (S = '    ') or (S = '+   ') or (S ='-   ') then S := '0';
-  S := StripBlanks(S);
-  Result := StrToIntDef(S, 0);
-end;
-
 procedure TOptionForm.GetKeyList(Source, Dest: TStringList);
 var
   i: Integer;
-  S: String;
+  S: string;
 begin
   Dest.Clear;
-  for i := 0 to Source.Count - 1 do begin
+  for i := 0 to Source.Count - 1 do
+  begin
     S := Copy(Source[i], 1, Pos('=', Source[i]) - 1);
     Dest.Add(S);
   end;
@@ -253,7 +230,7 @@ begin
   { IniFileName := ChangeFileExt(ParamStr(0), '.INI'); } { Alternative }
   { IniFileName := 'rigg.ini'; } { --> rigg.ini im Windows Verzeichnis }
 
-  FRumpfCell := Point(1,1);
+  FRumpfCell := Point(1, 1);
   RumpfGrid.Cells[0,0] := '';
   RumpfGrid.Cells[1,0] := '    x';
   RumpfGrid.Cells[2,0] := '    y';
@@ -292,7 +269,7 @@ end;
 procedure TOptionForm.FillRiggLists;
 begin
   FGSB := RiggModul.Rigg.GSB;
-  FEAarray := RiggModul.Rigg.EA; {EA in KN}
+  FEAarray := RiggModul.Rigg.EA; { EA in KN }
   FiEI := RiggModul.Rigg.MastEI;
   FiMastSaling := Round(RiggModul.Rigg.MastUnten);
   FiMastWante := FiMastSaling + Round(RiggModul.Rigg.MastOben);
@@ -304,7 +281,7 @@ begin
   FMastMassListe.Clear;
   FElementListe.Clear;
   FTrimmListe.Clear;
-  {FTempListe.Clear;} { kann weg, Löschen nicht nicht notwendig hier }
+  {FTempListe.Clear;} { kann weg, Löschen nicht notwendig hier }
 
   (*
   FMastTypIndex := 0;
@@ -436,20 +413,23 @@ begin
   MinEdit.Text := IntToStr(Round(FGSB.Wante.Min));
   PosEdit.Text := IntToStr(Round(FGSB.Wante.Ist));
   MaxEdit.Text := IntToStr(Round(FGSB.Wante.Max));
+
   { Elemente }
   GetKeyList(FElementListe, FTempListe);
   ElementCombo.Items := FTempListe;
   ElementCombo.ItemIndex := 0;
   EAEdit.Text := FElementListe.Values[ElementCombo.Text];
+
   { MastMaße }
   GetKeyList(FMastMassListe, FTempListe);
   MastMassCombo.Items := FTempListe;
   MastMassCombo.ItemIndex := 0;
   MastMassEdit.Text := FMastMassListe.Values[MastMassCombo.Text];
+
   { Werte in FiP im StringGrid anzeigen }
   for m := ooA0 to ooF0 do
     for n := x to z do
-      RumpfGrid.Cells[Ord(n)+1, Ord(m)] := Format(' %4.0f', [FiP[m,n]]);
+      RumpfGrid.Cells[Ord(n) + 1, Ord(m)] := Format('%4.0f', [FiP[m,n]]);
 end;
 
 procedure TOptionForm.LoadIniFileCombos;
@@ -461,11 +441,13 @@ begin
   MaterialCombo.Items := FTempListe;
   MaterialCombo.ItemIndex := 0;
   EEdit.Text := FMaterialListe.Values[MaterialCombo.Text];
+
   { Querschnitt }
   GetKeyList(FQuerschnittListe, FTempListe);
   QuerschnittCombo.Items := FTempListe;
   QuerschnittCombo.ItemIndex := 0;
   AEdit.Text := FQuerschnittListe.Values[QuerschnittCombo.Text];
+
   { MastTyp }
   GetKeyList(FMastTypListe, FTempListe);
   MastTypCombo.Items := FTempListe;
@@ -579,29 +561,35 @@ end;
 procedure TOptionForm.MinEditKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key = VK_Return then MinEditExit(Sender);
+  if Key = VK_Return then
+    MinEditExit(Sender);
 end;
 
 procedure TOptionForm.MinEditExit(Sender: TObject);
 var
-  i, iMin, iIst, iMax, iVar: Integer;
+  i: Integer;
   f: TRggSB;
+  iMin, iIst, iMax: Integer;
+  iVar: Integer;
 begin
-  iVar := GetInteger(TMaskEdit(Sender).Text);
   i := TrimmCombo.ItemIndex;
   f := FGSB.Find(TFederParam(i));
   iMin := Round(f.Min);
   iIst := Round(f.Ist);
   iMax := Round(f.Max);
+
   if Sender = MinEdit then
   begin
+    iVar := StrToIntDef(TEdit(Sender).Text, iMin);
     if iVar > iIst then
       iVar := iIst;
     f.Min := iVar;
     MinEdit.Text := IntToStr(iVar);
   end;
+
   if Sender = PosEdit then
   begin
+    iVar := StrToIntDef(TEdit(Sender).Text, iIst);
     if iVar < iMin then
       iVar := iMin;
     if iVar > iMax then
@@ -609,8 +597,10 @@ begin
     f.Ist := iVar;
     PosEdit.Text := IntToStr(iVar);
   end;
+
   if Sender = MaxEdit then
   begin
+    iVar := StrToIntDef(TEdit(Sender).Text, iMax);
     if iVar < iIst then
       iVar := iIst;
     f.Max := iVar;
@@ -621,21 +611,36 @@ end;
 procedure TOptionForm.MastMassEditKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if Key = VK_Return then MastMassEditExit(Sender);
+  if Key = VK_Return then
+    MastMassEditExit(Sender);
 end;
 
 procedure TOptionForm.MastMassEditExit(Sender: TObject);
 var
-  iVar: Integer;
-  S: String;
+  i: Integer;
+  temp: Integer;
+  s: string;
 begin
-  iVar := GetInteger(MastMassEdit.Text);
-  MastMassEdit.Text := IntToStr(iVar);
-  S := MastMassCombo.Text;
-  FMastMassListe.Values[S] := IntToStr(iVar);
-  if S = 'Saling' then FiMastSaling := iVar
-  else if S = 'Wante' then FiMastWante := iVar
-  else if S = 'Top' then FiMastTop := iVar;
+  temp := 0;
+
+  s := MastMassCombo.Text;
+  if s = 'Saling' then
+    temp := FiMastSaling
+  else if s = 'Wante' then
+    temp := FiMastWante
+  else if s = 'Top' then
+    temp := FiMastTop;
+
+  i := StrToIntDef(MastMassEdit.Text, temp);
+  MastMassEdit.Text := IntToStr(i);
+
+  FMastMassListe.Values[s] := IntToStr(i);
+  if s = 'Saling' then
+    FiMastSaling := i
+  else if s = 'Wante' then
+    FiMastWante := i
+  else if s = 'Top' then
+    FiMastTop := i;
 end;
 
 procedure TOptionForm.OKBtnClick(Sender: TObject);
@@ -695,7 +700,7 @@ begin
   FillRiggLists;
   LoadRiggCombos;
   RumpfSpinEdit.Position := StrToIntDef(RumpfGrid.Cells[FRumpfCell.x,FRumpfCell.y], 0);
-  RumpfEdit.Text := Format(' %4d mm',[RumpfSpinEdit.Position]);
+  RumpfEdit.Text := Format('%4d mm',[RumpfSpinEdit.Position]);
 end;
 
 procedure TOptionForm.RumpfGridSelectCell(Sender: TObject; Col, Row: Integer; var CanSelect: Boolean);
@@ -709,36 +714,47 @@ begin
       [TrimLeft(RumpfGrid.Cells[0,Row]),
        TrimLeft(RumpfGrid.Cells[Col,0])]);
     RumpfSpinEdit.Position := StrToInt(RumpfGrid.Cells[Col,Row]);
-    RumpfEdit.Text := Format(' %4d mm', [RumpfSpinEdit.Position]);
+    RumpfEdit.Text := Format('%4d mm', [RumpfSpinEdit.Position]);
   end;
 end;
 
 procedure TOptionForm.RumpfBtnClick(Sender: TObject);
+var
+  oo: TRiggPoint;
+  kk: TKoord;
 begin
-  FiP[TRiggPoint(FRumpfCell.y-1),TKoord(FRumpfCell.x-1)] :=  RumpfSpinEdit.Position;
-  RumpfGrid.Cells[FRumpfCell.x,FRumpfCell.y] := Format(' %4d',[RumpfSpinEdit.Position]);
+  { changed from old days:
+    - introduction of ooN0
+    - elements of a TIntPoint are double now, not Integer
+  }
+
+  oo := TRiggPoint(FRumpfCell.y); { A0 is now second element in enum }
+  kk := TKoord(FRumpfCell.x-1); {this has not changed }
+
+  FiP[oo, kk] :=  RumpfSpinEdit.Position;
+  RumpfGrid.Cells[FRumpfCell.x, FRumpfCell.y] := Format('%4d', [RumpfSpinEdit.Position]);
   if FRumpfCell.y = 2 then
   begin
     FiP[ooA0] := FiP[ooB0];
     FiP[ooA0,y] := -FiP[ooB0,y];
-    RumpfGrid.Cells[1,1] := Format(' %4d',[FiP[ooA0,x]]);
-    RumpfGrid.Cells[2,1] := Format(' %4d',[FiP[ooA0,y]]);
-    RumpfGrid.Cells[3,1] := Format(' %4d',[FiP[ooA0,z]]);
+    RumpfGrid.Cells[1,1] := Format('%4.0f',[FiP[ooA0,x]]);
+    RumpfGrid.Cells[2,1] := Format('%4.0f',[FiP[ooA0,y]]);
+    RumpfGrid.Cells[3,1] := Format('%4.0f',[FiP[ooA0,z]]);
   end;
   if FRumpfCell.y = 1 then
   begin
     FiP[ooB0] := FiP[ooA0];
     FiP[ooB0,y] := -FiP[ooA0,y];
-    RumpfGrid.Cells[1,2] := Format(' %4d',[FiP[ooB0,x]]);
-    RumpfGrid.Cells[2,2] := Format(' %4d',[FiP[ooB0,y]]);
-    RumpfGrid.Cells[3,2] := Format(' %4d',[FiP[ooB0,z]]);
+    RumpfGrid.Cells[1,2] := Format('%4.0f',[FiP[ooB0,x]]);
+    RumpfGrid.Cells[2,2] := Format('%4.0f',[FiP[ooB0,y]]);
+    RumpfGrid.Cells[3,2] := Format('%4.0f',[FiP[ooB0,z]]);
   end;
 end;
 
 procedure TOptionForm.RumpfSpinEditChanging(Sender: TObject;
   var AllowChange: Boolean);
 begin
-  RumpfEdit.Text := Format(' %4d mm',[RumpfSpinEdit.Position]);
+  RumpfEdit.Text := Format('%4d mm',[RumpfSpinEdit.Position]);
 end;
 
 procedure TOptionForm.RumpfSpinEditEnter(Sender: TObject);

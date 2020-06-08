@@ -1,4 +1,4 @@
-﻿unit RggPolarkar;
+﻿unit RggPolarKar;
 
 interface
 

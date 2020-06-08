@@ -81,8 +81,7 @@ type
 implementation
 
 uses
-  RiggVar.FB.ActionConst,
-  RiggVar.RG.Def;
+  RiggVar.FB.ActionConst;
 
 constructor TRaumGraph.Create(AZug3D: TZug3DBase);
 begin
