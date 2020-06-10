@@ -1,4 +1,4 @@
-object OptionForm: TOptionForm
+﻿object OptionForm: TOptionForm
   Left = 230
   Top = 113
   BorderIcons = [biSystemMenu, biMinimize]
@@ -13,7 +13,7 @@ object OptionForm: TOptionForm
   Font.Name = 'Tahoma'
   Font.Style = []
   FormStyle = fsStayOnTop
-  OldCreateOrder = True
+  OldCreateOrder = False
   Position = poScreenCenter
   Scaled = False
   OnCreate = FormCreate
@@ -30,10 +30,6 @@ object OptionForm: TOptionForm
     TabOrder = 0
     object tsTrimm: TTabSheet
       Caption = 'Trimm'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object LabelMin: TLabel
         Left = 56
         Top = 70
@@ -173,10 +169,6 @@ object OptionForm: TOptionForm
     end
     object tsFachwerk: TTabSheet
       Caption = 'Fachwerk'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object StabLabel: TLabel
         Left = 24
         Top = 14
@@ -379,10 +371,6 @@ object OptionForm: TOptionForm
     end
     object tsMast: TTabSheet
       Caption = 'Mast'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Bevel3: TBevel
         Left = 24
         Top = 32
@@ -599,10 +587,6 @@ object OptionForm: TOptionForm
     end
     object tsTabelle: TTabSheet
       Caption = 'Tabelle'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object MemoLabel: TLabel
         Left = 8
         Top = 9

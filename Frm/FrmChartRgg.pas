@@ -172,10 +172,10 @@ begin
   DrawLabels;
 
   { diese Labels sind nicht zeitkritisch }
-  lbAchseX.Caption := BottomTitle;
+  lbAchseX.Caption := XTitle;
   lbXLeft.Caption := IntToStr(Round(Xmin));
   lbXRight.Caption := IntToStr(Round(Xmax));
-  lbParam.Caption := RightTitle;
+  lbParam.Caption := PTitle;
 
   PlotWidth := Rect.Right - Rect.Left;
   PlotHeight := Rect.Bottom - Rect.Top;
@@ -280,7 +280,7 @@ begin
     PosY := ChartPaintBox.Top - 24;
     R := Rect(PosX, PosY, PosX+210, PosY+Font.Height);
     SetTextAlign(Handle, TA_LEFT or TA_TOP);
-    TextRect(R, PosX, PosY, LeftTitle);
+    TextRect(R, PosX, PosY, YTitle);
 
     PosX := ChartPaintBox.Left - 8;
     PosY := ChartPaintBox.Top;
@@ -346,7 +346,7 @@ begin
   if ShowGroup then
     ShowTogetherBtnClick(Self)
   else
-    Draw;
+    DrawInternal;
 end;
 
 procedure TChartFormGS.InitMenu;

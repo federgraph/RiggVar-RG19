@@ -21,6 +21,7 @@ uses
   Vcl.Menus,
   Vcl.ComCtrls,
   RggScroll,
+  RggUnit4,
   RggTypes,
   RggTrimmTab;
 
@@ -159,7 +160,7 @@ type
     FTrimmIndex :Integer;
     *)
 
-    FGSB : TRggFA;
+    FGSB: TRggFA;
     FiP: TIntRiggPoints;
     FRumpfCell: TPoint;
     FTrimmTabDaten: TTrimmTabDaten;
@@ -173,7 +174,9 @@ type
     procedure LoadRiggCombos;
     procedure CheckTabelle;
   public
+    Rigg: TRigg;
     IniFileName: string;
+    procedure Init(ARigg: TRigg);
     procedure LoadFromIniFile;
     procedure WriteToIniFile;
   end;
@@ -225,7 +228,12 @@ begin
   FQuerschnittListe := TStringList.Create;
   FTrimmListe := TStringList.Create;
   FTempListe := TStringList.Create;
+  Init(RiggModul.Rigg);
+end;
 
+procedure TOptionForm.Init(ARigg: TRigg);
+begin
+  Rigg := ARigg;
   InifileName := ChangeFileExt(Application.ExeName,'.ini');
   { IniFileName := ChangeFileExt(ParamStr(0), '.INI'); } { Alternative }
   { IniFileName := 'rigg.ini'; } { --> rigg.ini im Windows Verzeichnis }
@@ -268,14 +276,14 @@ end;
 
 procedure TOptionForm.FillRiggLists;
 begin
-  FGSB := RiggModul.Rigg.GSB;
-  FEAarray := RiggModul.Rigg.EA; { EA in KN }
-  FiEI := RiggModul.Rigg.MastEI;
-  FiMastSaling := Round(RiggModul.Rigg.MastUnten);
-  FiMastWante := FiMastSaling + Round(RiggModul.Rigg.MastOben);
-  FiMastTop := Round(RiggModul.Rigg.MastLaenge);
-  FiP := RiggModul.Rigg.iP;
-  FTrimmTabelle := RiggModul.Rigg.TrimmTab; { Zeiger speichern }
+  FGSB := Rigg.GSB;
+  FEAarray := Rigg.EA; { EA in KN }
+  FiEI := Rigg.MastEI;
+  FiMastSaling := Round(Rigg.MastUnten);
+  FiMastWante := FiMastSaling + Round(Rigg.MastOben);
+  FiMastTop := Round(Rigg.MastLaenge);
+  FiP := Rigg.iP;
+  FTrimmTabelle := Rigg.TrimmTab; { Zeiger speichern }
   FTrimmTabDaten := FTrimmTabelle.TrimmTabDaten; {zwischenspeichern}
 
   FMastMassListe.Clear;
@@ -645,13 +653,13 @@ end;
 
 procedure TOptionForm.OKBtnClick(Sender: TObject);
 begin
-  RiggModul.Rigg.iP := FiP; { Rumpfkoordinaten}
-  RiggModul.Rigg.MastUnten := FiMastSaling;
-  RiggModul.Rigg.MastOben := FiMastWante - FiMastSaling;
-  RiggModul.Rigg.MastLaenge := FiMastTop;
-  RiggModul.Rigg.GSB := FGSB; { neue Grenzen und Istwerte }
-  RiggModul.Rigg.EA := FEAarray;
-  RiggModul.Rigg.MastEI := FiEI;
+  Rigg.iP := FiP; { Rumpfkoordinaten}
+  Rigg.MastUnten := FiMastSaling;
+  Rigg.MastOben := FiMastWante - FiMastSaling;
+  Rigg.MastLaenge := FiMastTop;
+  Rigg.GSB := FGSB; { neue Grenzen und Istwerte }
+  Rigg.EA := FEAarray;
+  Rigg.MastEI := FiEI;
   FTabellenTyp := FTrimmTabelle.TabellenTyp;
 end;
 

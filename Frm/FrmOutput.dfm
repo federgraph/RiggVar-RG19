@@ -23,7 +23,7 @@ object OutputForm: TOutputForm
     Top = 0
     Width = 465
     Height = 255
-    ActivePage = KraftSheet
+    ActivePage = ChartSheet
     TabOrder = 0
     OnChange = OutputPagesChange
     object MasterMemo: TTabSheet
@@ -78,6 +78,10 @@ object OutputForm: TOutputForm
     object Salingsheet: TTabSheet
       Tag = 3
       Caption = 'Saling'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnSaling: TPanel
         Left = 0
         Top = 0
@@ -153,10 +157,6 @@ object OutputForm: TOutputForm
     object ChartSheet: TTabSheet
       Tag = 4
       Caption = 'Diagramm'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnChart2: TPanel
         Left = 0
         Top = 0
