@@ -118,7 +118,6 @@ type
     ChartBevelOuter: TBevel;
     procedure FormCreate(Sender: TObject);
     procedure YAuswahlClick(Sender: TObject);
-    procedure YComboChange(Sender: TObject);
     procedure CalcItemClick(Sender: TObject);
     procedure BuissyItemClick(Sender: TObject);
     procedure APItemClick(Sender: TObject);
@@ -134,6 +133,7 @@ type
     procedure RectangleItemClick(Sender: TObject);
     procedure PEditChange(Sender: TObject);
     procedure XComboChange(Sender: TObject);
+    procedure YComboChange(Sender: TObject);
     procedure PComboChange(Sender: TObject);
     procedure MemoItemClick(Sender: TObject);
     procedure ShowTogetherBtnClick(Sender: TObject);
@@ -187,6 +187,7 @@ type
     procedure UpdateYMinMax;
     procedure GetCurves;
     procedure LoadNormal;
+    procedure Draw;
     procedure DrawInternal;
     procedure DrawNormal;
     procedure DrawToChart;
@@ -219,14 +220,13 @@ type
     procedure UpdateXMinMax;
     procedure UpdatePMinMax;
     function CheckBeforeCalc: Boolean;
-    procedure Calc(Sender: TObject);
+    procedure Calc;
     procedure DoAfterCalc;
     procedure SaveToFile(FileName: string);
     procedure LoadFromFile(FileName: string);
     procedure Reset;
 
     property SalingTyp: TSalingTyp read FSalingTyp write SetSalingTyp;
-    property Legend: Boolean read FLegend;
     property Valid: Boolean read FValid write FValid;
     property ShowGroup: Boolean read FShowGroup;
   protected
@@ -308,6 +308,7 @@ begin
 //  Include(PSet, xpSalingW);
 
   WantRectangles := True;
+  FLegend := True;
 
   ChartForm := self; { wird schon in AchsForm.Create benötigt }
   HorzScrollBar.Position := 0;
@@ -317,16 +318,16 @@ begin
   SofortBerechnen := True;
 {$endif}
 
+  FSalingTyp := stFest;
+
   RggDocument := TRggDocument.Create;
   MemoLines := TStringList.Create;
   MemoLines.Add(AnfangsZustandString);
   SalingDreieck := TSalingDreieck.Create;
 
-  FLegend := True;
   ParamCount := 3;
   APWidth := 30;
 
-  APSpinner.Position := 30;
   YLED.Brush.Color := clRed;
   XLED.Brush.Color := clRed;
   PLED.Brush.Color := clRed;
@@ -342,6 +343,7 @@ begin
   XCombo.ItemIndex := XCombo.Items.IndexOf(FXTextClicked);
   PCombo.ItemIndex := PCombo.Items.IndexOf(FPTextClicked);
 
+  APSpinner.Position := 30;
   KurvenZahlSpinner.Position := 3;
 
   InitYAchseRecordList(YAchseRecordList);
@@ -374,7 +376,8 @@ begin
 {$endif}
 
   InitStraightLine;
-  DrawInternal;
+
+  Reset;
 
   ClientWidth := 800;
   ClientHeight := 478;
@@ -412,11 +415,6 @@ begin
   UpdatePMinMax;
 end;
 
-procedure TChartForm.BuissyItemClick(Sender: TObject);
-begin
-  Reset;
-end;
-
 procedure TChartForm.Reset;
 begin
   FBuissy := False;
@@ -430,50 +428,7 @@ begin
   TakeOver;
   DrawInternal;
   MemoLines.Clear;
-  MemoLines.Add(AnfangsZustandString);
-end;
-
-procedure TChartForm.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
-{$ifdef RG19}
-  RiggModul.ViewModelMain.HideDiagramm;
-  RiggModul.ChartFormActive := False;
-  Action := caFree;
-{$endif}
-end;
-
-procedure TChartForm.CloseItemClick(Sender: TObject);
-begin
-  Close;
-end;
-
-procedure TChartForm.FormActivate(Sender: TObject);
-begin
-  TakeOver;
-end;
-
-procedure TChartForm.UpdateChartItemClick(Sender: TObject);
-begin
-  TakeOver;
-end;
-
-procedure TChartForm.TakeOver;
-begin
-  Rigg.UpdateGSB;
-  SalingTyp := Rigg.SalingTyp;
-  { ControllerTyp := Rigg.ControllerTyp; }
-  { CalcTyp := Rigg.CalcTyp; }
-end;
-
-procedure TChartForm.SetSalingTyp(Value: TSalingTyp);
-begin
-  if FSalingTyp <> Value then
-  begin
-    FSalingTyp := Value;
-    FValid := False;
-    YLED.Brush.Color := clRed;
-    UpdateXCombo(SalingTyp);
-  end;
+  MemoLines.Add(ResetMessageString);
 end;
 
 procedure TChartForm.SetDarkColors(const Value: Boolean);
@@ -585,27 +540,7 @@ begin
   end;
 end;
 
-procedure TChartForm.RebuildYCombo;
-var
-  YAV: TYAchseValue;
-begin
-  { YComboBox }
-  YCombo.Items.Clear;
-  for YAV := Low(TYAchseValue) to High(TYAchseValue) do
-    if YAV in YAchseSet then
-      YCombo.Items.Add(YAchseRecordList[YAV].ComboText);
-  if YCombo.Items.Count > 0 then YCombo.ItemIndex := 0;
-  UpdateYAchseList;
-  { YAuswahlDlg.DstList }
-  YAuswahlDlg.DstList.Items := YCombo.Items;
-  { YAuswahlDlg.SrcList }
-  YAuswahlDlg.SrcList.Clear;
-  for YAV := Low(TYAchseValue) to High(TYAchseValue) do
-    if not (YAV in YAchseSet) then
-  YAuswahlDlg.SrcList.Items.Add(YAchseRecordList[YAV].ComboText);
-end;
-
-procedure TChartForm.CalcItemClick(Sender: TObject);
+procedure TChartForm.Calc;
 begin
   if not FBuissy then
   begin
@@ -634,13 +569,12 @@ begin
     { MaxValue muß größer MinValue sein }
     if PSpinner.Max = 1 then
       PSpinner.Max := 2;
-    PSpinner.Update;
 
     if YCombo.ItemIndex > ANr-1 then
       YCombo.ItemIndex := 1;
 
-    Calc(Self);
-    FBuissy := False;
+    UpdateYAchseSet;
+    GetCurves;
 
     DoAfterCalc;
     Rigg.GetDocument(RggDocument);
@@ -651,14 +585,7 @@ begin
 
     LoadNormal;
     DrawInternal;
-    ActiveControl := YCombo;
   end;
-end;
-
-procedure TChartForm.Calc(Sender: TObject);
-begin
-  UpdateYAchseSet;
-  GetCurves;
 end;
 
 procedure TChartForm.LoadNormal;
@@ -953,6 +880,11 @@ begin
   end;
 end;
 
+procedure TChartForm.Draw;
+begin
+
+end;
+
 procedure TChartForm.DrawNormal;
 begin
   FShowGroup := False;
@@ -968,10 +900,7 @@ begin
   begin
     YTitle := GetYText(YCombo.Text);
     XTitle := XAchseText;
-    if FLegend then
-      PTitle := Format('Parameter %s', [ParamText])
-    else
-      PTitle := '';
+    PTitle := Format('%s', [ParamText]);
     Xmin := XAchseMin;
     Xmax := XAchseMax;
     LookForYMinMax;
@@ -1035,32 +964,6 @@ begin
     bf[p] := af[p, j];
   UpdateYMinMax;
   DrawInternal; { auch TestF zeichnen }
-end;
-
-procedure TChartForm.KurvenZahlSpinnerChanging(Sender: TObject;
-  var AllowChange: Boolean);
-begin
-  tempSpinnerPosition := KurvenZahlSpinner.Position; { vor Veränderung }
-end;
-
-procedure TChartForm.KurvenzahlEditChange(Sender: TObject);
-{ Reihenfolge des Aufrufs:
-   1. KurvenzahlSpinnerChanging
-   2. KurvenZahlEditChange
-   3. KurvenZahlSpinnerClick }
-begin
-  { jetzt in KurvenzahlSpinnerClick(): }
-  { if ShowGroup then ShowTogetherBtnClick(Sender); }
-end;
-
-procedure TChartForm.KurvenZahlSpinnerClick(Sender: TObject; Button: TUDBtnType);
-begin
-  if (tempSpinnerPosition = ParamCount) and (Button = btNext) then
-    Exit;
-  if (tempSpinnerPosition = 1) and (Button = btPrev) then
-    Exit;
-  if ShowGroup then
-    ShowTogetherBtnClick(Sender);
 end;
 
 procedure TChartForm.ShowTogetherBtnClick(Sender: TObject);
@@ -1138,7 +1041,7 @@ begin
   TopTitle := '';
   YTitle := AllCurvesNormalizedString; // 'Alle Kurven normiert [%]';
   XTitle := XAchseText;
-  PTitle := Format('Parameter %s%d', [PIdentString, ParamNo]); //Nr.1
+  PTitle := Format('%s%d', [PIdentString, ParamNo]); //Nr.1
 
   Xmin := XAchseMin;
   Xmax := XAchseMax;
@@ -1244,40 +1147,6 @@ begin
   end;
 end;
 
-procedure TChartForm.YAuswahlClick(Sender: TObject);
-var
-  i: Integer;
-begin
-  with YAuswahlDlg do
-  begin
-    if not (DstList.ItemIndex = -1) then
-    begin
-      { clear selection if any }
-      for i := 0 to DstList.Items.Count-1 do
-      begin
-        DstList.Selected[i] := False;
-      end;
-      { In DstList den gleichen Eintrag wie in YComboBox selektieren }
-      DstList.ItemIndex := YCombo.ItemIndex;
-      DstList.Selected[YCombo.ItemIndex] := True;
-    end;
-
-    if ShowModal = mrOK then
-    begin
-      if (DstList.Items.Count = 0) then
-      begin
-        { mindestens ein Eintrag muß sich in DestList befinden }
-        DstList.Items.AddObject(SrcList.Items[0], SrcList.Items.Objects[0]);
-        SrcList.Items.Delete(0);
-      end;
-      YCombo.Items := DstList.Items;
-      YCombo.ItemIndex := DstList.ItemIndex;
-      UpdateYAchseList;
-      YComboChange(Sender);
-    end;
-  end;
-end;
-
 function TChartForm.GetYText(Text: string): string;
 var
   YAV: TYAchseValue;
@@ -1289,34 +1158,6 @@ begin
       result := YAchseRecordList[YAV].Text;
       break;
     end;
-end;
-
-procedure TChartForm.PSpinnerChanging(Sender: TObject; var AllowChange: Boolean);
-begin
-  if ParamCount = 1 then
-    AllowChange := False;
-end;
-
-procedure TChartForm.PEditChange(Sender: TObject);
-begin
-  UpdateYMinMax;
-end;
-
-procedure TChartForm.MemoItemClick(Sender: TObject);
-begin
-{$ifdef RG19}
-  MemoFormC := TMemoFormC.Create(Self);
-  with MemoFormC do
-  begin
-    try
-      Memo.Lines.Clear;
-      Memo.Lines := MemoLines;
-      ShowModal;
-    finally
-      Free;
-    end;
-  end;
-{$endif}
 end;
 
 procedure TChartForm.GetMemoText;
@@ -1473,119 +1314,20 @@ begin
       Add(Format('  D0F: %d mm (Top)', [Round(MastLaenge)]));
       Add(Format('  Biegesteifigkeit EI: %d Nm^2', [MastEI]));
     end;
+    { Exit Counters }
+    Add('');
+    with Rigg do
+    begin
+      if ExitCounter1 > 0 then Add(Format('  EC 1: %d ', [ExitCounter1]));
+      if ExitCounter2 > 0 then Add(Format('  EC 2: %d ', [ExitCounter2]));
+      if ExitCounter3 > 0 then Add(Format('  EC 3: %d ', [ExitCounter3]));
+      if ExitCounter4 > 0 then Add(Format('  EC 4: %d ', [ExitCounter4]));
+      if ExitCounter5 > 0 then Add(Format('  EC 5: %d ', [ExitCounter5]));
+      if ExitCounter6 > 0 then Add(Format('  EC 6: %d ', [ExitCounter6]));
+    end;
     Add(Format('Memo Counter: %d', [MemoCounter]));
     Add(Format('Calc Counter: %d', [CalcCounter]));
   end;
-end;
-
-procedure TChartForm.LoadFromFile(FileName: string);
-var
-  S: TFileStream;
-begin
-  S := TFileStream.Create(OpenDialog.FileName, fmOpenRead);
-  try
-    LoadFromStream(S);
-  finally
-    S.Free;
-  end;
-end;
-
-procedure TChartForm.SaveToFile(FileName: string);
-var
-  S: TFileStream;
-begin
-  S := TFileStream.Create(SaveDialog.FileName, fmCreate);
-  try
-    SaveToStream(S);
-  finally
-    S.Free;
-  end;
-end;
-
-{ yArray enthält jetzt Werte vom Typ single, um Platz zu sparen.
-  Es wird mit der Option 'Ausgerichtete RecordFelder' compiliert!
-  Damit hat das Feld RggDocument.TrimmTabDaten.TabellenTyp 4 Byte.
-  Dieses Format muß beibehalten werden.
-}
-procedure TChartForm.SaveToStream(S: TStream);
-var
-  ParamValue: double;
-  p: Integer;
-begin
-  with S do
-  begin
-    WriteBuffer(FLegend, SizeOf(Boolean));
-    WriteBuffer(XAchseMin, SizeOf(Integer));
-    WriteBuffer(XAchseMax, SizeOf(Integer));
-    WriteBuffer(ParamCount, SizeOf(Integer));
-    WriteBuffer(YAchseSet, SizeOf(YAchseSet));
-    WriteBuffer(YAchseRecordList, SizeOf(YAchseRecordList));
-    for p := 0 to PNr-1 do
-      WriteBuffer(af[p], SizeOf(TYLineArray));
-    for p := 0 to ParamCount-1 do begin
-      ParamValue := StrToFloat(PText[p]);
-      WriteBuffer(ParamValue, SizeOf(double));
-    end;
-    RggDocument.SaveToStream(S);
-    MemoLines.Add(XComboText);
-    MemoLines.Add(PComboText);
-    MemoLines.SaveToStream(S);
-  end;
-end;
-
-procedure TChartForm.LoadFromStream(S: TStream);
-var
-  ParamValue: double;
-  p: Integer;
-begin
-  with S do
-  begin
-    ReadBuffer(FLegend, SizeOf(Boolean));
-    ReadBuffer(XAchseMin, SizeOf(Integer));
-    ReadBuffer(XAchseMax, SizeOf(Integer));
-    ReadBuffer(ParamCount, SizeOf(Integer));
-    ReadBuffer(YAchseSet, SizeOf(YAchseSet));
-    ReadBuffer(YAchseRecordList, SizeOf(YAchseRecordList));
-    for p := 0 to PNr-1 do
-      ReadBuffer(af[p], SizeOf(TYLineArray));
-    for p := 0 to ParamCount-1 do
-    begin
-      ReadBuffer(ParamValue, SizeOf(double));
-      PText[p] := Format('%6.2f', [ParamValue]);
-    end;
-    RggDocument.LoadFromStream(S);
-    MemoLines.LoadFromStream(S);
-    XComboText := MemoLines[MemoLines.Count-2];
-    PComboText := MemoLines[MemoLines.Count-1];
-    MemoLines.Delete(MemoLines.Count-1);
-    MemoLines.Delete(MemoLines.Count-1);
-  end;
-end;
-
-procedure TChartForm.OpenItemClick(Sender: TObject);
-begin
-  if not OpenDialog.Execute then Exit;
-  LoadFromFile(OpenDialog.FileName);
-  Exclude(FStatus, csBerechnet);
-  Include(FStatus, csGeladen);
-  XAchseText := GetXText(XComboText); { benötigt für BottomTitel }
-  ParamText := GetPText(PComboText); { benötigt für RightTitel }
-  XLED.Brush.Color := clRed;
-  PLED.Brush.Color := clRed;
-  PSpinner.Position := 1;
-  PSpinner.Max := ParamCount;
-  if PSpinner.Max = 1 then
-    PSpinner.Max := 2;
-  KurvenZahlSpinner.Position := ParamCount;
-  RebuildYCombo;
-  YComboChange(Self);
-end;
-
-procedure TChartForm.SaveItemClick(Sender: TObject);
-begin
-  if not SaveDialog.Execute then
-    Exit;
-  SaveToFile(SaveDialog.FileName);
 end;
 
 procedure TChartForm.XComboChange(Sender: TObject);
@@ -2064,36 +1806,6 @@ begin
   end;
 end;
 
-function TChartForm.ValidateInput(Input: TMaskEdit): Boolean;
-var
-  s: string;
-  I: Integer;
-  Code: Integer;
-begin
-  Result := False;
-  try
-    Val(Input.Text, I, Code);
-    if Code <> 0 then
-    begin
-      s := Format('''%s'' ist kein gültiger Integerwert', [Input.Text]);
-      MessageDlg(s, mtWarning, [mbOK], 0);
-      Input.SetFocus;
-    end
-    else
-    begin
-      if (I >= 0) and (I < MaxInt) then
-      Result := True;
-    end;
-  except
-    on EConvertError do
-    begin
-      s := Format('''%s'' ist kein gültiger Integerwert', [Input.Text]);
-      MessageDlg(s, mtWarning, [mbOK], 0);
-      Input.SetFocus;
-    end;
-  end;
-end;
-
 function  TChartForm.CheckBeforeCalc: Boolean;
 begin
   result := True;
@@ -2286,13 +1998,12 @@ procedure TChartForm.DoLegend;
 var
   R: TRect;
 begin
-  if ParamCount = 1 then FLegend := False;
-  if ParamCount > 1 then FLegend := True;
-  { überschriebene virtuelle Methode }
-  inherited;
-  if Legend then DrawLegend(PaintBoxLegend.Canvas, PaintBoxLegend.BoundsRect)
+  FLegend := ParamCount > 1;
+  if FLegend then
+    DrawLegend(PaintBoxLegend.Canvas, PaintBoxLegend.BoundsRect)
   else
-    with PaintBoxLegend do  begin
+    with PaintBoxLegend do
+    begin
       R := Rect(0,0,Width,Height);
       Canvas.Brush.Color := clBtnFace;
       Canvas.FillRect(R);
@@ -2310,7 +2021,8 @@ var
   p, PosX, PosY: Integer;
 begin
   Bitmap := TBitmap.Create;
-  with Bitmap do begin
+  with Bitmap do
+  begin
     Width := Rect.Right-Rect.Left;
     Height := Rect.Bottom-Rect.Top;
   end;
@@ -2336,13 +2048,6 @@ begin
         else
           TextOut(PosX, PosY, PColorText[p]);
       end;
-      (*
-      { Rahmen zeichnen }
-      Pen.Width := 1;
-      Pen.Color := clBlack;
-      Brush.Style := bsClear;
-      Rectangle( 0, 0, Bitmap.Width, Bitmap.Height);
-      *)
     end;
 
     with Canvas do
@@ -2453,14 +2158,6 @@ begin
       SetMapMode(Handle, MM_TEXT);
       SetWindowOrgEx(Handle, 0, 0, nil);
       SetViewPortOrgEx(Handle, 0, 0, nil);
-
-      (*
-      {Rahmen zeichnen}
-      Pen.Width := 1;
-      Pen.Color := clBlack;
-      Brush.Style := bsClear;
-      Rectangle( 0, 0, Bitmap.Width, Bitmap.Height);
-      *)
     end;
 
     with Canvas do
@@ -2567,6 +2264,309 @@ begin
     Brush.Color := clBtnFace;
     FillRect(R);
   end;
+end;
+
+procedure TChartForm.RebuildYCombo;
+var
+  YAV: TYAchseValue;
+begin
+  { YComboBox }
+  YCombo.Items.Clear;
+  for YAV := Low(TYAchseValue) to High(TYAchseValue) do
+    if YAV in YAchseSet then
+      YCombo.Items.Add(YAchseRecordList[YAV].ComboText);
+  if YCombo.Items.Count > 0 then YCombo.ItemIndex := 0;
+  UpdateYAchseList;
+  { YAuswahlDlg.DstList }
+  YAuswahlDlg.DstList.Items := YCombo.Items;
+  { YAuswahlDlg.SrcList }
+  YAuswahlDlg.SrcList.Clear;
+  for YAV := Low(TYAchseValue) to High(TYAchseValue) do
+    if not (YAV in YAchseSet) then
+  YAuswahlDlg.SrcList.Items.Add(YAchseRecordList[YAV].ComboText);
+end;
+
+procedure TChartForm.KurvenZahlSpinnerChanging(Sender: TObject;
+  var AllowChange: Boolean);
+begin
+  tempSpinnerPosition := KurvenZahlSpinner.Position; { vor Veränderung }
+end;
+
+procedure TChartForm.KurvenzahlEditChange(Sender: TObject);
+{ Reihenfolge des Aufrufs:
+   1. KurvenzahlSpinnerChanging
+   2. KurvenZahlEditChange
+   3. KurvenZahlSpinnerClick }
+begin
+  { jetzt in KurvenzahlSpinnerClick(): }
+  { if ShowGroup then ShowTogetherBtnClick(Sender); }
+end;
+
+procedure TChartForm.KurvenZahlSpinnerClick(Sender: TObject; Button: TUDBtnType);
+begin
+  if (tempSpinnerPosition = ParamCount) and (Button = btNext) then
+    Exit;
+  if (tempSpinnerPosition = 1) and (Button = btPrev) then
+    Exit;
+  if ShowGroup then
+    ShowTogetherBtnClick(Sender);
+end;
+
+procedure TChartForm.YAuswahlClick(Sender: TObject);
+var
+  i: Integer;
+begin
+  with YAuswahlDlg do
+  begin
+    if not (DstList.ItemIndex = -1) then
+    begin
+      { clear selection if any }
+      for i := 0 to DstList.Items.Count-1 do
+      begin
+        DstList.Selected[i] := False;
+      end;
+      { In DstList den gleichen Eintrag wie in YComboBox selektieren }
+      DstList.ItemIndex := YCombo.ItemIndex;
+      DstList.Selected[YCombo.ItemIndex] := True;
+    end;
+
+    if ShowModal = mrOK then
+    begin
+      if (DstList.Items.Count = 0) then
+      begin
+        { mindestens ein Eintrag muß sich in DestList befinden }
+        DstList.Items.AddObject(SrcList.Items[0], SrcList.Items.Objects[0]);
+        SrcList.Items.Delete(0);
+      end;
+      YCombo.Items := DstList.Items;
+      YCombo.ItemIndex := DstList.ItemIndex;
+      UpdateYAchseList;
+      YComboChange(Sender);
+    end;
+  end;
+end;
+
+procedure TChartForm.PSpinnerChanging(Sender: TObject; var AllowChange: Boolean);
+begin
+  if ParamCount = 1 then
+    AllowChange := False;
+end;
+
+procedure TChartForm.PEditChange(Sender: TObject);
+begin
+  UpdateYMinMax;
+end;
+
+procedure TChartForm.MemoItemClick(Sender: TObject);
+begin
+{$ifdef RG19}
+  MemoFormC := TMemoFormC.Create(Self);
+  with MemoFormC do
+  begin
+    try
+      Memo.Lines.Clear;
+      Memo.Lines := MemoLines;
+      ShowModal;
+    finally
+      Free;
+    end;
+  end;
+{$endif}
+end;
+
+function TChartForm.ValidateInput(Input: TMaskEdit): Boolean;
+var
+  s: string;
+  I: Integer;
+  Code: Integer;
+begin
+  Result := False;
+  try
+    Val(Input.Text, I, Code);
+    if Code <> 0 then
+    begin
+      s := Format('''%s'' ist kein gültiger Integerwert', [Input.Text]);
+      MessageDlg(s, mtWarning, [mbOK], 0);
+      Input.SetFocus;
+    end
+    else
+    begin
+      if (I >= 0) and (I < MaxInt) then
+      Result := True;
+    end;
+  except
+    on EConvertError do
+    begin
+      s := Format('''%s'' ist kein gültiger Integerwert', [Input.Text]);
+      MessageDlg(s, mtWarning, [mbOK], 0);
+      Input.SetFocus;
+    end;
+  end;
+end;
+
+procedure TChartForm.LoadFromFile(FileName: string);
+var
+  S: TFileStream;
+begin
+  S := TFileStream.Create(OpenDialog.FileName, fmOpenRead);
+  try
+    LoadFromStream(S);
+  finally
+    S.Free;
+  end;
+end;
+
+procedure TChartForm.SaveToFile(FileName: string);
+var
+  S: TFileStream;
+begin
+  S := TFileStream.Create(SaveDialog.FileName, fmCreate);
+  try
+    SaveToStream(S);
+  finally
+    S.Free;
+  end;
+end;
+
+{ yArray enthält jetzt Werte vom Typ single, um Platz zu sparen.
+  Es wird mit der Option 'Ausgerichtete RecordFelder' compiliert!
+  Damit hat das Feld RggDocument.TrimmTabDaten.TabellenTyp 4 Byte.
+  Dieses Format muß beibehalten werden.
+}
+procedure TChartForm.SaveToStream(S: TStream);
+var
+  ParamValue: double;
+  p: Integer;
+begin
+  with S do
+  begin
+    WriteBuffer(FLegend, SizeOf(Boolean));
+    WriteBuffer(XAchseMin, SizeOf(Integer));
+    WriteBuffer(XAchseMax, SizeOf(Integer));
+    WriteBuffer(ParamCount, SizeOf(Integer));
+    WriteBuffer(YAchseSet, SizeOf(YAchseSet));
+    WriteBuffer(YAchseRecordList, SizeOf(YAchseRecordList));
+    for p := 0 to PNr-1 do
+      WriteBuffer(af[p], SizeOf(TYLineArray));
+    for p := 0 to ParamCount-1 do begin
+      ParamValue := StrToFloat(PText[p]);
+      WriteBuffer(ParamValue, SizeOf(double));
+    end;
+    RggDocument.SaveToStream(S);
+    MemoLines.Add(XComboText);
+    MemoLines.Add(PComboText);
+    MemoLines.SaveToStream(S);
+  end;
+end;
+
+procedure TChartForm.LoadFromStream(S: TStream);
+var
+  ParamValue: double;
+  p: Integer;
+begin
+  with S do
+  begin
+    ReadBuffer(FLegend, SizeOf(Boolean));
+    ReadBuffer(XAchseMin, SizeOf(Integer));
+    ReadBuffer(XAchseMax, SizeOf(Integer));
+    ReadBuffer(ParamCount, SizeOf(Integer));
+    ReadBuffer(YAchseSet, SizeOf(YAchseSet));
+    ReadBuffer(YAchseRecordList, SizeOf(YAchseRecordList));
+    for p := 0 to PNr-1 do
+      ReadBuffer(af[p], SizeOf(TYLineArray));
+    for p := 0 to ParamCount-1 do
+    begin
+      ReadBuffer(ParamValue, SizeOf(double));
+      PText[p] := Format('%6.2f', [ParamValue]);
+    end;
+    RggDocument.LoadFromStream(S);
+    MemoLines.LoadFromStream(S);
+    XComboText := MemoLines[MemoLines.Count-2];
+    PComboText := MemoLines[MemoLines.Count-1];
+    MemoLines.Delete(MemoLines.Count-1);
+    MemoLines.Delete(MemoLines.Count-1);
+  end;
+end;
+
+procedure TChartForm.OpenItemClick(Sender: TObject);
+begin
+  if not OpenDialog.Execute then Exit;
+  LoadFromFile(OpenDialog.FileName);
+  Exclude(FStatus, csBerechnet);
+  Include(FStatus, csGeladen);
+  XAchseText := GetXText(XComboText); { benötigt für BottomTitel }
+  ParamText := GetPText(PComboText); { benötigt für RightTitel }
+  XLED.Brush.Color := clRed;
+  PLED.Brush.Color := clRed;
+  PSpinner.Position := 1;
+  PSpinner.Max := ParamCount;
+  if PSpinner.Max = 1 then
+    PSpinner.Max := 2;
+  KurvenZahlSpinner.Position := ParamCount;
+  RebuildYCombo;
+  YComboChange(Self);
+end;
+
+procedure TChartForm.SaveItemClick(Sender: TObject);
+begin
+  if not SaveDialog.Execute then
+    Exit;
+  SaveToFile(SaveDialog.FileName);
+end;
+
+procedure TChartForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+{$ifdef RG19}
+  RiggModul.ViewModelMain.HideDiagramm;
+  RiggModul.ChartFormActive := False;
+  Action := caFree;
+{$endif}
+end;
+
+procedure TChartForm.CloseItemClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TChartForm.FormActivate(Sender: TObject);
+begin
+  TakeOver;
+end;
+
+procedure TChartForm.UpdateChartItemClick(Sender: TObject);
+begin
+  TakeOver;
+end;
+
+procedure TChartForm.TakeOver;
+begin
+  Rigg.UpdateGSB;
+  SalingTyp := Rigg.SalingTyp;
+  { ControllerTyp := Rigg.ControllerTyp; }
+  { CalcTyp := Rigg.CalcTyp; }
+end;
+
+procedure TChartForm.SetSalingTyp(Value: TSalingTyp);
+begin
+  if FSalingTyp <> Value then
+  begin
+    FSalingTyp := Value;
+    FValid := False;
+    YLED.Brush.Color := clRed;
+    UpdateXCombo(SalingTyp);
+  end;
+end;
+
+procedure TChartForm.CalcItemClick(Sender: TObject);
+begin
+  Calc;
+  PSpinner.Update;
+  ActiveControl := YCombo;
+end;
+
+procedure TChartForm.BuissyItemClick(Sender: TObject);
+begin
+  Reset;
 end;
 
 end.
