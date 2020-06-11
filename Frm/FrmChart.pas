@@ -138,12 +138,10 @@ type
     procedure MemoItemClick(Sender: TObject);
     procedure ShowTogetherBtnClick(Sender: TObject);
     procedure KurvenZahlSpinnerClick(Sender: TObject; Button: TUDBtnType);
-    procedure KurvenzahlEditChange(Sender: TObject);
     procedure ChartMenuClick(Sender: TObject);
     procedure UpdateChartItemClick(Sender: TObject);
     procedure BereichBtnClick(Sender: TObject);
     procedure APEditChange(Sender: TObject);
-    procedure KurvenZahlSpinnerChanging(Sender: TObject; var AllowChange: Boolean);
     procedure FormPaint(Sender: TObject);
     procedure ChartPaintBoxPaint(Sender: TObject);
     procedure PaintBoxLegendPaint(Sender: TObject);
@@ -159,11 +157,9 @@ type
     function GetYText(Text: string): string;
     function GetTsbName(Value: string): TxpName;
     procedure SetSalingTyp(Value: TSalingTyp);
-  protected
     function ValidateInput(Input: TMaskEdit): Boolean;
     procedure TakeOver;
-  protected
-    tempSpinnerPosition: Integer;
+  private
     YAchseRecordList: TYAchseRecordList;
     YAchseSortedList: TYAchseSortedList;
     YAchseSet: TYAchseSet;
@@ -174,6 +170,7 @@ type
     Xmin, Xmax, Ymin, Ymax: single;
     ParamCount: Integer;
     APWidth: Integer;
+    FAP: Boolean;
     TempF: TLineDataR100;
     TestF: TLineDataR100;
     af: array[0..PNr-1] of TYLineArray;
@@ -189,7 +186,7 @@ type
     procedure LoadNormal;
     procedure Draw;
     procedure DrawInternal;
-    procedure DrawNormal;
+    procedure DrawTogether;
     procedure DrawToChart;
     procedure DoLegend;
     procedure SaveToStream(S: TStream);
@@ -199,7 +196,9 @@ type
     function ComboIndexToCurve(ComboIndex: Integer): Integer;
     procedure RebuildYCombo;
     procedure ShowTogether(ParamNo: Integer);
-  public
+    procedure SetAP(const Value: Boolean);
+    property AP: Boolean read FAP write SetAP;
+  private
     XSet: TxpNameSet;
     PSet: TxpNameSet;
     ProgressPosition: Integer;
@@ -225,11 +224,11 @@ type
     procedure SaveToFile(FileName: string);
     procedure LoadFromFile(FileName: string);
     procedure Reset;
-
+  public
     property SalingTyp: TSalingTyp read FSalingTyp write SetSalingTyp;
     property Valid: Boolean read FValid write FValid;
     property ShowGroup: Boolean read FShowGroup;
-  protected
+  private
     MainMenu: TMainMenu;
     ChartMenu: TMenuItem;
     BerechnenItem: TMenuItem;
@@ -243,11 +242,13 @@ type
     TogetherItem: TMenuItem;
     UpdateRiggItem: TMenuItem;
     UpdateChartItem: TMenuItem;
+    RectangleItem: TMenuItem;
     N1: TMenuItem;
     N2: TMenuItem;
     N3: TMenuItem;
+    N4: TMenuItem;
     procedure InitMenu;
-  protected
+  private
     Rigg: TRigg;
     SofortBerechnen: Boolean;
     FDarkColors: Boolean;
@@ -257,13 +258,11 @@ type
   private
     procedure DrawChartPaintBox(Canvas: TCanvas; Rect: TRect);
     procedure PaintBackGround(Image: TBitMap);
-  protected
+  private
     procedure DrawLegend(Canvas: TCanvas; Rect: TRect);
     procedure DrawLabels;
-  protected
+  private
     WantRectangles: Boolean;
-    RectangleItem: TMenuItem;
-    N4: TMenuItem;
   end;
 
 var
@@ -343,8 +342,10 @@ begin
   XCombo.ItemIndex := XCombo.Items.IndexOf(FXTextClicked);
   PCombo.ItemIndex := PCombo.Items.IndexOf(FPTextClicked);
 
-  APSpinner.Position := 30;
-  KurvenZahlSpinner.Position := 3;
+  APSpinner.Position := APWidth;
+  APBtn.Down := True;
+  BereichBtn.Down := False;
+  KurvenZahlSpinner.Position := ParamCount;
 
   InitYAchseRecordList(YAchseRecordList);
   { Hiermit werden die Felder ComboText und Text initialisiert.
@@ -375,6 +376,8 @@ begin
   end;
 {$endif}
 
+  AP := True;
+
   InitStraightLine;
 
   Reset;
@@ -398,19 +401,9 @@ begin
   SalingDreieck.Free;
 end;
 
-procedure TChartForm.APItemClick(Sender: TObject);
+procedure TChartForm.SetAP(const Value: Boolean);
 begin
-  { APItem bedeutet ArbeitspunktItem }
-  APItem.Checked := not APItem.Checked;
-  APBtn.Down := APItem.Checked;
-  UpdateXMinMax;
-  UpdatePMinMax;
-end;
-
-procedure TChartForm.BereichItemClick(Sender: TObject);
-begin
-  BereichItem.Checked  := not BereichItem.Checked;
-  BereichBtn.Down := BereichItem.Checked;
+  FAP := Value;
   UpdateXMinMax;
   UpdatePMinMax;
 end;
@@ -882,20 +875,13 @@ end;
 
 procedure TChartForm.Draw;
 begin
-
-end;
-
-procedure TChartForm.DrawNormal;
-begin
-  FShowGroup := False;
-  LoadNormal;
-  DrawInternal;
+  DoLegend;
+  DrawToChart;
 end;
 
 procedure TChartForm.DrawInternal;
 begin
   FShowGroup := False;
-  DoLegend;
   if FValid then
   begin
     YTitle := GetYText(YCombo.Text);
@@ -937,7 +923,7 @@ begin
     Ymax := Ymax + 0.1;
   end;
 
-  DrawToChart;
+  Draw;
 end;
 
 procedure TChartForm.YComboChange(Sender: TObject);
@@ -966,13 +952,13 @@ begin
   DrawInternal; { auch TestF zeichnen }
 end;
 
-procedure TChartForm.ShowTogetherBtnClick(Sender: TObject);
+procedure TChartForm.DrawTogether;
 begin
   if FStatus = [] then
     Exit;
   if KurvenzahlSpinner.Position > ParamCount then
     KurvenzahlSpinner.Position := ParamCount;
-  ShowTogether(KurvenZahlSpinner.Position);
+  ShowTogether(KurvenZahlSpinner.Position); // --> Draw
   FShowGroup := True;
 end;
 
@@ -1065,8 +1051,7 @@ begin
   ParamCount := GroupKurvenZahl;
   PText := GroupText;
 
-  DoLegend;
-  DrawToChart;
+  Draw;
 
   ParamCount := tempParamCount;
   PText := tempPText;
@@ -1231,7 +1216,7 @@ begin
     { X }
     Add('');
     Add('XAchse: ' + XAchseText);
-    Add(Format('  Use AP: %s', [BoolStr[APBtn.Down]]));
+    Add(Format('  Use AP: %s', [BoolStr[AP]]));
     Add(Format('  AP Width: %d', [APWidth]));
     Add(Format('  %d ... %d', [XAchseMin, XAchseMax]));
     { P }
@@ -1838,14 +1823,13 @@ end;
 
 procedure TChartForm.ChartMenuClick(Sender: TObject);
 begin
-  BereichItem.Checked := BereichBtn.Down;
-  APItem.Checked := APBtn.Down;
+  APItem.Checked := AP;
+  BereichItem.Checked := not AP;
 end;
 
 procedure TChartForm.BereichBtnClick(Sender: TObject);
 begin
-  UpdateXMinMax;
-  UpdatePMinMax;
+  AP := False;
 end;
 
 procedure TChartForm.APEditChange(Sender: TObject);
@@ -2286,30 +2270,13 @@ begin
   YAuswahlDlg.SrcList.Items.Add(YAchseRecordList[YAV].ComboText);
 end;
 
-procedure TChartForm.KurvenZahlSpinnerChanging(Sender: TObject;
-  var AllowChange: Boolean);
-begin
-  tempSpinnerPosition := KurvenZahlSpinner.Position; { vor Veränderung }
-end;
-
-procedure TChartForm.KurvenzahlEditChange(Sender: TObject);
-{ Reihenfolge des Aufrufs:
-   1. KurvenzahlSpinnerChanging
-   2. KurvenZahlEditChange
-   3. KurvenZahlSpinnerClick }
-begin
-  { jetzt in KurvenzahlSpinnerClick(): }
-  { if ShowGroup then ShowTogetherBtnClick(Sender); }
-end;
-
 procedure TChartForm.KurvenZahlSpinnerClick(Sender: TObject; Button: TUDBtnType);
 begin
-  if (tempSpinnerPosition = ParamCount) and (Button = btNext) then
+  if FShowGroup and (KurvenZahlSpinner.Position > ParamCount) then
     Exit;
-  if (tempSpinnerPosition = 1) and (Button = btPrev) then
-    Exit;
+
   if ShowGroup then
-    ShowTogetherBtnClick(Sender);
+    DrawTogether;
 end;
 
 procedure TChartForm.YAuswahlClick(Sender: TObject);
@@ -2567,6 +2534,26 @@ end;
 procedure TChartForm.BuissyItemClick(Sender: TObject);
 begin
   Reset;
+end;
+
+procedure TChartForm.APItemClick(Sender: TObject);
+begin
+  { AP = Arbeitspunkt }
+  APItem.Checked := not APItem.Checked;
+  APBtn.Down := APItem.Checked;
+  AP := APBtn.Down;
+end;
+
+procedure TChartForm.BereichItemClick(Sender: TObject);
+begin
+  BereichItem.Checked  := not BereichItem.Checked;
+  BereichBtn.Down := BereichItem.Checked;
+  AP := not BereichBtn.Down;
+end;
+
+procedure TChartForm.ShowTogetherBtnClick(Sender: TObject);
+begin
+  DrawTogether;
 end;
 
 end.

@@ -468,7 +468,6 @@ object ChartForm: TChartForm
       ShowHint = True
       TabOrder = 9
       Text = '3'
-      OnChange = KurvenzahlEditChange
     end
     object KurvenZahlSpinner: TUpDown
       Left = 616
@@ -482,7 +481,6 @@ object ChartForm: TChartForm
       Position = 3
       ShowHint = False
       TabOrder = 12
-      OnChanging = KurvenZahlSpinnerChanging
       OnClick = KurvenZahlSpinnerClick
     end
     object PSpinner: TUpDown
