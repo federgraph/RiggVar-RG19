@@ -186,6 +186,8 @@ type
     procedure LoadNormal;
     procedure Draw;
     procedure DrawInternal;
+    procedure DrawNormal;
+    procedure DrawGroup;
     procedure DrawTogether;
     procedure DrawToChart;
     procedure DoLegend;
@@ -247,6 +249,7 @@ type
     N2: TMenuItem;
     N3: TMenuItem;
     N4: TMenuItem;
+  protected
     procedure InitMenu;
   private
     Rigg: TRigg;
@@ -879,9 +882,15 @@ begin
   DrawToChart;
 end;
 
-procedure TChartForm.DrawInternal;
+procedure TChartForm.DrawNormal;
 begin
   FShowGroup := False;
+  LoadNormal;
+  DrawInternal;
+end;
+
+procedure TChartForm.DrawInternal;
+begin
   if FValid then
   begin
     YTitle := GetYText(YCombo.Text);
@@ -923,13 +932,17 @@ begin
     Ymax := Ymax + 0.1;
   end;
 
-  Draw;
+  if FShowGroup then
+    DrawTogether
+  else
+    Draw;
 end;
 
 procedure TChartForm.YComboChange(Sender: TObject);
 var
   j, p: Integer;
 begin
+  FShowGroup := False;
   if (YCombo.ItemIndex < 0) or (YCombo.ItemIndex > VNr-1) then
   begin
     FValid := False;
@@ -950,6 +963,14 @@ begin
     bf[p] := af[p, j];
   UpdateYMinMax;
   DrawInternal; { auch TestF zeichnen }
+end;
+
+procedure TChartForm.DrawGroup;
+begin
+  if FShowGroup then
+    DrawTogether
+  else
+    DrawNormal;
 end;
 
 procedure TChartForm.DrawTogether;
