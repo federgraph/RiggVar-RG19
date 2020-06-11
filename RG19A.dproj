@@ -148,9 +148,6 @@
         <DCCReference Include="Frm\FrmProgress.pas">
             <Form>ProgressDlg</Form>
         </DCCReference>
-        <DCCReference Include="Frm\FrmChartRgg.pas">
-            <Form>ChartFormGS</Form>
-        </DCCReference>
         <DCCReference Include="Core\RggTrimmTab.pas"/>
         <DCCReference Include="Frm\FrmInfo.pas">
             <Form>KreisForm</Form>

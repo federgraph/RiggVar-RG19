@@ -294,7 +294,6 @@ uses
   FrmReglerGraph,
   FrmOptions,
   FrmChart,
-  FrmChartRgg,
   FrmAniRot,
   FrmRot,
   FrmPreview,
@@ -1688,7 +1687,7 @@ end;
 
 procedure TRiggModul.ChartItemClick;
 begin
-  ChartForm := TChartFormGS.Create(Application);
+  ChartForm := TChartForm.Create(Application);
 end;
 
 procedure TRiggModul.ReportItemClick;

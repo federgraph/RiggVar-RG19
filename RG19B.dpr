@@ -18,7 +18,6 @@ uses
   FrmChart in 'Frm\FrmChart.pas' {ChartForm},
   FrmAuswahl in 'Frm\FrmAuswahl.pas' {YAuswahlDlg},
   FrmProgress in 'Frm\FrmProgress.pas' {ProgressDlg},
-  FrmChartRgg in 'Frm\FrmChartRgg.pas' {ChartFormGS},
   FrmInfo in 'Frm\FrmInfo.pas' {KreisForm},
   FrmMemo in 'Frm\FrmMemo.pas' {MemoFormC},
   FrmAni in 'Frm\FrmAni.pas' {AnimationForm},

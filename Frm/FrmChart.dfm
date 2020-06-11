@@ -4,8 +4,8 @@ object ChartForm: TChartForm
   HorzScrollBar.Margin = 1
   VertScrollBar.Margin = 1
   Caption = 'Diagramm'
-  ClientHeight = 337
-  ClientWidth = 805
+  ClientHeight = 480
+  ClientWidth = 800
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -45,8 +45,66 @@ object ChartForm: TChartForm
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnPaint = FormPaint
   PixelsPerInch = 96
   TextHeight = 13
+  object lbXLeft: TLabel
+    Left = 80
+    Top = 446
+    Width = 22
+    Height = 13
+    Caption = 'Xmin'
+  end
+  object lbAchseX: TLabel
+    Left = 280
+    Top = 446
+    Width = 43
+    Height = 13
+    Caption = 'lbAchseX'
+  end
+  object lbXRight: TLabel
+    Left = 671
+    Top = 446
+    Width = 26
+    Height = 13
+    Alignment = taRightJustify
+    Caption = 'Xmax'
+  end
+  object ChartPaintBox: TPaintBox
+    Left = 80
+    Top = 182
+    Width = 601
+    Height = 257
+    OnPaint = ChartPaintBoxPaint
+  end
+  object PaintBoxLegend: TPaintBox
+    Left = 688
+    Top = 182
+    Width = 98
+    Height = 257
+    OnPaint = PaintBoxLegendPaint
+  end
+  object ChartBevelInner: TBevel
+    Left = 176
+    Top = 246
+    Width = 297
+    Height = 145
+  end
+  object lbParam: TLabel
+    Left = 738
+    Top = 158
+    Width = 38
+    Height = 13
+    Alignment = taRightJustify
+    Caption = 'lbParam'
+  end
+  object ChartBevelOuter: TBevel
+    Left = 8
+    Top = 152
+    Width = 780
+    Height = 314
+    Style = bsRaised
+  end
   object BedienPanel: TPanel
     Left = 0
     Top = 0
@@ -524,11 +582,11 @@ object ChartForm: TChartForm
     end
   end
   object OpenDialog: TOpenDialog
-    Left = 40
-    Top = 152
+    Left = 136
+    Top = 200
   end
   object SaveDialog: TSaveDialog
-    Left = 72
-    Top = 152
+    Left = 248
+    Top = 200
   end
 end
