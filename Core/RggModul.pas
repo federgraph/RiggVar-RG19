@@ -1466,7 +1466,7 @@ begin
 //    Rigg.SalingTyp := Value;
     GetriebeGraph.SalingTyp := Value;
     if ChartFormActive then
-      ChartForm.SalingTyp := Value;
+      ChartForm.ChartModel.SalingTyp := Value;
 
     case Value of
       stFest: InputForm.InputPages.ActivePage := InputForm.tsFest;

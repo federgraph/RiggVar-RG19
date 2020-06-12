@@ -1,4 +1,4 @@
-object ChartForm: TChartForm
+﻿object ChartForm: TChartForm
   Left = 202
   Top = 165
   HorzScrollBar.Margin = 1
@@ -175,7 +175,7 @@ object ChartForm: TChartForm
       Caption = 'Kurve'
     end
     object CalcBtn: TSpeedButton
-      Left = 679
+      Left = 673
       Top = 104
       Width = 25
       Height = 24
@@ -198,8 +198,8 @@ object ChartForm: TChartForm
       ShowHint = True
       OnClick = CalcItemClick
     end
-    object BuissyBtn: TSpeedButton
-      Left = 729
+    object ResetBtn: TSpeedButton
+      Left = 697
       Top = 104
       Width = 25
       Height = 24
@@ -220,7 +220,7 @@ object ChartForm: TChartForm
       NumGlyphs = 2
       ParentShowHint = False
       ShowHint = True
-      OnClick = BuissyItemClick
+      OnClick = ResetItemClick
     end
     object AuswahlBtn: TSpeedButton
       Left = 754
@@ -308,7 +308,7 @@ object ChartForm: TChartForm
       Caption = 'Parameter'
     end
     object MemoBtn: TSpeedButton
-      Left = 704
+      Left = 729
       Top = 104
       Width = 25
       Height = 24
@@ -356,7 +356,7 @@ object ChartForm: TChartForm
       OnClick = ShowTogetherBtnClick
     end
     object BereichBtn: TSpeedButton
-      Left = 410
+      Left = 405
       Top = 104
       Width = 25
       Height = 24
@@ -377,7 +377,7 @@ object ChartForm: TChartForm
       OnClick = BereichBtnClick
     end
     object APBtn: TSpeedButton
-      Left = 435
+      Left = 429
       Top = 104
       Width = 25
       Height = 24
@@ -496,6 +496,7 @@ object ChartForm: TChartForm
       ShowHint = False
       TabOrder = 11
       OnChanging = PSpinnerChanging
+      OnClick = PSpinnerClick
     end
     object XCombo: TComboBox
       Left = 24

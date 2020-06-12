@@ -83,7 +83,9 @@ uses
   RggDisplayOrder in 'Graph\RggDisplayOrder.pas',
   RggDisplayTypes in 'Graph\RggDisplayTypes.pas',
   RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas',
-  RggVector in 'Graph\RggVector.pas';
+  RggVector in 'Graph\RggVector.pas',
+  RggChart in 'Graph\RggChart.pas',
+  RiggVar.FB.Color in 'FB\RiggVar.FB.Color.pas';
 
 {$R *.res}
 
