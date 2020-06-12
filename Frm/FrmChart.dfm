@@ -515,37 +515,41 @@ object ChartForm: TChartForm
         'Saling H'#246'he'
         'Saling Abstand')
     end
-    object XMinEdit: TMaskEdit
+    object XMinEdit: TEdit
       Left = 200
       Top = 32
       Width = 73
       Height = 21
       TabOrder = 1
       Text = 'XMinEdit'
+      OnChange = XMinEditChange
     end
-    object XMaxEdit: TMaskEdit
+    object XMaxEdit: TEdit
       Left = 296
       Top = 32
       Width = 73
       Height = 21
       TabOrder = 2
       Text = 'XMaxEdit'
+      OnChange = XMaxEditChange
     end
-    object PMaxEdit: TMaskEdit
+    object PMaxEdit: TEdit
       Left = 296
       Top = 104
       Width = 73
       Height = 21
       TabOrder = 5
       Text = 'PMaxEdit'
+      OnChange = PMaxEditChange
     end
-    object PMinEdit: TMaskEdit
+    object PMinEdit: TEdit
       Left = 200
       Top = 105
       Width = 73
       Height = 21
       TabOrder = 4
       Text = 'PMinEdit'
+      OnChange = PMinEditChange
     end
     object PCombo: TComboBox
       Left = 23

@@ -151,9 +151,6 @@
         <DCCReference Include="Frm\FrmInfo.pas">
             <Form>KreisForm</Form>
         </DCCReference>
-        <DCCReference Include="Frm\FrmMemo.pas">
-            <Form>MemoFormC</Form>
-        </DCCReference>
         <DCCReference Include="Frm\FrmAni.pas">
             <Form>AnimationForm</Form>
         </DCCReference>

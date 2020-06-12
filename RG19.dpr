@@ -19,7 +19,6 @@ uses
   FrmAuswahl in 'Frm\FrmAuswahl.pas' {YAuswahlDlg},
   FrmProgress in 'Frm\FrmProgress.pas' {ProgressDlg},
   FrmInfo in 'Frm\FrmInfo.pas' {KreisForm},
-  FrmMemo in 'Frm\FrmMemo.pas' {MemoFormC},
   FrmAni in 'Frm\FrmAni.pas' {AnimationForm},
   FrmAniRot in 'Frm\FrmAniRot.pas' {AniRotationForm},
   FrmModel in 'Frm\FrmModel.pas' {RiggDialog},

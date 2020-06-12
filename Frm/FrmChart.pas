@@ -21,7 +21,6 @@ uses
   Vcl.Dialogs,
   Vcl.ExtCtrls,
   Vcl.StdCtrls,
-  Vcl.Mask,
   Vcl.Menus,
   Vcl.Buttons,
   Vcl.ComCtrls,
@@ -65,17 +64,17 @@ type
     BevelCtrls: TBevel;
     XCombo: TComboBox;
     XComboLabel: TLabel;
-    XMinEdit: TMaskEdit;
+    XMinEdit: TEdit;
     XMinLabel: TLabel;
-    XMaxEdit: TMaskEdit;
+    XMaxEdit: TEdit;
     XMaxLabel: TLabel;
     XLED: TShape;
     XBevel: TBevel;
     PCombo: TComboBox;
     PComboLabel: TLabel;
-    PMinEdit: TMaskEdit;
+    PMinEdit: TEdit;
     PMinLabel: TLabel;
-    PMaxEdit: TMaskEdit;
+    PMaxEdit: TEdit;
     PMaxLabel: TLabel;
     PLED: TShape;
     PBevel: TBevel;
@@ -117,7 +116,13 @@ type
     procedure YAuswahlClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure PSpinnerClick(Sender: TObject; Button: TUDBtnType);
+    procedure XMinEditChange(Sender: TObject);
+    procedure XMaxEditChange(Sender: TObject);
+    procedure PMinEditChange(Sender: TObject);
+    procedure PMaxEditChange(Sender: TObject);
   private
+    MemoForm: TForm;
+    MemoFormMemo: TMemo;
     MainMenu: TMainMenu;
     ChartMenu: TMenuItem;
     BerechnenItem: TMenuItem;
@@ -156,7 +161,7 @@ type
     procedure UpdateYEdits;
     procedure SetAP(const Value: Boolean);
     property AP: Boolean write SetAP;
-    function ValidateInput(Input: TMaskEdit): Boolean;
+    function ValidateInput(Input: TEdit): Boolean;
   protected
     procedure InitMenu;
   public
@@ -208,7 +213,6 @@ implementation
 uses
 {$ifdef RG19}
   RggModul,
-  FrmMemo,
 {$endif}
   RiggVar.App.Main,
   RiggVar.RG.Def,
@@ -795,12 +799,14 @@ procedure TChartForm.DrawLabels;
 var
   PosX, PosY: Integer;
   R: TRect;
-  S: String;
+  s: string;
 begin
   with Canvas do
   begin
+    Font.Height := 13;
+    Pen.Color := clBlack;
     Brush.Style := bsSolid;
-    Brush.Color := ClBtnFace;
+    Brush.Color := clBtnFace;
     PosX := ChartPaintBox.Left - 55;
     PosY := ChartPaintBox.Top - 24;
     R := Rect(PosX, PosY, PosX + 210, PosY + Font.Height);
@@ -811,15 +817,15 @@ begin
     PosY := ChartPaintBox.Top;
     R := Rect(PosX - 60, PosY, PosX, PosY + Font.Height);
     SetTextAlign(Handle, TA_RIGHT or TA_TOP);
-    S := IntToStr(Round(ChartModel.Ymax));
-    TextRect(R, PosX, PosY, S);
+    s := IntToStr(Round(ChartModel.Ymax));
+    TextRect(R, PosX, PosY, s);
 
     PosX := ChartPaintBox.Left - 8;
     PosY := ChartPaintBox.Top + ChartPaintBox.Height;
     R := Rect(PosX - 60, PosY-Font.Height, PosX, PosY);
     SetTextAlign(Handle, TA_RIGHT or TA_BOTTOM);
-    S := IntToStr(Round(ChartModel.Ymin));
-    TextRect(R, PosX, PosY, S);
+    s := IntToStr(Round(ChartModel.Ymin));
+    TextRect(R, PosX, PosY, s);
   end;
 end;
 
@@ -1147,23 +1153,46 @@ begin
   ChartModel.UpdateYMinMax;
 end;
 
-procedure TChartForm.MemoItemClick(Sender: TObject);
+procedure TChartForm.XMinEditChange(Sender: TObject);
 begin
-{$ifdef RG19}
-  MemoFormC := TMemoFormC.Create(Self);
-  try
-    MemoFormC.Width := 600;
-    MemoFormC.Height := 900;
-    MemoFormC.Memo.Lines.Clear;
-    MemoFormC.Memo.Lines := ChartModel.MemoLines;
-    MemoFormC.ShowModal;
-  finally
-    MemoFormC.Free;
-  end;
-{$endif}
+  ChartModel.XminEditText := XMinEdit.Text;
 end;
 
-function TChartForm.ValidateInput(Input: TMaskEdit): Boolean;
+procedure TChartForm.XMaxEditChange(Sender: TObject);
+begin
+  ChartModel.XmaxEditText := XMaxEdit.Text;
+end;
+
+procedure TChartForm.PMinEditChange(Sender: TObject);
+begin
+  ChartModel.PminEditText := PMinEdit.Text;
+end;
+
+procedure TChartForm.PMaxEditChange(Sender: TObject);
+begin
+  ChartModel.PmaxEditText := PMaxEdit.Text;
+end;
+
+procedure TChartForm.MemoItemClick(Sender: TObject);
+begin
+  if MemoForm = nil then
+  begin
+    MemoForm := TForm.Create(Application);
+    MemoForm.Width := 400;
+    MemoForm.Height := 600;
+    MemoForm.Caption := 'ChartMemoForm01';
+
+    MemoFormMemo := TMemo.Create(MemoForm);
+    MemoFormMemo.Parent := MemoForm;
+    MemoFormMemo.Align := alClient;
+    MemoFormMemo.ScrollBars := ssBoth;
+  end;
+  MemoFormMemo.Lines.Clear;
+  MemoFormMemo.Lines := ChartModel.MemoLines;
+  MemoForm.ShowModal;
+end;
+
+function TChartForm.ValidateInput(Input: TEdit): Boolean;
 var
   s: string;
   I: Integer;
