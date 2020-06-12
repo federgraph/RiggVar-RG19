@@ -138,6 +138,8 @@ type
     N4: TMenuItem;
   private
     FLegend: Boolean;
+    WantChartPunktX: Boolean;
+    FScale: single;
     procedure PaintBackGround(Image: TBitMap);
     procedure DrawChartPaintBox(Canvas: TCanvas; Rect: TRect);
     procedure DrawLegend(Canvas: TCanvas; Rect: TRect);
@@ -154,8 +156,8 @@ type
     procedure UpdateYEdits;
     procedure SetAP(const Value: Boolean);
     property AP: Boolean write SetAP;
-  protected
     function ValidateInput(Input: TMaskEdit): Boolean;
+  protected
     procedure InitMenu;
   public
     ChartModel: TRggChartModel;
@@ -243,6 +245,9 @@ begin
     InitMenu;
   end;
 {$endif}
+
+  FScale := 1.0;
+  WantChartPunktX := True;
 
   UpdateUI;
 end;
@@ -633,6 +638,23 @@ begin
 end;
 
 procedure TChartForm.DrawChartPaintBox(Canvas: TCanvas; Rect: TRect);
+var
+  P: TPoint;
+  R: TRect;
+  i, param: Integer;
+  RadiusX, RadiusY: Integer;
+  Bitmap: TBitmap;
+  PlotWidth, PlotHeight: Integer;
+  PlotExtX, PlotExtY: Integer;
+  PlotOrgX, PlotOrgY: Integer;
+  tempX, tempY: double;
+
+  xrange: single;
+  yrange: single;
+
+  P0: TPointF;
+  P1: TPoint;
+  P2: TPoint;
 
   function Limit(a: double): double;
   begin
@@ -643,15 +665,18 @@ procedure TChartForm.DrawChartPaintBox(Canvas: TCanvas; Rect: TRect);
     Result := a;
   end;
 
-var
-  Pt: TPoint;
-  R: TRect;
-  i, p, RadiusX, RadiusY: Integer;
-  Bitmap: TBitmap;
-  PlotWidth, PlotHeight: Integer;
-  PlotExtX, PlotExtY: Integer;
-  PlotOrgX, PlotOrgY: Integer;
-  tempX, tempY: double;
+  procedure DrawVerticalLine(g: TCanvas);
+  begin
+    P0.X := Limit(tempX);
+    P0.Y := Limit(tempY);
+    P2.X := Round(P0.X * FScale);
+    P2.Y := Round(P0.Y * FScale);
+    P1 := P2;
+    P1.Y := 0;
+    g.MoveTo(P1.X, P1.Y);
+    g.LineTo(P2.X, P2.Y);
+  end;
+
 begin
   DrawLabels;
 
@@ -684,6 +709,27 @@ begin
       SetViewPortExtEx(Handle, PlotWidth, PlotHeight, nil);
       SetViewPortOrgEx(Handle, 0, PlotHeight, nil);
 
+      { ChartPunktX }
+      WantChartPunktX := not ChartModel.AP;
+      if WantChartPunktX then
+      begin
+        xrange := ChartModel.Xmax - ChartModel.Xmin;
+
+        Pen.Color := clRed;
+        tempX := PlotExtX * ((ChartModel.ChartPunktX) - ChartModel.Xmin) / xrange;
+        tempY := PlotExtY;
+        DrawVerticalLine(Bitmap.Canvas);
+
+        Pen.Color := clSilver;
+        tempX := PlotExtX * ((ChartModel.ChartPunktX - ChartModel.APWidth) - ChartModel.Xmin) / xrange;
+        tempY := PlotExtY;
+        DrawVerticalLine(Bitmap.Canvas);
+
+        tempX := PlotExtX * ((ChartModel.ChartPunktX + ChartModel.APWidth) - ChartModel.Xmin) / xrange;
+        tempY := PlotExtY;
+        DrawVerticalLine(Bitmap.Canvas);
+      end;
+
       { Radius }
       R.Left := 0;
       R.Top := 0;
@@ -693,37 +739,37 @@ begin
       RadiusX := R.Right-R.Left;
       RadiusY := R.Bottom-R.Top;
 
-      for p := 0 to ChartModel.ParamCount-1 do
+      yrange := (ChartModel.Ymax-ChartModel.Ymin);
+      for param := 0 to ChartModel.ParamCount-1 do
       begin
-
         { Kurve }
-        Pen.Color := ChartModel.cf[p];
-        tempY := PlotExtY * (ChartModel.bf[p,0]-ChartModel.Ymin)/(ChartModel.Ymax-ChartModel.Ymin);
-        Pt.y := Round(Limit(tempY));
-        MoveTo(0,Pt.y);
+        Pen.Color := ChartModel.cf[param];
+        tempY := PlotExtY * (ChartModel.bf[param,0]-ChartModel.Ymin) / yrange;
+        P.Y := Round(Limit(tempY));
+        MoveTo(0, P.Y);
         for i := 1 to LNr do
         begin
           tempX := PlotExtX * (i/LNr);
-          tempY := PlotExtY * (ChartModel.bf[p,i]-ChartModel.Ymin)/(ChartModel.Ymax-ChartModel.Ymin);
-          Pt.x := Round(Limit(tempX));
-          Pt.y := Round(Limit(tempY));
-          LineTo(Pt.x, Pt.y);
+          tempY := PlotExtY * (ChartModel.bf[param,i]-ChartModel.Ymin) / yrange;
+          P.X := Round(Limit(tempX));
+          P.Y := Round(Limit(tempY));
+          LineTo(P.X, P.Y);
         end;
 
         if ChartModel.WantRectangles then
         begin
           { Rechtecke }
           Pen.Color := clBlack;
-          Brush.Color := ChartModel.cf[p];
+          Brush.Color := ChartModel.cf[param];
           Brush.Style := bsSolid;
           for i := 0 to LNr do
           begin
             tempX := PlotExtX * (i/LNr);
-            tempY := PlotExtY * (ChartModel.bf[p,i]-ChartModel.Ymin)/(ChartModel.Ymax-ChartModel.Ymin);
-            Pt.x := Round(Limit(tempX));
-            Pt.y := Round(Limit(tempY));
-            Rectangle( Pt.x - RadiusX, Pt.y - RadiusY,
-                       Pt.x + RadiusX, Pt.y + RadiusY);
+            tempY := PlotExtY * (ChartModel.bf[param,i]-ChartModel.Ymin) / yrange;
+            P.X := Round(Limit(tempX));
+            P.Y := Round(Limit(tempY));
+            Rectangle( P.X - RadiusX, P.Y - RadiusY,
+                       P.X + RadiusX, P.Y + RadiusY);
           end;
         end;
 
@@ -821,6 +867,7 @@ procedure TChartForm.PComboChange(Sender: TObject);
 begin
   ChartModel.PComboItemIndex := PCombo.ItemIndex;
   ChartModel.PComboChange(Sender);
+  UpdateXPEdits;
 end;
 
 procedure TChartForm.RectangleItemClick(Sender: TObject);
@@ -1153,6 +1200,8 @@ begin
 
   PCombo.Items := ChartModel.PComboItems;
   PCombo.ItemIndex := ChartModel.PComboItemIndex;
+
+  UpdateXPEdits;
 end;
 
 procedure TRggChartModel.LoadFromFile(FileName: string);
@@ -1287,6 +1336,10 @@ procedure TRggChartModel.YAuswahlClick;
 var
   i: Integer;
 begin
+  if YAuswahlDlg = nil then
+  begin
+    YAuswahlDlg := TYAuswahlDlg.Create(Application);
+  end;
   with YAuswahlDlg do
   begin
     if not (DstList.ItemIndex = -1) then

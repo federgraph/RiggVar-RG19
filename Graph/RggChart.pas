@@ -299,8 +299,8 @@ begin
   MemoLines.Add(AnfangsZustandString);
   SalingDreieck := TSalingDreieck.Create;
 
-  ParamCount := 2;
-  APWidth := 29;
+  ParamCount := 3;
+  APWidth := 30;
 
   YLEDFillColor := TRggColors.Red;
   XLEDFillColor := TRggColors.Red;

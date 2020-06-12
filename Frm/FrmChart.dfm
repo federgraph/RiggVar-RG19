@@ -1,4 +1,4 @@
-﻿object ChartForm: TChartForm
+object ChartForm: TChartForm
   Left = 202
   Top = 165
   HorzScrollBar.Margin = 1
