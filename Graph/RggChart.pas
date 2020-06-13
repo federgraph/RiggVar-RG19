@@ -131,6 +131,8 @@ type
     PSpinnerValue: Integer;
     PSpinnerMax: Integer;
 
+    UserSelectedKurvenZahl: Integer;
+    DefaultKurvenZahl: Integer;
     KurvenZahlSpinnerValue: Integer;
     KurvenZahlSpinnerMax: Integer;
 
@@ -271,6 +273,8 @@ end;
 
 constructor TChartModel.Create;
 begin
+  UserSelectedKurvenZahl := 3;
+
   Include(XSet, xpController);
   Include(XSet, xpWinkel);
   Include(XSet, xpVorstag);
@@ -517,6 +521,10 @@ begin
       PMinEditValue := 0;
       PMaxEditValue := 0;
       KurvenZahlSpinnerValue := 1;
+    end
+    else if KurvenZahlSpinnerValue = 1 then
+    begin
+      KurvenZahlSpinnerValue := UserSelectedKurvenZahl;
     end;
 
     ParamCount := KurvenZahlSpinnerValue;
@@ -619,7 +627,7 @@ begin
     for p := 0 to ParamCount - 1 do
     begin
       if ParamCount > 1 then
-        ProgressCaption := Format(ProgressCaptionFormatString, [p+1, ParamCount])
+        ProgressCaption := Format(ProgressCaptionFormatString, [p + 1, ParamCount])
       else
         ProgressCaption := ProgressCaptionString;
 
@@ -1102,7 +1110,7 @@ begin
   end;
   Ymax := af[p, j, 0];
   Ymin := Ymax;
-  for p := 0 to ParamCount-1 do
+  for p := 0 to ParamCount - 1 do
   begin
     TempF := af[p, j];
     for i := 0 to LNr do
@@ -1209,7 +1217,7 @@ begin
       Add('Parameter: ' + ParamText);
       with MemoLines do
       begin
-        for p := 0 to ParamCount-1 do
+        for p := 0 to ParamCount - 1 do
           Add(Format('  #%d: %s (%s) ', [p + 1, PText[p], PColorText[p]]));
       end;
     end;
@@ -1696,6 +1704,10 @@ begin
     PMaxEditText := IntToStr(0);
     KurvenZahlSpinnerValue := 1;
     Exit;
+  end
+  else if KurvenZahlSpinnerValue = 1 then
+  begin
+    KurvenzahlSpinnerValue := UserSelectedKurvenZahl;
   end;
 
   xp := GetTsbName(s);
@@ -1869,6 +1881,7 @@ begin
   UpdateYAchseList;
 
   KurvenZahlSpinnerValue := 3;
+  DefaultKurvenZahl := 3;
 end;
 
 procedure TChartModel.SuperCalc;
@@ -1937,6 +1950,8 @@ begin
       if KurvenZahlSpinnerValue > PNr then
         KurvenZahlSpinnerValue := PNr;
 
+      UserSelectedKurvenZahl := KurvenZahlSpinnerValue;
+
       if FShowGroup then
         DrawGroup
       else
@@ -1948,6 +1963,8 @@ begin
       Dec(KurvenZahlSpinnerValue);
       if KurvenZahlSpinnerValue < 1 then
         KurvenZahlSpinnerValue := 1;
+
+      UserSelectedKurvenZahl := KurvenZahlSpinnerValue;
 
       if FShowGroup then
         DrawGroup

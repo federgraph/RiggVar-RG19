@@ -89,21 +89,21 @@ type
     procedure FormCreate(Sender: TObject);
     procedure CalcItemClick(Sender: TObject);
     procedure ResetItemClick(Sender: TObject);
-    procedure APItemClick(Sender: TObject);
-    procedure BereichItemClick(Sender: TObject);
     procedure CloseItemClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormActivate(Sender: TObject);
     procedure PSpinnerChanging(Sender: TObject; var AllowChange: Boolean);
+    procedure APItemClick(Sender: TObject);
+    procedure BereichItemClick(Sender: TObject);
     procedure OpenItemClick(Sender: TObject);
     procedure SaveItemClick(Sender: TObject);
     procedure UpdateRiggItemClick(Sender: TObject);
     procedure RectangleItemClick(Sender: TObject);
+    procedure ChartMenuClick(Sender: TObject);
     procedure PEditChange(Sender: TObject);
     procedure MemoItemClick(Sender: TObject);
     procedure ShowTogetherBtnClick(Sender: TObject);
     procedure KurvenZahlSpinnerClick(Sender: TObject; Button: TUDBtnType);
-    procedure ChartMenuClick(Sender: TObject);
     procedure UpdateChartItemClick(Sender: TObject);
     procedure BereichBtnClick(Sender: TObject);
     procedure APEditChange(Sender: TObject);
@@ -166,6 +166,7 @@ type
     procedure InitMenu;
   public
     ChartModel: TRggChartModel;
+    WantAutoUpdate: Boolean;
     function CheckBeforeCalc: Boolean;
   end;
 
@@ -254,6 +255,7 @@ begin
   WantChartPunktX := True;
 
   UpdateUI;
+  WantAutoUpdate := True;
 end;
 
 procedure TChartForm.FormDestroy(Sender: TObject);
@@ -327,8 +329,18 @@ begin
     Exit;
 
   ChartModel.KurvenZahlSpinnerValue := KurvenZahlSpinner.Position;
+
   if ChartModel.ShowGroup then
+  begin
     ChartModel.DrawTogether;
+    Exit;
+  end;
+
+  ChartModel.UserSelectedKurvenZahl := ChartModel.KurvenZahlSpinnerValue;
+  if WantAutoUpdate then
+  begin
+    CalcItemClick(nil);
+  end;
 end;
 
 procedure TChartForm.OpenItemClick(Sender: TObject);
@@ -381,7 +393,10 @@ begin
   UpdateLEDs;
   UpdateEdits;
 
-  ActiveControl := YCombo;
+  if not WantAutoUpdate then
+  begin
+    ActiveControl := YCombo;
+  end;
 end;
 
 procedure TChartForm.ResetItemClick(Sender: TObject);
@@ -392,9 +407,17 @@ end;
 
 procedure TChartForm.ShowTogetherBtnClick(Sender: TObject);
 begin
-  ChartModel.KurvenZahlSpinnerValue := KurvenZahlSpinner.Position;
-  ChartModel.ShowGroup := True;
-  ChartModel.DrawTogether;
+  if not ChartModel.ShowGroup then
+  begin
+    ChartModel.KurvenZahlSpinnerValue := KurvenZahlSpinner.Position;
+    ChartModel.ShowGroup := True;
+    ChartModel.DrawTogether;
+  end
+  else
+  begin
+     { this will reset ChartModel.ShowGroup and restore KurvenZahlSpinner.Position }
+    YComboChange(nil);
+  end;
 end;
 
 procedure TChartForm.YAuswahlClick(Sender: TObject);
@@ -449,6 +472,8 @@ begin
   ChartModel.YComboItemIndex := YCombo.ItemIndex;
   ChartModel.YComboChange(Sender);
   UpdateYEdits;
+  ChartModel.KurvenZahlSpinnerValue := ChartModel.UserSelectedKurvenZahl;
+  KurvenZahlSpinner.Position := ChartModel.KurvenZahlSpinnerValue;
 end;
 
 procedure TChartForm.APEditChange(Sender: TObject);
@@ -457,6 +482,16 @@ begin
   ChartModel.AP := ChartModel.AP; // trigger update
   UpdateXPEdits;
   UpdateLEDs;
+
+  if ChartModel.BereichBtnDown then
+  begin
+    { Calc not needed, just redraw }
+    DrawToChart;
+  end
+  else if WantAutoUpdate then
+  begin
+    CalcItemClick(nil);
+  end;
 end;
 
 procedure TChartForm.UpdateRiggItemClick(Sender: TObject);
@@ -874,6 +909,11 @@ begin
   ChartModel.PComboItemIndex := PCombo.ItemIndex;
   ChartModel.PComboChange(Sender);
   UpdateXPEdits;
+
+  if WantAutoUpdate then
+  begin
+    CalcItemClick(nil);
+  end;
 end;
 
 procedure TChartForm.RectangleItemClick(Sender: TObject);
@@ -1231,6 +1271,11 @@ begin
   PCombo.ItemIndex := ChartModel.PComboItemIndex;
 
   UpdateXPEdits;
+
+  if WantAutoUpdate then
+  begin
+    CalcItemClick(nil);
+  end;
 end;
 
 procedure TRggChartModel.LoadFromFile(FileName: string);
