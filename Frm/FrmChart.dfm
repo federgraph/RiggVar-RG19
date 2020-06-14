@@ -1,4 +1,4 @@
-object ChartForm: TChartForm
+﻿object ChartForm: TChartForm
   Left = 202
   Top = 165
   HorzScrollBar.Margin = 1
@@ -175,7 +175,7 @@ object ChartForm: TChartForm
       Caption = 'Kurve'
     end
     object CalcBtn: TSpeedButton
-      Left = 673
+      Left = 679
       Top = 104
       Width = 25
       Height = 24
@@ -199,7 +199,7 @@ object ChartForm: TChartForm
       OnClick = CalcItemClick
     end
     object ResetBtn: TSpeedButton
-      Left = 697
+      Left = 729
       Top = 104
       Width = 25
       Height = 24
@@ -308,7 +308,7 @@ object ChartForm: TChartForm
       Caption = 'Parameter'
     end
     object MemoBtn: TSpeedButton
-      Left = 729
+      Left = 704
       Top = 104
       Width = 25
       Height = 24
@@ -332,8 +332,8 @@ object ChartForm: TChartForm
       OnClick = MemoItemClick
     end
     object ShowTogetherBtn: TSpeedButton
-      Left = 634
-      Top = 104
+      Left = 637
+      Top = 105
       Width = 25
       Height = 24
       Hint = 'Kurven nach Parameter gruppiert anzeigen|'
@@ -356,7 +356,7 @@ object ChartForm: TChartForm
       OnClick = ShowTogetherBtnClick
     end
     object BereichBtn: TSpeedButton
-      Left = 405
+      Left = 410
       Top = 104
       Width = 25
       Height = 24
@@ -377,7 +377,7 @@ object ChartForm: TChartForm
       OnClick = BereichBtnClick
     end
     object APBtn: TSpeedButton
-      Left = 429
+      Left = 435
       Top = 104
       Width = 25
       Height = 24
@@ -455,11 +455,10 @@ object ChartForm: TChartForm
       ShowHint = True
       TabOrder = 8
       Text = '1'
-      OnChange = PEditChange
     end
     object KurvenzahlEdit: TEdit
-      Left = 583
-      Top = 104
+      Left = 582
+      Top = 105
       Width = 33
       Height = 21
       Hint = 'Parameteranzahl festlegen/Parameter ausw'#228'hlen|'
@@ -470,8 +469,8 @@ object ChartForm: TChartForm
       Text = '3'
     end
     object KurvenZahlSpinner: TUpDown
-      Left = 616
-      Top = 104
+      Left = 615
+      Top = 105
       Width = 15
       Height = 21
       Associate = KurvenzahlEdit
@@ -495,7 +494,6 @@ object ChartForm: TChartForm
       Position = 1
       ShowHint = False
       TabOrder = 11
-      OnChanging = PSpinnerChanging
       OnClick = PSpinnerClick
     end
     object XCombo: TComboBox
@@ -570,7 +568,6 @@ object ChartForm: TChartForm
       Height = 21
       TabOrder = 13
       Text = '30'
-      OnChange = APEditChange
     end
     object APSpinner: TUpDown
       Left = 497
@@ -582,6 +579,7 @@ object ChartForm: TChartForm
       Max = 30
       Position = 30
       TabOrder = 14
+      OnClick = APSpinnerClick
     end
   end
   object OpenDialog: TOpenDialog

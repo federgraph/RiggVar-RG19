@@ -117,8 +117,8 @@ type
     procedure LookForYMinMax;
 
     procedure UpdateXMinMax; virtual;
-    procedure UpdateYMinMax; virtual;
     procedure UpdatePMinMax; virtual;
+    procedure UpdateYMinMax; virtual;
   public
     APWidth: Integer;
     FAP: Boolean;
@@ -278,10 +278,6 @@ begin
   APWidth := 30;
   FSalingTyp := stFest;
 
-  YLEDFillColor := TRggColors.Red;
-  XLEDFillColor := TRggColors.Red;
-  PLEDFillColor := TRggColors.Red;
-
   Include(XSet, xpController);
   Include(XSet, xpWinkel);
   Include(XSet, xpVorstag);
@@ -318,18 +314,13 @@ begin
 
   TakeOver;
 
-  { needed in UpdateXCombo }
   FXTextClicked := VorstagString;
   FPTextClicked := SalingHString;
-
-  { will initiate ItemIndex for X and P }
   UpdateXCombo(FSalingTyp);
-  UpdatePCombo(FSalingTyp);
-
   InitYComboItems;
   YComboItemIndex := 3;
-
   InitYAchseRecordList(YAchseRecordList);
+  UpdateYAchseList;
 
   AP := True;
 
@@ -414,20 +405,15 @@ var
   s: string;
   YAV: TYAchseValue;
 begin
-  { ComboIndex zurücksetzen auf -1 }
   for YAV := Low(TYAchseValue) to High(TYAchseValue) do
     YAchseRecordList[YAV].ComboIndex := -1;
-  { ComboIndex neu bestimmen. Nicht ausgewählte Einträge bleiben auf -1 }
   for i := 0 to YComboItems.Count-1 do
   begin
     s := YComboItems[i];
     for YAV := Low(TYAchseValue) to High(TYAchseValue) do
-      { Position j des Eintrag finden durch  Textvergleich }
       if s = YAchseRecordList[YAV].ComboText then
       begin
-        { Position in der ComboBox festhalten }
         YAchseRecordList[YAV].ComboIndex := i;
-        { Reihenfolge in Liste festhalten }
         YAchseSortedList[i] := YAV;
         break;
       end;
@@ -440,18 +426,14 @@ var
   s: string;
   YAV: TYAchseValue;
 begin
-  { Wird nur bei Neuberechnung aufgerufen }
   YAchseSet := [];
   for i := 0 to YComboItems.Count-1 do
   begin
     s := YComboItems[i];
     for YAV := Low(TYAchseValue) to High(TYAchseValue) do
-      { Position j des Eintrag finden durch Textvergleich }
       if s = YAchseRecordList[YAV].ComboText then
       begin
-        { Position in Combo festhalten }
         YAchseRecordList[YAV].ArrayIndex := i;
-        { festhalten, welche Kurven existieren }
         if i <= ANr-1 then
           Include(YAchseSet, YAV);
         break;
@@ -481,7 +463,6 @@ procedure TChartModel.Calc;
 begin
   if not FBusy then
   begin
-    { Berechnen }
     Inc(CalcCounter);
 
     if not CheckBeforeCalc then
@@ -489,7 +470,6 @@ begin
 
     FBusy := True;
 
-    { Parameterzahl bearbeiten }
     if PComboSelectedText = NoParamString then
     begin
       PMinEditValue := 0;
@@ -507,7 +487,6 @@ begin
       PSpinnerValue := ParamCount;
 
     PSpinnerMax := ParamCount;
-    { MaxValue muß größer MinValue sein }
     if PSpinnerMax = 1 then
       PSpinnerMax := 2;
 
@@ -906,7 +885,7 @@ begin
   for p := 0 to ParamCount - 1 do
     bf[p] := af[p, j];
   UpdateYMinMax;
-  DrawInternal; { auch TestF zeichnen }
+  DrawInternal;
 end;
 
 procedure TChartModel.DrawGroup;
@@ -929,7 +908,7 @@ end;
 
 procedure TChartModel.ShowTogether(ParamNo: Integer);
 var
-  i, j, p: Integer;
+  i, j, param: Integer;
   YAV: TYAchseValue;
   min, max, diff, temp: double;
   tempParamCount: Integer;
@@ -939,48 +918,48 @@ begin
     ParamNo := ParamCount;
 
   { bf füllen }
-  p := 0; { p steht hier für die Anzahl der Kurven in YAchseSet }
+  param := 0; { p steht hier für die Anzahl der Kurven in YAchseSet }
   for i := 0 to YComboItems.Count - 1 do
   begin
     YAV := YAchseSortedList[i];
     if YAV in YAchseSet then
     begin
       j := YAchseRecordList[YAV].ArrayIndex;
-      if p = PNr then
+      if param = PNr then
         break;
-      bf[p] := af[ParamNo - 1, j];
-      GroupText[p] := YAchseRecordList[YAV].ComboText;
-      p := p + 1;
+      bf[param] := af[ParamNo - 1, j];
+      GroupText[param] := YAchseRecordList[YAV].ComboText;
+      param := param + 1;
     end;
   end;
 
-  GroupKurvenZahl := p;
-  for p := 0 to GroupKurvenZahl - 1 do
+  GroupKurvenZahl := param;
+  for param := 0 to GroupKurvenZahl - 1 do
   begin
     { Maximum und Minimum ermitteln }
-    max := bf[p, 0];
+    max := bf[param, 0];
     min := max;
     for i := 0 to LNr do
     begin
-      if bf[p, i] > max then
-        max := bf[p, i];
-      if bf[p, i] < min then
-        min := bf[p, i];
+      if bf[param, i] > max then
+        max := bf[param, i];
+      if bf[param, i] < min then
+        min := bf[param, i];
     end;
 
     { Normieren }
     diff := max - min;
-    temp := p * 100 / GroupKurvenZahl;
+    temp := param * 100 / GroupKurvenZahl;
     if max-min = 0 then
       for i := 0 to LNr do
-        bf[p, i] := temp
+        bf[param, i] := temp
     else
     begin
       for i := 0 to LNr do
       try
-        bf[p, i] := (bf[p, i] - min) * 100 / diff;
+        bf[param, i] := (bf[param, i] - min) * 100 / diff;
       except on EMathError do
-        bf[p, i] := 0;
+        bf[param, i] := 0;
       end;
     end;
   end;
@@ -1841,21 +1820,17 @@ end;
 
 procedure TChartModel.SuperInit;
 begin
+  { Auswahl Anrieb (Definitionsbereich X): Wantenlänge }
   XComboItemIndex := XComboItems.IndexOf(WanteString);
   XComboChange(nil);
 
-  { SalingHöhe }
+  { Auswahl Parameter: SalingHöhe }
   PComboItemIndex := PComboItems.IndexOf(SalingHString);
   PComboChange(nil);
 
-  { Mastfall F0F }
+  { Selektierer Y-Wert: Mastfall F0F }
   YComboItemIndex := YComboItems.IndexOf(MastfallF0FString);
   YComboChange(nil);
-
-  UpdateYAchseList;
-
-  KurvenZahlSpinnerValue := 3;
-  DefaultKurvenZahl := 3;
 end;
 
 procedure TChartModel.SuperCalc;

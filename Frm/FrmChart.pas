@@ -87,35 +87,33 @@ type
     lbParam: TLabel;
     ChartBevelOuter: TBevel;
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormPaint(Sender: TObject);
     procedure CalcItemClick(Sender: TObject);
     procedure ResetItemClick(Sender: TObject);
     procedure CloseItemClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormActivate(Sender: TObject);
-    procedure PSpinnerChanging(Sender: TObject; var AllowChange: Boolean);
+    procedure ChartMenuClick(Sender: TObject);
     procedure APItemClick(Sender: TObject);
     procedure BereichItemClick(Sender: TObject);
     procedure OpenItemClick(Sender: TObject);
     procedure SaveItemClick(Sender: TObject);
     procedure UpdateRiggItemClick(Sender: TObject);
     procedure RectangleItemClick(Sender: TObject);
-    procedure ChartMenuClick(Sender: TObject);
-    procedure PEditChange(Sender: TObject);
     procedure MemoItemClick(Sender: TObject);
     procedure ShowTogetherBtnClick(Sender: TObject);
+    procedure APSpinnerClick(Sender: TObject; Button: TUDBtnType);
+    procedure PSpinnerClick(Sender: TObject; Button: TUDBtnType);
     procedure KurvenZahlSpinnerClick(Sender: TObject; Button: TUDBtnType);
     procedure UpdateChartItemClick(Sender: TObject);
     procedure BereichBtnClick(Sender: TObject);
-    procedure APEditChange(Sender: TObject);
-    procedure FormPaint(Sender: TObject);
     procedure ChartPaintBoxPaint(Sender: TObject);
     procedure PaintBoxLegendPaint(Sender: TObject);
     procedure XComboChange(Sender: TObject);
     procedure PComboChange(Sender: TObject);
     procedure YComboChange(Sender: TObject);
     procedure YAuswahlClick(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
-    procedure PSpinnerClick(Sender: TObject; Button: TUDBtnType);
     procedure XMinEditChange(Sender: TObject);
     procedure XMaxEditChange(Sender: TObject);
     procedure PMinEditChange(Sender: TObject);
@@ -192,8 +190,8 @@ type
 
     procedure YAuswahlClick;
     procedure RebuildYCombo;
-    procedure UpdateRiggItemClick;
 
+    procedure UpdateRiggItemClick;
     procedure OpenItemClick(AFileName: string);
     procedure SaveItemClick(AFileName: string);
     procedure LoadFromFile(FileName: string);
@@ -229,6 +227,7 @@ begin
   HorzScrollBar.Position := 0;
 
   ChartModel := TRggChartModel.Create;
+  Caption := IntToStr(ChartModel.KurvenZahlSpinnerValue);
 
   APSpinner.Position := ChartModel.APWidth;
   APBtn.Down := True;
@@ -343,19 +342,6 @@ begin
   end;
 end;
 
-procedure TChartForm.OpenItemClick(Sender: TObject);
-begin
-  if not OpenDialog.Execute then
-    Exit;
-end;
-
-procedure TChartForm.SaveItemClick(Sender: TObject);
-begin
-  if not SaveDialog.Execute then
-    Exit;
-  ChartModel.SaveToFile(SaveDialog.FileName);
-end;
-
 procedure TChartForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
 {$ifdef RG19}
@@ -446,27 +432,6 @@ begin
   end;
 end;
 
-procedure TChartForm.BereichItemClick(Sender: TObject);
-begin
-  BereichItem.Checked  := not BereichItem.Checked;
-  BereichBtn.Down := BereichItem.Checked;
-  AP := not BereichBtn.Down;
-end;
-
-procedure TChartForm.APItemClick(Sender: TObject);
-begin
-  { AP = Arbeitspunkt }
-  APItem.Checked := not APItem.Checked;
-  APBtn.Down := APItem.Checked;
-  AP := APBtn.Down;
-end;
-
-procedure TChartForm.ChartMenuClick(Sender: TObject);
-begin
-  APItem.Checked := ChartModel.AP;
-  BereichItem.Checked := not ChartModel.AP;
-end;
-
 procedure TChartForm.YComboChange(Sender: TObject);
 begin
   ChartModel.YComboItemIndex := YCombo.ItemIndex;
@@ -476,7 +441,7 @@ begin
   KurvenZahlSpinner.Position := ChartModel.KurvenZahlSpinnerValue;
 end;
 
-procedure TChartForm.APEditChange(Sender: TObject);
+procedure TChartForm.APSpinnerClick(Sender: TObject; Button: TUDBtnType);
 begin
   ChartModel.APWidth := APSpinner.Position;
   ChartModel.AP := ChartModel.AP; // trigger update
@@ -492,122 +457,6 @@ begin
   begin
     CalcItemClick(nil);
   end;
-end;
-
-procedure TChartForm.UpdateRiggItemClick(Sender: TObject);
-begin
-  ChartModel.UpdateRiggItemClick;
-end;
-
-procedure TChartForm.InitMenu;
-var
-  p: TMenuItem;
-  mi: TMenuItem;
-
-  function AddP(AName: string): TMenuItem;
-  begin
-    mi := TMenuItem.Create(MainMenu);
-    mi.Name := AName;
-    p := mi;
-    MainMenu.Items.Add(p);
-    result := mi;
-  end;
-
-  function AddI(AName: string): TMenuItem;
-  begin
-    mi := TMenuItem.Create(MainMenu);
-    mi.Name := AName;
-    p.Add(mi);
-    result := mi;
-  end;
-
-begin
-  MainMenu := TMainMenu.Create(Self);
-
-  ChartMenu := AddP('ChartMenu');
-  mi.Caption := 'Diagram&m';
-  mi.GroupIndex := 8;
-  mi.Hint := '  Diagramm Optionen';
-  mi.OnClick := ChartMenuClick;
-
-  BerechnenItem := AddI('BerechnenItem');
-  mi.Caption := '&Berechnen...';
-  mi.Hint := '  Berechnung starten';
-  mi.OnClick := CalcItemClick;
-
-  ResetItem := AddI('ResetItem');
-  mi.Caption := '&Zurücksetzen';
-  mi.Hint := '  Diagramm für Neuberechnung freigeben (nach Fehler)';
-  mi.OnClick := ResetItemClick;
-
-  UpdateChartItem := AddI('UpdateChartItem');
-  mi.Caption := 'Diagramm aktualisieren';
-  mi.Hint := '  Istwerte neu einlesen';
-  mi.OnClick := UpdateChartItemClick;
-
-  UpdateRiggItem := AddI('UpdateRiggItem');
-  mi.Caption := 'Rigg aktualisieren';
-  mi.Hint := 'Erzeugungsdaten zurückschreiben';
-  mi.OnClick := UpdateRiggItemClick;
-
-  N1 := AddI('N1');
-  mi.Caption := '-';
-
-  APItem := AddI('APItem');
-  mi.Caption := 'Arbeits&punkt';
-  mi.Checked := True;
-  mi.Hint := '  automatische X - Werte: Arbeitspunkt +/- 30';
-  mi.OnClick := APItemClick;
-
-  BereichItem := AddI('BereichItem');
-  mi.Caption := 'Be&reich';
-  mi.Hint := '  automatische X - Werte: gesamter Bereich';
-  mi.OnClick := BereichItemClick;
-
-  N2 := AddI('N2');
-  mi.Caption := '-';
-
-  AuswahlItem := AddI('AuswahlItem');
-  mi.Caption := '&Auswahl Y ...';
-  mi.Hint := '  Auswahl der Größen für die Y-Achse';
-  mi.OnClick := YAuswahlClick;
-
-  MemoItem := AddI('MemoItem');
-  mi.Caption := 'Erzeugungsdaten...';
-  mi.Hint := '  Erzeugungsdaten anzeigen';
-  mi.OnClick := MemoItemClick;
-
-  TogetherItem := AddI('TogetherItem');
-  mi.Caption := '&Gruppiert anzeigen';
-  mi.Hint := '  Kurven in einem Diagramm anzeigen';
-  mi.OnClick := ShowTogetherBtnClick;
-
-  N3 := AddI('N3');
-  mi.Caption := '-';
-
-  OpenItem := AddI('OpenItem');
-  mi.Caption := '&Öffnen...';
-  mi.Hint := '  gespeichertes Diagramm laden';
-  mi.OnClick := OpenItemClick;
-
-  SaveItem := AddI('SaveItem');
-  mi.Caption := '&Speichern...';
-  mi.Hint := '  Diagramm speichern';
-  mi.OnClick := SaveItemClick;
-
-  p := ChartMenu;
-
-  N4 := AddI('N4');
-  mi.Caption := '-';
-  mi.GroupIndex := 3;
-
-  RectangleItem := AddI('RectangleItem');
-  mi.Caption := 'Rechtecke';
-  mi.Checked := ChartModel.WantRectangles;
-  mi.GroupIndex := 3;
-  mi.Hint := '  Rechtecke anzeigen';
-  mi.OnClick := RectangleItemClick;
-
 end;
 
 procedure TChartForm.DoLegend;
@@ -648,7 +497,7 @@ begin
     begin
       PosX := 0;
       PosY := 0;
-      for p := 0 to ChartModel.ParamCount-1 do
+      for p := 0 to ChartModel.ParamCount - 1 do
       begin
         { Bullet }
         Pen.Color := clBlack;
@@ -779,17 +628,17 @@ begin
       RadiusY := R.Bottom-R.Top;
 
       yrange := (ChartModel.Ymax-ChartModel.Ymin);
-      for param := 0 to ChartModel.ParamCount-1 do
+      for param := 0 to ChartModel.ParamCount - 1 do
       begin
         { Kurve }
         Pen.Color := ChartModel.cf[param];
-        tempY := PlotExtY * (ChartModel.bf[param,0]-ChartModel.Ymin) / yrange;
+        tempY := PlotExtY * (ChartModel.bf[param,0] - ChartModel.Ymin) / yrange;
         P.Y := Round(Limit(tempY));
         MoveTo(0, P.Y);
         for i := 1 to LNr do
         begin
           tempX := PlotExtX * (i/LNr);
-          tempY := PlotExtY * (ChartModel.bf[param,i]-ChartModel.Ymin) / yrange;
+          tempY := PlotExtY * (ChartModel.bf[param,i] - ChartModel.Ymin) / yrange;
           P.X := Round(Limit(tempX));
           P.Y := Round(Limit(tempY));
           LineTo(P.X, P.Y);
@@ -916,16 +765,6 @@ begin
   end;
 end;
 
-procedure TChartForm.RectangleItemClick(Sender: TObject);
-begin
-  ChartModel.WantRectangles := not ChartModel.WantRectangles;
-  RectangleItem.Checked := ChartModel.WantRectangles;
-  if ChartModel.ShowGroup then
-    ShowTogetherBtnClick(Self)
-  else
-    ChartModel.DrawInternal;
-end;
-
 procedure TChartForm.PaintBackGround(Image: TBitMap);
 var
   R: TRect;
@@ -951,18 +790,239 @@ begin
   if not ValidateInput(PMaxEdit) then result := False;
 end;
 
+procedure TChartForm.PSpinnerClick(Sender: TObject; Button: TUDBtnType);
+begin
+  ChartModel.PSpinnerValue := PSpinner.Position;
+  ChartModel.UpdateYMinMax;
+  YMinEdit.Text := ChartModel.YminEditText;
+  YMaxEdit.Text := ChartModel.YmaxEditText;
+end;
+
+procedure TChartForm.XMinEditChange(Sender: TObject);
+begin
+  ChartModel.XminEditText := XMinEdit.Text;
+end;
+
+procedure TChartForm.XMaxEditChange(Sender: TObject);
+begin
+  ChartModel.XmaxEditText := XMaxEdit.Text;
+end;
+
+procedure TChartForm.PMinEditChange(Sender: TObject);
+begin
+  ChartModel.PminEditText := PMinEdit.Text;
+end;
+
+procedure TChartForm.PMaxEditChange(Sender: TObject);
+begin
+  ChartModel.PmaxEditText := PMaxEdit.Text;
+end;
+
+procedure TChartForm.MemoItemClick(Sender: TObject);
+begin
+  if MemoForm = nil then
+  begin
+    MemoForm := TForm.Create(Application);
+    MemoForm.Width := 400;
+    MemoForm.Height := 600;
+    MemoForm.Caption := 'ChartMemoForm01';
+
+    MemoFormMemo := TMemo.Create(MemoForm);
+    MemoFormMemo.Parent := MemoForm;
+    MemoFormMemo.Align := alClient;
+    MemoFormMemo.ScrollBars := ssBoth;
+  end;
+  MemoFormMemo.Lines.Clear;
+  MemoFormMemo.Lines := ChartModel.MemoLines;
+  MemoForm.ShowModal;
+end;
+
+procedure TChartForm.XComboChange(Sender: TObject);
+begin
+  ChartModel.XComboItemIndex := XCombo.ItemIndex;
+  ChartModel.XComboChange(Sender);
+
+  PCombo.Items := ChartModel.PComboItems;
+  PCombo.ItemIndex := ChartModel.PComboItemIndex;
+
+  UpdateXPEdits;
+
+  if WantAutoUpdate then
+  begin
+    CalcItemClick(nil);
+  end;
+end;
+
+procedure TChartForm.OpenItemClick(Sender: TObject);
+begin
+  if not OpenDialog.Execute then
+    Exit;
+end;
+
+procedure TChartForm.SaveItemClick(Sender: TObject);
+begin
+  if not SaveDialog.Execute then
+    Exit;
+  ChartModel.SaveToFile(SaveDialog.FileName);
+end;
+
+procedure TChartForm.RectangleItemClick(Sender: TObject);
+begin
+  ChartModel.WantRectangles := not ChartModel.WantRectangles;
+  RectangleItem.Checked := ChartModel.WantRectangles;
+  if ChartModel.ShowGroup then
+    ShowTogetherBtnClick(Self)
+  else
+    ChartModel.DrawInternal;
+end;
+
+procedure TChartForm.BereichItemClick(Sender: TObject);
+begin
+  BereichItem.Checked  := not BereichItem.Checked;
+  BereichBtn.Down := BereichItem.Checked;
+  AP := not BereichBtn.Down;
+end;
+
+procedure TChartForm.APItemClick(Sender: TObject);
+begin
+  APItem.Checked := not APItem.Checked;
+  APBtn.Down := APItem.Checked;
+  AP := APBtn.Down;
+end;
+
+procedure TChartForm.ChartMenuClick(Sender: TObject);
+begin
+  APItem.Checked := ChartModel.AP;
+  BereichItem.Checked := not ChartModel.AP;
+end;
+
+procedure TChartForm.UpdateRiggItemClick(Sender: TObject);
+begin
+  ChartModel.UpdateRiggItemClick;
+end;
+
+procedure TChartForm.InitMenu;
+var
+  p: TMenuItem;
+  mi: TMenuItem;
+
+  function AddP(AName: string): TMenuItem;
+  begin
+    mi := TMenuItem.Create(MainMenu);
+    mi.Name := AName;
+    p := mi;
+    MainMenu.Items.Add(p);
+    result := mi;
+  end;
+
+  function AddI(AName: string): TMenuItem;
+  begin
+    mi := TMenuItem.Create(MainMenu);
+    mi.Name := AName;
+    p.Add(mi);
+    result := mi;
+  end;
+
+begin
+  MainMenu := TMainMenu.Create(Self);
+
+  ChartMenu := AddP('ChartMenu');
+  mi.Caption := 'Diagram&m';
+  mi.GroupIndex := 8;
+  mi.Hint := '  Diagramm Optionen';
+  mi.OnClick := ChartMenuClick;
+
+  BerechnenItem := AddI('BerechnenItem');
+  mi.Caption := '&Berechnen...';
+  mi.Hint := '  Berechnung starten';
+  mi.OnClick := CalcItemClick;
+
+  ResetItem := AddI('ResetItem');
+  mi.Caption := '&Zurücksetzen';
+  mi.Hint := '  Diagramm für Neuberechnung freigeben (nach Fehler)';
+  mi.OnClick := ResetItemClick;
+
+  UpdateChartItem := AddI('UpdateChartItem');
+  mi.Caption := 'Diagramm aktualisieren';
+  mi.Hint := '  Istwerte neu einlesen';
+  mi.OnClick := UpdateChartItemClick;
+
+  UpdateRiggItem := AddI('UpdateRiggItem');
+  mi.Caption := 'Rigg aktualisieren';
+  mi.Hint := 'Erzeugungsdaten zurückschreiben';
+  mi.OnClick := UpdateRiggItemClick;
+
+  N1 := AddI('N1');
+  mi.Caption := '-';
+
+  APItem := AddI('APItem');
+  mi.Caption := 'Arbeits&punkt';
+  mi.Checked := True;
+  mi.Hint := '  automatische X - Werte: Arbeitspunkt +/- 30';
+  mi.OnClick := APItemClick;
+
+  BereichItem := AddI('BereichItem');
+  mi.Caption := 'Be&reich';
+  mi.Hint := '  automatische X - Werte: gesamter Bereich';
+  mi.OnClick := BereichItemClick;
+
+  N2 := AddI('N2');
+  mi.Caption := '-';
+
+  AuswahlItem := AddI('AuswahlItem');
+  mi.Caption := '&Auswahl Y ...';
+  mi.Hint := '  Auswahl der Größen für die Y-Achse';
+  mi.OnClick := YAuswahlClick;
+
+  MemoItem := AddI('MemoItem');
+  mi.Caption := 'Erzeugungsdaten...';
+  mi.Hint := '  Erzeugungsdaten anzeigen';
+  mi.OnClick := MemoItemClick;
+
+  TogetherItem := AddI('TogetherItem');
+  mi.Caption := '&Gruppiert anzeigen';
+  mi.Hint := '  Kurven in einem Diagramm anzeigen';
+  mi.OnClick := ShowTogetherBtnClick;
+
+  N3 := AddI('N3');
+  mi.Caption := '-';
+
+  OpenItem := AddI('OpenItem');
+  mi.Caption := '&Öffnen...';
+  mi.Hint := '  gespeichertes Diagramm laden';
+  mi.OnClick := OpenItemClick;
+
+  SaveItem := AddI('SaveItem');
+  mi.Caption := '&Speichern...';
+  mi.Hint := '  Diagramm speichern';
+  mi.OnClick := SaveItemClick;
+
+  p := ChartMenu;
+
+  N4 := AddI('N4');
+  mi.Caption := '-';
+  mi.GroupIndex := 3;
+
+  RectangleItem := AddI('RectangleItem');
+  mi.Caption := 'Rechtecke';
+  mi.Checked := ChartModel.WantRectangles;
+  mi.GroupIndex := 3;
+  mi.Hint := '  Rechtecke anzeigen';
+  mi.OnClick := RectangleItemClick;
+
+end;
+
 { TRggChartModel }
 
 constructor TRggChartModel.Create;
 begin
   WantRectangles := True;
   FLegend := True;
+
   BereichBtnDown := False;
   APBtnDown := True;
 
   inherited;
-
-  UpdateYAchseList; { ComboIndex festlegen in YAchseRecordList }
 
   IsUp := True;
 end;
@@ -1075,7 +1135,10 @@ begin
     PMinEditText := IntToStr(0);
     PMaxEditText := IntToStr(0);
     KurvenZahlSpinnerValue := 1;
-    Exit;
+  end
+  else if KurvenZahlSpinnerValue = 1 then
+  begin
+    KurvenzahlSpinnerValue := UserSelectedKurvenZahl;
   end;
 
   xp := GetTsbName(s);
@@ -1158,241 +1221,17 @@ procedure TRggChartModel.RebuildYCombo;
 var
   YAV: TYAchseValue;
 begin
-  { YComboBox }
   YComboItems.Clear;
   for YAV := Low(TYAchseValue) to High(TYAchseValue) do
     if YAV in YAchseSet then
       YComboItems.Add(YAchseRecordList[YAV].ComboText);
   if YComboItems.Count > 0 then YComboItemIndex := 0;
   UpdateYAchseList;
-  { YAuswahlDlg.DstList }
   YAuswahlDlg.DstList.Items := YComboItems;
-  { YAuswahlDlg.SrcList }
   YAuswahlDlg.SrcList.Clear;
   for YAV := Low(TYAchseValue) to High(TYAchseValue) do
     if not (YAV in YAchseSet) then
   YAuswahlDlg.SrcList.Items.Add(YAchseRecordList[YAV].ComboText);
-end;
-
-procedure TChartForm.PSpinnerChanging(Sender: TObject; var AllowChange: Boolean);
-begin
-  if ChartModel.ParamCount = 1 then
-    AllowChange := False;
-end;
-
-procedure TChartForm.PSpinnerClick(Sender: TObject; Button: TUDBtnType);
-begin
-  ChartModel.PSpinnerValue := PSpinner.Position;
-
-  YMinEdit.Text := ChartModel.YminEditText;
-  YMaxEdit.Text := ChartModel.YmaxEditText;
-end;
-
-procedure TChartForm.PEditChange(Sender: TObject);
-begin
-  ChartModel.UpdateYMinMax;
-end;
-
-procedure TChartForm.XMinEditChange(Sender: TObject);
-begin
-  ChartModel.XminEditText := XMinEdit.Text;
-end;
-
-procedure TChartForm.XMaxEditChange(Sender: TObject);
-begin
-  ChartModel.XmaxEditText := XMaxEdit.Text;
-end;
-
-procedure TChartForm.PMinEditChange(Sender: TObject);
-begin
-  ChartModel.PminEditText := PMinEdit.Text;
-end;
-
-procedure TChartForm.PMaxEditChange(Sender: TObject);
-begin
-  ChartModel.PmaxEditText := PMaxEdit.Text;
-end;
-
-procedure TChartForm.MemoItemClick(Sender: TObject);
-begin
-  if MemoForm = nil then
-  begin
-    MemoForm := TForm.Create(Application);
-    MemoForm.Width := 400;
-    MemoForm.Height := 600;
-    MemoForm.Caption := 'ChartMemoForm01';
-
-    MemoFormMemo := TMemo.Create(MemoForm);
-    MemoFormMemo.Parent := MemoForm;
-    MemoFormMemo.Align := alClient;
-    MemoFormMemo.ScrollBars := ssBoth;
-  end;
-  MemoFormMemo.Lines.Clear;
-  MemoFormMemo.Lines := ChartModel.MemoLines;
-  MemoForm.ShowModal;
-end;
-
-function TChartForm.ValidateInput(Input: TEdit): Boolean;
-var
-  s: string;
-  I: Integer;
-  Code: Integer;
-begin
-  Result := False;
-  try
-    Val(Input.Text, I, Code);
-    if Code <> 0 then
-    begin
-      s := Format('''%s'' ist kein gültiger Integerwert', [Input.Text]);
-      MessageDlg(s, mtWarning, [mbOK], 0);
-      Input.SetFocus;
-    end
-    else
-    begin
-      if (I >= 0) and (I < MaxInt) then
-      Result := True;
-    end;
-  except
-    on EConvertError do
-    begin
-      s := Format('''%s'' ist kein gültiger Integerwert', [Input.Text]);
-      MessageDlg(s, mtWarning, [mbOK], 0);
-      Input.SetFocus;
-    end;
-  end;
-end;
-
-procedure TChartForm.XComboChange(Sender: TObject);
-begin
-  ChartModel.XComboItemIndex := XCombo.ItemIndex;
-  ChartModel.XComboChange(Sender);
-
-  PCombo.Items := ChartModel.PComboItems;
-  PCombo.ItemIndex := ChartModel.PComboItemIndex;
-
-  UpdateXPEdits;
-
-  if WantAutoUpdate then
-  begin
-    CalcItemClick(nil);
-  end;
-end;
-
-procedure TRggChartModel.LoadFromFile(FileName: string);
-var
-  S: TFileStream;
-begin
-  S := TFileStream.Create(FileName, fmOpenRead);
-  try
-    LoadFromStream(S);
-  finally
-    S.Free;
-  end;
-end;
-
-procedure TRggChartModel.SaveToFile(FileName: string);
-var
-  S: TFileStream;
-begin
-  S := TFileStream.Create(FileName, fmCreate);
-  try
-    SaveToStream(S);
-  finally
-    S.Free;
-  end;
-end;
-
-{ Old comment:
-  TYLineArray enthält Werte vom Typ single.
-  Es wird mit der Option 'Ausgerichtete RecordFelder' compiliert.
-  Damit hat das Feld RggDocument.TrimmTabDaten.TabellenTyp 4 Byte.
-  Dieses Format sollte beibehalten werden.
-}
-procedure TRggChartModel.SaveToStream(S: TStream);
-var
-  ParamValue: double;
-  p: Integer;
-begin
-  with S do
-  begin
-    WriteBuffer(FLegend, SizeOf(Boolean));
-    WriteBuffer(XAchseMin, SizeOf(Integer));
-    WriteBuffer(XAchseMax, SizeOf(Integer));
-    WriteBuffer(ParamCount, SizeOf(Integer));
-    WriteBuffer(YAchseSet, SizeOf(YAchseSet));
-    WriteBuffer(YAchseRecordList, SizeOf(YAchseRecordList));
-    for p := 0 to PNr-1 do
-      WriteBuffer(af[p], SizeOf(TYLineArray));
-    for p := 0 to ParamCount-1 do
-    begin
-      ParamValue := StrToFloat(PText[p]);
-      WriteBuffer(ParamValue, SizeOf(double));
-    end;
-    RggDocument.SaveToStream(S);
-    MemoLines.Add(XComboText);
-    MemoLines.Add(PComboText);
-    MemoLines.SaveToStream(S);
-  end;
-end;
-
-procedure TRggChartModel.LoadFromStream(S: TStream);
-var
-  ParamValue: double;
-  p: Integer;
-begin
-  with S do
-  begin
-    ReadBuffer(FLegend, SizeOf(Boolean));
-    ReadBuffer(XAchseMin, SizeOf(Integer));
-    ReadBuffer(XAchseMax, SizeOf(Integer));
-    ReadBuffer(ParamCount, SizeOf(Integer));
-    ReadBuffer(YAchseSet, SizeOf(YAchseSet));
-    ReadBuffer(YAchseRecordList, SizeOf(YAchseRecordList));
-    for p := 0 to PNr-1 do
-      ReadBuffer(af[p], SizeOf(TYLineArray));
-    for p := 0 to ParamCount-1 do
-    begin
-      ReadBuffer(ParamValue, SizeOf(double));
-      PText[p] := Format('%6.2f', [ParamValue]);
-    end;
-    RggDocument.LoadFromStream(S);
-    MemoLines.LoadFromStream(S);
-    XComboText := MemoLines[MemoLines.Count-2];
-    PComboText := MemoLines[MemoLines.Count-1];
-    MemoLines.Delete(MemoLines.Count-1);
-    MemoLines.Delete(MemoLines.Count-1);
-  end;
-end;
-
-procedure TRggChartModel.OpenItemClick(AFileName: string);
-begin
-  LoadFromFile(AFileName);
-  Exclude(FStatus, csBerechnet);
-  Include(FStatus, csGeladen);
-  XAchseText := GetXText(XComboText); { benötigt für BottomTitel }
-  ParamText := GetPText(PComboText); { benötigt für RightTitel }
-  XLEDFillColor := clRed;
-  PLEDFillColor := clRed;
-  PSpinnerValue := 1;
-  PSpinnerMax := ParamCount;
-  if PSpinnerMax = 1 then
-    PSpinnerMax := 2;
-  KurvenZahlSpinnerValue := ParamCount;
-  RebuildYCombo;
-  YComboChange(nil);
-end;
-
-procedure TRggChartModel.SaveItemClick(AFileName: string);
-begin
-  SaveToFile(AFileName);
-end;
-
-procedure TRggChartModel.TakeOver;
-begin
-  Rigg.UpdateGSB;
-  SalingTyp := Rigg.SalingTyp;
-  { ControllerTyp := Rigg.ControllerTyp; }
-  { CalcTyp := Rigg.CalcTyp; }
 end;
 
 procedure TRggChartModel.SetSalingTyp(Value: TSalingTyp);
@@ -1442,6 +1281,147 @@ begin
       YComboChange(nil);
     end;
   end;
+end;
+
+function TChartForm.ValidateInput(Input: TEdit): Boolean;
+var
+  s: string;
+  I: Integer;
+  Code: Integer;
+begin
+  Result := False;
+  try
+    Val(Input.Text, I, Code);
+    if Code <> 0 then
+    begin
+      s := Format('''%s'' ist kein gültiger Integerwert', [Input.Text]);
+      MessageDlg(s, mtWarning, [mbOK], 0);
+      Input.SetFocus;
+    end
+    else
+    begin
+      if (I >= 0) and (I < MaxInt) then
+      Result := True;
+    end;
+  except
+    on EConvertError do
+    begin
+      s := Format('''%s'' ist kein gültiger Integerwert', [Input.Text]);
+      MessageDlg(s, mtWarning, [mbOK], 0);
+      Input.SetFocus;
+    end;
+  end;
+end;
+
+procedure TRggChartModel.LoadFromFile(FileName: string);
+var
+  S: TFileStream;
+begin
+  S := TFileStream.Create(FileName, fmOpenRead);
+  try
+    LoadFromStream(S);
+  finally
+    S.Free;
+  end;
+end;
+
+procedure TRggChartModel.SaveToFile(FileName: string);
+var
+  S: TFileStream;
+begin
+  S := TFileStream.Create(FileName, fmCreate);
+  try
+    SaveToStream(S);
+  finally
+    S.Free;
+  end;
+end;
+
+procedure TRggChartModel.SaveToStream(S: TStream);
+var
+  ParamValue: double;
+  param: Integer;
+begin
+  with S do
+  begin
+    WriteBuffer(FLegend, SizeOf(Boolean));
+    WriteBuffer(XAchseMin, SizeOf(Integer));
+    WriteBuffer(XAchseMax, SizeOf(Integer));
+    WriteBuffer(ParamCount, SizeOf(Integer));
+    WriteBuffer(YAchseSet, SizeOf(YAchseSet));
+    WriteBuffer(YAchseRecordList, SizeOf(YAchseRecordList));
+    for param := 0 to PNr - 1 do
+      WriteBuffer(af[param], SizeOf(TYLineArray));
+    for param := 0 to ParamCount - 1 do
+    begin
+      ParamValue := StrToFloat(PText[param]);
+      WriteBuffer(ParamValue, SizeOf(double));
+    end;
+    RggDocument.SaveToStream(S);
+    MemoLines.Add(XComboText);
+    MemoLines.Add(PComboText);
+    MemoLines.SaveToStream(S);
+  end;
+end;
+
+procedure TRggChartModel.LoadFromStream(S: TStream);
+var
+  ParamValue: double;
+  param: Integer;
+begin
+  with S do
+  begin
+    ReadBuffer(FLegend, SizeOf(Boolean));
+    ReadBuffer(XAchseMin, SizeOf(Integer));
+    ReadBuffer(XAchseMax, SizeOf(Integer));
+    ReadBuffer(ParamCount, SizeOf(Integer));
+    ReadBuffer(YAchseSet, SizeOf(YAchseSet));
+    ReadBuffer(YAchseRecordList, SizeOf(YAchseRecordList));
+    for param := 0 to PNr - 1 do
+      ReadBuffer(af[param], SizeOf(TYLineArray));
+    for param := 0 to ParamCount - 1 do
+    begin
+      ReadBuffer(ParamValue, SizeOf(double));
+      PText[param] := Format('%6.2f', [ParamValue]);
+    end;
+    RggDocument.LoadFromStream(S);
+    MemoLines.LoadFromStream(S);
+    XComboText := MemoLines[MemoLines.Count-2];
+    PComboText := MemoLines[MemoLines.Count-1];
+    MemoLines.Delete(MemoLines.Count-1);
+    MemoLines.Delete(MemoLines.Count-1);
+  end;
+end;
+
+procedure TRggChartModel.OpenItemClick(AFileName: string);
+begin
+  LoadFromFile(AFileName);
+  Exclude(FStatus, csBerechnet);
+  Include(FStatus, csGeladen);
+  XAchseText := GetXText(XComboText); { benötigt für BottomTitel }
+  ParamText := GetPText(PComboText); { benötigt für RightTitel }
+  XLEDFillColor := clRed;
+  PLEDFillColor := clRed;
+  PSpinnerValue := 1;
+  PSpinnerMax := ParamCount;
+  if PSpinnerMax = 1 then
+    PSpinnerMax := 2;
+  KurvenZahlSpinnerValue := ParamCount;
+  RebuildYCombo;
+  YComboChange(nil);
+end;
+
+procedure TRggChartModel.SaveItemClick(AFileName: string);
+begin
+  SaveToFile(AFileName);
+end;
+
+procedure TRggChartModel.TakeOver;
+begin
+  Rigg.UpdateGSB;
+  SalingTyp := Rigg.SalingTyp;
+  { ControllerTyp := Rigg.ControllerTyp; }
+  { CalcTyp := Rigg.CalcTyp; }
 end;
 
 procedure TRggChartModel.UpdateRiggItemClick;
