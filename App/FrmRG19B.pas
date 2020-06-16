@@ -324,7 +324,6 @@ type
     procedure InitFixpointCombo;
     function GetComboFixPoint: TRiggPoint;
   private
-    Margin: Integer;
     TL: TStrings;
     ML: TStrings;
     ReportManager: TRggReportManager;
@@ -355,6 +354,9 @@ type
     procedure ShowTrimm;
     procedure ShowCurrentReport;
   public
+    FScale: single;
+    Raster: Integer;
+    Margin: Integer;
     function GetOpenFileName(dn, fn: string): string;
     function GetSaveFileName(dn, fn: string): string;
 
@@ -401,10 +403,34 @@ begin
 {$ifdef Debug}
    ReportMemoryLeaksOnShutdown := True;
 {$endif}
+//  FormatSettings.DecimalSeparator := '.';
+
+  FScale := 1.0;
+{$ifdef MSWindows}
+  FScale := ScaleFactor;
+{$endif}
 
   FormRG19B := Self;
+  if (Screen.Width > 1700 * FScale) then
+  begin
+    Left := Round(60 * FScale);
+    Top := Round(105 * FScale);
+    Width := Round(1600 * FScale);
+    Height := Round(768 * FScale);
+  end
+  else
+  begin
+    Left := Round(60 * FScale);
+    Top := Round(105 * FScale);
+    Width := Round(1024 * FScale);
+    Height := Round(768 * FScale);
+  end;
 
-  Margin := 5;
+  Margin := Round(2 * FScale);
+  Raster := Round(MainVar.Raster * FScale);
+  MainVar.Scale := FScale;
+  MainVar.ScaledRaster := Raster;
+
   FormCreate1;
   FormCreate2;
   Main.IsUp := True;
@@ -432,13 +458,6 @@ begin
   Main := TMain.Create(rggm);
   Main.Logger.Verbose := True;
 
-  Left := 60;
-  Top := 105;
-  Height := 768;
-  if Screen.Width > 1800 then
-    Width := 1600
-  else
-    Width := 1024;
 
   Caption := 'Rigg';
   StatusBar.Panels[0].Text := '';

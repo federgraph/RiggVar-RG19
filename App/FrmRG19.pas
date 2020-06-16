@@ -311,7 +311,6 @@ type
     procedure InitFixpointCombo;
     function GetComboFixPoint: TRiggPoint;
   private
-    Margin: Integer;
     TL: TStrings;
     ML: TStrings;
     ReportManager: TRggReportManager;
@@ -342,6 +341,9 @@ type
     procedure ShowTrimm;
     procedure ShowCurrentReport;
   public
+    FScale: single;
+    Raster: Integer;
+    Margin: Integer;
     function GetOpenFileName(dn, fn: string): string;
     function GetSaveFileName(dn, fn: string): string;
 
@@ -388,11 +390,35 @@ begin
 {$ifdef Debug}
    ReportMemoryLeaksOnShutdown := True;
 {$endif}
+//  FormatSettings.DecimalSeparator := '.';
 
-  FormRG19 := Self;
+  FScale := 1.0;
+{$ifdef MSWindows}
+  FScale := ScaleFactor;
+{$endif}
 
-  Margin := 5;
-  FormCreate1;
+  FormRG19 := self;
+if (Screen.Width > 1700 * FScale) then
+  begin
+    Left := Round(60 * FScale);
+    Top := Round(105 * FScale);
+    Width := Round(1600 * FScale);
+    Height := Round(768 * FScale);
+  end
+  else
+  begin
+    Left := Round(60 * FScale);
+    Top := Round(105 * FScale);
+    Width := Round(1024 * FScale);
+    Height := Round(768 * FScale);
+  end;
+
+  Margin := Round(5 * FScale);
+  Raster := Round(MainVar.Raster * FScale);
+  MainVar.Scale := FScale;
+  MainVar.ScaledRaster := Raster;
+  
+FormCreate1;
   FormCreate2;
   Main.IsUp := True;
   RiggModul.ViewModelMain.IsUp := True;
@@ -425,14 +451,6 @@ begin
   rggm.Init420; // sets WantLogo to false
   WantLogoData := False;
 
-  Left := 60;
-  Top := 105;
-  Height := 768;
-  if Screen.Width > 1800 then
-    Width := 1600
-  else
-    Width := 1024;
-
   Caption := 'Rigg';
   StatusBar.Panels[0].Text := '';
   Application.OnHint := ShowHint;
@@ -448,10 +466,7 @@ begin
   RotaForm.Init;
   PaintboxR := RotaForm.PaintBox3D;
   RotaForm.IsUp := True;
-//  RotaForm.ViewPoint := vp3D;
   RotaForm.ZoomIndex := 8;
-//  RotaForm.RaumGraph.Koppel := True;
-//  RotaForm.FixPoint := ooD0;
 end;
 
 procedure TFormRG19.FormClose(Sender: TObject; var Action: TCloseAction);

@@ -85,7 +85,9 @@ uses
   RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas',
   RggVector in 'Graph\RggVector.pas',
   RiggVar.FB.Color in 'FB\RiggVar.FB.Color.pas',
-  RggChart in 'Graph\RggChart.pas';
+  RggChart in 'Graph\RggChart.pas',
+  RggChartModel01 in 'Graph\RggChartModel01.pas',
+  RggChartModel02 in 'Graph\RggChartModel02.pas';
 
 {$R *.res}
 

@@ -36,6 +36,10 @@ type
     Logger: TLogger;
     IsUp: Boolean;
     IsOrthoProjection: Boolean;
+
+    Scale: single;
+    IsRetina: Boolean;
+
     constructor Create;
     destructor Destroy; override;
 
@@ -58,6 +62,9 @@ uses
 constructor TMain0.Create;
 begin
   inherited;
+  Scale := MainVar.Scale;
+  IsRetina := Scale > 1;
+
   Logger := TLogger.Create;
   FL := TStringList.Create;
 end;

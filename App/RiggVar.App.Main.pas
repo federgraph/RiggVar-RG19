@@ -66,6 +66,8 @@ type
     ShowDebugData: Boolean;
 
     Raster: Integer;
+    ScaledRaster: Integer;
+    Scale: single;
     WheelFrequency: single;
     ShiftState: TShiftState;
 

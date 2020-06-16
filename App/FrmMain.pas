@@ -218,6 +218,9 @@ type
   private
     procedure wmGetMinMaxInfo(var Msg: TMessage); message wm_GetMinMaxInfo;
   public
+    FScale: single;
+    Raster: Integer;
+    Margin: Integer;
     function GetOpenFileName(dn, fn: string): string;
     function GetSaveFileName(dn, fn: string): string;
     procedure SetControllerEnabled;
@@ -267,8 +270,33 @@ begin
 {$ifdef Debug}
    ReportMemoryLeaksOnShutdown := True;
 {$endif}
+//  FormatSettings.DecimalSeparator := '.';
 
-  FormMain := Self;
+  FScale := 1.0;
+{$ifdef MSWindows}
+  FScale := ScaleFactor;
+{$endif}
+
+  FormMain := self;
+  if (Screen.Width > FScale * 1800) then
+  begin
+    Left := Round(60 * FScale);
+    Top := Round(105 * FScale);
+    Width := Round(1500 * FScale);
+    Height := Round(768 * FScale);
+  end
+  else
+  begin
+    Left := Round(60 * FScale);
+    Top := Round(105 * FScale);
+    Width := Round(1024 * FScale);
+    Height := Round(768 * FScale);
+  end;
+
+  Margin := Round(2 * FScale);
+  Raster := Round(MainVar.Raster * FScale);
+  MainVar.Scale := FScale;
+  MainVar.ScaledRaster := Raster;
 
   InputForm := TInputForm.Create(Application);
   OutputForm := TOutputForm.Create(Application);
@@ -285,14 +313,6 @@ begin
 
   Main := TMain.Create(rggm);
   Main.Logger.Verbose := True;
-
-  Left := 60;
-  Top := 105;
-  Height := 768;
-  if Screen.Width > 1800 then
-    Width := 1500
-  else
-    Width := 1024;
 
   Screen.OnActiveFormChange := UpdateMenuItems;
 

@@ -1,4 +1,4 @@
-object YAuswahlDlg: TYAuswahlDlg
+﻿object YAuswahlDlg: TYAuswahlDlg
   Left = 264
   Top = 162
   ActiveControl = OKBtn
@@ -10,7 +10,6 @@ object YAuswahlDlg: TYAuswahlDlg
   ParentFont = True
   OldCreateOrder = True
   Position = poScreenCenter
-  Scaled = False
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13

@@ -22,13 +22,13 @@ const
   ANr = 6; { maximale Anzahl Kurven, d.h. berechneter Y Werte }
   PNr = 5; { maximale Anzahl der Werte des Parameters }
   VNr = 14; { Anzahl der zur Auswahl stehenden Y Werte }
-  LNr = 100; { Anzahl der Punkte im Diagramm - 1 }
+  LNr = 50; { Anzahl der Punkte im Diagramm - 1 }
   ErrorIndex = 999;
   D180 = 180 / PI;
   P180 = PI / 180;
 
 type
-  TLineDataR = TLineDataR100;
+  TLineDataR = TLineDataR50;
 
   TxpName = (
     xpController,
@@ -96,7 +96,7 @@ type
 
     function GetXText(Text: string): string;
     function GetPText(Text: string): string;
-  protected
+  public
     YLEDFillColor: TRggColor;
     PLEDFillColor: TRggColor;
     XLEDFillColor: TRggColor;
@@ -124,7 +124,7 @@ type
     FAP: Boolean;
     procedure SetAP(const Value: Boolean);
     property AP: Boolean read FAP write SetAP;
-  protected
+  public
     APSpinnerValue: Integer;
     APSpinnerMax: Integer;
 
@@ -155,7 +155,7 @@ type
     FDarkColors: Boolean;
     procedure SetDarkColors(const Value: Boolean);
     property DarkColors: Boolean read FDarkColors write SetDarkColors;
-  protected
+  public
     TopTitle: string;
     YTitle: string;
     XTitle: string;
@@ -178,7 +178,7 @@ type
 
     PText: TYAchseStringArray;
     PColorText: TYAchseStringArray;
-  protected
+  public
     TempF: TLineDataR;
     TestF: TLineDataR;
     af: array[0..PNr-1] of TYLineArray;
@@ -189,12 +189,16 @@ type
     procedure GetCurves;
     procedure DrawInternal;
     procedure ShowTogether(ParamNo: Integer);
+  private
+    FOnActionHandled: TNotifyEvent;
+    FOnUpdateAvailable: TNotifyEvent;
+    procedure SetOnActionHandled(const Value: TNotifyEvent);
+    procedure SetOnUpdateAvailable(const Value: TNotifyEvent);
   protected
     FValid: Boolean;
     FBusy: Boolean;
     FStatus: set of TChartStatus;
     function GetTsbName(Value: string): TxpName;
-    property Valid: Boolean read FValid write FValid;
   public
     CalcCounter: Integer;
     procedure Reset;
@@ -215,6 +219,8 @@ type
     procedure HandleAction(fa: Integer);
     function GetChecked(fa: Integer): Boolean;
   public
+    IsUp: Boolean;
+
     constructor Create;
     destructor Destroy; override;
 
@@ -222,8 +228,11 @@ type
     procedure SuperCalc;
 
     procedure Draw; virtual;
-    procedure TakeOver; virtual;
     procedure DoOnAction; virtual;
+
+    property Valid: Boolean read FValid write FValid;
+    property OnActionHandled: TNotifyEvent read FOnActionHandled write SetOnActionHandled;
+    property OnUpdateAvailable: TNotifyEvent read FOnUpdateAvailable write SetOnUpdateAvailable;
   end;
 
 implementation
@@ -312,8 +321,6 @@ begin
 
   InitRigg;
 
-  TakeOver;
-
   FXTextClicked := VorstagString;
   FPTextClicked := SalingHString;
   UpdateXCombo(FSalingTyp);
@@ -356,7 +363,7 @@ begin
   YLEDFillColor := TRggColors.Red;
   XLEDFillColor := TRggColors.Red;
   PLEDFillColor := TRggColors.Red;
-  TakeOver;
+
   DrawInternal;
   MemoLines.Clear;
   MemoLines.Add(ResetMessageString);
@@ -381,6 +388,16 @@ begin
     cf[3] := TRggColors.White;
     cf[4] := TRggColors.Yellow;
   end;
+end;
+
+procedure TChartModel.SetOnActionHandled(const Value: TNotifyEvent);
+begin
+  FOnActionHandled := Value;
+end;
+
+procedure TChartModel.SetOnUpdateAvailable(const Value: TNotifyEvent);
+begin
+  FOnUpdateAvailable := Value;
 end;
 
 procedure TChartModel.InitStraightLine;
@@ -535,12 +552,13 @@ begin
   xn := GetTsbName(XComboSelectedText);
   pn := GetTsbName(PComboSelectedText);
 
-  { Getriebezustand sichern und verfügbar machen }
+  { Getriebezustand sichern und verfügbar machen /
+    record the model state and make it available, within this method }
   InputRec := Rigg.Glieder;
 
   case xn of
     xpController: ChartPunktX := InputRec.Controller;
-    xpWinkel: ChartPunktX := InputRec.Winkel; // / 10;
+    xpWinkel: ChartPunktX := InputRec.Winkel;
     xpVorstag: ChartPunktX := InputRec.Vorstag;
     xpWante: ChartPunktX := InputRec.Wanten;
     xpWoben: ChartPunktX := InputRec.Woben;
@@ -573,7 +591,7 @@ begin
   Rigg.ProofRequired := False;
 
   try
-    { Parameterbereich bestimmen und Schleife starten }
+    { determine parameter range (P) and and start outer loop }
     PAnfang := StrToInt(PminEditText);
     PEnde := StrToInt(PmaxEditText);
     PAntrieb := (PEnde + PAnfang) / 2;
@@ -590,7 +608,7 @@ begin
         PText[p] := Format('%6.2f', [PAntrieb]);
       end;
 
-      { Parameter ansteuern }
+      { Parameter ansteuern / set the param to its new loop value }
       if ParamCount < 2 then
       begin
        { do nothing }
@@ -632,7 +650,7 @@ begin
         end;
       end;
 
-      { Definitionsbereich bestimmen und Berechnungsschleife starten }
+      { determine definition range (X) and start inner loop }
       Anfang := StrToInt(XminEditText);
       Ende := StrToInt(XmaxEditText);
       for i := 0 to LNr do
@@ -642,7 +660,7 @@ begin
 
         Antrieb := Anfang + (Ende - Anfang) * i / LNr;
 
-        { Antrieb ansteuern }
+        { Antrieb ansteuern / set the primary driving member to new value }
         case xn of
           xpController: Rigg.RealGlied[fpController] := Antrieb;
           xpWinkel: Rigg.RealGlied[fpWinkel] := Antrieb * P180;
@@ -677,7 +695,7 @@ begin
           end;
         end;
 
-        { Berechnen }
+        { Berechnen / do some number crunching within the model (Rigg) }
         if FSalingTyp = stFest then
         begin
           if (XComboSelectedText = WinkelString) or
@@ -693,7 +711,7 @@ begin
         Rigg.UpdateRigg;
         PunktOK := Rigg.GetriebeOK and Rigg.MastOK and Rigg.RiggOK;
 
-        { Ergebnisse einspeichern }
+        { Ergebnisse einspeichern / take the results }
         if yavVorstagSpannung in YAchseSet then
         begin
           j := YAchseRecordList[yavVorstagSpannung].ArrayIndex;
@@ -793,16 +811,11 @@ begin
     end;
 
   finally
-    { Getriebe wiederherstellen }
+    { Getriebe wiederherstellen / restore the model state }
     Rigg.ProofRequired := True;
     Rigg.Glieder := InputRec;
     UpdateGetriebe;
   end;
-end;
-
-procedure TChartModel.Draw;
-begin
-
 end;
 
 procedure TChartModel.DrawNormal;
@@ -1736,10 +1749,6 @@ begin
     UpdateXMinMax;
   if (PMinEditText = PMinEditString) or (PMaxEditText = PMaxEditString) then
     UpdatePMinMax;
-//  if not ValidateInput(XMinEdit) then result := False;
-//  if not ValidateInput(XMaxEdit) then result := False;
-//  if not ValidateInput(PMinEdit) then result := False;
-//  if not ValidateInput(PMaxEdit) then result := False;
 end;
 
 procedure TChartModel.DoAfterCalc;
@@ -1983,11 +1992,16 @@ end;
 
 procedure TChartModel.DoOnAction;
 begin
+  if IsUp then
+  if Assigned(FOnActionHandled) then
+    OnActionHandled(Self);
 end;
 
-procedure TChartModel.TakeOver;
+procedure TChartModel.Draw;
 begin
-  { update SalingTyp from Rigg, for example }
+  if IsUp then
+    if Assigned(FOnUpdateAvailable) then
+      OnUpdateAvailable(self);
 end;
 
 end.

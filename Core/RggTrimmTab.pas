@@ -111,6 +111,7 @@ type
     procedure SetTrimmTabDaten(Value: TTrimmTabDaten); virtual;
     function GetTrimmTabDaten: TTrimmTabDaten; virtual;
   public
+    FScale: single;
     Kurve: array [1 .. PunkteMax] of TPoint; { Punkt 0 ist der NullPunkt }
     PunkteAnzahl: Integer; { tatsächliche Anzahl Punkte entsprechend Memo }
     EndKraftMin, EndWegMin, KraftMax, WegMax: Integer;
@@ -127,7 +128,7 @@ type
     procedure LoadFromStream(S: TStream);
     procedure SaveToStream(S: TStream);
     procedure GetMemoLines(ML: TStrings);
-    procedure Draw(Canvas: TCanvas; Rect: TRect); virtual;
+    procedure Draw(Canvas: TCanvas; ARect: TRect); virtual;
     procedure ProcessTrimmTab(ML: TStrings);
     function EvalY(x: double): double; virtual;
     function EvalX(y: double): double; virtual;
@@ -183,6 +184,7 @@ implementation
 
 constructor TTrimmTab.Create;
 begin
+  FScale := 1.0;
   Bezier := TBezier.Create;
   EndKraftMin := 100;
   KraftMax := 3000; { in N }
@@ -826,7 +828,7 @@ begin
   MittelPunkt := MittelPunkt;
 end;
 
-procedure TTrimmTab.Draw(Canvas: TCanvas; Rect: TRect);
+procedure TTrimmTab.Draw(Canvas: TCanvas; ARect: TRect);
 
   function Limit(a: double): double;
   begin
@@ -835,6 +837,18 @@ procedure TTrimmTab.Draw(Canvas: TCanvas; Rect: TRect);
     else if a > 32000 then
       a := 32000;
     result := a;
+  end;
+
+  procedure PaintBackGround(Image: TBitMap);
+  var
+    TempR: TRect;
+  begin
+    TempR := Rect(0, 0, Image.Width, Image.Height);
+    with Image.Canvas do
+    begin
+      Brush.Color := clBtnFace;
+      FillRect(TempR);
+    end;
   end;
 
 var
@@ -854,8 +868,8 @@ begin
   if TabellenTyp = itBezier then
     Bezier.GenerateCurve;
 
-  PlotWidth := Rect.Right - Rect.Left;
-  PlotHeight := Rect.Bottom - Rect.Top;
+  PlotWidth := ARect.Right - ARect.Left;
+  PlotHeight := ARect.Bottom - ARect.Top;
   PlotExtX := PlotWidth;
   PlotExtY := PlotHeight;
   PlotOrgX := 0;
@@ -881,8 +895,8 @@ begin
       { Radius }
       R.Left := 0;
       R.Top := 0;
-      R.Bottom := 3;
-      R.Right := 3;
+      R.Bottom := Round(3 * FScale);
+      R.Right := R.Bottom;
       DPTOLP(Handle, R, 2);
       RadiusX := R.Right - R.Left;
       RadiusY := R.Bottom - R.Top;

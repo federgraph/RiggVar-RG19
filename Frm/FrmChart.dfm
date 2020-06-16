@@ -1,4 +1,4 @@
-﻿object ChartForm: TChartForm
+object ChartForm: TChartForm
   Left = 202
   Top = 165
   HorzScrollBar.Margin = 1
@@ -39,7 +39,6 @@
     000000000000000000000000000000000000000000000000000000000000}
   OldCreateOrder = False
   Position = poDefault
-  Scaled = False
   Visible = True
   OnActivate = FormActivate
   OnClose = FormClose
