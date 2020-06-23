@@ -43,7 +43,7 @@ var
 
 implementation
 
-{$R *.DFM}
+{$R *.dfm}
 
 procedure TYAuswahlDlg.FormCreate(Sender: TObject);
 var

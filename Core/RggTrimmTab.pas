@@ -19,17 +19,11 @@
 interface
 
 uses
-  Winapi.Windows,
   System.SysUtils,
   System.Classes,
   System.Types,
   System.Inifiles,
   System.Math,
-  Vcl.Graphics,
-  Vcl.Controls,
-  Vcl.StdCtrls,
-  Vcl.ExtCtrls,
-  Vcl. Buttons,
   RggVector,
   RggTypes;
 
@@ -44,6 +38,24 @@ type
   { TTabellenTyp = (itKonstante, itGerade, itParabel, itBezier); }
 
   TBezier = class;
+
+  TTrimmTabKurve = array [1 .. PunkteMax] of TPoint;
+
+  TTrimmTabGraphModel = class
+  public
+    TabellenTyp: TTabellenTyp;
+
+    x1, y1, x2, y2: Integer;
+
+    EndwertWeg: Integer;
+    EndwertKraft: Integer;
+
+    PunkteAnzahl: Integer;
+    Kurve: TTrimmTabKurve; { Punkt 0 ist der NullPunkt }
+
+    LineDataX: TLineDataR100;
+    LineDataY: TLineDataR100;
+  end;
 
   ITrimmTab = interface
   ['{B3EE7E6D-ED13-4F90-A4F9-ABFFD56D0A95}']
@@ -72,7 +84,7 @@ type
     procedure GetMemoLines(ML: TStrings);
     procedure ProcessTrimmTab(ML: TStrings);
 
-    procedure Draw(Canvas: TCanvas; Rect: TRect);
+    procedure UpdateGraphModel(Model: TTrimmTabGraphModel);
 
     procedure LoadFromIniFile(IniFile: TIniFile);
     procedure WriteToIniFile(IniFile: TIniFile);
@@ -112,7 +124,7 @@ type
     function GetTrimmTabDaten: TTrimmTabDaten; virtual;
   public
     FScale: single;
-    Kurve: array [1 .. PunkteMax] of TPoint; { Punkt 0 ist der NullPunkt }
+    Kurve: TTrimmTabKurve; { Punkt 0 ist der NullPunkt }
     PunkteAnzahl: Integer; { tatsächliche Anzahl Punkte entsprechend Memo }
     EndKraftMin, EndWegMin, KraftMax, WegMax: Integer;
     Bezier: TBezier;
@@ -128,7 +140,7 @@ type
     procedure LoadFromStream(S: TStream);
     procedure SaveToStream(S: TStream);
     procedure GetMemoLines(ML: TStrings);
-    procedure Draw(Canvas: TCanvas; ARect: TRect); virtual;
+    procedure UpdateGraphModel(Model: TTrimmTabGraphModel);
     procedure ProcessTrimmTab(ML: TStrings);
     function EvalY(x: double): double; virtual;
     function EvalX(y: double): double; virtual;
@@ -155,7 +167,7 @@ type
     function BlendingValue(u: double; k: Integer): double;
     procedure ComputePoint(u: double; out pt: vec3);
   public
-    curve: TBezierKurve; { m+1 }
+    Curve: TBezierKurve; { m+1 }
     Controls: TControlPunkte; { n+1 }
     constructor Create;
     procedure ComputeCoefficients;
@@ -828,216 +840,55 @@ begin
   MittelPunkt := MittelPunkt;
 end;
 
-procedure TTrimmTab.Draw(Canvas: TCanvas; ARect: TRect);
-
-  function Limit(a: double): double;
-  begin
-    if a < -32000 then
-      a := -32000
-    else if a > 32000 then
-      a := 32000;
-    result := a;
-  end;
-
-  procedure PaintBackGround(Image: TBitMap);
-  var
-    TempR: TRect;
-  begin
-    TempR := Rect(0, 0, Image.Width, Image.Height);
-    with Image.Canvas do
-    begin
-      Brush.Color := clBtnFace;
-      FillRect(TempR);
-    end;
-  end;
-
+procedure TTrimmTab.UpdateGraphModel(Model: TTrimmTabGraphModel);
 var
-  pt: TPoint;
-  R: TRect;
-  i, RadiusX, RadiusY: Integer;
-  Bitmap: TBitMap;
-  PlotWidth, PlotHeight: Integer;
-  PlotExtX, PlotExtY: Integer;
-  PlotOrgX, PlotOrgY: Integer;
-  tempX, tempY: double;
-  PosX, PosY: Integer;
-  S: string;
+  i: Integer;
 begin
   if not Valid then
     GetPolynom;
   if TabellenTyp = itBezier then
     Bezier.GenerateCurve;
 
-  PlotWidth := ARect.Right - ARect.Left;
-  PlotHeight := ARect.Bottom - ARect.Top;
-  PlotExtX := PlotWidth;
-  PlotExtY := PlotHeight;
-  PlotOrgX := 0;
-  PlotOrgY := 0;
+  Model.TabellenTyp := TabellenTyp;
 
-  Bitmap := TBitMap.Create;
-  with Bitmap do
-  begin
-    Width := PlotWidth;
-    Height := PlotHeight;
-  end;
-  try
-    PaintBackGround(Bitmap);
+  Model.x1 := x1;
+  Model.y1 := y1;
 
-    with Bitmap.Canvas do
-    begin
-      SetMapMode(Handle, MM_ANISOTROPIC);
-      SetWindowExtEx(Handle, PlotExtX, -PlotExtY, nil);
-      SetWindowOrgEx(Handle, PlotOrgX, PlotOrgY, nil);
-      SetViewPortExtEx(Handle, PlotWidth, PlotHeight, nil);
-      SetViewPortOrgEx(Handle, 0, PlotHeight, nil);
+  Model.x2 := x2;
+  Model.y2 := y2;
 
-      { Radius }
-      R.Left := 0;
-      R.Top := 0;
-      R.Bottom := Round(3 * FScale);
-      R.Right := R.Bottom;
-      DPTOLP(Handle, R, 2);
-      RadiusX := R.Right - R.Left;
-      RadiusY := R.Bottom - R.Top;
+  Model.EndwertWeg := EndwertWeg;
+  Model.EndwertKraft := EndwertKraft;
 
-      { Kurve }
-      Pen.Color := clBlue;
+  Model.Kurve := Kurve;
+  Model.PunkteAnzahl := PunkteAnzahl;
+
+  { LineData }
       case TabellenTyp of
-        itKonstante:
-          begin
-            tempY := PlotExtY * (x1 / EndwertKraft);
-            pt.y := Round(Limit(tempY));
-            MoveTo(0, pt.y);
-            LineTo(PlotExtX, pt.y);
-          end;
-        itGerade:
-          begin
-            MoveTo(0, 0);
-            LineTo(PlotExtX, PlotExtY);
-          end;
         itParabel, itBezier:
           begin
-            MoveTo(0, 0);
-            tempX := 0;
-            tempY := 0;
             for i := 0 to 100 do
             begin
               case TabellenTyp of
                 itParabel:
                   begin
                     { Weg }
-                    tempX := PlotExtX * EvalY(i / 100 * EndwertKraft) / (EndwertWeg);
+                Model.LineDataX[i] := EvalY(i / 100 * EndwertKraft) / (EndwertWeg);
                     { Kraft als Argument auf y-Achse }
-                    tempY := PlotExtY * (i / 100);
+                Model.LineDataY[i] := i / 100;
                   end;
                 itBezier:
                   begin
                     { Weg }
-                    tempX := PlotExtX * Bezier.curve[i + 1].y / EndwertWeg;
+                Model.LineDataX[i] := Bezier.Curve[i + 1].y / EndwertWeg;
                     { Kraft }
-                    tempY := PlotExtY * Bezier.curve[i + 1].x / EndwertKraft;
-                  end;
-              end;
-              pt.x := Round(Limit(tempX));
-              pt.y := Round(Limit(tempY));
-              LineTo(pt.x, pt.y);
+                Model.LineDataY[i] := Bezier.Curve[i + 1].x / EndwertKraft;
             end;
           end;
       end;
-
-      { Rechtecke }
-      Pen.Color := clBlack;
-      Brush.Color := clYellow;
-      Brush.Style := bsSolid;
-      for i := 1 to PunkteAnzahl do
-      begin
-        tempX := PlotExtX * Kurve[i].y / EndwertWeg;
-        tempY := PlotExtY * Kurve[i].x / EndwertKraft;
-        pt.x := Round(Limit(tempX));
-        pt.y := Round(Limit(tempY));
-        Rectangle(
-          pt.x - RadiusX,
-          pt.y - RadiusY,
-          pt.x + RadiusX,
-          pt.y + RadiusY);
+      end;
       end;
 
-      Pen.Color := clBlack;
-      Brush.Color := clRed;
-      Brush.Style := bsSolid;
-
-      if TabellenTyp > itGerade then
-      begin
-        tempX := PlotExtX * y1 / EndwertWeg;
-        tempY := PlotExtY * x1 / EndwertKraft;
-        pt.x := Round(Limit(tempX));
-        pt.y := Round(Limit(tempY));
-        Rectangle(
-          pt.x - RadiusX,
-          pt.y - RadiusY,
-          pt.x + RadiusX,
-          pt.y + RadiusY);
-      end;
-
-      pt := Point(0, 0);
-      Rectangle(pt.x - RadiusX, pt.y - RadiusY, pt.x + RadiusX, pt.y + RadiusY);
-
-      tempX := PlotExtX * y2 / EndwertWeg;
-      tempY := PlotExtY * x2 / EndwertKraft;
-      pt.x := Round(Limit(tempX));
-      pt.y := Round(Limit(tempY));
-      Rectangle(pt.x - RadiusX, pt.y - RadiusY, pt.x + RadiusX, pt.y + RadiusY);
-
-      SetMapMode(Handle, MM_TEXT);
-      SetWindowOrgEx(Handle, 0, 0, nil);
-      SetViewPortOrgEx(Handle, 0, 0, nil);
-
-      { Texte }
-      Brush.Style := bsClear;
-      { Font := YFont; }
-      SetTextAlign(Handle, TA_LEFT or TA_TOP);
-      PosX := 5;
-      PosY := 5;
-      TextOut(PosX, PosY, 'Kraft [N]');
-
-      Font.Color := clBlack;
-      PosY := PosY - Font.Height + 5;
-      S := Format('(%d ... %d)', [0, EndwertKraft]);
-      TextOut(PosX, PosY, S);
-
-      { Font := XFont; }
-      SetTextAlign(Handle, TA_RIGHT or TA_BOTTOM);
-      PosX := PlotWidth - 5;
-      PosY := PlotHeight - 5;
-      TextOut(PosX, PosY, 'Weg [mm]');
-
-      Font.Color := clBlack;
-      PosY := PosY + Font.Height - 5;
-      S := Format('(%d ... %d)', [0, EndwertWeg]);
-      TextOut(PosX, PosY, S);
-
-      Brush.Style := bsSolid;
-      Brush.Color := clBtnFace;
-
-      { Rahmen zeichnen }
-      {
-        Pen.Width := 1;
-        Pen.Color := clRed;
-        Brush.Style := bsClear;
-        Rectangle( 0, 0, Bitmap.Width, Bitmap.Height);
-        }
-    end;
-
-    with Canvas do
-    begin
-      CopyMode := cmSrcCopy;
-      Draw(0, 0, Bitmap);
-    end;
-
-  finally
-    Bitmap.Free;
-  end;
 end;
 
 { TBezier }
@@ -1107,7 +958,7 @@ var
 begin
   ComputeCoefficients;
   for k := 0 to m do
-    ComputePoint(k / m, curve[k + 1]);
+    ComputePoint(k / m, Curve[k + 1]);
 end;
 
 end.

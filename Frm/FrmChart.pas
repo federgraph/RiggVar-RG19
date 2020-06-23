@@ -24,6 +24,7 @@ uses
   Vcl.Menus,
   Vcl.Buttons,
   Vcl.ComCtrls,
+  RggStrings,
   RggUnit4,
   RggTypes,
   RggDoc,

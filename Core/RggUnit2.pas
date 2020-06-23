@@ -33,6 +33,7 @@ uses
   Vcl.ExtCtrls,
   Vcl.StdCtrls,
   Vcl.ComCtrls,
+  RggStrings,
   RggTypes,
   RggCalc,
   RggSchnittKK,
@@ -254,38 +255,38 @@ end;
 
 function TMast.MastStatusText: string;
 var
-  S: string;
+  s: string;
 begin
-  S := '  Mast:';
+  s := Status_String_Mast;
   if FMastOK then
-    S := S + ' O.K.'
+    s := s + Status_String_OK
   else
   begin
     if msBiegungNegativ in FMastStatus then
-      S := S + ' Mastbiegung negativ'
+      s := s + Status_String_MastBiegungNegativ
     else if msControllerJenseits in FMastStatus then
-      S := S + ' Controller über Mitte gestellt'
+      s := s + Status_String_MastControllerBeyondMiddle
     else if msZugKraftimMast in FMastStatus then
-      S := S + ' Controller zu weit zurück'
+      s := s + Status_String_MastControllerTooFarBack
     else if msControllerKraftZuGross in FMastStatus then
-      S := S + ' Controller zu weit';
+      s := s + Status_String_MastControllerTooFar;
   end;
-  result := S;
+  result := s;
 end;
 
 procedure TMast.WriteToIniFile(ini: TIniFile);
 var
-  S: String;
+  s: string;
   tempEI: Integer;
 begin
   inherited WriteToIniFile(ini);
-  S := 'Rigg';
-  ini.WriteInteger(S, 'ControllerTyp', Ord(FControllerTyp));
-  ini.WriteInteger(S, 'CalcTyp', Ord(FCalcTyp));
+  s := Rigg_IniSectionString;
+  ini.WriteInteger(s, ControllerTyp_IniString, Ord(FControllerTyp));
+  ini.WriteInteger(s, CalcTyp_IniString, Ord(FCalcTyp));
 
-  S := 'Mast';
+  s := Mast_IniSectionString;
   tempEI := Round(EI / 1E6);
-  ini.WriteInteger(S, 'EI', tempEI);
+  ini.WriteInteger(s, EI_IniString, tempEI);
 end;
 
 procedure TMast.SaveToStream(S: TStream);
@@ -297,15 +298,15 @@ end;
 
 procedure TMast.LoadFromIniFile(ini: TIniFile);
 var
-  S: String;
+  s: String;
 begin
   inherited LoadFromIniFile(ini);
-    S := 'Rigg';
-    ControllerTyp := TControllerTyp(ini.ReadInteger(S, 'ControllerTyp', Ord(ctDruck)));
-    CalcTyp := TCalcTyp(ini.ReadInteger(S, 'CalcTyp', Ord(ctBiegeKnicken)));
+  s := Rigg_IniSectionString;
+  ControllerTyp := TControllerTyp(ini.ReadInteger(S, ControllerTyp_IniString, Ord(ctDruck)));
+  CalcTyp := TCalcTyp(ini.ReadInteger(S, CalcTyp_IniString, Ord(ctBiegeKnicken)));
 
-    S := 'Mast';
-  EI := ini.ReadInteger(S, 'EI', 14700) * 1E6;
+  s := Mast_IniSectionString;
+  EI := ini.ReadInteger(S, EI_IniString, 14700) * 1E6;
 end;
 
 procedure TMast.LoadFromStream(S: TStream);
@@ -829,16 +830,16 @@ begin
       { D ist Null, wenn FU1 und FU2 auf einer Geraden liegen. }
       FU1 := 0;
       FU2 := 0;
-      s := 'SolveKG21: EZeroDivide;';
+      s := LogString_SolveKG21_Except;
       if W1 = 0 then
-        s := ' W1';
+        s := s + LogString_W1;
       if W2 = 0 then
-        s := S + ' W2';
+        s := s + LogString_W2;
       if W3 = 0 then
-        s := S + ' W3';
+        s := s + LogString_W3;
       if D = 0 then
-        s := S + ' W2';
-      s := s + 'sind Null!';
+        s := s + LogString_D;
+      s := s + LogString_AreNull;
       Main.Logger.Info(s);
     end;
   end;
@@ -987,7 +988,7 @@ begin
           begin
           FE := 0;
           FD := 0;
-            Main.Logger.Info('MBox: EZeroDivide; cos(alpha?) = 0');
+            Main.Logger.Info(LogString_ZeroDivideAlpha);
         end;
       end;
       FLvon1 := FE * sin(alpha1);
@@ -1022,7 +1023,7 @@ begin
           begin
           FE := 0;
           FD := 0;
-            Main.Logger.Info('MBox: EZeroDivide; cos(alpha?) = 0');
+            Main.Logger.Info(LogString_ZeroDivideAlpha);
         end;
       end;
       FLvon1 := FE * sin(alpha1);
@@ -1150,28 +1151,33 @@ begin
   end;
   if max = min then
     StraightLine := True
-  else begin
+  else
+  begin
     Mitte := abs(max-min)/2 + min;
-    for i := 0 to FLineCountM do begin
+    for i := 0 to FLineCountM do
+    begin
       PlotLine[i].x := Round( 1000 * (LineData[i]-Mitte)/abs(max-min) ) + 1000;
       PlotLine[i].y := 20 * i; {von 0 bis 2000}
     end;
   end;
 
   bmp := TBitmap.Create;
-  with bmp do begin
+  with bmp do
+  begin
     Width := Rect.Right - Rect.Left;
     Height := Rect.Bottom - Rect.Top;
   end;
   try
     PaintBackGround(bmp);
 
-    with Rect do begin
+    with Rect do
+    begin
       Pos.x := Left + (Right-Left) div 2;
       Pos.y := Top + (Bottom-Top) div 2;
     end;
 
-    with bmp.Canvas do begin
+    with bmp.Canvas do
+    begin
       SetMapMode(Handle, MM_ANISOTROPIC);
       SetWindowExtEx(Handle, 2200, -2200, nil);
       SetWindowOrgEx(Handle, 1000, 1000, nil);
@@ -1192,7 +1198,8 @@ begin
       SetViewPortOrgEx(Handle, 0, 0, nil);
     end;
 
-    with Canvas do begin
+    with Canvas do
+    begin
       CopyMode := cmSrcCopy;
       Draw(0, 0, bmp);
     end;

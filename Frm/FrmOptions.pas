@@ -3,7 +3,7 @@
 interface
 
 uses
-  Winapi.Windows,
+  Winapi.Windows, // because of VK_Return
   System.SysUtils,
   System.Classes,
   System.Types,
@@ -23,61 +23,55 @@ uses
   RggScroll,
   RggUnit4,
   RggTypes,
-  RggTrimmTab;
+  RggTrimmTab,
+  RggTrimmTabGraph;
 
 type
   TOptionForm = class(TForm)
     PageControl: TPageControl;
     tsTrimm: TTabSheet;
-    Label16: TLabel;
     LabelMin: TLabel;
     LabelPos: TLabel;
     LabelMax: TLabel;
     MinEdit: TEdit;
     PosEdit: TEdit;
     MaxEdit: TEdit;
-    Label15: TLabel;
-    TrimmVarLabel: TLabel;
+    LengthEditLabel: TLabel;
+    TrimmComboLabel: TLabel;
     TrimmCombo: TComboBox;
-    Bevel1: TBevel;
     tsFachwerk: TTabSheet;
-    StabLabel: TLabel;
+    ElementLabel: TLabel;
     ElementCombo: TComboBox;
     EAEdit: TEdit;
-    Label9: TLabel;
+    EAEditLabel: TLabel;
     TakeOverBtn: TButton;
-    Bevel4: TBevel;
-    Label6: TLabel;
     MaterialCombo: TComboBox;
-    Label2: TLabel;
-    Label3: TLabel;
+    MaterialComboLabel: TLabel;
+    QuerschnittComboLabel: TLabel;
     QuerschnittCombo: TComboBox;
-    A: TLabel;
+    ALabel: TLabel;
     AEdit: TEdit;
     EEdit: TEdit;
-    Label4: TLabel;
-    Label8: TLabel;
-    Label10: TLabel;
+    ELabel: TLabel;
+    EEditLabel: TLabel;
+    AEditLabel: TLabel;
     tsMast: TTabSheet;
-    Label1: TLabel;
-    Bevel3: TBevel;
-    Label11: TLabel;
-    MastTypCombo: TComboBox;
-    Label14: TLabel;
+    MastTypeComboLabel: TLabel;
+    MastTypeCombo: TComboBox;
+    MastMassComboLabel: TLabel;
     MastMassCombo: TComboBox;
     EIEdit: TEdit;
     MastMassEdit: TEdit;
-    Label5: TLabel;
-    Label17: TLabel;
+    EILabel: TLabel;
+    MassMassEditLabel: TLabel;
     tsRumpf: TTabSheet;
-    RumpfGroupBox: TGroupBox;
+    GroupBoxRumpf: TGroupBox;
     RumpfLabel: TLabel;
     RumpfEdit: TEdit;
     RumpfBtn: TButton;
     RumpfGrid: TStringGrid;
-    OKBtn: TBitBtn;
-    CancelBtn: TBitBtn;
-    HelpBtn: TBitBtn;
+    OKBtn: TButton;
+    CancelBtn: TButton;
     tsTabelle: TTabSheet;
     RumpfSpinEdit: TUpDown;
     tsIniMemo: TTabSheet;
@@ -85,13 +79,11 @@ type
     Speichern: TButton;
     LoadIniBtn: TButton;
     MemoLabel: TLabel;
-    Label7: TLabel;
-    Label12: TLabel;
-    Label13: TLabel;
-    Label18: TLabel;
+    X1Label: TLabel;
+    Y1Label: TLabel;
+    X2Label: TLabel;
+    Y2Label: TLabel;
     TrimmMemo: TMemo;
-    pnTrimmTabChart: TPanel;
-    PaintBoxTabelle: TPaintBox;
     UpDownKraft1: TUpDown;
     Kraft1Edit: TEdit;
     Weg2Edit: TEdit;
@@ -102,14 +94,18 @@ type
     rbGerade: TRadioButton;
     rbParabel: TRadioButton;
     rbBezier: TRadioButton;
-    CalcBtn: TBitBtn;
-    ApplyBtn: TBitBtn;
     EvalOptionBtn: TSpeedButton;
+    GroupBoxMast: TGroupBox;
+    GroupBoxTrimm: TGroupBox;
+    GroupBoxMaterial: TGroupBox;
+    CalcBtn: TSpeedButton;
+    ApplyBtn: TSpeedButton;
+    Image: TImage;
     procedure MastMassEditExit(Sender: TObject);
     procedure MastMassEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure MastTypComboChange(Sender: TObject);
+    procedure MastTypeComboChange(Sender: TObject);
     procedure MastMassComboChange(Sender: TObject);
     procedure TrimmComboChange(Sender: TObject);
     procedure QuerschnittComboChange(Sender: TObject);
@@ -128,14 +124,12 @@ type
     procedure RumpfSpinEditExit(Sender: TObject);
     procedure RumpfSpinEditChanging(Sender: TObject; var AllowChange: Boolean);
     procedure ApplyBtnClick(Sender: TObject);
-    procedure PaintBoxTabellePaint(Sender: TObject);
     procedure CancelBtnClick(Sender: TObject);
     procedure CalcBtnClick(Sender: TObject);
     procedure EvalOptionBtnClick(Sender: TObject);
     procedure Kraft1EditChange(Sender: TObject);
     procedure rbKonstanteClick(Sender: TObject);
-    procedure PaintBoxTabelleMouseDown(Sender: TObject;
-      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure PaintBoxTabelleMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   private
     FiMastSaling: Integer;
     FiMastWante: Integer;
@@ -150,15 +144,6 @@ type
     FQuerschnittListe: TStringList;
     FTrimmListe: TStringList;
     FTempListe: TStringList;
-
-    (*
-    FMastTypIndex :Integer;
-    FMastMassIndex :Integer;
-    FElementIndex :Integer;
-    FMaterialIndex :Integer;
-    FQuerschnittIndex :Integer;
-    FTrimmIndex :Integer;
-    *)
 
     FGSB: TRggFA;
     FiP: TIntRiggPoints;
@@ -176,6 +161,8 @@ type
   public
     Rigg: TRigg;
     IniFileName: string;
+    TrimmTabGraph: TTrimmTabGraph;
+    procedure DrawTrimmTab;
     procedure Init(ARigg: TRigg);
     procedure LoadFromIniFile;
     procedure WriteToIniFile;
@@ -191,20 +178,6 @@ implementation
 uses
   RiggVar.RG.Def,
   RggModul;
-
-type
-  TIniFileGS = class(TInifile)
-    procedure DoFlush;
-  end;
-
-procedure TInifileGS.DoFlush;
-begin
-{ Windows 95 keeps a cached version of WIN.INI to improve performance.
-  If all three parameters are NULL, the function flushes the cache!
-  If the function fails, or if it flushes the cached version of
-  the most recently accessed initialization file, the return value is FALSE. }
-  WritePrivateProfileString(nil, nil, nil, PChar(FileName));
-end;
 
 procedure TOptionForm.GetKeyList(Source, Dest: TStringList);
 var
@@ -228,6 +201,10 @@ begin
   FQuerschnittListe := TStringList.Create;
   FTrimmListe := TStringList.Create;
   FTempListe := TStringList.Create;
+
+  TrimmTabGraph := TTrimmTabGraph.Create;
+  TrimmTabGraph.Image := Image;
+
   Init(RiggModul.Rigg);
 end;
 
@@ -235,8 +212,7 @@ procedure TOptionForm.Init(ARigg: TRigg);
 begin
   Rigg := ARigg;
   InifileName := ChangeFileExt(Application.ExeName,'.ini');
-  { IniFileName := ChangeFileExt(ParamStr(0), '.INI'); } { Alternative }
-  { IniFileName := 'rigg.ini'; } { --> rigg.ini im Windows Verzeichnis }
+  { IniFileName := ChangeFileExt(ParamStr(0), '.ini'); } { Alternative }
 
   FRumpfCell := Point(1, 1);
   RumpfGrid.Cells[0,0] := '';
@@ -272,6 +248,8 @@ begin
   FQuerschnittListe.Free;
   FTrimmListe.Free;
   FTempListe.Free;
+
+  TrimmTabGraph.Free;
 end;
 
 procedure TOptionForm.FillRiggLists;
@@ -283,22 +261,12 @@ begin
   FiMastWante := FiMastSaling + Round(Rigg.MastOben);
   FiMastTop := Round(Rigg.MastLaenge);
   FiP := Rigg.iP;
-  FTrimmTabelle := Rigg.TrimmTab; { Zeiger speichern }
-  FTrimmTabDaten := FTrimmTabelle.TrimmTabDaten; {zwischenspeichern}
+  FTrimmTabelle := Rigg.TrimmTab;
+  FTrimmTabDaten := FTrimmTabelle.TrimmTabDaten;
 
   FMastMassListe.Clear;
   FElementListe.Clear;
   FTrimmListe.Clear;
-  {FTempListe.Clear;} { kann weg, Löschen nicht notwendig hier }
-
-  (*
-  FMastTypIndex := 0;
-  FMastMassIndex := 0;
-  FElementIndex := 0;
-  FMaterialIndex := 0;
-  FQuerschnittIndex := 0;
-  FTrimmIndex := 3;
-  *)
 
   FMastMassListe.Add(Format('Saling=%d',[FiMastSaling]));
   FMastMassListe.Add(Format('Wante=%d',[FiMastWante]));
@@ -362,7 +330,7 @@ begin
     Exit;
   end;
 
-  { wenn Inifile nicht existiert dann Standardwerte laden: }
+  { wenn Inifile nicht existiert dann Standardwerte laden }
 
   { EI in Nm^2 }
   ML := FMastTypListe;
@@ -458,20 +426,20 @@ begin
 
   { MastTyp }
   GetKeyList(FMastTypListe, FTempListe);
-  MastTypCombo.Items := FTempListe;
+  MastTypeCombo.Items := FTempListe;
   j := 0;
   for i := 0 to FMastTypListe.Count - 1 do
-    if IntToStr(FiEI) = FMastTypListe.Values[MastTypCombo.Items[i]] then
+    if IntToStr(FiEI) = FMastTypListe.Values[MastTypeCombo.Items[i]] then
       j := i;
-  MastTypCombo.ItemIndex := j;
-  EIEdit.Text := FMastTypListe.Values[MastTypCombo.Text];
+  MastTypeCombo.ItemIndex := j;
+  EIEdit.Text := FMastTypListe.Values[MastTypeCombo.Text];
 end;
 
 procedure TOptionForm.LoadFromIniFile;
 var
-  IniFile: TIniFileGS;
+  IniFile: TMemIniFile;
 begin
-  IniFile := TIniFileGS.Create(IniFileName);
+  IniFile := TMemIniFile.Create(IniFileName);
   try
     FMaterialListe.Clear;
     IniFile.ReadSectionValues('Material', FMaterialListe);
@@ -479,7 +447,6 @@ begin
     IniFile.ReadSectionValues('Querschnitte', FQuerschnittListe);
     FMastTypListe.Clear;
     IniFile.ReadSectionValues('Profile', FMastTypListe);
-    IniFile.DoFlush; { Funktioniert sonst nur beim 1. Lesen! }
   finally
     IniFile.Free;
   end;
@@ -557,9 +524,9 @@ var
 begin
   i := TFederParam(TrimmCombo.ItemIndex);
   if i = TFederParam.fpWinkel then
-    label15.Caption := 'Winkel in 10E-1 Grad'
+    LengthEditLabel.Caption := 'Winkel in Grad'
   else
-    label15.Caption := 'Abmessungen in mm';
+    LengthEditLabel.Caption := 'Abmessungen in mm';
   f := FGSB.Find(i);
   MinEdit.Text := IntToStr(Round(f.Min));
   PosEdit.Text := IntToStr(Round(f.Ist));
@@ -677,9 +644,9 @@ begin
   FTrimmTabelle.TrimmTabDaten := FTrimmTabDaten; { wiederherstellen }
 end;
 
-procedure TOptionForm.MastTypComboChange(Sender: TObject);
+procedure TOptionForm.MastTypeComboChange(Sender: TObject);
 begin
-  EIEdit.Text := FMastTypListe.Values[MastTypCombo.Text];
+  EIEdit.Text := FMastTypListe.Values[MastTypeCombo.Text];
   FiEI := StrToInt(EIEdit.Text);
 end;
 
@@ -733,11 +700,11 @@ var
 begin
   { changed from old days:
     - introduction of ooN0
-    - elements of a TIntPoint are double now, not Integer
+    - elements of a TIntPoint are of type double now, no longer an Integer
   }
 
   oo := TRiggPoint(FRumpfCell.y); { A0 is now second element in enum }
-  kk := TKoord(FRumpfCell.x-1); {this has not changed }
+  kk := TKoord(FRumpfCell.x - 1); {this has not changed }
 
   FiP[oo, kk] :=  RumpfSpinEdit.Position;
   RumpfGrid.Cells[FRumpfCell.x, FRumpfCell.y] := Format('%4d', [RumpfSpinEdit.Position]);
@@ -785,14 +752,14 @@ begin
   Weg2Edit.Text := IntToStr(FTrimmTabelle.EndwertWeg);
   Kraft2Edit.Text := IntToStr(FTrimmTabelle.EndwertKraft);
   Temp := FTrimmTabelle.MittelPunkt;
-  { Temp ist notwendig, siehe KraftEditChange()!
-    Weg1Edit ist noch nicht gesetzt und verfälscht sonst den Mittelunkt!,
+  { Temp ist notwendig, siehe KraftEditChange,
+    Weg1Edit ist noch nicht gesetzt und verfälscht sonst den Mittelunkt,
     auch umgekehrt. }
   FTabChanging := True;
   Kraft1Edit.Text := IntToStr(Temp.x);
   Weg1Edit.Text := IntToStr(Temp.y);
   FTabChanging := False;
-  FTrimmTabelle.Draw(PaintBoxTabelle.Canvas, PaintBoxTabelle.BoundsRect);
+  DrawTrimmTab;
 end;
 
 procedure TOptionForm.Kraft1EditChange(Sender: TObject);
@@ -807,7 +774,7 @@ begin
   Kraft1Edit.Text := IntToStr(Temp.x);
   Weg1Edit.Text := IntToStr(Temp.y);
   if not FTabChanging then
-    FTrimmTabelle.Draw(PaintBoxTabelle.Canvas, PaintBoxTabelle.BoundsRect);
+    DrawTrimmTab;
 end;
 
 procedure TOptionForm.PaintBoxTabelleMouseDown(Sender: TObject;
@@ -815,21 +782,21 @@ procedure TOptionForm.PaintBoxTabelleMouseDown(Sender: TObject;
 var
   tempX, tempY: double;
 begin
-  tempY := PaintBoxTabelle.Height;
-  tempY := (tempY -Y) * FTrimmTabelle.EndwertKraft/tempY;
-  tempX := X * FTrimmTabelle.EndwertWeg/PaintBoxTabelle.Width;
+  tempY := Image.Height;
+  tempY := (tempY -Y) * FTrimmTabelle.EndwertKraft / tempY;
+  tempX := X * FTrimmTabelle.EndwertWeg / Image.Width;
   FTabChanging := True;
   Kraft1Edit.Text := IntToStr(Round(tempY));
   Weg1Edit.Text := IntToStr(Round(tempX));
   FTabChanging := False;
-  FTrimmTabelle.Draw(PaintBoxTabelle.Canvas, PaintBoxTabelle.BoundsRect);
+  DrawTrimmTab;
 end;
 
 procedure TOptionForm.rbKonstanteClick(Sender: TObject);
 begin
   if Sender = rbKonstante then
   begin
-    { rbKonstante.Checked := True; } { automatisch durch VCL }
+    { rbKonstante.Checked := True; }
     UpDownKraft1.Enabled := True;
     UpDownWeg1.Enabled := False;
   end
@@ -853,7 +820,7 @@ begin
   end;
   Assert(FTrimmTabelle <> nil);
   FTrimmTabelle.TabellenTyp := TTabellenTyp((Sender as TRadioButton).Tag);
-  FTrimmTabelle.Draw(PaintBoxTabelle.Canvas, PaintBoxTabelle.BoundsRect);
+  DrawTrimmTab;
 end;
 
 procedure TOptionForm.CalcBtnClick(Sender: TObject);
@@ -866,9 +833,10 @@ begin
   FTrimmTabelle.EvalDirection := EvalOptionBtn.Down;
 end;
 
-procedure TOptionForm.PaintBoxTabellePaint(Sender: TObject);
+procedure TOptionForm.DrawTrimmTab;
 begin
-  FTrimmTabelle.Draw(PaintBoxTabelle.Canvas, PaintBoxTabelle.BoundsRect);
+  FTrimmTabelle.UpdateGraphModel(TrimmTabGraph.Model);
+  TrimmTabGraph.Draw;
 end;
 
 end.

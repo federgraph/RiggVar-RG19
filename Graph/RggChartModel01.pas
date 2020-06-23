@@ -11,6 +11,7 @@ uses
   Graphics,
   UITypes,
   UIConsts,
+  RggStrings,
   RggChart,
   RggScroll,
   RggTypes;
@@ -293,7 +294,7 @@ begin
         DstList.Items.AddObject(SrcList.Items[0], SrcList.Items.Objects[0]);
         SrcList.Items.Delete(0);
       end;
-      YComboItems := DstList.Items;
+      YComboItems.Assign(DstList.Items);
       YComboItemIndex := DstList.ItemIndex;
       UpdateYAchseList;
       YComboChange(nil);
