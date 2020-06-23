@@ -50,7 +50,7 @@ type
     Ist: double;
     Min: double;
     Max: double;
-    TinyStep: Integer;
+    SmallStep: Integer;
     BigStep: Integer;
 
     procedure Assign(Value: TRggSB);
@@ -91,7 +91,7 @@ type
     function Find(Value: TFederParam): TRggSB;
 
     procedure InitStepDefault;
-    procedure InitTinyStep(Value: Integer);
+    procedure InitSmallStep(Value: Integer);
     procedure InitBigStep(Value: Integer);
 
     procedure SaveToStream(s: TStream);
@@ -107,7 +107,7 @@ begin
   Ist := Value.Ist;
   Min := Value.Min;
   Max := Value.Max;
-  TinyStep := Value.TinyStep;
+  SmallStep := Value.SmallStep;
   BigStep := Value.BigStep;
 end;
 
@@ -117,7 +117,7 @@ begin
     TsbParam.Ist: result := Ist;
     TsbParam.Min: result := Min;
     TsbParam.Max: result := Max;
-    TsbParam.TinyStep: result := TinyStep;
+    TsbParam.TinyStep: result := SmallStep;
     TsbParam.BigStep: result := BigStep;
     else
       result := 0;
@@ -135,7 +135,7 @@ begin
   Min := temp;
   s.WriteBuffer(temp, SizeOf(Integer));
   Max := temp;
-  s.WriteBuffer(TinyStep, SizeOf(Integer));
+  s.WriteBuffer(SmallStep, SizeOf(Integer));
   s.WriteBuffer(BigStep, SizeOf(Integer));
 end;
 
@@ -150,7 +150,7 @@ begin
   temp := Round(Max);
   s.WriteBuffer(temp, SizeOf(Integer));
 
-  s.WriteBuffer(TinyStep, SizeOf(Integer));
+  s.WriteBuffer(SmallStep, SizeOf(Integer));
   s.WriteBuffer(BigStep, SizeOf(Integer));
 end;
 
@@ -206,24 +206,24 @@ end;
 
 procedure TRggFA.InitStepDefault;
 begin
-  InitTinyStep(1);
-  InitTinyStep(10)
+  InitSmallStep(1);
+  InitBigStep(10)
 end;
 
-procedure TRggFA.InitTinyStep(Value: Integer);
+procedure TRggFA.InitSmallStep(Value: Integer);
 begin
-  Controller.TinyStep := Value;
-  Winkel.TinyStep := Value;
-  Vorstag.TinyStep := Value;
-  Wante.TinyStep := Value;
-  Woben.TinyStep := Value;
-  SalingH.TinyStep := Value;
-  SalingA.TinyStep := Value;
-  SalingL.TinyStep := Value;
-  VorstagOS.TinyStep := Value;
-  WPowerOS.TinyStep := Value;
-  T1.TinyStep := Value;
-  T2.TinyStep := Value;
+  Controller.SmallStep := Value;
+  Winkel.SmallStep := Value;
+  Vorstag.SmallStep := Value;
+  Wante.SmallStep := Value;
+  Woben.SmallStep := Value;
+  SalingH.SmallStep := Value;
+  SalingA.SmallStep := Value;
+  SalingL.SmallStep := Value;
+  VorstagOS.SmallStep := Value;
+  WPowerOS.SmallStep := Value;
+  T1.SmallStep := Value;
+  T2.SmallStep := Value;
 end;
 
 procedure TRggFA.Assign(Value: TRggFA);

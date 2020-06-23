@@ -434,7 +434,7 @@ begin
   cr := Rigg.GSB.Find(b);
   a.SetParams(Round(cr.Ist), Round(cr.Min), Round(cr.Max));
   a.LargeChange := Round(cr.BigStep);
-  a.SmallChange := Round(cr.TinyStep);
+  a.SmallChange := Round(cr.SmallStep);
 end;
 
 procedure TRiggModul.SetupGCtrls;

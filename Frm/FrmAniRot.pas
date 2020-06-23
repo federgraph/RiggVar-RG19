@@ -387,7 +387,7 @@ begin
   TrackBar.Max := Round(cr.Max);
   TrackBar.Position := Round(temp);
   TrackBar.Min := Round(cr.Min);
-  TrackBar.LineSize := Round(cr.TinyStep);
+  TrackBar.LineSize := Round(cr.SmallStep);
   TrackBar.PageSize := Round(cr.BigStep);
   //TrackBar.Frequency := (Max-Min) div 10;
 

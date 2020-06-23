@@ -715,7 +715,7 @@ begin
   for i := fpController to fpD0X do
   begin
     sb := FactArray.Find(i);
-    sb.TinyStep := 1;
+    sb.SmallStep := 1;
     sb.BigStep := 10;
     temp := sb.Ist;
     sb.Min := temp - 100;
@@ -895,7 +895,7 @@ begin
   for i := fpController to fpD0X do
   begin
     sb := FactArray.Find(i);
-    sb.TinyStep := 1;
+    sb.SmallStep := 1;
     sb.BigStep := 10;
     temp := sb.Ist;
     sb.Min := temp - 100;
@@ -1151,7 +1151,7 @@ begin
   tb.Max := sb.Max;
   tb.ValueNoChange := temp;
   tb.Min := sb.Min;
-  tb.Frequency := sb.TinyStep;
+  tb.Frequency := sb.SmallStep;
 //  tb.LineSize := sb.TinyStep;
 //  tb.PageSize := sb.BigStep;
 
