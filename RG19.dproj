@@ -191,7 +191,7 @@
         <DCCReference Include="Core\RggTrimmTab.pas"/>
         <DCCReference Include="Core\RggTypes.pas"/>
         <DCCReference Include="Core\RggCalc.pas"/>
-        <DCCReference Include="Graph\RggKraft.pas"/>
+        <DCCReference Include="Graph\RggKraftGraph.pas"/>
         <DCCReference Include="Graph\RggCtrls.pas"/>
         <DCCReference Include="Graph\RggMatrix.pas"/>
         <DCCReference Include="Core\RggScroll.pas"/>
@@ -237,6 +237,7 @@
         <DCCReference Include="Graph\RggChartModel02.pas"/>
         <DCCReference Include="Core\RggStrings.pas"/>
         <DCCReference Include="Graph\RggTrimmTabGraph.pas"/>
+        <DCCReference Include="Graph\RggMastGraph.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

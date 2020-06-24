@@ -58,7 +58,6 @@ uses
   RggRaumGraph in 'Graph\RggRaumGraph.pas',
   RggRota in 'Graph\RggRota.pas',
   RggDisplay in 'Graph\RggDisplay.pas',
-  RggKraft in 'Graph\RggKraft.pas',
   RggTestData in 'Graph\RggTestData.pas',
   RiggVar.App.Main in 'App\RiggVar.App.Main.pas',
   RiggVar.App.Main0 in 'App\RiggVar.App.Main0.pas',
@@ -88,7 +87,9 @@ uses
   RggChartModel01 in 'Graph\RggChartModel01.pas',
   RggChartModel02 in 'Graph\RggChartModel02.pas',
   RggStrings in 'Core\RggStrings.pas',
-  RggTrimmTabGraph in 'Graph\RggTrimmTabGraph.pas';
+  RggTrimmTabGraph in 'Graph\RggTrimmTabGraph.pas',
+  RggKraftGraph in 'Graph\RggKraftGraph.pas',
+  RggMastGraph in 'Graph\RggMastGraph.pas';
 
 {$R *.res}
 

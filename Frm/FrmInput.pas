@@ -43,7 +43,7 @@ type
     rbSalingH: TRadioButton;
     rbSalingA: TRadioButton;
     pnMast: TPanel;
-    PaintBoxM: TPaintBox;
+    PaintBoxM: TImage;
     tsDrehbar: TTabSheet;
     pnDrehbar: TPanel;
     lbControllerD: TLabel;
@@ -67,7 +67,7 @@ type
     rbWobenD: TRadioButton;
     rbSalingLD: TRadioButton;
     pnMastD: TPanel;
-    PaintBoxMD: TPaintBox;
+    PaintBoxMD: TImage;
     tsOhne: TTabSheet;
     pnOhneBK: TPanel;
     lbControllerOhne: TLabel;
@@ -83,7 +83,7 @@ type
     sbControllerOhne: TScrollBar;
     rbWanteOhne: TRadioButton;
     pnMastOhne: TPanel;
-    PaintBoxMOhne: TPaintBox;
+    PaintBoxMOhne: TImage;
     tsOhneStarr: TTabSheet;
     pnOhne: TPanel;
     lbVorstagOS: TLabel;
@@ -100,7 +100,6 @@ type
     procedure sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode;
       var ScrollPos: Integer);
     procedure InputPagesChange(Sender: TObject);
-    procedure PaintBoxMPaint(Sender: TObject);
     procedure FormHide(Sender: TObject);
   end;
 
@@ -196,11 +195,6 @@ procedure TInputForm.sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode
   var ScrollPos: Integer);
 begin
   RiggModul.sbControllerScroll(Sender, ScrollCode, ScrollPos);
-end;
-
-procedure TInputForm.PaintBoxMPaint(Sender: TObject);
-begin
-  RiggModul.DrawPaintBoxM;
 end;
 
 procedure TInputForm.FormHide(Sender: TObject);

@@ -28,7 +28,7 @@ type
     ZustellBtn: TButton;
     KraftSheet: TTabSheet;
     pnKraft: TPanel;
-    KraftPaintBox: TPaintBox;
+    KraftPaintBox: TImage;
     TestBtn: TButton;
     ChartSheet: TTabSheet;
     pnChart2: TPanel;
@@ -59,7 +59,6 @@ type
     procedure SalingPaintBoxPaint(Sender: TObject);
     procedure ChartPaintBoxPaint(Sender: TObject);
     procedure ControllerPaintBoxPaint(Sender: TObject);
-    procedure KraftPaintBoxPaint(Sender: TObject);
     procedure FormHide(Sender: TObject);
   public
     procedure SetKurveValidLED(Value: Boolean);
@@ -141,11 +140,6 @@ end;
 procedure TOutputForm.ZustellBtnClick(Sender: TObject);
 begin
   RiggModul.ZustellBtnClick;
-end;
-
-procedure TOutputForm.KraftPaintBoxPaint(Sender: TObject);
-begin
-  RiggModul.Rigg.DrawPaintBoxK(KraftPaintBox.Canvas, KraftPaintBox.BoundsRect);
 end;
 
 procedure TOutputForm.TestBtnClick(Sender: TObject);

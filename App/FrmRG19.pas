@@ -1784,7 +1784,7 @@ begin
   cl.Add('E');
   cl.Add('F0');
   cl.Add('F');
-  FixpointCombo.ItemIndex := cl.IndexOf('D0');
+  FixpointCombo.ItemIndex := cl.IndexOf('D');
   FixpointCombo.DropDownCount := cl.Count;
 end;
 

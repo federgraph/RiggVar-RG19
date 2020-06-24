@@ -23,7 +23,7 @@ object OutputForm: TOutputForm
     Top = 0
     Width = 465
     Height = 255
-    ActivePage = ChartSheet
+    ActivePage = KraftSheet
     TabOrder = 0
     OnChange = OutputPagesChange
     object MasterMemo: TTabSheet
@@ -157,6 +157,10 @@ object OutputForm: TOutputForm
     object ChartSheet: TTabSheet
       Tag = 4
       Caption = 'Diagramm'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnChart2: TPanel
         Left = 0
         Top = 0
@@ -325,13 +329,12 @@ object OutputForm: TOutputForm
         BevelOuter = bvNone
         BorderStyle = bsSingle
         TabOrder = 0
-        object KraftPaintBox: TPaintBox
+        object KraftPaintBox: TImage
           Left = 0
           Top = 0
           Width = 345
           Height = 223
           Align = alLeft
-          OnPaint = KraftPaintBoxPaint
           ExplicitHeight = 220
         end
         object TestBtn: TButton

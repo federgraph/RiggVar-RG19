@@ -168,7 +168,7 @@ type
     BitmapC: TBitmap;
     ControllerPaintBox: TPaintBox;
     SalingPaintBox: TPaintBox;
-    KraftPaintBox: TPaintBox;
+    KraftPaintBox: TImage;
     ChartPaintBox: TPaintBox;
     YComboBox: TComboBox;
     YComboSavedItemIndex: Integer;
@@ -896,7 +896,7 @@ begin
   DataInMeta := True;
 end;
 
-procedure TRiggModul.PaintBackGround(Image: TBitMap);
+procedure TRiggModul.PaintBackGround(Image: TBitmap);
 var
   R: TRect;
 begin
@@ -907,16 +907,17 @@ end;
 
 procedure TRiggModul.DrawPaintBoxM;
 var
-  PaintBox: TPaintBox;
+  img: TImage;
 begin
   case InputForm.InputPages.ActivePage.Tag of
-    0: PaintBox := InputForm.PaintBoxM;
-    1: PaintBox := InputForm.PaintBoxMD;
-    2: PaintBox := InputForm.PaintBoxMOhne;
+    0: img := InputForm.PaintBoxM;
+    1: img := InputForm.PaintBoxMD;
+    2: img := InputForm.PaintBoxMOhne;
   else
     Exit;
   end;
-  Rigg.DrawMastLine(PaintBox.Canvas, PaintBox.BoundsRect);
+  Rigg.MastGraph.Image := img;
+  Rigg.UpdateMastGraph;
 end;
 
 procedure TRiggModul.AusgabeText;
@@ -2573,7 +2574,10 @@ begin
   Screen.Cursor := crHourGlass;
   Rigg.GetTestKurven;
   if Assigned(KraftPaintBox) then
-    Rigg.DrawPaintBoxK(KraftPaintBox.Canvas, KraftPaintBox.BoundsRect);
+  begin
+    Rigg.KraftGraph.Image := KraftPaintBox;
+    Rigg.UpdateKraftGraph;
+  end;
   Screen.Cursor := crDefault;
 end;
 

@@ -43,7 +43,7 @@ uses
   RggTrimmTab in 'Core\RggTrimmTab.pas',
   RggTypes in 'Core\RggTypes.pas',
   RggCalc in 'Core\RggCalc.pas',
-  RggKraft in 'Graph\RggKraft.pas',
+  RggKraftGraph in 'Graph\RggKraftGraph.pas',
   RggCtrls in 'Graph\RggCtrls.pas',
   RggMatrix in 'Graph\RggMatrix.pas',
   RggScroll in 'Core\RggScroll.pas',
@@ -88,7 +88,8 @@ uses
   RggChartModel01 in 'Graph\RggChartModel01.pas',
   RggChartModel02 in 'Graph\RggChartModel02.pas',
   RggStrings in 'Core\RggStrings.pas',
-  RggTrimmTabGraph in 'Graph\RggTrimmTabGraph.pas';
+  RggTrimmTabGraph in 'Graph\RggTrimmTabGraph.pas',
+  RggMastGraph in 'Graph\RggMastGraph.pas';
 
 {$R *.res}
 

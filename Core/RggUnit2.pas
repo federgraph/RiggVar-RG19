@@ -19,20 +19,12 @@
 interface
 
 uses
-  Winapi.Windows,
-  Winapi.Messages,
   System.SysUtils,
   System.Classes,
   System.IniFiles,
   System.Types,
   System.Math,
-  Vcl.Dialogs,
-  Vcl.Graphics,
-  Vcl.Controls,
-  Vcl.Forms,
   Vcl.ExtCtrls,
-  Vcl.StdCtrls,
-  Vcl.ComCtrls,
   RggStrings,
   RggTypes,
   RggCalc,
@@ -48,9 +40,19 @@ type
   private
     FShowAll: Boolean;
   public
-    procedure DrawPaintBoxK(Canvas: TCanvas; Rect: TRect); virtual; abstract;
+    Image: TImage;
+    procedure Draw; virtual; abstract;
     procedure GetTestKurven; virtual; abstract;
     property ShowAll: Boolean read FShowAll write FShowAll;
+  end;
+
+  TMastGraph0 = class
+  public
+    FLineCountM: Integer;
+    LineData: TLineDataR100; { Durchbiegungswerte in mm }
+    GetriebeOK: Boolean;
+    Image: TImage;
+    procedure Draw; virtual; abstract;
   end;
 
   TMast = class(TGetriebeFS)
@@ -64,6 +66,7 @@ type
     FKorrigiert: Boolean;
     FMastOK: Boolean;
     FKraftGraph: TKraftGraph0;
+    FMastGraph: TMastGraph0;
 
     procedure CalcW1W2;
     procedure CalcW1;
@@ -77,6 +80,8 @@ type
     procedure SetShowAll(Value: Boolean);
     function GetKraftGraph: TKraftGraph0;
     procedure SetKraftGraph(Value: TKraftGraph0);
+    function GetMastGraph: TMastGraph0;
+    procedure SetMastGraph(Value: TMastGraph0);
     function GetKoppelFaktor: double;
     procedure SolveKG21(KM, KU1, KU2, KB: TRealPoint; var FU1, FU2, FB: double);
 
@@ -138,8 +143,8 @@ type
     procedure SchnittKraefte;
     procedure ResetMastStatus;
     function MastStatusText: string;
-    procedure DrawPaintBoxK(Canvas: TCanvas; Rect: TRect);
-    procedure DrawMastLine(Canvas: TCanvas; Rect: TRect);
+    procedure UpdateKraftGraph;
+    procedure UpdateMastGraph;
     procedure GetTestKurven;
     procedure GetMastPositionE;
 
@@ -155,13 +160,15 @@ type
     property CalcTyp: TCalcTyp read FCalcTyp write FCalcTyp;
     property MastLinie: TLineDataR100 read LineData write LineData;
     property KraftGraph: TKraftGraph0 read GetKraftGraph write SetKraftGraph;
+    property MastGraph: TMastGraph0 read GetMastGraph write SetMastGraph;
   end;
 
 implementation
 
 uses
   RiggVar.App.Main,
-  RggKraft;
+  RggMastGraph,
+  RggKraftGraph;
 
 { TMast }
 
@@ -182,12 +189,29 @@ end;
 
 destructor TMast.Destroy;
 begin
-  if Assigned(FKraftGraph) then
-  begin
-    FKraftGraph.Free;
-    FKraftGraph := nil;
-  end;
+  FKraftGraph.Free;
+  FKraftGraph := nil;
+
+  FMastGraph.Free;
+  FMastGraph := nil;
+
   inherited Destroy;
+end;
+
+function TMast.GetMastGraph;
+begin
+  if not Assigned(FMastGraph) then
+    FMastGraph := TRggMastGraph.Create;
+  result := FMastGraph;
+end;
+
+procedure TMast.SetMastGraph(Value: TMastGraph0);
+begin
+  if Value <> FMastGraph then
+  begin
+    FMastGraph.Free;
+    FMastGraph := Value;
+  end;
 end;
 
 function TMast.GetKraftGraph;
@@ -1124,89 +1148,17 @@ begin
   KraftGraph.GetTestKurven;
 end;
 
-procedure TMast.DrawPaintBoxK(Canvas: TCanvas; Rect: TRect);
+procedure TMast.UpdateKraftGraph;
 begin
-  KraftGraph.DrawPaintBoxK(Canvas, Rect);
+  KraftGraph.Draw;
 end;
 
-procedure TMast.DrawMastLine(Canvas: TCanvas; Rect: TRect);
-var
-  Pos: TPoint;
-  min, max, Mitte: double;
-  i: Integer;
-  bmp: TBitmap;
-  PlotLine: Linie;
-  StraightLine: Boolean;
+procedure TMast.UpdateMastGraph;
 begin
-  { Skalieren:  PlotLine soll Integerbereich gut ausfüllen.
-  Es ist garantiert, daß Anfangs- und Endpunkt der Linie
-  Null sind }
-  StraightLine := False;
-  max := LineData[0];
-  min := max;
-  for i := 0 to FLineCountM do
-  begin
-    if LineData[i] > max then max := LineData[i];
-    if LineData[i] < min then min := LineData[i];
-  end;
-  if max = min then
-    StraightLine := True
-  else
-  begin
-    Mitte := abs(max-min)/2 + min;
-    for i := 0 to FLineCountM do
-    begin
-      PlotLine[i].x := Round( 1000 * (LineData[i]-Mitte)/abs(max-min) ) + 1000;
-      PlotLine[i].y := 20 * i; {von 0 bis 2000}
-    end;
-  end;
-
-  bmp := TBitmap.Create;
-  with bmp do
-  begin
-    Width := Rect.Right - Rect.Left;
-    Height := Rect.Bottom - Rect.Top;
-  end;
-  try
-    PaintBackGround(bmp);
-
-    with Rect do
-    begin
-      Pos.x := Left + (Right-Left) div 2;
-      Pos.y := Top + (Bottom-Top) div 2;
-    end;
-
-    with bmp.Canvas do
-    begin
-      SetMapMode(Handle, MM_ANISOTROPIC);
-      SetWindowExtEx(Handle, 2200, -2200, nil);
-      SetWindowOrgEx(Handle, 1000, 1000, nil);
-      SetViewPortExtEx(Handle, bmp.Width, bmp.Height, nil);
-      SetViewPortOrgEx(Handle, Pos.x, Pos.y, nil);
-
-      {Mastbiegekurve zeichnen}
-      Pen.Color := clBlue;
-      if StraightLine or not GetriebeOK then begin
-        MoveTo(1000, 0); LineTo(1000, 2000);
-      end else
-        PolyLine(PlotLine);
-
-      SetMapMode(Handle, MM_TEXT);
-      {SetWindowExtEx(Handle, 1, 1, nil);}
-      SetWindowOrgEx(Handle, 0, 0, nil);
-      {SetWindowExtEx(Handle, 1, 1, nil);}
-      SetViewPortOrgEx(Handle, 0, 0, nil);
-    end;
-
-    with Canvas do
-    begin
-      CopyMode := cmSrcCopy;
-      Draw(0, 0, bmp);
-    end;
-
-  finally
-    bmp.Free;
-  end;
+  MastGraph.LineData := LineData;
+  MastGraph.FLineCountM := FLineCountM;
+  MastGraph.GetriebeOK := GetriebeOK;
+  MastGraph.Draw;
 end;
 
 end.
