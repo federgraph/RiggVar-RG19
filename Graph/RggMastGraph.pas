@@ -12,22 +12,23 @@ uses
   Vcl.ExtCtrls;
 
 type
-  TRggMastGraph = class(TMastGraph0)
+  TMastGraph = class(TMastGraphModel)
   private
     procedure PaintBackGround(g: TCanvas);
   public
+    Image: TImage;
     Bitmap: TBitmap;
     Width: Integer;
     Height: Integer;
     constructor Create;
     destructor Destroy; override;
     procedure DrawMastLine(g: TCanvas);
-    procedure Draw; override;
+    procedure Draw;
   end;
 
 implementation
 
-procedure TRggMastGraph.PaintBackGround(g: TCanvas);
+procedure TMastGraph.PaintBackGround(g: TCanvas);
 var
   R: TRect;
 begin
@@ -36,7 +37,7 @@ begin
   g.FillRect(R);
 end;
 
-procedure TRggMastGraph.DrawMastLine(g: TCanvas);
+procedure TMastGraph.DrawMastLine(g: TCanvas);
 var
   Pos: TPoint;
   min, max, Mitte: double;
@@ -93,7 +94,7 @@ begin
   SetViewPortOrgEx(g.Handle, 0, 0, nil);
 end;
 
-constructor TRggMastGraph.Create;
+constructor TMastGraph.Create;
 begin
   Width := 60;
   Height := 163;
@@ -103,13 +104,13 @@ begin
   Bitmap.Height := Height;
 end;
 
-destructor TRggMastGraph.Destroy;
+destructor TMastGraph.Destroy;
 begin
   Bitmap.Free;
   inherited;
 end;
 
-procedure TRggMastGraph.Draw;
+procedure TMastGraph.Draw;
 begin
   if Image = nil then
     Exit;

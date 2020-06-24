@@ -391,23 +391,10 @@ const
     'Big' // BigStep
     );
 
-procedure PaintBackGround(Image: TBitmap);
 procedure InitYAchseRecordList(var RecordList: TYAchseRecordList);
 function StrToRiggPoint(const s: string): TRiggPoint;
 
 implementation
-
-procedure PaintBackGround(Image: TBitMap);
-var
-  R: TRect;
-begin
-  R := Rect(0, 0, Image.Width, Image.Height);
-  with Image.Canvas do 
-  begin
-    Brush.Color := clBtnFace;
-    FillRect(R);
-  end;
-end;
 
 procedure TRiggMetafile.Draw(ACanvas: TCanvas; const Rect: TRect);
 var

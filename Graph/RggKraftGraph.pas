@@ -25,8 +25,11 @@ uses
   RggUnit2;
 
 type
-  TKraftGraph = class(TKraftGraph0)
+  TLineDataR150 = array[0..150] of double;
+
+  TKraftGraph = class
   private
+    FShowAll: Boolean;
     FOffsetX, FOffsetY: Integer;
     FZoomX, FZoomY: double;
     FPunktPos: TPoint;
@@ -46,7 +49,9 @@ type
     function GetControllerTyp: TControllerTyp;
     procedure InitBitmap;
     procedure PaintBackGround(g: TCanvas);
+    procedure SetImage(const Value: TImage);
   protected
+    FImage: TImage;
     Bitmap: TBitmap;
     Width: Integer;
     Height: Integer;
@@ -54,13 +59,14 @@ type
     Mast: TMast;
     constructor Create(AMast: TMast); virtual;
     destructor Destroy; override;
-    procedure Draw; override;
-    procedure GetTestKurven; override;
+    procedure Draw;
+    procedure GetTestKurven;
     property KoppelFaktor: double read GetKoppelFaktor;
     property SalingAlpha: double read GetSalingAlpha;
     property Korrigiert: Boolean read GetKorrigiert;
     property ControllerTyp: TControllerTyp read GetControllerTyp;
-//    property Image: TImage read FImage write SetImage;
+    property Image: TImage read FImage write SetImage;
+    property ShowAll: Boolean read FShowAll write FShowAll;
   end;
 
 implementation
@@ -114,6 +120,11 @@ begin
   R := Rect(0, 0, Width, Height);
   g.Brush.Color := clBtnFace;
   g.FillRect(R);
+end;
+
+procedure TKraftGraph.SetImage(const Value: TImage);
+begin
+  FImage := Value;
 end;
 
 procedure TKraftGraph.DrawGraph(g: TCanvas);

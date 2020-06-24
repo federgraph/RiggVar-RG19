@@ -25,7 +25,7 @@ uses
   RggTypes,
   RggGetriebeGraph,
   RggMatrix,
-  Rggunit4,
+  RggUnit4,
   RggPrinter,
   RggPreview,
   FrmIndicator,

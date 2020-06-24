@@ -25,6 +25,8 @@ uses
   RggRota,
   RggTypes,
   RggGetriebeGraph,
+  RggKraftGraph,
+  RggMastGraph,
   RggUnit4,
   RggReport,
   RggCalc,
@@ -175,6 +177,9 @@ type
 
     AutoSave: Boolean;
     AllreadyUpdatedGetriebeFlag: Boolean;
+
+    MastGraph: TMastGraph;
+    KraftGraph: TKraftGraph;
 
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -400,6 +405,9 @@ begin
   StraightLine;
   DrawChart;
 
+  MastGraph := TMastGraph.Create;
+  KraftGraph := TKraftGraph.Create(Rigg);
+
   NeedPaint := True;
 //  if Main <> nil then
 //  begin
@@ -410,6 +418,8 @@ end;
 
 destructor TRiggModul.Destroy;
 begin
+  MastGraph.Free;
+  KraftGraph.Free;
   GetriebeGraph.Transformer.Rotator.Free;
   GetriebeGraph.Transformer.Free;
   GetriebeGraph.Free;
@@ -916,8 +926,9 @@ begin
   else
     Exit;
   end;
-  Rigg.MastGraph.Image := img;
-  Rigg.UpdateMastGraph;
+  Rigg.UpdateMastGraph(MastGraph);
+  MastGraph.Image := img;
+  MastGraph.Draw;
 end;
 
 procedure TRiggModul.AusgabeText;
@@ -2572,11 +2583,11 @@ end;
 procedure TRiggModul.TestBtnClick;
 begin
   Screen.Cursor := crHourGlass;
-  Rigg.GetTestKurven;
+  KraftGraph.GetTestKurven;
   if Assigned(KraftPaintBox) then
   begin
-    Rigg.KraftGraph.Image := KraftPaintBox;
-    Rigg.UpdateKraftGraph;
+    KraftGraph.Image := KraftPaintBox;
+    KraftGraph.Draw;
   end;
   Screen.Cursor := crDefault;
 end;

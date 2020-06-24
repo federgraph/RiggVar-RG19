@@ -24,35 +24,20 @@ uses
   System.IniFiles,
   System.Types,
   System.Math,
-  Vcl.ExtCtrls,
   RggStrings,
   RggTypes,
   RggCalc,
-  RggSchnittKK,
   RggUnit1;
 
 type
   TKurvenTyp = (KurveOhneController, KurveMitController);
-  TLineDataR150 = array[0..150] of double;
   TMastStatusSet = set of TMastStatus;
 
-  TKraftGraph0 = class
-  private
-    FShowAll: Boolean;
-  public
-    Image: TImage;
-    procedure Draw; virtual; abstract;
-    procedure GetTestKurven; virtual; abstract;
-    property ShowAll: Boolean read FShowAll write FShowAll;
-  end;
-
-  TMastGraph0 = class
+  TMastGraphModel = class
   public
     FLineCountM: Integer;
     LineData: TLineDataR100; { Durchbiegungswerte in mm }
     GetriebeOK: Boolean;
-    Image: TImage;
-    procedure Draw; virtual; abstract;
   end;
 
   TMast = class(TGetriebeFS)
@@ -64,9 +49,6 @@ type
     FCalcTyp: TCalcTyp;
     FMastStatus: TMastStatusSet;
     FKorrigiert: Boolean;
-    FMastOK: Boolean;
-    FKraftGraph: TKraftGraph0;
-    FMastGraph: TMastGraph0;
 
     procedure CalcW1W2;
     procedure CalcW1;
@@ -76,12 +58,6 @@ type
     procedure FanIn;
     procedure FanOut;
     procedure GetEpsilon;
-    function GetShowAll: Boolean;
-    procedure SetShowAll(Value: Boolean);
-    function GetKraftGraph: TKraftGraph0;
-    procedure SetKraftGraph(Value: TKraftGraph0);
-    function GetMastGraph: TMastGraph0;
-    procedure SetMastGraph(Value: TMastGraph0);
     function GetKoppelFaktor: double;
     procedure SolveKG21(KM, KU1, KU2, KB: TRealPoint; var FU1, FU2, FB: double);
 
@@ -132,7 +108,6 @@ type
     FControllerAlpha: double; { in mm/N }
 
     constructor Create;
-    destructor Destroy; override;
 
     procedure CalcWKnick;
     procedure GetSalingWeg;
@@ -143,10 +118,9 @@ type
     procedure SchnittKraefte;
     procedure ResetMastStatus;
     function MastStatusText: string;
-    procedure UpdateKraftGraph;
-    procedure UpdateMastGraph;
-    procedure GetTestKurven;
     procedure GetMastPositionE;
+
+    procedure UpdateMastGraph(Model: TMastGraphModel);
 
     property MastEI: Integer read GetEI write SetEI;
     property MastStatus: TMastStatusSet read FMastStatus;
@@ -155,20 +129,15 @@ type
     property SalingAlpha: double read FSalingAlpha;
     property Korrigiert: Boolean read FKorrigiert write FKorrigiert;
     property MastOK: Boolean read FMastOK;
-    property ShowAll: Boolean read GetShowAll write SetShowAll;
     property ControllerTyp: TControllerTyp read FControllerTyp write FControllerTyp;
     property CalcTyp: TCalcTyp read FCalcTyp write FCalcTyp;
     property MastLinie: TLineDataR100 read LineData write LineData;
-    property KraftGraph: TKraftGraph0 read GetKraftGraph write SetKraftGraph;
-    property MastGraph: TMastGraph0 read GetMastGraph write SetMastGraph;
   end;
 
 implementation
 
 uses
-  RiggVar.App.Main,
-  RggMastGraph,
-  RggKraftGraph;
+  RiggVar.App.Main;
 
 { TMast }
 
@@ -185,62 +154,6 @@ begin
   { Achtung: inherited Create() ruft virtuelle Funktionen auf, deshalb muß
    z.Bsp. EI vorher initialisiert werden, sonst Division durch Null! }
   inherited Create;
-end;
-
-destructor TMast.Destroy;
-begin
-  FKraftGraph.Free;
-  FKraftGraph := nil;
-
-  FMastGraph.Free;
-  FMastGraph := nil;
-
-  inherited Destroy;
-end;
-
-function TMast.GetMastGraph;
-begin
-  if not Assigned(FMastGraph) then
-    FMastGraph := TRggMastGraph.Create;
-  result := FMastGraph;
-end;
-
-procedure TMast.SetMastGraph(Value: TMastGraph0);
-begin
-  if Value <> FMastGraph then
-  begin
-    FMastGraph.Free;
-    FMastGraph := Value;
-  end;
-end;
-
-function TMast.GetKraftGraph;
-begin
-  if not Assigned(FKraftGraph) then
-    FKraftGraph := TKraftGraph.Create(Self);
-  result := FKraftGraph;
-end;
-
-procedure TMast.SetKraftGraph(Value: TKraftGraph0);
-begin
-  if Value <> FKraftGraph then
-  begin
-    FKraftGraph.Free;
-    FKraftGraph := Value;
-  end;
-end;
-
-function TMast.GetShowAll: Boolean;
-begin
-  result := False;
-  if Assigned(FKraftGraph) then
-    result := FKraftGraph.ShowAll;
-end;
-
-procedure TMast.SetShowAll(Value: Boolean);
-begin
-  if Assigned(FKraftGraph) then
-    FKraftGraph.ShowAll := Value;
 end;
 
 procedure TMast.SetEI(Value: Integer);
@@ -1143,22 +1056,11 @@ begin
   MastPositionE := PositionEStrich;
 end;
 
-procedure TMast.GetTestKurven;
+procedure TMast.UpdateMastGraph(Model: TMastGraphModel);
 begin
-  KraftGraph.GetTestKurven;
-end;
-
-procedure TMast.UpdateKraftGraph;
-begin
-  KraftGraph.Draw;
-end;
-
-procedure TMast.UpdateMastGraph;
-begin
-  MastGraph.LineData := LineData;
-  MastGraph.FLineCountM := FLineCountM;
-  MastGraph.GetriebeOK := GetriebeOK;
-  MastGraph.Draw;
+  Model.LineData := LineData;
+  Model.FLineCountM := FLineCountM;
+  Model.GetriebeOK := GetriebeOK;
 end;
 
 end.
