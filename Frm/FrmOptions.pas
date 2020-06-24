@@ -98,8 +98,8 @@ type
     GroupBoxMast: TGroupBox;
     GroupBoxTrimm: TGroupBox;
     GroupBoxMaterial: TGroupBox;
-    CalcBtn: TSpeedButton;
-    ApplyBtn: TSpeedButton;
+    WriteMemoBtn: TSpeedButton;
+    ReadMemoBtn: TSpeedButton;
     Image: TImage;
     procedure MastMassEditExit(Sender: TObject);
     procedure MastMassEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -123,9 +123,9 @@ type
     procedure RumpfSpinEditEnter(Sender: TObject);
     procedure RumpfSpinEditExit(Sender: TObject);
     procedure RumpfSpinEditChanging(Sender: TObject; var AllowChange: Boolean);
-    procedure ApplyBtnClick(Sender: TObject);
+    procedure ReadMemoBtnClick(Sender: TObject);
     procedure CancelBtnClick(Sender: TObject);
-    procedure CalcBtnClick(Sender: TObject);
+    procedure WriteMemoBtnClick(Sender: TObject);
     procedure EvalOptionBtnClick(Sender: TObject);
     procedure Kraft1EditChange(Sender: TObject);
     procedure rbKonstanteClick(Sender: TObject);
@@ -303,7 +303,7 @@ begin
       itBezier: rbBezier.Checked := True;
     end;
   FTrimmTabelle.GetMemoLines(TrimmMemo.Lines);
-  ApplyBtnClick(Self);
+  ReadMemoBtnClick(Self);
 end;
 
 procedure TOptionForm.FillInifileLists;
@@ -742,7 +742,7 @@ begin
   RumpfEdit.Color := clBtnFace;
 end;
 
-procedure TOptionForm.ApplyBtnClick(Sender: TObject);
+procedure TOptionForm.ReadMemoBtnClick(Sender: TObject);
 var
   Temp: TPoint;
 begin
@@ -823,7 +823,7 @@ begin
   DrawTrimmTab;
 end;
 
-procedure TOptionForm.CalcBtnClick(Sender: TObject);
+procedure TOptionForm.WriteMemoBtnClick(Sender: TObject);
 begin
   FTrimmTabelle.GetMemoLines(TrimmMemo.Lines);
 end;

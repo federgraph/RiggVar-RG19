@@ -24,6 +24,7 @@ uses
   System.Types,
   System.Inifiles,
   System.Math,
+  System.UIConsts,
   RggVector,
   RggTypes;
 

@@ -546,7 +546,6 @@ object OptionForm: TOptionForm
     end
     object tsTabelle: TTabSheet
       Caption = 'Tabelle'
-      ExplicitLeft = 0
       object MemoLabel: TLabel
         Left = 8
         Top = 9
@@ -596,21 +595,21 @@ object OptionForm: TOptionForm
         ShowHint = True
         OnClick = EvalOptionBtnClick
       end
-      object CalcBtn: TSpeedButton
+      object WriteMemoBtn: TSpeedButton
         Left = 143
         Top = 101
         Width = 25
         Height = 25
         Caption = '<'
-        OnClick = CalcBtnClick
+        OnClick = WriteMemoBtnClick
       end
-      object ApplyBtn: TSpeedButton
+      object ReadMemoBtn: TSpeedButton
         Left = 143
         Top = 55
         Width = 25
         Height = 25
         Caption = '>'
-        OnClick = ApplyBtnClick
+        OnClick = ReadMemoBtnClick
       end
       object Image: TImage
         Left = 184
