@@ -185,6 +185,10 @@ end;
 function TRggReportManager.GetItemIndexOfReport(const Value: TRggReport): Integer;
 begin
   result := RDI[Value];
+  if (result = 0) and (Value <> rgLog) then
+  begin
+    result := RDI[rgNone];
+  end;
 end;
 
 procedure TRggReportManager.SetCurrentIndex(const Value: Integer);

@@ -60,7 +60,11 @@ type
     fpBiegung,
     fpD0X,
     fpT1,
-    fpT2
+    fpT2,
+    fpAPW,
+    fpEAH,
+    fpEAR,
+    fpEI
     );
 
 const
