@@ -27,22 +27,96 @@ uses
   RiggVar.RG.Def,
   RiggVar.RG.Track,
   RiggVar.RG.Graph,
+  RiggVar.Util.Logger,
   RggStrings,
   RggRaumGraph,
   RggRota,
   RggScroll,
   RggTypes,
   RggUnit4,
-  RggCalc;
+  RggCalc,
+  RggDoc;
 
 type
   TFederAction = Integer;
 
-  TRggMain0 = class
-  protected
-    FAction: TFederAction;
-    FParam: TFederParam;
+  TRggRigg = class
+  public
+    Rigg: TRigg;
+    IsUp: Boolean;
+  end;
 
+  TRggText = class(TRggRigg)
+  protected
+    FL: TStringList;
+    function GetFLText: string;
+    procedure CopyText;
+  public
+    Logger: TLogger;
+    constructor Create;
+    destructor Destroy; override;
+    property FLText: string read GetFLText;
+  end;
+
+  TRggParam = class(TRggText)
+  private
+    FParam: TFederParam;
+    procedure SetParam(Value: TFederParam); virtual; abstract;
+  public
+    FactArray: TRggFA; // not owned, cached from Rigg
+    property Param: TFederParam read FParam write SetParam;
+  end;
+
+  TRggTrimm = class(TRggParam)
+  protected
+    FTrimm: Integer;
+    function GetCurrentTrimm: TRggData;
+    procedure SetTrimm(const Value: Integer);
+    procedure SetTrimmNoChange(const Value: Integer);
+    procedure InitTrimmData;
+  public
+    RggData: TRggData; // temp object for data transfer
+
+    { slot used as reference for diffing }
+    Trimm0: TRggData;
+
+    { user data slots }
+    Trimm1: TRggData; // selected with button T1
+    Trimm2: TRggData; // selected with button T2
+    Trimm3: TRggData;
+    Trimm4: TRggData;
+    Trimm5: TRggData;
+    Trimm6: TRggData;
+
+    { example data slots }
+    Trimm7: TRggData; // 420
+    Trimm8: TRggData; // Logo
+
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure LoadTrimm(fd: TRggData);
+    procedure SaveTrimm(fd: TRggData);
+
+    function GetTrimmItem(i: Integer): TRggData;
+    function GetTrimmItemReport(ReportID: Integer): string;
+    function GetTrimmItemReportData: string;
+    function GetTrimmItemReportJson: string;
+    function GetTrimmItemReportShort: string;
+    function GetTrimmItemReportLong: string;
+
+    property CurrentTrimm: TRggData read GetCurrentTrimm;
+    property TrimmNoChange: Integer read FTrimm write SetTrimmNoChange;
+    property Trimm: Integer read FTrimm write SetTrimm;
+
+    property TrimmData: string read GetTrimmItemReportData;
+    property TrimmJson: string read GetTrimmItemReportJson;
+    property TrimmShort: string read GetTrimmItemReportShort;
+    property TrimmLong: string read GetTrimmItemReportLong;
+  end;
+
+  TRggWheel = class(TRggTrimm)
+  protected
     function GetBigStep: single;
     function GetSmallStep: single;
     procedure TrackBarChange(Sender: TObject);
@@ -61,14 +135,12 @@ type
     procedure DoZoom(Delta: single);
     procedure DoRotation(Delta: single);
 
-    procedure DoBigWheel(Delta: single);
-    procedure DoSmallWheel(Delta: single);
-    procedure DoRasterWheel(Delta: single);
-
-    procedure ViewportChanged(Sender: TObject);
+    procedure DoBigWheelRG(Delta: single);
+    procedure DoSmallWheelRG(Delta: single);
+    procedure DoRasterWheelRG(Delta: single);
   end;
 
-  TRggMain = class(TRggMain0)
+  TRggMain = class(TRggWheel)
   private
     FFixPoint: TRiggPoint;
     FixPunkt: TRealPoint;
@@ -87,7 +159,7 @@ type
 
     procedure ChangeRigg(Value: single);
 
-    procedure SetParam(Value: TFederParam);
+    procedure SetParam(Value: TFederParam); override;
     procedure SetParamValue(idx: TFederParam; Value: single);
     function GetParamValue(idx: TFederParam): single;
     procedure SetFixPoint(const Value: TRiggPoint);
@@ -105,6 +177,7 @@ type
     function GetHullVisible: Boolean;
     procedure SetOnUpdateGraph(const Value: TNotifyEvent);
   protected
+    FAction: TFederAction;
     procedure InitFactArray;
     procedure RggSpecialDoOnTrackBarChange; override;
   public
@@ -113,12 +186,9 @@ type
     IstValCaption: string;
     ParamCaption: string;
 
-    Rigg: TRigg; // owned, passed in via constructor
-    FactArray: TRggFA; // not owned, cached from Rigg
-
     Demo: Boolean;
 
-    StrokeRigg: TRotaForm; // injected, not owned
+    StrokeRigg: TRotaForm; // injected
 
     RiggLED: Boolean;
     StatusText: string;
@@ -127,15 +197,12 @@ type
 
     UpdateTextCounter: Integer;
 
-    constructor Create(ARigg: TRigg);
+    constructor Create;
     destructor Destroy; override;
 
     procedure Reset;
     procedure UpdateGetriebe;
     procedure UpdateGraph;
-
-    procedure LoadTrimm(fd: TRggData);
-    procedure SaveTrimm(fd: TRggData);
 
     procedure Init;
     procedure InitStrokeRigg;
@@ -165,10 +232,11 @@ type
     procedure SetParameter(fa: TFederAction);
     procedure SetOption(fa: TFederAction);
 
+    procedure ViewportChanged(Sender: TObject);
+
     property Action: TFederAction read FAction;
     property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
-    property Param: TFederParam read FParam write SetParam;
     property ParamValue[index: TFederParam]: single read GetParamValue write SetParamValue;
     property ParamValueString[index: TFederParam]: string read GetParamValueString;
     property ParamValueStringDiff[index: TFederParam]: string read GetParamValueStringDiff;
@@ -183,24 +251,23 @@ type
 implementation
 
 uses
-  RggDoc,
-  RggModul,
-  RiggVar.App.Main;
+  Clipbrd,
+//  FrmMain,
+  RggModul;
 
 const
   tfs = '%-3s %s %8s %6s';
 
 { TRggMain }
 
-constructor TRggMain.Create(ARigg: TRigg);
+constructor TRggMain.Create;
 begin
-  inherited Create;
+  inherited;
 
   InitialFixPoint := ooD;
 
   Demo := False;
 
-  Rigg := ARigg;
   FactArray := Rigg.GSB;
   Rigg.ControllerTyp := ctOhne;
   Init;
@@ -208,7 +275,6 @@ end;
 
 destructor TRggMain.Destroy;
 begin
-//  StrokeRigg.Free; // not owned, do this in FormMain where RotaForm is owned
   Rigg.Free;
   inherited;
 end;
@@ -537,7 +603,7 @@ var
   tv: single;
   fd: TRggData;
 begin
-  fd := Main.Trimm0;
+  fd := Trimm0;
   tv := FactArray.Find(fp).Ist;
   case fp of
     fpD0X: tv := tv - fd.D0X;
@@ -560,8 +626,6 @@ end;
 
 procedure TRggMain.SetParam(Value: TFederParam);
 begin
-//  Main.Param := Integer(Value);
-
   if Demo then
   begin
     InitFactArray;
@@ -871,7 +935,7 @@ end;
 //  end;
 //end;
 
-procedure TRggMain.LoadTrimm(fd: TRggData);
+procedure TRggTrimm.LoadTrimm(fd: TRggData);
 var
   temp, tempH, tempA: single;
   i: TFederParam;
@@ -968,7 +1032,7 @@ begin
   SetParam(FParam);
 end;
 
-procedure TRggMain.SaveTrimm(fd: TRggData);
+procedure TRggTrimm.SaveTrimm(fd: TRggData);
 begin
   Rigg.SaveToFederData(fd);
 
@@ -1026,8 +1090,8 @@ begin
   SetParam(FParam);
   FixPoint := ooD;
 
-  SaveTrimm(Main.Trimm7);
-  Main.TrimmNoChange := 7;
+  SaveTrimm(Trimm7);
+  TrimmNoChange := 7;
 end;
 
 procedure TRggMain.InitLogo;
@@ -1047,8 +1111,8 @@ begin
   SetParam(FParam);
   FixPoint := ooD;
 
-  SaveTrimm(Main.Trimm8);
-  Main.TrimmNoChange := 8;
+  SaveTrimm(Trimm8);
+  TrimmNoChange := 8;
 end;
 
 procedure TRggMain.InitSalingTyp(fa: Integer);
@@ -1227,31 +1291,32 @@ end;
 
 { TRggMain0 }
 
-constructor TRggMain0.Create;
+constructor TRggWheel.Create;
 begin
+  inherited;
   RggTrackbar := TFederTrackbar.Create;
 end;
 
-destructor TRggMain0.Destroy;
+destructor TRggWheel.Destroy;
 begin
   RggTrackbar.Free;
   inherited;
 end;
 
-procedure TRggMain0.TrackBarChange(Sender: TObject);
+procedure TRggWheel.TrackBarChange(Sender: TObject);
 begin
   RggSpecialDoOnTrackBarChange;
 end;
 
-procedure TRggMain0.RggSpecialDoOnTrackBarChange;
+procedure TRggWheel.RggSpecialDoOnTrackBarChange;
 begin
 end;
 
-procedure TRggMain0.DoRasterWheel(Delta: single);
+procedure TRggWheel.DoRasterWheelRG(Delta: single);
 begin
 end;
 
-procedure TRggMain0.DoSmallWheel(Delta: single);
+procedure TRggWheel.DoSmallWheelRG(Delta: single);
 var
   f: single;
 begin
@@ -1262,7 +1327,7 @@ begin
     DoWheel(-f);
 end;
 
-procedure TRggMain0.DoBigWheel(Delta: single);
+procedure TRggWheel.DoBigWheelRG(Delta: single);
 var
   f: single;
 begin
@@ -1273,29 +1338,29 @@ begin
     DoWheel(-f);
 end;
 
-procedure TRggMain0.DoWheel(Delta: single);
+procedure TRggWheel.DoWheel(Delta: single);
 begin
 //  RggTrackbar.Value := RggTrackbar.Value + Delta; // --> UpdateGraph;
   RggTrackbar.Delta := Delta;
 end;
 
-procedure TRggMain0.DoRotation(Delta: single);
+procedure TRggWheel.DoRotation(Delta: single);
 begin
   UpdateText;
 end;
 
-procedure TRggMain0.DoZoom(Delta: single);
+procedure TRggWheel.DoZoom(Delta: single);
 begin
   UpdateText;
 end;
 
-procedure TRggMain0.ViewportChanged(Sender: TObject);
+procedure TRggMain.ViewportChanged(Sender: TObject);
 begin
-  if Main.IsUp then
+  if IsUp then
     UpdateText;
 end;
 
-function TRggMain0.GetBigStep: single;
+function TRggWheel.GetBigStep: single;
 begin
   case FParam of
     fpWante: result := 5;
@@ -1306,16 +1371,16 @@ begin
   end;
 end;
 
-function TRggMain0.GetSmallStep: single;
+function TRggWheel.GetSmallStep: single;
 begin
   result := 1;
 end;
 
-procedure TRggMain0.UpdateText(ClearFlash: Boolean);
+procedure TRggWheel.UpdateText(ClearFlash: Boolean);
 begin
 end;
 
-procedure TRggMain0.TestStream;
+procedure TRggWheel.TestStream;
 var
   d: TRggDocument;
 begin
@@ -1429,8 +1494,8 @@ end;
 procedure TRggMain.UpdateTrimmText(ML: TStrings);
 begin
   ML.Clear;
-  ML.Add('Trimm = ' + IntToStr(Main.Trimm));
-  ML.Add('Name = ' + Main.CurrentTrimm.Name);
+  ML.Add('Trimm = ' + IntToStr(Trimm));
+  ML.Add('Name = ' + CurrentTrimm.Name);
   if Action = faPan then
   begin
     ML.Add('Param = Pan');
@@ -1456,12 +1521,12 @@ end;
 
 procedure TRggMain.UpdateJsonText(ML: TStrings);
 begin
-  ML.Text := Main.TrimmJson;
+  ML.Text := TrimmJson;
 end;
 
 procedure TRggMain.UpdateDataText(ML: TStrings);
 begin
-  ML.Text := Main.TrimmData;
+  ML.Text := TrimmData;
 end;
 
 procedure TRggMain.UpdateGetriebe;
@@ -1469,6 +1534,204 @@ begin
   RiggModul.UpdateGetriebe;
   RiggLED := Rigg.RiggOK;
   Draw;
+end;
+
+{ TRggTrimm }
+
+procedure TRggTrimm.SetTrimmNoChange(const Value: Integer);
+begin
+  Logger.Info('SetTrimmNoChange: ' + IntToStr(Value));
+  FTrimm := Value;
+end;
+
+procedure TRggTrimm.SetTrimm(const Value: Integer);
+begin
+  RiggModul.DoResetForTrimmData;
+  Logger.Info('SetTrimm: ' + IntToStr(Value));
+  FTrimm := Value;
+  LoadTrimm(CurrentTrimm);
+//  FormMain.UpdateOnParamValueChanged;
+  RiggModul.UpdateGControls;
+
+end;
+
+constructor TRggTrimm.Create;
+begin
+  inherited;
+  RggData := TRggData.Create;
+  RggData.Name := 'fd';
+
+  Trimm0 := TRggData.Create;
+  Trimm0.Name := 'T0';
+  Trimm7 := TRggData.Create;
+  Trimm7.Name := '420';
+  Trimm8 := TRggData.Create;
+  Trimm8.Name := 'Logo';
+
+  Trimm1 := TRggData.Create;
+  Trimm2 := TRggData.Create;
+  Trimm3 := TRggData.Create;
+  Trimm4 := TRggData.Create;
+  Trimm5 := TRggData.Create;
+  Trimm6 := TRggData.Create;
+
+  InitTrimmData;
+
+  { this should be done after or when calling Init }
+//  InitLogo; // sets WantLogoData to true
+//  Init420; // resets WantLogo to false
+//  WantLogoData := False;
+end;
+
+destructor TRggTrimm.Destroy;
+begin
+  RggData.Free;
+  Trimm0.Free;
+  Trimm1.Free;
+  Trimm2.Free;
+  Trimm3.Free;
+  Trimm4.Free;
+  Trimm5.Free;
+  Trimm6.Free;
+  Trimm7.Free;
+  Trimm8.Free;
+  inherited;
+end;
+
+function TRggTrimm.GetCurrentTrimm: TRggData;
+begin
+  result := GetTrimmItem(FTrimm);
+end;
+
+function TRggTrimm.GetTrimmItem(i: Integer): TRggData;
+begin
+  case i of
+    1: result := Trimm1;
+    2: result := Trimm2;
+    3: result := Trimm3;
+    4: result := Trimm4;
+    5: result := Trimm5;
+    6: result := Trimm6;
+    7: result := Trimm7;
+    8: result := Trimm8;
+    else
+      result := Trimm0;
+  end;
+end;
+
+function TRggTrimm.GetTrimmItemReport(ReportID: Integer): string;
+begin
+  if Assigned(Rigg) and Assigned(RggData) and Assigned(FL) then
+  begin
+    Rigg.SaveToFederData(RggData);
+    FL.Clear;
+    case ReportID of
+      0: RggData.WriteReport(FL);
+      1: RggData.WriteJSon(FL);
+      2:
+      begin
+        RggData.WantAll := False;
+        RggData.SaveTrimmItem(FL);
+      end;
+      3:
+      begin
+        RggData.WantAll := True;
+        RggData.SaveTrimmItem(FL);
+      end;
+
+      else
+        RggData.WriteReport(FL);
+    end;
+    result := FL.Text;
+    FL.Clear;
+  end;
+end;
+
+function TRggTrimm.GetTrimmItemReportLong: string;
+begin
+  result := GetTrimmItemReport(3);
+end;
+
+function TRggTrimm.GetTrimmItemReportShort: string;
+begin
+  result := GetTrimmItemReport(2);
+end;
+
+function TRggTrimm.GetTrimmItemReportJson: string;
+begin
+  result := GetTrimmItemReport(1);
+end;
+
+function TRggTrimm.GetTrimmItemReportData: string;
+begin
+  result := GetTrimmItemReport(0);
+end;
+
+procedure TRggTrimm.InitTrimmData;
+var
+  fd: TRggData;
+begin
+  Logger.Info('in InitTrimmData ( default data )');
+  fd := Trimm0;
+  fd.Reset;
+
+  fd := Trimm1;
+  fd.Assign(Trimm0);
+  fd.Name := 'T1';
+  fd.MV := fd.MV + 10;
+
+  fd := Trimm2;
+  fd.Assign(Trimm0);
+  fd.Name := 'T2';
+  fd.WLPos := fd.WLPos + 20;
+
+  fd := Trimm3;
+  fd.Assign(Trimm0);
+  fd.Name := 'T3';
+  fd.VOPos := fd.VOPos + 30;
+
+  fd := Trimm4;
+  fd.Assign(Trimm0);
+  fd.Name := 'T4';
+  fd.SHPos := fd.SHPos + 40;
+
+  fd := Trimm5;
+  fd.Assign(Trimm0);
+  fd.Name := 'T5';
+  fd.SAPos := fd.SAPos + 50;
+
+  fd := Trimm6;
+  fd.Assign(Trimm0);
+  fd.Name := 'T6';
+  fd.VOPos := fd.VOPos + 60;
+  fd.WLPos := fd.WLPos - 20;
+end;
+
+{ TRggText }
+
+constructor TRggText.Create;
+begin
+  inherited;
+  FL := TStringList.Create;
+  Logger := TLogger.Create;
+end;
+
+destructor TRggText.Destroy;
+begin
+  Logger.Free;
+  FL.Free;
+  inherited;
+end;
+
+function TRggText.GetFLText: string;
+begin
+  result := FL.Text;
+end;
+
+procedure TRggText.CopyText;
+begin
+  Clipboard.AsText := FL.Text;
+  Logger.Info('in CopyText ( check clipboard )');
 end;
 
 end.

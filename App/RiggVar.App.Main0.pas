@@ -21,20 +21,16 @@ interface
 uses
   System.SysUtils,
   System.Classes,
-  RiggVar.Util.Logger;
+  RiggVar.RG.Main;
 
 type
-  TMain0 = class
+  TMain0 = class(TRggMain)
   protected
-    FL: TStringList;
-    procedure CopyText;
     procedure Viewpoint3;
     procedure ViewpointA;
     procedure ViewpointS;
     procedure ViewpointT;
   public
-    Logger: TLogger;
-    IsUp: Boolean;
     IsOrthoProjection: Boolean;
 
     Scale: single;
@@ -52,7 +48,7 @@ type
 implementation
 
 uses
-  Clipbrd,
+//  FrmMain,
   RggTypes,
   RggModul,
   RiggVar.App.Main;
@@ -64,22 +60,11 @@ begin
   inherited;
   Scale := MainVar.Scale;
   IsRetina := Scale > 1;
-
-  Logger := TLogger.Create;
-  FL := TStringList.Create;
 end;
 
 destructor TMain0.Destroy;
 begin
-  Logger.Free;
-  FL.Free;
   inherited;
-end;
-
-procedure TMain0.CopyText;
-begin
-  Clipboard.AsText := FL.Text;
-  Logger.Info('in CopyText ( check clipboard )');
 end;
 
 procedure TMain0.ViewpointS;

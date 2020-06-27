@@ -426,8 +426,6 @@ FormCreate1;
 end;
 
 procedure TFormRG19.FormCreate1;
-var
-  rggm: TRggMain;
 begin
   InputForm := TInputForm.Create(Application);
   OutputForm := TOutputForm.Create(Application);
@@ -442,13 +440,11 @@ begin
   RiggModul.SofortBtnDown := False;
   RiggModul.BtnGrauDown := True;
 
-  rggm := TRggMain.Create(RiggModul.Rigg);
-
-  Main := TMain.Create(rggm);
+  Main := TMain.Create(RiggModul.Rigg);
   Main.Logger.Verbose := True;
 
-  rggm.InitLogo; // sets WantLogoData to true
-  rggm.Init420; // sets WantLogo to false
+  Main.InitLogo; // sets WantLogoData to true
+  Main.Init420; // sets WantLogo to false
   WantLogoData := False;
 
   Caption := 'Rigg';
@@ -460,7 +456,7 @@ begin
   OnCloseQuery := FormCloseQuery;
 
   RotaForm := TRotaForm.Create;
-  rggm.StrokeRigg := RotaForm;
+  Main.StrokeRigg := RotaForm;
   RotaForm.PaintBox3D := PaintboxR;
   RotaForm.UseDisplayList := False;
   RotaForm.Init;
@@ -766,7 +762,7 @@ begin
     PaintBtn.Down := False;
     PaintBtn.Enabled := False;
   end;
-  Main.RggMain.Draw;
+  Main.Draw;
 end;
 
 procedure TFormRG19.SetControllerChecked(Value: Boolean);
@@ -774,7 +770,7 @@ begin
   ControllerItem.Checked := Value;
   ControllerBtn.Down := Value;
   RiggModul.ControllerBtnDown := Value;
-  RotaForm.RaumGraph.ControllerTyp := Main.RggMain.Rigg.ControllerTyp;
+  RotaForm.RaumGraph.ControllerTyp := Main.Rigg.ControllerTyp;
 //  RotaForm.RaumGraph.ControllerTyp := RiggModul.ControllerTyp;
   RotaForm.Draw;
 end;
@@ -1375,9 +1371,9 @@ begin
   sb.Caption := 'Hull';
   sb.Hint := 'Hull';
   sb.AllowAllUp := True;
-  sb.Down := Main.RggMain.StrokeRigg.RumpfItemChecked;
+  sb.Down := Main.StrokeRigg.RumpfItemChecked;
   sb.GroupIndex := 12;
-  sb.OnClick :=Main.RggMain.StrokeRigg.RumpfBtnClick;
+  sb.OnClick :=Main.StrokeRigg.RumpfBtnClick;
 
   sb := AddSpeedBtn('BuntBtn', 0);
   BuntBtn := sb;
@@ -1815,7 +1811,7 @@ procedure TFormRG19.InitParamCombo;
   var
     s: string;
   begin
-    s := Main.RggMain.Param2Text(fp);
+    s := Main.Param2Text(fp);
     ParamCombo.Items.AddObject(s, TObject(fp));
   end;
 begin
@@ -1886,7 +1882,7 @@ var
 begin
   ii := ParamCombo.ItemIndex;
   fp := TFederParam(ParamCombo.Items.Objects[ii]);
-  Main.RggMain.Param := fp;
+  Main.Param := fp;
   ShowTrimm;
 end;
 
@@ -1916,7 +1912,7 @@ end;
 
 procedure TFormRG19.ShowTrimm;
 begin
-  Main.RggMain.UpdateTrimmText(TL);
+  Main.UpdateTrimmText(TL);
   ShowCurrentReport;
 end;
 

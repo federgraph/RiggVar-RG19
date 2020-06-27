@@ -439,8 +439,6 @@ begin
 end;
 
 procedure TFormRG19B.FormCreate1;
-var
-  rggm: TRggMain;
 begin
   InputForm := TInputForm.Create(Application);
   OutputForm := TOutputForm.Create(Application);
@@ -453,9 +451,7 @@ begin
   RiggModul.BackgroundColor := TColors.Wheat; // call after RiggModul.Init
   RiggModul.PBG := GrafikForm.PaintBoxG;
 
-  rggm := TRggMain.Create(RiggModul.Rigg);
-
-  Main := TMain.Create(rggm);
+  Main := TMain.Create(RiggModul.Rigg);
   Main.Logger.Verbose := True;
 
 
@@ -471,7 +467,7 @@ begin
   RotaForm.PaintBox3D := PaintboxR;
   RotaForm.Init;
   PaintboxR := RotaForm.PaintBox3D;
-  Main.RggMain.StrokeRigg := RotaForm;
+  Main.StrokeRigg := RotaForm;
   RotaForm.IsUp := True;
 //  RotaForm.ViewPoint := vp3D;
   RotaForm.ZoomIndex := 8;
@@ -717,7 +713,7 @@ begin
   EntlastetItem.Checked := not EntlastetItem.Checked;
   BtnGrau.Down := EntlastetItem.Checked;
   RiggModul.BtnGrauDown := BtnGrau.Down;
-  Main.RggMain.Draw;
+  Main.Draw;
 end;
 
 procedure TFormRG19B.SetKoppelChecked(Value: Boolean);
@@ -777,7 +773,7 @@ begin
     PaintBtn.Down := False;
     PaintBtn.Enabled := False;
   end;
-  Main.RggMain.Draw;
+  Main.Draw;
 end;
 
 procedure TFormRG19B.SetControllerChecked(Value: Boolean);
@@ -785,7 +781,7 @@ begin
   ControllerItem.Checked := Value;
   ControllerBtn.Down := Value;
   RiggModul.ControllerBtnDown := Value;
-  RotaForm.RaumGraph.ControllerTyp := Main.RggMain.Rigg.ControllerTyp;
+  RotaForm.RaumGraph.ControllerTyp := Main.Rigg.ControllerTyp;
   RotaForm.Draw;
 end;
 
@@ -1764,7 +1760,7 @@ procedure TFormRG19B.InitParamCombo;
   var
     s: string;
   begin
-    s := Main.RggMain.Param2Text(fp);
+    s := Main.Param2Text(fp);
     ParamCombo.Items.AddObject(s, TObject(fp));
   end;
 begin
@@ -1835,7 +1831,7 @@ var
 begin
   ii := ParamCombo.ItemIndex;
   fp := TFederParam(ParamCombo.Items.Objects[ii]);
-  Main.RggMain.Param := fp;
+  Main.Param := fp;
   ShowTrimm;
 end;
 
@@ -1865,7 +1861,7 @@ end;
 
 procedure TFormRG19B.ShowTrimm;
 begin
-  Main.RggMain.UpdateTrimmText(TL);
+  Main.UpdateTrimmText(TL);
   ShowCurrentReport;
 end;
 

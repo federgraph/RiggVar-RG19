@@ -759,10 +759,10 @@ begin
     end;
   end;
 
-  if (Main <> nil) and (Main.RggMain <> nil) and (Main.RggMain.StrokeRigg <> nil) then
+  if (Main <> nil) and (Main.StrokeRigg <> nil) then
   begin
-    Main.RggMain.UpdateStrokeRigg;
-    Main.RggMain.StrokeRigg.Draw;
+    Main.UpdateStrokeRigg;
+    Main.StrokeRigg.Draw;
   end;
 
 end;

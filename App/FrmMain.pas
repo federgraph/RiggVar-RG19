@@ -33,6 +33,7 @@ uses
   Vcl.Buttons,
   Vcl.ExtCtrls,
   Vcl.ComCtrls,
+  RiggVar.RG.Graph,
   RggTypes;
 
 type
@@ -264,8 +265,6 @@ begin
 end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
-var
-  rggm: TRggMain;
 begin
 {$ifdef Debug}
    ReportMemoryLeaksOnShutdown := True;
@@ -309,9 +308,7 @@ begin
   RiggModul.BackgroundColor := TColors.Wheat; // call after RiggModul.Init
   RiggModul.PBG := GrafikForm.PaintBoxG;
 
-  rggm := TRggMain.Create(RiggModul.Rigg);
-
-  Main := TMain.Create(rggm);
+  Main := TMain.Create(RiggModul.Rigg);
   Main.Logger.Verbose := True;
 
   Screen.OnActiveFormChange := UpdateMenuItems;

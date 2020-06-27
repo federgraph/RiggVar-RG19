@@ -368,7 +368,7 @@ procedure TTextForm.InitParamCombo;
   var
     s: string;
   begin
-    s := Main.RggMain.Param2Text(fp);
+    s := Main.Param2Text(fp);
     ParamCombo.Items.AddObject(s, TObject(fp));
   end;
 begin
@@ -437,7 +437,7 @@ var
 begin
   ii := ParamCombo.ItemIndex;
   fp := TFederParam(ParamCombo.Items.Objects[ii]);
-  Main.RggMain.Param := fp;
+  Main.Param := fp;
   ShowTrimm;
 end;
 
@@ -467,7 +467,7 @@ end;
 
 procedure TTextForm.ShowTrimm;
 begin
-  Main.RggMain.UpdateTrimmText(TL);
+  Main.UpdateTrimmText(TL);
   ShowCurrentReport;
 end;
 
@@ -484,7 +484,7 @@ end;
 
 procedure TTextForm.PaintBtnClick(Sender: TObject);
 begin
-  Main.RggMain.UpdateGraph;
+  Main.UpdateGraph;
 end;
 
 procedure TTextForm.ViewpointComboChange(Sender: TObject);
