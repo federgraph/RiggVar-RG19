@@ -44,6 +44,7 @@ type
   public
     Rigg: TRigg;
     IsUp: Boolean;
+    procedure TestStream;
   end;
 
   TRggText = class(TRggRigg)
@@ -55,6 +56,7 @@ type
     Logger: TLogger;
     constructor Create;
     destructor Destroy; override;
+    procedure UpdateText(ClearFlash: Boolean = False); virtual;
     property FLText: string read GetFLText;
   end;
 
@@ -63,11 +65,32 @@ type
     FParam: TFederParam;
     procedure SetParam(Value: TFederParam); virtual; abstract;
   public
-    FactArray: TRggFA; // not owned, cached from Rigg
     property Param: TFederParam read FParam write SetParam;
   end;
 
-  TRggTrimm = class(TRggParam)
+  TRggWheel = class(TRggParam)
+  protected
+    FactArray: TRggFA; // not owned, cached from Rigg
+    function GetBigStep: single;
+    function GetSmallStep: single;
+    procedure TrackBarChange(Sender: TObject);
+    procedure RggSpecialDoOnTrackBarChange; virtual;
+  public
+    RggTrackbar: TFederTrackbar;
+
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure DoWheel(Delta: single);
+    procedure DoZoom(Delta: single);
+    procedure DoRotation(Delta: single);
+
+    procedure DoBigWheelRG(Delta: single);
+    procedure DoSmallWheelRG(Delta: single);
+    procedure DoRasterWheelRG(Delta: single);
+  end;
+
+  TRggTrimm = class(TRggWheel)
   protected
     FTrimm: Integer;
     function GetCurrentTrimm: TRggData;
@@ -115,32 +138,7 @@ type
     property TrimmLong: string read GetTrimmItemReportLong;
   end;
 
-  TRggWheel = class(TRggTrimm)
-  protected
-    function GetBigStep: single;
-    function GetSmallStep: single;
-    procedure TrackBarChange(Sender: TObject);
-    procedure RggSpecialDoOnTrackBarChange; virtual;
-  public
-    RggTrackbar: TFederTrackbar;
-
-    constructor Create;
-    destructor Destroy; override;
-
-    procedure TestStream;
-
-    procedure UpdateText(ClearFlash: Boolean = False);
-
-    procedure DoWheel(Delta: single);
-    procedure DoZoom(Delta: single);
-    procedure DoRotation(Delta: single);
-
-    procedure DoBigWheelRG(Delta: single);
-    procedure DoSmallWheelRG(Delta: single);
-    procedure DoRasterWheelRG(Delta: single);
-  end;
-
-  TRggMain = class(TRggWheel)
+  TRggMain = class(TRggTrimm)
   private
     FFixPoint: TRiggPoint;
     FixPunkt: TRealPoint;
@@ -214,8 +212,6 @@ type
 
     procedure Draw;
 
-//    function GetPlotValue(PlotID: Integer; x, y: single): single;
-
     procedure DebugBiegungGF(ML: TStrings);
     procedure UpdateColumnC(ML: TStrings);
     procedure UpdateColumnD(ML: TStrings);
@@ -252,7 +248,6 @@ implementation
 
 uses
   Clipbrd,
-//  FrmMain,
   RggModul;
 
 const
@@ -910,31 +905,6 @@ begin
 
 end;
 
-//function TRggMain.GetPlotValue(PlotID: Integer; x, y: single): single;
-//var
-//  tx, ty: single;
-//begin
-//  case PlotID of
-//    1..12:
-//    begin
-//      tx := FactArray.Vorstag.Ist;
-//      ty := FactArray.SalingL.Ist;
-//      Rigg.RealGlied[fpVorstag] := tx + x;
-//      Rigg.RealGlied[fpSalingA] := ty + y / 10;
-//      Rigg.UpdateGetriebe;
-//      if Rigg.GetriebeOK then
-//      begin
-//        result := Abstand(Rigg.rP[ooF0], Rigg.rP[ooF]); // - 5000;
-//        UpdateFactArrayFromRigg;
-//      end
-//      else
-//        result := 0;
-//    end;
-//    else
-//      result := 0;
-//  end;
-//end;
-
 procedure TRggTrimm.LoadTrimm(fd: TRggData);
 var
   temp, tempH, tempA: single;
@@ -1376,11 +1346,7 @@ begin
   result := 1;
 end;
 
-procedure TRggWheel.UpdateText(ClearFlash: Boolean);
-begin
-end;
-
-procedure TRggWheel.TestStream;
+procedure TRggRigg.TestStream;
 var
   d: TRggDocument;
 begin
@@ -1550,7 +1516,6 @@ begin
   Logger.Info('SetTrimm: ' + IntToStr(Value));
   FTrimm := Value;
   LoadTrimm(CurrentTrimm);
-//  FormMain.UpdateOnParamValueChanged;
   RiggModul.UpdateGControls;
 
 end;
@@ -1732,6 +1697,10 @@ procedure TRggText.CopyText;
 begin
   Clipboard.AsText := FL.Text;
   Logger.Info('in CopyText ( check clipboard )');
+end;
+
+procedure TRggText.UpdateText(ClearFlash: Boolean);
+begin
 end;
 
 end.
