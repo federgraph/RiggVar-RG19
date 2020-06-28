@@ -39,15 +39,13 @@ type
     Timer: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure FormHide(Sender: TObject);
     procedure TimerTimer(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure PaintBoxPaint(Sender: TObject);
-    procedure ShapeOKMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure ShapeKreiseMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure FormHide(Sender: TObject);
-    procedure FormShow(Sender: TObject);
+    procedure ShapeOKMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure ShapeKreiseMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   private
     SchnittKK: TSchnittKK;
     Sprite1, Sprite2: TSprite;
@@ -340,7 +338,8 @@ end;
 
 procedure TKreisForm.PaintBoxPaint(Sender: TObject);
 begin
-  with PaintBox.Canvas do begin
+  with PaintBox.Canvas do
+  begin
     CopyMode := cmSrcCopy;
     Draw(0, 0, TheImage);
   end;

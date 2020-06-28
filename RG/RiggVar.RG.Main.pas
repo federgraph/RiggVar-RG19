@@ -280,7 +280,6 @@ begin
     Exit;
 
   RggTrackbar.OnChange := TrackBarChange;
-//  StrokeRigg := TStrokeRigg.Create(Rigg);
 
   InitFactArray;
 

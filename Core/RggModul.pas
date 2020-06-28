@@ -409,11 +409,6 @@ begin
   KraftGraph := TKraftGraph.Create(Rigg);
 
   NeedPaint := True;
-//  if Main <> nil then
-//  begin
-//    UpdateGetriebe;
-//    TestBtnClick;
-//  end;
 end;
 
 destructor TRiggModul.Destroy;
