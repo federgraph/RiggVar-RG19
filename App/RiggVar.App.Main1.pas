@@ -90,8 +90,8 @@ implementation
 uses
   System.Rtti,
   Vcl.Clipbrd,
+  FrmMain,
   RggTypes,
-  RggModul,
   RiggVar.FB.Classes,
   RiggVar.App.Main,
   RiggVar.Util.AppUtils;
@@ -116,35 +116,32 @@ end;
 
 procedure TMain1.SetShowTrimmText(const Value: Boolean);
 begin
-//  FederText.TrimmVisible := Value;
+  FormMain.ShowTrimmText := Value;
 end;
 
 procedure TMain1.SetShowDiffText(const Value: Boolean);
 begin
-//  FederText.DiffVisible := Value;
+  FormMain.ShowDiffText := Value;
 end;
 
 procedure TMain1.SetShowDataText(const Value: Boolean);
 begin
-//  FederText.DataVisible := Value;
+  FormMain.ShowDataText := Value;
 end;
 
 function TMain1.GetShowTrimmText: Boolean;
 begin
-  result := False;
-//  result := FederText.TrimmVisible;
+  result := FormMain.ShowTrimmText;
 end;
 
 function TMain1.GetShowDiffText: Boolean;
 begin
-  result := False;
-//  result := FederText.DiffVisible;
+  result := FormMain.ShowDiffText;
 end;
 
 function TMain1.GetShowDataText: Boolean;
 begin
-  result := True;
-//  result := FederText.DataVisible;
+  result := FormMain.ShowDataText;
 end;
 
 procedure TMain1.WriteTrimmItem;
@@ -221,7 +218,7 @@ begin
       end
       else
       begin
-        Logger.Error('there is no ''data'' string on the clipboard');
+         Logger.Error('there is no ''data'' string on the clipboard');
       end;
     end;
   except
@@ -359,7 +356,7 @@ begin
   s := fp + fn;
   if IsSandboxed then
   begin
-    s := RiggModul.ViewModelMain.GetOpenFileName(fp, fn);
+    s := FormMain.GetOpenFileName(fp, fn);
   end;
 
   if s <> '' then
@@ -447,7 +444,7 @@ begin
   s := fp + fn;
   if IsSandboxed then
   begin
-    s := RiggModul.ViewModelMain.GetSaveFileName(fp, fn);
+    s := FormMain.GetSaveFileName(fp, fn);
   end;
 
   if s <> '' then
@@ -467,7 +464,7 @@ procedure TMain1.UpdateTrimm0;
 begin
   Logger.Info('in UpdateTrimm0');
   SaveTrimm(Trimm0);
-//  FormMain.UpdateReport;
+  FormMain.UpdateReport;
 end;
 
 function TMain1.GetIsRggParam: Boolean;
@@ -531,10 +528,10 @@ begin
     faWantRenderE,
     faWantRenderS: ToggleRenderOption(fa);
 
-    faViewpointS: ViewPointS;
-    faViewpointA: ViewPointA;
-    faViewpointT: ViewPointT;
-    faViewpoint3: ViewPoint3;
+    faViewpointS: ViewPoint := vpSeite;
+    faViewpointA: ViewPoint := vpAchtern;
+    faViewpointT: ViewPoint := vpTop;
+    faViewpoint3: ViewPoint := vp3D;
 
     faHull: SetOption(faHull);
     faDemo: SetOption(faDemo);
@@ -546,8 +543,18 @@ begin
     faTrimm4: Trimm := 4;
     faTrimm5: Trimm := 5;
     faTrimm6: Trimm := 6;
-    fa420: Init420;
-    faLogo: InitLogo;
+
+    fa420:
+    begin
+      Init420;
+      FormMain.UpdateOnParamValueChanged;
+    end;
+
+    faLogo:
+    begin
+      InitLogo;
+      FormMain.UpdateOnParamValueChanged;
+    end;
 
     faUpdateTrimm0: UpdateTrimm0;
     faCopyAndPaste: CopyAndPaste;
@@ -568,6 +575,17 @@ begin
 
     else
       inherited HandleAction(fa);
+  end;
+
+  if IsUp then
+  begin
+    FederText.PaintBackgroundNeeded := True;
+    if (fa in ParamsRange) then
+      FormMain.UpdateItemIndexParams
+    else if (fa in ReportsRange) then
+      FormMain.UpdateItemIndexReports
+    else if (fa in TrimmsRange) then
+      FormMain.UpdateItemIndexTrimms;
   end;
 end;
 
@@ -636,6 +654,11 @@ begin
     faHull: result := HullVisible;
     faDemo: result := Demo;
 
+    faSofortBtn: result := SofortBerechnen;
+    faGrauBtn: result := BtnGrauDown;
+    faBlauBtn: result := BtnBlauDown;
+    faMemoryBtn: result := False;
+
     else
       result := inherited;
   end;
@@ -669,12 +692,15 @@ begin
 
   ML.Add('Report:');
   ML.Add('  ReportCounter = ' + IntToStr(ReportCounter));
+  ML.Add('  ColorScheme = ' + IntToStr(MainVar.ColorScheme.Scheme));
+  ML.Add('  Scale = ' + FloatToStr(Scale));
+  ML.Add('  Retina = ' + BoolStr[IsRetina]);
   ML.Add('  Sandboxed = ' + BoolStr[IsSandboxed]);
   ML.Add('  WantOnResize = ' + BoolStr[MainVar.WantOnResize]);
   ML.Add('  ResizeCounter = ' + IntToStr(ResizeCounter));
   ML.Add(Format('  ClientSize = (%d, %d)', [MainVar.ClientWidth, MainVar.ClientHeight]));
+  ML.Add(Format('  Image.Size = (%d, %d)', [FormMain.Image.Width, FormMain.Image.Height]));
   ML.Add('---');
-  ShowDataText := true;
 end;
 
 procedure TMain1.DoCleanReport;

@@ -1,4 +1,4 @@
-object OutputForm: TOutputForm
+﻿object OutputForm: TOutputForm
   Left = 282
   Top = 186
   Caption = 'OutputForm'
@@ -11,8 +11,7 @@ object OutputForm: TOutputForm
   Font.Name = 'Tahoma'
   Font.Style = []
   FormStyle = fsStayOnTop
-  OldCreateOrder = True
-  Scaled = False
+  OldCreateOrder = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnHide = FormHide
@@ -23,7 +22,7 @@ object OutputForm: TOutputForm
     Top = 0
     Width = 465
     Height = 255
-    ActivePage = DetailsSheet
+    ActivePage = Salingsheet
     TabOrder = 0
     OnChange = OutputPagesChange
     object MasterMemo: TTabSheet

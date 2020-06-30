@@ -3,11 +3,11 @@
 interface
 
 uses
-  Winapi.Windows,
-  System.SysUtils,
-  System.Types,
-  Vcl.Graphics,
-  Vcl.ExtCtrls,
+  Windows,
+  SysUtils,
+  Types,
+  Graphics,
+  ExtCtrls,
   RggTypes,
   RggTrimmTab;
 
@@ -23,6 +23,7 @@ type
     procedure DrawText(g: TCanvas);
   public
     FScale: single;
+    Margin: Integer;
     BackgroundColor: TColor;
     Width: Integer;
     Height: Integer;
@@ -44,6 +45,7 @@ uses
 constructor TTrimmTabGraph.Create;
 begin
   FScale := Main.Scale;
+  Margin := 5;
   BackgroundColor := clWhite;
 
   Width := 319; // unscaled value
@@ -96,95 +98,95 @@ begin
   PlotOrgY := 0;
 
   with g do
+  begin
+    SetMapMode(Handle, MM_ANISOTROPIC);
+    SetWindowExtEx(Handle, PlotExtX, -PlotExtY, nil);
+    SetWindowOrgEx(Handle, PlotOrgX, PlotOrgY, nil);
+    SetViewPortExtEx(Handle, PlotWidth, PlotHeight, nil);
+    SetViewPortOrgEx(Handle, 0, PlotHeight, nil);
+
+    { Radius }
+    R.Left := 0;
+    R.Top := 0;
+    R.Bottom := Round(3 * FScale);
+    R.Right := R.Bottom;
+    DPTOLP(Handle, R, 2);
+    RadiusX := R.Right - R.Left;
+    RadiusY := R.Bottom - R.Top;
+
+    { Kurve }
+    Pen.Color := clBlue;
+    case Model.TabellenTyp of
+      itKonstante:
+        begin
+          tempY := PlotExtY * (Model.x1 / Model.EndwertKraft);
+          P.y := Round(Limit(tempY));
+          MoveTo(0, P.y);
+          LineTo(PlotExtX, P.y);
+        end;
+      itGerade:
+        begin
+          MoveTo(0, 0);
+          LineTo(PlotExtX, PlotExtY);
+        end;
+      itParabel, itBezier:
+        begin
+          MoveTo(0, 0);
+          for i := 0 to 100 do
+          begin
+            P.x := Round(Limit(PlotExtX * Model.LineDataX[i]));
+            P.y := Round(Limit(PlotExtY * Model.LineDataY[i]));
+            LineTo(P.x, P.y);
+          end;
+        end;
+    end;
+
+    { Rechtecke }
+    Pen.Color := clBlack;
+    Brush.Color := clYellow;
+    Brush.Style := bsSolid;
+    for i := 1 to Model.PunkteAnzahl do
     begin
-      SetMapMode(Handle, MM_ANISOTROPIC);
-      SetWindowExtEx(Handle, PlotExtX, -PlotExtY, nil);
-      SetWindowOrgEx(Handle, PlotOrgX, PlotOrgY, nil);
-      SetViewPortExtEx(Handle, PlotWidth, PlotHeight, nil);
-      SetViewPortOrgEx(Handle, 0, PlotHeight, nil);
-
-      { Radius }
-      R.Left := 0;
-      R.Top := 0;
-      R.Bottom := Round(3 * FScale);
-      R.Right := R.Bottom;
-      DPTOLP(Handle, R, 2);
-      RadiusX := R.Right - R.Left;
-      RadiusY := R.Bottom - R.Top;
-
-      { Kurve }
-      Pen.Color := clBlue;
-      case Model.TabellenTyp of
-        itKonstante:
-          begin
-            tempY := PlotExtY * (Model.x1 / Model.EndwertKraft);
-            P.y := Round(Limit(tempY));
-            MoveTo(0, P.y);
-            LineTo(PlotExtX, P.y);
-          end;
-        itGerade:
-          begin
-            MoveTo(0, 0);
-            LineTo(PlotExtX, PlotExtY);
-          end;
-        itParabel, itBezier:
-          begin
-            MoveTo(0, 0);
-            for i := 0 to 100 do
-            begin
-              P.x := Round(Limit(PlotExtX * Model.LineDataX[i]));
-              P.y := Round(Limit(PlotExtY * Model.LineDataY[i]));
-              LineTo(P.x, P.y);
-            end;
-          end;
-      end;
-
-      { Rechtecke }
-      Pen.Color := clBlack;
-      Brush.Color := clYellow;
-      Brush.Style := bsSolid;
-      for i := 1 to Model.PunkteAnzahl do
-      begin
-        tempX := PlotExtX * Model.Kurve[i].y / Model.EndwertWeg;
-        tempY := PlotExtY * Model.Kurve[i].x / Model.EndwertKraft;
-        P.x := Round(Limit(tempX));
-        P.y := Round(Limit(tempY));
-        Rectangle(
-          P.x - RadiusX,
-          P.y - RadiusY,
-          P.x + RadiusX,
-          P.y + RadiusY);
-      end;
-
-      Pen.Color := clBlack;
-      Brush.Color := clRed;
-      Brush.Style := bsSolid;
-
-      if Model.TabellenTyp > itGerade then
-      begin
-        tempX := PlotExtX * Model.y1 / Model.EndwertWeg;
-        tempY := PlotExtY * Model.x1 / Model.EndwertKraft;
-        P.x := Round(Limit(tempX));
-        P.y := Round(Limit(tempY));
-        Rectangle(
-          P.x - RadiusX,
-          P.y - RadiusY,
-          P.x + RadiusX,
-          P.y + RadiusY);
-      end;
-
-      P := Point(0, 0);
-      Rectangle(P.x - RadiusX, P.y - RadiusY, P.x + RadiusX, P.y + RadiusY);
-
-      tempX := PlotExtX * Model.y2 / Model.EndwertWeg;
-      tempY := PlotExtY * Model.x2 / Model.EndwertKraft;
+      tempX := PlotExtX * Model.Kurve[i].y / Model.EndwertWeg;
+      tempY := PlotExtY * Model.Kurve[i].x / Model.EndwertKraft;
       P.x := Round(Limit(tempX));
       P.y := Round(Limit(tempY));
-      Rectangle(P.x - RadiusX, P.y - RadiusY, P.x + RadiusX, P.y + RadiusY);
+      Rectangle(
+        P.x - RadiusX,
+        P.y - RadiusY,
+        P.x + RadiusX,
+        P.y + RadiusY);
+    end;
 
-      SetMapMode(Handle, MM_TEXT);
-      SetWindowOrgEx(Handle, 0, 0, nil);
-      SetViewPortOrgEx(Handle, 0, 0, nil);
+    Pen.Color := clBlack;
+    Brush.Color := clRed;
+    Brush.Style := bsSolid;
+
+    if Model.TabellenTyp > itGerade then
+    begin
+      tempX := PlotExtX * Model.y1 / Model.EndwertWeg;
+      tempY := PlotExtY * Model.x1 / Model.EndwertKraft;
+      P.x := Round(Limit(tempX));
+      P.y := Round(Limit(tempY));
+      Rectangle(
+        P.x - RadiusX,
+        P.y - RadiusY,
+        P.x + RadiusX,
+        P.y + RadiusY);
+    end;
+
+    P := Point(0, 0);
+    Rectangle(P.x - RadiusX, P.y - RadiusY, P.x + RadiusX, P.y + RadiusY);
+
+    tempX := PlotExtX * Model.y2 / Model.EndwertWeg;
+    tempY := PlotExtY * Model.x2 / Model.EndwertKraft;
+    P.x := Round(Limit(tempX));
+    P.y := Round(Limit(tempY));
+    Rectangle(P.x - RadiusX, P.y - RadiusY, P.x + RadiusX, P.y + RadiusY);
+
+    SetMapMode(Handle, MM_TEXT);
+    SetWindowOrgEx(Handle, 0, 0, nil);
+    SetViewPortOrgEx(Handle, 0, 0, nil);
   end;
 end;
 
@@ -194,35 +196,29 @@ var
   PosX, PosY: Integer;
   s: string;
 begin
-  with g do
-  begin
-      { Texte }
-      Brush.Style := bsClear;
-      { Font := YFont; }
-      SetTextAlign(Handle, TA_LEFT or TA_TOP);
-      PosX := 5;
-      PosY := 5;
-      TextOut(PosX, PosY, 'Kraft [N]');
+  g.Brush.Style := bsClear;
+  SetTextAlign(g.Handle, TA_LEFT or TA_TOP);
+  PosX := Margin;
+  PosY := Margin;
+  g.TextOut(PosX, PosY, 'Kraft [N]');
 
-      Font.Color := clBlack;
-      PosY := PosY - Font.Height + 5;
-      s := Format('(%d ... %d)', [0, Model.EndwertKraft]);
-      TextOut(PosX, PosY, s);
+  g.Font.Color := clBlack;
+  PosY := PosY - g.Font.Height + Margin;
+  s := Format('(%d ... %d)', [0, Model.EndwertKraft]);
+  g.TextOut(PosX, PosY, s);
 
-      { Font := XFont; }
-      SetTextAlign(Handle, TA_RIGHT or TA_BOTTOM);
-    PosX := Width - 5;
-    PosY := Height - 5;
-      TextOut(PosX, PosY, 'Weg [mm]');
+  SetTextAlign(g.Handle, TA_RIGHT or TA_BOTTOM);
+  PosX := Width - Margin;
+  PosY := Height - Margin;
+  g.TextOut(PosX, PosY, 'Weg [mm]');
 
-      Font.Color := clBlack;
-      PosY := PosY + Font.Height - 5;
-      s := Format('(%d ... %d)', [0, Model.EndwertWeg]);
-      TextOut(PosX, PosY, s);
+  g.Font.Color := clBlack;
+  PosY := PosY + g.Font.Height - Margin;
+  s := Format('(%d ... %d)', [0, Model.EndwertWeg]);
+  g.TextOut(PosX, PosY, s);
 
-      Brush.Style := bsSolid;
-      Brush.Color := clBtnFace;
-    end;
+  g.Brush.Style := bsSolid;
+  g.Brush.Color := clBtnFace;
 end;
 
 procedure TTrimmTabGraph.SetImage(const Value: TImage);
@@ -234,9 +230,9 @@ end;
 procedure TTrimmTabGraph.InitBitmap;
 begin
   if FBitmap <> nil then
-    begin
+  begin
     FBitmap.Free;
-    end;
+  end;
   FBitmap := TBitmap.Create;
   FBitmap.Width := Round(Width * MainVar.Scale);
   FBitmap.Height := Round(Height * MainVar.Scale);

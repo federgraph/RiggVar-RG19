@@ -3,12 +3,10 @@
 interface
 
 uses
-  System.Types,
-  System.SysUtils,
-  System.Classes,
-  System.UITypes,
-  System.UIConsts,
-  Vcl.Graphics,
+  Types,
+  SysUtils,
+  Classes,
+  Graphics,
   RggCalc,
   RggTypes,
   RggDisplayTypes,
@@ -81,7 +79,8 @@ type
 implementation
 
 uses
-  RiggVar.FB.ActionConst;
+  RiggVar.FB.ActionConst,
+  RiggVar.FB.Color;
 
 constructor TRaumGraph.Create(AZug3D: TZug3DBase);
 begin
@@ -90,7 +89,7 @@ begin
   WantFixPunkt := True;
   WantRumpf := True;
   WantSaling := True;
-  WantController := True;
+  WantController := False;
   WantWante := True;
   WantMast := True;
   WantVorstag := True;
@@ -152,8 +151,6 @@ var
   MKT: array [0 .. BogenMax] of TRealPoint;
   KKT: TKoordLine;
 begin
-  Transformer.UpdateTransformedFixPunkt;
-
   { Graph drehen }
   if Assigned(Transformer) then
   begin
@@ -264,7 +261,7 @@ begin
     Exit;
 
   if not Updated then
-      Update;
+    Update;
 
   Zug3D.DrawToCanvas(g);
 end;
@@ -337,9 +334,9 @@ begin
     begin
       DI.StrokeColor := clAqua;
       DI.StrokeWidth := 3;
-      DL.Line('A0-B0', deA0B0, A0, B0, ZugRumpf[0], ZugRumpf[1], TColors.Blue);
-      DL.Line('B0-C0', deB0C0, B0, C0, ZugRumpf[1], ZugRumpf[2], TColors.DodgerBlue);
-      DL.Line('C0-A0', deA0C0, C0, A0, ZugRumpf[2], ZugRumpf[0], TColors.Cornflowerblue);
+      DL.Line('A0-B0', deA0B0, A0, B0, ZugRumpf[0], ZugRumpf[1], TRggColors.Blue);
+      DL.Line('B0-C0', deB0C0, B0, C0, ZugRumpf[1], ZugRumpf[2], TRggColors.DodgerBlue);
+      DL.Line('C0-A0', deA0C0, C0, A0, ZugRumpf[2], ZugRumpf[0], TRggColors.Cornflowerblue);
 
       DL.Line('A0-D0', deA0D0, A0, D0, ZugRumpf[0], ZugRumpf[4], clRed);
       DL.Line('B0-D0', deB0D0, B0, D0, ZugRumpf[1], ZugRumpf[4], clGreen);
@@ -349,19 +346,19 @@ begin
     { Mast }
     if WantMast then
     begin
-      DI.StrokeColor := TColors.Cornflowerblue;
+      DI.StrokeColor := TRggColors.Cornflowerblue;
       DI.StrokeWidth := 5;
       if Props.Bogen then
       begin
-        DL.PolyLine('D0-D', deD0D, D0, D, ZugMastKurveD0D, TColors.Cornflowerblue);
-        DL.PolyLine('D-C', deCD, D, C, ZugMastKurveDC, TColors.Plum);
-        DL.Line('C-F', deCF, C, F, ZugMast[2], ZugMast[3], TColors.Navy);
+        DL.PolyLine('D0-D', deD0D, D0, D, ZugMastKurveD0D, TRggColors.Cornflowerblue);
+        DL.PolyLine('D-C', deCD, D, C, ZugMastKurveDC, TRggColors.Plum);
+        DL.Line('C-F', deCF, C, F, ZugMast[2], ZugMast[3], TRggColors.Navy);
       end
       else
       begin
-        DL.Line('D0-D', deD0D, D0, D, ZugMast[0], ZugMast[1], TColors.Cornflowerblue);
-        DL.Line('D-C', deCD, D, C, ZugMast[1], ZugMast[2], TColors.Lime);
-        DL.Line('C-F', deCF, C, F, ZugMast[2], ZugMast[3], TColors.Navy);
+        DL.Line('D0-D', deD0D, D0, D, ZugMast[0], ZugMast[1], TRggColors.Cornflowerblue);
+        DL.Line('D-C', deCD, D, C, ZugMast[1], ZugMast[2], TRggColors.Lime);
+        DL.Line('C-F', deCF, C, F, ZugMast[2], ZugMast[3], TRggColors.Navy);
       end;
     end;
 
@@ -384,20 +381,20 @@ begin
     { Saling }
     if WantSaling then
     begin
-      DI.StrokeColor := TColors.Chartreuse;
+      DI.StrokeColor := TRggColors.Chartreuse;
       DI.StrokeWidth := 6;
       if Props.SalingTyp = stFest then
       begin
         DL.Line('A-D', deAD, A, D, ZugSalingFS[0], ZugSalingFS[1], clLime);
-        DL.Line('B-D', deBD, B, D, ZugSalingFS[2], ZugSalingFS[1], TColors.Chartreuse);
+        DL.Line('B-D', deBD, B, D, ZugSalingFS[2], ZugSalingFS[1], TRggColors.Chartreuse);
         DL.Line('A-B', deAB, A, B, ZugSalingFS[0], ZugSalingFS[2], clTeal);
       end;
       if Props.SalingTyp = stDrehbar then
       begin
-        DI.StrokeColor := TColors.Chartreuse;
+        DI.StrokeColor := TRggColors.Chartreuse;
         DI.StrokeWidth := 2;
-        DL.Line('A-D', deAD, A, D, ZugSalingDS[0], ZugSalingDS[1], TColors.Chartreuse);
-        DL.Line('B-D', deBD, B, D, ZugSalingDS[2], ZugSalingDS[1], TColors.Chartreuse);
+        DL.Line('A-D', deAD, A, D, ZugSalingDS[0], ZugSalingDS[1], TRggColors.Chartreuse);
+        DL.Line('B-D', deBD, B, D, ZugSalingDS[2], ZugSalingDS[1], TRggColors.Chartreuse);
       end;
     end;
 
@@ -405,8 +402,8 @@ begin
     if WantController then
     begin
       if Props.ControllerTyp <> ctOhne then
-    begin
-        DI.StrokeColor := TColors.Orchid;
+      begin
+        DI.StrokeColor := TRggColors.Orchid;
         DI.StrokeWidth := 4;
         DL.Line('E0-E', deE0E, E0, E, ZugController[0], ZugController[1], clTeal);
       end;
@@ -420,9 +417,9 @@ begin
       DL.Line('C0-C', deC0C, C0, C, ZugVorstag[0], ZugVorstag[1], clYellow);
     end;
 
-  { Achsen }
-  if WantAchsen then
-  begin
+    { Achsen }
+    if WantAchsen then
+    begin
       DI.StrokeWidth := 1;
       DI.StrokeColor := clFuchsia;
       DL.Line('N-X', deNX, AchseNT, AchseXT, ZugAchsen[0], ZugAchsen[1], clRed);
@@ -430,13 +427,13 @@ begin
       DL.Line('N-Y', deNY, AchseNT, AchseYT, ZugAchsen[0], ZugAchsen[2], clGreen);
       DI.StrokeColor := clAqua;
       DL.Line('N-Z', deNZ, AchseNT, AchseZT, ZugAchsen[0], ZugAchsen[3], clBlue);
-  end;
+    end;
 
     if WantRenderF then
     begin
-      DI.StrokeColor := TColors.Goldenrod;
+      DI.StrokeColor := TRggColors.Goldenrod;
       DI.StrokeWidth := 1;
-      DL.Line('F-M', deMastFall, F, M, ZugMastfall[0], ZugMastfall[1], TColors.Goldenrod);
+      DL.Line('F-M', deMastFall, F, M, ZugMastfall[0], ZugMastfall[1], TRggColors.Goldenrod);
       DI.StrokeWidth := 4;
       DL.Line('M-F0', deMastFall, M, F0, ZugMastfall[1], ZugMastfall[2], clYellow);
     end;

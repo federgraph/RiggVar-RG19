@@ -2,13 +2,15 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  Winapi.Windows,
-  System.SysUtils,
-  System.Classes,
-  System.Types,
-  System.UITypes,
-  Vcl.Graphics,
+  Types,
+  SysUtils,
+  Classes,
+  Graphics,
   RggTypes,
   RggZug;
 
@@ -23,6 +25,7 @@ type
 implementation
 
 uses
+  RiggVar.FB.Color,
   RiggVar.RG.Def;
 
 { TZug3D }
@@ -221,7 +224,7 @@ begin
     begin
       Pen.Color := clGreen;
       if Props.Gestrichelt then
-        Pen.Color := TColors.Antiquewhite;
+        Pen.Color := TRggColors.Antiquewhite;
     end;
     PolyLine(ZugWanteStb);
 
@@ -230,7 +233,7 @@ begin
     begin
       Pen.Color := clRed;
       if Props.Gestrichelt then
-        Pen.Color := TColors.Antiquewhite;
+        Pen.Color := TRggColors.Antiquewhite;
     end;
     PolyLine(ZugWanteBb);
 

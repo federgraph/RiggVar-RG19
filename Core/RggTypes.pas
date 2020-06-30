@@ -22,9 +22,6 @@ uses
   System.SysUtils,
   System.Classes,
   System.Types,
-  System.UIConsts,
-  System.UITypes,
-  Vcl.Graphics,
   RiggVar.RG.Def;
 
 const
@@ -39,11 +36,6 @@ var
 
 type
   EFileFormatError = class(Exception);
-
-  TRiggMetaFile = class(TMetaFile)
-  protected
-    procedure Draw(ACanvas: TCanvas; const Rect: TRect); override;
-  end;
 
   TYAchseValue = (
     yavDurchbiegungHD,
@@ -395,16 +387,6 @@ procedure InitYAchseRecordList(var RecordList: TYAchseRecordList);
 function StrToRiggPoint(const s: string): TRiggPoint;
 
 implementation
-
-procedure TRiggMetafile.Draw(ACanvas: TCanvas; const Rect: TRect);
-var
-  R: TRect;
-begin
-  R := Rect;
-  Inc(R.Right);
-  Inc(R.Bottom);
-  inherited Draw(ACanvas, R);
-end;
 
 procedure InitYAchseRecordList(var RecordList: TYAchseRecordList);
 begin

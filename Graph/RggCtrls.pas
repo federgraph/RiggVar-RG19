@@ -2,35 +2,56 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  Winapi.Windows,
-  System.SysUtils,
-  System.Classes,
-  Vcl.Graphics,
-  Vcl.Controls,
-  Vcl.ExtCtrls,
-  RggTypes;
+{$ifdef fpc}
+  LCLIntf,
+  LCLType,
+{$endif}
+{$ifdef MSWindows}
+  Windows,
+{$endif}
+  SysUtils,
+  Classes,
+  Graphics,
+  Controls,
+  ExtCtrls,
+  RggTypes,
+  RggProfile;
 
 type
-  TLage = (hoch, quer);
+  TFigure = (
+    dtTest,
+    dtSalingAll,
+    dtSalingDetail,
+    dtController,
+    dtProfileDrawHoch,
+    dtProfileDrawQuer,
+    dtProfileOuter,
+    dtProfileInner,
+    dtProfileLeft,
+    dtProfileRight
+  );
 
-  TSalingGraph = class
+  TSalingGraph = class(TMastProfile)
   private
-    OffsetX: Integer;
-    OffsetY: Integer;
-    Lage: TLage;
-    SalingZoom: Integer;
-    ControllerZoom: Integer;
-    procedure DrawProfile(g: TCanvas);
-
+    FImage: TImage;
+    FBitmap: TBitmap;
+    procedure SetImage(const Value: TImage);
+    procedure InitBitmap;
+    procedure PaintBackground(g: TCanvas);
   public
     BackgroundColor: TColor;
     ControllerTyp: TControllerTyp;
-    PBSize: TPoint; { PaintBox-Size }
+    Width: Integer;
+    Height: Integer;
 
     EdgePos: Integer; { Abstand von E0 zur Anschlagkante Deck + Klotzdicke }
     ControllerPos: Integer; { Abstand(iP[ooE0,x], iP[ooE ,x]) in mm }
-    ParamXE: Integer; { Abstand(iP[ooD0,x], iP[ooE,x]) in mm }
+    ParamXE: double; { Abstand(iP[ooD0,x], iP[ooE,x]) in mm }
     ParamXE0: Integer; { Abstand(iP[ooD0,x], iP[ooE0,x]) in mm }
 
     SalingA: Integer; { Abstand(iP[ooA,x], iP[ooB,x]) in mm }
@@ -39,313 +60,174 @@ type
     SalingHOffset: Integer; { Abstand Hinterkante Mast zur neutrale Faser in mm }
     SalingDetail: Boolean; { Umschalten zwischen den beiden SalingViews }
 
-    constructor Create;
+    ImageOpacity: single;
 
-    procedure DrawSalingAll(g: TCanvas);
-    procedure DrawSalingDetail(g: TCanvas);
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure DrawSaling(g: TCanvas);
     procedure DrawController(g: TCanvas);
+
+    procedure Draw(df: TFigure);
+
+    property Image: TImage read FImage write SetImage;
   end;
 
 implementation
 
+uses
+  RiggVar.App.Main,
+  RiggVar.FB.Color;
+
 constructor TSalingGraph.Create;
 begin
+  inherited;
+
   BackgroundColor := clBtnFace;
-  PBSize.x := 453;
-  PBSize.y := 220;
+
+  Width := 453; // unscaled value
+  Height := 220; // unscaled value
+
   ControllerZoom := 1;
   SalingZoom := 5;
   ControllerTyp := ctDruck;
 
-  { Properties für ControllerGrafik in mm }
+  { Properties für ControllerGraph in mm }
   EdgePos := 25;
   ControllerPos := 80;
   ParamXE := -20;
   ParamXE0 := 110;
 
-  { Properties für SalingGrafik in mm }
+  { Properties für SalingGraph in mm }
   SalingHOffset := 37;
   SalingH := 80;
   SalingA := 800;
   SalingL := 1000;
 end;
 
-procedure TSalingGraph.DrawProfile(g: TCanvas);
-
-  procedure MetaLINE(x1, y1, x2, y2: Integer);
-  begin
-    if Lage = quer then
-    begin
-      x1 := x1 + OffsetX;
-      y1 := y1 + OffsetY;
-      x2 := x2 + OffsetX;
-      y2 := y2 + OffsetY;
-      x1 := x1 div ControllerZoom;
-      y1 := y1 div ControllerZoom;
-      x2 := x2 div ControllerZoom;
-      y2 := y2 div ControllerZoom;
-      g.MoveTo(y1, x1);
-      g.LineTo(y2, x2);
-    end
-    else if Lage = hoch then
-    begin
-      x1 := x1 + OffsetX;
-      y1 := y1 + OffsetY;
-      x2 := x2 + OffsetX;
-      y2 := y2 + OffsetY;
-      x1 := x1 div SalingZoom;
-      y1 := y1 div SalingZoom;
-      x2 := x2 div SalingZoom;
-      y2 := y2 div SalingZoom;
-      g.MoveTo(x1, y1);
-      g.LineTo(x2, y2);
-    end;
-  end;
-
-  procedure MetaARC(xm, ym, Radius: Integer; phi1, phi2: double);
-  var
-    temp: Integer;
-  begin
-    if Lage = quer then
-    begin
-      xm := xm + OffsetX;
-      ym := ym + OffsetY;
-      xm := xm div ControllerZoom;
-      ym := ym div ControllerZoom;
-      Radius := Radius div ControllerZoom;
-      temp := xm; xm := ym; ym := temp;
-      g.Arc(
-        xm - Radius,
-        ym - Radius,
-        xm + Radius,
-        ym + Radius,
-        xm + Round(sin(phi2*pi/180)*Radius),
-        ym + Round(cos(phi2*pi/180)*Radius),
-        xm + Round(sin(phi1*pi/180)*Radius),
-        ym + Round(cos(phi1*pi/180)*Radius)
-      );
-    end
-    else if Lage = hoch then
-    begin
-      xm := xm + OffsetX;
-      ym := ym + OffsetY;
-      xm := xm div SalingZoom;
-      ym := ym div SalingZoom;
-      Radius := Radius div SalingZoom;
-      g.Arc(
-        xm - Radius,
-        ym - Radius,
-        xm + Radius,
-        ym + Radius,
-        xm + Round(cos(phi1*pi/180)*Radius),
-        ym + Round(sin(phi1*pi/180)*Radius),
-        xm + Round(cos(phi2*pi/180)*Radius),
-        ym + Round(sin(phi2*pi/180)*Radius)
-      );
-    end;
-  end;
-
-begin
-{ MetaLINE(    x1,   y1,    x2,     y2); }
-  MetaLINE(   490,  997,  1044,    520);
-  MetaLINE(  2850, 4070,  2850,   4350);
-  MetaLINE(   350, 1300,     0,   1300);
-  MetaLINE(  1148,  609,   350,   1300);
-  MetaLINE(   500,    0,   200,      0);
-  MetaLINE(  2600, 3185,  2600,   4900);
-
-  MetaLINE(  -485, 1002, -1044,    520);
-  MetaLINE(     0, 1300,  -350,   1300);
-  MetaLINE(  -350, 1300, -1155,    604);
-  MetaLINE( -2850, 4350, -2850,   4070);
-  MetaLINE(  -500,    0,  -200,      0);
-  MetaLINE( -2600, 4900, -2600,   3185);
-{ MetaLINE(     0, 7200,     0,      0); }
-
-{ MetaARC(     xm,   ym,     r,    phi1,    phi2); }
-  MetaARC(  -1850, 4070,  4580,  -59.83,  -50.83);
-  MetaARC(  -1850, 4070,  4580,  -49.09,  -16.70);
-  MetaARC(  -1850, 4070,  4700,  -60.00,    0.00);
-  MetaARC(      0,  430,   750,   49.15,   90.00);
-  MetaARC(      0, 4350,  2850,    0.00,   90.00);
-  MetaARC(      0, 4350,  2730,   26.58,   90.00);
-  MetaARC(    350,  000,   150,   47.46, -180.00);
-  MetaARC(   1100, 3185,  1500,  -16.71,    0.00);
-  MetaARC(   1100, 4900,  1500,    0.00,   26.58);
-
-{ MetaARC(     xm,   ym,     r,    phi1,    phi2); }
-  MetaARC(  -1100, 4900,  1500,  153.42, -180.00);
-  MetaARC(  -1100, 3185,  1500, -180.00, -163.29);
-  MetaARC(   -350,    0,   150,    0.00,  132.53);
-  MetaARC(      0,  430,   750,   90.00,  130.85);
-  MetaARC(      0, 4350,  2850,   90.00, -180.00);
-  MetaARC(      0, 4350,  2730,   90.00,  153.42);
-  MetaARC(   1850, 4070,  4580, -129.17, -120.16);
-  MetaARC(   1850, 4070,  4580, -163.29, -130.91);
-  MetaARC(   1850, 4070,  4700, -180.00, -120.00);
-end;
-
-procedure TSalingGraph.DrawSalingAll(g: TCanvas);
-var
-  SalingX: Integer;
-  SalingY: Integer;
-begin
-  Lage := hoch;
-  OffsetX := 0; { 0 * 100; }
-  OffsetY := (SalingH-SalingHOffset) * 100;
-
-  SetMapMode(g.Handle, MM_ISOTROPIC);
-  SetWindowExtEx(g.Handle, 9000, 9000, nil);
-  SetWindowOrgEx(g.Handle, 0, -2000, nil);
-  SetViewPortExtEx(g.Handle, PBSize.x, -PBSize.y, nil);
-  SetViewPortOrgEx(g.Handle, PBSize.x div 2, PBSize.y, nil);
-
-  { SalingH }
-  SalingY := SalingH * 100 div SalingZoom;
-  g.Pen.Width := 2*100 div SalingZoom;
-  g.Pen.Color := clBlack;
-  g.MoveTo( 0, SalingY);
-  g.LineTo( 0, 0);
-  { SalingA }
-  SalingX := (SalingA *  50) div SalingZoom; { SalingA/2 gezoomt }
-  SalingY := (SalingH*100) div SalingZoom;
-  g.Pen.Width := 2*100 div SalingZoom;
-  g.Pen.Color := clBlue;
-  g.MoveTo(-SalingX, 0);
-  g.LineTo( SalingX, 0);
-  { SalingL }
-  g.Pen.Width := 20*100 div SalingZoom;
-  g.Pen.Color := $00C0DCC0; { hellgrün }
-  g.LineTo( 0, SalingY);
-  g.LineTo(-SalingX, 0);
-  { Wanten als Kreise }
-  g.Pen.Width := 1;
-  g.Pen.Color := clBlack;
-  g.Brush.Color := clRed;
-  g.Ellipse(-SalingX - 100, 100, -SalingX + 100, -100);
-  g.Ellipse( SalingX - 100, 100,  SalingX + 100, -100);
-  g.Pen.Color := clBlack;
-  g.Brush.Color := clRed;
-  g.Ellipse( -100, SalingY + 100,  100, SalingY - 100);
-
-  { Profilschnitt zeichnen }
-  g.Pen.Width := 2*100 div SalingZoom;
-  g.Pen.Color := clBlue;
-  DrawProfile(g);
-
-  SetWindowOrgEx(g.Handle, 0, 0, nil);
-  SetViewPortOrgEx(g.Handle, 0, 0, nil);
-  SetMapMode(g.Handle, MM_TEXT);
-end;
-
-procedure TSalingGraph.DrawSalingDetail(g: TCanvas);
+procedure TSalingGraph.DrawSaling(g: TCanvas);
 var
   SalingX, SalingY: Integer;
   PosX, PosY: Integer;
   s: string;
-//  t: Integer;
+  f: single;
+  radius: Integer;
+  ox, oy, lh: Integer;
 begin
-//  t := Canvas.Font.Size; // = 8 in debugger
+  SetViewPortOrgEx(g.Handle,
+    Round(Width * MainVar.Scale/2),
+    Round((Height-40) * MainVar.Scale), nil);
 
-  Lage := hoch;
-  OffsetX := 0; { 0 * 100; }
-  OffsetY := (SalingH-SalingHOffset) * 100;
+  radius := Round(5 * MainVar.Scale);
+  f := 0.4 * MainVar.Scale;
 
-  SetMapMode(g.Handle, MM_ISOTROPIC);
-  SetWindowExtEx(g.Handle, 5000, 5000, nil);
-  SetWindowOrgEx(g.Handle, 0, -800, nil);
-  SetViewPortExtEx(g.Handle, PBSize.x, -PBSize.y, nil);
-  SetViewPortOrgEx(g.Handle, PBSize.x div 2, PBSize.y, nil);
+  SalingX := Round(SalingA / 2 * f);
+  SalingY := -Round(SalingH * f);
 
-  { SalingH }
-  SalingY := ((SalingH)*100) div SalingZoom;
-  g.Pen.Width := 2*100 div SalingZoom;
+  { SalingL }
+  g.Pen.Width := Round(15 * MainVar.Scale);
+  g.Pen.Color := TRggColors.Cornflowerblue;
+  g.MoveTo(-SalingX, 0);
+  g.LineTo( 0, SalingY);
+  g.LineTo(SalingX, 0);
+
+  { Wanten als Kreise }
+  SalingY := -Round(SalingH * f);
+  g.Pen.Width := Round(1 * MainVar.Scale);
   g.Pen.Color := clBlack;
-  g.MoveTo( 0, SalingY);
-  g.LineTo( 0, 0);
-  { SalingH - SalingHOffset }
-  SalingY := ((SalingH-SalingHOffset)*100) div SalingZoom;
-  g.Pen.Width := 2*100 div SalingZoom;
-  g.Pen.Color := clFuchsia;
-  g.MoveTo( -100, SalingY);
-  g.LineTo( -100, 0);
+  g.Brush.Color := clRed;
+  g.Ellipse(-SalingX - radius, -radius, -SalingX + radius, radius);
+  g.Ellipse( SalingX - radius, -radius,  SalingX + radius, radius);
+  g.Ellipse( -radius, SalingY - radius,  radius, SalingY + radius);
+
   { SalingA }
-  SalingX := (SalingA * 50) div SalingZoom; { SalingA/2 gezoomt }
-  SalingY := ((SalingH)*100) div SalingZoom;
-  g.Pen.Width := 2*100 div SalingZoom;
-  g.Pen.Color := clBlue;
+  g.Pen.Width := Round(2 * MainVar.Scale);
+  g.Pen.Color := clAqua;
   g.MoveTo(-SalingX, 0);
   g.LineTo( SalingX, 0);
-  { SalingL }
-  g.Pen.Width := 15*100 div SalingZoom;
-  g.Pen.Color := $00C0DCC0; { hellgrün }
+
+  { SalingH }
+  SalingY := -Round(SalingH * f);
+  g.Pen.Color := clSilver;
+  g.MoveTo( 0, 0);
   g.LineTo( 0, SalingY);
-  g.LineTo(-SalingX, 0);
-  { Wanten als Kreise }
-  g.Pen.Width := 1;
-  g.Pen.Color := clBlack;
-  g.Brush.Color := clRed;
-  g.Ellipse(-SalingX - 100, 100, -SalingX + 100, -100);
-  g.Ellipse( SalingX - 100, 100,  SalingX + 100, -100);
-  g.Pen.Color := clBlack;
-  g.Brush.Color := clRed;
-  g.Ellipse( -70, SalingY + 70,  70, SalingY - 70);
-  { Profilschnitt zeichnen }
-  g.Pen.Width := 2*100 div SalingZoom;
-  g.Pen.Color := clBlue;
-  DrawProfile(g);
 
-  { Texte }
-  g.Font.Height := 25 * 100 div SalingZoom;
+  { SalingH - SalingHOffset }
+  SalingY := -Round((SalingH-SalingHOffset) * f);
+  g.Pen.Color := clFuchsia;
+  g.MoveTo( -4, 0);
+  g.LineTo( -4, SalingY);
 
-  g.Font.Color := clNavy;
-  { Canvas.Brush.Color := clSilver; }
+  { Profile }
+  g.Pen.Color := TRggColors.Dodgerblue;
+  Lage := hoch;
+  OffsetX := 0;
+  OffsetY := -Round((SalingH-SalingHOffset) * f) ;
+  WantSegmentColor := False;
+  WantRight := False;
+  WantLeft := False;
+  WantOuter := True;
+  WantInner := False;
+  ProfileZoom := f;
+  InternalDrawProfile6(g);
+
+  { Text }
+  SetViewPortOrgEx(g.Handle, 0, 0, nil);
   g.Brush.Style := bsClear;
-  SetTextAlign(g.Handle, TA_CENTER or TA_TOP);
-  PosX := 0;
-  PosY := -700 div SalingZoom;
-  s := Format('Salingabstand = %d mm',[SalingA]);
+  g.Font.Height := Round(20 * MainVar.Scale);
+
+  ox := Round(20 * MainVar.Scale);
+  oy := Round(20 * MainVar.Scale);
+  lh := Round(40 * MainVar.Scale);
+
+  g.Font.Color := clFuchsia;
+  PosX := ox;
+  PosY := oy + 0 * lh;
+  s := Format('Salinghöhe - Offset = %d mm', [SalingH - SalingHOffset]);
   g.TextOut(PosX, PosY, s);
 
-  g.Font.Color := clGreen;
-  // Canvas.Brush.Color := clWhite;
-  // Canvas.Brush.Style := bsClear;
-  SetTextAlign(g.Handle, TA_LEFT or TA_BOTTOM);
-  PosX := -220*100 div SalingZoom;
-  PosY :=   70*100 div SalingZoom;
+  g.Font.Color := TRggColors.Dodgerblue;
+  PosX := ox;
+  PosY := oy + 1 * lh;
   s := Format('Salinglänge = %d mm',[SalingL]);
   g.TextOut(PosX, PosY, s);
 
-  g.Font.Color := clBlack;
-  // Canvas.Brush.Color := clSilver;
-  // Canvas.Brush.Style := bsClear;
-  // SetTextAlign(Canvas.Handle, TA_LEFT or TA_BOTTOM);
-  PosX := 1000 div SalingZoom;
-  PosY := 3000 div SalingZoom;
+  g.Font.Color := clSilver;
+  PosX := ox;
+  PosY := oy + 2 * lh;
   s := Format('Salinghöhe = %d mm',[SalingH]);
   g.TextOut(PosX, PosY, s);
 
-  g.Font.Color := clFuchsia;
-  // Canvas.Brush.Color := clWhite;
-  // Canvas.Brush.Style := bsClear;
-  SetTextAlign(g.Handle, TA_RIGHT or TA_BOTTOM);
-  PosX := -1500 div SalingZoom;
-  PosY := 1000 div SalingZoom;
-  s := Format('Salinghöhe - Offset = %d mm',[SalingH - SalingHOffset]);
+  g.Font.Color := clYellow;
+  PosX := 20;
+  PosY := oy + 3 * lh;
+  s := Format('SalingHOffset = %d mm', [SalingHOffset]);
   g.TextOut(PosX, PosY, s);
 
-  g.Font.Color := clBlack;
-  // Canvas.Brush.Color := clWhite;
-  // Canvas.Brush.Style := bsClear;
-  SetTextAlign(g.Handle, TA_LEFT or TA_BOTTOM);
-  PosX := 35*100 div SalingZoom;
-  PosY := 180*100 div SalingZoom;
-  s := Format('SalingHOffset = %d mm',[SalingHOffset]);
+  g.Font.Color := clAqua;
+  PosX := 100;
+  PosY := oy + 4 * lh;
+  s := Format('Salingabstand = %d mm',[SalingA]);
   g.TextOut(PosX, PosY, s);
+end;
 
-  SetWindowOrgEx(g.Handle, 0, 0, nil);
-  SetViewPortOrgEx(g.Handle, 0, 0, nil);
-  SetMapMode(g.Handle, MM_TEXT);
+procedure TSalingGraph.SetImage(const Value: TImage);
+begin
+  FImage := Value;
+  InitBitmap;
+end;
+
+procedure TSalingGraph.InitBitmap;
+begin
+  if FBitmap <> nil then
+  begin
+    FBitmap.Free;
+  end;
+  FBitmap := TBitmap.Create;
+  FBitmap.Width := Round(Width * MainVar.Scale);
+  FBitmap.Height := Round(Height * MainVar.Scale);
+  Image.Width := FBitmap.Width;
+  Image.Height := FBitmap.Height;
 end;
 
 procedure TSalingGraph.DrawController(g: TCanvas);
@@ -355,140 +237,225 @@ var
   KlotzX2: Integer;
   PosXE0: Integer;
   StrichX: Integer;
+
   PositionXE0: Integer;
   PositionXE: Integer;
-  ProfilPosMastfuss: Integer;
-  ProfilPosXE: Integer;
-  EdgePosition: Integer;
+  ProfilePosMastfuss: Integer;
+  ProfilePosXE: double;
+  PositionEdge: Integer;
+
+  vPositionXE0: Integer;
+  vPositionXE: Integer;
+  vProfilePosMastfuss: Integer;
+  vProfilePosXE: double;
+  vPositionEdge: Integer;
+
   s: string;
   clDeck: TColor;
   clMarke: TColor;
   clMassband: TColor;
-  tmpFontSize: Integer;
   txtHeight: Integer;
-  t: Integer;
-begin
-  tmpFontSize := g.Font.Size;
-  g.Font.Size := tmpFontSize * 50;
+  u, v: Integer;
+  f: single;
 
-  clDeck := clTeal;
+  v1: Integer;
+  v3: Integer;
+  v5: Integer;
+  v6: Integer;
+  v7: Integer;
+  v15: Integer;
+  v80: Integer;
+  v32: Integer;
+  v20: Integer;
+  v30: Integer;
+  v40: Integer;
+  v50: Integer;
+  v60: Integer;
+  v10: Integer;
+  v85: Integer;
+  v100: Integer;
+  v105: Integer;
+begin
+  clDeck := TRggColors.Cornflowerblue;
   clMarke := clYellow;
   clMassband := clGray;
 
   PositionXE0 := 95; { Position der Ablesemarke, Konstante in der Grafik }
   PositionXE := PositionXE0-ControllerPos; { Position linke Kante Mastklotz }
-  ProfilPosMastfuss := PositionXE0-ParamXE0-72; { Position Hinterkante Mastfuss }
-  ProfilPosXE := ProfilPosMastfuss+ParamXE; { Position Hinterkante Mast in Höhe Punkt E }
-  EdgePosition := PositionXE0-EdgePos + 15; { Abstand Deckanschlag - E0 }
+  PositionEdge := PositionXE0-EdgePos + 15; { Abstand Deckanschlag - E0 }
+  ProfilePosMastfuss := PositionXE0-ParamXE0-72; { Position Hinterkante Mastfuss }
+  ProfilePosXE := ProfilePosMastfuss+ParamXE; { Position Hinterkante Mast in Höhe Punkt E }
 
-  OffsetX := 0;
-  Lage := quer;
+  f := 2.0 * MainVar.Scale;
 
-  SetMapMode(g.Handle, MM_ISOTROPIC);
-  SetWindowExtEx(g.Handle, 10000, 10000, nil);
-  SetWindowOrgEx(g.Handle, 0, 0, nil);
-  SetViewPortExtEx(g.Handle, PBSize.x, -PBSize.y, nil);
-  SetViewPortOrgEx(g.Handle, PBSize.x div 2, PBSize.y div 2, nil);
+  vPositionXE0 := Round(PositionXE0 * f);
+  vPositionXE := Round(PositionXE * f);
+  vPositionEdge := Round(PositionEdge * f);
+  vProfilePosMastfuss := Round(ProfilePosMastfuss * f);
+  vProfilePosXE := Round(ProfilePosXE * f);
+
+  v1 := Round(1 * f);
+  v3 := Round(3 * f);
+  v5 := Round(5 * f);
+  v6 := Round(6 * f);
+  v7 := Round(7 * f);
+  v10 := Round(10 * f);
+  v15 := Round(15 * f);
+  v20 := Round(20 * f);
+  v30 := Round(30 * f);
+  v32 := Round(32 * f);
+  v40 := Round(40 * f);
+  v50 := Round(50 * f);
+  v60 := Round(60 * f);
+  v80 := Round(80 * f);
+  v85 := Round(85 * f);
+  v100 := Round(100 * f);
+  v105 := Round(105 * f);
+
+  SetViewPortOrgEx(g.Handle,
+    Round(Width * MainVar.Scale/2),
+    Round(Height * MainVar.Scale/2), nil);
 
   { Mastfuß angedeutet mit Mastquerschnitt }
-  OffsetY := ProfilPosMastfuss * 100; { OffsetY entspricht OffsetX, da gedreht }
-  g.Pen.Color := clBlack;
-  DrawProfile(g);
+  Lage := quer;
+  OffsetX := 0;
+  OffsetY := vProfilePosMastfuss; { OffsetY entspricht OffsetX, da gedreht }
+  g.Pen.Color := clSilver;
+  ControllerZoom3 := f;
+  InternalDrawProfile3(g);
 
   { Deck }
   g.Pen.Color := clDeck;
   g.Brush.Color := clDeck;
-  g.RoundRect( -10000, -8000,  8500, -3200, 2000, 2000);
-  g.RoundRect( -10000,  8000,  8500,  3200, 2000, 2000);
-  g.Rectangle(   8000, -8000, 10500,  8000);
+  g.RoundRect( -v100, -v80,  v85, -v32, v20, v20);
+  g.RoundRect( -v100,  v80,  v85,  v32, v20, v20);
 
-  { rechter Klotz, um die Rundung im Deckausschnitt zeichnen }
-  KlotzX1 := EdgePosition * 100 - 1000;
-  KlotzX2 := 8000;
+  { Deck vorn }
+  KlotzX1 := vPositionEdge - v10;
+  KlotzX2 := v105 + 100; // or bigger
   g.Pen.Color := clDeck;
   g.Brush.Color := clDeck;
-  g.Rectangle( KlotzX1, -8000, KlotzX2,  8000);
+  g.Rectangle( KlotzX1, -v80, KlotzX2, v80);
 
-  KlotzX2 := EdgePosition * 100;
-  KlotzX1 := KlotzX2 - 2000;
+  { rechter Klotz, um die Rundung im Deckausschnitt zeichnen }
+  KlotzX2 := vPositionEdge;
+  KlotzX1 := KlotzX2 - v20;
   g.Pen.Color := BackgroundColor;
   g.Brush.Color := BackgroundColor;
-  g.RoundRect( KlotzX1, -3200, KlotzX2,  3200, 1000, 1000);
+  g.RoundRect( KlotzX1, -v32, KlotzX2,  v32, v10, v10);
 
-  { Controller ausblenden, wenn OhneSaling/Mast starr }
+  { when active }
   if ControllerTyp <> ctOhne then
   begin
     { linker Klotz }
-    KlotzX1 := PositionXE * 100;
-    KlotzX2 := KlotzX1 + 1500;
+    KlotzX1 := vPositionXE;
+    KlotzX2 := KlotzX1 + v15;
     g.Pen.Color := clBlack;
     g.Brush.Color := clAqua;
-    g.Rectangle( KlotzX1, -4000, KlotzX2,  4000);
+    g.Rectangle( KlotzX1, -v40, KlotzX2, v40);
 
     { Maßband Hintergrund }
-    PosXE0 := PositionXE0 * 100;
+    PosXE0 := vPositionXE0;
     g.Pen.Color := clRed;
     g.Brush.Color := clMassband;
-    g.Rectangle( KlotzX1, -700, PosXE0 + 1000, 700);
+    g.Rectangle( KlotzX1, -v7, PosXE0 + v100, v7);
+
     { Maßband Beschriftung }
+    g.Font.Height := v6;
     g.Pen.Color := clWhite;
     g.Font.Color := clWhite;
-    SetTextAlign(g.Handle, TA_CENTER or TA_TOP);
     StrichX := KlotzX1;
     for i := 1 to 20 do
     begin
-      StrichX := StrichX + 1000;
-      g.MoveTo(StrichX, -500);
-      g.LineTo(StrichX, 500);
+      StrichX := StrichX + v10;
+      g.MoveTo(StrichX, -v5);
+      g.LineTo(StrichX, v5);
       s := IntToStr(i);
       txtHeight := g.Font.Height;
-      t := -500 + (1000 - txtHeight) div 2;
-      g.TextOut(StrichX, t, S);
+      if i < 10 then
+        u := StrichX - v1
+      else
+        u := StrichX - v3;
+      v := txtHeight div 2;
+      g.TextOut(u, -v, s)
     end;
 
     { Ablesemarke an Stelle EO }
     g.Pen.Color := clMarke;
     g.Brush.Style := bsClear;
-    g.Rectangle( PosXE0-250, -1000, PosXE0+250, 1000);
+    g.Rectangle( PosXE0 - v3, -v10, PosXE0 + v3, v10);
     g.Font.Color := clMarke;
-    g.TextOut(PosXE0, 2000, 'E0');
-    g.TextOut(5000, -4200, 'Ablesemarke an Position E0 + Offset');
-
-    { ButtonRechteck }
-    { wirkt in Verbindung mit Shape oder Region }
-    (*
-    Canvas.Pen.Color := clMarke;
-    Canvas.Brush.Style := bsClear;
-    Canvas.RoundRect(PosXE0-2300, 4600, PosXE0+250, 3400, 250, 250);
-    Canvas.Font.Color := clMarke;
-    SetTextAlign(Canvas.Handle, TA_LEFT or TA_TOP);
-    Canvas.TextOut(PosXE0-2200, 4400, 'Zustellen');
-    *)
+    g.Font.Height := Round(20 * MainVar.Scale);
+    g.TextOut(PosXE0 - v10, v15, 'E0');
+    g.TextOut(-v60, v40, 'Ablesemarke an Position E0 + Offset');
   end;
 
-  { Mastquerschnitt in Höhe E }
-  if ProfilPosXE > 250 then
-    ProfilPosXE := 250; { Integerüberlauf vermeiden! }
-  if ProfilPosXE < -250 then
-    ProfilPosXE := -250; { Integerüberlauf vermeiden! }
-  OffsetY := ProfilPosXE * 100;
-  g.Pen.Color := clBlue;
-  g.Pen.Width := 90;
-  DrawProfile(g);
-  g.Pen.Width := 1;
+  g.Brush.Style := bsClear;
+  g.Font.Color := clMarke;
+  g.Font.Height := Round(16 * MainVar.Scale);
+  g.Font.Color := clAqua;
+  g.TextOut(v30, -v50, Format('ControllerPos = %d', [ControllerPos]));
+//  g.TextOut(0, -v50, Format('Beta = %6.2f', [Main.RggMain.Rigg.Beta]));
+//  g.TextOut(0, -v40, Format('alpha1 = %6.2f', [Main.RggMain.Rigg.alpha1]));
+//  g.TextOut(0, -v50, Format('lc = %6.2f', [Main.RggMain.Rigg.lc]));
+  { drift because of how le is determined, see RggUnit2.FanIn() }
+  g.TextOut(v30, -v40, Format('le = %6.2f', [Main.Rigg.le]));
+  g.TextOut(v30, -v30, Format('BiegungE = %6.2f', [Main.Rigg.BiegungE]));
+  g.TextOut(v30, -v20, Format('ParamXE = %6.2f', [ParamXE]));
 
-  // SetWindowOrgEx(Canvas.Handle, 0, 0, nil); { war schon auf 0,0 }
+//  g.TextOut(0, -v50, Format('ControllerPos = %d', [ControllerPos]));
+//  g.Font.Color := TRggColors.Yellow;
+//  g.TextOut(0, -v40, Format('ProfilPosXE = %6.2f', [ProfilePosXE]));
+//  g.Font.Color := TRggColors.Orange;
+//  g.TextOut(0, -v30, Format('ParamXE = %6.2f', [ParamXE]));
+
+  { Mastquerschnitt in Höhe E }
+  g.Pen.Color := TRggColors.Cornflowerblue;
+  g.Pen.Width := 1;
+  ControllerZoom3 := f;
+  OffsetY := Round(vProfilePosXE);
+  InternalDrawProfile3(g);
+
   SetViewPortOrgEx(g.Handle, 0, 0, nil);
-  SetMapMode(g.Handle, MM_TEXT);
-  { Es Die origins werden von SetMapMode MM_TEXT nicht automatisch zurückgesetzt!
-   Alternative: }
-  (*
-  SetWindowExtEx(Canvas.Handle, 1, 1, nil);
-  SetWindowOrgEx(Canvas.Handle, 0, 0, nil);
-  SetViewPortExtEx(Canvas.Handle, 1, 1, nil);
-  SetViewPortOrgEx(Canvas.Handle, 0, 0, nil);
-  *)
-  g.Font.Size := tmpFontSize;
+end;
+
+destructor TSalingGraph.Destroy;
+begin
+  FBitmap.Free;
+  inherited;
+end;
+
+procedure TSalingGraph.Draw(df: TFigure);
+begin
+  if Image = nil then
+    Exit;
+
+  PaintBackground(FBitmap.Canvas);
+
+  case df of
+    dtTest: ;
+    dtSalingAll: ;
+    dtSalingDetail: DrawSaling(FBitmap.Canvas);
+    dtController: DrawController(FBitmap.Canvas);
+    dtProfileDrawHoch: ;
+    dtProfileDrawQuer: ;
+    dtProfileOuter: ;
+    dtProfileInner: ;
+    dtProfileLeft: ;
+    dtProfileRight: ;
+  end;
+
+  Image.Canvas.CopyMode := cmSrcCopy;
+  Image.Canvas.Draw(0, 0, FBitmap);
+end;
+
+procedure TSalingGraph.PaintBackground(g: TCanvas);
+var
+  R: TRect;
+begin
+  R := Rect(0, 0, Image.Width, Image.Height);
+  g.Brush.Color := BackgroundColor;
+  g.FillRect(R);
 end;
 
 end.

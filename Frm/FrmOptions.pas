@@ -176,8 +176,7 @@ implementation
 {$R *.DFM}
 
 uses
-  RiggVar.RG.Def,
-  RggModul;
+  RiggVar.RG.Def;
 
 procedure TOptionForm.GetKeyList(Source, Dest: TStringList);
 var
@@ -204,8 +203,6 @@ begin
 
   TrimmTabGraph := TTrimmTabGraph.Create;
   TrimmTabGraph.Image := Image;
-
-  Init(RiggModul.Rigg);
 end;
 
 procedure TOptionForm.Init(ARigg: TRigg);

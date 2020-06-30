@@ -6,9 +6,9 @@ uses
   RggTypes,
   RggDisplayTypes,
   RiggVar.FB.Classes,
-  System.SysUtils,
-  System.Classes,
-  System.Math.Vectors;
+  SysUtils,
+  Classes,
+  RggVector;
 
 type
   TDisplayOrderReport = (
@@ -57,9 +57,9 @@ type
     oo2: TRiggPoint;
     Vert1: TRggVert;
     Vert2: TRggVert;
-    V1: TPoint3D;
-    V2: TPoint3D;
-    Direction: TPoint3D;
+    V1: vec3;
+    V2: vec3;
+    Direction: vec3;
     constructor Create(Aee: TRiggEdge; Ao1, Ao2: TRiggPoint);
     procedure Init(Frame: TRggFrame);
     procedure Update;
@@ -77,9 +77,9 @@ type
     Edge2: TRggEdge;
     Edge3: TRggEdge;
     IsFrontFacing: Boolean;
-    E1: TPoint3D;
-    E2: TPoint3D;
-    E3: TPoint3D;
+    E1: vec3;
+    E2: vec3;
+    E3: vec3;
     SortedEdges: array[0..2] of TRggEdge;
     EdgeCount: Integer;
     constructor Create(Aff: TRiggFace; Ae1, Ae2, Ae3: TRiggEdge);
@@ -337,16 +337,16 @@ end;
 
 procedure TRggEdge.Update;
 begin
-  V1 := TPoint3D.Create(Vert1.Point[x], Vert1.Point[y], Vert1.Point[z]);
-  V2 := TPoint3D.Create(Vert2.Point[x], Vert2.Point[y], Vert2.Point[z]);
-  Direction := (V2-V1).Normalize;
+  V1 := InitPoint3D(Vert1.Point[x], Vert1.Point[y], Vert1.Point[z]);
+  V2 := InitPoint3D(Vert2.Point[x], Vert2.Point[y], Vert2.Point[z]);
+  Direction := Normalize3D(Subtract(V2, V1));
 end;
 
 { TRggFace }
 
 procedure TRggFace.CheckOrientation;
 begin
-  IsFrontFacing := Edge1.Direction.CrossProduct(Edge2.Direction).Y > 0;
+  IsFrontFacing := Cross(Edge1.Direction, Edge2.Direction).Y > 0;
 end;
 
 constructor TRggFace.Create(Aff: TRiggFace; Ae1, Ae2, Ae3: TRiggEdge);
@@ -373,7 +373,6 @@ procedure TRggFace.SortEdges;
 var
   cr12: TRggLinePair;
   cr23: TRggLinePair;
-  cr31: TRggLinePair;
 begin
   cr12.L1.A.P := Edge1.Vert1.Point;
   cr12.L1.B.P := Edge1.Vert2.Point;
@@ -384,11 +383,6 @@ begin
   cr23.L1.B.P := Edge2.Vert2.Point;
   cr23.L2.A.P := Edge3.Vert1.Point;
   cr23.L2.B.P := Edge3.Vert2.Point;
-
-  cr31.L1.A.P := Edge3.Vert1.Point;
-  cr31.L1.B.P := Edge3.Vert2.Point;
-  cr31.L2.A.P := Edge1.Vert1.Point;
-  cr31.L2.B.P := Edge1.Vert2.Point;
 
   if cr12.CompareCommon > 0 then
   begin
@@ -858,7 +852,7 @@ procedure TRggFrame.CrossReport(ML: TStrings);
 var
   e1, e2: TRggEdge;
   s1, s2: string;
-  p: TPoint3D;
+  p: vec3;
 begin
   ML.Add('');
 
@@ -866,14 +860,14 @@ begin
   e2 := Edges[B0C0];
   s1 := EdgeNames[e1.ee];
   s2 := EdgeNames[e2.ee];
-  p := e1.Direction.CrossProduct(e2.Direction);
+  p := Cross(e1.Direction, e2.Direction);
   ML.Add(Format('%s x %s = (%.2f, %.2f, %.2f)', [s1, s2, p.X, p.Y, p.Z]));
 
   e1 := Edges[B0A0];
   e2 := Edges[A0C0];
   s1 := EdgeNames[e1.ee];
   s2 := EdgeNames[e2.ee];
-  p := e1.Direction.CrossProduct(e2.Direction);
+  p := Cross(e1.Direction, e2.Direction);
   ML.Add(Format('%s x %s = (%.2f, %.2f, %.2f)', [s1, s2, p.X, p.Y, p.Z]));
 end;
 

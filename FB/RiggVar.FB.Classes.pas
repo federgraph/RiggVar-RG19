@@ -23,9 +23,9 @@ interface
 {$endif}
 
 uses
-  SysUtils,
-  Classes,
-  Math;
+  System.SysUtils,
+  System.Classes,
+  System.Math;
 
 const
   BoolStr: array[Boolean] of string = ('False', 'True');

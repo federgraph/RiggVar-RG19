@@ -2,26 +2,32 @@
 
 interface
 
-{$define Rigg19}
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
 
 uses
-  Winapi.Windows,
-  System.SysUtils,
-  System.Classes,
-  System.Types,
-  System.UITypes,
-  Vcl.Graphics,
-  Vcl.Forms,
-  Vcl.Controls,
-  Vcl.Menus,
-  Vcl.StdCtrls,
-  Vcl.ExtCtrls,
-  Vcl.ComCtrls,
-  Vcl.ExtDlgs,
+{$ifdef fpc}
+  LCLIntf,
+  LCLType,
+{$endif}
+{$ifdef MSWindows}
+  Windows,
+{$endif}
+  SysUtils,
+  Classes,
+  Types,
+  Graphics,
+  Forms,
+  Controls,
+  StdCtrls,
+  ExtCtrls,
+  ComCtrls,
   RggVector,
   RiggVar.RG.Graph,
   RggTypes,
   RggMatrix,
+  RggCircleGraph,
   RggRaumGraph,
   RggGraph,
   RggHull,
@@ -71,8 +77,7 @@ type
     MinTrackX, MinTrackY: Integer;
     MaxTrackX, MaxTrackY: Integer;
     CreatedScreenWidth: Integer;
-    Bitmap: TBitmap;
-    procedure PaintBackGround(Image: TBitmap);
+    procedure PaintBackGround(g: TCanvas);
     procedure PaintBox3DPaint(Sender: TObject);
   private
     FViewPoint: TViewPoint;
@@ -143,6 +148,10 @@ type
     procedure UpdateMatrixText;
     procedure DrawMatrix(g: TCanvas);
   private
+    FScale: single;
+    FBitmapWidth: Integer;
+    FBitmapHeight: Integer;
+    Bitmap: TBitmap;
     EraseBK: Boolean;
     procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
     procedure Translate(x, y: Integer);
@@ -171,12 +180,14 @@ type
     function SingleDraw: Boolean;
   public
     IsUp: Boolean;
-    PaintBox3D: TPaintBox; // injected and replaced
+    Image: TImage; // injected
 
+    CircleGraph: TCircleGraph;
     HullGraph: THullGraph0;
     RaumGraph: TRaumGraph;
     UseDisplayList: Boolean;
     WantOverlayedRiggs: Boolean;
+    WantCircles: Boolean;
 
     constructor Create;
     destructor Destroy; override;
@@ -209,14 +220,18 @@ type
 
     property OnBeforeDraw: TNotifyEvent read FOnBeforeDraw write SetOnBeforeDraw;
     property OnAfterDraw: TNotifyEvent read FOnAfterDraw write SetOnAfterDraw;
+
+    property BitmapWidth: Integer read FBitmapWidth;
+    property BitmapHeight: Integer read FBitmapHeight;
   end;
 
 implementation
 
 uses
-  RggDisplay,
+  RiggVar.App.Main,
+  RiggVar.FB.ActionConst,
   RiggVar.RG.Def,
-  RggPBox, // special paintbox which captures the mouse properly
+  RggDisplay,
   RggZug3D,
   RggTestData;
 
@@ -224,21 +239,25 @@ uses
 
 constructor TRotaForm.Create;
 begin
+  FScale := MainVar.Scale;
   KeepInsideItemChecked := True;
   FBogen := True;
 
-    { do almost nothing here,
+  { do almost nothing here,
     - Image reference needs to be injected first,
     later Init must be called, from the outside.
   }
+
+  CircleGraph := TCircleGraph.Create;
 end;
 
 destructor TRotaForm.Destroy;
 begin
-  Paintbox3D.Free;
+  Image := nil;
   Bitmap.Free;
   RaumGraph.Free;
   HullGraph.Free;
+  CircleGraph.Free;
   Rotator.Free;
   Transformer.Free;
   inherited;
@@ -247,7 +266,6 @@ end;
 procedure TRotaForm.Init;
 var
   wx, wy: Integer;
-  NewPaintBox: TPaintBox;
 begin
   FDrawAlways := True;
   AlwaysShowAngle := False;
@@ -265,30 +283,25 @@ begin
   if wy > MaxTrackY then
     wy := MaxTrackY;
 
+  FBitmapWidth := wx;
+  FBitmapHeight := wy;
+
   Bitmap := TBitmap.Create;
-  Bitmap.Width := wx;
-  Bitmap.Height := wy;
-  PaintBackGround(Bitmap);
+  Bitmap.Width := Round(FBitmapWidth * FScale);
+  Bitmap.Height := Round(FBitmapHeight * FScale);
+  PaintBackGround(Bitmap.Canvas);
+
+  Image.Picture.Graphic := Bitmap;
 
   FZoomBase := 0.05;
   FViewPoint := vp3D;
-  FFixPoint := ooD;
+  FFixPoint := ooD0;
+//  FXPos := Round(-260 * FScale);
+//  FYPos := 0;
 
-  { PaintBox }
-  NewPaintBox := TRggPaintBox.Create(PaintBox3D.Owner);
-  try
-    NewPaintBox.Parent := PaintBox3D.Parent;
-    NewPaintBox.Align := PaintBox3D.Align;
-    NewPaintBox.OnMouseDown := PaintBox3DMouseDown;
-    NewPaintBox.OnMouseMove := PaintBox3DMouseMove;
-    NewPaintBox.OnMouseUp := PaintBox3DMouseUp;
-    NewPaintBox.OnPaint := PaintBox3DPaint;
-
-    PaintBox3D.Free;
-    PaintBox3D := NewPaintBox;
-  except
-    NewPaintBox.Free;
-  end;
+  Image.OnMouseDown := PaintBox3DMouseDown;
+  Image.OnMouseMove := PaintBox3DMouseMove;
+  Image.OnMouseUp := PaintBox3DMouseUp;
 
   InitGraph;
   InitRaumGraph;
@@ -319,7 +332,7 @@ end;
 
 procedure TRotaForm.InitHullGraph;
 begin
-  HullGraph := THullGraph.Create;
+  HullGraph := THullGraph0.Create;
   HullGraph.Transformer := Transformer;
 end;
 
@@ -401,14 +414,19 @@ begin
 end;
 
 procedure TRotaForm.DrawMatrix(g: TCanvas);
+var
+  tx: Integer;
+  th: Integer;
 begin
+  tx := Round(20 * FScale);
+  th := Round(20 * FScale);
   with g do
   begin
     Font.Name := 'Courier New';
     Font.Size := 10;
-    TextOut(20,40, MatrixTextU);
-    TextOut(20,60, MatrixTextU);
-    TextOut(20,80, MatrixTextU);
+    TextOut(tx, 2 * th, MatrixTextU);
+    TextOut(tx, 3 * th, MatrixTextV);
+    TextOut(tx, 4 * th, MatrixTextW);
   end;
 end;
 
@@ -429,10 +447,13 @@ begin
   end;
 
   { Bitmap auf den Bildschirm kopieren }
-  with PaintBox3D.Canvas do
+  Image.Canvas.CopyMode := cmSrcCopy;
+  Image.Canvas.Draw(0, 0, Bitmap);
+
+  if WantCircles then
   begin
-    CopyMode := cmSrcCopy;
-    Draw(0, 0, Bitmap);
+    CircleGraph.Action;
+    CircleGraph.Draw(Image.Canvas, 0, 0);
   end;
 
   Painted := True;
@@ -487,7 +508,7 @@ begin
   end
   else if not PaintItemChecked or EraseBK then
   begin
-    PaintBackGround(Bitmap);
+    PaintBackGround(Bitmap.Canvas);
     EraseBK := False;
   end;
 
@@ -502,17 +523,11 @@ begin
     DrawMatrix(g);
   end;
 
-  with g do
-  begin
-    SetMapMode(Handle, MM_ANISOTROPIC);
-    SetWindowExtEx(Handle, 1000, 1000, nil);
-    SetWindowOrgEx(Handle, 0, 0, nil);
-    SetViewPortExtEx(Handle, 1000, 1000, nil);
-    SetViewPortOrgEx(Handle, NullpunktOffset.x, NullpunktOffset.y, nil);
-  end;
+  SetViewPortOrgEx(g.Handle, NullpunktOffset.x, NullpunktOffset.y, nil);
 
   if UseDisplayList then
   begin
+    UpdateDisplayListForBoth(False);
     TDisplayItem.NullpunktOffset := NullpunktOffset;;
     RaumGraph.DL.WantLegend := LegendItemChecked; // not RumpfItemChecked;
     RaumGraph.DL.Draw(g);
@@ -525,12 +540,7 @@ begin
   { This method will first check whether this should be done at all. }
   DrawHullNormal(g);
 
-  with g do
-  begin
-    SetWindowOrgEx(Handle, 0, 0, nil);
-    SetViewPortOrgEx(Handle, 0, 0, nil);
-    SetMapMode(Handle, MM_TEXT);
-  end;
+  SetViewPortOrgEx(g.Handle, 0, 0, nil);
 end;
 
 procedure TRotaForm.DoTrans;
@@ -558,10 +568,10 @@ begin
     ymin := -Bitmap.Height div 2;
     xmax := Abs(xmin);
     ymax := Abs(ymin);
-    if xmax > xmin + PaintBox3D.Width then
-      xmax := xmin + PaintBox3D.Width;
-    if ymax > ymin + PaintBox3D.Height then
-      ymax := ymin + PaintBox3D.Height;
+    if xmax > xmin + Image.Width then
+      xmax := xmin + Image.Width;
+    if ymax > ymin + Image.Height then
+      ymax := ymin + Image.Height;
   end
   else
   begin
@@ -855,13 +865,13 @@ begin
   result := RPN[FFixPoint];
 end;
 
-procedure TRotaForm.PaintBackGround(Image: TBitmap);
+procedure TRotaForm.PaintBackGround(g: TCanvas);
 var
   R: TRect;
 begin
   R := Rect(0, 0, Image.Width, Image.Height);
-  Image.Canvas.Brush.Color := clGray;
-  Image.Canvas.FillRect(R);
+  g.Brush.Color := clGray; // TRggColors.WindowWhite;
+  g.FillRect(R);
 end;
 
 procedure TRotaForm.PaintBox3DPaint(Sender: TObject);
@@ -871,12 +881,27 @@ end;
 
 procedure TRotaForm.ToggleRenderOption(const fa: Integer);
 begin
-
+  case fa of
+    faWantRenderE: RaumGraph.WantRenderE := not RaumGraph.WantRenderP;
+    faWantRenderF: RaumGraph.WantRenderF := not RaumGraph.WantRenderF;
+    faWantRenderH: RaumGraph.WantRenderH := not RaumGraph.WantRenderH;
+    faWantRenderP: RaumGraph.WantRenderP := not RaumGraph.WantRenderP;
+    faWantRenderS: RaumGraph.WantRenderS := not RaumGraph.WantRenderS;
+  end;
 end;
 
 function TRotaForm.QueryRenderOption(const fa: Integer): Boolean;
 begin
-  result := False;
+  case fa of
+    faHull: result := RumpfItemChecked;
+    faWantRenderE: result := RaumGraph.WantRenderE;
+    faWantRenderF: result := RaumGraph.WantRenderF;
+    faWantRenderH: result := RaumGraph.WantRenderH;
+    faWantRenderP: result := RaumGraph.WantRenderP;
+    faWantRenderS: result := RaumGraph.WantRenderS;
+    else
+      result := False;
+  end;
 end;
 
 function TRotaForm.GetMastKurvePoint(const Index: Integer): TRealPoint;

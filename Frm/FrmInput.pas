@@ -111,6 +111,7 @@ implementation
 {$R *.DFM}
 
 uses
+  RiggVar.App.Main,
   RiggVar.RG.Def,
   RggModul,
   RggTypes;
@@ -201,8 +202,11 @@ procedure TInputForm.FormHide(Sender: TObject);
 begin
   if RiggModul <> nil then
   begin
-    RiggModul.ViewModelMain.InputFormItemChecked := False;
-    RiggModul.ViewModelMain.UpdateView;
+    if RiggModul.ViewModelMain <> nil then
+    begin
+      RiggModul.ViewModelMain.InputFormItemChecked := False;
+      RiggModul.ViewModelMain.UpdateView;
+    end;
   end;
 end;
 

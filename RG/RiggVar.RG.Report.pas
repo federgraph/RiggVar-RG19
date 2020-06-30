@@ -2,10 +2,13 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  System.SysUtils,
-  System.Classes,
-  Vcl.StdCtrls,
+  SysUtils,
+  Classes,
   RiggVar.FB.ActionConst,
   RggReport;
 
@@ -37,7 +40,7 @@ type
 
   TRggReportManager = class
   private
-    FMemo: TMemo;
+    FMemo: TStrings;
     ML: TStrings;
     RiggReport: TRiggReport;
     RDR: array[0..Integer(High(TRggReport))] of TRggReport; //TDictionary<Integer, TRggReport>;
@@ -51,7 +54,7 @@ type
     procedure SetXmlAllTags(const Value: Boolean);
     procedure SetCurrentReport(const Value: TRggReport);
   public
-    constructor Create(Memo: TMemo);
+    constructor Create(MemoLines: TStrings);
     destructor Destroy; override;
     procedure InitLB(LB: TStrings);
     procedure HandleAction(fa: Integer);
@@ -68,16 +71,14 @@ type
 implementation
 
 uses
-  Winapi.Windows,
-  Winapi.Messages,
   RiggVar.App.Main;
 
 { TRggReportManager }
 
-constructor TRggReportManager.Create(Memo: TMemo);
+constructor TRggReportManager.Create(MemoLines: TStrings);
 begin
-  FMemo := Memo;
-  ML := Memo.Lines;
+  FMemo := MemoLines;
+  ML := MemoLines;
   RiggReport := TRiggReport.Create;
   InitRD;
 end;
@@ -216,12 +217,9 @@ begin
 end;
 
 procedure TRggReportManager.ShowCurrentReport;
-var
-  MemoPosY: LongInt;
 begin
   ML.BeginUpdate;
   try
-    MemoPosY := SendMessage(FMemo.Handle, EM_GETFIRSTVISIBLELINE, 0, 0);
     ML.Clear;
     case CurrentReport of
       rgNone: ;
@@ -232,11 +230,6 @@ begin
         ML.Add('Wheel by itself will scroll Text in Controls.');
         ML.Add('Shift-Wheel changes current param value (small step)');
         ML.Add('Ctrl-Wheel changes current param value (big step)');
-        ML.Add('The "mouse" must be over this window (Form Text).');
-        ML.Add('');
-        ML.Add('- Form Text was added on top of the "old" application.');
-        ML.Add('- In Xml Report current text scroll position is maintained.');
-        ML.Add('- Try out AutoCalc mode (On) while using shift wheel.');
       end;
       rgLog: ML.Text := Main.Logger.TL.Text;
       rgJson: Main.RggData.WriteJSon(ML);
@@ -277,11 +270,12 @@ begin
         RiggReport.AusgabeDiffP(Main.Rigg.rP, Main.Rigg.rPE);
         ML.Assign(RiggReport.ML);
       end;
+{$ifdef MSWindowsDelphi}
       rgXML:
       begin
-        Main.Rigg.WriteXml(ML, XmlAllTags);
-        SendMessage(FMemo.Handle, EM_LINESCROLL, 0, MemoPosY);
+        Main.RggMain.Rigg.WriteXml(ML, XmlAllTags);
       end;
+{$endif}
       rgShort: ML.Text := Main.TrimmShort;
       rgLong: ML.Text := Main.TrimmLong;
       rgDiffText: Main.UpdateDiffText(ML);
@@ -326,7 +320,7 @@ begin
   Include(rs, rgAusgabeDiffL);
 //  Include(rs, rgAusgabeDiffP);
 
-  Include(rs, rgXML);
+  //Include(rs, rgXML);
   Include(rs, rgDebugReport);
   Include(rs, rgReadme);
   Include(rs, rgNone);

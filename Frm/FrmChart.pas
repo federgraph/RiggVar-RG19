@@ -6,7 +6,7 @@ interface
 {$mode delphi}
 {$endif}
 
-{$define RG19}
+{.$define RG19}
 
 uses
   Winapi.Windows,

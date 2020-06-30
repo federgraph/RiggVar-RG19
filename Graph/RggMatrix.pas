@@ -3,12 +3,8 @@
 interface
 
 uses
-  System.SysUtils,
-  System.Math,
-  System.Math.Vectors,
-  Vcl.Graphics,
-  RggVector,
-  RggTypes;
+  RggTypes,
+  RggVector;
 
 const
   maxvert = 400;
@@ -47,7 +43,6 @@ type
     procedure Transform(var v: TVertArrayF; var tv: TVertArrayI; nvert: Integer);
     procedure TransformF(var v: TVertArrayF; var tv: TVertArrayF; nvert: Integer);
     procedure CopyFrom(m: TMatrix4x4);
-    function GetDelphiMatrix3D: TMatrix3D;
     property Mat: Matrix4x4 read FMat write FMat;
   end;
 
@@ -422,16 +417,6 @@ begin
   uz.x := FMat[1, 3];
   uz.y := FMat[2, 3];
   uz.z := FMat[3, 3];
-end;
-
-function TMatrix4x4.GetDelphiMatrix3D: TMatrix3D;
-begin
-  result := TMatrix3D.Create(
-    FMat[1, 1], FMat[2, 1], FMat[3, 1], FMat[4, 1],
-    FMat[1, 2], FMat[2, 2], FMat[3, 2], FMat[4, 2],
-    FMat[1, 3], FMat[2, 3], FMat[3, 3], FMat[4, 3],
-    FMat[1, 4], FMat[2, 4], FMat[3, 4], FMat[4, 4]
-  );
 end;
 
 { TRotaParams }

@@ -1,60 +1,46 @@
-# RiggVar-RG19
+﻿# RiggVar-RG19
 
-This is the original (legacy) Delphi VCL Rigg Application.
+VCL version of Trimm 420.
 
-Other Names:
-- RiggVar
-- Rgg19
-- RG19
+```
+(*
+-
+-     F
+-    * * *
+-   *   *   G
+-  *     * *   *
+- E - - - H - - - I
+-  *     * *         *
+-   *   *   *           *
+-    * *     *             *
+-     D-------A---------------B
+-              *
+-              (C) federgraph.de
+-
+*)
+```
 
-Most of the code was developed between October 1995 and January 1998,
-based on paper and pencil work done in 1991 and 1992.
+In this repo I will transition from old to new.
 
-Original developer: Gustav Schubert.
+I started the repo by uploading old code, very close to the original version of 1997.
 
-This project is now public under the GPL license.
+Note that I already have new versions of the app  - with less features - but with better looking graphics and also for other compilers, including fpc.
+the fpc version will be in another repo.
 
-> This repository is in maintenance mode.
+> This repos may end up being - or continuing to be - the feature richest.
 
-> Use this project for reference only.
+## I jumped!
 
-> Delphi development will now continue in RiggVar-RG38 (FMX).
+I have just taken an aggressive step by including a VCL version of the button frame, which is great for touch screen.
 
-I have been working recently on RG19 with the goal of getting old and new sources (VCL and FMX) in sync as much as possible (including bug fixes).
-This will help me to rescue some goodies that have been lost in between, during my attempt to build a tablet version for the store.
+> But original code is still present - in Branch RG19ABC.
 
-Note that this is why - here in this project - we have two competing User Interfaces, which is certainly confusing when you look at the code.
-In terms of Model View Controller, there are two controllers, which try to drive old and new views, respectively.
+Now, suddenly, I have very new code and very old code in the same project.
 
-How everything is supposed to work will be more clear in the new repo.
-Note that the FMX app (over there) will have better graphics.
-Here we still have GDI graphics which is based on Integer coordinates with no antialiasing.
-But if you want to see textual output in a TMemo, the VCL application (here) is still of good use.
-
-## Building
-
-I suggest latest Delphi CE (Community Edition).
-
-## Using the Application
-
-Start by using the wheel of the mouse, Shift-Wheel and Ctrl-Wheel.
-
-## Helping
-
-You could provide concrete data for your boat (420), and test out if you can set up everything so that the predictions of the app match what you can measure at the real boat, on shore, before you take to the lake or sea.
-
-I need help to adapt the program for other, similarly rigged boats.
-
-And much more.
-
-## Notes
-
-- Most of the existing documentation pieces, e.g drawings, relate most directly to this project.
-- Where and how to publish documentation is still to be decided.
-- Note that over the years I have ported parts of the code to java, c#, and typescript, so there is more, but it is basically the same.
-- The old Delphi project contains features that have not yet been surfaced in any of the newer apps.
-- The new Delphi project is currently the most advanced.
-- The new data format should be usable on all platforms.
-- No dependency on any third party components in this project.
-- Just hit F9 in the Delphi IDE and have a look.
-
+- I am in the middle of transition.
+- You can watch me as I go.
+- Trying to reconcile old with new.
+- Want to rescue some features, which did not make it into the published version.
+- This repo will continue to use GDI for drawing, and have no dependencies.
+- Old code not even tested on high-dpi screen.
+- The master branch is work in progress.

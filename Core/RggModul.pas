@@ -12,29 +12,18 @@ uses
   System.Math,
   Vcl.Graphics,
   Vcl.Forms,
-  Vcl.Controls,
-  Vcl.Menus,
-  Vcl.Dialogs,
   Vcl.StdCtrls,
-  Vcl.Buttons,
   Vcl.ExtCtrls,
   Vcl.Tabs,
-  Vcl.ComCtrls,
-  Vcl.Printers,
-  Vcl.Clipbrd,
-  RggRota,
   RggTypes,
-  RggGetriebeGraph,
+  RggCalc,
+  RggUnit4,
+  RggRota,
   RggKraftGraph,
   RggMastGraph,
-  RggUnit4,
   RggReport,
-  RggCalc,
   RggCtrls,
   RggDoc,
-  RggPrinter,
-  RggPolarKar,
-  RggTransformer,
   RiggVar.FB.ActionConst,
   RiggVar.RG.Def,
   RiggVar.VM.FormMain;
@@ -60,8 +49,8 @@ type
     Log_Item
   );
 
-  TRiggModul = class(TComponent)
-  private
+  TRiggModul = class
+  protected
     FBackgroundColor: TColor;
     FKorrigiertItem: Boolean;
     FPaintBtnDown: Boolean;
@@ -88,41 +77,30 @@ type
     NeedPaint: Boolean;
     FGrauZeichnen: Boolean;
     TextFlipFlop: Boolean;
+  public
+    ViewModelMain: TViewModelMain00;
 
-    { Diagram.Begin }
-    sbPuffer: TTrimmControls;
-    TopTitel, LeftTitel, BottomTitel, RightTitel: string;
-    Xmin, Xmax, Ymin, Ymax, YGap: single;
-    ChartPunktX, ChartPunktY: single;
-    PunktColor: TColor;
-    f, TestF: TChartLineData;
-    af: ChartArray;
-    bf: array[0..ANr - 1] of double;
+    Rigg: TRigg;
+    RiggReport: TRiggReport;
+    FWReport: TFWReport;
+    MemCtrl: TTrimmControls;
+    RefCtrl: TTrimmControls;
+    RefPoints: TRealRiggPoints;
+
+    IniFileName: string;
+    lbMastfall, lbSpannung, lbBiegung: string;
+    Modified: Boolean;
+
+    AutoSave: Boolean;
+    AlreadyUpdatedGetriebeFlag: Boolean;
+  protected
     ShowTriangle: Boolean;
-    FConsoleActive: Boolean;
-    FReportFormActive: Boolean;
-    FRotaFormActive: Boolean;
-
-    procedure StraightLine;
-    procedure GetCurves;
-    procedure UpdateGetriebePunkt;
-    procedure UpdateRiggPunkt;
-    procedure DrawChart;
-    procedure LookForYMinMax;
-    function GetXText(sbn: TsbName): string;
-    function GetYText(Text: string): string;
-    function GetPunktColor: TColor;
-    { Diagram.End }
+    sbPuffer: TTrimmControls;
 
     { private Getters and Setters }
     function GetControllerEnabled: Boolean;
     procedure SetKorrigiertItem(Value: Boolean);
-    procedure SetViewPoint(Value: TViewPoint);
     procedure SetPaintBtnDown(Value: Boolean);
-    procedure SetBtnBlauDown(Value: Boolean);
-    procedure SetBtnGrauDown(Value: Boolean);
-    procedure SetKoppelBtnDown(Value: Boolean);
-    procedure SetZweischlagBtnDown(Value: Boolean);
     procedure SetControllerBtnDown(Value: Boolean);
     procedure SetDiffBtnDown(Value: Boolean);
     procedure SetSofortBtnDown(Value: Boolean);
@@ -132,62 +110,19 @@ type
     procedure SetLEDShape(Value: Boolean);
     procedure SetSBName(Value: TSBName);
     procedure SetSalingTyp(Value: TSalingTyp);
-    procedure SetControllerTyp(Value: TControllerTyp);
+    procedure SetControllerTyp(Value: TControllerTyp); virtual; abstract;
     procedure SetWinkelBtnDown(Value: Boolean);
-    procedure SetConsoleActive(const Value: Boolean);
-    procedure SetReportFormActive(const Value: Boolean);
-    procedure SetRotaFormActive(const Value: Boolean);
-    procedure SetBackgroundColor(const Value: TColor);
+  protected
+    procedure UpdateGetriebe; virtual; abstract;
+    procedure UpdateRigg; virtual; abstract;
+    procedure DrawPoint; virtual; abstract;
+    procedure DrawChart; virtual; abstract;
+    procedure PaintBackGround(Image: TBitmap);
   public
-    ViewModelMain: TViewModelMain00;
-    PBG: TPaintbox;
-    RG19A: Boolean; { RG19A = MDI app }
-
-    Rigg: TRigg;
-    RiggReport: TRiggReport;
-    FWReport: TFWReport;
-    MemCtrl: TTrimmControls;
-    RefCtrl: TTrimmControls;
-    RefPoints: TRealRiggPoints;
-
-    ChartFormActive: Boolean;
-
-    IniFileName: string;
-    lbMastfall, lbSpannung, lbBiegung: string;
-    Modified: Boolean;
-
-    GetriebeGraph: TGetriebeGraph;
-    BitmapG: TBitmap;
-    MetaFileG: TRiggMetaFile;
-    DataInMeta: Boolean;
-    DataInMetaCounter: Integer;
-    MetaGPaintCount: Integer;
-    MetaGMaxCount: Integer;
-    ThickPenWidth: Integer;
-
-    SalingGraph: TSalingGraph;
-    BitmapS: TBitmap;
-    BitmapC: TBitmap;
-    ControllerPaintBox: TPaintBox;
-    SalingPaintBox: TPaintBox;
-    KraftPaintBox: TImage;
-    ChartPaintBox: TPaintBox;
-    YComboBox: TComboBox;
-    YComboSavedItemIndex: Integer;
-
-    AutoSave: Boolean;
-    AlreadyUpdatedGetriebeFlag: Boolean;
-
-    MastGraph: TMastGraph;
-    KraftGraph: TKraftGraph;
-
-    constructor Create(AOwner: TComponent); override;
+    constructor Create;
     destructor Destroy; override;
-    procedure Init;
 
     procedure DoOnWheelScroll(fp: TFederParam; ScrollPos: Integer);
-    procedure DoOnUpdateSalingTyp(Value: TSalingTyp);
-    procedure DoUpdateChartBuffer;
     procedure DoResetForTrimmData;
 
     procedure SetupGCtrl(a: TScrollBar; b: TsbName);
@@ -195,66 +130,27 @@ type
     procedure UpdateGControls;
     procedure UpdateGCtrls(InputRec: TTrimmControls);
     procedure UpdateGCtrlLabels(InputRec: TTrimmControls);
-    procedure UpdateGetriebe;
-    procedure UpdateRigg;
-    procedure AusgabeText;
-    procedure AusgabeKommentar;
-    procedure ResetPaintBoxG;
-    procedure PrintPaintBoxG;
-    procedure PreviewPaintBoxG;
-    procedure DrawPaintBoxG(Canvas: TCanvas);
-    procedure DrawToMetaG(Canvas: TMetaFileCanvas);
-    procedure CopyMetaFileG; { --> Clipboard }
-    procedure DrawPaintBoxM;
-    procedure DrawPaintBoxS(Canvas: TCanvas);
-    procedure DrawPaintBoxC(Canvas: TCanvas);
-    procedure Draw;
-    procedure PaintBackGround(Image: TBitmap);
-    procedure DoGraphics;
-    procedure DrawPoint;
-    procedure DrawChartPaintBox(Canvas: TCanvas; Rect: TRect);
-    procedure AdjustGrafik;
-    procedure AdjustGBox(Sender: TObject);
-    procedure GetGBoxOffset;
 
     { former event handlers }
     procedure UpdateUI;
     procedure Neu(Doc: TRggDocument);
     procedure Open(FileName: string);
     procedure Save;
-    procedure About;
     procedure rLItemClick(Item: TReportItem);
     procedure UpdateBtnClick;
     procedure BiegeNeigeItemClick;
     procedure ReglerBtnClick;
-    procedure MemoryBtnClick;
-    procedure MemoryRecallBtnClick;
     procedure FestItemClick;
     procedure OhneItemClick;
     procedure OSDlgItemClick;
     procedure DrehbarItemClick;
-    procedure ZustellBtnClick;
-    procedure OutputPagesChange(Seite: Integer);
-    procedure YComboBoxChange(ItemIndex: Integer);
-    procedure KurveBtnClick;
-    procedure SalingPaintBoxClick;
-    procedure TestBtnClick;
     procedure ChartItemClick;
-    procedure ReportItemClick;
-    procedure OptionItemClick;
-    procedure RotaFormItemClick;
-    procedure PrintGrafik;
     procedure WriteReportToMemo(Memo: TMemo);
     procedure sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
 
     { Properties }
     property KorrigiertItem: Boolean read FKorrigiertItem write SetKorrigiertItem;
-    property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property PaintBtnDown: Boolean read FPaintBtnDown write SetPaintBtnDown;
-    property BtnBlauDown: Boolean read FBtnBlauDown write SetBtnBlauDown;
-    property BtnGrauDown: Boolean read FBtnGrauDown write SetBtnGrauDown;
-    property KoppelBtnDown: Boolean read FKoppelBtnDown write SetKoppelBtnDown;
-    property ZweischlagBtnDown: Boolean read FZweischlagBtnDown write SetZweischlagBtnDown;
     property ControllerBtnDown: Boolean read FControllerBtnDown write SetControllerBtnDown;
     property WinkelBtnDown: Boolean read FWinkelBtnDown write SetWinkelBtnDown;
     property DiffBtnDown: Boolean read FDiffBtnDown write SetDiffBtnDown;
@@ -270,16 +166,84 @@ type
     property ControllerTyp: TControllerTyp read FControllerTyp write SetControllerTyp;
     property SofortBerechnen: Boolean read FSofortBtnDown;
     property GrauZeichnen: Boolean read FGrauZeichnen;
+  end;
 
-    property BackgroundColor: TColor read FBackgroundColor write SetBackgroundColor;
-    property ConsoleActive: Boolean read FConsoleActive write SetConsoleActive;
-    property ReportFormActive: Boolean read FReportFormActive write SetReportFormActive;
-    property RotaFormActive: Boolean read FRotaFormActive write SetRotaFormActive;
+  TRiggModulD = class(TRiggModul)
+  private
+    TopTitel, LeftTitel, BottomTitel, RightTitel: string;
+    Xmin, Xmax, Ymin, Ymax, YGap: single;
+    ChartPunktX, ChartPunktY: single;
+    PunktColor: TColor;
+    f, TestF: TChartLineData;
+    af: ChartArray;
+    bf: array[0..ANr - 1] of double;
+  public
+    YComboBox: TComboBox;
+    YComboSavedItemIndex: Integer;
 
+    ChartPaintBox: TPaintBox;
+
+    procedure DoUpdateChartBuffer;
+    procedure DrawPoint; override;
+    procedure DrawChartPaintBox(Canvas: TCanvas; Rect: TRect);
+    procedure YComboBoxChange(ItemIndex: Integer);
+    procedure KurveBtnClick;
+
+    procedure StraightLine;
+    procedure GetCurves;
+    procedure UpdateGetriebePunkt;
+    procedure UpdateRiggPunkt;
+    procedure DrawChart; override;
+    procedure LookForYMinMax;
+    function GetXText(sbn: TsbName): string;
+    function GetYText(Text: string): string;
+    function GetPunktColor: TColor;
+  end;
+
+  TRiggModulG = class(TRiggModulD)
+  public
+    SalingGraph: TSalingGraph;
+    BitmapS: TBitmap;
+    BitmapC: TBitmap;
+    ControllerPaintBox: TPaintBox;
+    SalingPaintBox: TPaintBox;
+    KraftPaintBox: TImage;
+
+    MastGraph: TMastGraph;
+    KraftGraph: TKraftGraph;
+
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure TestBtnClick;
+
+    procedure ZustellBtnClick;
+    procedure OutputPagesChange(Seite: Integer);
+    procedure SalingPaintBoxClick;
+
+    procedure DoOnUpdateSalingTyp(Value: TSalingTyp);
+    procedure AusgabeText;
+    procedure AusgabeKommentar;
+    procedure DrawPaintBoxM;
+    procedure DrawPaintBoxS(Canvas: TCanvas);
+    procedure DrawPaintBoxC(Canvas: TCanvas);
+    procedure DoGraphics;
+  end;
+
+  TRiggModulA = class(TRiggModulG)
+  protected
+    procedure SetControllerTyp(Value: TControllerTyp); override;
+  public
+    constructor Create(ARigg: TRigg);
+    destructor Destroy; override;
+    procedure Init;
+
+    procedure UpdateGetriebe; override;
+    procedure UpdateRigg; override;
   end;
 
 var
-  RiggModul: TRiggModul;
+  RiggModul: TRiggModulA;
 
 implementation
 
@@ -288,32 +252,19 @@ uses
   RggFachwerk,
   RggScroll,
   RggMatrix,
-  RggZug2D,
-  FrmConsole,
   FrmInput,
   FrmOutput,
-  FrmGrafik,
-  FrmReport,
   FrmSelect,
   FrmRegler,
   FrmReglerGraph,
-  FrmOptions,
   FrmChart,
-  FrmAniRot,
-  FrmRot,
-  FrmPreview,
   FrmBiege,
-  FrmKreis,
-  FrmAdjust;
+  FrmKreis;
 
-constructor TRiggModul.Create(AOwner: TComponent);
+constructor TRiggModul.Create;
 begin
   inherited;
   FBackgroundColor := clBtnFace;
-end;
-
-procedure TRiggModul.Init;
-begin
   FKorrigiertItem := True;
   FPaintBtnDown := False;
   FBtnBlauDown := False;
@@ -334,97 +285,12 @@ begin
   FCursorSB := fpVorstag;
   FSalingTyp := stFest;
   FControllerTyp := ctOhne;
-
-  { FGrauZeichnen := False; }
-  { TextFlipFlop := False; }
-  IniFileName := '';
-
-  RiggModul := Self;
-  ControllerPaintBox := OutputForm.ControllerPaintBox;
-  SalingPaintBox := OutputForm.SalingPaintBox;
-  KraftPaintBox := OutputForm.KraftPaintBox;
-  ChartPaintBox := OutputForm.ChartPaintBox;
-  YComboBox := OutputForm.YComboBox;
-
-  { Rigg }
-  Rigg := TRigg.Create;
-
-  SetupGCtrls;
-
-  MemCtrl := ZeroCtrl;
-  RefCtrl := Rigg.Glieder;
-  sbPuffer := Rigg.Glieder;
-  RefPoints := Rigg.rP;
-
-  { GetriebeGrafik }
-  GetriebeGraph := TGetriebeGraph.Create(TZug4.Create);
-  GetriebeGraph.Transformer := TRggTransformer.Create;
-  GetriebeGraph.Transformer.Rotator := TPolarKar.Create;
-  GetriebeGraph.InitZoom;
-  GetriebeGraph.InitRotation;
-  GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  GetriebeGraph.Koordinaten := Rigg.rP;
-  GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
-  GetriebeGraph.ViewPoint := vpSeite;
-  GetriebeGraph.ControllerTyp := Rigg.ControllerTyp;
-
-  BitmapG := TBitmap.Create;
-  BitmapG.Width := 293;
-  BitmapG.Height := 422;
-  BitmapG.Canvas.Font.Name := 'Arial';
-  BitmapG.Canvas.Font.Height := 14;
-  PaintBackGround(BitmapG);
-
-  MetaGMaxCount := 50;
-  MetaFileG := TRiggMetaFile.Create;
-  MetaFileG.Width := 293;
-  MetaFileG.Height := 422;
-
-  { SalingCtrls }
-  SalingGraph := TSalingGraph.Create;
-  SalingGraph.BackgroundColor := FBackgroundColor;
-  SalingGraph.PBSize := Point(453, 220);
-
-  BitmapS := TBitmap.Create;
-  BitmapS.Width := 453;
-  BitmapS.Height := 220;
-  PaintBackGround(BitmapS);
-
-  BitmapC := TBitmap.Create;
-  BitmapC.Width := 453;
-  BitmapC.Height := 220;
-  PaintBackGround(BitmapC);
-
-  { Berichte }
-  RiggReport := TRiggReport.Create;
-  FWReport := TFWReport.Create;
-
-  {Chart}
-  YComboBox.ItemIndex := 1; { sonst Exception, wenn ItemIndex := -1 }
-  YComboSavedItemIndex := 1;
-  StraightLine;
-  DrawChart;
-
-  MastGraph := TMastGraph.Create;
-  KraftGraph := TKraftGraph.Create(Rigg);
-
-  NeedPaint := True;
 end;
 
 destructor TRiggModul.Destroy;
 begin
-  MastGraph.Free;
-  KraftGraph.Free;
-  GetriebeGraph.Transformer.Rotator.Free;
-  GetriebeGraph.Transformer.Free;
-  GetriebeGraph.Free;
-  SalingGraph.Free;
   RiggReport.Free;
   FWReport.Free;
-  BitmapG.Free;
-  MetaFileG.Free;
-  BitmapS.Free;
-  BitmapC.Free;
 
   ViewModelMain.Free;
 
@@ -540,8 +406,6 @@ begin
   InputForm.sbWPowerOS.Position := InputRec.WPowerOS;
 
   UpdateGCtrlLabels(InputRec);
-  if RotaFormActive then
-    AniRotationForm.Modified := True;
 end;
 
 procedure TRiggModul.sbControllerScroll(Sender: TObject;
@@ -665,26 +529,10 @@ begin
   end;
 end;
 
-procedure TRiggModul.UpdateGetriebe;
-begin
-  Rigg.UpdateGetriebe;
-  if NeedPaint then
-    DoGraphics;
-  NeedPaint := True;
-  if (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK) then
-    UpdateRigg;
-end;
-
-procedure TRiggModul.DoGraphics;
+procedure TRiggModulG.DoGraphics;
 var
   TrimmRec: TTrimmControls;
 begin
-  { Koppelkurve }
-  if (SalingTyp = stFest) and (KoppelBtnDown = True) then
-    GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
-
-  GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-
   { ControllerPaintBox }
   if OutputForm.OutputPages.ActivePage = OutputForm.ControllerSheet then
   begin
@@ -731,7 +579,7 @@ begin
       LEDShape := False;
     ViewModelMain.StatusPanelText1 := Rigg.GetriebeStatusText;
     DrawPaintBoxM;
-    Draw;
+//    Draw;
     if Rigg.GetriebeOK and not Rigg.MastOK then
     begin
       LEDShape := False;
@@ -739,20 +587,6 @@ begin
     end;
   end;
   ViewModelMain.UpdateView;
-
-  { 3D Grafik - AniRotationForm muß erzeugt sein! }
-  if RotaFormActive then
-  begin
-    if AniRotationForm.Visible then
-    begin
-      { Trackbar und Labels flackern zu sehr, daher nicht immer aktualisieren }
-      //if SofortBerechnen then
-      //  Modified := True;
-      AniRotationForm.UpdateAll(Rigg);
-      AniRotationForm.Draw;
-//      AniRotationForm.Invalidate;
-    end;
-  end;
 
   if (Main <> nil) and (Main.StrokeRigg <> nil) then
   begin
@@ -762,155 +596,19 @@ begin
 
 end;
 
-procedure TRiggModul.UpdateRigg;
-begin
-  Rigg.UpdateRigg;
-  ViewModelMain.StatusPanelText1 := Rigg.RiggStatusText;
-  if Rigg.RiggOK then
-  begin
-    FGrauZeichnen := True;
-    LEDShape := True;
-  end
-  else
-  begin
-    FGrauZeichnen := False;
-    LEDShape := False;
-  end;
-  if OutputForm.OutputPages.ActivePage = OutputForm.ChartSheet then
-    UpdateRiggPunkt; { GetriebePunkte oben schon aktualisiert }
-  AusgabeText; { update text before drawing }
-  AusgabeKommentar;
-  DrawPaintBoxM;
-  Draw;
-  rLItemClick(ReportItem);
-  ViewModelMain.UpdateView;
-end;
-
-procedure TRiggModul.Draw;
-var
-  MetaCanvas: TMetaFileCanvas;
-  c: TCanvas;
-  g: TCanvas;
-begin
-  if PBG = nil then
-    Exit;
-
-  c := BitmapG.Canvas;
-  if PaintBtnDown = False then
-  begin
-    PaintBackGround(BitmapG);
-    c.Textout(180, 16, lbMastfall);
-    c.Textout(180, 32, lbSpannung);
-    c.Textout(180, 48, lbBiegung);
-  end
-  else if TextFlipFlop then
-    PaintBackGround(BitmapG);
-
-  DrawPaintBoxG(c);
-
-  g := PBG.Canvas;
-  g.CopyMode := cmSrcCopy;
-  g.Draw(0, 0, BitMapG);
-
-  if PaintBtnDown = True and (MetaGPaintCount <= MetaGMaxCount) then
-  begin
-    MetaCanvas := TMetaFileCanvas.Create(MetaFileG, 0);
-    try
-      if DataInMeta and (DataInMetaCounter < 8) then
-      begin
-        Inc(DataInMetaCounter);
-        MetaCanvas.Draw(0, 0, MetaFileG);
-      end
-      else
-        DataInMetaCounter := 0;
-      GetriebeGraph.ZoomFaktor := 10;
-      DrawToMetaG(MetaCanvas);
-    finally
-      MetaCanvas.Free;
-      GetriebeGraph.ZoomFaktor := 1;
-      Inc(MetaGPaintCount);
-    end;
-  end;
-
-end;
-
-procedure TRiggModul.DrawPaintBoxG(Canvas: TCanvas);
-begin
-  GetriebeGraph.Koppel := KoppelBtnDown;
-
-  { entspanntes Rigg grau zeichnen }
-  if Grauzeichnen and BtnGrauDown then
-  begin
-    GetriebeGraph.Color := clEntspannt;
-    GetriebeGraph.Coloriert := False;
-    GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
-    GetriebeGraph.Koordinaten := Rigg.rPe;
-    GetriebeGraph.DrawToCanvas(Canvas);
-  end;
-
-  { Nullstellung hellblau zeichnen }
-  if BtnBlauDown then
-  begin
-    GetriebeGraph.Color := clNullStellung;
-    GetriebeGraph.Coloriert := False;
-    GetriebeGraph.WanteGestrichelt := False;
-    GetriebeGraph.Koordinaten := RefPoints;
-    GetriebeGraph.DrawToCanvas(Canvas);
-  end;
-
-  { gespanntes Rigg farbig zeichnen}
-//  GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta); // see above
-  GetriebeGraph.Coloriert := True;
-  GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
-  GetriebeGraph.Koordinaten := Rigg.rP;
-  GetriebeGraph.DrawToCanvas(Canvas);
-end;
-
-procedure TRiggModul.DrawToMetaG(Canvas: TMetaFileCanvas);
-begin
-  GetriebeGraph.Koppel := KoppelBtnDown;
-
-  { entspanntes Rigg grau zeichnen }
-  if Grauzeichnen and BtnGrauDown then
-  begin
-    GetriebeGraph.Color := clBlack;
-    GetriebeGraph.Coloriert := False;
-    GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
-    GetriebeGraph.Koordinaten := Rigg.rPe;
-    GetriebeGraph.DrawToMeta(Canvas);
-  end;
-
-  { Nullstellung hellblau zeichnen }
-  if BtnBlauDown then
-  begin
-    GetriebeGraph.Color := clNullStellung;
-    GetriebeGraph.Coloriert := False;
-    GetriebeGraph.WanteGestrichelt := False;
-    GetriebeGraph.Koordinaten := RefPoints;
-    GetriebeGraph.DrawToMeta(Canvas);
-  end;
-
-  { gespanntes Rigg farbig zeichnen}
-  // GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta); // see above
-  GetriebeGraph.Coloriert := True;
-  GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
-  GetriebeGraph.Koordinaten := Rigg.rP;
-  Canvas.Pen.Width := ThickPenWidth;
-  GetriebeGraph.DrawToMeta(Canvas);
-
-  DataInMeta := True;
-end;
-
 procedure TRiggModul.PaintBackGround(Image: TBitmap);
 var
   R: TRect;
 begin
+  if Image = nil then
+    Exit;
+
   R := Rect(0, 0, Image.Width, Image.Height);
-  Image.Canvas.Brush.Color := BackgroundColor;
+  Image.Canvas.Brush.Color := clWhite; //BackgroundColor;
   Image.Canvas.FillRect(R);
 end;
 
-procedure TRiggModul.DrawPaintBoxM;
+procedure TRiggModulG.DrawPaintBoxM;
 var
   img: TImage;
 begin
@@ -926,7 +624,7 @@ begin
   MastGraph.Draw;
 end;
 
-procedure TRiggModul.AusgabeText;
+procedure TRiggModulG.AusgabeText;
 var
   tempSalingDaten: TSalingDaten;
   MemoPosY: LongInt;
@@ -1011,7 +709,7 @@ begin
   ML.EndUpdate;
 end;
 
-procedure TRiggModul.AusgabeKommentar;
+procedure TRiggModulG.AusgabeKommentar;
 var
   temp: double;
   ML: TStrings;
@@ -1037,13 +735,6 @@ begin
   ML.EndUpdate;
 end;
 
-procedure TRiggModul.SetReportFormActive(const Value: Boolean);
-begin
-  FReportFormActive := Value;
-  if not Value then
-    ViewModelMain.HideReport;
-end;
-
 procedure TRiggModul.SetReportItem(Value: TReportItem);
 begin
   if FReportItem <> Value then
@@ -1052,13 +743,6 @@ begin
     rLItemClick(Value);
     OutputForm.OutputPages.ActivePage := OutputForm.MasterMemo;
   end;
-end;
-
-procedure TRiggModul.SetRotaFormActive(const Value: Boolean);
-begin
-  FRotaFormActive := Value;
-  if not Value then
-    ViewModelMain.HideGrafik;
 end;
 
 procedure TRiggModul.rLItemClick(Item: TReportItem);
@@ -1248,85 +932,11 @@ begin
   Modified := False;
 end;
 
-procedure TRiggModul.SetViewPoint(Value: TViewPoint);
-begin
-  if Value <> FViewPoint then
-  begin
-    FViewPoint := Value;
-    GetriebeGraph.ViewPoint := Value;
-    TextFlipFlop := True;
-    ResetPaintBoxG;
-    if RG19A and (GrafikForm <> nil) then
-      GrafikForm.ViewTab.TabIndex := Ord(FViewPoint);
-  end;
-  ViewModelMain.VonDerSeiteItemClick(Value);
-end;
-
-procedure TRiggModul.ResetPaintBoxG;
-begin
-  MetaFileG.Clear;
-  DataInMeta := False;
-  ThickPenWidth := 1;
-  MetaGPaintCount := 0;
-  TextFlipFlop := True;
-  Draw;
-end;
-
 procedure TRiggModul.SetPaintBtnDown(Value: Boolean);
 begin
   if FPaintBtnDown <> Value then
   begin
     FPaintBtnDown := Value;
-    ResetPaintBoxG;
-  end;
-end;
-
-procedure TRiggModul.SetBackgroundColor(const Value: TColor);
-begin
-  FBackgroundColor := Value;
-  SalingGraph.BackgroundColor := Value;
-end;
-
-procedure TRiggModul.SetBtnBlauDown(Value: Boolean);
-begin
-  if FBtnBlauDown <> Value then
-  begin
-    FBtnBlauDown := Value;
-    Draw;
-  end;
-end;
-
-procedure TRiggModul.SetBtnGrauDown(Value: Boolean);
-begin
-  if FBtnGrauDown <> Value then
-  begin
-    FBtnGrauDown := Value;
-    if Value then
-      Draw
-    else
-      UpdateGetriebe;
-  end;
-end;
-
-procedure TRiggModul.SetKoppelBtnDown(Value: Boolean);
-begin
-  if FKoppelBtnDown <> Value then
-  begin
-    FKoppelBtnDown := Value;
-    GetriebeGraph.Koppel := Value;
-    if Value then
-      GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
-    Draw;
-  end;
-end;
-
-procedure TRiggModul.SetZweischlagBtnDown(Value: Boolean);
-begin
-  if FZweischlagBtnDown <> Value then
-  begin
-    FZweischlagBtnDown := Value;
-    GetriebeGraph.Bogen := not Value;
-    Draw;
   end;
 end;
 
@@ -1337,26 +947,6 @@ begin
     Result := False;
   if SalingTyp = stOhne then
     Result := False;
-end;
-
-procedure TRiggModul.SetControllerTyp(Value: TControllerTyp);
-begin
-  if FControllerTyp <> Value then
-  begin
-    FControllerTyp := Value;
-    Rigg.ControllerTyp := Value;
-  end;
-  GetriebeGraph.ControllerTyp := Value;
-  SalingGraph.ControllerTyp := Value;
-end;
-
-procedure TRiggModul.SetConsoleActive(const Value: Boolean);
-begin
-  FConsoleActive := Value;
-  if Value then
-    ViewModelMain.ShowConsole
-  else
-    ViewModelMain.HideConsole;
 end;
 
 procedure TRiggModul.SetControllerBtnDown(Value: Boolean);
@@ -1465,15 +1055,12 @@ begin
   end;
 end;
 
-procedure TRiggModul.DoOnUpdateSalingTyp(Value: TSalingTyp);
+procedure TRiggModulG.DoOnUpdateSalingTyp(Value: TSalingTyp);
 begin
   if FSalingTyp <> Value then
   begin
     FSalingTyp := Value;
 //    Rigg.SalingTyp := Value;
-    GetriebeGraph.SalingTyp := Value;
-    if ChartFormActive then
-      ChartForm.ChartModel.SalingTyp := Value;
 
     case Value of
       stFest: InputForm.InputPages.ActivePage := InputForm.tsFest;
@@ -1488,8 +1075,6 @@ begin
       stOhne: ViewModelMain.OhneItemClick;
       stOhne_2: ViewModelMain.OSDlgItemClick;
     end;
-
-    Draw;
   end;
 end;
 
@@ -1562,26 +1147,6 @@ begin
   UpdateGCtrls(Rigg.Glieder);
   KurveValid := False;
   DrawPoint;
-end;
-
-procedure TRiggModul.MemoryBtnClick;
-begin
-  RefCtrl := Rigg.Glieder;
-  RefPoints := Rigg.rP;
-  if DiffBtnDown then
-    MemCtrl := RefCtrl;
-  UpdateGCtrlLabels(Rigg.Glieder);
-  Draw;
-end;
-
-procedure TRiggModul.MemoryRecallBtnClick;
-begin
-  Rigg.Glieder := RefCtrl;
-  if DiffBtnDown then
-    MemCtrl := RefCtrl;
-  UpdateGCtrls(Rigg.Glieder);
-  KurveValid := False;
-  UpdateGetriebe;
 end;
 
 procedure TRiggModul.OhneItemClick;
@@ -1699,65 +1264,6 @@ begin
   ChartForm := TChartForm.Create(Application);
 end;
 
-procedure TRiggModul.ReportItemClick;
-begin
-  ReportForm := TReportForm.Create(Application.MainForm);
-end;
-
-procedure TRiggModul.OptionItemClick;
-begin
-  Rigg.UpdateGSB;
-  { Istwerte in GSB aktualisieren für aktuelle Werte in Optionform! }
-  OptionForm.ShowModal;
-  if OptionForm.ModalResult = mrOK then
-  begin
-    Rigg.UpdateGlieder; { neue GSB Werte --> neue Integerwerte }
-    Rigg.Reset; { neue Integerwerte --> neue Gleitkommawerte }
-    KurveValid := False;
-    UpdateGetriebe;
-    // Rigg.UpdateGSB; { enfällt hier, da GSB schon aktuell }
-    SetupGCtrls;
-    sbPuffer := Rigg.Glieder; { weil Istwerte nicht über Scrollbar verändert }
-  end;
-end;
-
-procedure TRiggModul.RotaFormItemClick;
-begin
-  AniRotationForm := TAniRotationForm.Create(Application.MainForm);
-  AniRotationForm.UpdateAll(Rigg);
-
-  (*
-  { dies wird durch AniRotationForm.UpdateAll(Rigg) ersetzt
-    beachte, dass Draw nicht aufgerufen wird }
-  RotationForm.RaumGrafik.Salingtyp := Salingtyp;
-  RotationForm.RaumGrafik.ControllerTyp := ControllerTyp;
-  RotationForm.RaumGrafik.Koordinaten := Rigg.rP;
-  RotationForm.RaumGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  *)
-end;
-
-procedure TRiggModul.About;
-begin
-  KreisForm := TKreisForm.Create(Application);
-  try
-    KreisForm.ShowModal;
-  finally
-    KreisForm.Free;
-  end;
-end;
-
-procedure TRiggModul.PrintGrafik;
-begin
-  if not PaintBtnDown then
-    PreviewGForm.cbThickLines.Enabled := True
-  else
-  begin
-    PreviewGForm.cbThickLines.Enabled := False;
-    PreviewGForm.cbThickLines.Checked := False;
-  end;
-  PreviewGForm.ShowModal;
-end;
-
 procedure TRiggModul.SetKorrigiertItem(Value: Boolean);
 begin
   if FKorrigiertItem <> Value then
@@ -1769,208 +1275,7 @@ begin
   end;
 end;
 
-function GetEnvelopeSize: TPoint;
-var
-  EnvW, EnvH: Integer;
-  PixPerInX: Integer;
-  PixPerInY: Integer;
-begin
-  if RiggPrinter.OKToPrint then
-  begin
-    PixPerInX := GetDeviceCaps(Printer.Handle, LOGPIXELSX);
-    PixPerInY := GetDeviceCaps(Printer.Handle, LOGPIXELSY);
-    EnvW := trunc((210 - 50) / 25.4 * PixPerInX);
-    EnvH := trunc((297 - 50) / 25.4 * PixPerInY);
-    Result := Point(EnvW, EnvH);
-  end
-  else
-  begin
-    PixPerInX := RiggPrinter.PixPerInX;
-    PixPerInY := RiggPrinter.PixPerInY;
-    EnvW := trunc((210 - 50) / 25.4 * PixPerInX);
-    EnvH := trunc((297 - 50) / 25.4 * PixPerInY);
-    Result := Point(EnvW, EnvH);
-  end;
-end;
-
-function GetEnvelopePos(EnvSize: TPoint): TRect;
-begin
-  if RiggPrinter.OKToPrint then
-  begin
-    Result := Rect(
-      (Printer.PageWidth - EnvSize.x) div 2,
-      (Printer.PageHeight - EnvSize.y) div 2 + 58,
-      (Printer.PageWidth - EnvSize.x) div 2 + EnvSize.x,
-      (Printer.PageHeight - EnvSize.y) div 2 + EnvSize.y + 58);
-  end
-  else
-  begin
-    Result := Rect(
-      (RiggPrinter.PageWidth - EnvSize.x) div 2,
-      (RiggPrinter.PageHeight - EnvSize.y) div 2 + 58,
-      (RiggPrinter.PageWidth - EnvSize.x) div 2 + EnvSize.x,
-      (RiggPrinter.PageHeight - EnvSize.y) div 2 + EnvSize.y + 58);
-  end;
-end;
-
-procedure TRiggModul.PrintPaintBoxG;
-var
-  Rgn: THandle;
-  EnvSize: TPoint;
-  EnvPos: TRect;
-  SavedZoomFaktor, Zoom: Integer;
-  MetaCanvas: TMetaFileCanvas;
-  h: HDC;
-  pb: TPaintBox;
-begin
-  if not RiggPrinter.OKToPrint then
-  begin
-    MessageDlg('Kein Drucker konfiguriert.', mtInformation, [mbOK], 0);
-    exit;
-  end;
-
-  Zoom := 10;
-  if Printer.Orientation <> poPortrait then
-    Printer.Orientation := poPortrait;
-  Printer.Title := 'Rigg/Getriebegrafik';
-  EnvSize := GetEnvelopeSize;
-  EnvPos := GetEnvelopePos(EnvSize);
-
-  Printer.BeginDoc;
-
-  h := Printer.Canvas.Handle;
-  pb := PBG;
-  SetMapMode(h, MM_ISOTROPIC);
-  SetWindowExtEx(h, pb.Width * Zoom, pb.Height * Zoom, nil);
-  SetWindowOrgEx(h, (pb.Width * Zoom) div 2, (pb.Height * Zoom) div 2, nil);
-  SetViewPortExtEx(h, EnvSize.x, EnvSize.y, nil);
-  SetViewPortOrgEx(h, EnvPos.Left + EnvSize.x div 2, EnvPos.Bottom - EnvSize.y div 2, nil);
-
-  Rgn := CreateRectRgnIndirect(EnvPos);
-  SelectClipRgn(Printer.Canvas.Handle, Rgn);
-  { SelectClipRgn() arbeitet mit Kopie von Rgn! }
-  DeleteObject(Rgn);
-
-  { Metafile schreiben; mit Pen.Width = Zoom, wenn Box gecheckt }
-  if not PaintBtnDown then
-  begin
-    SavedZoomFaktor := GetriebeGraph.ZoomFaktor;
-    GetriebeGraph.ZoomFaktor := Zoom;
-    MetaCanvas := TMetaFileCanvas.Create(MetaFileG, 0);
-    try
-      if PreviewGForm.cbThickLines.Checked then
-        ThickPenWidth := Zoom;
-      DrawToMetaG(MetaCanvas);
-    finally
-      MetaCanvas.Free;
-      GetriebeGraph.ZoomFaktor := SavedZoomFaktor;
-    end;
-  end;
-
-  Printer.Canvas.Draw(0, 0, MetaFileG);
-
-  Printer.EndDoc;
-end;
-
-procedure TRiggModul.PreviewPaintBoxG;
-var
-  Rgn: THandle;
-  R: TRect;
-  Rand, OffsetY: Integer;
-  SavedZoomFaktor, Zoom: Integer;
-  MetaCanvas: TMetaFileCanvas;
-
-  WindowExtX, WindowExtY: Integer;
-  WindowOrgX, WindowOrgY: Integer;
-  ViewPortExtX, ViewPortExtY: Integer;
-  ViewPortOrgX, ViewPortOrgY: Integer;
-  h: HDC;
-  pb: TPaintBox;
-begin
-  ThickPenWidth := 1;
-  Zoom := 10;
-
-  { wenn notwendig MetafileG schreiben,
-      falls Box gecheckt mit Pen.Width = 4 * Zoom }
-  if not PaintBtnDown then
-  begin
-    SavedZoomFaktor := GetriebeGraph.ZoomFaktor;
-    GetriebeGraph.ZoomFaktor := Zoom;
-    MetaCanvas := TMetaFileCanvas.Create(MetaFileG, 0);
-    try
-      if PreviewGForm.cbThickLines.Checked then
-        ThickPenWidth := 4 * Zoom;
-      DrawToMetaG(MetaCanvas);
-    finally
-      MetaCanvas.Free;
-      GetriebeGraph.ZoomFaktor := SavedZoomFaktor;
-    end;
-  end;
-
-  pb := PreviewGForm.PreviewGBox;
-  h := pb.Canvas.Handle;
-
-  WindowExtX := pb.Width * Zoom;
-  WindowExtY := pb.Height * Zoom;
-  WindowOrgX := WindowExtX div 2;
-  WindowOrgY := WindowExtY div 2;
-
-  Rand := 10;
-  OffsetY := 0;
-  ViewPortExtX := pb.Width - Rand;
-  ViewPortExtY := pb.Height - Rand;
-  ViewPortOrgX := pb.Left + Rand div 2 + ViewPortExtX div 2;
-  ViewPortOrgY := pb.Top + Rand div 2 + OffsetY + ViewPortExtY div 2;
-
-  SetMapMode(h, MM_ISOTROPIC);
-  SetWindowExtEx(h, WindowExtX, WindowExtY, nil);
-  SetWindowOrgEx(h, WindowOrgX, WindowOrgY, nil);
-  SetViewPortExtEx(h, ViewPortExtX, ViewPortExtY, nil);
-  SetViewPortOrgEx(h, ViewPortOrgX, ViewPortOrgY, nil);
-
-  pb.Canvas.Brush.Color := clSilver;
-  pb.Canvas.Pen.Color := clBlue;
-  pb.Canvas.Pen.Width := 1;
-  pb.Canvas.Rectangle(0, 0, WindowExtX, WindowExtY);
-
-  R := Rect(0, 0, WindowExtX, WindowExtY);
-  LPTODP(h, R, 2);
-  Rgn := CreateRectRgnIndirect(R);
-  SelectClipRgn(h, Rgn); { SelectClipRgn arbeitet mit Kopie von Rgn! }
-  DeleteObject(Rgn);
-
-  pb.Canvas.Draw(0, 0, MetaFileG)
-end;
-
-procedure TRiggModul.CopyMetaFileG;
-var
-  MetaFile: TMetaFile;
-  mfc: TMetafileCanvas;
-  h: HDC;
-begin
-  MetaFile := TMetaFile.Create;
-  MetaFile.Width := 293;
-  MetaFile.Height := 422;
-  mfc := TMetaFileCanvas.CreateWithComment(MetaFile, 0, 'Gustav Schubert', 'Rigg, Getriebegrafik');
-  h := mfc.Handle;
-  try
-    SetMapMode(h, MM_ISOTROPIC);
-    SetWindowExtEx(h, 100, 100, nil);
-    SetWindowOrgEx(h, 0, 0, nil);
-    SetViewPortExtEx(h, 10, 10, nil);
-    SetViewPortOrgEx(h, 0, 0, nil);
-    mfc.Brush.Color := clSilver;
-    mfc.Pen.Color := clBlue;
-    mfc.Rectangle(0, 0, 2930, 4220);
-    mfc.Draw(0, 0, MetaFileG);
-  finally
-    Free;
-  end;
-  Clipboard.Assign(MetaFile);
-  MetaFile.Free;
-end;
-
-procedure TRiggModul.StraightLine;
+procedure TRiggModulD.StraightLine;
 var
   i: Integer;
 begin
@@ -1979,7 +1284,7 @@ begin
   TestF := f;
 end;
 
-procedure TRiggModul.GetCurves;
+procedure TRiggModulD.GetCurves;
 var
   i, tempIndex: Integer;
   Antrieb, Anfang, Ende: double;
@@ -2065,9 +1370,7 @@ begin
     DrawChart;
 
     if OutputForm.OutputPages.ActivePage = OutputForm.ChartSheet then
-      if Screen.ActiveForm = ConsoleForm then
-        ConsoleForm.ActiveControl := OutputForm.YComboBox
-      else if Screen.ActiveForm = OutputForm then
+      if Screen.ActiveForm = OutputForm then
         OutputForm.ActiveControl := OutputForm.YComboBox
       else
       begin
@@ -2084,7 +1387,7 @@ begin
   end;
 end;
 
-procedure TRiggModul.UpdateGetriebePunkt;
+procedure TRiggModulD.UpdateGetriebePunkt;
 var
   tempIndex: Integer;
 begin
@@ -2122,7 +1425,7 @@ begin
     DrawPoint;
 end;
 
-procedure TRiggModul.UpdateRiggPunkt;
+procedure TRiggModulD.UpdateRiggPunkt;
 var
   tempIndex: Integer;
 begin
@@ -2143,7 +1446,7 @@ begin
     DrawPoint;
 end;
 
-procedure TRiggModul.DrawChart;
+procedure TRiggModulD.DrawChart;
 var
   i: Integer;
 begin
@@ -2204,7 +1507,7 @@ begin
     DrawChartPaintBox(ChartPaintBox.Canvas, ChartPaintBox.BoundsRect);
 end;
 
-procedure TRiggModul.DrawChartPaintBox(Canvas: TCanvas; Rect: TRect);
+procedure TRiggModulD.DrawChartPaintBox(Canvas: TCanvas; Rect: TRect);
 
   function Limit(a: double): double;
   begin
@@ -2318,7 +1621,7 @@ begin
   OutputForm.lbYTop.Caption := IntToStr(Round(Ymax));
 end;
 
-function TRiggModul.GetPunktColor: TColor;
+function TRiggModulD.GetPunktColor: TColor;
 var
   i: Integer;
   ML: TStrings;
@@ -2344,7 +1647,7 @@ begin
   end;
 end;
 
-procedure TRiggModul.DrawPoint;
+procedure TRiggModulD.DrawPoint;
 var
   i: Integer;
 begin
@@ -2375,7 +1678,7 @@ begin
     DrawChartPaintBox(ChartPaintBox.Canvas, ChartPaintBox.BoundsRect);
 end;
 
-procedure TRiggModul.LookForYMinMax;
+procedure TRiggModulD.LookForYMinMax;
 var
   i: Integer;
 begin
@@ -2407,7 +1710,7 @@ begin
   end;
 end;
 
-function TRiggModul.GetXText(sbn: TsbName): string;
+function TRiggModulD.GetXText(sbn: TsbName): string;
 var
   S: string;
 begin
@@ -2430,7 +1733,7 @@ begin
   Result := S;
 end;
 
-function TRiggModul.GetYText(Text: string): string;
+function TRiggModulD.GetYText(Text: string): string;
 var
   S: string;
 begin
@@ -2464,7 +1767,7 @@ begin
     DrawChart;
 end;
 
-procedure TRiggModul.YComboBoxChange(ItemIndex: Integer);
+procedure TRiggModulD.YComboBoxChange(ItemIndex: Integer);
 begin
   (*
   if YComboBox.ItemIndex <> YComboBox2.ItemIndex then begin
@@ -2493,7 +1796,7 @@ begin
   end;
 end;
 
-procedure TRiggModul.KurveBtnClick;
+procedure TRiggModulD.KurveBtnClick;
 var
   cr: TRggSB;
 begin
@@ -2510,23 +1813,20 @@ begin
   GetCurves;
 end;
 
-procedure TRiggModul.SalingPaintBoxClick;
+procedure TRiggModulG.SalingPaintBoxClick;
 begin
   SalingGraph.SalingDetail := not SalingGraph.SalingDetail;
 end;
 
-procedure TRiggModul.DrawPaintBoxS(Canvas: TCanvas);
+procedure TRiggModulG.DrawPaintBoxS(Canvas: TCanvas);
 begin
   PaintBackGround(BitmapS);
-  if SalingGraph.SalingDetail then
-    SalingGraph.DrawSalingDetail(BitmapS.Canvas)
-  else
-    SalingGraph.DrawSalingAll(BitmapS.Canvas);
+  SalingGraph.DrawSaling(BitmapS.Canvas);
   Canvas.CopyMode := cmSrcCopy;
   Canvas.Draw(0, 0, BitMapS);
 end;
 
-procedure TRiggModul.DrawPaintBoxC(Canvas: TCanvas);
+procedure TRiggModulG.DrawPaintBoxC(Canvas: TCanvas);
 begin
   PaintBackGround(BitmapC);
   SalingGraph.DrawController(BitmapC.Canvas);
@@ -2534,7 +1834,7 @@ begin
   Canvas.Draw(0, 0, BitMapC);
 end;
 
-procedure TRiggModul.OutputPagesChange(Seite: Integer);
+procedure TRiggModulG.OutputPagesChange(Seite: Integer);
 var
   TrimmRec: TTrimmControls;
 begin
@@ -2560,7 +1860,7 @@ begin
   end;
 end;
 
-procedure TRiggModul.ZustellBtnClick;
+procedure TRiggModulG.ZustellBtnClick;
 var
   TrimmRec: TTrimmControls;
 begin
@@ -2568,8 +1868,6 @@ begin
   TrimmRec.Controller := 50;
   Rigg.Glieder := TrimmRec;
   Rigg.UpdateGetriebe;
-  GetriebeGraph.Koordinaten := Rigg.rP;
-  GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
   SalingGraph.ControllerPos := Round(SalingGraph.ParamXE0 - Rigg.MastPositionE);
   TrimmRec.Controller := SalingGraph.ControllerPos;
   UpdateGCtrls(TrimmRec);
@@ -2577,7 +1875,7 @@ begin
   UpdateGetriebe;
 end;
 
-procedure TRiggModul.TestBtnClick;
+procedure TRiggModulG.TestBtnClick;
 begin
   Screen.Cursor := crHourGlass;
   KraftGraph.GetTestKurven;
@@ -2587,37 +1885,6 @@ begin
     KraftGraph.Draw;
   end;
   Screen.Cursor := crDefault;
-end;
-
-procedure TRiggModul.AdjustGrafik;
-begin
-  ShowAdjustForm(GetriebeGraph, AdjustGBox);
-  if ViewPoint <> GetriebeGraph.ViewPoint then
-    { Alles notwendige wird automatisch in SetViewPoint() erledigt. }
-    ViewPoint := GetriebeGraph.ViewPoint
-  else
-  begin
-    TextFlipFlop := True;
-    ResetPaintBoxG;
-    if RG19A and (GrafikForm <> nil) then
-      GrafikForm.ViewTab.TabIndex := Ord(FViewPoint);
-  end;
-end;
-
-procedure TRiggModul.AdjustGBox(Sender: TObject);
-begin
-  { Koppelkurve }
-  if (SalingTyp = stFest) and
-    (KoppelBtnDown = True) and
-    (GetriebeGraph.ViewPoint = vpSeite) then
-    GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
-  Draw;
-end;
-
-procedure TRiggModul.GetGBoxOffset;
-begin
-  GetriebeGraph.CalcOffset(PBG.ClientRect);
-  AdjustGbox(Self);
 end;
 
 procedure TRiggModul.DoOnWheelScroll(fp: TFederParam; ScrollPos: Integer);
@@ -2798,7 +2065,7 @@ begin
   end;
 end;
 
-procedure TRiggModul.DoUpdateChartBuffer;
+procedure TRiggModulD.DoUpdateChartBuffer;
 begin
   sbPuffer := Rigg.Glieder;
 end;
@@ -2810,6 +2077,128 @@ begin
   ControllerTyp := ctOhne;
   CalcTyp := ctQuerKraftBiegung;
   AlreadyUpdatedGetriebeFlag := False;
+end;
+
+{ RiggModulG }
+
+constructor TRiggModulG.Create;
+begin
+  inherited;
+
+  ControllerPaintBox := OutputForm.ControllerPaintBox;
+  SalingPaintBox := OutputForm.SalingPaintBox;
+  KraftPaintBox := OutputForm.KraftPaintBox;
+  ChartPaintBox := OutputForm.ChartPaintBox;
+  YComboBox := OutputForm.YComboBox;
+
+  { SalingCtrls }
+  SalingGraph := TSalingGraph.Create;
+  SalingGraph.BackgroundColor := FBackgroundColor;
+
+  BitmapS := TBitmap.Create;
+  BitmapS.Width := 453;
+  BitmapS.Height := 220;
+  PaintBackGround(BitmapS);
+
+  BitmapC := TBitmap.Create;
+  BitmapC.Width := 453;
+  BitmapC.Height := 220;
+  PaintBackGround(BitmapC);
+
+  MastGraph := TMastGraph.Create;
+  KraftGraph := TKraftGraph.Create(Rigg);
+end;
+
+destructor TRiggModulG.Destroy;
+begin
+  MastGraph.Free;
+  KraftGraph.Free;
+  SalingGraph.Free;
+
+  BitmapS.Free;
+  BitmapC.Free;
+  inherited;
+end;
+
+{ RiggModulA }
+
+constructor TRiggModulA.Create(ARigg: TRigg);
+begin
+  Rigg := ARigg;
+  RiggModul := Self;
+  inherited Create;
+end;
+
+destructor TRiggModulA.Destroy;
+begin
+  inherited;
+end;
+
+procedure TRiggModulA.UpdateGetriebe;
+begin
+  Rigg.UpdateGetriebe;
+  if NeedPaint then
+    DoGraphics;
+  NeedPaint := True;
+  if (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK) then
+    UpdateRigg;
+end;
+
+procedure TRiggModulA.UpdateRigg;
+begin
+  Rigg.UpdateRigg;
+  ViewModelMain.StatusPanelText1 := Rigg.RiggStatusText;
+  if Rigg.RiggOK then
+  begin
+    FGrauZeichnen := True;
+    LEDShape := True;
+  end
+  else
+  begin
+    FGrauZeichnen := False;
+    LEDShape := False;
+  end;
+  if OutputForm.OutputPages.ActivePage = OutputForm.ChartSheet then
+    UpdateRiggPunkt; { GetriebePunkte oben schon aktualisiert }
+  AusgabeText; { update text befor drawing }
+  AusgabeKommentar;
+  DrawPaintBoxM;
+
+  rLItemClick(ReportItem);
+  ViewModelMain.UpdateView;
+end;
+
+procedure TRiggModulA.SetControllerTyp(Value: TControllerTyp);
+begin
+  if FControllerTyp <> Value then
+  begin
+    FControllerTyp := Value;
+    Rigg.ControllerTyp := Value;
+  end;
+  SalingGraph.ControllerTyp := Value;
+end;
+
+procedure TRiggModulA.Init;
+begin
+  IniFileName := '';
+
+  SetupGCtrls;
+
+  MemCtrl := ZeroCtrl;
+  sbPuffer := Rigg.Glieder;
+  RefCtrl := Rigg.Glieder;
+  RefPoints := Rigg.rP;
+
+  { Berichte }
+  RiggReport := TRiggReport.Create;
+  FWReport := TFWReport.Create;
+
+  NeedPaint := True;
+
+  YComboBox.ItemIndex := 1; { sonst Exception, wenn ItemIndex := -1 }
+  YComboSavedItemIndex := 1;
+  StraightLine;
+  DrawChart;
 end;
 
 end.
