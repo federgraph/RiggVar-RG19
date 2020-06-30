@@ -579,7 +579,7 @@ begin
       LEDShape := False;
     ViewModelMain.StatusPanelText1 := Rigg.GetriebeStatusText;
     DrawPaintBoxM;
-//    Draw;
+
     if Rigg.GetriebeOK and not Rigg.MastOK then
     begin
       LEDShape := False;
@@ -854,7 +854,10 @@ begin
   FWReport.ML.Add('');
   for i := 0 to MemoDlg.DstList.Items.Count - 1 do
   begin
-    // FWReport.Ausgabe(Rigg.Fachwerk);
+    { output all}
+//     FWReport.Ausgabe(Rigg.Fachwerk);
+
+    { output selected reports }
     if MemoDlg.DstList.Items[i] = 'FW_Geometrie' then
       FWReport.AusgabeGeometrie(Rigg.Fachwerk.G, Rigg.Fachwerk.S);
     if MemoDlg.DstList.Items[i] = 'FW_StabQuerschnitte' then
@@ -1101,8 +1104,6 @@ procedure TRiggModul.BiegeNeigeItemClick;
 var
   ControllerAnschlag: Integer;
 begin
-  { Controller zurückfahren auf Rigg.ControllerAnschlag
-    --> entspricht 50 in GUI }
   ControllerAnschlag := 50;
   if SalingTyp = stFest then
   begin
@@ -1114,6 +1115,9 @@ begin
     InputForm.sbControllerD.Position := ControllerAnschlag;
     sbControllerScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
   end;
+
+  if BiegeUndNeigeForm = nil then
+    BiegeUndNeigeForm := TBiegeUndNeigeForm.Create(Application);
 
   BiegeUndNeigeForm.ShowModal;
   UpdateGCtrls(Rigg.Glieder);
@@ -1126,7 +1130,7 @@ var
   ReglerForm: TForm;
   ControllerAnschlag: Integer;
 begin
-  { Controller zurückfahren auf Rigg.FiControllerAnschlag }
+  { reset Rigg.FiControllerAnschlag }
   ControllerAnschlag := 50;
   if SalingTyp = stFest then
   begin
@@ -1139,9 +1143,18 @@ begin
     sbControllerScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
   end;
 
-  ReglerForm := FormReglerGraph;
   if Rigg.CalcTyp = ctKraftGemessen then
+  begin
     ReglerForm := BiegeUndNeigeForm;
+    if BiegeUndNeigeForm = nil then
+      BiegeUndNeigeForm := TBiegeUndNeigeForm.Create(Application);
+  end
+  else
+  begin
+    ReglerForm := FormReglerGraph;
+    if ReglerForm = nil then
+      ReglerForm := TFormRegler.Create(Application);
+  end;
 
   ReglerForm.ShowModal;
   UpdateGCtrls(Rigg.Glieder);
@@ -1374,11 +1387,13 @@ begin
         OutputForm.ActiveControl := OutputForm.YComboBox
       else
       begin
-//        MessageBeep(MB_ICONASTERISK);
+{$ifdef debug}
+        MessageBeep(MB_ICONASTERISK);
+{$endif}
       end;
 
   finally
-    { Getriebe wiederherstellen }
+    { restore Model (Getriebe) }
     Rigg.ProofRequired := True;
     Rigg.Glieder := InputRec;
     UpdateGetriebe;
@@ -1457,7 +1472,9 @@ begin
     if i = -1 then
     begin
       i := YComboSavedItemIndex;
-      // MessageBeep(MB_ICONASTERISK); { debugging }
+{$ifdef debug}
+      MessageBeep(MB_ICONASTERISK);
+{$endif}
     end;
     f := af[i];
     case SBName of
@@ -1669,7 +1686,9 @@ begin
   if i = -1 then
   begin
     i := YComboSavedItemIndex;
-    // MessageBeep(MB_ICONQUESTION); { debugging }
+{$ifdef debug}
+    MessageBeep(MB_ICONQUESTION);
+{$endif}
   end;
   ChartPunktY := bf[i];
   { Farbe des Punktes }
@@ -1770,7 +1789,8 @@ end;
 procedure TRiggModulD.YComboBoxChange(ItemIndex: Integer);
 begin
   (*
-  if YComboBox.ItemIndex <> YComboBox2.ItemIndex then begin
+  if YComboBox.ItemIndex <> YComboBox2.ItemIndex then
+  begin
     if Sender = YComboBox then YComboBox2.ItemIndex := YComboBox.ItemIndex;
     if Sender = YComboBox2 then YComboBox.ItemIndex := YComboBox2.ItemIndex;
     if (YComboBox.ItemIndex > -1) and (YComboBox.ItemIndex < ANr) then
@@ -1842,7 +1862,7 @@ begin
     1: { Controller }
       begin
         TrimmRec := Rigg.Glieder;
-        { ControllerParameter }
+        { Controller Parameter }
         SalingGraph.ControllerTyp := Rigg.ControllerTyp;
         SalingGraph.ControllerPos := TrimmRec.Controller;
         SalingGraph.ParamXE := Round(Rigg.MastPositionE);
@@ -1852,7 +1872,7 @@ begin
     3: { Saling }
       begin
         TrimmRec := Rigg.Glieder;
-        { SalingParameter }
+        { Saling Parameter }
         SalingGraph.SalingA := TrimmRec.SalingA;
         SalingGraph.SalingH := TrimmRec.SalingH;
         SalingGraph.SalingL := TrimmRec.SalingL;
@@ -2195,7 +2215,8 @@ begin
 
   NeedPaint := True;
 
-  YComboBox.ItemIndex := 1; { sonst Exception, wenn ItemIndex := -1 }
+  { avoid Exception, if ItemIndex = -1 }
+  YComboBox.ItemIndex := 1;
   YComboSavedItemIndex := 1;
   StraightLine;
   DrawChart;

@@ -27,9 +27,9 @@ I started the repo by uploading old code, very close to the original version of 
 Note that I already have new versions of the app  - with less features - but with better looking graphics and also for other compilers, including fpc.
 The fpc version will be in another repo.
 
-> This repos may end up being - or continuing to be - the feature richest.
+> This repository may end up being - or continue to be - the feature richest.
 
-## I jumped!
+## I jumped !
 
 I have just taken an aggressive step by including a VCL version of the button frame, which is great for touch screen.
 
