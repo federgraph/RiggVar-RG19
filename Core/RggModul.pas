@@ -165,7 +165,7 @@ type
     MetaGMaxCount: Integer;
     ThickPenWidth: Integer;
 
-    SalingCtrl: TSalingCtrl;
+    SalingGraph: TSalingGraph;
     BitmapS: TBitmap;
     BitmapC: TBitmap;
     ControllerPaintBox: TPaintBox;
@@ -176,7 +176,7 @@ type
     YComboSavedItemIndex: Integer;
 
     AutoSave: Boolean;
-    AllreadyUpdatedGetriebeFlag: Boolean;
+    AlreadyUpdatedGetriebeFlag: Boolean;
 
     MastGraph: TMastGraph;
     KraftGraph: TKraftGraph;
@@ -381,9 +381,9 @@ begin
   MetaFileG.Height := 422;
 
   { SalingCtrls }
-  SalingCtrl := TSalingCtrl.Create;
-  SalingCtrl.BackgroundColor := FBackgroundColor;
-  SalingCtrl.PBSize := Point(453, 220);
+  SalingGraph := TSalingGraph.Create;
+  SalingGraph.BackgroundColor := FBackgroundColor;
+  SalingGraph.PBSize := Point(453, 220);
 
   BitmapS := TBitmap.Create;
   BitmapS.Width := 453;
@@ -418,7 +418,7 @@ begin
   GetriebeGraph.Transformer.Rotator.Free;
   GetriebeGraph.Transformer.Free;
   GetriebeGraph.Free;
-  SalingCtrl.Free;
+  SalingGraph.Free;
   RiggReport.Free;
   FWReport.Free;
   BitmapG.Free;
@@ -661,7 +661,7 @@ begin
     sbPuffer := InputRec;
     Rigg.Glieder := InputRec;
     UpdateGetriebe;
-    AllreadyUpdatedGetriebeFlag := True;
+    AlreadyUpdatedGetriebeFlag := True;
   end;
 end;
 
@@ -688,16 +688,16 @@ begin
   { ControllerPaintBox }
   if OutputForm.OutputPages.ActivePage = OutputForm.ControllerSheet then
   begin
-    SalingCtrl.ControllerTyp := Rigg.ControllerTyp;
+    SalingGraph.ControllerTyp := Rigg.ControllerTyp;
     TrimmRec := Rigg.Glieder;
     { Abstand(iP[ooE0,x], iP[ooE,x]) in mm}
-    SalingCtrl.ControllerPos := TrimmRec.Controller;
+    SalingGraph.ControllerPos := TrimmRec.Controller;
     { Position des Mastes in Deckshöhe von D0 aus in mm }
-    SalingCtrl.ParamXE := Round(Rigg.MastPositionE);
+    SalingGraph.ParamXE := Round(Rigg.MastPositionE);
     { Abstand(iP[ooD0,x], iP[ooE0,x]) in mm }
-    SalingCtrl.ParamXE0 := Round(Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x]);
+    SalingGraph.ParamXE0 := Round(Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x]);
     { Abstand von E0 zur Anschlagkante Deck + Klotzdicke }
-    SalingCtrl.EdgePos := Round(Rigg.GSB.Find(fpController).Min);
+    SalingGraph.EdgePos := Round(Rigg.GSB.Find(fpController).Min);
     if Assigned(ControllerPaintBox) then
       DrawPaintBoxC(ControllerPaintBox.Canvas);
   end;
@@ -707,11 +707,11 @@ begin
   begin
     TrimmRec := Rigg.Glieder;
     { SalingAbstand }
-    SalingCtrl.SalingA := TrimmRec.SalingA;
+    SalingGraph.SalingA := TrimmRec.SalingA;
     { Abstand Verbindungslinie Salinge zu Hinterkante Mast in mm }
-    SalingCtrl.SalingH := TrimmRec.SalingH;
+    SalingGraph.SalingH := TrimmRec.SalingH;
     { Salinglänge in mm - außerhalb berechnen }
-    SalingCtrl.SalingL := TrimmRec.SalingL;
+    SalingGraph.SalingL := TrimmRec.SalingL;
     if Assigned(SalingPaintBox) then
       DrawPaintBoxS(SalingPaintBox.Canvas);
   end;
@@ -778,7 +778,7 @@ begin
   end;
   if OutputForm.OutputPages.ActivePage = OutputForm.ChartSheet then
     UpdateRiggPunkt; { GetriebePunkte oben schon aktualisiert }
-  AusgabeText; { update text befor drawing }
+  AusgabeText; { update text before drawing }
   AusgabeKommentar;
   DrawPaintBoxM;
   Draw;
@@ -1284,7 +1284,7 @@ end;
 procedure TRiggModul.SetBackgroundColor(const Value: TColor);
 begin
   FBackgroundColor := Value;
-  SalingCtrl.BackgroundColor := Value;
+  SalingGraph.BackgroundColor := Value;
 end;
 
 procedure TRiggModul.SetBtnBlauDown(Value: Boolean);
@@ -1347,7 +1347,7 @@ begin
     Rigg.ControllerTyp := Value;
   end;
   GetriebeGraph.ControllerTyp := Value;
-  SalingCtrl.ControllerTyp := Value;
+  SalingGraph.ControllerTyp := Value;
 end;
 
 procedure TRiggModul.SetConsoleActive(const Value: Boolean);
@@ -1452,7 +1452,7 @@ var
 begin
   if SalingTyp <> Value then
   begin
-    AllreadyUpdatedGetriebeFlag := False;
+    AlreadyUpdatedGetriebeFlag := False;
     case Value of
       stFest: fa := faSalingTypFest;
       stDrehbar: fa := faSalingTypDrehbar;
@@ -1529,6 +1529,7 @@ begin
     InputForm.sbControllerD.Position := ControllerAnschlag;
     sbControllerScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
   end;
+
   BiegeUndNeigeForm.ShowModal;
   UpdateGCtrls(Rigg.Glieder);
   KurveValid := False;
@@ -1537,7 +1538,7 @@ end;
 
 procedure TRiggModul.ReglerBtnClick;
 var
-  CtrlForm: TForm;
+  ReglerForm: TForm;
   ControllerAnschlag: Integer;
 begin
   { Controller zurückfahren auf Rigg.FiControllerAnschlag }
@@ -1552,11 +1553,12 @@ begin
     InputForm.sbControllerD.Position := ControllerAnschlag;
     sbControllerScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
   end;
-  CtrlForm := CtrlDlg1; { CtrlForm := CtrlDlg oder CtrlDlg1; }
-  if Rigg.CalcTyp = ctKraftGemessen then
-    CtrlForm := BiegeUndNeigeForm;
 
-  CtrlForm.ShowModal;
+  ReglerForm := FormReglerGraph;
+  if Rigg.CalcTyp = ctKraftGemessen then
+    ReglerForm := BiegeUndNeigeForm;
+
+  ReglerForm.ShowModal;
   UpdateGCtrls(Rigg.Glieder);
   KurveValid := False;
   DrawPoint;
@@ -2510,16 +2512,16 @@ end;
 
 procedure TRiggModul.SalingPaintBoxClick;
 begin
-  SalingCtrl.SalingDetail := not SalingCtrl.SalingDetail;
+  SalingGraph.SalingDetail := not SalingGraph.SalingDetail;
 end;
 
 procedure TRiggModul.DrawPaintBoxS(Canvas: TCanvas);
 begin
   PaintBackGround(BitmapS);
-  if SalingCtrl.SalingDetail then
-    SalingCtrl.DrawSalingDetail(BitmapS.Canvas)
+  if SalingGraph.SalingDetail then
+    SalingGraph.DrawSalingDetail(BitmapS.Canvas)
   else
-    SalingCtrl.DrawSalingAll(BitmapS.Canvas);
+    SalingGraph.DrawSalingAll(BitmapS.Canvas);
   Canvas.CopyMode := cmSrcCopy;
   Canvas.Draw(0, 0, BitMapS);
 end;
@@ -2527,7 +2529,7 @@ end;
 procedure TRiggModul.DrawPaintBoxC(Canvas: TCanvas);
 begin
   PaintBackGround(BitmapC);
-  SalingCtrl.DrawController(BitmapC.Canvas);
+  SalingGraph.DrawController(BitmapC.Canvas);
   Canvas.CopyMode := cmSrcCopy;
   Canvas.Draw(0, 0, BitMapC);
 end;
@@ -2541,19 +2543,19 @@ begin
       begin
         TrimmRec := Rigg.Glieder;
         { ControllerParameter }
-        SalingCtrl.ControllerTyp := Rigg.ControllerTyp;
-        SalingCtrl.ControllerPos := TrimmRec.Controller;
-        SalingCtrl.ParamXE := Round(Rigg.MastPositionE);
-        SalingCtrl.ParamXE0 := Round(Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x]);
-        SalingCtrl.EdgePos := Round(Rigg.GSB.Find(fpController).Min);
+        SalingGraph.ControllerTyp := Rigg.ControllerTyp;
+        SalingGraph.ControllerPos := TrimmRec.Controller;
+        SalingGraph.ParamXE := Round(Rigg.MastPositionE);
+        SalingGraph.ParamXE0 := Round(Rigg.iP[ooE0, x] - Rigg.iP[ooD0, x]);
+        SalingGraph.EdgePos := Round(Rigg.GSB.Find(fpController).Min);
       end;
     3: { Saling }
       begin
         TrimmRec := Rigg.Glieder;
         { SalingParameter }
-        SalingCtrl.SalingA := TrimmRec.SalingA;
-        SalingCtrl.SalingH := TrimmRec.SalingH;
-        SalingCtrl.SalingL := TrimmRec.SalingL;
+        SalingGraph.SalingA := TrimmRec.SalingA;
+        SalingGraph.SalingH := TrimmRec.SalingH;
+        SalingGraph.SalingL := TrimmRec.SalingL;
       end;
   end;
 end;
@@ -2568,8 +2570,8 @@ begin
   Rigg.UpdateGetriebe;
   GetriebeGraph.Koordinaten := Rigg.rP;
   GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  SalingCtrl.ControllerPos := Round(SalingCtrl.ParamXE0 - Rigg.MastPositionE);
-  TrimmRec.Controller := SalingCtrl.ControllerPos;
+  SalingGraph.ControllerPos := Round(SalingGraph.ParamXE0 - Rigg.MastPositionE);
+  TrimmRec.Controller := SalingGraph.ControllerPos;
   UpdateGCtrls(TrimmRec);
   Rigg.Glieder := TrimmRec;
   UpdateGetriebe;
@@ -2792,7 +2794,7 @@ begin
     sbPuffer := InputRec;
     Rigg.Glieder := InputRec;
     UpdateGetriebe;
-    AllreadyUpdatedGetriebeFlag := True;
+    AlreadyUpdatedGetriebeFlag := True;
   end;
 end;
 
@@ -2803,11 +2805,11 @@ end;
 
 procedure TRiggModul.DoResetForTrimmData;
 begin
-  AllreadyUpdatedGetriebeFlag := True;
+  AlreadyUpdatedGetriebeFlag := True;
   SalingTyp := stFest;
   ControllerTyp := ctOhne;
   CalcTyp := ctQuerKraftBiegung;
-  AllreadyUpdatedGetriebeFlag := False;
+  AlreadyUpdatedGetriebeFlag := False;
 end;
 
 end.

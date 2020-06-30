@@ -100,8 +100,8 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="App\FrmRG19.pas">
-            <Form>FormRG19</Form>
+        <DCCReference Include="App\FrmMain.pas">
+            <Form>FormMain</Form>
         </DCCReference>
         <DCCReference Include="Frm\FrmRegler.pas">
             <Form>CtrlDlg</Form>
@@ -224,7 +224,7 @@
         <DCCReference Include="Util\RiggVar.Util.InfoMemo.pas"/>
         <DCCReference Include="Util\RiggVar.Util.Logger.pas"/>
         <DCCReference Include="VM\RiggVar.VM.FormMain.pas"/>
-        <DCCReference Include="VM\RiggVar.VM.FormMainC.pas"/>
+        <DCCReference Include="VM\RiggVar.VM.FormMainD.pas"/>
         <DCCReference Include="Graph\RggZug2D.pas"/>
         <DCCReference Include="Graph\RggTransformer.pas"/>
         <DCCReference Include="Graph\RggZug3D.pas"/>

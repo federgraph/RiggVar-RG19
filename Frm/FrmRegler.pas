@@ -13,7 +13,7 @@ uses
   RggTypes;
 
 type
-  TCtrlDlg = class(TForm)
+  TFormRegler = class(TForm)
     sbMastfall: TScrollBar;
     sbSpannung: TScrollBar;
     sbBiegungS: TScrollBar;
@@ -22,22 +22,22 @@ type
     lbBiegungS: TLabel;
     lbZaehler: TLabel;
     ZaehlerEdit: TEdit;
-    LoopBtn: TBitBtn; { startet die Regelung }
+    LoopBtn: TBitBtn;
     OK: TBitBtn;
-    procedure LoopBtnClick(Sender: TObject);
-    procedure sbMastfallScroll(Sender: TObject; ScrollCode: TScrollCode;
-      var ScrollPos: Integer);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure LoopBtnClick(Sender: TObject);
+    procedure sbMastfallScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
   private
     procedure SetupCtrls;
   public
-    Zaehler: Integer;
-    TrimmIst, TrimmSoll: TTrimm;
+    Counter: Integer;
+    TrimmIst: TTrimm;
+    TrimmSoll: TTrimm;
   end;
 
 var
-  CtrlDlg: TCtrlDlg;
+  FormRegler: TFormRegler;
 
 implementation
 
@@ -46,7 +46,18 @@ implementation
 uses
   RggModul;
 
-procedure TCtrlDlg.SetupCtrls;
+procedure TFormRegler.FormCreate(Sender: TObject);
+begin
+  SetupCtrls;
+end;
+
+procedure TFormRegler.FormShow(Sender: TObject);
+begin
+  ZaehlerEdit.Text := '0';
+  TrimmIst := RiggModul.Rigg.Trimm;
+end;
+
+procedure TFormRegler.SetupCtrls;
 begin
   sbMastfall.SetParams(1100, 1000, 1300);
   sbSpannung.SetParams(800, 500, 1500);
@@ -66,7 +77,7 @@ begin
   ZaehlerEdit.Text := '0';
 end;
 
-procedure TCtrlDlg.LoopBtnClick(Sender: TObject);
+procedure TFormRegler.LoopBtnClick(Sender: TObject);
 begin
   TrimmSoll.Mastfall := sbMastfall.Position;
   TrimmSoll.Spannung := sbSpannung.Position;
@@ -76,7 +87,7 @@ begin
   ZaehlerEdit.Text := '0';
   Screen.Cursor := crHourGlass;
   try
-    Zaehler := RiggModul.Rigg.Regeln(TrimmSoll);
+    Counter := RiggModul.Rigg.Regeln(TrimmSoll);
     if RiggModul.Rigg.GetriebeOK then
     begin
     { GCtrls werden nicht sofort aktualisiert. Deshalb sind die Einstellwerte
@@ -87,23 +98,25 @@ begin
       Berechnung des Getriebes, ausgelöst vom Benutzer }
       RiggModul.DoGraphics;
       RiggModul.UpdateRigg;
-   (* Alternative:
+
+//   Alternative:
     { Die GCtrls werden sofort aktualisiert. Damit werden die Werte
       für die Wanten geradzahlig und die Einstellwerte für Mastfall und
       Biegung verändern sich. }
-      RiggModul.UpdateGCtrls(RiggModul.Rigg.Glieder);
-      RiggModul.UpdateGetriebe; *)
+//      RiggModul.UpdateGCtrls(RiggModul.Rigg.Glieder);
+//      RiggModul.UpdateGetriebe;
+
     end;
   finally
-    if Zaehler = 20 then
+    if Counter = 20 then
       ZaehlerEdit.Text := 'Max'
     else
-      ZaehlerEdit.Text := IntToStr(Zaehler);
+      ZaehlerEdit.Text := IntToStr(Counter);
     Screen.Cursor := crDefault;
   end;
 end;
 
-procedure TCtrlDlg.sbMastfallScroll(Sender: TObject;
+procedure TFormRegler.sbMastfallScroll(Sender: TObject;
   ScrollCode: TScrollCode; var ScrollPos: Integer);
 begin
   if Sender = sbMastfall then
@@ -112,17 +125,6 @@ begin
     lbSpannung.Caption := Format('Vorstagspannung = %d N', [ScrollPos])
   else if Sender = sbBiegungS then
     lbBiegungS.Caption := Format('Mastbiegung = %d mm', [ScrollPos]);
-end;
-
-procedure TCtrlDlg.FormCreate(Sender: TObject);
-begin
-  SetupCtrls;
-end;
-
-procedure TCtrlDlg.FormShow(Sender: TObject);
-begin
-  ZaehlerEdit.Text := '0';
-  TrimmIst := RiggModul.Rigg.Trimm;
 end;
 
 end.

@@ -3,7 +3,7 @@
         <ProjectGuid>{E65EBE9F-9BF4-4F78-B440-5DD9D095260B}</ProjectGuid>
         <ProjectVersion>18.8</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
-        <MainSource>RG19A.dpr</MainSource>
+        <MainSource>RG19C.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -57,7 +57,7 @@
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
-        <SanitizedProjectName>RG19A</SanitizedProjectName>
+        <SanitizedProjectName>RG19C</SanitizedProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;IndyIPCommon;RESTComponents;bindcompdbx;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;vclFireDAC;IndySystem;tethering;svnui;dsnapcon;FireDACADSDriver;FireDACMSAccDriver;fmxFireDAC;vclimg;TeeDB;FireDAC;vcltouch;vcldb;bindcompfmx;svn;FireDACSqliteDriver;FireDACPgDriver;inetdb;FMXTee;soaprtl;DbxCommonDriver;FmxTeeUI;fmx;FireDACIBDriver;fmxdae;xmlrtl;soapmidas;Tee;fmxobj;vclwinx;rtl;DbxClientDriver;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;bindcomp;appanalytics;dsnap;FireDACCommon;IndyIPClient;bindcompvcl;RESTBackendComponents;TeeUI;VCLRESTComponents;soapserver;dbxcds;VclSmp;adortl;vclie;bindengine;DBXMySQLDriver;CloudService;dsnapxml;FireDACMySQLDriver;dbrtl;IndyProtocols;inetdbxpress;FireDACCommonODBC;FireDACCommonDriver;inet;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
@@ -100,8 +100,8 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="App\FrmRG19A.pas">
-            <Form>FormRG19A</Form>
+        <DCCReference Include="App\FrmRG19C.pas">
+            <Form>FormRG19C</Form>
         </DCCReference>
         <DCCReference Include="Frm\FrmRegler.pas">
             <Form>CtrlDlg</Form>
@@ -148,7 +148,6 @@
         <DCCReference Include="Frm\FrmProgress.pas">
             <Form>ProgressDlg</Form>
         </DCCReference>
-        <DCCReference Include="Core\RggTrimmTab.pas"/>
         <DCCReference Include="Frm\FrmInfo.pas">
             <Form>KreisForm</Form>
         </DCCReference>
@@ -176,44 +175,45 @@
         <DCCReference Include="Frm\FrmKreis.pas">
             <Form>KreisForm</Form>
         </DCCReference>
-        <DCCReference Include="App\FrmText.pas">
-            <Form>TextForm</Form>
-        </DCCReference>
         <DCCReference Include="Graph\ThreeD.pas"/>
         <DCCReference Include="Graph\ThreeDSolid.pas"/>
+        <DCCReference Include="Core\RggDoc.pas"/>
+        <DCCReference Include="Core\RggFachwerk.pas"/>
+        <DCCReference Include="Core\RggModul.pas"/>
         <DCCReference Include="Core\RggReport.pas"/>
-        <DCCReference Include="Core\RggTypes.pas"/>
         <DCCReference Include="Core\RggUnit0.pas"/>
         <DCCReference Include="Core\RggUnit1.pas"/>
         <DCCReference Include="Core\RggUnit2.pas"/>
         <DCCReference Include="Core\RggUnit3.pas"/>
         <DCCReference Include="Core\RggUnit4.pas"/>
-        <DCCReference Include="Core\RggFachwerk.pas"/>
+        <DCCReference Include="Core\RggSchnittKK.pas"/>
+        <DCCReference Include="Core\RggSaling3Eck.pas"/>
+        <DCCReference Include="Core\RggTrimmTab.pas"/>
+        <DCCReference Include="Core\RggTypes.pas"/>
+        <DCCReference Include="Core\RggCalc.pas"/>
+        <DCCReference Include="Graph\RggKraftGraph.pas"/>
         <DCCReference Include="Graph\RggCtrls.pas"/>
-        <DCCReference Include="Core\RggModul.pas"/>
         <DCCReference Include="Graph\RggMatrix.pas"/>
-        <DCCReference Include="Core\RggDoc.pas"/>
+        <DCCReference Include="Core\RggScroll.pas"/>
         <DCCReference Include="Graph\RggGetriebeGraph.pas"/>
+        <DCCReference Include="Graph\RggPBox.pas"/>
         <DCCReference Include="Graph\RggHull.pas"/>
         <DCCReference Include="Graph\RggPal.pas"/>
-        <DCCReference Include="Graph\RggPreview.pas"/>
+        <DCCReference Include="Graph\RggRota.pas"/>
         <DCCReference Include="Graph\RggPrinter.pas"/>
-        <DCCReference Include="Core\RggSaling3Eck.pas"/>
-        <DCCReference Include="Graph\RggPBox.pas"/>
-        <DCCReference Include="Core\RggSchnittKK.pas"/>
-        <DCCReference Include="Core\RggCalc.pas"/>
-        <DCCReference Include="Core\RggScroll.pas"/>
+        <DCCReference Include="Graph\RggPreview.pas"/>
         <DCCReference Include="Graph\RggGraph.pas"/>
         <DCCReference Include="Graph\RggPolarkar.pas"/>
         <DCCReference Include="Graph\RggBootGraph.pas"/>
         <DCCReference Include="Graph\RggRaumGraph.pas"/>
-        <DCCReference Include="Graph\RggRota.pas"/>
         <DCCReference Include="Graph\RggDisplay.pas"/>
         <DCCReference Include="Graph\RggTestData.pas"/>
+        <DCCReference Include="Graph\RggChart.pas"/>
+        <DCCReference Include="App\RiggVar.App.Main.pas"/>
         <DCCReference Include="App\RiggVar.App.Main0.pas"/>
         <DCCReference Include="App\RiggVar.App.Main1.pas"/>
-        <DCCReference Include="App\RiggVar.App.Main.pas"/>
         <DCCReference Include="FB\RiggVar.FB.Classes.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.Color.pas"/>
         <DCCReference Include="RG\RiggVar.RG.Data.pas"/>
         <DCCReference Include="RG\RiggVar.RG.Main.pas"/>
         <DCCReference Include="RG\RiggVar.RG.Def.pas"/>
@@ -221,25 +221,22 @@
         <DCCReference Include="RG\RiggVar.RG.Graph.pas"/>
         <DCCReference Include="RG\RiggVar.RG.Report.pas"/>
         <DCCReference Include="Util\RiggVar.Util.AppUtils.pas"/>
-        <DCCReference Include="Util\RiggVar.Util.Logger.pas"/>
         <DCCReference Include="Util\RiggVar.Util.InfoMemo.pas"/>
+        <DCCReference Include="Util\RiggVar.Util.Logger.pas"/>
         <DCCReference Include="VM\RiggVar.VM.FormMain.pas"/>
-        <DCCReference Include="VM\RiggVar.VM.FormMainA.pas"/>
-        <DCCReference Include="Graph\RggZug.pas"/>
+        <DCCReference Include="VM\RiggVar.VM.FormMainC.pas"/>
+        <DCCReference Include="Graph\RggZug2D.pas"/>
         <DCCReference Include="Graph\RggTransformer.pas"/>
         <DCCReference Include="Graph\RggZug3D.pas"/>
-        <DCCReference Include="Graph\RggZug2D.pas"/>
+        <DCCReference Include="Graph\RggZug.pas"/>
         <DCCReference Include="Graph\RggDisplayOrder.pas"/>
         <DCCReference Include="Graph\RggDisplayTypes.pas"/>
         <DCCReference Include="FB\RiggVar.FB.ActionConst.pas"/>
         <DCCReference Include="Graph\RggVector.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.Color.pas"/>
-        <DCCReference Include="Graph\RggChart.pas"/>
         <DCCReference Include="Graph\RggChartModel01.pas"/>
         <DCCReference Include="Graph\RggChartModel02.pas"/>
         <DCCReference Include="Core\RggStrings.pas"/>
         <DCCReference Include="Graph\RggTrimmTabGraph.pas"/>
-        <DCCReference Include="Graph\RggKraftGraph.pas"/>
         <DCCReference Include="Graph\RggMastGraph.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
@@ -259,7 +256,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">RG19A.dpr</Source>
+                    <Source Name="MainSource">RG19C.dpr</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Beispiele für gekapselte Komponenten für Automatisierungsserver</Excluded_Packages>
@@ -267,9 +264,9 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="Win32\Debug\RG19A.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Win32\Debug\RG19C.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>RG19A.exe</RemoteName>
+                        <RemoteName>RG19C.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

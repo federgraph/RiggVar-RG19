@@ -3,7 +3,7 @@
 interface
 
 uses
-  UITypes;
+  Graphics;
 
 type
   TRggColor = TColor;

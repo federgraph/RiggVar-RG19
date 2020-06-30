@@ -1,7 +1,7 @@
-object FormRG19: TFormRG19
+object FormRG19C: TFormRG19C
   Left = 0
   Top = 0
-  Caption = 'RG19'
+  Caption = 'RG19C'
   ClientHeight = 695
   ClientWidth = 1094
   Color = clBtnFace

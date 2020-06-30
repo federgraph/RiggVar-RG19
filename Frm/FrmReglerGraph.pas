@@ -12,22 +12,39 @@ uses
   Vcl.StdCtrls,
   Vcl.Buttons,
   Vcl.ExtCtrls,
-  RggTypes,
-  FrmRegler;
+  RggTypes;
 
 type
-  TCtrlDlg1 = class(TCtrlDlg)
+  TFormReglerGraph = class(TForm)
     RegelPaintBox: TPaintBox;
-    Bevel1: TBevel;
-    procedure FormPaint(Sender: TObject);
+    lbMastfall: TLabel;
+    lbSpannung: TLabel;
+    lbBiegungS: TLabel;
+    lbZaehler: TLabel;
+    sbMastfall: TScrollBar;
+    sbSpannung: TScrollBar;
+    sbBiegungS: TScrollBar;
+    ZaehlerEdit: TEdit;
+    LoopBtn: TBitBtn;
+    OK: TBitBtn;
     procedure FormCreate(Sender: TObject);
-    procedure sbMastfallScroll(Sender: TObject; ScrollCode: TScrollCode;
-      var ScrollPos: Integer);
+    procedure FormShow(Sender: TObject);
+    procedure FormPaint(Sender: TObject);
+    procedure sbMastfallScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
+    procedure LoopBtnClick(Sender: TObject);
   private
-    TopTitel, LeftTitel, BottomTitel, RightTitel: string;
-    Xmin, Xmax, Ymin, Ymax, XGap, YGap: double;
-    { ChartPunktX, ChartPunktY: double; }
-    f, TestF: TChartLine;
+    TopTitel: string;
+    LeftTitel: string;
+    BottomTitel: string;
+    RightTitel: string;
+    Xmin: double;
+    Xmax: double;
+    Ymin: double;
+    Ymax: double;
+    XGap: double;
+    YGap: double;
+    f: TChartLine;
+    TestF: TChartLine;
     procedure GetTestData;
     procedure GetData;
     procedure GetXMinMax;
@@ -36,13 +53,19 @@ type
     function GetYText: String;
     procedure DrawToPaintBox(Canvas: TCanvas; Rect: TRect);
     procedure PaintBackGround(Image: TBitMap);
+  private
+    procedure SetupCtrls;
+  public
+    Counter: Integer;
+    TrimmIst: TTrimm;
+    TrimmSoll: TTrimm;
   public
     ChartValid: Boolean;
     procedure Draw(Sender: TObject);
   end;
 
 var
-  CtrlDlg1: TCtrlDlg1;
+  FormReglerGraph: TFormReglerGraph;
 
 implementation
 
@@ -51,21 +74,99 @@ uses
 
 {$R *.DFM}
 
-procedure TCtrlDlg1.FormCreate(Sender: TObject);
+procedure TFormReglerGraph.FormCreate(Sender: TObject);
 begin
-  inherited;
+  SetupCtrls;
   GetTestData;
   RiggModul.Rigg.OnRegelGrafik := Draw;
   ChartValid := True;
 end;
 
-procedure TCtrlDlg1.FormPaint(Sender: TObject);
+procedure TFormReglerGraph.FormShow(Sender: TObject);
 begin
-  inherited;
+  ZaehlerEdit.Text := '0';
+  TrimmIst := RiggModul.Rigg.Trimm;
+end;
+
+procedure TFormReglerGraph.SetupCtrls;
+begin
+  sbMastfall.SetParams(1100, 1000, 1300);
+  sbSpannung.SetParams(800, 500, 1500);
+  sbBiegungS.SetParams(40, 10, 80);
+
+  sbMastfall.SmallChange := 1;
+  sbSpannung.SmallChange := 10;
+  sbBiegungS.SmallChange := 1;
+
+  sbMastfall.LargeChange := 10;
+  sbSpannung.LargeChange := 100;
+  sbBiegungS.LargeChange := 10;
+
+  lbMastfall.Caption := Format('Mastfall = %d mm', [sbMastfall.Position]);
+  lbSpannung.Caption := Format('Vorstagspannung = %d N', [sbSpannung.Position]);
+  lbBiegungS.Caption := Format('Mastbiegung = %d mm', [sbBiegungS.Position]);
+  ZaehlerEdit.Text := '0';
+end;
+
+procedure TFormReglerGraph.LoopBtnClick(Sender: TObject);
+begin
+  TrimmSoll.Mastfall := sbMastfall.Position;
+  TrimmSoll.Spannung := sbSpannung.Position;
+  TrimmSoll.BiegungS := sbBiegungS.Position;
+  TrimmSoll.BiegungC := TrimmIst.BiegungC;
+  TrimmSoll.Flexwert := TrimmIst.Flexwert;
+  ZaehlerEdit.Text := '0';
+  Screen.Cursor := crHourGlass;
+  try
+    Counter := RiggModul.Rigg.Regeln(TrimmSoll);
+    if RiggModul.Rigg.GetriebeOK then
+    begin
+    { GCtrls werden nicht sofort aktualisiert. Deshalb sind die Einstellwerte
+      für Mastfall und Biegung noch exakt. Die Wanten haben ungeradzahlige Längen.
+      In UpdateRigg werden die Labels und die Graphic richtig aktualisiert.
+      Die GCtrls werden erst nach Schließen des Dialogfensters aktualisiert.
+      Gerundet auf geradzahlige Wantenwerte wird aber erst nach erneuter
+      Berechnung des Getriebes, ausgelöst vom Benutzer }
+      RiggModul.DoGraphics;
+      RiggModul.UpdateRigg;
+
+//   Alternative:
+    { Die GCtrls werden sofort aktualisiert. Damit werden die Werte
+      für die Wanten geradzahlig und die Einstellwerte für Mastfall und
+      Biegung verändern sich. }
+//      RiggModul.UpdateGCtrls(RiggModul.Rigg.Glieder);
+//      RiggModul.UpdateGetriebe;
+
+    end;
+  finally
+    if Counter = 20 then
+      ZaehlerEdit.Text := 'Max'
+    else
+      ZaehlerEdit.Text := IntToStr(Counter);
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TFormReglerGraph.sbMastfallScroll(Sender: TObject;
+  ScrollCode: TScrollCode; var ScrollPos: Integer);
+begin
+  if Sender = sbMastfall then
+    lbMastfall.Caption := Format('Mastfall = %d mm', [ScrollPos])
+  else if Sender = sbSpannung then
+    lbSpannung.Caption := Format('Vorstagspannung = %d N', [ScrollPos])
+  else if Sender = sbBiegungS then
+    lbBiegungS.Caption := Format('Mastbiegung = %d mm', [ScrollPos]);
+
+  if (ScrollCode = scEndScroll) and (Sender = sbSpannung) then
+    DrawToPaintBox(RegelPaintBox.Canvas, RegelPaintBox.BoundsRect);
+end;
+
+procedure TFormReglerGraph.FormPaint(Sender: TObject);
+begin
   Draw(Self);
 end;
 
-procedure TCtrlDlg1.Draw(Sender: TObject);
+procedure TFormReglerGraph.Draw(Sender: TObject);
 begin
   if ChartValid then
   begin
@@ -108,7 +209,7 @@ begin
   DrawToPaintBox(RegelPaintBox.Canvas, RegelPaintBox.BoundsRect);
 end;
 
-procedure TCtrlDlg1.DrawToPaintBox(Canvas: TCanvas; Rect: TRect);
+procedure TFormReglerGraph.DrawToPaintBox(Canvas: TCanvas; Rect: TRect);
 var
   P: TPoint;
   i: Integer;
@@ -268,18 +369,18 @@ begin
   *)
 end;
 
-function TCtrlDlg1.GetXText: String;
+function TFormReglerGraph.GetXText: String;
 var
-  S: String;
+  s: string;
 begin
   case RiggModul.Rigg.SalingTyp of
-    stFest: S := 'Saling-Höhe [mm]';
-    stDrehbar: S := 'Saling-Länge [mm]';
+    stFest: s := 'Saling-Höhe [mm]';
+    stDrehbar: s := 'Saling-Länge [mm]';
   end;
-  Result := S;
+  Result := s;
 end;
 
-function TCtrlDlg1.GetYText: String;
+function TFormReglerGraph.GetYText: String;
 var
   S: String;
 begin
@@ -287,7 +388,7 @@ begin
   Result := S;
 end;
 
-procedure TCtrlDlg1.GetYMinMax;
+procedure TFormReglerGraph.GetYMinMax;
 var
   i: Integer;
 begin
@@ -302,13 +403,13 @@ begin
   end;
 end;
 
-procedure TCtrlDlg1.GetXMinMax;
+procedure TFormReglerGraph.GetXMinMax;
 begin
   Xmin := RiggModul.Rigg.Anfang;
   Xmax := RiggModul.Rigg.Ende;
 end;
 
-procedure TCtrlDlg1.GetTestData;
+procedure TFormReglerGraph.GetTestData;
 var
   i: Integer;
 begin
@@ -316,13 +417,13 @@ begin
   TestF := f;
 end;
 
-procedure TCtrlDlg1.GetData;
+procedure TFormReglerGraph.GetData;
 begin
   ChartValid := True;
   f := RiggModul.Rigg.KurveF;
 end;
 
-procedure TCtrlDlg1.PaintBackGround(Image: TBitMap);
+procedure TFormReglerGraph.PaintBackGround(Image: TBitMap);
 var
   R: TRect;
 begin
@@ -332,14 +433,6 @@ begin
     Brush.Color := clWhite;
     FillRect(R);
   end;
-end;
-
-procedure TCtrlDlg1.sbMastfallScroll(Sender: TObject;
-  ScrollCode: TScrollCode; var ScrollPos: Integer);
-begin
-  inherited;
-  if (ScrollCode = scEndScroll) and (Sender = sbSpannung) then
-    DrawToPaintBox(RegelPaintBox.Canvas, RegelPaintBox.BoundsRect);
 end;
 
 end.

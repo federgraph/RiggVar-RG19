@@ -20,7 +20,7 @@ type
 implementation
 
 uses
-  FrmRG19;
+  FrmRG19C;
 
 { TViewModelMainC }
 
@@ -39,41 +39,41 @@ end;
 
 function TViewModelMainC.GetOpenFileName(dn, fn: string): string;
 begin
-  result := FormRG19.GetOpenFileName(dn, fn);
+  result := FormRG19C.GetOpenFileName(dn, fn);
 end;
 
 function TViewModelMainC.GetSaveFileName(dn, fn: string): string;
 begin
-  result := FormRG19.GetSaveFileName(dn, fn);
+  result := FormRG19C.GetSaveFileName(dn, fn);
 end;
 
 procedure TViewModelMainC.HideDiagramm;
 begin
   inherited;
-  if FormRG19 <> nil then
+  if FormRG19C <> nil then
   begin
-    FormRG19.ChartFormItem.Caption := ChartFormItemCaption;
-    FormRG19.ChartFormItem.Hint := ChartFormItemHint;
+    FormRG19C.ChartFormItem.Caption := ChartFormItemCaption;
+    FormRG19C.ChartFormItem.Hint := ChartFormItemHint;
   end;
 end;
 
 procedure TViewModelMainC.HideGrafik;
 begin
   inherited;
-  if FormRG19 <> nil then
+  if FormRG19C <> nil then
   begin
-    FormRG19.RotaFormItem.Caption := RotaFormItemCaption;
-    FormRG19.RotaFormItem.Hint := RotaFormItemHint;
+    FormRG19C.RotaFormItem.Caption := RotaFormItemCaption;
+    FormRG19C.RotaFormItem.Hint := RotaFormItemHint;
   end;
 end;
 
 procedure TViewModelMainC.HideReport;
 begin
   inherited;
-  if FormRG19 <> nil then
+  if FormRG19C <> nil then
   begin
-    FormRG19.ReportFormItem.Caption := ReportFormItemCaption;
-    FormRG19.ReportFormItem.Hint := ReportFormItemHint;
+    FormRG19C.ReportFormItem.Caption := ReportFormItemCaption;
+    FormRG19C.ReportFormItem.Hint := ReportFormItemHint;
   end;
 end;
 
@@ -84,60 +84,60 @@ begin
   if not IsUp then
     Exit;
 
-  FormRG19.LEDShape.Brush.Color := LEDColor;
-  FormRG19.Statusbar.Panels[1].Text := StatusPanelText1;
-  FormRG19.Caption := Caption;
+  FormRG19C.LEDShape.Brush.Color := LEDColor;
+  FormRG19C.Statusbar.Panels[1].Text := StatusPanelText1;
+  FormRG19C.Caption := Caption;
 
-  FormRG19.FestItem.Checked := FestItemChecked;
-  FormRG19.DrehbarItem.Checked := DrehbarItemChecked;
-  FormRG19.OhneItem.Checked := OhneItemChecked;
-  FormRG19.OSDlgItem.Checked := OSDlgItemChecked;
+  FormRG19C.FestItem.Checked := FestItemChecked;
+  FormRG19C.DrehbarItem.Checked := DrehbarItemChecked;
+  FormRG19C.OhneItem.Checked := OhneItemChecked;
+  FormRG19C.OSDlgItem.Checked := OSDlgItemChecked;
 
-  FormRG19.WinkelItem.Checked := WinkelDown;
-  FormRG19.WinkelBtn.Down := WinkelDown;
+  FormRG19C.WinkelItem.Checked := WinkelDown;
+  FormRG19C.WinkelBtn.Down := WinkelDown;
 
-  FormRG19.WinkelItem.Enabled := WinkelEnabled;
-  FormRG19.WinkelBtn.Enabled := WinkelEnabled;
+  FormRG19C.WinkelItem.Enabled := WinkelEnabled;
+  FormRG19C.WinkelBtn.Enabled := WinkelEnabled;
 
-//  FormRG19.BogenBtn.Down := BogenBtnDown;
+//  FormRG19C.BogenBtn.Down := BogenBtnDown;
 
-  FormRG19.BiegeNeigeItem.Enabled := BiegeNeigeItemEnabled;
-  FormRG19.ReglerItem.Enabled := ReglerItemEnabled;
-  FormRG19.ReglerBtn.Enabled := ReglerBtnEnabled;
+  FormRG19C.BiegeNeigeItem.Enabled := BiegeNeigeItemEnabled;
+  FormRG19C.ReglerItem.Enabled := ReglerItemEnabled;
+  FormRG19C.ReglerBtn.Enabled := ReglerBtnEnabled;
 
-  FormRG19.QuerKraftItem.Enabled := QuerKraftItemEnabled;
-  FormRG19.KnickenItem.Enabled := KnickenItemEnabled;
-  FormRG19.KraftGemessenItem.Enabled := KraftGemessenItemEnabled;
-  FormRG19.KorrigiertItem.Enabled := KorrigiertItemEnabled;
+  FormRG19C.QuerKraftItem.Enabled := QuerKraftItemEnabled;
+  FormRG19C.KnickenItem.Enabled := KnickenItemEnabled;
+  FormRG19C.KraftGemessenItem.Enabled := KraftGemessenItemEnabled;
+  FormRG19C.KorrigiertItem.Enabled := KorrigiertItemEnabled;
 
-  FormRG19.ControllerItem.Enabled := ControllerEnabled;
-  FormRG19.ControllerBtn.Enabled := ControllerEnabled;
-  FormRG19.ControllerItem.Checked := ControllerDown;
-  FormRG19.ControllerBtn.Down := ControllerDown;
+  FormRG19C.ControllerItem.Enabled := ControllerEnabled;
+  FormRG19C.ControllerBtn.Enabled := ControllerEnabled;
+  FormRG19C.ControllerItem.Checked := ControllerDown;
+  FormRG19C.ControllerBtn.Down := ControllerDown;
 
-  FormRG19.KoppelkurveItem.Checked := KoppelKurveEnabled;
-  FormRG19.KoppelBtn.Down := KoppelKurveEnabled;
+  FormRG19C.KoppelkurveItem.Checked := KoppelKurveEnabled;
+  FormRG19C.KoppelBtn.Down := KoppelKurveEnabled;
 
-  FormRG19.QuerKraftItem.Checked := QuerKraftItemChecked;
-  FormRG19.KnickenItem.Checked := KnickenItemChecked;
-  FormRG19.KorrigiertItem.Enabled := KorrigiertItemEnabled;
-  FormRG19.KraftGemessenItem.Checked := KraftGemessenItemChecked;
+  FormRG19C.QuerKraftItem.Checked := QuerKraftItemChecked;
+  FormRG19C.KnickenItem.Checked := KnickenItemChecked;
+  FormRG19C.KorrigiertItem.Enabled := KorrigiertItemEnabled;
+  FormRG19C.KraftGemessenItem.Checked := KraftGemessenItemChecked;
 
-  FormRG19.VonDerSeiteItem.Checked := VonDerSeiteItemChecked;
-  FormRG19.VonHintenItem.Checked := VonHintenItemChecked;
-  FormRG19.VonObenItem.Checked := VonObenItemChecked;
-  FormRG19.Von3DItem.Checked := Von3DItemChecked;
+  FormRG19C.VonDerSeiteItem.Checked := VonDerSeiteItemChecked;
+  FormRG19C.VonHintenItem.Checked := VonHintenItemChecked;
+  FormRG19C.VonObenItem.Checked := VonObenItemChecked;
+  FormRG19C.Von3DItem.Checked := Von3DItemChecked;
 
-  FormRG19.InputFormItem.Checked := InputFormItemChecked;
-  FormRG19.OutputFormItem.Checked := OutputFormItemChecked;
-  FormRG19.GrafikFormItem.Checked := GrafikFormItemChecked;
+  FormRG19C.InputFormItem.Checked := InputFormItemChecked;
+  FormRG19C.OutputFormItem.Checked := OutputFormItemChecked;
+  FormRG19C.GrafikFormItem.Checked := GrafikFormItemChecked;
 
-  FormRG19.InputFormItem.Enabled := InputFormItemEnabled;
-  FormRG19.OutputFormItem.Enabled := OutputFormItemEnabled;
-  FormRG19.GrafikFormItem.Enabled := GrafikFormItemEnabled;
+  FormRG19C.InputFormItem.Enabled := InputFormItemEnabled;
+  FormRG19C.OutputFormItem.Enabled := OutputFormItemEnabled;
+  FormRG19C.GrafikFormItem.Enabled := GrafikFormItemEnabled;
 
-//  FormRG19.ConsoleItem.Caption := ConsoleItemCaption;
-  FormRG19.ConsoleItem.Hint := ConsoleItemHint;
+//  FormRG19C.ConsoleItem.Caption := ConsoleItemCaption;
+  FormRG19C.ConsoleItem.Hint := ConsoleItemHint;
 end;
 
 end.

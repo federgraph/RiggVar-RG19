@@ -1,4 +1,4 @@
-object CtrlDlg: TCtrlDlg
+object FormRegler: TFormRegler
   Left = 331
   Top = 172
   BorderStyle = bsDialog
@@ -11,9 +11,8 @@ object CtrlDlg: TCtrlDlg
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = True
+  OldCreateOrder = False
   Position = poScreenCenter
-  Scaled = False
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96

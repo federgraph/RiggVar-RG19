@@ -417,7 +417,7 @@ begin
     fpWPowerOS,
     fpMastfallVorlauf:
     begin
-      if not RiggModul.AllreadyUpdatedGetriebeFlag then
+      if not RiggModul.AlreadyUpdatedGetriebeFlag then
         UpdateGetriebe;
     end;
 
@@ -437,7 +437,7 @@ begin
   end;
 
   { because Draw is no longer called }
-  if not RiggModul.AllreadyUpdatedGetriebeFlag then
+  if not RiggModul.AlreadyUpdatedGetriebeFlag then
     UpdateFactArrayFromRigg;
 end;
 
@@ -555,7 +555,7 @@ begin
     else
       sb.Ist := Value;
 
-    RiggModul.AllreadyUpdatedGetriebeFlag := False;
+    RiggModul.AlreadyUpdatedGetriebeFlag := False;
     RiggModul.DoOnWheelScroll(idx, Round(Value));
     UpdateGraph;
   end;

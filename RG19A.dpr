@@ -2,7 +2,7 @@
 
 uses
   Vcl.Forms,
-  FrmMain in 'App\FrmMain.pas' {FormMain},
+  FrmRG19A in 'App\FrmRG19A.pas' {FormRG19A},
   FrmRegler in 'Frm\FrmRegler.pas' {CtrlDlg},
   FrmReport in 'Frm\FrmReport.pas' {ReportForm},
   FrmSelect in 'Frm\FrmSelect.pas' {MemoDlg},
@@ -98,10 +98,10 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.Title := 'RG19A';
-  Application.CreateForm(TFormMain, FormMain);
+  Application.CreateForm(TFormRG19A, FormRG19A);
   Application.CreateForm(TBiegeUndNeigeForm, BiegeUndNeigeForm);
-  Application.CreateForm(TCtrlDlg, CtrlDlg);
-  Application.CreateForm(TCtrlDlg1, CtrlDlg1);
+  Application.CreateForm(TFormRegler, FormRegler);
+  Application.CreateForm(TFormReglerGraph, FormReglerGraph);
   Application.CreateForm(TMemoDlg, MemoDlg);
   Application.CreateForm(TOptionForm, OptionForm);
   Application.CreateForm(TPreviewGForm, PreviewGForm);

@@ -2,7 +2,7 @@
 
 uses
   Vcl.Forms,
-  FrmRG19 in 'App\FrmRG19.pas' {FormRG19},
+  FrmMain in 'App\FrmMain.pas' {FormMain},
   FrmRegler in 'Frm\FrmRegler.pas' {CtrlDlg},
   FrmReport in 'Frm\FrmReport.pas' {ReportForm},
   FrmSelect in 'Frm\FrmSelect.pas' {MemoDlg},
@@ -76,7 +76,7 @@ uses
   RiggVar.Util.InfoMemo in 'Util\RiggVar.Util.InfoMemo.pas',
   RiggVar.Util.Logger in 'Util\RiggVar.Util.Logger.pas',
   RiggVar.VM.FormMain in 'VM\RiggVar.VM.FormMain.pas',
-  RiggVar.VM.FormMainC in 'VM\RiggVar.VM.FormMainC.pas',
+  RiggVar.VM.FormMainD in 'VM\RiggVar.VM.FormMainD.pas',
   RggZug2D in 'Graph\RggZug2D.pas',
   RggTransformer in 'Graph\RggTransformer.pas',
   RggZug3D in 'Graph\RggZug3D.pas',
@@ -97,10 +97,10 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.Title := 'RG19';
-  Application.CreateForm(TFormRG19, FormRG19);
+  Application.CreateForm(TFormMain, FormMain);
   Application.CreateForm(TBiegeUndNeigeForm, BiegeUndNeigeForm);
-  Application.CreateForm(TCtrlDlg, CtrlDlg);
-  Application.CreateForm(TCtrlDlg1, CtrlDlg1);
+  Application.CreateForm(TFormRegler, FormRegler);
+  Application.CreateForm(TFormReglerGraph, FormReglerGraph);
   Application.CreateForm(TMemoDlg, MemoDlg);
   Application.CreateForm(TOptionForm, OptionForm);
   Application.CreateForm(TPreviewGForm, PreviewGForm);

@@ -19,47 +19,47 @@ type
 implementation
 
 uses
-  FrmMain;
+  FrmRG19A;
 
 { TViewModelMainA }
 
 function TViewModelMainA.GetOpenFileName(dn, fn: string): string;
 begin
-  result := FormMain.GetOpenFileName(dn, fn);
+  result := FormRG19A.GetOpenFileName(dn, fn);
 end;
 
 function TViewModelMainA.GetSaveFileName(dn, fn: string): string;
 begin
-  result := FormMain.GetSaveFileName(dn, fn);
+  result := FormRG19A.GetSaveFileName(dn, fn);
 end;
 
 procedure TViewModelMainA.HideDiagramm;
 begin
   inherited;
-  if FormMain <> nil then
+  if FormRG19A <> nil then
   begin
-    FormMain.ChartFormItem.Caption := ChartFormItemCaption;
-    FormMain.ChartFormItem.Hint := ChartFormItemHint;
+    FormRG19A.ChartFormItem.Caption := ChartFormItemCaption;
+    FormRG19A.ChartFormItem.Hint := ChartFormItemHint;
   end
 end;
 
 procedure TViewModelMainA.HideGrafik;
 begin
   inherited;
-  if FormMain <> nil then
+  if FormRG19A <> nil then
   begin
-    FormMain.RotaFormItem.Caption := RotaFormItemCaption;
-    FormMain.RotaFormItem.Hint := RotaFormItemHint;
+    FormRG19A.RotaFormItem.Caption := RotaFormItemCaption;
+    FormRG19A.RotaFormItem.Hint := RotaFormItemHint;
   end;
 end;
 
 procedure TViewModelMainA.HideReport;
 begin
   inherited;
-  if FormMain <> nil then
+  if FormRG19A <> nil then
   begin
-    FormMain.ReportFormItem.Caption := 'Report ...';
-    FormMain.ReportFormItem.Hint := '  Report anzeigen';
+    FormRG19A.ReportFormItem.Caption := 'Report ...';
+    FormRG19A.ReportFormItem.Hint := '  Report anzeigen';
   end
 end;
 
@@ -70,58 +70,58 @@ begin
   if not IsUp then
     Exit;
 
-  FormMain.LEDShape.Brush.Color := LEDColor;
-  FormMain.Statusbar.Panels[1].Text := StatusPanelText1;
-  FormMain.Caption := Caption;
+  FormRG19A.LEDShape.Brush.Color := LEDColor;
+  FormRG19A.Statusbar.Panels[1].Text := StatusPanelText1;
+  FormRG19A.Caption := Caption;
 
-  FormMain.FestItem.Checked := FestItemChecked;
-  FormMain.DrehbarItem.Checked := DrehbarItemChecked;
-  FormMain.OhneItem.Checked := OhneItemChecked;
-  FormMain.OSDlgItem.Checked := OSDlgItemChecked;
+  FormRG19A.FestItem.Checked := FestItemChecked;
+  FormRG19A.DrehbarItem.Checked := DrehbarItemChecked;
+  FormRG19A.OhneItem.Checked := OhneItemChecked;
+  FormRG19A.OSDlgItem.Checked := OSDlgItemChecked;
 
-  FormMain.WinkelItem.Checked := WinkelDown;
-  FormMain.WinkelBtn.Down := WinkelDown;
+  FormRG19A.WinkelItem.Checked := WinkelDown;
+  FormRG19A.WinkelBtn.Down := WinkelDown;
 
-  FormMain.WinkelItem.Enabled := WinkelEnabled;
-  FormMain.WinkelBtn.Enabled := WinkelEnabled;
+  FormRG19A.WinkelItem.Enabled := WinkelEnabled;
+  FormRG19A.WinkelBtn.Enabled := WinkelEnabled;
 
-  FormMain.BiegeNeigeItem.Enabled := BiegeNeigeItemEnabled;
-  FormMain.ReglerItem.Enabled := ReglerItemEnabled;
-  FormMain.ReglerBtn.Enabled := ReglerBtnEnabled;
+  FormRG19A.BiegeNeigeItem.Enabled := BiegeNeigeItemEnabled;
+  FormRG19A.ReglerItem.Enabled := ReglerItemEnabled;
+  FormRG19A.ReglerBtn.Enabled := ReglerBtnEnabled;
 
-  FormMain.QuerKraftItem.Enabled := QuerKraftItemEnabled;
-  FormMain.KnickenItem.Enabled := KnickenItemEnabled;
-  FormMain.KraftGemessenItem.Enabled := KraftGemessenItemEnabled;
-  FormMain.KorrigiertItem.Enabled := KorrigiertItemEnabled;
+  FormRG19A.QuerKraftItem.Enabled := QuerKraftItemEnabled;
+  FormRG19A.KnickenItem.Enabled := KnickenItemEnabled;
+  FormRG19A.KraftGemessenItem.Enabled := KraftGemessenItemEnabled;
+  FormRG19A.KorrigiertItem.Enabled := KorrigiertItemEnabled;
 
-  FormMain.ControllerItem.Enabled := ControllerEnabled;
-  FormMain.ControllerBtn.Enabled := ControllerEnabled;
-  FormMain.ControllerItem.Checked := ControllerDown;
-  FormMain.ControllerBtn.Down := ControllerDown;
+  FormRG19A.ControllerItem.Enabled := ControllerEnabled;
+  FormRG19A.ControllerBtn.Enabled := ControllerEnabled;
+  FormRG19A.ControllerItem.Checked := ControllerDown;
+  FormRG19A.ControllerBtn.Down := ControllerDown;
 
-  FormMain.KoppelkurveItem.Checked := KoppelKurveEnabled;
-  FormMain.KoppelBtn.Down := KoppelKurveEnabled;
+  FormRG19A.KoppelkurveItem.Checked := KoppelKurveEnabled;
+  FormRG19A.KoppelBtn.Down := KoppelKurveEnabled;
 
-  FormMain.QuerKraftItem.Checked := QuerKraftItemChecked;
-  FormMain.KnickenItem.Checked := KnickenItemChecked;
-  FormMain.KorrigiertItem.Enabled := KorrigiertItemEnabled;
-  FormMain.KraftGemessenItem.Checked := KraftGemessenItemChecked;
+  FormRG19A.QuerKraftItem.Checked := QuerKraftItemChecked;
+  FormRG19A.KnickenItem.Checked := KnickenItemChecked;
+  FormRG19A.KorrigiertItem.Enabled := KorrigiertItemEnabled;
+  FormRG19A.KraftGemessenItem.Checked := KraftGemessenItemChecked;
 
-  FormMain.VonDerSeiteItem.Checked := VonDerSeiteItemChecked;
-  FormMain.VonHintenItem.Checked := VonHintenItemChecked;
-  FormMain.VonObenItem.Checked := VonObenItemChecked;
-  FormMain.Von3DItem.Checked := Von3DItemChecked;
+  FormRG19A.VonDerSeiteItem.Checked := VonDerSeiteItemChecked;
+  FormRG19A.VonHintenItem.Checked := VonHintenItemChecked;
+  FormRG19A.VonObenItem.Checked := VonObenItemChecked;
+  FormRG19A.Von3DItem.Checked := Von3DItemChecked;
 
-  FormMain.InputFormItem.Checked := InputFormItemChecked;
-  FormMain.OutputFormItem.Checked := OutputFormItemChecked;
-  FormMain.GrafikFormItem.Checked := GrafikFormItemChecked;
+  FormRG19A.InputFormItem.Checked := InputFormItemChecked;
+  FormRG19A.OutputFormItem.Checked := OutputFormItemChecked;
+  FormRG19A.GrafikFormItem.Checked := GrafikFormItemChecked;
 
-  FormMain.InputFormItem.Enabled := InputFormItemEnabled;
-  FormMain.OutputFormItem.Enabled := OutputFormItemEnabled;
-  FormMain.GrafikFormItem.Enabled := GrafikFormItemEnabled;
+  FormRG19A.InputFormItem.Enabled := InputFormItemEnabled;
+  FormRG19A.OutputFormItem.Enabled := OutputFormItemEnabled;
+  FormRG19A.GrafikFormItem.Enabled := GrafikFormItemEnabled;
 
-  FormMain.ConsoleItem.Caption := ConsoleItemCaption;
-  FormMain.ConsoleItem.Hint := ConsoleItemHint;
+  FormRG19A.ConsoleItem.Caption := ConsoleItemCaption;
+  FormRG19A.ConsoleItem.Hint := ConsoleItemHint;
 end;
 
 end.

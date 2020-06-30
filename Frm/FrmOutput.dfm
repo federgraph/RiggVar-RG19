@@ -23,15 +23,11 @@ object OutputForm: TOutputForm
     Top = 0
     Width = 465
     Height = 255
-    ActivePage = KraftSheet
+    ActivePage = DetailsSheet
     TabOrder = 0
     OnChange = OutputPagesChange
     object MasterMemo: TTabSheet
       Caption = 'Tabellen'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Memo: TMemo
         Left = 0
         Top = 0
@@ -53,10 +49,6 @@ object OutputForm: TOutputForm
     end
     object DetailsSheet: TTabSheet
       Caption = 'Details'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DisplayMemo: TMemo
         Left = 0
         Top = 0
@@ -78,10 +70,6 @@ object OutputForm: TOutputForm
     object Salingsheet: TTabSheet
       Tag = 3
       Caption = 'Saling'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnSaling: TPanel
         Left = 0
         Top = 0
@@ -115,10 +103,6 @@ object OutputForm: TOutputForm
     object ControllerSheet: TTabSheet
       Tag = 1
       Caption = 'Controller'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnController: TPanel
         Left = 0
         Top = 0
@@ -157,10 +141,6 @@ object OutputForm: TOutputForm
     object ChartSheet: TTabSheet
       Tag = 4
       Caption = 'Diagramm'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnChart2: TPanel
         Left = 0
         Top = 0
@@ -303,10 +283,6 @@ object OutputForm: TOutputForm
     end
     object CommentSheet: TTabSheet
       Caption = 'Kommentar'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object KommentarMemo: TMemo
         Left = 0
         Top = 0
