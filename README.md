@@ -25,7 +25,7 @@ In this repo I will transition from old to new.
 I started the repo by uploading old code, very close to the original version of 1997.
 
 Note that I already have new versions of the app  - with less features - but with better looking graphics and also for other compilers, including fpc.
-the fpc version will be in another repo.
+The fpc version will be in another repo.
 
 > This repos may end up being - or continuing to be - the feature richest.
 

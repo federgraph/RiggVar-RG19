@@ -110,7 +110,7 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.Title := 'RG67';
+  Application.Title := 'RG19';
   Application.CreateForm(TFormMain, FormMain);
   Application.Run;
 end.
