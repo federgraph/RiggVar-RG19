@@ -11,9 +11,7 @@ object FormMain: TFormMain
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
-  OldCreateOrder = False
-  OnClose = FormClose
-  OnCloseQuery = FormCloseQuery
+  OldCreateOrder = True
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyPress = FormKeyPress
@@ -22,19 +20,4 @@ object FormMain: TFormMain
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object StatusBar: TStatusBar
-    Left = 0
-    Top = 578
-    Width = 900
-    Height = 22
-    Panels = <
-      item
-        Text = 'MenuText'
-        Width = 353
-      end
-      item
-        Text = 'RiggText'
-        Width = 50
-      end>
-  end
 end

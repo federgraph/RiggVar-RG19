@@ -197,12 +197,7 @@
             <Form>YAuswahlDlg</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Frm\FrmChart.pas">
-            <Form>ChartForm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="Graph\RggChartModel01.pas"/>
-        <DCCReference Include="Graph\RggChartModel02.pas"/>
         <DCCReference Include="Frm\FrmDiagramQ.pas">
             <Form>FormDiagramQ</Form>
             <FormType>dfm</FormType>
@@ -219,42 +214,12 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Graph\RggCircleGraph.pas"/>
-        <DCCReference Include="Core\RggModul.pas"/>
         <DCCReference Include="Frm\FrmConfig.pas">
             <Form>FormConfig</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Frm\FrmInput.pas">
-            <Form>InputForm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="Frm\FrmOutput.pas">
-            <Form>OutputForm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="Graph\RggKraftGraph.pas"/>
         <DCCReference Include="Graph\RggMastGraph.pas"/>
-        <DCCReference Include="Frm\FrmBiege.pas">
-            <Form>BiegeUndNeigeForm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="Frm\FrmRegler.pas">
-            <Form>FormRegler</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="Frm\FrmReglerGraph.pas">
-            <Form>FormReglerGraph</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="Frm\FrmSplash.pas">
-            <Form>RiggSplash</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="VM\RiggVar.VM.FormMain.pas"/>
-        <DCCReference Include="Frm\FrmSelect.pas">
-            <Form>MemoDlg</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="Frm\FrmInfo.pas">
             <Form>FormInfo</Form>
             <FormType>dfm</FormType>

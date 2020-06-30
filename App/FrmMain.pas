@@ -22,6 +22,8 @@ interface
 {$mode delphi}
 {$endif}
 
+{.$define UseImageControl}
+
 uses
   RiggVar.RG.Def,
   RiggVar.RG.Report,
@@ -30,25 +32,22 @@ uses
   RiggVar.RG.Graph,
   RggTypes,
   RggUnit4,
-  System.SysUtils,
-  System.Classes,
-  System.Types,
-  System.UITypes,
+  SysUtils,
+  Classes,
+  Types,
+  UITypes,
   RggDisplayTypes,
   RggDisplay,
-  RggStrings,
   RggRaumGraph,
   RggRota,
   RggCtrls,
   RggChartGraph,
-  Vcl.Controls,
-  Vcl.Forms,
-  Vcl.StdCtrls,
-  Vcl.ExtCtrls,
-  Vcl.Dialogs,
-  Vcl.Graphics,
-  Vcl.Menus,
-  Vcl.ComCtrls;
+  Controls,
+  Forms,
+  StdCtrls,
+  ExtCtrls,
+  Dialogs,
+  Graphics;
 
 {$define Vcl}
 
@@ -57,15 +56,12 @@ type
   { TFormMain }
 
   TFormMain = class(TForm)
-    StatusBar: TStatusBar;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     procedure UpdateFormat(w, h: Integer);
     procedure GotoLandscape;
@@ -203,6 +199,9 @@ type
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property IsUp: Boolean read GetIsUp write SetIsUp;
   public
+{$ifdef UseImageControl}
+    ImageControl: TWinControl;
+{$endif}
     Image: TImage;
     ImagePositionX: Integer;
     ImagePositionY: Integer;
@@ -224,138 +223,15 @@ type
     procedure UpdateChartGraph;
     procedure LayoutImages;
   protected
-    procedure ShowChartForm;
     procedure ShowDiagramC;
     procedure ShowDiagramE;
     procedure ShowDiagramQ;
-    procedure ShowKreisForm;
     procedure DestroyForms;
     procedure MemoBtnClick(Sender: TObject);
     procedure ActiBtnClick(Sender: TObject);
     procedure ConfigBtnClick(Sender: TObject);
     procedure TrimmTabBtnClick(Sender: TObject);
     procedure CheckFormBounds(AForm: TForm);
-  private
-    MainMenu: TMainMenu;
-
-    FileMenu: TMenuItem;
-    NewItem: TMenuItem;
-    OpenItem: TMenuItem;
-    SaveItem: TMenuItem;
-    SaveAsItem: TMenuItem;
-    N9: TMenuItem;
-    ExitItem: TMenuItem;
-
-    BearbeitenMenu: TMenuItem;
-    RecalcItem: TMenuItem;
-    BiegeNeigeItem: TMenuItem;
-    ReglerItem: TMenuItem;
-    MemoryItem: TMenuItem;
-    MemoryRecallItem: TMenuItem;
-
-    AnsichtMenu: TMenuItem;
-    InputFormItem: TMenuItem;
-    OutputFormItem: TMenuItem;
-    ConfigItem: TMenuItem;
-    TrimmTabItem: TMenuItem;
-
-    N1: TMenuItem;
-    SpeedBarItem: TMenuItem;
-    StatusBarItem: TMenuItem;
-
-    MemoMenu: TMenuItem;
-    rLItem: TMenuItem;
-    rLeItem: TMenuItem;
-    rFItem: TMenuItem;
-    rPItem: TMenuItem;
-    rPeItem: TMenuItem;
-    DiffLItem: TMenuItem;
-    DiffPItem: TMenuItem;
-    LogItem: TMenuItem;
-
-    GrafikMenu: TMenuItem;
-    VonDerSeiteItem: TMenuItem;
-    VonHintenItem: TMenuItem;
-    VonObenItem: TMenuItem;
-    Von3DItem: TMenuItem;
-    N3: TMenuItem;
-    ReferenzItem: TMenuItem;
-    EntlastetItem: TMenuItem;
-    KoppelkurveItem: TMenuItem;
-    ZweischlagItem: TMenuItem;
-
-    OptionenMenu: TMenuItem;
-    FestItem: TMenuItem;
-    DrehbarItem: TMenuItem;
-    OhneItem: TMenuItem;
-    OSDlgItem: TMenuItem;
-    N11: TMenuItem;
-    ControllerItem: TMenuItem;
-    DifferenzItem: TMenuItem;
-    WinkelItem: TMenuItem;
-    SofortItem: TMenuItem;
-    N8: TMenuItem;
-    QuerKraftItem: TMenuItem;
-    KnickenItem: TMenuItem;
-    KraftGemessenItem: TMenuItem;
-    N2: TMenuItem;
-    KorrigiertItem: TMenuItem;
-    AutoLoadItem: TMenuItem;
-
-    HelpMenu: TMenuItem;
-    HilfeItem: TMenuItem;
-    InfoItem: TMenuItem;
-    LogoItem: TMenuItem;
-    AboutItem: TMenuItem;
-  private
-    { File Menu }
-    procedure NewItemClick(Sender: TObject);
-    procedure OpenItemClick(Sender: TObject);
-    procedure SaveItemClick(Sender: TObject);
-    procedure SaveAsItemClick(Sender: TObject);
-    procedure ExitItemClick(Sender: TObject);
-
-    { Bearbeiten Menu }
-    procedure BiegeNeigeItemClick(Sender: TObject);
-
-    { Ansicht Menu }
-    procedure InputFormItemClick(Sender: TObject);
-    procedure OutputFormItemClick(Sender: TObject);
-    procedure ConfigItemClick(Sender: TObject);
-    procedure TrimmTabItemClick(Sender: TObject);
-
-    procedure SpeedBarItemClick(Sender: TObject);
-    procedure StatusBarItemClick(Sender: TObject);
-
-    { Memo Menu }
-    procedure rLItemClick(Sender: TObject);
-
-    { Grafik Menu }
-    procedure VonDerSeiteItemClick(Sender: TObject);
-
-    { Optionen Menu }
-    procedure SalingTypChanged(Sender: TObject);
-
-    procedure WinkelItemClick(Sender: TObject);
-    procedure SofortItemClick(Sender: TObject);
-    procedure DifferenzItemClick(Sender: TObject);
-    procedure KnickenItemClick(Sender: TObject);
-    procedure KorrigiertItemClick(Sender: TObject);
-    procedure AutoLoadItemClick(Sender: TObject);
-
-    { Help Menu }
-    procedure InfoItemClick(Sender: TObject);
-    procedure LogoItemClick(Sender: TObject);
-    procedure AboutItemClick(Sender: TObject);
-  private
-//    procedure PaintBtnClick(Sender: TObject);
-    procedure ControllerBtnClick(Sender: TObject);
-    procedure ZweischlagBtnClick(Sender: TObject);
-    procedure UpdateBtnClick(Sender: TObject);
-    procedure ReglerBtnClick(Sender: TObject);
-  private
-    procedure InitMenu;
-    procedure InitStatusBar;
   end;
 
 var
@@ -370,27 +246,19 @@ uses
   FrmAction,
   FrmConfig,
   FrmTrimmTab,
-  FrmChart,
   FrmDiagramC,
   FrmDiagramE,
   FrmDiagramQ,
-  FrmInfo,
-  FrmInput,
-  FrmKreis,
-  FrmOutput,
-  RggModul,
   RiggVar.RG.Main,
   RiggVar.RG.Speed01,
   RiggVar.RG.Speed02,
   RiggVar.App.Main,
-  RiggVar.Util.AppUtils,
   RiggVar.FB.ActionConst,
-  RiggVar.FB.Classes,
-  RiggVar.VM.FormMain;
+  RiggVar.FB.Classes;
 
 const
   HelpCaptionText = 'press h for help';
-  ApplicationTitleText = 'RG68';
+  ApplicationTitleText = 'RG67';
 
 { TFormMain }
 
@@ -398,13 +266,6 @@ procedure TFormMain.ApplicationEventsException(Sender: TObject; E: Exception);
 begin
   if (Main <> nil) and (Main.Logger <> nil) then
     Main.Logger.Info(E.Message);
-end;
-
-procedure TFormMain.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
-  Action := caFree;
-  Screen.OnActiveFormChange := nil;
-  // Application.HelpCommand(HELP_QUIT,0);
 end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
@@ -547,26 +408,11 @@ begin
   UpdateColorScheme;
   Main.FederText1.SendToBack;
   Main.FederText2.SendToBack;
-
-  InitMenu;
-  InitStatusBar;
-
-  InputForm := TInputForm.Create(Self);
-  OutputForm := TOutputForm.Create(Self);
-
-  RiggModul := TRiggModulA.Create(Rigg);
-  RiggModul.ViewModelMain := TViewModelMain00.Create;
-//  RiggModul.Rigg := Rigg;
-  RiggModul.Init;
-
-  OnCloseQuery := FormCloseQuery;
 end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
 begin
   DestroyForms;
-
-  RiggModul.Free;
 
   HL.Free;
   TL.Free;
@@ -795,14 +641,25 @@ end;
 
 procedure TFormMain.PlaceImage(PosLeft, PosTop: Integer);
 begin
+{$ifdef UseImageControl}
+  ImageControl.Left := PosLeft;
+  ImageControl.Top := PosTop;
+  ImageControl.Width := ClientWidth - ImageControl.Left - Raster - Margin;
+  ImageControl.Height := ClientHeight - ImageControl.Top - Raster - Margin;
+  if ImageControl.Width > Bitmap.Width then
+     ImageControl.Width := Bitmap.Width;
+  if ImageControl.Height > Bitmap.Height then
+     ImageControl.Height := Bitmap.Height;
+{$else}
   Image.Left := PosLeft;
   Image.Top := PosTop;
   Image.Width := ClientWidth - Image.Left - Raster - Margin;
-  Image.Height := ClientHeight - Image.Top - Raster - Margin - StatusBar.Height;
+  Image.Height := ClientHeight - Image.Top - Raster - Margin;
   if Image.Width > RotaForm.BitmapWidth * FScale then
      Image.Width := Round(RotaForm.BitmapWidth * FScale);
   if Image.Height > RotaForm.BitmapHeight * FScale then
      Image.Height := Round(RotaForm.BitmapHeight * FScale);
+{$endif}
 end;
 
 procedure TFormMain.CheckSpaceForMemo;
@@ -852,7 +709,7 @@ begin
     ReportText.Anchors := [];
     ReportText.Left := TrimmText.Left + TrimmText.Width + Margin;
     ReportText.Top := HintContainer.Top + HintContainer.Height + Margin;
-    ReportText.Height := ClientHeight - ReportText.Top - Raster - Margin - StatusBar.Height;
+    ReportText.Height := ClientHeight - ReportText.Top - Raster - Margin;
     ReportText.Width := ReportMemoWidth;
     ReportText.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akBottom];
 
@@ -981,7 +838,6 @@ end;
 procedure TFormMain.HandleShowHint(Sender: TObject);
 begin
   HintText.Caption := Application.Hint;
-  StatusBar.Panels[0].Text := Application.Hint;
 end;
 
 procedure TFormMain.HandleAction(fa: Integer);
@@ -1076,17 +932,6 @@ begin
     faToggleSandboxed: IsSandboxed := not IsSandboxed;
     faToggleAllProps: AllProps := not AllProps;
     faToggleAllTags: ReportManager.XmlAllTags := not ReportManager.XmlAllTags;
-
-    faTR02: ShowDiagramC;
-    faTR03: ShowDiagramQ;
-    faTR04: ShowDiagramE;
-    faTR05: ShowChartForm;
-
-    faBR01: ShowKreisForm;
-    faBR02: RotaForm.WantCircles := True;
-    faBR03: RotaForm.WantCircles := False;
-    faBR04: RotaForm.CircleGraph.Kreise := True;
-    faBR05: RotaForm.CircleGraph.Kreise := False;
 
     else
     begin
@@ -1421,6 +1266,17 @@ begin
   begin
     Image := TImage.Create(Self);
     Image.Parent := Self;
+
+{$ifdef UseImageControl}
+    ImageControl := TWinControl.Create(Self);
+    ImageControl.Parent := Self;
+    ImageControl.Width := Bitmap.Width;
+    ImageControl.Height := Bitmap.Height;
+    ImageControl.DoubleBuffered := True;
+
+    Image.Parent := ImageControl;
+{$endif}
+
   end;
 
   ComponentsCreated := True;
@@ -1477,7 +1333,7 @@ begin
   ReportListbox.Left := ParamListbox.Left;
   ReportListbox.Top := ParamListbox.Top + ParamListbox.Height + Margin;
   ReportListbox.Width := ParamListbox.Width;
-  ReportListbox.Height := ClientHeight - ReportListbox.Top - Raster - Margin - StatusBar.Height;
+  ReportListbox.Height := ClientHeight - ReportListbox.Top - Raster - Margin;
   ReportListbox.Anchors := ReportListbox.Anchors + [TAnchorKind.akBottom];
 
   HintContainer.Left := TrimmText.Left + TrimmText.Width + Margin;
@@ -1490,7 +1346,7 @@ begin
 
   ReportText.Left := TrimmText.Left + TrimmText.Width + Margin;
   ReportText.Top := HintContainer.Top + HintContainer.Height + Margin;
-  ReportText.Height := ClientHeight - ReportText.Top - Raster - Margin - StatusBar.Height;
+  ReportText.Height := ClientHeight - ReportText.Top - Raster - Margin;
   ReportText.Width := ReportMemoWidth;
   ReportText.Anchors := ReportText.Anchors + [TAnchorKind.akBottom];
   ReportText.WordWrap := False;
@@ -1498,13 +1354,23 @@ begin
   TextPositionX := ReportText.Left;
   TextPositionY := ReportText.Top;
 
+{$ifdef UseImageControl}
+  ImageControl.Left := ReportText.Left + ReportText.Width + Margin;
+  ImageControl.Top := 2 * Raster + Margin;
+  ImageControl.Width := ClientWidth - ImageControl.Left - Raster - Margin;
+  ImageControl.Height := ClientHeight - ImageControl.Top - Raster - Margin;
+  ImageControl.Anchors := [];
+  ImagePositionX := ImageControl.Left;
+  ImagePositionY := ImageControl.Top;
+{$else}
   Image.Left := ReportText.Left + ReportText.Width + Margin;
   Image.Top := 2 * Raster + Margin;
   Image.Width := ClientWidth - Image.Left - Raster - Margin;
-  Image.Height := ClientHeight - Image.Top - Raster - Margin - Statusbar.Height;
+  Image.Height := ClientHeight - Image.Top - Raster - Margin;
   Image.Anchors := [];
   ImagePositionX := Image.Left;
   ImagePositionY := Image.Top;
+{$endif}
 end;
 
 procedure TFormMain.LineColorBtnClick(Sender: TObject);
@@ -2100,18 +1966,15 @@ var
   ft: TWinControl;
 begin
   ft := Main.FederText;
+
+{$ifdef UseImageControl}
+//  ImageControl.Parent := ft;
+{$else}
   Image.Parent := ft;
+{$endif}
+
   SalingImage.Parent := ft;
   ControllerImage.Parent := ft;
-end;
-
-procedure TFormMain.ShowChartForm;
-begin
-  if not Assigned(ChartForm) then
-  begin
-    ChartForm := TChartForm.Create(Application);
-  end;
-  ChartForm.Show;
 end;
 
 procedure TFormMain.ShowDiagramE;
@@ -2150,865 +2013,6 @@ begin
   end;
 
   FormDiagramC.Visible := True;
-end;
-
-procedure TFormMain.ShowKreisForm;
-begin
-  if not Assigned(KreisForm) then
-  begin
-    KreisForm := TKreisForm.Create(Application);
-  end;
-  KreisForm.Show;
-end;
-
-procedure TFormMain.InitMenu;
-var
-  p: TMenuItem;
-  mi: TMenuItem;
-
-  function AddP(AName: string): TMenuItem;
-  begin
-    mi := TMenuItem.Create(MainMenu);
-    mi.Name := AName;
-    p := mi;
-    MainMenu.Items.Add(p);
-    result := mi;
-  end;
-
-  function AddI(AName: string): TMenuItem;
-  begin
-    mi := TMenuItem.Create(MainMenu);
-    mi.Name := AName;
-    p.Add(mi);
-    result := mi;
-  end;
-
-begin
-  if MainMenu = nil then
-    MainMenu := TMainMenu.Create(Self)
-  else
-    MainMenu.Items.Clear;
-
-  { File }
-
-  FileMenu := AddP('FileMenu');
-  mi.Caption := '&Datei';
-  mi.Hint := '  Dateibefehle';
-
-  NewItem := AddI('NewItem');
-  mi.Caption := '&Neu';
-  mi.Hint := '  Standardwerte laden';
-  mi.OnClick := NewItemClick;
-
-  OpenItem := AddI('OpenItem');
-  mi.Caption := '&Öffnen ...';
-  mi.Hint := '  Konfiguration aus Datei laden';
-  mi.OnClick := OpenItemClick;
-
-  SaveItem := AddI('SaveItem');
-  mi.Caption := '&Speichern';
-  mi.Hint := '  Konfiguration in Datei speichern';
-  mi.OnClick := SaveItemClick;
-
-  SaveAsItem := AddI('SaveAsItem');
-  mi.Caption := 'Speichern &unter ...';
-  mi.Hint := '  Konfiguration in neue Datei schreiben';
-  mi.OnClick := SaveAsItemClick;
-
-  N9 := AddI('N9');
-  mi.Caption := '-';
-
-  ExitItem := AddI('ExitItem');
-  mi.Caption := '&Beenden';
-  mi.Hint := '  Anwendung verlassen';
-  mi.ShortCut := 32856;
-  mi.OnClick := ExitItemClick;
-
-  { Bearbeiten }
-
-  BearbeitenMenu := AddP('BearbeitenMenu');
-  mi.Caption := '&Bearbeiten';
-  mi.GroupIndex := 2;
-  mi.Hint := '  Bearbeitungsbefehle';
-
-  RecalcItem := AddI('RecalcItem');
-  mi.Caption := 'Neu &berechnen ( = )';
-  mi.Hint := '  Rigg neu berechnen';
-  mi.OnClick := UpdateBtnClick;
-
-  BiegeNeigeItem := AddI('BiegeNeigeItem');
-  mi.Caption := 'Biegen und &Neigen ...';
-  mi.Hint := '  Mastbiegung und Mastfall einstellen';
-  mi.OnClick := BiegeNeigeItemClick;
-
-  ReglerItem := AddI('ReglerItem');
-  mi.Caption := 'Trimm &regeln ... ( R )';
-  mi.Hint := '  Trimm automatisch einstellen';
-  mi.OnClick := ReglerBtnClick;
-
-  MemoryItem := AddI('MemoryItem');
-  mi.Caption := 'Trimm &speichern ( M )';
-  mi.Hint := '  Trimm in den Zwischenspeicher kopieren';
-  mi.OnClick := MemoryBtnClick;
-
-  MemoryRecallItem := AddI('MemoryRecallItem');
-  mi.Caption := 'Trimm &zurücksetzen ( MR )';
-  mi.Hint := '  Trimm aus dem Zwischenspeicher zurückholen';
-  mi.OnClick := MemoryRecallBtnClick;
-
-  { Ansicht }
-
-  AnsichtMenu := AddP('AnsichtMenu');
-  mi.Caption := '&Ansicht';
-  mi.GroupIndex := 2;
-  mi.Hint := '  Fenster anzeigen und verbergen';
-
-  InputFormItem := AddI('InputItem');
-  mi.Caption := '&Eingabe ...';
-  mi.Hint := '  Eingabeseiten anzeigen';
-  mi.ShortCut := 16453;
-  mi.OnClick := InputFormItemClick;
-
-  OutputFormItem := AddI('OutputFormItem');
-  mi.Caption := '&Ausgabe ...';
-  mi.Hint := '  Ausgabeseiten anzeigen';
-  mi.ShortCut := 16449;
-  mi.OnClick := OutputFormItemClick;
-
-  ConfigItem := AddI('ConfigItem');
-  mi.Caption := '&Konfiguration ...';
-  mi.Hint := '  Konstanten und Parameter verändern';
-  mi.ShortCut := 16459;
-  mi.OnClick := ConfigItemClick;
-
-  TrimmTabItem := AddI('TrimmTabItem');
-  mi.Caption := '&TrimmTab ...';
-  mi.Hint := '  Edit TrimmTab Properties';
-  mi.OnClick := TrimmTabItemClick;
-
-  N1 := AddI('N1');
-  mi.Caption := '-';
-
-  SpeedBarItem := AddI('SpeedBarItem');
-  mi.Caption := 'Symbolleiste';
-  mi.Checked := True;
-  mi.Hint := '  Symbolleiste einblenden';
-  mi.OnClick := SpeedBarItemClick;
-
-  StatusBarItem := AddI('StatusBarItem');
-  mi.Caption := 'Statusleiste';
-  mi.Checked := True;
-  mi.Hint := '  Statusleiste einblenden';
-  mi.OnClick := StatusBarItemClick;
-
-  { Memo }
-
-  MemoMenu := AddP('MemoMenu');
-  mi.Caption := '&Tabellen';
-  mi.GroupIndex := 3;
-  mi.Hint := '  Tabelle für Anzeige im Memo auswählen';
-
-  rLItem := AddI('rLItem');
-  mi.Caption := 'rL';
-  mi.Hint := '  Längen (Rigg verformt) anzeigen';
-  mi.RadioItem := True;
-  mi.ShortCut := 16460;
-  mi.OnClick := rLItemClick;
-
-  rLeItem := AddI('rLeItem');
-  mi.Caption := 'rLe';
-  mi.Hint := '  Längen (Rigg entspannt) anzeigen';
-  mi.RadioItem := True;
-  mi.OnClick := rLItemClick;
-
-  rFItem := AddI('rFItem');
-  mi.Caption := 'rF';
-  mi.Checked := True;
-  mi.Hint := '  Kräfte anzeigen';
-  mi.RadioItem := True;
-  mi.ShortCut := 16454;
-  mi.OnClick := rLItemClick;
-
-  rPItem := AddI('rPItem');
-  mi.Caption := 'rP';
-  mi.Hint := '  Koordinaten (Rigg verformt) anzeigen';
-  mi.RadioItem := True;
-  mi.ShortCut := 16464;
-  mi.OnClick := rLItemClick;
-
-  rPeItem := AddI('rPeItem');
-  mi.Caption := 'rPe';
-  mi.Hint := '  Koordinaten (Rigg entlastet) anzeigen';
-  mi.RadioItem := True;
-  mi.OnClick := rLItemClick;
-
-  DiffLItem := AddI('DiffLItem');
-  mi.Caption := 'Diff_L';
-  mi.Hint := '  Längendifferenzen (entlastet - belastet) anzeigen';
-  mi.RadioItem := True;
-  mi.OnClick := rLItemClick;
-
-  DiffPItem := AddI('DiffPItem');
-  mi.Caption := 'Diff_P';
-  mi.Hint := '  Punktverschiebungen (entlastet - belastet) anzeigen';
-  mi.RadioItem := True;
-  mi.OnClick := rLItemClick;
-
-  LogItem := AddI('LogItem');
-  mi.Caption := 'Log';
-  mi.Hint := '  Log anzeigen';
-  mi.RadioItem := True;
-  mi.OnClick := rLItemClick;
-
-  { Grafik }
-
-  GrafikMenu := AddP('GrafikMenu');
-  mi.Caption := '&Grafik';
-  mi.GroupIndex := 3;
-  mi.Hint := '  2D Grafikoptionen ';
-
-  VonDerSeiteItem := AddI('VonDerSeiteItem');
-  mi.Caption := 'Seitenansicht';
-  mi.Checked := True;
-  mi.Hint := '  Rigg von der Seite gesehen darstellen';
-  mi.RadioItem := True;
-  mi.OnClick := VonDerSeiteItemClick;
-
-  VonHintenItem := AddI('VonHintenItem');
-  mi.Caption := 'Blick von Achtern';
-  mi.Hint := '  Rigg von hinten gesehen darstellen';
-  mi.RadioItem := True;
-  mi.OnClick := VonDerSeiteItemClick;
-
-  VonObenItem := AddI('VonObenItem');
-  mi.Caption := 'Draufsicht';
-  mi.Hint := '  Rigg von oben gesehen darstellen';
-  mi.RadioItem := True;
-  mi.OnClick := VonDerSeiteItemClick;
-
-  Von3DItem := AddI('Von3DItem');
-  mi.Caption := 'Perspektive';
-  mi.Hint := '  Rigg schräg von oben gesehen darstellen';
-  mi.RadioItem := True;
-  mi.OnClick := VonDerSeiteItemClick;
-
-  N3 := AddI('N3');
-  mi.Caption := '-';
-
-  ReferenzItem := AddI('ReferenzItem');
-  mi.Caption := 'Referenzstellung';
-  mi.GroupIndex := 1;
-  mi.Hint := '  Nullstellung einblenden';
-  mi.OnClick := BlauBtnClick;
-
-  EntlastetItem := AddI('EntlastetItem');
-  mi.Caption := 'Entspanntes Rigg';
-  mi.Checked := True;
-  mi.GroupIndex := 1;
-  mi.Hint := '  Entspanntes Rigg einblenden';
-  mi.OnClick := GrauBtnClick;
-
-  KoppelkurveItem := AddI('KoppelkurveItem');
-  mi.Caption := 'Koppelkurve';
-  mi.Checked := True;
-  mi.GroupIndex := 1;
-  mi.Hint := '  Koppelkurve einblenden';
-  mi.OnClick := KoppelBtnClick;
-
-  ZweischlagItem := AddI('ZweischlagItem');
-  mi.Caption := 'Mast als Zweischlag zeichnen';
-  mi.GroupIndex := 1;
-  mi.Hint := '  Mast als Bogen oder Zweischlag zeichnen';
-  mi.OnClick := ZweischlagBtnClick;
-
-  { Optionen }
-
-  OptionenMenu := AddP('OptionenMenu');
-  mi.Caption := '&Modell';
-  mi.GroupIndex := 3;
-  mi.Hint := '  Modell - und Berechnungsoptionen';
-
-  FestItem := AddI('FestItem');
-  mi.Caption := 'feste Salinge';
-  mi.Checked := True;
-  mi.Hint := '  Modell: Salinge starr befestigt';
-  mi.RadioItem := True;
-  mi.OnClick := SalingTypChanged;
-
-  DrehbarItem := AddI('DrehbarItem');
-  mi.Caption := 'drehbare Salinge';
-  mi.Hint := '  Modell: Salinge drehbar angelenkt';
-  mi.RadioItem := True;
-  mi.OnClick := SalingTypChanged;
-
-  OhneItem := AddI('OhneItem');
-  mi.Caption := 'ohne Salinge / Mast biegt aus';
-  mi.Hint := '  Modell: Biegeknicken des Mastes ohne Salinge';
-  mi.RadioItem := True;
-  mi.OnClick := SalingTypChanged;
-
-  OSDlgItem := AddI('OSDlgItem');
-  mi.Caption := 'ohne Saling / Mast starr';
-  mi.Hint := '  Modell: Mast steif ohne Salinge';
-  mi.RadioItem := True;
-  mi.OnClick := SalingTypChanged;
-
-  N11 := AddI('N11');
-  mi.Caption := '-';
-  mi.GroupIndex := 1;
-
-  ControllerItem := AddI('ControllerItem');
-  mi.Caption := 'Controller ( C )';
-  mi.Checked := True;
-  mi.GroupIndex := 1;
-  mi.Hint := '  Mastcontroller berücksichtigen';
-  mi.ShortCut := 16451;
-  mi.OnClick := ControllerBtnClick;
-
-  DifferenzItem := AddI('DifferenzItem');
-  mi.Caption := 'Differenzen ( D )';
-  mi.GroupIndex := 1;
-  mi.Hint := '  Länge als Differenz oder Absolutwert anzeigen';
-  mi.ShortCut := 16452;
-  mi.OnClick := DifferenzItemClick;
-
-  WinkelItem := AddI('WinkelItem');
-  mi.Caption := 'Winkel einstellbar ( W )';
-  mi.GroupIndex := 1;
-  mi.Hint := ' Wanten-Winkel oder Vorstaglänge einstellen';
-  mi.OnClick := WinkelItemClick;
-
-  SofortItem := AddI('SofortItem');
-  mi.Caption := 'Rigg automatisch berechnen ( A )';
-  mi.Checked := False;
-  mi.GroupIndex := 1;
-  mi.Hint := '  Rigg (Kräfte) automatisch berechnen';
-  mi.OnClick := SofortItemClick;
-
-  N8 := AddI('N8');
-  mi.Caption := '-';
-  mi.GroupIndex := 2;
-
-  QuerKraftItem := AddI('QuerKraftItem');
-  mi.Caption := 'QuerKraftBiegung';
-  mi.GroupIndex := 2;
-  mi.Hint := '  Kraftberechnung nur mit Querkraftbiegung - kein Knicken';
-  mi.RadioItem := True;
-  mi.OnClick := KnickenItemClick;
-
-  KnickenItem := AddI('KnickenItem');
-  mi.Caption := 'Biegeknicken';
-  mi.Checked := True;
-  mi.GroupIndex := 2;
-  mi.Hint := '  Biegeknicken bei der Kraftberechnung berücksichtigen';
-  mi.RadioItem := True;
-  mi.OnClick := KnickenItemClick;
-
-  KraftGemessenItem := AddI('KraftGemessenItem');
-  mi.Caption := 'gemessene Kraftwerte verwenden';
-  mi.GroupIndex := 2;
-  mi.Hint := '  Kräfte aus der Trimmtabelle entnehmen';
-  mi.RadioItem := True;
-  mi.OnClick := KnickenItemClick;
-
-  N2 := AddI('N2');
-  mi.Caption := '-';
-  mi.GroupIndex := 3;
-
-  KorrigiertItem := AddI('KorrigiertItem');
-  mi.Caption := 'BiegeKnicken korrigiert';
-  mi.Checked := True;
-  mi.GroupIndex := 3;
-  mi.Hint := '  Anteil der Salingkraft an der Mastbiegung beachten';
-  mi.OnClick := KorrigiertItemClick;
-
-  AutoLoadItem := AddI('AutoLoadItem');
-  mi.Caption := 'Datensatz automatisch laden';
-  mi.GroupIndex := 3;
-  mi.Hint := '  Datensätze aus Datenbank einlesen, wenn selektiert';
-  mi.OnClick := AutoLoadItemClick;
-
-  { Help }
-
-  HelpMenu := AddP('HelpMenu');;
-  mi.Caption := '&Hilfe';
-  mi.GroupIndex := 10;
-  mi.Hint := '  Hilfethemen';
-  mi.Enabled := True;
-
-  HilfeItem := AddI('HilfeItem');
-  mi.Caption := '&Hilfe ...';
-  mi.Hint := '  Hilfesystem starten';
-  mi.Enabled := False;
-
-  InfoItem := AddI('InfoItem');
-  mi.Caption := '&Info...';
-  mi.Hint := '  Infofenster anzeigen';
-  mi.OnClick := InfoItemClick;
-
-  LogoItem := AddI('LogoItem');
-  mi.Caption := 'Logo';
-  mi.Hint := '  Toggle between Logo and 420 (Reset)';
-  mi.OnClick := LogoItemClick;
-
-  AboutItem := AddI('DreItem');
-  mi.Caption := 'About';
-  mi.Hint := '  KreisForm.ShowModal';
-  mi.OnClick := AboutItemClick;
-end;
-
-procedure TFormMain.NewItemClick(Sender: TObject);
-var
-  DialogValue: Integer;
-  FName: string;
-begin
-  if (Caption <> 'Rigg') and Main.Modified then
-  begin
-    FName := Caption;
-    DialogValue := MessageDlg(Format(SWarningText, [FName]), mtConfirmation,
-      [mbYes, mbNo, mbCancel], 0);
-    case DialogValue of
-      mrYes:
-        SaveItemClick(Sender);
-      { mrNo: weiter ohne speichern }
-      mrCancel:
-        Exit;
-    end;
-  end;
-//  RiggModul.Neu(nil);
-//  Caption := 'Rigg';
-end;
-
-procedure TFormMain.OpenItemClick(Sender: TObject);
-var
-  DialogValue: Integer;
-  FName: string;
-begin
-  if Main.Modified then
-  begin
-    FName := Caption;
-    DialogValue := MessageDlg(Format(SWarningText, [FName]), mtConfirmation,
-      mbYesNoCancel, 0);
-    case DialogValue of
-      mrYes:
-        SaveItemClick(Sender);
-      { mrNo: weiter ohne speichern }
-      mrCancel:
-        Exit;
-    end;
-  end;
-
-  if not Assigned(OpenDialog) then
-    OpenDialog := TOpenDialog.Create(self);
-   if OpenDialog.Execute then
-  begin
-//    RiggModul.Open(OpenDialog.FileName);
-//    Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
-  end;
-end;
-
-procedure TFormMain.SaveItemClick(Sender: TObject);
-begin
-//  if RiggModul.IniFileName = '' then
-//    SaveAsItemClick(Sender)
-//  else
-//    RiggModul.Save;
-end;
-
-procedure TFormMain.SaveAsItemClick(Sender: TObject);
-begin
-//  if not Assigned(SaveDialog) then
-//    SaveDialog := TSaveDialog.Create(self);
-//
-//  SaveDialog.FileName := RiggModul.IniFileName;
-//  if SaveDialog.Execute then
-//  begin
-//    RiggModul.IniFileName := SaveDialog.FileName;
-//    Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
-//    SaveItemClick(Sender);
-//  end;
-end;
-
-procedure TFormMain.ExitItemClick(Sender: TObject);
-begin
-  Close;
-end;
-
-procedure TFormMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-var
-  DialogValue: Integer;
-  FName: string;
-begin
-  if not Main.AutoSave then
-  begin
-    Main.IsUp := False;
-    CanClose := True;
-    FormShown := False;
-    Exit;
-  end;
-
-  if Main.Modified then
-  begin
-    FName := Caption;
-    DialogValue := MessageDlg(Format(SWarningText, [FName]), mtConfirmation,
-      mbYesNoCancel, 0);
-    case DialogValue of
-      mrYes:
-        begin
-          SaveItemClick(Sender);
-          CanClose := not Main.Modified;
-        end;
-      mrNo:
-        CanClose := True;
-      mrCancel:
-        CanClose := False;
-    end;
-  end;
-end;
-
-procedure TFormMain.VonDerSeiteItemClick(Sender: TObject);
-var
-  ViewPoint: TViewPoint;
-begin
-  VonDerSeiteItem.Checked := False;
-  VonHintenItem.Checked := False;
-  VonObenItem.Checked := False;
-  Von3DItem.Checked := False;
-  if Sender = VonDerSeiteItem then
-  begin
-    ViewPoint := vpSeite;
-    VonDerSeiteItem.Checked := True;
-  end
-  else if Sender = VonHintenItem then
-  begin
-    ViewPoint := vpAchtern;
-    VonHintenItem.Checked := True;
-  end
-  else if Sender = VonObenItem then
-  begin
-    ViewPoint := vpTop;
-    VonObenItem.Checked := True;
-  end
-  else // if Sender = Von3DItem then
-  begin
-    ViewPoint := vp3D;
-    Von3DItem.Checked := True;
-  end;
-
-  Main.ViewPoint := ViewPoint;
-//  RiggModul.ViewPoint := ViewPoint;
-end;
-
-//procedure TFormMain.PaintBtnClick(Sender: TObject);
-//begin
-//  PaintItem.Checked := not PaintItem.Checked;
-//  PaintBtn.Down := PaintItem.Checked;
-//  RiggModul.PaintBtnDown := PaintBtn.Down;
-//end;
-
-//procedure TFormMain.BtnBlauClick(Sender: TObject);
-//begin
-//  ReferenzItem.Checked := not ReferenzItem.Checked;
-//  Main.BtnBlauDown := ReferenzItem.Checked;
-//end;
-
-//procedure TFormMain.BtnGrauClick(Sender: TObject);
-//begin
-//  EntlastetItem.Checked := not EntlastetItem.Checked;
-//  Main.BtnGrauDown := EntlastetItem.Checked;
-//end;
-
-//procedure TFormMain.SetKoppelChecked(Value: Boolean);
-//begin
-//  KoppelkurveItem.Checked := Value;
-//  KoppelBtn.Down := Value;
-//  RiggModul.KoppelBtnDown := Value;
-//end;
-
-//procedure TFormMain.SetReportLabelCaption(const Value: string);
-//begin
-//  FReportLabelCaption := Value;
-//  StatusBar.Panels[2].Text := Value;
-//end;
-
-//procedure TFormMain.KoppelBtnClick(Sender: TObject);
-//begin
-//  SetKoppelChecked(not KoppelkurveItem.Checked);
-//end;
-
-procedure TFormMain.ZweischlagBtnClick(Sender: TObject);
-begin
-  ZweischlagItem.Checked := not ZweischlagItem.Checked;
-//  ZweischlagBtn.Down := ZweischlagItem.Checked;
-//  RiggModul.ZweischlagBtnDown := ZweischlagBtn.Down;
-end;
-
-procedure TFormMain.WinkelItemClick(Sender: TObject);
-begin
-  WinkelItem.Checked := not WinkelItem.Checked;
-//  WinkelBtn.Down := WinkelItem.Checked;
-//  RiggModul.WinkelBtnDown := WinkelBtn.Down;
-end;
-
-procedure TFormMain.DifferenzItemClick(Sender: TObject);
-begin
-  DifferenzItem.Checked := not DifferenzItem.Checked;
-//  DiffBtn.Down := DifferenzItem.Checked;
-//  RiggModul.DiffBtnDown := DiffBtn.Down;
-end;
-
-procedure TFormMain.SofortItemClick(Sender: TObject);
-begin
-//  SofortItem.Checked := not SofortItem.Checked;
-//  SofortBtn.Down := SofortItem.Checked;
-//  RiggModul.SofortBtnDown := SofortBtn.Down;
-//  if SofortItem.Checked then
-//  begin
-//    PaintItem.Enabled := True;
-//    PaintBtn.Enabled := True;
-//  end
-//  else
-//  begin
-//    StatusBar.Panels[1].Text := Main.Rigg.GetriebeStatusText;
-//    PaintItem.Checked := False;
-//    PaintItem.Enabled := False;
-//    PaintBtn.Down := False;
-//    PaintBtn.Enabled := False;
-//  end;
-//  Main.Draw;
-end;
-
-//procedure TFormMain.SetControllerChecked(Value: Boolean);
-//begin
-//  ControllerItem.Checked := Value;
-//  ControllerBtn.Down := Value;
-//  RiggModul.ControllerBtnDown := Value;
-//  RotaForm.RaumGraph.ControllerTyp := Main.Rigg.ControllerTyp;
-////  RotaForm.RaumGraph.ControllerTyp := RiggModul.ControllerTyp;
-//  RotaForm.Draw;
-//end;
-
-procedure TFormMain.ControllerBtnClick(Sender: TObject);
-begin
-//  SetControllerChecked(not ControllerItem.Checked);
-end;
-
-procedure TFormMain.KnickenItemClick(Sender: TObject);
-begin
-  if Sender = QuerKraftItem then
-    Main.Rigg.CalcTyp := ctQuerKraftBiegung
-  else if Sender = KnickenItem then
-    Main.Rigg.CalcTyp := ctBiegeKnicken
-  else if Sender = KraftGemessenItem then
-    Main.Rigg.CalcTyp := ctKraftGemessen;
-end;
-
-procedure TFormMain.KorrigiertItemClick(Sender: TObject);
-begin
-  KorrigiertItem.Checked := not KorrigiertItem.Checked;
-//  RiggModul.KorrigiertItem := KorrigiertItem.Checked;
-end;
-
-procedure TFormMain.LogoItemClick(Sender: TObject);
-begin
-  WantLogoData := not WantLogoData;
-  LogoItem.Checked := WantLogoData;
-//  RiggModul.Neu(nil);
-//  RiggModul.UpdateGetriebe;
-end;
-
-procedure TFormMain.UpdateBtnClick(Sender: TObject);
-begin
-  RiggModul.UpdateBtnClick;
-end;
-
-procedure TFormMain.BiegeNeigeItemClick(Sender: TObject);
-begin
-  RiggModul.BiegeNeigeItemClick;
-end;
-
-procedure TFormMain.ReglerBtnClick(Sender: TObject);
-begin
-  RiggModul.ReglerBtnClick;
-//  SetKoppelChecked(False);
-end;
-
-//procedure TFormMain.MemoryBtnClick(Sender: TObject);
-//begin
-//  Main.MemoryBtnClick;
-//  RiggModul.MemoryBtnClick;
-//end;
-
-//procedure TFormMain.MemoryRecallBtnClick(Sender: TObject);
-//begin
-//  Main.MemoryRecallBtnClick;
-//  RiggModul.MemoryRecallBtnClick;
-//end;
-
-procedure TFormMain.ConfigItemClick(Sender: TObject);
-begin
-  ConfigBtnClick(nil);
-//  RiggModul.OptionItemClick;
-end;
-
-procedure TFormMain.TrimmTabItemClick(Sender: TObject);
-begin
-  TrimmTabBtnClick(nil);
-end;
-
-procedure TFormMain.AboutItemClick(Sender: TObject);
-begin
-  if KreisForm = nil then
-    KreisForm := TKreisForm.Create(Application);
-
-  KreisForm.ShowModal;
-end;
-
-procedure TFormMain.InfoItemClick(Sender: TObject);
-begin
-  FrmInfo.ShowInfo;
-end;
-
-procedure TFormMain.InputFormItemClick(Sender: TObject);
-begin
-  InputFormItem.Checked := not InputFormItem.Checked;
-  if InputFormItem.Checked then
-  begin
-    if InputForm = nil then
-    begin
-      InputForm := TInputForm.Create(Self);
-    end;
-
-    InputForm.Parent := nil;
-    InputForm.BorderStyle := bsSizeable;
-    InputForm.ClientHeight := 195;
-    InputForm.ClientWidth := 465;
-    InputForm.Show;
-  end
-  else
-    InputForm.Hide;
-end;
-
-procedure TFormMain.OutputFormItemClick(Sender: TObject);
-begin
-  OutputFormItem.Checked := not OutputFormItem.Checked;
-  if OutputFormItem.Checked then
-  begin
-    if OutputForm = nil then
-    begin
-      OutputForm := TOutputForm.Create(Self);
-    end;
-
-    OutputForm.Parent := nil;
-    OutputForm.BorderStyle := bsSizeable;
-    OutputForm.ClientHeight := 255;
-    OutputForm.ClientWidth := 465;
-    OutputForm.Show;
-    if OutputForm.YComboBox.ItemIndex = -1 then
-      OutputForm.YComboBox.ItemIndex := RiggModul.YComboSavedItemIndex;
-  end
-  else
-    OutputForm.Hide;
-end;
-
-procedure TFormMain.SpeedBarItemClick(Sender: TObject);
-begin
-  SpeedBarItem.Checked := not SpeedBarItem.Checked;
-  SpeedPanel.Visible := SpeedBarItem.Checked;
-end;
-
-procedure TFormMain.StatusBarItemClick(Sender: TObject);
-begin
-  StatusBarItem.Checked := not StatusBarItem.Checked;
-  StatusBar.Visible := StatusBarItem.Checked;
-end;
-
-procedure TFormMain.AutoLoadItemClick(Sender: TObject);
-begin
-  AutoLoadItem.Checked := not AutoLoadItem.Checked;
-end;
-
-procedure TFormMain.rLItemClick(Sender: TObject);
-var
-  i: Integer;
-  Item: TReportItem;
-begin
-  for i := 0 to MemoMenu.Count - 1 do
-    MemoMenu.Items[i].Checked := False;
-
-  if Sender = rLItem then
-  begin
-    Item := rL_Item;
-    rLItem.Checked := True;
-  end
-  else if Sender = rLeItem then
-  begin
-    Item := rLe_Item;
-    rLeItem.Checked := True;
-  end
-  else if Sender = rPItem then
-  begin
-    Item := rP_Item;
-    rPItem.Checked := True;
-  end
-  else if Sender = rPeItem then
-  begin
-    Item := rPe_Item;
-    rPeItem.Checked := True;
-  end
-  else if Sender = rFItem then
-  begin
-    Item := rF_Item;
-    rFItem.Checked := True;
-  end
-  else if Sender = DiffLItem then
-  begin
-    Item := DiffL_Item;
-    DiffLItem.Checked := True;
-  end
-  else if Sender = DiffPItem then
-  begin
-    Item := DiffP_Item;
-    DiffPItem.Checked := True;
-  end
-  else //if Sender = LogItem then
-  begin
-    Item := Log_Item;
-    LogItem.Checked := True;
-  end;
-
-  RiggModul.ReportItem := Item;
-end;
-
-procedure TFormMain.SalingTypChanged(Sender: TObject);
-begin
-  if Sender = FestItem then
-    Main.Rigg.SalingTyp := stFest
-  else if Sender = DrehbarItem then
-    Main.Rigg.SalingTyp := stDrehbar
-  else if Sender = OhneItem then
-    Main.Rigg.SalingTyp := stOhne
-  else if Sender = OSDlgItem then
-    Main.Rigg.SalingTyp := stOhne_2;
-end;
-
-procedure TFormMain.InitStatusBar;
-var
-  sp: TStatusPanel;
-begin
-  StatusBar.Panels.Clear;
-
-  sp := StatusBar.Panels.Add;
-  sp.Text := 'MenuText';
-  sp.Width := 353;
-
-  sp := StatusBar.Panels.Add;
-  sp.Text := 'RiggText';
-  sp.Width := 300;
-
-  sp := StatusBar.Panels.Add;
-  sp.Text := 'ReportLabel';
-  sp.Width := 50;
 end;
 
 end.

@@ -213,13 +213,13 @@ end;
 procedure TMain0.InitRaster;
 begin
   MainVar.ClientWidth := FormMain.ClientWidth;
-  MainVar.ClientHeight := FormMain.ClientHeight - FormMain.StatusBar.Height;
+  MainVar.ClientHeight := FormMain.ClientHeight;
 end;
 
 procedure TMain0.InitText;
 begin
   MainVar.ClientWidth := FormMain.ClientWidth;
-  MainVar.ClientHeight := FormMain.ClientHeight - FormMain.StatusBar.Height;
+  MainVar.ClientHeight := FormMain.ClientHeight;
   InitFederText(FederText1);
   InitFederText(FederText2);
   Touch := faTouchDesk;
@@ -244,8 +244,6 @@ begin
   begin
     MainVar.ClientWidth := FormMain.ClientWidth;
     MainVar.ClientHeight := FormMain.ClientHeight;
-    if FormMain.StatusBar.Visible then
-      MainVar.ClientHeight := MainVar.ClientHeight - FormMain.StatusBar.Height;
     InitTouch;
     FederText.UpdateShape;
   end;
