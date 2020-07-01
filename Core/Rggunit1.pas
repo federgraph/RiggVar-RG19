@@ -45,6 +45,7 @@ type
     ExitCounter4: Integer;
     ExitCounter5: Integer;
     ExitCounter6: Integer;
+    ExitCounter7: Integer;
     procedure ResetExitCounters;
 
     constructor Create;
@@ -98,6 +99,7 @@ begin
   ExitCounter4 := 0;
   ExitCounter5 := 0;
   ExitCounter6 := 0;
+  ExitCounter7 := 0;
 end;
 
 procedure TGetriebeFS.UpdateGetriebe;

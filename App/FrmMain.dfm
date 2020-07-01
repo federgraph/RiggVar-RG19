@@ -1,4 +1,4 @@
-object FormMain: TFormMain
+﻿object FormMain: TFormMain
   Left = 90
   Top = 60
   Caption = 'RGXX'
@@ -11,7 +11,7 @@ object FormMain: TFormMain
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
-  OldCreateOrder = True
+  OldCreateOrder = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyPress = FormKeyPress

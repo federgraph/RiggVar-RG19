@@ -22,8 +22,6 @@ interface
 {$mode delphi}
 {$endif}
 
-{.$define UseImageControl}
-
 uses
   RiggVar.RG.Def,
   RiggVar.RG.Report,
@@ -48,8 +46,6 @@ uses
   ExtCtrls,
   Dialogs,
   Graphics;
-
-{$define Vcl}
 
 type
 
@@ -199,9 +195,6 @@ type
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property IsUp: Boolean read GetIsUp write SetIsUp;
   public
-{$ifdef UseImageControl}
-    ImageControl: TWinControl;
-{$endif}
     Image: TImage;
     ImagePositionX: Integer;
     ImagePositionY: Integer;
@@ -641,16 +634,6 @@ end;
 
 procedure TFormMain.PlaceImage(PosLeft, PosTop: Integer);
 begin
-{$ifdef UseImageControl}
-  ImageControl.Left := PosLeft;
-  ImageControl.Top := PosTop;
-  ImageControl.Width := ClientWidth - ImageControl.Left - Raster - Margin;
-  ImageControl.Height := ClientHeight - ImageControl.Top - Raster - Margin;
-  if ImageControl.Width > Bitmap.Width then
-     ImageControl.Width := Bitmap.Width;
-  if ImageControl.Height > Bitmap.Height then
-     ImageControl.Height := Bitmap.Height;
-{$else}
   Image.Left := PosLeft;
   Image.Top := PosTop;
   Image.Width := ClientWidth - Image.Left - Raster - Margin;
@@ -659,7 +642,6 @@ begin
      Image.Width := Round(RotaForm.BitmapWidth * FScale);
   if Image.Height > RotaForm.BitmapHeight * FScale then
      Image.Height := Round(RotaForm.BitmapHeight * FScale);
-{$endif}
 end;
 
 procedure TFormMain.CheckSpaceForMemo;
@@ -1266,17 +1248,6 @@ begin
   begin
     Image := TImage.Create(Self);
     Image.Parent := Self;
-
-{$ifdef UseImageControl}
-    ImageControl := TWinControl.Create(Self);
-    ImageControl.Parent := Self;
-    ImageControl.Width := Bitmap.Width;
-    ImageControl.Height := Bitmap.Height;
-    ImageControl.DoubleBuffered := True;
-
-    Image.Parent := ImageControl;
-{$endif}
-
   end;
 
   ComponentsCreated := True;
@@ -1354,15 +1325,6 @@ begin
   TextPositionX := ReportText.Left;
   TextPositionY := ReportText.Top;
 
-{$ifdef UseImageControl}
-  ImageControl.Left := ReportText.Left + ReportText.Width + Margin;
-  ImageControl.Top := 2 * Raster + Margin;
-  ImageControl.Width := ClientWidth - ImageControl.Left - Raster - Margin;
-  ImageControl.Height := ClientHeight - ImageControl.Top - Raster - Margin;
-  ImageControl.Anchors := [];
-  ImagePositionX := ImageControl.Left;
-  ImagePositionY := ImageControl.Top;
-{$else}
   Image.Left := ReportText.Left + ReportText.Width + Margin;
   Image.Top := 2 * Raster + Margin;
   Image.Width := ClientWidth - Image.Left - Raster - Margin;
@@ -1370,7 +1332,6 @@ begin
   Image.Anchors := [];
   ImagePositionX := Image.Left;
   ImagePositionY := Image.Top;
-{$endif}
 end;
 
 procedure TFormMain.LineColorBtnClick(Sender: TObject);
@@ -1966,13 +1927,7 @@ var
   ft: TWinControl;
 begin
   ft := Main.FederText;
-
-{$ifdef UseImageControl}
-//  ImageControl.Parent := ft;
-{$else}
   Image.Parent := ft;
-{$endif}
-
   SalingImage.Parent := ft;
   ControllerImage.Parent := ft;
 end;
