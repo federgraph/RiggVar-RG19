@@ -50,14 +50,11 @@ uses
   Vcl.Menus,
   Vcl.ComCtrls;
 
-{$define Vcl}
-
 type
 
   { TFormMain }
 
   TFormMain = class(TForm)
-    StatusBar: TStatusBar;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormResize(Sender: TObject);
@@ -235,7 +232,8 @@ type
     procedure ConfigBtnClick(Sender: TObject);
     procedure TrimmTabBtnClick(Sender: TObject);
     procedure CheckFormBounds(AForm: TForm);
-  private
+  public
+    StatusBar: TStatusBar;
     MainMenu: TMainMenu;
 
     FileMenu: TMenuItem;
@@ -303,7 +301,7 @@ type
     AutoLoadItem: TMenuItem;
 
     HelpMenu: TMenuItem;
-    HilfeItem: TMenuItem;
+//    HilfeItem: TMenuItem;
     InfoItem: TMenuItem;
     LogoItem: TMenuItem;
     AboutItem: TMenuItem;
@@ -354,8 +352,11 @@ type
     procedure UpdateBtnClick(Sender: TObject);
     procedure ReglerBtnClick(Sender: TObject);
   private
+    FReportLabelCaption: string;
     procedure InitMenu;
     procedure InitStatusBar;
+    procedure SetReportLabelCaption(const Value: string);
+    property ReportLabelCaption: string read FReportLabelCaption write SetReportLabelCaption;
   end;
 
 var
@@ -555,9 +556,12 @@ begin
   OutputForm := TOutputForm.Create(Self);
 
   RiggModul := TRiggModulA.Create(Rigg);
-  RiggModul.ViewModelMain := TViewModelMain00.Create;
+  RiggModul.ViewModelM := TViewModelMain00.Create;
 //  RiggModul.Rigg := Rigg;
   RiggModul.Init;
+
+  Main.RiggModul := RiggModul;
+  RiggModul.ViewModelM.IsUp := True;
 
   OnCloseQuery := FormCloseQuery;
 end;
@@ -1375,6 +1379,9 @@ end;
 
 procedure TFormMain.CreateComponents;
 begin
+  StatusBar := TStatusBar.Create(Self);
+  StatusBar.Parent := Self;
+
   HintContainer := TWinControl.Create(Self);
   HintContainer.Parent := Self;
 
@@ -1727,6 +1734,7 @@ begin
     UpdateReport;
     Main.FederText.CheckState;
   end;
+  ReportLabelCaption := ReportManager.GetCurrentCaption;
 end;
 
 procedure TFormMain.InitReportCombo;
@@ -2282,7 +2290,7 @@ begin
   mi.OnClick := ConfigItemClick;
 
   TrimmTabItem := AddI('TrimmTabItem');
-  mi.Caption := '&TrimmTab ...';
+  mi.Caption := '&Trimm Tabelle ...';
   mi.Hint := '  Edit TrimmTab Properties';
   mi.OnClick := TrimmTabItemClick;
 
@@ -2536,25 +2544,25 @@ begin
   mi.Hint := '  Hilfethemen';
   mi.Enabled := True;
 
-  HilfeItem := AddI('HilfeItem');
-  mi.Caption := '&Hilfe ...';
-  mi.Hint := '  Hilfesystem starten';
-  mi.Enabled := False;
+//  HilfeItem := AddI('HilfeItem');
+//  mi.Caption := '&Hilfe ...';
+//  mi.Hint := '  Hilfesystem starten';
+//  mi.Enabled := False;
 
   InfoItem := AddI('InfoItem');
-  mi.Caption := '&Info...';
+  mi.Caption := '&Info ...';
   mi.Hint := '  Infofenster anzeigen';
   mi.OnClick := InfoItemClick;
+
+  AboutItem := AddI('AboutItem');
+  mi.Caption := 'About ...';
+  mi.Hint := '  KreisForm.ShowModal';
+  mi.OnClick := AboutItemClick;
 
   LogoItem := AddI('LogoItem');
   mi.Caption := 'Logo';
   mi.Hint := '  Toggle between Logo and 420 (Reset)';
   mi.OnClick := LogoItemClick;
-
-  AboutItem := AddI('DreItem');
-  mi.Caption := 'About';
-  mi.Hint := '  KreisForm.ShowModal';
-  mi.OnClick := AboutItemClick;
 end;
 
 procedure TFormMain.NewItemClick(Sender: TObject);
@@ -2811,7 +2819,12 @@ end;
 
 procedure TFormMain.LogoItemClick(Sender: TObject);
 begin
-  WantLogoData := not WantLogoData;
+  if Main.Trimm <> 8 then
+    Main.ActionHandler.Execute(faLogo)
+  else
+    Main.ActionHandler.Execute(fa420);
+
+  WantLogoData := Main.Trimm = 8;
   LogoItem.Checked := WantLogoData;
 //  RiggModul.Neu(nil);
 //  RiggModul.UpdateGetriebe;
@@ -3009,6 +3022,12 @@ begin
   sp := StatusBar.Panels.Add;
   sp.Text := 'ReportLabel';
   sp.Width := 50;
+end;
+
+procedure TFormMain.SetReportLabelCaption(const Value: string);
+begin
+  FReportLabelCaption := Value;
+  StatusBar.Panels[2].Text := Value;
 end;
 
 end.

@@ -11,6 +11,7 @@ object FormReglerGraph: TFormReglerGraph
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
+  OnCreate = FormCreate
   OnPaint = FormPaint
   OnShow = FormShow
   PixelsPerInch = 96

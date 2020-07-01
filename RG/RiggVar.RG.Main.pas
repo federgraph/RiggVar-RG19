@@ -34,6 +34,7 @@ uses
   RggUnit4,
   RggCalc,
   RggChart,
+  RggModul,
   RggDoc;
 
 type
@@ -207,6 +208,8 @@ type
     InitialFixPoint: TRiggPoint;
 
     UpdateTextCounter: Integer;
+
+    RiggModul: TRiggModulA;
 
     constructor Create;
     destructor Destroy; override;
@@ -1609,6 +1612,11 @@ begin
 
   Rigg.UpdateGetriebe;
 
+  if RiggModul <> nil then
+  begin
+    RiggModul.DoGraphics;
+  end;
+
   temp := (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK);
 
   if temp then
@@ -1633,6 +1641,11 @@ begin
   end;
 
   Draw;
+
+  if RiggModul <> nil then
+  begin
+    RiggModul.DoOnUpdateRigg;
+  end;
 end;
 
 procedure TRggMain.MemoryBtnClick;

@@ -20,39 +20,43 @@ VCL version of Trimm 420.
 *)
 ```
 
-I am about to create another branch and immediately continue in master.
+## Branch RG68
 
-In the branch I will continue the attempt to reconcile old and new, but not now.
-Instead I want press ahead and put the new VCL app in the master branch, mainly by deleting old code.
+In this branch I will continue the attempt to reconcile old and new.
 
-Note that I started the repo by uploading old code, very close to the original version of 1997.
-
-I did so while I already had newer versions of the app  - with less features - but with better graphics and for other compilers, including fpc.
-The fpc version will be in another repo.
-
-## Branchpoint RG68
-
-This branch may end up being - or continue to be - the feature richest app, for desktop with main menu and status bar.
-
-In addition to the main menu it still has some old forms:
+Old features to retain:
 - TInputForm which is not strictly needed any more, but it would be bad to throw it away.
-- TOutputForm which is not strictly needed any more.
+- TOutputForm.
 
-TRggModule, the old controller which has been replace by TRggMain, is needed to support TInputForm and TOutputForm.
-Unfortunately some work is needed because it not exactly compatible with the new regime of doing things. 
+TRggModule, the old controller which has been replaced by TRggMain, is needed to support TInputForm and TOutputForm.
+Unfortunately some work is needed because it is not exactly compatible with the new regime of doing things. 
 
-## I jumped !
+Branch RG68 may end up being - or continue to be - the feature richest app, for the desktop, with a main menu and a status bar.
 
-I have just taken an aggressive step by including a VCL version of the button frame, which is great for touch screen.
+## Some History
 
-> But original code is still present - in branch RG19ABC.
+I started the repo by uploading old code, very close to the original version of 1997.
+And I did so while I already had newer versions of the app - with less features.
 
-Now, suddenly, I have very new code and very old code in the same project.
+Branch RG19ABC was created just before taking an aggressive step forward (the Jump) by including a VCL version of the button frame,
+which is supposed to be great for touch.
+In order to do so I needed to delete incompatible code.
+Some know problems appeared, which I will NOT sort out immediately.
+Instead I created a permanent brach point RG68, for the work to continue. 
 
-- I am in the middle of transition.
-- You can watch me as I go.
-- Trying to reconcile old with new.
-- Want to rescue some features, which did not make it into the published version.
-- This repo will continue to use GDI for drawing, and have no dependencies.
-- Old code not yet tested on high-dpi screen.
-- The master branch is work in progress.
+Then - in the master branch - I was now free to delete more code, and making remaining files identical to existing project RG67.
+
+Now, if you are located in the master branch and look back: Branch RG68 adds features to RG67!
+
+Both branches, RG68 and RG19ABC are considered permanent branches.
+
+- RG19 in master branch: matches RG67
+- RG19 in branch RG68: desktop app with main menu and status bar
+- RG19A in branch RG68ABC: old MDI application
+- RG19B in branch RG68ABC: old SDI application
+- RG19C in branch RG68ABC: latest code behind combined with old forms.
+
+The Rigg model code (in folder Core) used in the branches is up to date.
+It is UI that is still old.
+
+Future derived projects will use other graphics technology, and other compilers.

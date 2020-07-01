@@ -93,21 +93,30 @@ type
 implementation
 
 uses
+  FrmMain,
   RggModul;
 
 constructor TViewModelMain00.Create;
 begin
   FestItemClick;
+
+  InputFormItemEnabled := True;
+  OutputFormItemEnabled := True;
+  GrafikFormItemEnabled := True;
+
+  InputFormItemChecked := False;
+  OutputFormItemChecked := False;
+  GrafikFormItemChecked := False;
 end;
 
 function TViewModelMain00.GetOpenFileName(dn, fn: string): string;
 begin
-  result := '';
+  result := FormMain.GetOpenFileName(dn, fn);
 end;
 
 function TViewModelMain00.GetSaveFileName(dn, fn: string): string;
 begin
-  result := '';
+  result := FormMain.GetSaveFileName(dn, fn);
 end;
 
 procedure TViewModelMain00.FestItemClick;
@@ -257,15 +266,15 @@ begin
   UpdateView;
 end;
 
-procedure TViewModelMain00.UpdateView;
-begin
-  if RiggModul <> nil then
-  begin
-    ControllerEnabled := RiggModul.ControllerEnabled;
-    ControllerDown := RiggModul.ControllerBtnDown;
-    WinkelDown := RiggModul.WinkelBtnDown;
-  end;
-end;
+//procedure TViewModelMain00.UpdateView;
+//begin
+//  if RiggModul <> nil then
+//  begin
+//    ControllerEnabled := RiggModul.ControllerEnabled;
+//    ControllerDown := RiggModul.ControllerBtnDown;
+//    WinkelDown := RiggModul.WinkelBtnDown;
+//  end;
+//end;
 
 procedure TViewModelMain00.HideConsole;
 begin
@@ -287,18 +296,96 @@ procedure TViewModelMain00.HideDiagramm;
 begin
   ChartFormItemCaption := 'Diagramm ...';
   ChartFormItemHint := '  Diagramm aktivieren';
+
+//  if FormMain <> nil then
+//  begin
+//    FormMain.ChartFormItem.Caption := ChartFormItemCaption;
+//    FormMain.ChartFormItem.Hint := ChartFormItemHint;
+//  end;
 end;
 
 procedure TViewModelMain00.HideReport;
 begin
   ReportFormItemCaption := 'Report ...';
   ReportFormItemHint := '  Report anzeigen';
+
+//  if FormMain <> nil then
+//  begin
+//    FormMain.ReportFormItem.Caption := ReportFormItemCaption;
+//    FormMain.ReportFormItem.Hint := ReportFormItemHint;
+//  end;
 end;
 
 procedure TViewModelMain00.HideGrafik;
 begin
   RotaFormItemCaption := '3D Grafik ...';
   RotaFormItemHint := '  3D Grafik anzeigen';
+
+//  if FormMain <> nil then
+//  begin
+//    FormMain.RotaFormItem.Caption := RotaFormItemCaption;
+//    FormMain.RotaFormItem.Hint := RotaFormItemHint;
+//  end;
+end;
+
+procedure TViewModelMain00.UpdateView;
+begin
+  inherited;
+
+  if not IsUp then
+    Exit;
+
+//  FormMain.LEDShape.Brush.Color := LEDColor;
+  FormMain.Statusbar.Panels[1].Text := StatusPanelText1;
+  FormMain.Caption := Caption;
+
+  FormMain.FestItem.Checked := FestItemChecked;
+  FormMain.DrehbarItem.Checked := DrehbarItemChecked;
+  FormMain.OhneItem.Checked := OhneItemChecked;
+  FormMain.OSDlgItem.Checked := OSDlgItemChecked;
+
+  FormMain.WinkelItem.Checked := WinkelDown;
+//  FormMain.WinkelBtn.Down := WinkelDown;
+
+  FormMain.WinkelItem.Enabled := WinkelEnabled;
+//  FormMain.WinkelBtn.Enabled := WinkelEnabled;
+
+//  FormMain.BogenBtn.Down := BogenBtnDown;
+
+  FormMain.BiegeNeigeItem.Enabled := BiegeNeigeItemEnabled;
+  FormMain.ReglerItem.Enabled := ReglerItemEnabled;
+//  FormMain.ReglerBtn.Enabled := ReglerBtnEnabled;
+
+  FormMain.QuerKraftItem.Enabled := QuerKraftItemEnabled;
+  FormMain.KnickenItem.Enabled := KnickenItemEnabled;
+  FormMain.KraftGemessenItem.Enabled := KraftGemessenItemEnabled;
+  FormMain.KorrigiertItem.Enabled := KorrigiertItemEnabled;
+
+  FormMain.ControllerItem.Enabled := ControllerEnabled;
+//  FormMain.ControllerBtn.Enabled := ControllerEnabled;
+  FormMain.ControllerItem.Checked := ControllerDown;
+//  FormMain.ControllerBtn.Down := ControllerDown;
+
+  FormMain.KoppelkurveItem.Checked := KoppelKurveEnabled;
+//  FormMain.KoppelBtn.Down := KoppelKurveEnabled;
+
+  FormMain.QuerKraftItem.Checked := QuerKraftItemChecked;
+  FormMain.KnickenItem.Checked := KnickenItemChecked;
+  FormMain.KorrigiertItem.Enabled := KorrigiertItemEnabled;
+  FormMain.KraftGemessenItem.Checked := KraftGemessenItemChecked;
+
+  FormMain.VonDerSeiteItem.Checked := VonDerSeiteItemChecked;
+  FormMain.VonHintenItem.Checked := VonHintenItemChecked;
+  FormMain.VonObenItem.Checked := VonObenItemChecked;
+  FormMain.Von3DItem.Checked := Von3DItemChecked;
+
+  FormMain.InputFormItem.Checked := InputFormItemChecked;
+  FormMain.OutputFormItem.Checked := OutputFormItemChecked;
+//  FormMain.GrafikFormItem.Checked := GrafikFormItemChecked;
+
+  FormMain.InputFormItem.Enabled := InputFormItemEnabled;
+  FormMain.OutputFormItem.Enabled := OutputFormItemEnabled;
+//  FormMain.GrafikFormItem.Enabled := GrafikFormItemEnabled;
 end;
 
 end.

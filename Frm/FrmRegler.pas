@@ -10,7 +10,8 @@ uses
   Vcl.Controls,
   Vcl.Buttons,
   Vcl.StdCtrls,
-  RggTypes;
+  RggTypes,
+  RggUnit4;
 
 type
   TFormRegler = class(TForm)
@@ -29,6 +30,7 @@ type
     procedure LoopBtnClick(Sender: TObject);
     procedure sbMastfallScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
   private
+    Rigg: TRigg;
     procedure SetupCtrls;
   public
     Counter: Integer;
@@ -44,7 +46,7 @@ implementation
 {$R *.DFM}
 
 uses
-  RggModul;
+  RiggVar.App.Main;
 
 procedure TFormRegler.FormCreate(Sender: TObject);
 begin
@@ -54,7 +56,8 @@ end;
 procedure TFormRegler.FormShow(Sender: TObject);
 begin
   ZaehlerEdit.Text := '0';
-  TrimmIst := RiggModul.Rigg.Trimm;
+  Rigg := Main.Rigg;
+  TrimmIst := Rigg.Trimm;
 end;
 
 procedure TFormRegler.SetupCtrls;
@@ -87,8 +90,8 @@ begin
   ZaehlerEdit.Text := '0';
   Screen.Cursor := crHourGlass;
   try
-    Counter := RiggModul.Rigg.Regeln(TrimmSoll);
-    if RiggModul.Rigg.GetriebeOK then
+    Counter := Rigg.Regeln(TrimmSoll);
+    if Rigg.GetriebeOK then
     begin
     { GCtrls werden nicht sofort aktualisiert. Deshalb sind die Einstellwerte
       für Mastfall und Biegung noch exakt. Die Wanten haben ungeradzahlige Längen.
@@ -96,8 +99,10 @@ begin
       Die GCtrls werden erst nach Schließen des Dialogfensters aktualisiert.
       Gerundet auf geradzahlige Wantenwerte wird aber erst nach erneuter
       Berechnung des Getriebes, ausgelöst vom Benutzer }
-      RiggModul.DoGraphics;
-      RiggModul.UpdateRigg;
+
+//      RiggModul.DoGraphics;
+//      RiggModul.UpdateRigg;
+      Rigg.UpdateGetriebe;
 
 //   Alternative:
     { Die GCtrls werden sofort aktualisiert. Damit werden die Werte

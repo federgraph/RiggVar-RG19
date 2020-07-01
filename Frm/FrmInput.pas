@@ -202,10 +202,10 @@ procedure TInputForm.FormHide(Sender: TObject);
 begin
   if RiggModul <> nil then
   begin
-    if RiggModul.ViewModelMain <> nil then
+    if RiggModul.ViewModelM <> nil then
     begin
-      RiggModul.ViewModelMain.InputFormItemChecked := False;
-      RiggModul.ViewModelMain.UpdateView;
+      RiggModul.ViewModelM.InputFormItemChecked := False;
+      RiggModul.ViewModelM.UpdateView;
     end;
   end;
 end;

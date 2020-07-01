@@ -12,7 +12,8 @@ uses
   Vcl.StdCtrls,
   Vcl.Buttons,
   Vcl.ExtCtrls,
-  RggTypes;
+  RggTypes,
+  RggUnit4;
 
 type
   TFormReglerGraph = class(TForm)
@@ -54,6 +55,7 @@ type
     procedure DrawToPaintBox(Canvas: TCanvas; Rect: TRect);
     procedure PaintBackGround(Image: TBitMap);
   private
+    Rigg: TRigg;
     procedure SetupCtrls;
   public
     Counter: Integer;
@@ -70,7 +72,7 @@ var
 implementation
 
 uses
-  RggModul;
+  RiggVar.App.Main;
 
 {$R *.DFM}
 
@@ -78,14 +80,15 @@ procedure TFormReglerGraph.FormCreate(Sender: TObject);
 begin
   SetupCtrls;
   GetTestData;
-  RiggModul.Rigg.OnRegelGrafik := Draw;
+  Rigg := Main.Rigg;
+  Rigg.OnRegelGrafik := Draw;
   ChartValid := True;
 end;
 
 procedure TFormReglerGraph.FormShow(Sender: TObject);
 begin
   ZaehlerEdit.Text := '0';
-  TrimmIst := RiggModul.Rigg.Trimm;
+  TrimmIst := Rigg.Trimm;
 end;
 
 procedure TFormReglerGraph.SetupCtrls;
@@ -118,8 +121,8 @@ begin
   ZaehlerEdit.Text := '0';
   Screen.Cursor := crHourGlass;
   try
-    Counter := RiggModul.Rigg.Regeln(TrimmSoll);
-    if RiggModul.Rigg.GetriebeOK then
+    Counter := Rigg.Regeln(TrimmSoll);
+    if Rigg.GetriebeOK then
     begin
     { GCtrls werden nicht sofort aktualisiert. Deshalb sind die Einstellwerte
       für Mastfall und Biegung noch exakt. Die Wanten haben ungeradzahlige Längen.
@@ -127,8 +130,9 @@ begin
       Die GCtrls werden erst nach Schließen des Dialogfensters aktualisiert.
       Gerundet auf geradzahlige Wantenwerte wird aber erst nach erneuter
       Berechnung des Getriebes, ausgelöst vom Benutzer }
-      RiggModul.DoGraphics;
-      RiggModul.UpdateRigg;
+//      RiggModul.DoGraphics;
+//      RiggModul.UpdateRigg;
+      Rigg.UpdateGetriebe;
 
 //   Alternative:
     { Die GCtrls werden sofort aktualisiert. Damit werden die Werte
@@ -275,7 +279,7 @@ begin
       LineTo(P.x, P.y);
 
       { Istwert SalingH/SalingL - Scheibenwischer-Linie }
-      temp := RiggModul.Rigg.Antrieb;
+      temp := Rigg.Antrieb;
       Pen.Color := clGreen;
       P.x := Round(temp*ZoomX);
       P.y := Round(Ymin*ZoomY);
@@ -295,7 +299,7 @@ begin
       LineTo(P.x, P.y);
 
       { TrySalingH }
-      temp := RiggModul.Rigg.TrySalingH;
+      temp := Rigg.TrySalingH;
       Pen.Color := clRed;
       P.x := Round(temp*ZoomX);
       P.y := Round(Ymin*ZoomY);
@@ -306,7 +310,7 @@ begin
 
       (*
       { limitA }
-      temp := RiggModul.Rigg.limitA;
+      temp := Rigg.limitA;
       Pen.Color := clRed;
       P.x := Round(temp*ZoomX);
       P.y := Round(Ymin*ZoomY);
@@ -316,7 +320,7 @@ begin
       LineTo(P.x, P.y);
 
       { limitB }
-      temp := RiggModul.Rigg.limitB;
+      temp := Rigg.limitB;
       Pen.Color := clRed;
       P.x := Round(temp*ZoomX);
       P.y := Round(Ymin*ZoomY);
@@ -373,7 +377,7 @@ function TFormReglerGraph.GetXText: String;
 var
   s: string;
 begin
-  case RiggModul.Rigg.SalingTyp of
+  case Rigg.SalingTyp of
     stFest: s := 'Saling-Höhe [mm]';
     stDrehbar: s := 'Saling-Länge [mm]';
   end;
@@ -405,8 +409,8 @@ end;
 
 procedure TFormReglerGraph.GetXMinMax;
 begin
-  Xmin := RiggModul.Rigg.Anfang;
-  Xmax := RiggModul.Rigg.Ende;
+  Xmin := Rigg.Anfang;
+  Xmax := Rigg.Ende;
 end;
 
 procedure TFormReglerGraph.GetTestData;
@@ -420,7 +424,7 @@ end;
 procedure TFormReglerGraph.GetData;
 begin
   ChartValid := True;
-  f := RiggModul.Rigg.KurveF;
+  f := Rigg.KurveF;
 end;
 
 procedure TFormReglerGraph.PaintBackGround(Image: TBitMap);

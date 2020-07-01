@@ -10,7 +10,8 @@ uses
   Vcl.Controls,
   Vcl.Buttons,
   Vcl.StdCtrls,
-  RggTypes;
+  RggTypes,
+  RggUnit4;
 
 type
   TBiegeUndNeigeForm = class(TForm)
@@ -25,6 +26,7 @@ type
       var ScrollPos: Integer);
     procedure FormCreate(Sender: TObject);
   private
+    Rigg: TRigg;
     procedure SetupCtrls;
   public
 
@@ -38,7 +40,13 @@ implementation
 {$R *.DFM}
 
 uses
-  RggModul;
+  RiggVar.App.Main;
+
+procedure TBiegeUndNeigeForm.FormCreate(Sender: TObject);
+begin
+  Rigg := Main.Rigg;
+  SetupCtrls;
+end;
 
 procedure TBiegeUndNeigeForm.SetupCtrls;
 begin
@@ -60,14 +68,15 @@ begin
   try
     Mastfall := sbMastfall.Position;
     Biegung := sbBiegungS.Position;
-    RiggModul.Rigg.BiegeUndNeigeF(Mastfall, Biegung);
-    RiggModul.Rigg.SchnittKraefte;
+    Rigg.BiegeUndNeigeF(Mastfall, Biegung);
+    Rigg.SchnittKraefte;
     { Getriebe nicht neu berechnen,
       damit die Einstellwerte nicht sofort gerundet werden. }
-    if RiggModul.Rigg.GetriebeOK then
+    if Rigg.GetriebeOK then
     begin
-      RiggModul.DoGraphics;
-      RiggModul.UpdateRigg;
+//      RiggModul.DoGraphics;
+//      RiggModul.UpdateRigg;
+      Main.UpdateGetriebe;
     end;
   finally
     Screen.Cursor := crDefault;
@@ -81,11 +90,6 @@ begin
     lbMastfall.Caption := Format('Mastfall = %d mm', [ScrollPos])
   else if Sender = sbBiegungS then
     lbBiegungS.Caption := Format('Mastbiegung = %d mm', [ScrollPos]);
-end;
-
-procedure TBiegeUndNeigeForm.FormCreate(Sender: TObject);
-begin
-  SetupCtrls;
 end;
 
 end.
