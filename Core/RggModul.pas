@@ -974,7 +974,7 @@ begin
     if Value <> ctBiegeKnicken then
     begin
       if OutputForm.OutputPages.ActivePage = OutputForm.KraftSheet then
-          OutputForm.OutputPages.ActivePage := OutputForm.OutputPages.FindNextPage(OutputForm.KraftSheet, False, False);
+        OutputForm.OutputPages.ActivePage := OutputForm.OutputPages.FindNextPage(OutputForm.KraftSheet, False, False);
       OutputForm.Kraftsheet.TabVisible := False;
     end
     else

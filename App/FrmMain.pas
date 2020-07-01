@@ -557,11 +557,11 @@ begin
 
   RiggModul := TRiggModulA.Create(Rigg);
   RiggModul.ViewModelM := TViewModelMain00.Create;
-//  RiggModul.Rigg := Rigg;
   RiggModul.Init;
 
   Main.RiggModul := RiggModul;
   RiggModul.ViewModelM.IsUp := True;
+  RiggModul.UpdateUI;
 
   OnCloseQuery := FormCloseQuery;
 end;
@@ -2809,6 +2809,8 @@ begin
     Main.Rigg.CalcTyp := ctBiegeKnicken
   else if Sender = KraftGemessenItem then
     Main.Rigg.CalcTyp := ctKraftGemessen;
+
+  Main.RiggModul.CalcTyp := Main.Rigg.CalcTyp;
 end;
 
 procedure TFormMain.KorrigiertItemClick(Sender: TObject);

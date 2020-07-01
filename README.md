@@ -42,7 +42,7 @@ Branch RG19ABC was created just before taking an aggressive step forward (the Ju
 which is supposed to be great for touch.
 In order to do so I needed to delete incompatible code.
 Some know problems appeared, which I will NOT sort out immediately.
-Instead I created a permanent brach point RG68, for the work to continue. 
+Instead I created a permanent branch point RG68, for the work to continue. 
 
 Then - in the master branch - I was now free to delete more code, and making remaining files identical to existing project RG67.
 
@@ -56,7 +56,7 @@ Both branches, RG68 and RG19ABC are considered permanent branches.
 - RG19B in branch RG68ABC: old SDI application
 - RG19C in branch RG68ABC: latest code behind combined with old forms.
 
-The Rigg model code (in folder Core) used in the branches is up to date.
-It is UI that is still old.
+The Rigg model code (in folder Core) is kept up to date, across the branches.
+It is the UI that is still old.
 
-Future derived projects will use other graphics technology, and other compilers.
+Future derived projects will use other graphics technology, and may use other compilers.
