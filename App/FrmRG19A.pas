@@ -303,7 +303,7 @@ begin
 
   RiggModul := TRiggModul.Create(Self);
   RiggModul.RG19A := True;
-  RiggModul.ViewModelMain := TViewModelMainA.Create;
+  RiggModul.ViewModelM := TViewModelMainA.Create;
   RiggModul.Init;
   RiggModul.BackgroundColor := TColors.Wheat; // call after RiggModul.Init
   RiggModul.PBG := GrafikForm.PaintBoxG;
@@ -321,7 +321,7 @@ begin
   LogoItem.Checked := WantLogoData;
 
   Main.IsUp := True;
-  RiggModul.ViewModelMain.IsUp := True;
+  RiggModul.ViewModelM.IsUp := True;
   RiggModul.UpdateUI;
 end;
 

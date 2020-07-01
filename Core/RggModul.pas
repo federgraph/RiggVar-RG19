@@ -139,7 +139,7 @@ type
     procedure SetRotaFormActive(const Value: Boolean);
     procedure SetBackgroundColor(const Value: TColor);
   public
-    ViewModelMain: TViewModelMain00;
+    ViewModelM: TViewModelMain00;
     PBG: TPaintbox;
     RG19A: Boolean; { RG19A = MDI app }
 
@@ -426,7 +426,7 @@ begin
   BitmapS.Free;
   BitmapC.Free;
 
-  ViewModelMain.Free;
+  ViewModelM.Free;
 
   RiggModul := nil;
   inherited;
@@ -729,16 +729,16 @@ begin
       LEDShape := True
     else
       LEDShape := False;
-    ViewModelMain.StatusPanelText1 := Rigg.GetriebeStatusText;
+    ViewModelM.StatusPanelText1 := Rigg.GetriebeStatusText;
     DrawPaintBoxM;
     Draw;
     if Rigg.GetriebeOK and not Rigg.MastOK then
     begin
       LEDShape := False;
-      ViewModelMain.StatusPanelText1 := Rigg.MastStatusText;
+      ViewModelM.StatusPanelText1 := Rigg.MastStatusText;
     end;
   end;
-  ViewModelMain.UpdateView;
+  ViewModelM.UpdateView;
 
   { 3D Grafik - AniRotationForm muß erzeugt sein! }
   if RotaFormActive then
@@ -765,7 +765,7 @@ end;
 procedure TRiggModul.UpdateRigg;
 begin
   Rigg.UpdateRigg;
-  ViewModelMain.StatusPanelText1 := Rigg.RiggStatusText;
+  ViewModelM.StatusPanelText1 := Rigg.RiggStatusText;
   if Rigg.RiggOK then
   begin
     FGrauZeichnen := True;
@@ -783,7 +783,7 @@ begin
   DrawPaintBoxM;
   Draw;
   rLItemClick(ReportItem);
-  ViewModelMain.UpdateView;
+  ViewModelM.UpdateView;
 end;
 
 procedure TRiggModul.Draw;
@@ -1041,7 +1041,7 @@ procedure TRiggModul.SetReportFormActive(const Value: Boolean);
 begin
   FReportFormActive := Value;
   if not Value then
-    ViewModelMain.HideReport;
+    ViewModelM.HideReport;
 end;
 
 procedure TRiggModul.SetReportItem(Value: TReportItem);
@@ -1058,7 +1058,7 @@ procedure TRiggModul.SetRotaFormActive(const Value: Boolean);
 begin
   FRotaFormActive := Value;
   if not Value then
-    ViewModelMain.HideGrafik;
+    ViewModelM.HideGrafik;
 end;
 
 procedure TRiggModul.rLItemClick(Item: TReportItem);
@@ -1210,10 +1210,10 @@ begin
   FControllerBtnDown := FControllerTyp <> ctOhne;
 
   { 'TakeOver' }
-  ViewModelMain.ControllerEnabled := ControllerEnabled;
-  ViewModelMain.ControllerDown := ControllerBtnDown;
+  ViewModelM.ControllerEnabled := ControllerEnabled;
+  ViewModelM.ControllerDown := ControllerBtnDown;
 //  ViewModelMain.BogenBtnDown := ZweischlagBtnDown;
-  ViewModelMain.UpdateView;
+  ViewModelM.UpdateView;
 end;
 
 procedure TRiggModul.Neu(Doc: TRggDocument);
@@ -1236,8 +1236,8 @@ begin
     on EFileFormatError do { eat ecxeption }
       if IniFileName = '' then
       begin
-        ViewModelMain.Caption := 'Rigg';
-        ViewModelMain.UpdateView;
+        ViewModelM.Caption := 'Rigg';
+        ViewModelM.UpdateView;
       end;
   end;
 end;
@@ -1259,7 +1259,7 @@ begin
     if RG19A and (GrafikForm <> nil) then
       GrafikForm.ViewTab.TabIndex := Ord(FViewPoint);
   end;
-  ViewModelMain.VonDerSeiteItemClick(Value);
+  ViewModelM.VonDerSeiteItemClick(Value);
 end;
 
 procedure TRiggModul.ResetPaintBoxG;
@@ -1354,9 +1354,9 @@ procedure TRiggModul.SetConsoleActive(const Value: Boolean);
 begin
   FConsoleActive := Value;
   if Value then
-    ViewModelMain.ShowConsole
+    ViewModelM.ShowConsole
   else
-    ViewModelMain.HideConsole;
+    ViewModelM.HideConsole;
 end;
 
 procedure TRiggModul.SetControllerBtnDown(Value: Boolean);
@@ -1396,11 +1396,11 @@ begin
     KurveValid := False;
     UpdateGetriebe;
 
-    ViewModelMain.KnickenItemClick(Value);
-    ViewModelMain.ControllerEnabled := ControllerEnabled;
-    ViewModelMain.ControllerDown := ControllerBtnDown;
-    ViewModelMain.WinkelDown := WinkelBtnDown;
-    ViewModelMain.UpdateView;
+    ViewModelM.KnickenItemClick(Value);
+    ViewModelM.ControllerEnabled := ControllerEnabled;
+    ViewModelM.ControllerDown := ControllerBtnDown;
+    ViewModelM.WinkelDown := WinkelBtnDown;
+    ViewModelM.UpdateView;
   end;
 end;
 
@@ -1418,8 +1418,8 @@ begin
       SBName := fpVorstag;
     KurveValid := False;
     UpdateGetriebe;
-    ViewModelMain.WinkelDown := FWinkelBtnDown;
-    ViewModelMain.UpdateView;
+    ViewModelM.WinkelDown := FWinkelBtnDown;
+    ViewModelM.UpdateView;
   end;
 end;
 
@@ -1483,10 +1483,10 @@ begin
     end;
 
     case Value of
-      stFest: ViewModelMain.FestItemClick;
-      stDrehbar: ViewModelMain.DrehbarItemClick;
-      stOhne: ViewModelMain.OhneItemClick;
-      stOhne_2: ViewModelMain.OSDlgItemClick;
+      stFest: ViewModelM.FestItemClick;
+      stDrehbar: ViewModelM.DrehbarItemClick;
+      stOhne: ViewModelM.OhneItemClick;
+      stOhne_2: ViewModelM.OSDlgItemClick;
     end;
 
     Draw;
@@ -1499,10 +1499,10 @@ begin
   begin
     FLEDShape := Value;
     if Value then
-      ViewModelMain.LEDColor := clLime
+      ViewModelM.LEDColor := clLime
     else
-      ViewModelMain.LEDColor := clRed;
-    ViewModelMain.UpdateView;
+      ViewModelM.LEDColor := clRed;
+    ViewModelM.UpdateView;
   end;
 end;
 
@@ -1605,10 +1605,10 @@ begin
   Rigg.UpdateGSB;
   SetupGCtrls;
 
-  ViewModelMain.OhneItemClick;
-  ViewModelMain.ControllerEnabled := ControllerEnabled;
-  ViewModelMain.WinkelDown := WinkelBtnDown;
-  ViewModelMain.UpdateView;
+  ViewModelM.OhneItemClick;
+  ViewModelM.ControllerEnabled := ControllerEnabled;
+  ViewModelM.WinkelDown := WinkelBtnDown;
+  ViewModelM.UpdateView;
 end;
 
 procedure TRiggModul.DrehbarItemClick;
@@ -1636,10 +1636,10 @@ begin
   Rigg.UpdateGSB;
   SetupGCtrls;
 
-  ViewModelMain.DrehbarItemClick;
-  ViewModelMain.ControllerEnabled := ControllerEnabled;
-  ViewModelMain.WinkelDown := WinkelBtnDown;
-  ViewModelMain.UpdateView;
+  ViewModelM.DrehbarItemClick;
+  ViewModelM.ControllerEnabled := ControllerEnabled;
+  ViewModelM.WinkelDown := WinkelBtnDown;
+  ViewModelM.UpdateView;
 end;
 
 procedure TRiggModul.FestItemClick;
@@ -1669,10 +1669,10 @@ begin
   Rigg.UpdateGSB;
   SetupGCtrls;
 
-  ViewModelMain.FestItemClick;
-  ViewModelMain.ControllerEnabled := ControllerEnabled;
-  ViewModelMain.WinkelDown := WinkelBtnDown;
-  ViewModelMain.UpdateView;
+  ViewModelM.FestItemClick;
+  ViewModelM.ControllerEnabled := ControllerEnabled;
+  ViewModelM.WinkelDown := WinkelBtnDown;
+  ViewModelM.UpdateView;
 end;
 
 procedure TRiggModul.OSDlgItemClick;
@@ -1689,9 +1689,9 @@ begin
   Rigg.UpdateGSB;
   SetupGCtrls;
 
-  ViewModelMain.OSDlgItemClick;
-  ViewModelMain.ControllerEnabled := ControllerEnabled;
-  ViewModelMain.UpdateView;
+  ViewModelM.OSDlgItemClick;
+  ViewModelM.ControllerEnabled := ControllerEnabled;
+  ViewModelM.UpdateView;
 end;
 
 procedure TRiggModul.ChartItemClick;

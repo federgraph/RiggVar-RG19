@@ -1,4 +1,4 @@
-object FormReglerGraph: TFormReglerGraph
+﻿object FormReglerGraph: TFormReglerGraph
   Left = 0
   Top = 0
   Caption = 'Trimm Einstellen'
@@ -11,6 +11,7 @@ object FormReglerGraph: TFormReglerGraph
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
+  OnCreate = FormCreate
   OnPaint = FormPaint
   OnShow = FormShow
   PixelsPerInch = 96

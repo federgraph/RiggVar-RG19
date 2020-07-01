@@ -3,7 +3,6 @@
 interface
 
 uses
- System.Math.Vectors,
   RggCalc,
   RggTypes,
   RggMatrix,
@@ -50,15 +49,6 @@ type
     Mat: TMatrix4x4;
     constructor Create;
     destructor Destroy; override;
-    function TransformPoint(p: TRealPoint): TRealPoint;
-  end;
-
-  { version with TMatrix3D }
-  TRggTransformer3D = class(TRggTransformer00)
-  private
-    procedure BuildMatrix;
-  public
-    mat3D: TMatrix3D;
     function TransformPoint(p: TRealPoint): TRealPoint;
   end;
 
@@ -152,54 +142,6 @@ begin
   result[x] := pt.x;
   result[y] := pt.y;
   result[z] := pt.z;
-end;
-
-{ TRggTransformer3D }
-
-procedure TRggTransformer3D.BuildMatrix;
-var
-  pt: TPoint3D;
-  ps: TPoint3D;
-
-  mt: TMatrix3D;
-  ms: TMatrix3D;
-  mr: TMatrix3D;
-begin
-  if Assigned(OnGetFixPunkt) then
-    FFixPunkt := OnGetFixPunkt;
-
-  FTransformedFixPunkt := Rotator.Rotiere(FFixPunkt);
-
-  pt := TPoint3D.Create(
-    -FTransformedFixPunkt[x],
-    -FTransformedFixPunkt[y],
-    -FTransformedFixPunkt[z]
-  );
-  mt := TMatrix3D.CreateTranslation(pt);
-
-  ps := TPoint3D.Create(Zoom, Zoom, Zoom);
-  ms := TMatrix3D.CreateScaling(ps);
-
-  mr := Rotator.Mat.GetDelphiMatrix3D;
-
-  mat3D := TMatrix3D.Identity;
-  mat3D := mat3D * mr;
-  mat3D := mat3D * mt;
-  mat3D := mat3D * ms;
-end;
-
-function TRggTransformer3D.TransformPoint(p: TRealPoint): TRealPoint;
-var
-  p1, p2: TPoint3D;
-begin
-  if not Updated then
-    BuildMatrix;
-
-  p1 := TPoint3D.Create(p[x], p[y], p[z]);
-  p2 := p1 * mat3D;
-  result[x] := p2.X;
-  result[y] := p2.Y;
-  result[z] := p2.Z;
 end;
 
 end.

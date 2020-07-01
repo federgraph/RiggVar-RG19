@@ -359,7 +359,7 @@ begin
   s := fp + fn;
   if IsSandboxed then
   begin
-    s := RiggModul.ViewModelMain.GetOpenFileName(fp, fn);
+    s := RiggModul.ViewModelM.GetOpenFileName(fp, fn);
   end;
 
   if s <> '' then
@@ -447,7 +447,7 @@ begin
   s := fp + fn;
   if IsSandboxed then
   begin
-    s := RiggModul.ViewModelMain.GetSaveFileName(fp, fn);
+    s := RiggModul.ViewModelM.GetSaveFileName(fp, fn);
   end;
 
   if s <> '' then

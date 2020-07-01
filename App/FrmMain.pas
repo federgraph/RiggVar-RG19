@@ -421,7 +421,7 @@ begin
 FormCreate1;
   FormCreate2;
   Main.IsUp := True;
-  RiggModul.ViewModelMain.IsUp := True;
+  RiggModul.ViewModelM.IsUp := True;
   RiggModul.UpdateUI;
 end;
 
@@ -433,7 +433,7 @@ begin
 
   RiggModul := TRiggModul.Create(Self);
   RiggModul.RG19A := False;
-  RiggModul.ViewModelMain := TViewModelMainC.Create;
+  RiggModul.ViewModelM := TViewModelMainC.Create;
   RiggModul.Init;
   RiggModul.BackgroundColor := TColors.Wheat; // call after RiggModul.Init
   RiggModul.PBG := GrafikForm.PaintBoxG;

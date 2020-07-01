@@ -1300,6 +1300,7 @@ begin
       if ExitCounter4 > 0 then Add(Format('  EC 4: %d ', [ExitCounter4]));
       if ExitCounter5 > 0 then Add(Format('  EC 5: %d ', [ExitCounter5]));
       if ExitCounter6 > 0 then Add(Format('  EC 6: %d ', [ExitCounter6]));
+      if ExitCounter7 > 0 then Add(Format('  EC 7: %d ', [ExitCounter6]));
     end;
     Add(Format('Memo Counter: %d', [MemoCounter]));
     Add(Format('Calc Counter: %d', [CalcCounter]));

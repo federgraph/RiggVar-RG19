@@ -165,8 +165,8 @@ procedure TOutputForm.FormHide(Sender: TObject);
 begin
   if RiggModul <> nil then
   begin
-    RiggModul.ViewModelMain.OutputFormItemChecked := False;
-    RiggModul.ViewModelMain.UpdateView;
+    RiggModul.ViewModelM.OutputFormItemChecked := False;
+    RiggModul.ViewModelM.UpdateView;
   end;
 end;
 

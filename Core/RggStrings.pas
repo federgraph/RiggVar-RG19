@@ -321,6 +321,8 @@ const
   EA_M_Key: string = 'EA Medium';
   EA_L_Key: string = 'EA Large';
 
+  SWarningText: string = 'Änderungen in %s sichern?';
+
 implementation
 
 end.

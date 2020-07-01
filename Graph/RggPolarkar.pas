@@ -211,7 +211,7 @@ end;
 procedure TPolarKar.FillMatrixInc;
 begin
   tmat.Identity;
-  p1 := NullVec;
+  p1 := vec3Null;
   if FTheta <> 0 then
   begin
     p2.x := Mat.Mat[1, 2];
@@ -428,10 +428,8 @@ begin
     end
     else
     begin
-      tempY := Cross(zVec, ux);
-      Normalize3D(tempY);
-      tempZ := Cross(ux, tempY);
-      Normalize3D(tempZ);
+      tempY := Normalize3D(Cross(zVec, ux));
+      tempZ := Normalize3D(Cross(ux, tempY));
       tempcos := dot(uz, tempZ);
       tempsin := -dot(uz, tempY);
       wg := ArcCos(CheckSinCos(tempcos));
@@ -442,8 +440,7 @@ begin
     { Winkel Phi ermitteln im Bereich -180..180 Grad }
     if Theta90 then
     begin
-      tempVec := Cross(uy, zVec);
-      Normalize3D(tempVec);
+      tempVec := Normalize3D(Cross(uy, zVec));
       tempcos := tempVec.x; //tempcos := -uz.x;
       tempsin := tempVec.y; //tempsin := -uz.y;
     end
@@ -451,7 +448,7 @@ begin
     begin
       tempVec := ux;
       tempVec.z := 0;
-      Normalize3D(tempVec); //d := Hypot(ux.x,ux.y);
+      tempVec := Normalize3D(tempVec); //d := Hypot(ux.x,ux.y);
       tempcos := dot(xVec, tempVec); //tempcos := ux.x/d;
       tempsin := dot(yVec, tempVec); //tempsin := ux.y/d;
     end;

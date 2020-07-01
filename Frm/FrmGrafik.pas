@@ -60,8 +60,8 @@ procedure TGrafikForm.FormHide(Sender: TObject);
 begin
   if RiggModul <> nil then
   begin
-    RiggModul.ViewModelMain.GrafikFormItemChecked := False;
-    RiggModul.ViewModelMain.UpdateView;
+    RiggModul.ViewModelM.GrafikFormItemChecked := False;
+    RiggModul.ViewModelM.UpdateView;
   end;
 end;
 

@@ -434,7 +434,7 @@ begin
   FormCreate1;
   FormCreate2;
   Main.IsUp := True;
-  RiggModul.ViewModelMain.IsUp := True;
+  RiggModul.ViewModelM.IsUp := True;
   RiggModul.UpdateUI;
 end;
 
@@ -446,7 +446,7 @@ begin
 
   RiggModul := TRiggModul.Create(Self);
   RiggModul.RG19A := False;
-  RiggModul.ViewModelMain := TViewModelMainB.Create;
+  RiggModul.ViewModelM := TViewModelMainB.Create;
   RiggModul.Init;
   RiggModul.BackgroundColor := TColors.Wheat; // call after RiggModul.Init
   RiggModul.PBG := GrafikForm.PaintBoxG;
@@ -2325,7 +2325,7 @@ begin
   mi.Enabled := False;
 
   InfoItem := AddI('InfoItem');
-  mi.Caption := '&Info...';
+  mi.Caption := '&Info ...';
   mi.Hint := '  Infofenster anzeigen';
   mi.OnClick := InfoItemClick;
 
@@ -2334,8 +2334,8 @@ begin
   mi.Hint := '  Toggle between Logo and 420 (Reset)';
   mi.OnClick := LogoItemClick;
 
-  AboutItem := AddI('DreItem');
-  mi.Caption := 'About';
+  AboutItem := AddI('AboutItem');
+  mi.Caption := 'About ...';
   mi.Hint := '  KreisForm.ShowModal';
   mi.OnClick := AboutItemClick;
 end;

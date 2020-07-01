@@ -643,8 +643,15 @@ begin
     Exit;
   end;
 
-  r1 := Abstand(rP[ooP0], Null);
+  r2 := sqr(rLe[5]) - sqr(rLe[6] / 2);
+  if (r2 < 0.1) then
+  begin
+    Inc(ExitCounter7);
+    Exit;
+  end;
+
   r2 := sqrt(sqr(rLe[5]) - sqr(rLe[6] / 2));
+  r1 := Abstand(rP[ooP0], Null);
   if (r1 < 0.1) or (r2 < 0.1) then
   begin
     Inc(ExitCounter5);
@@ -665,12 +672,27 @@ begin
       rPe[ooB0] := rPe[ooP0];
       rPe[ooB0, y] := -rLe[6] / 2;
     end;
+
+    r1 := sqr(rLe[3]) - sqr(rLe[6] / 2);
+    if (r1 < 0.1) then
+    begin
+      Inc(ExitCounter7);
+      Exit;
+    end;
+
+    r2 := rLe[1];
+    if (r2 < 0.1) then
+    begin
+      Inc(ExitCounter7);
+      Exit;
+    end;
+
     with SchnittKK do
     begin
       SchnittEbene := seXZ;
       { 2. Aufruf SchnittKK: ooC0 ermitteln }
-      Radius1 := sqrt(sqr(rLe[3]) - sqr(rLe[6] / 2));
-      Radius2 := rLe[1];
+      Radius1 := sqrt(r1);
+      Radius2 := r2;
       MittelPunkt1 := rPe[ooP0];
       MittelPunkt2 := rPe[ooD0];
       rPe[ooC0] := SchnittPunkt1;

@@ -755,7 +755,7 @@ object FormRG19A: TFormRG19A
         Hint = '  Hilfesystem starten'
       end
       object AboutItem: TMenuItem
-        Caption = '&About...'
+        Caption = '&About ...'
         Hint = '  Aboutfenster anzeigen'
         OnClick = AboutItemClick
       end

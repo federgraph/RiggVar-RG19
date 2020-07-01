@@ -40,6 +40,11 @@ implementation
 uses
   RggModul;
 
+procedure TBiegeUndNeigeForm.FormCreate(Sender: TObject);
+begin
+  SetupCtrls;
+end;
+
 procedure TBiegeUndNeigeForm.SetupCtrls;
 begin
   sbMastfall.SetParams(1100, 1000, 1300);
@@ -81,11 +86,6 @@ begin
     lbMastfall.Caption := Format('Mastfall = %d mm', [ScrollPos])
   else if Sender = sbBiegungS then
     lbBiegungS.Caption := Format('Mastbiegung = %d mm', [ScrollPos]);
-end;
-
-procedure TBiegeUndNeigeForm.FormCreate(Sender: TObject);
-begin
-  SetupCtrls;
 end;
 
 end.
