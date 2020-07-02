@@ -23,6 +23,7 @@ type
     procedure DrawText(g: TCanvas);
   public
     FScale: single;
+    Margin: Integer;
     BackgroundColor: TColor;
     Width: Integer;
     Height: Integer;
@@ -44,6 +45,7 @@ uses
 constructor TTrimmTabGraph.Create;
 begin
   FScale := Main.Scale;
+  Margin := 5;
   BackgroundColor := clWhite;
 
   Width := 319; // unscaled value
@@ -194,35 +196,29 @@ var
   PosX, PosY: Integer;
   s: string;
 begin
-  with g do
-  begin
-      { Texte }
-      Brush.Style := bsClear;
-      { Font := YFont; }
-      SetTextAlign(Handle, TA_LEFT or TA_TOP);
-      PosX := 5;
-      PosY := 5;
-      TextOut(PosX, PosY, 'Kraft [N]');
+  g.Brush.Style := bsClear;
+  SetTextAlign(g.Handle, TA_LEFT or TA_TOP);
+  PosX := Margin;
+  PosY := Margin;
+  g.TextOut(PosX, PosY, 'Kraft [N]');
 
-      Font.Color := clBlack;
-      PosY := PosY - Font.Height + 5;
+  g.Font.Color := clBlack;
+  PosY := PosY - g.Font.Height + Margin;
       s := Format('(%d ... %d)', [0, Model.EndwertKraft]);
-      TextOut(PosX, PosY, s);
+  g.TextOut(PosX, PosY, s);
 
-      { Font := XFont; }
-      SetTextAlign(Handle, TA_RIGHT or TA_BOTTOM);
-    PosX := Width - 5;
-    PosY := Height - 5;
-      TextOut(PosX, PosY, 'Weg [mm]');
+  SetTextAlign(g.Handle, TA_RIGHT or TA_BOTTOM);
+  PosX := Width - Margin;
+  PosY := Height - Margin;
+  g.TextOut(PosX, PosY, 'Weg [mm]');
 
-      Font.Color := clBlack;
-      PosY := PosY + Font.Height - 5;
+  g.Font.Color := clBlack;
+  PosY := PosY + g.Font.Height - Margin;
       s := Format('(%d ... %d)', [0, Model.EndwertWeg]);
-      TextOut(PosX, PosY, s);
+  g.TextOut(PosX, PosY, s);
 
-      Brush.Style := bsSolid;
-      Brush.Color := clBtnFace;
-    end;
+  g.Brush.Style := bsSolid;
+  g.Brush.Color := clBtnFace;
 end;
 
 procedure TTrimmTabGraph.SetImage(const Value: TImage);

@@ -35,6 +35,8 @@ uses
   RggTypes,
   RggUnit4,
   RggCalc,
+  RggChart,
+  RggModul,
   RggDoc;
 
 type
@@ -44,6 +46,8 @@ type
   public
     Rigg: TRigg;
     IsUp: Boolean;
+    Modified: Boolean;
+    AutoSave: Boolean;
     procedure TestStream;
   end;
 
@@ -150,7 +154,9 @@ type
 
     TML: TStrings;
     FHullVisible: Boolean;
-    FOnUpdateGraph: TNotifyEvent;
+    FBtnGrauDown: Boolean;
+    FBtnBlauDown: Boolean;
+    FSofortBerechnen: Boolean;
 
     function FormatValue(Value: single): string;
     procedure DoBiegungGF;
@@ -173,7 +179,11 @@ type
     procedure BL(A: string; C: string);
     procedure SetHullVisible(const Value: Boolean);
     function GetHullVisible: Boolean;
-    procedure SetOnUpdateGraph(const Value: TNotifyEvent);
+    procedure SetBtnBlauDown(const Value: Boolean);
+    procedure SetBtnGrauDown(const Value: Boolean);
+    procedure SetSofortBerechnen(const Value: Boolean);
+    procedure UpdateEAR(Value: single);
+    procedure UpdateEAH(Value: single);
   protected
     FAction: TFederAction;
     procedure InitFactArray;
@@ -184,16 +194,22 @@ type
     IstValCaption: string;
     ParamCaption: string;
 
+    RefCtrl: TTrimmControls;
+
     Demo: Boolean;
 
-    StrokeRigg: TRotaForm; // injected
+    StrokeRigg: IStrokeRigg; // injected
+    ChartGraph: TChartModel;
 
     RiggLED: Boolean;
     StatusText: string;
+    GrauZeichnen: Boolean;
 
     InitialFixPoint: TRiggPoint;
 
     UpdateTextCounter: Integer;
+
+    RiggModul: TRiggModul;
 
     constructor Create;
     destructor Destroy; override;
@@ -210,7 +226,12 @@ type
     procedure InitLogo;
     procedure InitSalingTyp(fa: Integer);
 
+    procedure MemoryBtnClick;
+    procedure MemoryRecallBtnClick;
+
     procedure Draw;
+
+    function GetPlotValue(PlotID: Integer; x, y: single): single;
 
     procedure DebugBiegungGF(ML: TStrings);
     procedure UpdateColumnC(ML: TStrings);
@@ -241,14 +262,16 @@ type
 
     property HullVisible: Boolean read GetHullVisible write SetHullVisible;
     property Visible: Boolean read FVisible write SetVisible;
-    property OnUpdateGraph: TNotifyEvent read FOnUpdateGraph write SetOnUpdateGraph;
+
+    property SofortBerechnen: Boolean read FSofortBerechnen write SetSofortBerechnen;
+    property BtnGrauDown: Boolean read FBtnGrauDown write SetBtnGrauDown;
+    property BtnBlauDown: Boolean read FBtnBlauDown write SetBtnBlauDown;
   end;
 
 implementation
 
 uses
-  Clipbrd,
-  RggModul;
+  Clipbrd;
 
 const
   tfs = '%-3s %s %8s %6s';
@@ -262,6 +285,11 @@ begin
   InitialFixPoint := ooD;
 
   Demo := False;
+
+  FParam := fpVorstag;
+  FSofortBerechnen := False;
+  FBtnGrauDown := True;
+  FBtnBlauDown := False;
 
   FactArray := Rigg.GSB;
   Rigg.ControllerTyp := ctOhne;
@@ -307,11 +335,11 @@ procedure TRggMain.UpdateStrokeRigg;
 begin
   if StrokeRigg <> nil then
   begin
-    StrokeRigg.SofortBerechnen := RiggModul.SofortBerechnen;
-    StrokeRigg.GrauZeichnen := RiggModul.GrauZeichnen;
-    StrokeRigg.BtnGrauDown := RiggModul.BtnGrauDown;
-    StrokeRigg.BtnBlauDown := RiggModul.BtnBlauDown;
-    StrokeRigg.RiggLED := RiggModul.LEDShape;
+    StrokeRigg.SofortBerechnen := SofortBerechnen;
+    StrokeRigg.GrauZeichnen := GrauZeichnen;
+    StrokeRigg.BtnGrauDown := BtnGrauDown;
+    StrokeRigg.BtnBlauDown := BtnBlauDown;
+    StrokeRigg.RiggLED := RiggLED;
 
     StrokeRigg.Koordinaten := Rigg.rP;
     StrokeRigg.KoordinatenE := Rigg.rPe;
@@ -341,6 +369,46 @@ begin
     faMastfallVorlauf: Param := fpMastfallVorlauf;
     faBiegung: Param := fpBiegung;
     faMastfussD0X: Param := fpD0X;
+
+    faParamAPW: Param := fpAPW;
+    faParamEAH: Param := fpEAH;
+    faParamEAR: Param := fpEAR;
+    faParamEI: Param := fpEI;
+  end;
+end;
+
+procedure TRggMain.SetSofortBerechnen(const Value: Boolean);
+begin
+  if FSofortBerechnen <> Value then
+  begin
+    FSofortBerechnen := Value;
+    if Value then
+      UpdateGetriebe
+    else
+      Draw;
+  end;
+end;
+
+procedure TRggMain.SetBtnBlauDown(const Value: Boolean);
+begin
+  if FBtnBlauDown <> Value then
+  begin
+    RiggModul.BtnBlauDown := Value; // ###
+    FBtnBlauDown := Value;
+    Draw;
+  end;
+end;
+
+procedure TRggMain.SetBtnGrauDown(const Value: Boolean);
+begin
+  if FBtnGrauDown <> Value then
+  begin
+    FBtnGrauDown := Value;
+    RiggModul.BtnBlauDown := Value; // ###
+    if Value then
+      Draw
+    else
+      UpdateGetriebe;
   end;
 end;
 
@@ -372,11 +440,6 @@ begin
     StrokeRigg.HullVisible := Value;
     Draw;
   end;
-end;
-
-procedure TRggMain.SetOnUpdateGraph(const Value: TNotifyEvent);
-begin
-  FOnUpdateGraph := Value;
 end;
 
 procedure TRggMain.SetOption(fa: TFederAction);
@@ -417,8 +480,7 @@ begin
     fpWPowerOS,
     fpMastfallVorlauf:
     begin
-      if not RiggModul.AlreadyUpdatedGetriebeFlag then
-        UpdateGetriebe;
+      UpdateGetriebe;
     end;
 
     fpMastfallF0C,
@@ -434,11 +496,35 @@ begin
       Rigg.Reset;
       UpdateGetriebe;
     end;
-  end;
 
-  { because Draw is no longer called }
-  if not RiggModul.AlreadyUpdatedGetriebeFlag then
-    UpdateFactArrayFromRigg;
+    fpAPW:
+    begin
+      if ChartGraph <> nil then
+      begin
+        ChartGraph.APWidth := Round(CurrentValue);
+        ChartGraph.UpdateXMinMax;
+      end;
+    end;
+
+    fpEAH:
+    begin
+      UpdateEAH(CurrentValue);
+      UpdateGetriebe;
+    end;
+
+    fpEAR:
+    begin
+      UpdateEAR(CurrentValue);
+      UpdateGetriebe;
+    end;
+
+    fpEI:
+    begin
+      Rigg.MastEI := Round(CurrentValue);
+      UpdateGetriebe;
+    end;
+
+  end;
 end;
 
 procedure TRggMain.ChangeRigg(Value: single);
@@ -523,7 +609,7 @@ begin
     end;
 
     fpMastfallF0F:
-      Rigg.BiegeUndNeigeF(Value - FactArray.MastfallVorlauf.Ist, FactArray.Biegung.Ist);
+      Rigg.NeigeF(Value - FactArray.MastfallVorlauf.Ist);
 
     fpMastfallF0C:
       Rigg.BiegeUndNeigeC(Value, FactArray.Biegung.Ist);
@@ -555,8 +641,7 @@ begin
     else
       sb.Ist := Value;
 
-    RiggModul.AlreadyUpdatedGetriebeFlag := False;
-    RiggModul.DoOnWheelScroll(idx, Round(Value));
+    //RiggModul.DoOnWheelScroll(idx, Round(Value)); // ###
     UpdateGraph;
   end;
 end;
@@ -648,8 +733,9 @@ begin
     StrokeRigg.ControllerTyp := Rigg.ControllerTyp;
   end;
 
-  { WinkelBtnDow must in sync, otherwise hysteresis ? }
-  RiggModul.WinkelBtnDown := (Value = fpWinkel);
+//  if RiggModul <> nil then
+//    RiggModul.WinkelBtnDown := (Value = fpWinkel);
+
   Rigg.ManipulatorMode := (Value = fpWinkel);
   FParam := Value;
   CurrentValue := FactArray.Find(FParam).Ist;
@@ -904,6 +990,31 @@ begin
 
 end;
 
+function TRggMain.GetPlotValue(PlotID: Integer; x, y: single): single;
+var
+  tx, ty: single;
+begin
+  case PlotID of
+    1..12:
+    begin
+      tx := FactArray.Vorstag.Ist;
+      ty := FactArray.SalingL.Ist;
+      Rigg.RealGlied[fpVorstag] := tx + x;
+      Rigg.RealGlied[fpSalingA] := ty + y / 10;
+      Rigg.UpdateGetriebe;
+      if Rigg.GetriebeOK then
+      begin
+        result := Abstand(Rigg.rP[ooF0], Rigg.rP[ooF]); // - 5000;
+        UpdateFactArrayFromRigg;
+      end
+      else
+        result := 0;
+    end;
+    else
+      result := 0;
+  end;
+end;
+
 procedure TRggTrimm.LoadTrimm(fd: TRggData);
 var
   temp, tempH, tempA: single;
@@ -1095,7 +1206,7 @@ begin
   if StrokeRigg <> nil then
     StrokeRigg.SalingTyp := Rigg.SalingTyp;
   SetParam(FParam);
-  RiggModul.DoOnUpdateSalingTyp(Rigg.SalingTyp);
+  RiggModul.DoOnUpdateSalingTyp(Rigg.SalingTyp); // ###
 end;
 
 procedure TRggMain.UpdateColumnC(ML: TStrings);
@@ -1232,15 +1343,11 @@ end;
 
 procedure TRggMain.Draw;
 begin
-  { Note: Draw is not called when going through RiggModul }
   if StrokeRigg <> nil then
   begin
     UpdateStrokeRigg;
     StrokeRigg.Draw;
-    if Assigned(FOnUpdateGraph) then
-    begin
-      OnUpdateGraph(nil);
-    end;
+    RiggModul.Draw; // ###
   end;
   UpdateFactArrayFromRigg;
   UpdateText;
@@ -1495,10 +1602,140 @@ begin
 end;
 
 procedure TRggMain.UpdateGetriebe;
+var
+  temp: Boolean;
 begin
-  RiggModul.UpdateGetriebe;
+  GrauZeichnen := False;
+  RiggLED := False;
+  StatusText := '';
+
+  Rigg.UpdateGetriebe;
+
+  if RiggModul <> nil then
+  begin
+    RiggModul.DoGraphics;
+  end;
+
+  temp := (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK);
+
+  if temp then
+  begin
+    { continue to do Rigg }
+    Rigg.UpdateRigg;
+
   RiggLED := Rigg.RiggOK;
+    StatusText := Rigg.RiggStatusText;
+    Grauzeichnen := RiggLED;
+  end
+  else
+  begin
+    { be done with Getriebe only }
+    RiggLED := Rigg.GetriebeOK;
+    StatusText := Rigg.GetriebeStatusText;
+    if Rigg.GetriebeOK and not Rigg.MastOK then
+    begin
+      RiggLED := False;
+      StatusText := Rigg.MastStatusText;
+    end;
+  end;
+
   Draw;
+
+  if RiggModul <> nil then
+  begin
+    RiggModul.DoOnUpdateRigg;
+  end;
+end;
+
+procedure TRggMain.MemoryBtnClick;
+begin
+{$ifdef debug}
+  Logger.Info('in MemoryBtnClick');
+{$endif}
+  RefCtrl := Rigg.Glieder;
+  StrokeRigg.KoordinatenR := Rigg.rP;
+  Draw;
+end;
+
+procedure TRggMain.MemoryRecallBtnClick;
+begin
+{$ifdef debug}
+  Logger.Info('in MemoryRecallBtnClick');
+{$endif}
+  Rigg.Glieder := RefCtrl;
+  UpdateGetriebe;
+end;
+
+procedure TRggMain.UpdateEAR(Value: single);
+var
+  EA: TRiggLvektor; { EA in KN }
+  c: Integer;
+begin
+  EA := Rigg.EA;
+
+  c := Round(Value);
+
+//  { Rumpflängen }
+//  EA[1] := c;
+//  EA[2] := c;
+//  EA[3] := c;
+//  EA[4] := c;
+//  EA[5] := c;
+//  EA[6] := c;
+
+  { Wanten }
+  EA[7] := c;
+  EA[8] := c;
+  EA[12] := c;
+  EA[13] := c;
+
+  { Vorstag }
+  EA[14] := c;
+
+  { Saling }
+  EA[9] := c;
+  EA[10] := c;
+
+  { Saling-Verbindung }
+  EA[11] := c;
+
+  Rigg.EA := EA;
+end;
+
+procedure TRggMain.UpdateEAH(Value: single);
+var
+  EA: TRiggLvektor; { EA in KN }
+  c: Integer;
+begin
+  EA := Rigg.EA;
+
+  c := Round(Value);
+
+  { Rumpflängen }
+  EA[1] := c;
+  EA[2] := c;
+  EA[3] := c;
+  EA[4] := c;
+  EA[5] := c;
+  EA[6] := c;
+
+//  { Wanten }
+//  EA[7] := c;
+//  EA[8] := c;
+//  EA[12] := c;
+//  EA[13] := c;
+//
+//  { Vorstag }
+//  EA[14] := c;
+//
+//  { Saling }
+//  EA[9] := c;
+//  EA[10] := c;
+//
+//  { Saling-Verbindung }
+//  EA[11] := c;
+
+  Rigg.EA := EA;
 end;
 
 { TRggTrimm }
@@ -1511,12 +1748,12 @@ end;
 
 procedure TRggTrimm.SetTrimm(const Value: Integer);
 begin
-  RiggModul.DoResetForTrimmData;
+  RiggModul.DoResetForTrimmData; // ###
   Logger.Info('SetTrimm: ' + IntToStr(Value));
   FTrimm := Value;
   LoadTrimm(CurrentTrimm);
-  RiggModul.UpdateGControls;
-
+  RiggModul.UpdateGControls; // ###
+//  FormMain.UpdateOnParamValueChanged;
 end;
 
 constructor TRggTrimm.Create;
@@ -1700,6 +1937,7 @@ end;
 
 procedure TRggText.UpdateText(ClearFlash: Boolean);
 begin
+
 end;
 
 end.

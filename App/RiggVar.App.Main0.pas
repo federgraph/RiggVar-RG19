@@ -48,7 +48,6 @@ type
 implementation
 
 uses
-//  FrmMain,
   RggTypes,
   RggModul,
   RiggVar.App.Main;

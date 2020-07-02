@@ -12,26 +12,22 @@ uses
   System.Math,
   Vcl.Graphics,
   Vcl.Forms,
-  Vcl.Controls,
-  Vcl.Menus,
-  Vcl.Dialogs,
   Vcl.StdCtrls,
-  Vcl.Buttons,
   Vcl.ExtCtrls,
   Vcl.Tabs,
-  Vcl.ComCtrls,
+  Vcl.Dialogs,
   Vcl.Printers,
   Vcl.Clipbrd,
-  RggRota,
   RggTypes,
-  RggGetriebeGraph,
+  RggCalc,
+  RggUnit4,
+  RggRota,
   RggKraftGraph,
   RggMastGraph,
-  RggUnit4,
   RggReport,
-  RggCalc,
   RggCtrls,
   RggDoc,
+  RggGetriebeGraph,
   RggPrinter,
   RggPolarKar,
   RggTransformer,
@@ -60,8 +56,8 @@ type
     Log_Item
   );
 
-  TRiggModul = class(TComponent)
-  private
+  TRiggModul = class
+  protected
     FBackgroundColor: TColor;
     FKorrigiertItem: Boolean;
     FPaintBtnDown: Boolean;
@@ -141,7 +137,7 @@ type
   public
     ViewModelM: TViewModelMain00;
     PBG: TPaintbox;
-    RG19A: Boolean; { RG19A = MDI app }
+    RG19A: Boolean;
 
     Rigg: TRigg;
     RiggReport: TRiggReport;
@@ -176,12 +172,11 @@ type
     YComboSavedItemIndex: Integer;
 
     AutoSave: Boolean;
-    AlreadyUpdatedGetriebeFlag: Boolean;
 
     MastGraph: TMastGraph;
     KraftGraph: TKraftGraph;
 
-    constructor Create(AOwner: TComponent); override;
+    constructor Create;
     destructor Destroy; override;
     procedure Init;
 
@@ -196,7 +191,6 @@ type
     procedure UpdateGCtrls(InputRec: TTrimmControls);
     procedure UpdateGCtrlLabels(InputRec: TTrimmControls);
     procedure UpdateGetriebe;
-    procedure UpdateRigg;
     procedure AusgabeText;
     procedure AusgabeKommentar;
     procedure ResetPaintBoxG;
@@ -222,24 +216,23 @@ type
     procedure Neu(Doc: TRggDocument);
     procedure Open(FileName: string);
     procedure Save;
-    procedure About;
     procedure rLItemClick(Item: TReportItem);
-    procedure UpdateBtnClick;
     procedure BiegeNeigeItemClick;
     procedure ReglerBtnClick;
-    procedure MemoryBtnClick;
-    procedure MemoryRecallBtnClick;
     procedure FestItemClick;
     procedure OhneItemClick;
     procedure OSDlgItemClick;
     procedure DrehbarItemClick;
+    procedure ChartItemClick;
+    procedure About;
+    procedure MemoryBtnClick;
+    procedure MemoryRecallBtnClick;
     procedure ZustellBtnClick;
     procedure OutputPagesChange(Seite: Integer);
     procedure YComboBoxChange(ItemIndex: Integer);
     procedure KurveBtnClick;
     procedure SalingPaintBoxClick;
     procedure TestBtnClick;
-    procedure ChartItemClick;
     procedure ReportItemClick;
     procedure OptionItemClick;
     procedure RotaFormItemClick;
@@ -247,14 +240,16 @@ type
     procedure WriteReportToMemo(Memo: TMemo);
     procedure sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
 
+    procedure DoOnUpdateRigg;
+
     { Properties }
-    property KorrigiertItem: Boolean read FKorrigiertItem write SetKorrigiertItem;
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property PaintBtnDown: Boolean read FPaintBtnDown write SetPaintBtnDown;
     property BtnBlauDown: Boolean read FBtnBlauDown write SetBtnBlauDown;
     property BtnGrauDown: Boolean read FBtnGrauDown write SetBtnGrauDown;
     property KoppelBtnDown: Boolean read FKoppelBtnDown write SetKoppelBtnDown;
     property ZweischlagBtnDown: Boolean read FZweischlagBtnDown write SetZweischlagBtnDown;
+    property KorrigiertItem: Boolean read FKorrigiertItem write SetKorrigiertItem;
     property ControllerBtnDown: Boolean read FControllerBtnDown write SetControllerBtnDown;
     property WinkelBtnDown: Boolean read FWinkelBtnDown write SetWinkelBtnDown;
     property DiffBtnDown: Boolean read FDiffBtnDown write SetDiffBtnDown;
@@ -288,38 +283,38 @@ uses
   RggFachwerk,
   RggScroll,
   RggMatrix,
-  RggZug2D,
-  FrmConsole,
   FrmInput,
   FrmOutput,
-  FrmGrafik,
-  FrmReport,
   FrmSelect,
   FrmRegler,
   FrmReglerGraph,
-  FrmOptions,
   FrmChart,
+  FrmOptions,
   FrmAniRot,
   FrmRot,
   FrmPreview,
+  RggZug2D,
+  FrmConsole,
+  FrmGrafik,
+  FrmReport,
+  FrmAdjust,
   FrmBiege,
-  FrmKreis,
-  FrmAdjust;
+  FrmKreis;
 
-constructor TRiggModul.Create(AOwner: TComponent);
+constructor TRiggModul.Create;
 begin
   inherited;
-  FBackgroundColor := clBtnFace;
 end;
 
 procedure TRiggModul.Init;
 begin
-  FKorrigiertItem := True;
   FPaintBtnDown := False;
   FBtnBlauDown := False;
   FBtnGrauDown := True;
   FKoppelBtnDown := True;
   FZweischlagBtnDown := False;
+  FBackgroundColor := clBtnFace;
+  FKorrigiertItem := True;
   FControllerBtnDown := True;
   FWinkelBtnDown := False;
   FDiffBtnDown := False;
@@ -335,8 +330,6 @@ begin
   FSalingTyp := stFest;
   FControllerTyp := ctOhne;
 
-  { FGrauZeichnen := False; }
-  { TextFlipFlop := False; }
   IniFileName := '';
 
   RiggModul := Self;
@@ -413,14 +406,14 @@ end;
 
 destructor TRiggModul.Destroy;
 begin
+  RiggReport.Free;
+  FWReport.Free;
   MastGraph.Free;
   KraftGraph.Free;
   GetriebeGraph.Transformer.Rotator.Free;
   GetriebeGraph.Transformer.Free;
   GetriebeGraph.Free;
   SalingGraph.Free;
-  RiggReport.Free;
-  FWReport.Free;
   BitmapG.Free;
   MetaFileG.Free;
   BitmapS.Free;
@@ -661,18 +654,7 @@ begin
     sbPuffer := InputRec;
     Rigg.Glieder := InputRec;
     UpdateGetriebe;
-    AlreadyUpdatedGetriebeFlag := True;
   end;
-end;
-
-procedure TRiggModul.UpdateGetriebe;
-begin
-  Rigg.UpdateGetriebe;
-  if NeedPaint then
-    DoGraphics;
-  NeedPaint := True;
-  if (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK) then
-    UpdateRigg;
 end;
 
 procedure TRiggModul.DoGraphics;
@@ -731,7 +713,7 @@ begin
       LEDShape := False;
     ViewModelM.StatusPanelText1 := Rigg.GetriebeStatusText;
     DrawPaintBoxM;
-    Draw;
+//    Draw;
     if Rigg.GetriebeOK and not Rigg.MastOK then
     begin
       LEDShape := False;
@@ -753,37 +735,13 @@ begin
 //      AniRotationForm.Invalidate;
     end;
   end;
-
+{
   if (Main <> nil) and (Main.StrokeRigg <> nil) then
   begin
     Main.UpdateStrokeRigg;
     Main.StrokeRigg.Draw;
   end;
-
-end;
-
-procedure TRiggModul.UpdateRigg;
-begin
-  Rigg.UpdateRigg;
-  ViewModelM.StatusPanelText1 := Rigg.RiggStatusText;
-  if Rigg.RiggOK then
-  begin
-    FGrauZeichnen := True;
-    LEDShape := True;
-  end
-  else
-  begin
-    FGrauZeichnen := False;
-    LEDShape := False;
-  end;
-  if OutputForm.OutputPages.ActivePage = OutputForm.ChartSheet then
-    UpdateRiggPunkt; { GetriebePunkte oben schon aktualisiert }
-  AusgabeText; { update text before drawing }
-  AusgabeKommentar;
-  DrawPaintBoxM;
-  Draw;
-  rLItemClick(ReportItem);
-  ViewModelM.UpdateView;
+}
 end;
 
 procedure TRiggModul.Draw;
@@ -905,8 +863,11 @@ procedure TRiggModul.PaintBackGround(Image: TBitmap);
 var
   R: TRect;
 begin
+  if Image = nil then
+    Exit;
+
   R := Rect(0, 0, Image.Width, Image.Height);
-  Image.Canvas.Brush.Color := BackgroundColor;
+  Image.Canvas.Brush.Color := FBackgroundColor;
   Image.Canvas.FillRect(R);
 end;
 
@@ -1037,6 +998,13 @@ begin
   ML.EndUpdate;
 end;
 
+procedure TRiggModul.SetRotaFormActive(const Value: Boolean);
+begin
+  FRotaFormActive := Value;
+  if not Value then
+    ViewModelM.HideGrafik;
+end;
+
 procedure TRiggModul.SetReportFormActive(const Value: Boolean);
 begin
   FReportFormActive := Value;
@@ -1052,13 +1020,6 @@ begin
     rLItemClick(Value);
     OutputForm.OutputPages.ActivePage := OutputForm.MasterMemo;
   end;
-end;
-
-procedure TRiggModul.SetRotaFormActive(const Value: Boolean);
-begin
-  FRotaFormActive := Value;
-  if not Value then
-    ViewModelM.HideGrafik;
 end;
 
 procedure TRiggModul.rLItemClick(Item: TReportItem);
@@ -1170,7 +1131,10 @@ begin
   FWReport.ML.Add('');
   for i := 0 to MemoDlg.DstList.Items.Count - 1 do
   begin
-    // FWReport.Ausgabe(Rigg.Fachwerk);
+    { output all}
+//     FWReport.Ausgabe(Rigg.Fachwerk);
+
+    { output selected reports }
     if MemoDlg.DstList.Items[i] = 'FW_Geometrie' then
       FWReport.AusgabeGeometrie(Rigg.Fachwerk.G, Rigg.Fachwerk.S);
     if MemoDlg.DstList.Items[i] = 'FW_StabQuerschnitte' then
@@ -1209,10 +1173,9 @@ begin
   CalcTyp := Rigg.CalcTyp;
   FControllerBtnDown := FControllerTyp <> ctOhne;
 
-  { 'TakeOver' }
   ViewModelM.ControllerEnabled := ControllerEnabled;
   ViewModelM.ControllerDown := ControllerBtnDown;
-//  ViewModelMain.BogenBtnDown := ZweischlagBtnDown;
+
   ViewModelM.UpdateView;
 end;
 
@@ -1330,26 +1293,6 @@ begin
   end;
 end;
 
-function TRiggModul.GetControllerEnabled: Boolean;
-begin
-  Result := True;
-  if CalcTyp = ctKraftGemessen then
-    Result := False;
-  if SalingTyp = stOhne then
-    Result := False;
-end;
-
-procedure TRiggModul.SetControllerTyp(Value: TControllerTyp);
-begin
-  if FControllerTyp <> Value then
-  begin
-    FControllerTyp := Value;
-    Rigg.ControllerTyp := Value;
-  end;
-  GetriebeGraph.ControllerTyp := Value;
-  SalingGraph.ControllerTyp := Value;
-end;
-
 procedure TRiggModul.SetConsoleActive(const Value: Boolean);
 begin
   FConsoleActive := Value;
@@ -1357,6 +1300,15 @@ begin
     ViewModelM.ShowConsole
   else
     ViewModelM.HideConsole;
+end;
+
+function TRiggModul.GetControllerEnabled: Boolean;
+begin
+  Result := True;
+  if CalcTyp = ctKraftGemessen then
+    Result := False;
+  if SalingTyp = stOhne then
+    Result := False;
 end;
 
 procedure TRiggModul.SetControllerBtnDown(Value: Boolean);
@@ -1452,7 +1404,6 @@ var
 begin
   if SalingTyp <> Value then
   begin
-    AlreadyUpdatedGetriebeFlag := False;
     case Value of
       stFest: fa := faSalingTypFest;
       stDrehbar: fa := faSalingTypDrehbar;
@@ -1470,7 +1421,7 @@ begin
   if FSalingTyp <> Value then
   begin
     FSalingTyp := Value;
-//    Rigg.SalingTyp := Value;
+
     GetriebeGraph.SalingTyp := Value;
     if ChartFormActive then
       ChartForm.ChartModel.SalingTyp := Value;
@@ -1488,8 +1439,6 @@ begin
       stOhne: ViewModelM.OhneItemClick;
       stOhne_2: ViewModelM.OSDlgItemClick;
     end;
-
-    Draw;
   end;
 end;
 
@@ -1506,18 +1455,10 @@ begin
   end;
 end;
 
-procedure TRiggModul.UpdateBtnClick;
-begin
-  Rigg.Schnittkraefte;
-  UpdateRigg;
-end;
-
 procedure TRiggModul.BiegeNeigeItemClick;
 var
   ControllerAnschlag: Integer;
 begin
-  { Controller zurückfahren auf Rigg.ControllerAnschlag
-    --> entspricht 50 in GUI }
   ControllerAnschlag := 50;
   if SalingTyp = stFest then
   begin
@@ -1529,19 +1470,25 @@ begin
     InputForm.sbControllerD.Position := ControllerAnschlag;
     sbControllerScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
   end;
+
+  if BiegeUndNeigeForm = nil then
+    BiegeUndNeigeForm := TBiegeUndNeigeForm.Create(Application);
 
   BiegeUndNeigeForm.ShowModal;
   UpdateGCtrls(Rigg.Glieder);
   KurveValid := False;
   DrawPoint;
+
+  { When Modal dialog is closed, update the current param value. }
+  Main.Param := Main.Param;
 end;
 
 procedure TRiggModul.ReglerBtnClick;
 var
-  ReglerForm: TForm;
+  RF: TForm;
   ControllerAnschlag: Integer;
 begin
-  { Controller zurückfahren auf Rigg.FiControllerAnschlag }
+  { reset Rigg.FiControllerAnschlag }
   ControllerAnschlag := 50;
   if SalingTyp = stFest then
   begin
@@ -1554,14 +1501,26 @@ begin
     sbControllerScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
   end;
 
-  ReglerForm := FormReglerGraph;
   if Rigg.CalcTyp = ctKraftGemessen then
-    ReglerForm := BiegeUndNeigeForm;
+  begin
+    if BiegeUndNeigeForm = nil then
+      BiegeUndNeigeForm := TBiegeUndNeigeForm.Create(Application);
+    RF := BiegeUndNeigeForm;
+  end
+  else
+  begin
+    if FormReglerGraph = nil then
+      FormReglerGraph := TFormReglerGraph.Create(Application);
+    RF := FormReglerGraph;
+  end;
 
-  ReglerForm.ShowModal;
+  RF.ShowModal;
   UpdateGCtrls(Rigg.Glieder);
   KurveValid := False;
   DrawPoint;
+
+  { Update the current param value }
+  Main.Param := Main.Param;
 end;
 
 procedure TRiggModul.MemoryBtnClick;
@@ -1764,8 +1723,7 @@ begin
   begin
     FKorrigiertItem := Value;
     Rigg.Korrigiert := Value;
-    Rigg.Schnittkraefte;
-    UpdateRigg;
+    UpdateGetriebe;
   end;
 end;
 
@@ -2065,17 +2023,19 @@ begin
     DrawChart;
 
     if OutputForm.OutputPages.ActivePage = OutputForm.ChartSheet then
-      if Screen.ActiveForm = ConsoleForm then
-        ConsoleForm.ActiveControl := OutputForm.YComboBox
-      else if Screen.ActiveForm = OutputForm then
+      if Screen.ActiveForm = OutputForm then
         OutputForm.ActiveControl := OutputForm.YComboBox
+      else if Screen.ActiveForm = ConsoleForm then
+        ConsoleForm.ActiveControl := OutputForm.YComboBox
       else
       begin
-//        MessageBeep(MB_ICONASTERISK);
+{$ifdef debug}
+        MessageBeep(MB_ICONASTERISK);
+{$endif}
       end;
 
   finally
-    { Getriebe wiederherstellen }
+    { restore Model (Getriebe) }
     Rigg.ProofRequired := True;
     Rigg.Glieder := InputRec;
     UpdateGetriebe;
@@ -2154,7 +2114,9 @@ begin
     if i = -1 then
     begin
       i := YComboSavedItemIndex;
-      // MessageBeep(MB_ICONASTERISK); { debugging }
+{$ifdef debug}
+      MessageBeep(MB_ICONASTERISK);
+{$endif}
     end;
     f := af[i];
     case SBName of
@@ -2366,7 +2328,9 @@ begin
   if i = -1 then
   begin
     i := YComboSavedItemIndex;
-    // MessageBeep(MB_ICONQUESTION); { debugging }
+{$ifdef debug}
+    MessageBeep(MB_ICONQUESTION);
+{$endif}
   end;
   ChartPunktY := bf[i];
   { Farbe des Punktes }
@@ -2467,7 +2431,8 @@ end;
 procedure TRiggModul.YComboBoxChange(ItemIndex: Integer);
 begin
   (*
-  if YComboBox.ItemIndex <> YComboBox2.ItemIndex then begin
+  if YComboBox.ItemIndex <> YComboBox2.ItemIndex then
+  begin
     if Sender = YComboBox then YComboBox2.ItemIndex := YComboBox.ItemIndex;
     if Sender = YComboBox2 then YComboBox.ItemIndex := YComboBox2.ItemIndex;
     if (YComboBox.ItemIndex > -1) and (YComboBox.ItemIndex < ANr) then
@@ -2542,7 +2507,7 @@ begin
     1: { Controller }
       begin
         TrimmRec := Rigg.Glieder;
-        { ControllerParameter }
+        { Controller Parameter }
         SalingGraph.ControllerTyp := Rigg.ControllerTyp;
         SalingGraph.ControllerPos := TrimmRec.Controller;
         SalingGraph.ParamXE := Round(Rigg.MastPositionE);
@@ -2552,7 +2517,7 @@ begin
     3: { Saling }
       begin
         TrimmRec := Rigg.Glieder;
-        { SalingParameter }
+        { Saling Parameter }
         SalingGraph.SalingA := TrimmRec.SalingA;
         SalingGraph.SalingH := TrimmRec.SalingH;
         SalingGraph.SalingL := TrimmRec.SalingL;
@@ -2794,7 +2759,6 @@ begin
     sbPuffer := InputRec;
     Rigg.Glieder := InputRec;
     UpdateGetriebe;
-    AlreadyUpdatedGetriebeFlag := True;
   end;
 end;
 
@@ -2805,11 +2769,69 @@ end;
 
 procedure TRiggModul.DoResetForTrimmData;
 begin
-  AlreadyUpdatedGetriebeFlag := True;
   SalingTyp := stFest;
   ControllerTyp := ctOhne;
   CalcTyp := ctQuerKraftBiegung;
-  AlreadyUpdatedGetriebeFlag := False;
+end;
+
+procedure TRiggModul.UpdateGetriebe;
+begin
+  Main.UpdateGetriebe;
+
+//  Rigg.UpdateGetriebe;
+//  if NeedPaint then
+//    DoGraphics;
+//  NeedPaint := True;
+//  if (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK) then
+//    UpdateRigg;
+end;
+
+//procedure TRiggModul.UpdateRigg;
+//begin
+//  Rigg.UpdateRigg;
+//
+//  if Rigg.RiggOK then
+//  begin
+//    FGrauZeichnen := True;
+//    LEDShape := True;
+//  end
+//  else
+//  begin
+//    FGrauZeichnen := False;
+//    LEDShape := False;
+//  end;
+//
+//  DoOnUpdateRigg;
+//end;
+
+procedure TRiggModul.DoOnUpdateRigg;
+begin
+  if Rigg.GetriebeOK then
+  begin
+    ViewModelM.StatusPanelText1 := Rigg.RiggStatusText;
+    ViewModelM.UpdateView;
+  end;
+
+  if OutputForm.Visible then
+  begin
+    if OutputForm.OutputPages.ActivePage = OutputForm.ChartSheet then
+      UpdateRiggPunkt; { GetriebePunkte oben schon aktualisiert }
+    AusgabeText; { update text before drawing }
+    AusgabeKommentar;
+    DrawPaintBoxM;
+    rLItemClick(ReportItem);
+  end;
+end;
+
+procedure TRiggModul.SetControllerTyp(Value: TControllerTyp);
+begin
+  if FControllerTyp <> Value then
+  begin
+    FControllerTyp := Value;
+    Rigg.ControllerTyp := Value;
+  end;
+  GetriebeGraph.ControllerTyp := Value;
+  SalingGraph.ControllerTyp := Value;
 end;
 
 end.

@@ -28,6 +28,7 @@ uses
   RggRota,
   RiggVar.FB.ActionConst,
   RiggVar.RG.Def,
+  RiggVar.RG.Graph,
   RiggVar.RG.Report,
   Vcl.Graphics,
   Vcl.Controls,
@@ -363,6 +364,7 @@ type
     property ReportLabelCaption: string read FReportLabelCaption write SetReportLabelCaption;
   private
     RotaForm: TRotaForm;
+    StrokeRigg: IStrokeRigg;
   end;
 
 var
@@ -426,7 +428,7 @@ begin
     Height := Round(768 * FScale);
   end;
 
-  Margin := Round(2 * FScale);
+  Margin := Round(5 * FScale);
   Raster := Round(MainVar.Raster * FScale);
   MainVar.Scale := FScale;
   MainVar.ScaledRaster := Raster;
@@ -444,7 +446,7 @@ begin
   OutputForm := TOutputForm.Create(Application);
   GrafikForm := TGrafikForm.Create(Application);
 
-  RiggModul := TRiggModul.Create(Self);
+  RiggModul := TRiggModul.Create;
   RiggModul.RG19A := False;
   RiggModul.ViewModelM := TViewModelMainB.Create;
   RiggModul.Init;
@@ -453,7 +455,7 @@ begin
 
   Main := TMain.Create(RiggModul.Rigg);
   Main.Logger.Verbose := True;
-
+  Main.RiggModul := RiggModul;
 
   Caption := 'Rigg';
   StatusBar.Panels[0].Text := '';
@@ -464,6 +466,7 @@ begin
   OnCloseQuery := FormCloseQuery;
 
   RotaForm := TRotaForm.Create;
+  StrokeRigg := RotaForm;
   RotaForm.PaintBox3D := PaintboxR;
   RotaForm.Init;
   PaintboxR := RotaForm.PaintBox3D;
@@ -485,8 +488,6 @@ end;
 procedure TFormRG19B.FormDestroy(Sender: TObject);
 begin
   ReportManager.Free;
-
-  RotaForm.Free;
 
   Main.Free;
   Main := nil;
@@ -816,7 +817,7 @@ end;
 
 procedure TFormRG19B.UpdateBtnClick(Sender: TObject);
 begin
-  RiggModul.UpdateBtnClick;
+  Main.Rigg.UpdateGetriebe;
 end;
 
 procedure TFormRG19B.BiegeNeigeItemClick(Sender: TObject);

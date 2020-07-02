@@ -269,7 +269,7 @@ begin
 {$ifdef Debug}
    ReportMemoryLeaksOnShutdown := True;
 {$endif}
-//  FormatSettings.DecimalSeparator := '.';
+  FormatSettings.DecimalSeparator := '.';
 
   FScale := 1.0;
 {$ifdef MSWindows}
@@ -301,7 +301,7 @@ begin
   OutputForm := TOutputForm.Create(Application);
   GrafikForm := TGrafikForm.Create(Application);
 
-  RiggModul := TRiggModul.Create(Self);
+  RiggModul := TRiggModul.Create;
   RiggModul.RG19A := True;
   RiggModul.ViewModelM := TViewModelMainA.Create;
   RiggModul.Init;
@@ -310,6 +310,8 @@ begin
 
   Main := TMain.Create(RiggModul.Rigg);
   Main.Logger.Verbose := True;
+  Main.RiggModul := RiggModul;
+  Main.StrokeRigg := TDummyStrokeRigg.Create(RiggModul.Rigg);
 
   Screen.OnActiveFormChange := UpdateMenuItems;
 
@@ -336,6 +338,9 @@ procedure TFormRG19A.FormDestroy(Sender: TObject);
 begin
   Main.Free;
   Main := nil;
+
+//  RiggModul.Free;
+//  RiggModul := nil;
 end;
 
 procedure TFormRG19A.SalingTypChanged(Sender: TObject);
@@ -661,7 +666,7 @@ end;
 
 procedure TFormRG19A.UpdateBtnClick(Sender: TObject);
 begin
-  RiggModul.UpdateBtnClick;
+  Main.Rigg.UpdateGetriebe;
 end;
 
 procedure TFormRG19A.BiegeNeigeItemClick(Sender: TObject);

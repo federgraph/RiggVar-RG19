@@ -28,6 +28,7 @@ uses
   RggRota,
   RiggVar.FB.ActionConst,
   RiggVar.RG.Def,
+  RiggVar.RG.Graph,
   RiggVar.RG.Report,
   Vcl.Graphics,
   Vcl.Controls,
@@ -350,6 +351,7 @@ type
     property ReportLabelCaption: string read FReportLabelCaption write SetReportLabelCaption;
   private
     RotaForm: TRotaForm;
+    StrokeRigg: IStrokeRigg;
   end;
 
 var
@@ -418,7 +420,7 @@ begin
   MainVar.Scale := FScale;
   MainVar.ScaledRaster := Raster;
   
-FormCreate1;
+  FormCreate1;
   FormCreate2;
   Main.IsUp := True;
   RiggModul.ViewModelM.IsUp := True;
@@ -431,7 +433,7 @@ begin
   OutputForm := TOutputForm.Create(Application);
   GrafikForm := TGrafikForm.Create(Application);
 
-  RiggModul := TRiggModul.Create(Self);
+  RiggModul := TRiggModul.Create;
   RiggModul.RG19A := False;
   RiggModul.ViewModelM := TViewModelMainC.Create;
   RiggModul.Init;
@@ -442,6 +444,7 @@ begin
 
   Main := TMain.Create(RiggModul.Rigg);
   Main.Logger.Verbose := True;
+  Main.RiggModul := RiggModul;
 
   Main.InitLogo; // sets WantLogoData to true
   Main.Init420; // sets WantLogo to false
@@ -456,6 +459,7 @@ begin
   OnCloseQuery := FormCloseQuery;
 
   RotaForm := TRotaForm.Create;
+  StrokeRigg := RotaForm;
   Main.StrokeRigg := RotaForm;
   RotaForm.PaintBox3D := PaintboxR;
   RotaForm.UseDisplayList := False;
@@ -475,8 +479,6 @@ end;
 procedure TFormMain.FormDestroy(Sender: TObject);
 begin
   ReportManager.Free;
-
-  RotaForm.Free;
 
   Main.Free;
   Main := nil;
@@ -806,7 +808,7 @@ end;
 
 procedure TFormMain.UpdateBtnClick(Sender: TObject);
 begin
-  RiggModul.UpdateBtnClick;
+  Main.Rigg.UpdateGetriebe;
 end;
 
 procedure TFormMain.BiegeNeigeItemClick(Sender: TObject);
@@ -1371,9 +1373,9 @@ begin
   sb.Caption := 'Hull';
   sb.Hint := 'Hull';
   sb.AllowAllUp := True;
-  sb.Down := Main.StrokeRigg.RumpfItemChecked;
+  sb.Down := RotaForm.RumpfItemChecked;
   sb.GroupIndex := 12;
-  sb.OnClick :=Main.StrokeRigg.RumpfBtnClick;
+  sb.OnClick := RotaForm.RumpfBtnClick;
 
   sb := AddSpeedBtn('BuntBtn', 0);
   BuntBtn := sb;

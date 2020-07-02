@@ -176,8 +176,7 @@ implementation
 {$R *.DFM}
 
 uses
-  RiggVar.RG.Def,
-  RggModul;
+  RiggVar.RG.Def;
 
 procedure TOptionForm.GetKeyList(Source, Dest: TStringList);
 var
@@ -204,8 +203,6 @@ begin
 
   TrimmTabGraph := TTrimmTabGraph.Create;
   TrimmTabGraph.Image := Image;
-
-  Init(RiggModul.Rigg);
 end;
 
 procedure TOptionForm.Init(ARigg: TRigg);
@@ -675,7 +672,7 @@ begin
   FillRiggLists;
   LoadRiggCombos;
   RumpfSpinEdit.Position := StrToIntDef(RumpfGrid.Cells[FRumpfCell.x,FRumpfCell.y], 0);
-  RumpfEdit.Text := Format('%4d mm',[RumpfSpinEdit.Position]);
+  RumpfEdit.Text := Format('%4d mm', [RumpfSpinEdit.Position]);
 end;
 
 procedure TOptionForm.RumpfGridSelectCell(Sender: TObject; Col, Row: Integer; var CanSelect: Boolean);

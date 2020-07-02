@@ -31,12 +31,12 @@ object FormRegler: TFormRegler
     Height = 13
     Caption = 'lbSpannung'
   end
-  object lbBiegungS: TLabel
+  object lbBiegung: TLabel
     Left = 152
     Top = 64
-    Width = 52
+    Width = 46
     Height = 13
-    Caption = 'lbBiegungS'
+    Caption = 'lbBiegung'
   end
   object lbZaehler: TLabel
     Left = 16
@@ -63,7 +63,7 @@ object FormRegler: TFormRegler
     TabOrder = 1
     OnScroll = sbMastfallScroll
   end
-  object sbBiegungS: TScrollBar
+  object sbBiegung: TScrollBar
     Left = 16
     Top = 64
     Width = 121

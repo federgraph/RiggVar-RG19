@@ -1,4 +1,4 @@
-unit RiggVar.VM.FormMain;
+﻿unit RiggVar.VM.FormMain;
 
 interface
 
@@ -23,8 +23,6 @@ type
 
     WinkelEnabled: Boolean;
     WinkelDown: Boolean;
-
-//    BogenBtnDown: Boolean;
 
     BiegeNeigeItemEnabled: Boolean;
     ReglerItemEnabled: Boolean;
@@ -243,7 +241,7 @@ end;
 
 procedure TViewModelMain00.ShowConsole;
 begin
-  ConsoleItemCaption := 'Console schlie�en';
+  ConsoleItemCaption := 'Console schließen';
   ConsoleItemHint := '  Anordnung der Dialoge aufheben';
 
   InputFormItemEnabled := False;

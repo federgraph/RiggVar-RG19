@@ -636,6 +636,11 @@ begin
     faHull: result := HullVisible;
     faDemo: result := Demo;
 
+    faSofortBtn: result := SofortBerechnen;
+    faGrauBtn: result := BtnGrauDown;
+    faBlauBtn: result := BtnBlauDown;
+    faMemoryBtn: result := False;
+
     else
       result := inherited;
   end;
@@ -674,7 +679,7 @@ begin
   ML.Add('  ResizeCounter = ' + IntToStr(ResizeCounter));
   ML.Add(Format('  ClientSize = (%d, %d)', [MainVar.ClientWidth, MainVar.ClientHeight]));
   ML.Add('---');
-  ShowDataText := true;
+  //ShowDataText := true;
 end;
 
 procedure TMain1.DoCleanReport;

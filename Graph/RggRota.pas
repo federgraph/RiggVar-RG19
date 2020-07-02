@@ -171,7 +171,7 @@ type
     function SingleDraw: Boolean;
   public
     IsUp: Boolean;
-    PaintBox3D: TPaintBox; // injected and replaced
+    PaintBox3D: TPaintBox; // injected
 
     HullGraph: THullGraph0;
     RaumGraph: TRaumGraph;
@@ -235,7 +235,7 @@ end;
 
 destructor TRotaForm.Destroy;
 begin
-  Paintbox3D.Free;
+  Paintbox3D := nil;
   Bitmap.Free;
   RaumGraph.Free;
   HullGraph.Free;

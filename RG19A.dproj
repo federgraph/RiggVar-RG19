@@ -104,7 +104,7 @@
             <Form>FormRG19A</Form>
         </DCCReference>
         <DCCReference Include="Frm\FrmRegler.pas">
-            <Form>CtrlDlg</Form>
+            <Form>FormRegler</Form>
         </DCCReference>
         <DCCReference Include="Frm\FrmReport.pas">
             <Form>ReportForm</Form>
@@ -119,7 +119,7 @@
             <Form>PreviewGForm</Form>
         </DCCReference>
         <DCCReference Include="Frm\FrmReglerGraph.pas">
-            <Form>CtrlDlg1</Form>
+            <Form>FormReglerGraph</Form>
         </DCCReference>
         <DCCReference Include="Frm\FrmBiege.pas">
             <Form>BiegeUndNeigeForm</Form>
