@@ -547,12 +547,14 @@ begin
     fa420:
     begin
       Init420;
+      ParamValue[Param] := ParamValue[Param];
       FormMain.UpdateOnParamValueChanged;
     end;
 
     faLogo:
     begin
       InitLogo;
+      ParamValue[Param] := ParamValue[Param];
       FormMain.UpdateOnParamValueChanged;
     end;
 

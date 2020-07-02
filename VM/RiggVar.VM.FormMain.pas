@@ -24,8 +24,6 @@ type
     WinkelEnabled: Boolean;
     WinkelDown: Boolean;
 
-//    BogenBtnDown: Boolean;
-
     BiegeNeigeItemEnabled: Boolean;
     ReglerItemEnabled: Boolean;
     ReglerBtnEnabled: Boolean;
@@ -55,7 +53,6 @@ type
 
     InputFormItemEnabled: Boolean;
     OutputFormItemEnabled: Boolean;
-    GrafikFormItemEnabled: Boolean;
 
     ConsoleItemCaption: string;
     ConsoleItemHint: string;
@@ -94,7 +91,8 @@ implementation
 
 uses
   FrmMain,
-  RggModul;
+  RiggVar.App.Main,
+  RiggVar.FB.ActionConst;
 
 constructor TViewModelMain00.Create;
 begin
@@ -102,11 +100,9 @@ begin
 
   InputFormItemEnabled := True;
   OutputFormItemEnabled := True;
-  GrafikFormItemEnabled := True;
 
   InputFormItemChecked := False;
   OutputFormItemChecked := False;
-  GrafikFormItemChecked := False;
 end;
 
 function TViewModelMain00.GetOpenFileName(dn, fn: string): string;
@@ -257,7 +253,6 @@ begin
 
   InputFormItemEnabled := False;
   OutputFormItemEnabled := False;
-  GrafikFormItemEnabled := False;
 
   InputFormItemChecked := True;
   OutputFormItemChecked := True;
@@ -266,16 +261,6 @@ begin
   UpdateView;
 end;
 
-//procedure TViewModelMain00.UpdateView;
-//begin
-//  if RiggModul <> nil then
-//  begin
-//    ControllerEnabled := RiggModul.ControllerEnabled;
-//    ControllerDown := RiggModul.ControllerBtnDown;
-//    WinkelDown := RiggModul.WinkelBtnDown;
-//  end;
-//end;
-
 procedure TViewModelMain00.HideConsole;
 begin
   ConsoleItemCaption := 'Console ...';
@@ -283,11 +268,9 @@ begin
 
   InputFormItemEnabled := True;
   OutputFormItemEnabled := True;
-  GrafikFormItemEnabled := True;
 
   InputFormItemChecked := False;
   OutputFormItemChecked := False;
-  GrafikFormItemChecked := False;
 
   UpdateView;
 end;
@@ -337,7 +320,7 @@ begin
 
 //  FormMain.LEDShape.Brush.Color := LEDColor;
   FormMain.Statusbar.Panels[1].Text := StatusPanelText1;
-  FormMain.Caption := Caption;
+//  FormMain.Caption := Caption;
 
   FormMain.FestItem.Checked := FestItemChecked;
   FormMain.DrehbarItem.Checked := DrehbarItemChecked;
@@ -345,16 +328,10 @@ begin
   FormMain.OSDlgItem.Checked := OSDlgItemChecked;
 
   FormMain.WinkelItem.Checked := WinkelDown;
-//  FormMain.WinkelBtn.Down := WinkelDown;
 
   FormMain.WinkelItem.Enabled := WinkelEnabled;
-//  FormMain.WinkelBtn.Enabled := WinkelEnabled;
-
-//  FormMain.BogenBtn.Down := BogenBtnDown;
-
   FormMain.BiegeNeigeItem.Enabled := BiegeNeigeItemEnabled;
   FormMain.ReglerItem.Enabled := ReglerItemEnabled;
-//  FormMain.ReglerBtn.Enabled := ReglerBtnEnabled;
 
   FormMain.QuerKraftItem.Enabled := QuerKraftItemEnabled;
   FormMain.KnickenItem.Enabled := KnickenItemEnabled;
@@ -362,12 +339,7 @@ begin
   FormMain.KorrigiertItem.Enabled := KorrigiertItemEnabled;
 
   FormMain.ControllerItem.Enabled := ControllerEnabled;
-//  FormMain.ControllerBtn.Enabled := ControllerEnabled;
   FormMain.ControllerItem.Checked := ControllerDown;
-//  FormMain.ControllerBtn.Down := ControllerDown;
-
-  FormMain.KoppelkurveItem.Checked := KoppelKurveEnabled;
-//  FormMain.KoppelBtn.Down := KoppelKurveEnabled;
 
   FormMain.QuerKraftItem.Checked := QuerKraftItemChecked;
   FormMain.KnickenItem.Checked := KnickenItemChecked;
@@ -381,11 +353,25 @@ begin
 
   FormMain.InputFormItem.Checked := InputFormItemChecked;
   FormMain.OutputFormItem.Checked := OutputFormItemChecked;
-//  FormMain.GrafikFormItem.Checked := GrafikFormItemChecked;
 
   FormMain.InputFormItem.Enabled := InputFormItemEnabled;
   FormMain.OutputFormItem.Enabled := OutputFormItemEnabled;
-//  FormMain.GrafikFormItem.Enabled := GrafikFormItemEnabled;
+
+  FormMain.KoppelkurveItem.Enabled := KoppelKurveEnabled;
+  FormMain.KoppelkurveItem.Checked := Main.GetChecked(faKoppelBtn);
+
+  FormMain.ZweischlagItem.Checked := Main.GetChecked(faRggBogen);
+
+  FormMain.ReferenzItem.Enabled := Main.GetChecked(faMultiBtn);
+  FormMain.ReferenzItem.Checked := Main.BtnBlauDown;
+
+  FormMain.EntlastetItem.Enabled := Main.GetChecked(faMultiBtn);
+  FormMain.EntlastetItem.Checked := Main.BtnGrauDown;
+
+//  FormMain.SofortItem.Checked := Main.SofortBerechnen;
+  FormMain.SofortItem.Checked := Main.GetChecked(faSofortBtn);
+
+  FormMain.SpeedBarItem.Checked := FormMain.SpeedPanel.Visible;
 end;
 
 end.

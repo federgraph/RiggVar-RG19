@@ -38,12 +38,12 @@ object FormReglerGraph: TFormReglerGraph
     Height = 13
     Caption = 'lbSpannung'
   end
-  object lbBiegungS: TLabel
+  object lbBiegung: TLabel
     Left = 148
     Top = 64
-    Width = 52
+    Width = 46
     Height = 13
-    Caption = 'lbBiegungS'
+    Caption = 'lbBiegung'
   end
   object lbZaehler: TLabel
     Left = 242
@@ -59,6 +59,7 @@ object FormReglerGraph: TFormReglerGraph
     Height = 17
     PageSize = 0
     TabOrder = 0
+    OnScroll = sbMastfallScroll
   end
   object sbSpannung: TScrollBar
     Left = 8
@@ -67,14 +68,16 @@ object FormReglerGraph: TFormReglerGraph
     Height = 17
     PageSize = 0
     TabOrder = 1
+    OnScroll = sbMastfallScroll
   end
-  object sbBiegungS: TScrollBar
+  object sbBiegung: TScrollBar
     Left = 8
     Top = 64
     Width = 121
     Height = 17
     PageSize = 0
     TabOrder = 2
+    OnScroll = sbMastfallScroll
   end
   object ZaehlerEdit: TEdit
     Left = 240
@@ -84,7 +87,7 @@ object FormReglerGraph: TFormReglerGraph
     TabOrder = 3
     Text = 'ZaehlerEdit'
   end
-  object LoopBtn: TBitBtn
+  object LoopBtn: TButton
     Left = 136
     Top = 112
     Width = 75
@@ -93,15 +96,14 @@ object FormReglerGraph: TFormReglerGraph
     TabOrder = 4
     OnClick = LoopBtnClick
   end
-  object OK: TBitBtn
-    Left = 224
+  object OK: TButton
+    Left = 217
     Top = 112
     Width = 75
     Height = 25
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    NumGlyphs = 2
     TabOrder = 5
   end
 end

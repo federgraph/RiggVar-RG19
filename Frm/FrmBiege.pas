@@ -16,18 +16,21 @@ uses
 type
   TBiegeUndNeigeForm = class(TForm)
     sbMastfall: TScrollBar;
-    sbBiegungS: TScrollBar;
+    sbBiegung: TScrollBar;
     lbMastfall: TLabel;
-    lbBiegungS: TLabel;
+    lbBiegung: TLabel;
     BiegeBtn: TBitBtn;
     OK: TBitBtn;
-    procedure BiegeBtnClick(Sender: TObject);
-    procedure sbMastfallScroll(Sender: TObject; ScrollCode: TScrollCode;
-      var ScrollPos: Integer);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure BiegeBtnClick(Sender: TObject);
+    procedure sbMastfallScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
+    procedure InitBtnClick(Sender: TObject);
   private
     Rigg: TRigg;
     procedure SetupCtrls;
+    procedure UpdateLabels;
+    procedure UpdateWithCurrentValue;
   public
 
   end;
@@ -40,7 +43,8 @@ implementation
 {$R *.DFM}
 
 uses
-  RiggVar.App.Main;
+  RiggVar.App.Main,
+  RiggVar.RG.Def;
 
 procedure TBiegeUndNeigeForm.FormCreate(Sender: TObject);
 begin
@@ -48,16 +52,51 @@ begin
   SetupCtrls;
 end;
 
+procedure TBiegeUndNeigeForm.FormShow(Sender: TObject);
+begin
+  UpdateWithCurrentValue;
+end;
+
+procedure TBiegeUndNeigeForm.InitBtnClick(Sender: TObject);
+begin
+  UpdateWithCurrentValue;
+end;
+
+procedure TBiegeUndNeigeForm.UpdateWithCurrentValue;
+var
+  v: Integer;
+  mf: double;
+  mfv: double;
+begin
+  mf := Main.ParamValue[fpMastfallF0F];
+  mfv := Main.ParamValue[fpMastfallVorlauf];
+  v := Round(mf - mfv);
+  if (v > sbMastfall.Min) and (v < sbMastfall.Max) then
+    sbMastfall.Position := v;
+
+  v := Round(Main.ParamValue[fpBiegung]);
+  if (v > sbBiegung.Min) and (v < sbBiegung.Max) then
+    sbBiegung.Position := v;
+
+  UpdateLabels;
+end;
+
 procedure TBiegeUndNeigeForm.SetupCtrls;
 begin
   sbMastfall.SetParams(1100, 1000, 1300);
-  sbBiegungS.SetParams(40, 10, 80);
+  sbBiegung.SetParams(40, 10, 80);
   sbMastfall.SmallChange := 1;
-  sbBiegungS.SmallChange := 1;
+  sbBiegung.SmallChange := 1;
   sbMastfall.LargeChange := 10;
-  sbBiegungS.LargeChange := 10;
-  lbMastfall.Caption := Format('Mastfall = %d mm', [sbMastfall.Position]);
-  lbBiegungS.Caption := Format('Mastbiegung = %d mm', [sbBiegungS.Position]);
+  sbBiegung.LargeChange := 10;
+
+//  UpdateLabels;
+end;
+
+procedure TBiegeUndNeigeForm.UpdateLabels;
+begin
+  lbMastfall.Caption := Format('Mastfall MF = %d mm', [sbMastfall.Position]);
+  lbBiegung.Caption := Format('Biegung Bie = %d mm', [sbBiegung.Position]);
 end;
 
 procedure TBiegeUndNeigeForm.BiegeBtnClick(Sender: TObject);
@@ -67,8 +106,8 @@ begin
   Screen.Cursor := crHourGlass;
   try
     Mastfall := sbMastfall.Position;
-    Biegung := sbBiegungS.Position;
-    Rigg.BiegeUndNeigeF(Mastfall, Biegung);
+    Biegung := sbBiegung.Position;
+    Rigg.BiegeUndNeigeF1(Mastfall, Biegung);
     Rigg.SchnittKraefte;
     { Getriebe nicht neu berechnen,
       damit die Einstellwerte nicht sofort gerundet werden. }
@@ -88,8 +127,8 @@ procedure TBiegeUndNeigeForm.sbMastfallScroll(Sender: TObject;
 begin
   if Sender = sbMastfall then
     lbMastfall.Caption := Format('Mastfall = %d mm', [ScrollPos])
-  else if Sender = sbBiegungS then
-    lbBiegungS.Caption := Format('Mastbiegung = %d mm', [ScrollPos]);
+  else if Sender = sbBiegung then
+    lbBiegung.Caption := Format('Mastbiegung = %d mm', [ScrollPos]);
 end;
 
 end.

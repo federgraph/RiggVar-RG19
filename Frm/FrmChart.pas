@@ -312,7 +312,7 @@ end;
 procedure TChartForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
 {$ifdef RG19}
-  RiggModul.ViewModelMain.HideDiagramm;
+  RiggModul.ViewModelM.HideDiagramm;
   RiggModul.ChartFormActive := False;
   Action := caFree;
 {$endif}

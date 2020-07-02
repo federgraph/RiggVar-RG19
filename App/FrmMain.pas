@@ -298,10 +298,8 @@ type
     KraftGemessenItem: TMenuItem;
     N2: TMenuItem;
     KorrigiertItem: TMenuItem;
-    AutoLoadItem: TMenuItem;
 
     HelpMenu: TMenuItem;
-//    HilfeItem: TMenuItem;
     InfoItem: TMenuItem;
     LogoItem: TMenuItem;
     AboutItem: TMenuItem;
@@ -339,18 +337,17 @@ type
     procedure DifferenzItemClick(Sender: TObject);
     procedure KnickenItemClick(Sender: TObject);
     procedure KorrigiertItemClick(Sender: TObject);
-    procedure AutoLoadItemClick(Sender: TObject);
 
     { Help Menu }
     procedure InfoItemClick(Sender: TObject);
     procedure LogoItemClick(Sender: TObject);
     procedure AboutItemClick(Sender: TObject);
-  private
-//    procedure PaintBtnClick(Sender: TObject);
+  public
+    procedure SetControllerChecked(Value: Boolean);
     procedure ControllerBtnClick(Sender: TObject);
-    procedure ZweischlagBtnClick(Sender: TObject);
     procedure UpdateBtnClick(Sender: TObject);
     procedure ReglerBtnClick(Sender: TObject);
+    procedure BogenBtnClick(Sender: TObject);
   private
     FReportLabelCaption: string;
     procedure InitMenu;
@@ -561,7 +558,7 @@ begin
 
   Main.RiggModul := RiggModul;
   RiggModul.ViewModelM.IsUp := True;
-  RiggModul.UpdateUI;
+  Main.RiggModul.UpdateUI;
 
   OnCloseQuery := FormCloseQuery;
 end;
@@ -1445,6 +1442,8 @@ begin
   SpeedPanel.Visible := True;
   SpeedPanel.UpdateSpeedButtonEnabled;
   SpeedPanel.UpdateSpeedButtonDown;
+
+  Main.RiggModul.ViewModelM.UpdateView;
 end;
 
 procedure TFormMain.LayoutSpeedPanel(SP: TActionSpeedBar);
@@ -1911,11 +1910,13 @@ end;
 procedure TFormMain.GrauBtnClick(Sender: TObject);
 begin
   Main.BtnGrauDown := not Main.BtnGrauDown;
+  Main.RiggModul.UpdateUI;
 end;
 
 procedure TFormMain.BlauBtnClick(Sender: TObject);
 begin
   Main.BtnBlauDown := not Main.BtnBlauDown;
+  Main.RiggModul.UpdateUI;
 end;
 
 procedure TFormMain.MemoryBtnClick(Sender: TObject);
@@ -1934,11 +1935,14 @@ procedure TFormMain.MultiBtnClick(Sender: TObject);
 begin
   RotaForm.WantOverlayedRiggs := not RotaForm.WantOverlayedRiggs;
   Main.Draw;
+  Main.RiggModul.UpdateUI;
 end;
 
 procedure TFormMain.KoppelBtnClick(Sender: TObject);
 begin
   RotaForm.KoppelBtnClick(Sender);
+  Main.RiggModul.UpdateUI;
+  SpeedPanel.UpdateSpeedButtonDown;
 end;
 
 function TFormMain.GetChecked(fa: Integer): Boolean;
@@ -2113,15 +2117,6 @@ begin
   ControllerImage.Parent := ft;
 end;
 
-procedure TFormMain.ShowChartForm;
-begin
-  if not Assigned(ChartForm) then
-  begin
-    ChartForm := TChartForm.Create(Application);
-  end;
-  ChartForm.Show;
-end;
-
 procedure TFormMain.ShowDiagramE;
 begin
   if not Assigned(FormDiagramE) then
@@ -2158,6 +2153,15 @@ begin
   end;
 
   FormDiagramC.Visible := True;
+end;
+
+procedure TFormMain.ShowChartForm;
+begin
+  if not Assigned(ChartForm) then
+  begin
+    ChartForm := TChartForm.Create(Application);
+  end;
+  ChartForm.Show;
 end;
 
 procedure TFormMain.ShowKreisForm;
@@ -2309,7 +2313,7 @@ begin
   mi.Hint := '  Statusleiste einblenden';
   mi.OnClick := StatusBarItemClick;
 
-  { Memo }
+  { Tabellen }
 
   MemoMenu := AddP('MemoMenu');
   mi.Caption := '&Tabellen';
@@ -2427,9 +2431,9 @@ begin
   mi.Caption := 'Mast als Zweischlag zeichnen';
   mi.GroupIndex := 1;
   mi.Hint := '  Mast als Bogen oder Zweischlag zeichnen';
-  mi.OnClick := ZweischlagBtnClick;
+  mi.OnClick := BogenBtnClick;
 
-  { Optionen }
+  { Modell }
 
   OptionenMenu := AddP('OptionenMenu');
   mi.Caption := '&Modell';
@@ -2530,13 +2534,7 @@ begin
   mi.Hint := '  Anteil der Salingkraft an der Mastbiegung beachten';
   mi.OnClick := KorrigiertItemClick;
 
-  AutoLoadItem := AddI('AutoLoadItem');
-  mi.Caption := 'Datensatz automatisch laden';
-  mi.GroupIndex := 3;
-  mi.Hint := '  Datensätze aus Datenbank einlesen, wenn selektiert';
-  mi.OnClick := AutoLoadItemClick;
-
-  { Help }
+  { Hilfe }
 
   HelpMenu := AddP('HelpMenu');;
   mi.Caption := '&Hilfe';
@@ -2704,51 +2702,14 @@ begin
   end;
 
   Main.ViewPoint := ViewPoint;
-//  RiggModul.ViewPoint := ViewPoint;
 end;
 
-//procedure TFormMain.PaintBtnClick(Sender: TObject);
-//begin
-//  PaintItem.Checked := not PaintItem.Checked;
-//  PaintBtn.Down := PaintItem.Checked;
-//  RiggModul.PaintBtnDown := PaintBtn.Down;
-//end;
-
-//procedure TFormMain.BtnBlauClick(Sender: TObject);
-//begin
-//  ReferenzItem.Checked := not ReferenzItem.Checked;
-//  Main.BtnBlauDown := ReferenzItem.Checked;
-//end;
-
-//procedure TFormMain.BtnGrauClick(Sender: TObject);
-//begin
-//  EntlastetItem.Checked := not EntlastetItem.Checked;
-//  Main.BtnGrauDown := EntlastetItem.Checked;
-//end;
-
-//procedure TFormMain.SetKoppelChecked(Value: Boolean);
-//begin
-//  KoppelkurveItem.Checked := Value;
-//  KoppelBtn.Down := Value;
-//  RiggModul.KoppelBtnDown := Value;
-//end;
-
-//procedure TFormMain.SetReportLabelCaption(const Value: string);
-//begin
-//  FReportLabelCaption := Value;
-//  StatusBar.Panels[2].Text := Value;
-//end;
-
-//procedure TFormMain.KoppelBtnClick(Sender: TObject);
-//begin
-//  SetKoppelChecked(not KoppelkurveItem.Checked);
-//end;
-
-procedure TFormMain.ZweischlagBtnClick(Sender: TObject);
+procedure TFormMain.BogenBtnClick(Sender: TObject);
 begin
-  ZweischlagItem.Checked := not ZweischlagItem.Checked;
-//  ZweischlagBtn.Down := ZweischlagItem.Checked;
-//  RiggModul.ZweischlagBtnDown := ZweischlagBtn.Down;
+  StrokeRigg.Bogen := not ZweischlagItem.Checked;
+  StrokeRigg.Draw;
+  Main.RiggModul.UpdateUI;
+  SpeedPanel.UpdateSpeedButtonDown;
 end;
 
 procedure TFormMain.WinkelItemClick(Sender: TObject);
@@ -2786,19 +2747,19 @@ begin
 //  Main.Draw;
 end;
 
-//procedure TFormMain.SetControllerChecked(Value: Boolean);
-//begin
-//  ControllerItem.Checked := Value;
+procedure TFormMain.SetControllerChecked(Value: Boolean);
+begin
+  ControllerItem.Checked := Value;
 //  ControllerBtn.Down := Value;
-//  RiggModul.ControllerBtnDown := Value;
-//  RotaForm.RaumGraph.ControllerTyp := Main.Rigg.ControllerTyp;
-////  RotaForm.RaumGraph.ControllerTyp := RiggModul.ControllerTyp;
-//  RotaForm.Draw;
-//end;
+  RiggModul.ControllerBtnDown := Value;
+  RotaForm.RaumGraph.ControllerTyp := Main.Rigg.ControllerTyp;
+//  RotaForm.RaumGraph.ControllerTyp := RiggModul.ControllerTyp;
+  RotaForm.Draw;
+end;
 
 procedure TFormMain.ControllerBtnClick(Sender: TObject);
 begin
-//  SetControllerChecked(not ControllerItem.Checked);
+  SetControllerChecked(not ControllerItem.Checked);
 end;
 
 procedure TFormMain.KnickenItemClick(Sender: TObject);
@@ -2816,7 +2777,7 @@ end;
 procedure TFormMain.KorrigiertItemClick(Sender: TObject);
 begin
   KorrigiertItem.Checked := not KorrigiertItem.Checked;
-//  RiggModul.KorrigiertItem := KorrigiertItem.Checked;
+  RiggModul.KorrigiertItem := KorrigiertItem.Checked;
 end;
 
 procedure TFormMain.LogoItemClick(Sender: TObject);
@@ -2845,25 +2806,12 @@ end;
 procedure TFormMain.ReglerBtnClick(Sender: TObject);
 begin
   RiggModul.ReglerBtnClick;
-//  SetKoppelChecked(False);
+  StrokeRigg.Bogen := False;
 end;
-
-//procedure TFormMain.MemoryBtnClick(Sender: TObject);
-//begin
-//  Main.MemoryBtnClick;
-//  RiggModul.MemoryBtnClick;
-//end;
-
-//procedure TFormMain.MemoryRecallBtnClick(Sender: TObject);
-//begin
-//  Main.MemoryRecallBtnClick;
-//  RiggModul.MemoryRecallBtnClick;
-//end;
 
 procedure TFormMain.ConfigItemClick(Sender: TObject);
 begin
   ConfigBtnClick(nil);
-//  RiggModul.OptionItemClick;
 end;
 
 procedure TFormMain.TrimmTabItemClick(Sender: TObject);
@@ -2929,18 +2877,15 @@ end;
 procedure TFormMain.SpeedBarItemClick(Sender: TObject);
 begin
   SpeedBarItem.Checked := not SpeedBarItem.Checked;
+  Main.FederText.PaintBackgroundNeeded := True;
   SpeedPanel.Visible := SpeedBarItem.Checked;
+//  SpeedPanel.Visible := not SpeedPanel.Visible;
 end;
 
 procedure TFormMain.StatusBarItemClick(Sender: TObject);
 begin
   StatusBarItem.Checked := not StatusBarItem.Checked;
   StatusBar.Visible := StatusBarItem.Checked;
-end;
-
-procedure TFormMain.AutoLoadItemClick(Sender: TObject);
-begin
-  AutoLoadItem.Checked := not AutoLoadItem.Checked;
 end;
 
 procedure TFormMain.rLItemClick(Sender: TObject);

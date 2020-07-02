@@ -53,11 +53,6 @@ type
   protected
     FBackgroundColor: TColor;
     FKorrigiertItem: Boolean;
-    FPaintBtnDown: Boolean;
-    FBtnBlauDown: Boolean;
-    FBtnGrauDown: Boolean;
-    FKoppelBtnDown: Boolean;
-    FZweischlagBtnDown: Boolean;
     FControllerBtnDown: Boolean;
     FWinkelBtnDown: Boolean;
     FDiffBtnDown: Boolean;
@@ -92,14 +87,12 @@ type
     Modified: Boolean;
 
     AutoSave: Boolean;
-    AlreadyUpdatedGetriebeFlag: Boolean;
   protected
     ShowTriangle: Boolean;
     sbPuffer: TTrimmControls;
 
     function GetControllerEnabled: Boolean;
     procedure SetKorrigiertItem(Value: Boolean);
-    procedure SetPaintBtnDown(Value: Boolean);
     procedure SetControllerBtnDown(Value: Boolean);
     procedure SetDiffBtnDown(Value: Boolean);
     procedure SetSofortBtnDown(Value: Boolean);
@@ -148,7 +141,6 @@ type
 
     { Properties }
     property KorrigiertItem: Boolean read FKorrigiertItem write SetKorrigiertItem;
-    property PaintBtnDown: Boolean read FPaintBtnDown write SetPaintBtnDown;
     property ControllerBtnDown: Boolean read FControllerBtnDown write SetControllerBtnDown;
     property WinkelBtnDown: Boolean read FWinkelBtnDown write SetWinkelBtnDown;
     property DiffBtnDown: Boolean read FDiffBtnDown write SetDiffBtnDown;
@@ -261,13 +253,8 @@ uses
 constructor TRiggModul.Create;
 begin
   inherited;
-  FBackgroundColor := clNavy; //clBtnFace;
+  FBackgroundColor := clBtnFace;
   FKorrigiertItem := True;
-  FPaintBtnDown := False;
-  FBtnBlauDown := False;
-  FBtnGrauDown := True;
-  FKoppelBtnDown := True;
-  FZweischlagBtnDown := False;
   FControllerBtnDown := True;
   FWinkelBtnDown := False;
   FDiffBtnDown := False;
@@ -522,7 +509,6 @@ begin
     sbPuffer := InputRec;
     Rigg.Glieder := InputRec;
     UpdateGetriebe;
-    AlreadyUpdatedGetriebeFlag := True;
   end;
 end;
 
@@ -889,10 +875,9 @@ begin
   CalcTyp := Rigg.CalcTyp;
   FControllerBtnDown := FControllerTyp <> ctOhne;
 
-  { 'TakeOver' }
   ViewModelM.ControllerEnabled := ControllerEnabled;
   ViewModelM.ControllerDown := ControllerBtnDown;
-//  ViewModelM.BogenBtnDown := ZweischlagBtnDown;
+
   ViewModelM.UpdateView;
 end;
 
@@ -926,14 +911,6 @@ procedure TRiggModul.Save;
 begin
   Rigg.WriteToDocFile(IniFileName);
   Modified := False;
-end;
-
-procedure TRiggModul.SetPaintBtnDown(Value: Boolean);
-begin
-  if FPaintBtnDown <> Value then
-  begin
-    FPaintBtnDown := Value;
-  end;
 end;
 
 function TRiggModul.GetControllerEnabled: Boolean;
@@ -1027,7 +1004,6 @@ begin
   if FSofortBtnDown <> Value then
   begin
     FSofortBtnDown := Value;
-    PaintBtnDown := False;
     UpdateGetriebe;
   end;
 end;
@@ -1038,7 +1014,6 @@ var
 begin
   if SalingTyp <> Value then
   begin
-    AlreadyUpdatedGetriebeFlag := False;
     case Value of
       stFest: fa := faSalingTypFest;
       stDrehbar: fa := faSalingTypDrehbar;
@@ -1056,7 +1031,6 @@ begin
   if FSalingTyp <> Value then
   begin
     FSalingTyp := Value;
-//    Rigg.SalingTyp := Value;
 
     case Value of
       stFest: InputForm.InputPages.ActivePage := InputForm.tsFest;
@@ -1110,6 +1084,9 @@ begin
   UpdateGCtrls(Rigg.Glieder);
   KurveValid := False;
   DrawPoint;
+
+  { When Modal dialog is closed, update the current param value. }
+  Main.Param := Main.Param;
 end;
 
 procedure TRiggModul.ReglerBtnClick;
@@ -1147,6 +1124,9 @@ begin
   UpdateGCtrls(Rigg.Glieder);
   KurveValid := False;
   DrawPoint;
+
+  { Update the current param value }
+  Main.Param := Main.Param;
 end;
 
 procedure TRiggModul.OhneItemClick;
@@ -1270,10 +1250,6 @@ begin
   begin
     FKorrigiertItem := Value;
     Rigg.Korrigiert := Value;
-
-//    Rigg.Schnittkraefte;
-//    UpdateRigg;
-
     UpdateGetriebe;
   end;
 end;
@@ -2071,7 +2047,6 @@ begin
     sbPuffer := InputRec;
     Rigg.Glieder := InputRec;
     UpdateGetriebe;
-    AlreadyUpdatedGetriebeFlag := True;
   end;
 end;
 
@@ -2082,11 +2057,9 @@ end;
 
 procedure TRiggModul.DoResetForTrimmData;
 begin
-  AlreadyUpdatedGetriebeFlag := True;
   SalingTyp := stFest;
   ControllerTyp := ctOhne;
   CalcTyp := ctQuerKraftBiegung;
-  AlreadyUpdatedGetriebeFlag := False;
 end;
 
 { RiggModulG }
@@ -2146,9 +2119,6 @@ end;
 
 procedure TRiggModul.UpdateBtnClick;
 begin
-//  Rigg.Schnittkraefte;
-//  UpdateRigg;
-
   UpdateGetriebe;
 end;
 

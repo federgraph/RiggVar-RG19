@@ -60,9 +60,8 @@ type
     procedure BerechneWinkel;
     procedure BerechneM;
     function Koppelkurve: TKoordLine;
-    procedure BiegeUndNeigeF(Mastfall, Biegung: double);
     procedure BiegeUndNeigeF1(Mastfall, Biegung: double);
-    procedure BiegeUndNeigeF2(Mastfall, Biegung: double);
+    procedure NeigeF(Mastfall: double);
     procedure BiegeUndNeigeC(MastfallC, Biegung: double);
     procedure BiegeUndNeigeFS(TrimmSoll: TTrimm; var SalingHStart: double);
     procedure BiegeUndNeigeDS(TrimmSoll: TTrimm; var SalingLStart: double);
@@ -448,72 +447,6 @@ procedure TGetriebeFS.KorrekturF(tempH, k1, k2: double; var k3, Beta, Gamma: dou
 begin
 end;
 
-(*
-  procedure TGetriebeFS.BiegeUndNeigeFS(TrimmSoll: TTrimm; var SalingHStart: double);
-  { var Parameter SalingHStart wird vom Regler benötigt }
-  var
-  k1, k2, k3, k4, k5, k6, k7: double;
-  tempAlpha, tempBeta, tempGamma: double;
-  tempH, tempM: double;
-  ooTemp: TRealPoint;
-  begin
-  ResetStatus;
-  Wanten3dTo2d;
-  tempH := TrimmSoll.BiegungS;
-  tempM := TrimmSoll.Mastfall;
-
-  { 1. Berechnung Länge D0F aus Durchbiegung }
-  k1 := sqrt((sqr(FrMastunten)-sqr(tempH)));
-  k2 := sqrt((sqr(FrMastoben)-sqr(tempH)));
-  tempAlpha := arctan2(tempH, k1);
-  k4 := (k1+k2)* sin(tempAlpha);
-  k6 := (k1+k2)* cos(tempAlpha);
-  tempGamma := arctan2(k4, (k6-FrMastunten));
-  k5 := (FrMastoben+FrMastEnde)* sin(tempGamma);
-  k7 := (FrMastoben+FrMastEnde)* cos(tempGamma);
-  tempBeta := arctan2(k5, (FrMastunten+k7));
-  k3 := sqrt(sqr(k5)+sqr(FrMastunten+k7)); { oder k3 := k5/sin(tempBeta) }
-  {k3 ist der Abstand D0F}
-
-  { Bessere Werte für k3 und tempBeta bestimmen }
-  KorrekturF(tempH, k1, k2, k3, tempBeta, tempGamma); { virtuelle Methode }
-
-  { 2. Berechnung Punkt F mit Mastfall}
-  with SchnittKK do begin
-  SchnittEbene := seXZ;
-    Radius1 := tempM + FiMastfallVorlauf;
-  Radius2 := k3;
-  MittelPunkt1 := rP[ooF0];
-  MittelPunkt2 := rP[ooD0];
-  rP[ooF] := SchnittPunkt1;
-  end;
-
-  { 3. psi, D, und C ermitteln}
-  FrPsi := arctan2((rP[ooD0,x]-rP[ooF,x]), (rP[ooF,z]-rP[ooD0,z]));
-  FrPsi := FrAlpha + FrPsi + pi/2 - tempBeta;
-
-  rP[ooD,x] := rP[ooD0,x] + FrMastunten*cos(FrPsi - FrAlpha);
-  rP[ooD,y] := 0;
-  rP[ooD,z] := rP[ooD0,z] + FrMastunten*sin(FrPsi - FrAlpha);
-
-  rP[ooC,x] := rP[ooD,x] + FrMastoben*cos(FrPsi - FrAlpha + tempGamma);
-  rP[ooC,y] := 0;
-  rP[ooC,z] := rP[ooD,z] + FrMastoben*sin(FrPsi - FrAlpha + tempGamma);
-
-  FrVorstag :=Abstand(rP[ooC0],rP[ooC]);
-
-  { 4. Startwert für FrSalingH ermitteln}
-  ooTemp := Evektor(rP[ooC],rP[ooP0]);
-  ooTemp := skalarmult(ooTemp, FrWoben2d);
-  rP[ooP] := vadd(rP[ooC],ooTemp);
-  SalingHStart:= Abstand(rP[ooP],rP[ooD]);
-  FrSalingH := Trunc(SalingHStart)+1; {FiSalingH garantiert größer}
-
-  { 5. restliche Aktualisierungen in MakeSalingHBiggerFS vornehmen! }
-  MakeSalingHBiggerFS(SalingHStart);
-end;
-*)
-
 procedure TGetriebeFS.MakeSalingHBiggerFS(SalingHplus: double);
 { FrSalingH größer machen, FrWoben2d, Neigung und Biegung beibehalten;
   FrWunten2d neu berechnen }
@@ -719,71 +652,6 @@ begin
   FrWinkel := FrPhi - FrAlpha;
   Rest;
 end;
-
-(*
-procedure TGetriebeFS.BiegeUndNeigeDS(TrimmSoll:TTrimm; var SalingLStart:double);
-  { var Parameter SalingLStart wird vom Regler benötigt }
-var
-  k1, k2, k3, k4, k5, k6, k7: double;
-  tempAlpha, tempBeta, tempGamma: double;
-  tempH, tempM: double;
-  ooTemp: TRealPoint;
-begin
-  ResetStatus;
-  tempH := TrimmSoll.BiegungS;
-  tempM := TrimmSoll.Mastfall;
-
-  { 1. Berechnung Länge D0F aus Durchbiegung }
-  k1 := sqrt((sqr(FrMastunten)-sqr(tempH)));
-  k2 := sqrt((sqr(FrMastoben)-sqr(tempH)));
-  tempAlpha := arctan2(tempH, k1);
-  k4 := (k1+k2)* sin(tempAlpha);
-  k6 := (k1+k2)* cos(tempAlpha);
-  tempGamma := arctan2(k4, (k6-FrMastunten));
-  k5 := (FrMastoben+FrMastEnde)* sin(tempGamma);
-  k7 := (FrMastoben+FrMastEnde)* cos(tempGamma);
-  tempBeta := arctan2(k5,(FrMastunten+k7));
-  k3 := sqrt(sqr(k5)+sqr(FrMastunten+k7)); {oder k3 := k5/sin(tempBeta)}
-  {k3 ist der Abstand D0F}
-
-  { Bessere Werte für k3 und tempBeta bestimmen }
-  KorrekturF(tempH, k1, k2, k3, tempBeta, tempGamma); { virtuelle Methode }
-
-  { 2. Berechnung Punkt F mit Mastfall}
-  with SchnittKK do begin
-  SchnittEbene := seXZ;
-    Radius1 := tempM + FiMastfallVorlauf;
-  Radius2 := k3;
-  MittelPunkt1 := rP[ooF0];
-  MittelPunkt2 := rP[ooD0];
-  rP[ooF] := SchnittPunkt1;
-  end;
-
-  { 3. psi, D, und C ermitteln}
-  FrPsi := arctan2((rP[ooD0,x]-rP[ooF,x]), (rP[ooF,z]-rP[ooD0,z]));
-  FrPsi := FrPsi + pi/2 + FrAlpha - tempBeta;
-
-  rP[ooD,x] := rP[ooD0,x] + FrMastunten*cos(FrPsi - FrAlpha);
-  rP[ooD,y] := 0;
-  rP[ooD,z] := rP[ooD0,z] + FrMastunten*sin(FrPsi - FrAlpha);
-
-  rP[ooC,x] := rP[ooD,x] + FrMastoben*cos(FrPsi - FrAlpha + tempGamma);
-  rP[ooC,y] := 0;
-  rP[ooC,z] := rP[ooD,z] + FrMastoben*sin(FrPsi - FrAlpha + tempGamma);
-
-  FrVorstag :=Abstand(rP[ooC0],rP[ooC]);
-
-  { 4. Startwert für SalingL ermitteln}
-  ooTemp := Evektor(rP[ooC],rP[ooA0]);
-  ooTemp := skalarmult(ooTemp, FrWoben3d);
-  rP[ooA] := vadd(rP[ooC],ooTemp);
-  SalingLStart:= Abstand(rP[ooA],rP[ooD]);
-  FrSalingL := Trunc(SalingLStart)+1; {FiSalingL dann garantiert größer!}
-
-  { 5. restliche Aktualisierungen in MakeSalingLBiggerDS vornehmen }
-  MakeSalingLBiggerDS(SalingLStart);
-end;
-*)
 
 procedure TGetriebeFS.MakeSalingLBiggerDS(SalingLplus: double);
 var
@@ -1151,12 +1019,7 @@ begin
   end;
 end;
 
-procedure TGetriebeFS.BiegeUndNeigeF(Mastfall, Biegung: double);
-begin
-  BiegeUndNeigeF2(Mastfall, Biegung);
-end;
-
-procedure TGetriebeFS.BiegeUndNeigeF2(Mastfall, Biegung: double);
+procedure TGetriebeFS.NeigeF(Mastfall: double);
 var
   D0: TRealPoint;
 
@@ -1185,7 +1048,6 @@ begin
   D0 := rp[ooD0];
   D0F := Abstand(rp[ooD0], rp[ooF]);
   D0C := Abstand(rp[ooD0], rp[ooC]);
-//D0D := Abstand(rp[ooD0], rp[ooD]);
   D0D := FrMastUnten;
 
   { compute new Point F }
@@ -1226,6 +1088,7 @@ begin
   { continue as in original BiegeUndNeigeF }
 
   FrVorstag := Abstand(rP[ooC0], rP[ooC]);
+
   case SalingTyp of
     stFest:
       MakeSalingHBiggerFS(FrSalingH);
@@ -1256,7 +1119,7 @@ begin
   k7 := (FrMastoben + FrMastEnde) * cos(tempGamma);
   tempBeta := arctan2(k5, (FrMastunten + k7));
   k3 := sqrt(sqr(k5) + sqr(FrMastunten + k7));
-  { oder k3 := k5/sin(tempBeta) }
+  { oder k3 := k5 / sin(tempBeta) }
   { k3 = Abstand D0F }
 
   { Bessere Werte für k3 und tempBeta bestimmen }
@@ -1303,7 +1166,7 @@ procedure TGetriebeFS.BiegeUndNeigeFS(TrimmSoll: TTrimm; var SalingHStart: doubl
 var
   ooTemp: TRealPoint;
 begin
-  BiegeUndNeigeF(TrimmSoll.Mastfall, TrimmSoll.BiegungS);
+  BiegeUndNeigeF1(TrimmSoll.Mastfall, TrimmSoll.BiegungS);
 
   { 4. Startwert für FrSalingH ermitteln }
   ooTemp := EVektor(rP[ooC], rP[ooP0]);
@@ -1321,7 +1184,7 @@ procedure TGetriebeFS.BiegeUndNeigeDS(TrimmSoll: TTrimm; var SalingLStart: doubl
 var
   ooTemp: TRealPoint;
 begin
-  BiegeUndNeigeF(TrimmSoll.Mastfall, TrimmSoll.BiegungS);
+  BiegeUndNeigeF1(TrimmSoll.Mastfall, TrimmSoll.BiegungS);
 
   { Startwert für SalingL ermitteln }
   ooTemp := EVektor(rP[ooC], rP[ooA0]);

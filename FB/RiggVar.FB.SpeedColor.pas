@@ -152,8 +152,8 @@ begin
   claSegment := TRggColors.Crimson;
   claBogen := TRggColors.Dodgerblue;
   claImage := TRggColors.Goldenrod;
-  claMemory := TRggColors.Beige;
-  claRigg := TRggColors.Aquamarine;
+  claMemory := TRggColors.White;
+  claRigg := TRggColors.Slateblue;
   claView := TRggColors.Beige;
   claZoom := TRggColors.Teal;
 

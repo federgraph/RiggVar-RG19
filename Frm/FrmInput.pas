@@ -111,7 +111,6 @@ implementation
 {$R *.DFM}
 
 uses
-  RiggVar.App.Main,
   RiggVar.RG.Def,
   RggModul,
   RggTypes;

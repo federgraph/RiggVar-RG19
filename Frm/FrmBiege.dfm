@@ -4,7 +4,7 @@ object BiegeUndNeigeForm: TBiegeUndNeigeForm
   BorderStyle = bsDialog
   Caption = 'Mast Biegen und Neigen'
   ClientHeight = 107
-  ClientWidth = 324
+  ClientWidth = 410
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,6 +15,7 @@ object BiegeUndNeigeForm: TBiegeUndNeigeForm
   Position = poScreenCenter
   Scaled = False
   OnCreate = FormCreate
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object lbMastfall: TLabel
@@ -24,12 +25,12 @@ object BiegeUndNeigeForm: TBiegeUndNeigeForm
     Height = 13
     Caption = 'lbMastfall'
   end
-  object lbBiegungS: TLabel
+  object lbBiegung: TLabel
     Left = 152
     Top = 40
-    Width = 52
+    Width = 46
     Height = 13
-    Caption = 'lbBiegungS'
+    Caption = 'lbBiegung'
   end
   object sbMastfall: TScrollBar
     Left = 16
@@ -40,7 +41,7 @@ object BiegeUndNeigeForm: TBiegeUndNeigeForm
     TabOrder = 0
     OnScroll = sbMastfallScroll
   end
-  object sbBiegungS: TScrollBar
+  object sbBiegung: TScrollBar
     Left = 16
     Top = 40
     Width = 121
@@ -51,7 +52,7 @@ object BiegeUndNeigeForm: TBiegeUndNeigeForm
   end
   object BiegeBtn: TBitBtn
     Left = 56
-    Top = 72
+    Top = 74
     Width = 153
     Height = 25
     Caption = 'Biegen und Neigen'
@@ -59,8 +60,8 @@ object BiegeUndNeigeForm: TBiegeUndNeigeForm
     OnClick = BiegeBtnClick
   end
   object OK: TBitBtn
-    Left = 224
-    Top = 72
+    Left = 215
+    Top = 74
     Width = 81
     Height = 25
     Kind = bkOK

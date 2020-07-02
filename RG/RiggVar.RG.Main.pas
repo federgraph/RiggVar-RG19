@@ -58,7 +58,7 @@ type
     Logger: TLogger;
     constructor Create;
     destructor Destroy; override;
-    procedure UpdateText(ClearFlash: Boolean = False); virtual; abstract;
+    procedure UpdateText(ClearFlash: Boolean = False); virtual;
     property FLText: string read GetFLText;
   end;
 
@@ -311,7 +311,6 @@ begin
     Exit;
 
   RggTrackbar.OnChange := TrackBarChange;
-//  StrokeRigg := TStrokeRigg.Create(Rigg);
 
   InitFactArray;
 
@@ -616,7 +615,7 @@ begin
     end;
 
     fpMastfallF0F:
-      Rigg.BiegeUndNeigeF(Value - FactArray.MastfallVorlauf.Ist, FactArray.Biegung.Ist);
+      Rigg.NeigeF(Value - FactArray.MastfallVorlauf.Ist);
 
     fpMastfallF0C:
       Rigg.BiegeUndNeigeC(Value, FactArray.Biegung.Ist);
@@ -1932,6 +1931,11 @@ procedure TRggText.CopyText;
 begin
   Clipboard.AsText := FL.Text;
   Logger.Info('in CopyText ( check clipboard )');
+end;
+
+procedure TRggText.UpdateText(ClearFlash: Boolean);
+begin
+
 end;
 
 end.

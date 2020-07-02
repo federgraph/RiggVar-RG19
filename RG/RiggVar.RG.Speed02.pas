@@ -104,7 +104,7 @@ begin
     faRggZoomIn: FormMain.RotaForm.ZoomInBtnClick(Sender);
     faRggZoomOut: FormMain.RotaForm.ZoomOutBtnClick(Sender);
 
-    faRggBogen: FormMain.RotaForm.BogenBtnClick(Sender);
+    faRggBogen: FormMain.BogenBtnClick(Sender);
 
     faToggleChartGraph: FormMain.ChartImageBtnClick(Sender);
     faToggleSalingGraph: FormMain.SalingImageBtnClick(Sender);

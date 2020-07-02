@@ -672,7 +672,7 @@ begin
   FillRiggLists;
   LoadRiggCombos;
   RumpfSpinEdit.Position := StrToIntDef(RumpfGrid.Cells[FRumpfCell.x,FRumpfCell.y], 0);
-  RumpfEdit.Text := Format('%4d mm',[RumpfSpinEdit.Position]);
+  RumpfEdit.Text := Format('%4d mm', [RumpfSpinEdit.Position]);
 end;
 
 procedure TOptionForm.RumpfGridSelectCell(Sender: TObject; Col, Row: Integer; var CanSelect: Boolean);
