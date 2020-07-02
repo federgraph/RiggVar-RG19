@@ -19,7 +19,7 @@
 interface
 
 uses
-  Classes;
+  System.Classes;
 
 type
   TFederBinding = class

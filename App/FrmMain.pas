@@ -30,22 +30,23 @@ uses
   RiggVar.RG.Graph,
   RggTypes,
   RggUnit4,
-  SysUtils,
-  Classes,
-  Types,
-  UITypes,
+  System.SysUtils,
+  System.Classes,
+  System.Types,
+  System.UITypes,
   RggDisplayTypes,
   RggDisplay,
+  RggStrings,
   RggRaumGraph,
   RggRota,
   RggCtrls,
   RggChartGraph,
-  Controls,
-  Forms,
-  StdCtrls,
-  ExtCtrls,
-  Dialogs,
-  Graphics;
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.StdCtrls,
+  Vcl.ExtCtrls,
+  Vcl.Dialogs,
+  Vcl.Graphics;
 
 type
 
@@ -414,10 +415,6 @@ begin
 
   Main.Free;
   Main := nil;
-
-{ RotaForm is managed via StrokeRigg interface reference }
-// RotaForm.Free;
-// StrokeRigg := nil;
 
   SalingGraph.Free;
   ControllerGraph.Free;
