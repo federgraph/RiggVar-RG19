@@ -547,12 +547,14 @@ begin
     fa420:
     begin
       Init420;
+      ParamValue[Param] := ParamValue[Param];
       FormMain.UpdateOnParamValueChanged;
     end;
 
     faLogo:
     begin
       InitLogo;
+      ParamValue[Param] := ParamValue[Param];
       FormMain.UpdateOnParamValueChanged;
     end;
 
@@ -627,7 +629,8 @@ begin
 
     faSalingTypFest: result := Rigg.SalingTyp = stFest;
     faSalingTypDrehbar: result := Rigg.SalingTyp = stDrehbar;
-    faSalingTypOhne: result := Rigg.SalingTyp = stOhne;
+    faSalingTypOhne: result := Rigg.SalingTyp = stOhneBiegt;
+    faSalingTypOhneStarr: result := Rigg.SalingTyp = stOhneStarr;
 
     faTrimm0: result := Trimm = 0;
     faTrimm1: result := Trimm = 1;

@@ -119,6 +119,8 @@ type
     constructor Create;
     destructor Destroy; override;
 
+    procedure InitSalingTyp(fa: Integer); virtual; abstract;
+
     procedure LoadTrimm(fd: TRggData);
     procedure SaveTrimm(fd: TRggData);
 
@@ -221,7 +223,7 @@ type
 
     procedure Init420;
     procedure InitLogo;
-    procedure InitSalingTyp(fa: Integer);
+    procedure InitSalingTyp(fa: Integer); override;
 
     procedure MemoryBtnClick;
     procedure MemoryRecallBtnClick;
@@ -1197,10 +1199,10 @@ end;
 procedure TRggMain.InitSalingTyp(fa: Integer);
 begin
   case fa of
-    faSalingTypOhne: Rigg.SalingTyp := stOhne;
-    faSalingTypDrehbar: Rigg.SalingTyp := stDrehbar;
     faSalingTypFest: Rigg.SalingTyp := stFest;
-    faSalingTypOhneStarr: Rigg.SalingTyp := stOhne_2;
+    faSalingTypDrehbar: Rigg.SalingTyp := stDrehbar;
+    faSalingTypOhne: Rigg.SalingTyp := stOhneBiegt;
+    faSalingTypOhneStarr: Rigg.SalingTyp := stOhneStarr;
   end;
   if StrokeRigg <> nil then
     StrokeRigg.SalingTyp := Rigg.SalingTyp;
@@ -1738,6 +1740,7 @@ begin
   Logger.Info('SetTrimm: ' + IntToStr(Value));
   FTrimm := Value;
   LoadTrimm(CurrentTrimm);
+  InitSalingTyp(faSalingTypFest);
   FormMain.UpdateOnParamValueChanged;
 end;
 

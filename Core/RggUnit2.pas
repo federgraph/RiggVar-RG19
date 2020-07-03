@@ -453,7 +453,7 @@ begin
         FA := F2 * (lc - ld) / lc;
         FB := F2 * ld / lc;
     end;
-    stOhne_2:
+    stOhneBiegt:
       begin
         { Gleichgewicht am Punkt ooC }
       {         KM       KU1       KU2       KB        FU1  FU2  FB  }
@@ -612,7 +612,7 @@ begin
   { Salingkraft ermitteln }
   SalingKraft := FKoppelFaktor * MastDruck;
 
-  if SalingTyp <> stOhne_2 then
+  if SalingTyp <> stOhneBiegt then
   begin
     F1 := -ControllerKraft;
     F2 := SalingKraft;
@@ -621,11 +621,11 @@ begin
     FB := (F1 * le + F2 * ld) / lc;
     { Wantangriffspunkt ohne Einfluß der Druckkraft im Mast }
     FC := -MastDruck;
-    { Druckkraft ist negativ. FC wird nur bei stOhne_2 verwendet,
+    { Druckkraft ist negativ. FC wird nur bei stOhneBiegt verwendet,
       die Druckkraft im Mast ergibt sich sonst über den Umweg der Salingkraft }
   end;
 
-  if SalingTyp = stOhne_2 then
+  if SalingTyp = stOhneBiegt then
   begin
     F1 := -ControllerKraft;
     F2 := 0; { Salingkraft, hier immer Null }
@@ -696,7 +696,7 @@ begin
   FU2 := 0;
   result := 0;
   case SalingTyp of
-    stOhne, stOhne_2:
+    stOhneStarr, stOhneBiegt:
       result := 0;
     stFest, stDrehbar:
       begin
@@ -807,7 +807,7 @@ begin
           CalcWante;
     end;
 
-    stOhne:
+    stOhneStarr:
       begin
       case ControllerTyp of
           ctOhne:
@@ -820,7 +820,7 @@ begin
       end;
     end;
 
-    stOhne_2:
+    stOhneBiegt:
       begin
       case ControllerTyp of
           ctOhne:
@@ -853,7 +853,7 @@ begin
 
   { Geometrie für Mastsystem }
   case SalingTyp of
-    stFest, stDrehbar, stOhne_2:
+    stFest, stDrehbar, stOhneBiegt:
     begin
       SchnittGG(rP[ooD0], rP[ooC], rP[ooP], rP[ooD], SPSaling);
       SchnittGG(rP[ooD0], rP[ooC], rP[ooE], rP[ooE0], SPController);
@@ -869,7 +869,7 @@ begin
         he := -he;
     end;
 
-    stOhne:
+    stOhneStarr:
     begin
       SchnittGG(rP[ooD0], rP[ooC], rP[ooE], rP[ooE0], SPController);
       ld := rL[16];
@@ -900,7 +900,7 @@ begin
         alpha2 := Beta + delta2;
     end;
 
-    stOhne, stOhne_2:
+    stOhneStarr, stOhneBiegt:
       begin
         Gamma := pi / 2 - arctan2((rP[ooC, x] - rP[ooD0, x]), (rP[ooC, z] - rP[ooD0, z]));
         delta1 := arctan2((rP[ooE, z] - rP[ooC0, z]), (rP[ooC0, x] - rP[ooE, x]));
@@ -950,7 +950,7 @@ begin
       FDy := FD * sin(delta2);
     end;
 
-    stOhne, stOhne_2:
+    stOhneStarr, stOhneBiegt:
       begin
       try
           FE := F1 / cos(alpha1);
