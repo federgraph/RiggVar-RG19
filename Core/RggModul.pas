@@ -220,8 +220,8 @@ type
     procedure BiegeNeigeItemClick;
     procedure ReglerBtnClick;
     procedure FestItemClick;
-    procedure OhneItemClick;
-    procedure OSDlgItemClick;
+    procedure OSBItemClick;
+    procedure OSSItemClick;
     procedure DrehbarItemClick;
     procedure ChartItemClick;
     procedure About;
@@ -1307,7 +1307,7 @@ begin
   Result := True;
   if CalcTyp = ctKraftGemessen then
     Result := False;
-  if SalingTyp = stOhne then
+  if SalingTyp = stOhneStarr then
     Result := False;
 end;
 
@@ -1407,8 +1407,8 @@ begin
     case Value of
       stFest: fa := faSalingTypFest;
       stDrehbar: fa := faSalingTypDrehbar;
-      stOhne: fa := faSalingTypOhne;
-      stOhne_2: fa := faSalingTypOhneStarr;
+      stOhneBiegt: fa := faSalingTypOhne;
+      stOhneStarr: fa := faSalingTypOhneStarr;
       else
         fa := faSalingTypFest;
     end;
@@ -1429,15 +1429,15 @@ begin
     case Value of
       stFest: InputForm.InputPages.ActivePage := InputForm.tsFest;
       stDrehbar: InputForm.InputPages.ActivePage := InputForm.tsDrehbar;
-      stOhne: InputForm.InputPages.ActivePage := InputForm.tsOhne;
-      stOhne_2: InputForm.InputPages.ActivePage := InputForm.tsOhneStarr;
+      stOhneBiegt: InputForm.InputPages.ActivePage := InputForm.tsOhne;
+      stOhneStarr: InputForm.InputPages.ActivePage := InputForm.tsOhneStarr;
     end;
 
     case Value of
       stFest: ViewModelM.FestItemClick;
       stDrehbar: ViewModelM.DrehbarItemClick;
-      stOhne: ViewModelM.OhneItemClick;
-      stOhne_2: ViewModelM.OSDlgItemClick;
+      stOhneBiegt: ViewModelM.OSBItemClick;
+      stOhneStarr: ViewModelM.OSSItemClick;
     end;
   end;
 end;
@@ -1543,14 +1543,14 @@ begin
   UpdateGetriebe;
 end;
 
-procedure TRiggModul.OhneItemClick;
+procedure TRiggModul.OSBItemClick;
 begin
   InputForm.pnOhneBK.Update;
   InputForm.pnMastOhne.Update;
 
   WinkelBtnDown := False;
 
-  SalingTyp := stOhne_2;
+  SalingTyp := stOhneBiegt;
 
   KurveValid := False;
   if InputForm.rbControllerOhne.Checked then
@@ -1564,7 +1564,7 @@ begin
   Rigg.UpdateGSB;
   SetupGCtrls;
 
-  ViewModelM.OhneItemClick;
+  ViewModelM.OSBItemClick;
   ViewModelM.ControllerEnabled := ControllerEnabled;
   ViewModelM.WinkelDown := WinkelBtnDown;
   ViewModelM.UpdateView;
@@ -1634,12 +1634,12 @@ begin
   ViewModelM.UpdateView;
 end;
 
-procedure TRiggModul.OSDlgItemClick;
+procedure TRiggModul.OSSItemClick;
 begin
   InputForm.pnOhne.Update;
 
   WinkelBtnDown := False;
-  SalingTyp := stOhne;
+  SalingTyp := stOhneStarr;
   ControllerBtnDown := False;
   KurveValid := False;
   SBName := fpVorstag;
@@ -1648,7 +1648,7 @@ begin
   Rigg.UpdateGSB;
   SetupGCtrls;
 
-  ViewModelM.OSDlgItemClick;
+  ViewModelM.OSSItemClick;
   ViewModelM.ControllerEnabled := ControllerEnabled;
   ViewModelM.UpdateView;
 end;
@@ -2613,7 +2613,7 @@ begin
           t := InputForm.sbControllerD.Tag;
           InputForm.lbD1.Caption := ls;
         end;
-        stOhne:
+        stOhneBiegt:
         begin
           InputForm.lbOhne1.Caption := ls;
         end;
@@ -2650,14 +2650,14 @@ begin
           t := InputForm.sbVorstagD.Tag;
           InputForm.lbD2.Caption := ls;
         end;
-        stOhne:
+        stOhneBiegt:
         begin
           InputRec.Vorstag := ScrollPos;
           InputForm.sbVorstagOhne.Position := ScrollPos;
           t := InputForm.sbVorstagOhne.Tag;
           InputForm.lbOhne1.Caption := ls;
         end;
-        stOhne_2:
+        stOhneStarr:
         begin
           InputForm.sbVorstagOS.Position := ScrollPos;
           t := InputForm.sbVorstagOS.Tag;
@@ -2683,7 +2683,7 @@ begin
           t := InputForm.sbWanteD.Tag;
           InputForm.lbD3.Caption := ls;
         end;
-        stOhne:
+        stOhneBiegt:
         begin
           InputForm.sbWanteOhne.Position := ScrollPos;
           t := InputForm.sbWanteOhne.Tag;

@@ -44,8 +44,8 @@ begin
   case Rigg.SalingTyp of
     stFest: rgSalingTyp.ItemIndex := 0;
     stDrehbar: rgSalingTyp.ItemIndex := 1;
-    stOhne: rgSalingTyp.ItemIndex := 2;
-    stOhne_2: rgSalingTyp.ItemIndex := 3;
+    stOhneBiegt: rgSalingTyp.ItemIndex := 2;
+    stOhneStarr: rgSalingTyp.ItemIndex := 3;
   end;
 
   case Rigg.ControllerTyp of
@@ -96,8 +96,8 @@ begin
   case rgSalingTyp.ItemIndex of
     0: Rigg.SalingTyp := stFest;
     1: Rigg.SalingTyp := stDrehbar;
-    2: Rigg.SalingTyp := stOhne;
-    3: Rigg.SalingTyp := stOhne_2;
+    2: Rigg.SalingTyp := stOhneBiegt;
+    3: Rigg.SalingTyp := stOhneStarr;
   end;
 
   if cbController.Checked then

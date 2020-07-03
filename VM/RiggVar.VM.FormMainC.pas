@@ -90,8 +90,8 @@ begin
 
   FormRG19C.FestItem.Checked := FestItemChecked;
   FormRG19C.DrehbarItem.Checked := DrehbarItemChecked;
-  FormRG19C.OhneItem.Checked := OhneItemChecked;
-  FormRG19C.OSDlgItem.Checked := OSDlgItemChecked;
+  FormRG19C.OSBItem.Checked := OSBItemChecked;
+  FormRG19C.OSSItem.Checked := OSSItemChecked;
 
   FormRG19C.WinkelItem.Checked := WinkelDown;
   FormRG19C.WinkelBtn.Down := WinkelDown;

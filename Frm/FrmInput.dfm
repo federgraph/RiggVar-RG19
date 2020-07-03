@@ -1,4 +1,4 @@
-﻿object InputForm: TInputForm
+object InputForm: TInputForm
   Left = 266
   Top = 163
   BorderStyle = bsDialog

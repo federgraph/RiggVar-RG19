@@ -212,8 +212,8 @@ type
     OptionenMenu: TMenuItem;
     FestItem: TMenuItem;
     DrehbarItem: TMenuItem;
-    OhneItem: TMenuItem;
-    OSDlgItem: TMenuItem;
+    OSBItem: TMenuItem;
+    OSSItem: TMenuItem;
     N11: TMenuItem;
     ControllerItem: TMenuItem;
     DifferenzItem: TMenuItem;
@@ -490,10 +490,10 @@ begin
     RiggModul.SalingTyp := stFest
   else if Sender = DrehbarItem then
     RiggModul.SalingTyp := stDrehbar
-  else if Sender = OhneItem then
-    RiggModul.SalingTyp := stOhne
-  else if Sender = OSDlgItem then
-    RiggModul.SalingTyp := stOhne_2;
+  else if Sender = OSBItem then
+    RiggModul.SalingTyp := stOhneBiegt
+  else if Sender = OSSItem then
+    RiggModul.SalingTyp := stOhneStarr;
 end;
 
 procedure TFormMain.rLItemClick(Sender: TObject);
@@ -2277,13 +2277,13 @@ begin
   mi.RadioItem := True;
   mi.OnClick := SalingTypChanged;
 
-  OhneItem := AddI('OhneItem');
+  OSBItem := AddI('OhneItem');
   mi.Caption := 'ohne Salinge / Mast biegt aus';
   mi.Hint := '  Modell: Biegeknicken des Mastes ohne Salinge';
   mi.RadioItem := True;
   mi.OnClick := SalingTypChanged;
 
-  OSDlgItem := AddI('OSDlgItem');
+  OSSItem := AddI('OSDlgItem');
   mi.Caption := 'ohne Saling / Mast starr';
   mi.Hint := '  Modell: Mast steif ohne Salinge';
   mi.RadioItem := True;

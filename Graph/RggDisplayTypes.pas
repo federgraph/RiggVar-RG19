@@ -2,11 +2,15 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  System.SysUtils,
-  System.Classes,
-  System.Math,
-  System.Math.Vectors,
+  SysUtils,
+  Classes,
+  Math,
+  RggVector,
   RggTypes,
   RggCalc;
 
@@ -352,8 +356,8 @@ var
   vSP: TRealPoint;
   vAB: TRealPoint; // Rgg Vector 3D
 
-  vABxz: TVector;
-  vSPxz: TVector; // Delphi 2D Vectors
+  vABxz: vec2;
+  vSPxz: vec2; // Delphi 2D Vectors
   lengthABxz, lengthSPxz: double;
   RatioSPtoAB, g: double;
 begin
@@ -362,11 +366,11 @@ begin
   vSP := vsub(SP, A.P);
   vAB := vsub(B.P, A.P);
 
-  vABxz := TVector.Create(vAB[x], vAB[z]);
-  lengthABxz := vABxz.Length;
+  vABxz := InitPoint2D(vAB[x], vAB[z]);
+  lengthABxz := Mag2D(vABxz);
 
-  vSPxz := TVector.Create(vSP[x], vSP[z]);
-  lengthSPxz := vSPxz.Length;
+  vSPxz := InitPoint2D(vSP[x], vSP[z]);
+  lengthSPxz := Mag2D(vSPxz);
 
   if lengthABxz < Eps then
   begin
@@ -383,10 +387,10 @@ end;
 function TRggLine.ComputeSPY(SP: TRealPoint): double;
 var
   vSP: TRealPoint;
-  vAB: TRealPoint; // Rgg Vector 3D
+  vAB: TRealPoint;
 
-  vABxz: TVector;
-  vSPxz: TVector; // Delphi 2D Vectors
+  vABxz: vec2;
+  vSPxz: vec2;
   lengthABxz, lengthSPxz: double;
   RatioSPtoAB, g: double;
 begin
@@ -395,11 +399,11 @@ begin
   vSP := vsub(SP, A.P);
   vAB := vsub(B.P, A.P);
 
-  vABxz := TVector.Create(vAB[x], vAB[z]);
-  lengthABxz := vABxz.Length;
+  vABxz := InitPoint2D(vAB[x], vAB[z]);
+  lengthABxz := Mag2D(vABxz);
 
-  vSPxz := TVector.Create(vSP[x], vSP[z]);
-  lengthSPxz := vSPxz.Length;
+  vSPxz := InitPoint2D(vSP[x], vSP[z]);
+  lengthSPxz := Mag2D(vSPxz);
 
   if lengthABxz < Eps then
   begin
@@ -437,11 +441,11 @@ end;
 
 function TRggLinePair.CompareVV(v1, v2: TRealPoint): Integer;
 var
-  m1, m2: TPoint3D;
+  m1, m2: vec3;
   r: double;
 begin
-  m1 := TPoint3D.Create(v1[x], v1[y], v1[z]).Normalize;
-  m2 := TPoint3D.Create(v2[x], v2[y], v2[z]).Normalize;
+  m1 := Normalize3D(InitPoint3D(v1[x], v1[y], v1[z]));
+  m2 := Normalize3D(InitPoint3D(v2[x], v2[y], v2[z]));
   r := m2.Y - m1.Y;
   if r > 0 then
     result := 1

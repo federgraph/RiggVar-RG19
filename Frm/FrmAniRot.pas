@@ -423,7 +423,7 @@ begin
   with ListBox.Items do
   begin
     Clear;
-    if (Rigg.ControllerTyp = ctDruck) and (Rigg.SalingTyp <> stOhne) then
+    if (Rigg.ControllerTyp = ctDruck) and (Rigg.SalingTyp <> stOhneStarr) then
       Add('Controller');
     if Rigg.SalingTyp = stFest then
     begin
@@ -443,12 +443,12 @@ begin
       Add('Wante oben');
       Add('Saling Länge');
     end;
-    if Rigg.SalingTyp = stOhne_2 then
+    if Rigg.SalingTyp = stOhneBiegt then
     begin
       Add('Vorstag');
       Add('Wante');
     end;
-    if Rigg.SalingTyp = stOhne then
+    if Rigg.SalingTyp = stOhneStarr then
     begin
       Add('Vorstag');
     end;

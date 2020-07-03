@@ -90,8 +90,8 @@ begin
 
   FormMain.FestItem.Checked := FestItemChecked;
   FormMain.DrehbarItem.Checked := DrehbarItemChecked;
-  FormMain.OhneItem.Checked := OhneItemChecked;
-  FormMain.OSDlgItem.Checked := OSDlgItemChecked;
+  FormMain.OSBItem.Checked := OSBItemChecked;
+  FormMain.OSSItem.Checked := OSSItemChecked;
 
   FormMain.WinkelItem.Checked := WinkelDown;
   FormMain.WinkelBtn.Down := WinkelDown;

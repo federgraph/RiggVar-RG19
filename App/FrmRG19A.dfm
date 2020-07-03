@@ -634,13 +634,13 @@ object FormRG19A: TFormRG19A
         RadioItem = True
         OnClick = SalingTypChanged
       end
-      object OhneItem: TMenuItem
+      object OSBItem: TMenuItem
         Caption = 'ohne Salinge / Mast biegt aus'
         Hint = '  Modell: Biegeknicken des Mastes ohne Salinge'
         RadioItem = True
         OnClick = SalingTypChanged
       end
-      object OSDlgItem: TMenuItem
+      object OSSItem: TMenuItem
         Caption = 'ohne Saling / Mast starr'
         Hint = '  Modell: Mast steif ohne Salinge'
         RadioItem = True

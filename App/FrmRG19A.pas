@@ -92,8 +92,8 @@ type
     OptionenMenu: TMenuItem;
     FestItem: TMenuItem;
     DrehbarItem: TMenuItem;
-    OhneItem: TMenuItem;
-    OSDlgItem: TMenuItem;
+    OSBItem: TMenuItem;
+    OSSItem: TMenuItem;
     N11: TMenuItem;
     ControllerItem: TMenuItem;
     DifferenzItem: TMenuItem;
@@ -349,10 +349,10 @@ begin
     RiggModul.SalingTyp := stFest
   else if Sender = DrehbarItem then
     RiggModul.SalingTyp := stDrehbar
-  else if Sender = OhneItem then
-    RiggModul.SalingTyp := stOhne
-  else if Sender = OSDlgItem then
-    RiggModul.SalingTyp := stOhne_2;
+  else if Sender = OSBItem then
+    RiggModul.SalingTyp := stOhneBiegt
+  else if Sender = OSSItem then
+    RiggModul.SalingTyp := stOhneStarr;
 end;
 
 procedure TFormRG19A.rLItemClick(Sender: TObject);

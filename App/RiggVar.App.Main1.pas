@@ -546,8 +546,20 @@ begin
     faTrimm4: Trimm := 4;
     faTrimm5: Trimm := 5;
     faTrimm6: Trimm := 6;
-    fa420: Init420;
-    faLogo: InitLogo;
+
+    fa420:
+    begin
+      Init420;
+      ParamValue[Param] := ParamValue[Param];
+//      FormMain.UpdateOnParamValueChanged;
+    end;
+
+    faLogo:
+    begin
+      InitLogo;
+      ParamValue[Param] := ParamValue[Param];
+//      FormMain.UpdateOnParamValueChanged;
+    end;
 
     faUpdateTrimm0: UpdateTrimm0;
     faCopyAndPaste: CopyAndPaste;
@@ -609,7 +621,8 @@ begin
 
     faSalingTypFest: result := Rigg.SalingTyp = stFest;
     faSalingTypDrehbar: result := Rigg.SalingTyp = stDrehbar;
-    faSalingTypOhne: result := Rigg.SalingTyp = stOhne;
+    faSalingTypOhne: result := Rigg.SalingTyp = stOhneBiegt;
+    faSalingTypOhneStarr: result := Rigg.SalingTyp = stOhneStarr;
 
     faTrimm0: result := Trimm = 0;
     faTrimm1: result := Trimm = 1;
@@ -679,7 +692,6 @@ begin
   ML.Add('  ResizeCounter = ' + IntToStr(ResizeCounter));
   ML.Add(Format('  ClientSize = (%d, %d)', [MainVar.ClientWidth, MainVar.ClientHeight]));
   ML.Add('---');
-  //ShowDataText := true;
 end;
 
 procedure TMain1.DoCleanReport;
