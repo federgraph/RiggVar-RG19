@@ -209,8 +209,8 @@ const
 
   SalingFestString: string = 'fest';
   SalingDrehbarString: string = 'drehbar';
-  OhneSalingString: string = 'ohne Saling';
-  OhneSalingStarrString: string = 'ohne Saling (BK)';
+  OhneSalingString: string = 'ohne Saling biegt';
+  OhneSalingStarrString: string = 'ohne Saling starr';
 
   TopTitleTestString: string = 'Top Title';
   BottomTitleTestString: string = 'Bottom Title';

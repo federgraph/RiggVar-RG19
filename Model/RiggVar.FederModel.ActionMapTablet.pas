@@ -300,10 +300,10 @@ begin
 
       cl := BottomRight;
       cla := TRggColors.White;
-      InitAC(cl, 1, faSalingTypOhne, claOption);
+      InitAC(cl, 1, faSalingTypFest, claOption);
       InitAC(cl, 2, faSalingTypDrehbar, claOption);
-      InitAC(cl, 3, faSalingTypFest, claOption);
-      InitAC(cl, 4, faNoop, cla);
+      InitAC(cl, 3, faSalingTypOhne, claOption);
+      InitAC(cl, 4, faSalingTypOhneStarr, claOption);
       InitAC(cl, 5, faNoop, cla);
       InitAC(cl, 6, faNoop, cla);
     end;

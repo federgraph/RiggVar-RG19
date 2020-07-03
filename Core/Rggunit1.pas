@@ -54,8 +54,8 @@ type
     procedure UpdateGetriebe;
     procedure UpdateGetriebeFS;
     procedure UpdateGetriebeDS;
-    procedure UpdateGetriebeOS;
-    procedure UpdateGetriebeOS_2;
+    procedure UpdateGetriebeOSS;
+    procedure UpdateGetriebeOSB;
     procedure Rest;
     procedure BerechneWinkel;
     procedure BerechneM;
@@ -106,10 +106,10 @@ begin
   Inc(UpdateGetriebeCounter);
   LogList.Clear;
   case SalingTyp of
-    stOhne:
-      UpdateGetriebeOS;
-    stOhne_2:
-      UpdateGetriebeOS_2;
+    stOhneStarr:
+      UpdateGetriebeOSS;
+    stOhneBiegt:
+      UpdateGetriebeOSB;
     stDrehbar:
       UpdateGetriebeDS;
     stFest:
@@ -722,7 +722,7 @@ begin
   FrController := FiControllerAnschlag;
 end;
 
-procedure TGetriebeFS.UpdateGetriebeOS;
+procedure TGetriebeFS.UpdateGetriebeOSS;
 { FrVorstag und FrWoben2d gegeben }
 var
   temp: TRealPoint;
@@ -770,7 +770,7 @@ begin
   Rest;
 end;
 
-procedure TGetriebeFS.UpdateGetriebeOS_2;
+procedure TGetriebeFS.UpdateGetriebeOSB;
 { FrVorstag und FrWoben3d und FrWunten3d gegeben }
 var
   TempW, Skalar, TempWunten2d, TempWoben2d: double;
@@ -993,7 +993,7 @@ begin
           result := Abstand(rP[ooC0], TempC);
           end;
 
-        stOhne, stOhne_2:
+        stOhneStarr, stOhneBiegt:
           begin
             { 1. Aufruf SchnittKK: Wante2d und Mast; TempC ermitteln }
             Radius1 := FrWunten2d + FrWoben2d;

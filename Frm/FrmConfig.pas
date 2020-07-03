@@ -273,6 +273,7 @@ procedure TFormConfig.SelectInitialCell;
 var
   b: Boolean;
 begin
+  b := True;
   FRumpfCell := Point(1, FirstRowIndex);
   GridSelectCell(nil, FRumpfCell.X, FRumpfCell.Y, b);
 end;

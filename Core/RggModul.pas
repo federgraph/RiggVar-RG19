@@ -132,8 +132,8 @@ type
     procedure BiegeNeigeItemClick;
     procedure ReglerBtnClick;
     procedure FestItemClick;
-    procedure OhneItemClick;
-    procedure OSDlgItemClick;
+    procedure OhneStarrItemClick;
+    procedure OhneBiegtItemClick;
     procedure DrehbarItemClick;
     procedure ChartItemClick;
     procedure WriteReportToMemo(Memo: TMemo);
@@ -298,6 +298,7 @@ begin
   SetupGCtrl(InputForm.sbController, fpController);
   SetupGCtrl(InputForm.sbControllerD, fpController);
   SetupGCtrl(InputForm.sbControllerOhne, fpController);
+
   { Vorstag/Winkel }
   if WinkelBtnDown then
     SetupGCtrl(InputForm.sbWinkel, fpWinkel)
@@ -305,17 +306,21 @@ begin
     SetupGCtrl(InputForm.sbWinkel, fpVorstag);
   SetupGCtrl(InputForm.sbVorstagD, fpVorstag);
   SetupGCtrl(InputForm.sbVorstagOhne, fpVorstag);
+
   { Wante }
   SetupGCtrl(InputForm.sbWante, fpWante);
   SetupGCtrl(InputForm.sbWanteD, fpWante);
   SetupGCtrl(InputForm.sbWanteOhne, fpWante);
+
   { Woben }
   SetupGCtrl(InputForm.sbWoben, fpWoben);
   SetupGCtrl(InputForm.sbWobenD, fpWoben);
+
   { Saling }
   SetupGCtrl(InputForm.sbSalingH, fpSalingH);
   SetupGCtrl(InputForm.sbSalingA, fpSalingA);
   SetupGCtrl(InputForm.sbSalingLD, fpSalingL);
+
   { Ohne Saling starr }
   SetupGCtrl(InputForm.sbVorstagOS, fpVorstagOS);
   InputForm.sbVorstagOS.Position := Round(Rigg.GSB.Find(fpVorstag).Ist);
@@ -918,7 +923,7 @@ begin
   Result := True;
   if CalcTyp = ctKraftGemessen then
     Result := False;
-  if SalingTyp = stOhne then
+  if SalingTyp = stOhneStarr then
     Result := False;
 end;
 
@@ -1017,8 +1022,8 @@ begin
     case Value of
       stFest: fa := faSalingTypFest;
       stDrehbar: fa := faSalingTypDrehbar;
-      stOhne: fa := faSalingTypOhne;
-      stOhne_2: fa := faSalingTypOhneStarr;
+      stOhneBiegt: fa := faSalingTypOhne;
+      stOhneStarr: fa := faSalingTypOhneStarr;
       else
         fa := faSalingTypFest;
     end;
@@ -1035,15 +1040,15 @@ begin
     case Value of
       stFest: InputForm.InputPages.ActivePage := InputForm.tsFest;
       stDrehbar: InputForm.InputPages.ActivePage := InputForm.tsDrehbar;
-      stOhne: InputForm.InputPages.ActivePage := InputForm.tsOhne;
-      stOhne_2: InputForm.InputPages.ActivePage := InputForm.tsOhneStarr;
+      stOhneBiegt: InputForm.InputPages.ActivePage := InputForm.tsOhne;
+      stOhneStarr: InputForm.InputPages.ActivePage := InputForm.tsOhneStarr;
     end;
 
     case Value of
       stFest: ViewModelM.FestItemClick;
       stDrehbar: ViewModelM.DrehbarItemClick;
-      stOhne: ViewModelM.OhneItemClick;
-      stOhne_2: ViewModelM.OSDlgItemClick;
+      stOhneBiegt: ViewModelM.OSBItemClick;
+      stOhneStarr: ViewModelM.OSSItemClick;
     end;
   end;
 end;
@@ -1129,14 +1134,14 @@ begin
   Main.Param := Main.Param;
 end;
 
-procedure TRiggModul.OhneItemClick;
+procedure TRiggModul.OhneBiegtItemClick;
 begin
   InputForm.pnOhneBK.Update;
   InputForm.pnMastOhne.Update;
 
   WinkelBtnDown := False;
 
-  SalingTyp := stOhne_2;
+  SalingTyp := stOhneBiegt;
 
   KurveValid := False;
   if InputForm.rbControllerOhne.Checked then
@@ -1150,7 +1155,7 @@ begin
   Rigg.UpdateGSB;
   SetupGCtrls;
 
-  ViewModelM.OhneItemClick;
+  ViewModelM.OSBItemClick;
   ViewModelM.ControllerEnabled := ControllerEnabled;
   ViewModelM.WinkelDown := WinkelBtnDown;
   ViewModelM.UpdateView;
@@ -1220,12 +1225,12 @@ begin
   ViewModelM.UpdateView;
 end;
 
-procedure TRiggModul.OSDlgItemClick;
+procedure TRiggModul.OhneStarrItemClick;
 begin
   InputForm.pnOhne.Update;
 
   WinkelBtnDown := False;
-  SalingTyp := stOhne;
+  SalingTyp := stOhneStarr;
   ControllerBtnDown := False;
   KurveValid := False;
   SBName := fpVorstag;
@@ -1234,7 +1239,7 @@ begin
   Rigg.UpdateGSB;
   SetupGCtrls;
 
-  ViewModelM.OSDlgItemClick;
+  ViewModelM.OSSItemClick;
   ViewModelM.ControllerEnabled := ControllerEnabled;
   ViewModelM.UpdateView;
 end;
@@ -1901,7 +1906,7 @@ begin
           t := InputForm.sbControllerD.Tag;
           InputForm.lbD1.Caption := ls;
         end;
-        stOhne:
+        stOhneStarr:
         begin
           InputForm.lbOhne1.Caption := ls;
         end;
@@ -1938,14 +1943,14 @@ begin
           t := InputForm.sbVorstagD.Tag;
           InputForm.lbD2.Caption := ls;
         end;
-        stOhne:
+        stOhneStarr:
         begin
           InputRec.Vorstag := ScrollPos;
           InputForm.sbVorstagOhne.Position := ScrollPos;
           t := InputForm.sbVorstagOhne.Tag;
           InputForm.lbOhne1.Caption := ls;
         end;
-        stOhne_2:
+        stOhneBiegt:
         begin
           InputForm.sbVorstagOS.Position := ScrollPos;
           t := InputForm.sbVorstagOS.Tag;
@@ -1971,7 +1976,7 @@ begin
           t := InputForm.sbWanteD.Tag;
           InputForm.lbD3.Caption := ls;
         end;
-        stOhne:
+        stOhneStarr:
         begin
           InputForm.sbWanteOhne.Position := ScrollPos;
           t := InputForm.sbWanteOhne.Tag;

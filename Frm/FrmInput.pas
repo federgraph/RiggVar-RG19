@@ -186,8 +186,8 @@ begin
   case InputForm.InputPages.ActivePage.Tag of
     0: RiggModul.SalingTyp := stFest;
     1: RiggModul.SalingTyp := stDrehbar;
-    2: RiggModul.SalingTyp := stOhne;
-    3: RiggModul.SalingTyp := stOhne_2;
+    2: RiggModul.SalingTyp := stOhneBiegt;
+    3: RiggModul.SalingTyp := stOhneStarr;
   end;
 end;
 

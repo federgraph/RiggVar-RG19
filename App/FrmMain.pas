@@ -285,8 +285,8 @@ type
     OptionenMenu: TMenuItem;
     FestItem: TMenuItem;
     DrehbarItem: TMenuItem;
-    OhneItem: TMenuItem;
-    OSDlgItem: TMenuItem;
+    OSBItem: TMenuItem;
+    OSSItem: TMenuItem;
     N11: TMenuItem;
     ControllerItem: TMenuItem;
     DifferenzItem: TMenuItem;
@@ -2453,13 +2453,13 @@ begin
   mi.RadioItem := True;
   mi.OnClick := SalingTypChanged;
 
-  OhneItem := AddI('OhneItem');
+  OSBItem := AddI('OSBItem');
   mi.Caption := 'ohne Salinge / Mast biegt aus';
   mi.Hint := '  Modell: Biegeknicken des Mastes ohne Salinge';
   mi.RadioItem := True;
   mi.OnClick := SalingTypChanged;
 
-  OSDlgItem := AddI('OSDlgItem');
+  OSSItem := AddI('OSSItem');
   mi.Caption := 'ohne Saling / Mast starr';
   mi.Hint := '  Modell: Mast steif ohne Salinge';
   mi.RadioItem := True;
@@ -2942,14 +2942,23 @@ end;
 
 procedure TFormMain.SalingTypChanged(Sender: TObject);
 begin
+//  if Sender = FestItem then
+//    Main.Rigg.SalingTyp := stFest
+//  else if Sender = DrehbarItem then
+//    Main.Rigg.SalingTyp := stDrehbar
+//  else if Sender = OhneBiegtItem then
+//    Main.Rigg.SalingTyp := stOhneBiegt
+//  else if Sender = OhneStarrItem then
+//    Main.Rigg.SalingTyp := stOhneStarr;
+
   if Sender = FestItem then
-    Main.Rigg.SalingTyp := stFest
+    Main.RiggModul.FestItemClick
   else if Sender = DrehbarItem then
-    Main.Rigg.SalingTyp := stDrehbar
-  else if Sender = OhneItem then
-    Main.Rigg.SalingTyp := stOhne
-  else if Sender = OSDlgItem then
-    Main.Rigg.SalingTyp := stOhne_2;
+    Main.RiggModul.DrehbarItemClick
+  else if Sender = OSBItem then
+    Main.RiggModul.OhneBiegtItemClick
+  else if Sender = OSSItem then
+    Main.RiggModul.OhneStarrItemClick
 end;
 
 procedure TFormMain.InitStatusBar;

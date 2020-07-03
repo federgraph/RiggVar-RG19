@@ -1,4 +1,4 @@
-unit RiggVar.VM.FormMain;
+﻿unit RiggVar.VM.FormMain;
 
 interface
 
@@ -18,8 +18,8 @@ type
 
     FestItemChecked: Boolean;
     DrehbarItemChecked: Boolean;
-    OhneItemChecked: Boolean;
-    OSDlgItemChecked: Boolean;
+    OSBItemChecked: Boolean;
+    OSSItemChecked: Boolean;
 
     WinkelEnabled: Boolean;
     WinkelDown: Boolean;
@@ -67,8 +67,8 @@ type
 
     procedure FestItemClick;
     procedure DrehbarItemClick;
-    procedure OSDlgItemClick;
-    procedure OhneItemClick;
+    procedure OSBItemClick;
+    procedure OSSItemClick;
 
     procedure KnickenItemClick(ct: TCalcTyp);
 
@@ -119,8 +119,8 @@ procedure TViewModelMain00.FestItemClick;
 begin
   FestItemChecked := True;
   DrehbarItemChecked := False;
-  OhneItemChecked := False;
-  OSDlgItemChecked := False;
+  OSBItemChecked := False;
+  OSSItemChecked := False;
 
   WinkelEnabled := True;
   KoppelKurveEnabled := True;
@@ -140,8 +140,8 @@ procedure TViewModelMain00.DrehbarItemClick;
 begin
   FestItemChecked := False;
   DrehbarItemChecked := True;
-  OhneItemChecked := False;
-  OSDlgItemChecked := False;
+  OSBItemChecked := False;
+  OSSItemChecked := False;
 
   WinkelEnabled := False;
   KoppelKurveEnabled := False;
@@ -157,14 +157,14 @@ begin
   UpdateView;
 end;
 
-procedure TViewModelMain00.OhneItemClick;
+procedure TViewModelMain00.OSBItemClick;
 begin
   WinkelDown := False;
 
   FestItemChecked := False;
   DrehbarItemChecked := False;
-  OhneItemChecked := True;
-  OSDlgItemChecked := False;
+  OSBItemChecked := True;
+  OSSItemChecked := False;
 
   WinkelEnabled := False;
   KoppelKurveEnabled := False;
@@ -180,12 +180,12 @@ begin
   UpdateView;
 end;
 
-procedure TViewModelMain00.OSDlgItemClick;
+procedure TViewModelMain00.OSSItemClick;
 begin
   FestItemChecked := False;
   DrehbarItemChecked := False;
-  OhneItemChecked := False;
-  OSDlgItemChecked := True;
+  OSBItemChecked := False;
+  OSSItemChecked := True;
 
   WinkelEnabled := False;
   KoppelKurveEnabled := False;
@@ -248,7 +248,7 @@ end;
 
 procedure TViewModelMain00.ShowConsole;
 begin
-  ConsoleItemCaption := 'Console schlie�en';
+  ConsoleItemCaption := 'Console schließen';
   ConsoleItemHint := '  Anordnung der Dialoge aufheben';
 
   InputFormItemEnabled := False;
@@ -324,8 +324,8 @@ begin
 
   FormMain.FestItem.Checked := FestItemChecked;
   FormMain.DrehbarItem.Checked := DrehbarItemChecked;
-  FormMain.OhneItem.Checked := OhneItemChecked;
-  FormMain.OSDlgItem.Checked := OSDlgItemChecked;
+  FormMain.OSBItem.Checked := OSBItemChecked;
+  FormMain.OSSItem.Checked := OSSItemChecked;
 
   FormMain.WinkelItem.Checked := WinkelDown;
 
@@ -368,7 +368,6 @@ begin
   FormMain.EntlastetItem.Enabled := Main.GetChecked(faMultiBtn);
   FormMain.EntlastetItem.Checked := Main.BtnGrauDown;
 
-//  FormMain.SofortItem.Checked := Main.SofortBerechnen;
   FormMain.SofortItem.Checked := Main.GetChecked(faSofortBtn);
 
   FormMain.SpeedBarItem.Checked := FormMain.SpeedPanel.Visible;

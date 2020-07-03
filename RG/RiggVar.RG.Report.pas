@@ -273,7 +273,7 @@ begin
 {$ifdef MSWindowsDelphi}
       rgXML:
       begin
-        Main.RggMain.Rigg.WriteXml(ML, XmlAllTags);
+        Main.Rigg.WriteXml(ML, XmlAllTags);
       end;
 {$endif}
       rgShort: ML.Text := Main.TrimmShort;
