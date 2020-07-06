@@ -617,7 +617,7 @@ begin
         psiB := FrPsi
       else
         psiA := FrPsi;
-    until 
+    until
       (abs(Diff) < 0.01) or (FiZaehler = 200);
   end;
 
