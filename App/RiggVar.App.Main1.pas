@@ -702,7 +702,7 @@ begin
   ML.Add('  WantOnResize = ' + BoolStr[MainVar.WantOnResize]);
   ML.Add('  ResizeCounter = ' + IntToStr(ResizeCounter));
   ML.Add(Format('  ClientSize = (%d, %d)', [MainVar.ClientWidth, MainVar.ClientHeight]));
-  ML.Add(Format('  Image.Size = (%d, %d)', [FormMain.Image.Width, FormMain.Image.Height]));
+  ML.Add(Format('  Image.Size = (%d, %d)', [Round(FormMain.Image.Width), Round(FormMain.Image.Height)]));
   ML.Add('---');
 end;
 
