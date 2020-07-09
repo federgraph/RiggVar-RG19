@@ -37,7 +37,6 @@ uses
   RiggVar.FederModel.TouchBase,
   RiggVar.FederModel.Touch,
   RiggVar.FederModel.TouchPhone,
-  RiggVar.Util.Logger,
   RiggVar.RG.Main;
 
 type

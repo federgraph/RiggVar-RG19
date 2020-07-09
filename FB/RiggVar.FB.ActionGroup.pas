@@ -18,91 +18,23 @@
 
 interface
 
-{$ifdef fpc}
-{$mode delphi}
-{$endif}
-
 uses
   RiggVar.FB.ActionConst;
 
 type
   TActionGroup = array of Integer;
 
-var
-  ActionGroupEmptyAction: TActionGroup;
-  ActionGroupTouchLayout: TActionGroup;
-  ActionGroupPages: TActionGroup;
-  ActionGroupColorScheme: TActionGroup;
-  ActionGroupWheel: TActionGroup;
-  ActionGroupForms: TActionGroup;
-  ActionGroupViewParams: TActionGroup;
-  ActionGroupFederText: TActionGroup;
-  ActionGroupRggControls: TActionGroup;
-  ActionGroupRggFixPoints: TActionGroup;
-  ActionGroupRggTrimms: TActionGroup;
-  ActionGroupRggSalingType: TActionGroup;
-  ActionGroupRggAppMode: TActionGroup;
-  ActionGroupRggTrimmFile: TActionGroup;
-  ActionGroupRggTrimmText: TActionGroup;
-  ActionGroupRggViewPoint: TActionGroup;
-  ActionGroupRggRenderOptions: TActionGroup;
-  ActionGroupRggChart: TActionGroup;
-  ActionGroupRggReport: TActionGroup;
-  ActionGroupRggSegment: TActionGroup;
-  ActionGroupRggGraph: TActionGroup;
-  ActionGroupMemeFormat: TActionGroup;
-  ActionGroupRggSonstiges: TActionGroup;
-  ActionGroupBtnLegendTablet: TActionGroup;
-  ActionGroupBtnLegendPhone: TActionGroup;
-  ActionGroupCircles: TActionGroup;
+const
 
-  (*
-  ActionGroupViewOptions: TActionGroup;
-  ActionGroupViewType: TActionGroup;
-  ActionGroupParamT: TActionGroup;
-  ActionGroupRggHullMesh: TActionGroup;
-  ActionGroupEmptyLastLine: TActionGroup;
-  ActionGroupHelp: TActionGroup;
-  ActionGroupCopyPaste: TActionGroup;
-  ActionGroupCopyImage: TActionGroup;
-  ActionGroupTextureImport: TActionGroup;
-  ActionGroupInput: TActionGroup;
-  ActionGroupBitmapCycle: TActionGroup;
-  ActionGroupViewFlags: TActionGroup;
-  ActionGroupFormat: TActionGroup;
-  ActionGroupIconSize: TActionGroup;
-  ActionGroupReset: TActionGroup;
-  ActionGroupCopyOptions: TActionGroup;
-  *)
+ActionGroupEmptyAction: TActionGroup = [
+faNoop];
 
-implementation
-
-uses
- SysUtils,
- Classes;
-
-function IntegerArray(const Values: array of Integer): TActionGroup;
-var
-  l: Integer;
-  i: Integer;
-begin
-  l := Length(Values);
-  SetLength(Result, l);
-  for i := 0 to high(Result) do
-    Result[i] := Values[i];
-end;
-
-initialization
-
-ActionGroupEmptyAction := IntegerArray([
-faNoop]);
-
-ActionGroupTouchLayout := IntegerArray([
+ActionGroupTouchLayout: TActionGroup = [
 faTouchTablet,
 faTouchPhone,
-faTouchDesk]);
+faTouchDesk];
 
-ActionGroupPages := IntegerArray([
+ActionGroupPages: TActionGroup = [
 faActionPageM,
 faActionPageP,
 faActionPageE,
@@ -113,16 +45,16 @@ faActionPage2,
 faActionPage3,
 faActionPage4,
 faActionPage5,
-faActionPage6]);
+faActionPage6];
 
-ActionGroupColorScheme := IntegerArray([
+ActionGroupColorScheme: TActionGroup = [
 faCycleColorSchemeM,
 faCycleColorSchemeP,
 faBlackText,
 faGrayText,
-faWhiteText]);
+faWhiteText];
 
-ActionGroupWheel := IntegerArray([
+ActionGroupWheel: TActionGroup = [
 faPlusOne,
 faPlusTen,
 faWheelLeft,
@@ -132,9 +64,9 @@ faWheelUp,
 faParamValuePlus1,
 faParamValueMinus1,
 faParamValuePlus10,
-faParamValueMinus10]);
+faParamValueMinus10];
 
-ActionGroupForms := IntegerArray([
+ActionGroupForms: TActionGroup = [
 faShowActi,
 faShowMemo,
 faShowOpti,
@@ -144,9 +76,9 @@ faShowChart,
 faShowDiagA,
 faShowDiagC,
 faShowDiagE,
-faShowDiagQ]);
+faShowDiagQ];
 
-ActionGroupViewParams := IntegerArray([
+ActionGroupViewParams: TActionGroup = [
 faPan,
 faParamORX,
 faParamORY,
@@ -154,13 +86,13 @@ faParamORZ,
 faParamRX,
 faParamRY,
 faParamRZ,
-faParamCZ]);
+faParamCZ];
 
-ActionGroupFederText := IntegerArray([
+ActionGroupFederText: TActionGroup = [
 faToggleAllText,
-faToggleTouchFrame]);
+faToggleTouchFrame];
 
-ActionGroupRggControls := IntegerArray([
+ActionGroupRggControls: TActionGroup = [
 faController,
 faWinkel,
 faVorstag,
@@ -180,9 +112,9 @@ faWPowerOS,
 faParamAPW,
 faParamEAH,
 faParamEAR,
-faParamEI]);
+faParamEI];
 
-ActionGroupRggFixPoints := IntegerArray([
+ActionGroupRggFixPoints: TActionGroup = [
 faFixpointA0,
 faFixpointA,
 faFixpointB0,
@@ -194,9 +126,9 @@ faFixpointD,
 faFixpointE0,
 faFixpointE,
 faFixpointF0,
-faFixpointF]);
+faFixpointF];
 
-ActionGroupRggTrimms := IntegerArray([
+ActionGroupRggTrimms: TActionGroup = [
 faTrimm0,
 faTrimm1,
 faTrimm2,
@@ -205,55 +137,62 @@ faTrimm4,
 faTrimm5,
 faTrimm6,
 fa420,
-faLogo]);
+faLogo];
 
-ActionGroupRggSalingType := IntegerArray([
+ActionGroupRggSalingType: TActionGroup = [
 faSalingTypOhne,
 faSalingTypDrehbar,
 faSalingTypFest,
-faSalingTypOhneStarr]);
+faSalingTypOhneStarr];
 
-ActionGroupRggAppMode := IntegerArray([
+ActionGroupRggAppMode: TActionGroup = [
 faDemo,
 faMemoryBtn,
 faMemoryRecallBtn,
 faSofortBtn,
 faGrauBtn,
 faBlauBtn,
-faMultiBtn,
-faKoppelBtn,
-faHull]);
+faMultiBtn];
 
-ActionGroupRggTrimmFile := IntegerArray([
+ActionGroupRggSuper: TActionGroup = [
+faSuperSimple,
+faSuperNormal,
+faSuperGrau,
+faSuperBlau,
+faSuperMulti,
+faSuperDisplay,
+faSuperQuick];
+
+ActionGroupRggTrimmFile: TActionGroup = [
 faCopyTrimmItem,
 faPasteTrimmItem,
 faCopyAndPaste,
 faUpdateTrimm0,
 faReadTrimmFile,
 faSaveTrimmFile,
-faCopyTrimmFile]);
+faCopyTrimmFile];
 
-ActionGroupRggTrimmText := IntegerArray([
+ActionGroupRggTrimmText: TActionGroup = [
 faToggleTrimmText,
 faToggleDiffText,
 faToggleDataText,
 faToggleDebugText,
-faUpdateReportText]);
+faUpdateReportText];
 
-ActionGroupRggViewPoint := IntegerArray([
+ActionGroupRggViewPoint: TActionGroup = [
 faViewpointS,
 faViewpointA,
 faViewpointT,
-faViewpoint3]);
+faViewpoint3];
 
-ActionGroupRggRenderOptions := IntegerArray([
+ActionGroupRggRenderOptions: TActionGroup = [
 faWantRenderH,
 faWantRenderP,
 faWantRenderF,
 faWantRenderE,
-faWantRenderS]);
+faWantRenderS];
 
-ActionGroupRggChart := IntegerArray([
+ActionGroupRggChart: TActionGroup = [
   faChartRect,
   faChartTextRect,
   faChartLegend,
@@ -273,9 +212,9 @@ ActionGroupRggChart := IntegerArray([
   faYComboPlus,
   faYComboMinus,
 
-  faChartReset]);
+  faChartReset];
 
-ActionGroupRggReport := IntegerArray([
+ActionGroupRggReport: TActionGroup = [
   faReportNone,
   faReportLog,
   faReportJson,
@@ -294,9 +233,9 @@ ActionGroupRggReport := IntegerArray([
   faReportAusgabeDiffP,
   faReportXML,
   faReportDebugReport,
-  faReportReadme]);
+  faReportReadme];
 
-ActionGroupRggSegment := IntegerArray([
+ActionGroupRggSegment: TActionGroup = [
   faToggleSegmentF,
   faToggleSegmentR,
   faToggleSegmentS,
@@ -304,14 +243,17 @@ ActionGroupRggSegment := IntegerArray([
   faToggleSegmentV,
   faToggleSegmentW,
   faToggleSegmentC,
-  faToggleSegmentA]);
+  faToggleSegmentA];
 
-ActionGroupRggGraph := IntegerArray([
+ActionGroupRggGraph: TActionGroup = [
   faToggleLineColor,
   faToggleUseDisplayList,
   faToggleUseQuickSort,
   faToggleShowLegend,
+
   faRggBogen,
+  faRggKoppel,
+  faRggHull,
 
   faRggZoomIn,
   faRggZoomOut,
@@ -319,9 +261,9 @@ ActionGroupRggGraph := IntegerArray([
   faToggleSalingGraph,
   faToggleControllerGraph,
   faToggleChartGraph,
-  faToggleMatrixText]);
+  faToggleMatrixText];
 
-ActionGroupMemeFormat := IntegerArray([
+ActionGroupMemeFormat: TActionGroup = [
   faMemeGotoLandscape,
   faMemeGotoSquare,
   faMemeGotoPortrait,
@@ -334,9 +276,9 @@ ActionGroupMemeFormat := IntegerArray([
   faMemeFormat6,
   faMemeFormat7,
   faMemeFormat8,
-  faMemeFormat9]);
+  faMemeFormat9];
 
-ActionGroupRggSonstiges := IntegerArray([
+ActionGroupRggSonstiges: TActionGroup = [
   faMemeToggleHelp,
   faMemeToggleReport,
   faButtonFrameReport,
@@ -344,9 +286,9 @@ ActionGroupRggSonstiges := IntegerArray([
   faToggleSandboxed,
   faToggleSpeedPanel,
   faToggleAllProps,
-  faToggleAllTags]);
+  faToggleAllTags];
 
-ActionGroupBtnLegendTablet := IntegerArray([
+ActionGroupBtnLegendTablet: TActionGroup = [
 faTL01,
 faTL02,
 faTL03,
@@ -377,9 +319,9 @@ faBR02,
 faBR03,
 faBR04,
 faBR05,
-faBR06]);
+faBR06];
 
-ActionGroupBtnLegendPhone := IntegerArray([
+ActionGroupBtnLegendPhone: TActionGroup = [
 faMB01,
 faMB02,
 faMB03,
@@ -387,9 +329,9 @@ faMB04,
 faMB05,
 faMB06,
 faMB07,
-faMB08]);
+faMB08];
 
-ActionGroupCircles := IntegerArray([
+ActionGroupCircles: TActionGroup = [
   faCirclesSelectC0,
   faCirclesSelectC1,
   faCirclesSelectC2,
@@ -405,73 +347,73 @@ ActionGroupCircles := IntegerArray([
   faLineParamE2,
   faCircleParamM1Z,
   faCircleParamM2Z,
-  faCirclesReset]);
+  faCirclesReset];
 
 (*
-ActionGroupViewOptions: TActionGroup := IntegerArray([
+ActionGroupViewOptions: TActionGroup = [
 faToggleMoveMode,
 faLinearMove,
-faExpoMove]);
+faExpoMove];
 
-ActionGroupViewType: TActionGroup := IntegerArray([
+ActionGroupViewType: TActionGroup = [
 faToggleViewType,
 faViewTypeOrtho,
-faViewTypePerspective]);
+faViewTypePerspective];
 
-ActionGroupParamT: TActionGroup := IntegerArray([
+ActionGroupParamT: TActionGroup = [
 faParamT1,
 faParamT2,
 faParamT3,
-faParamT4]);
+faParamT4];
 
-ActionGroupRggHullMesh: TActionGroup := IntegerArray([
+ActionGroupRggHullMesh: TActionGroup = [
 faHullMesh,
 faHullMeshOn,
-faHullMeshOff]);
+faHullMeshOff];
 
-ActionGroupEmptyLastLine: TActionGroup := IntegerArray([
+ActionGroupEmptyLastLine: TActionGroup = [
 faELLOn,
 faELLOff
-]);
+];
 
-ActionGroupHelp: TActionGroup := IntegerArray([
+ActionGroupHelp: TActionGroup = [
 faCycleHelpM,
 faCycleHelpP,
 faHelpCycle,
 faHelpList,
 faHelpHome,
-faToggleLanguage]);
+faToggleLanguage];
 
-ActionGroupCopyPaste: TActionGroup := IntegerArray([
+ActionGroupCopyPaste: TActionGroup = [
 faSave,
 faLoad,
 faOpen,
 faCopy,
 faPaste,
-faShare]);
+faShare];
 
-ActionGroupCopyImage: TActionGroup := IntegerArray([
+ActionGroupCopyImage: TActionGroup = [
 
 faCopyScreenshot,
 faCopyBitmap,
-faCopyBitmap3D]);
+faCopyBitmap3D];
 
-ActionGroupTextureImport: TActionGroup := IntegerArray([
-faToggleDropTarget]);
+ActionGroupTextureImport: TActionGroup = [
+faToggleDropTarget];
 
-ActionGroupInput: TActionGroup := IntegerArray([
-faToggleDropTarget]);
+ActionGroupInput: TActionGroup = [
+faToggleDropTarget];
 
-ActionGroupBitmapCycle: TActionGroup := IntegerArray([
+ActionGroupBitmapCycle: TActionGroup = [
 faCycleBitmapM,
 faCycleBitmapP,
 faRandom,
 faRandomWhite,
 faRandomBlack,
 faBitmapEscape,
-faToggleContour]);
+faToggleContour];
 
-ActionGroupViewFlags: TActionGroup := IntegerArray([
+ActionGroupViewFlags: TActionGroup = [
 faToggleBMap,
 faToggleZoom,
 faToggleMapK,
@@ -485,15 +427,15 @@ faToggleLabelText,
 faLabelBatchM,
 faLabelBatchP,
 faLabelTextP,
-faLabelTextM]);
+faLabelTextM];
 
-ActionGroupFormat: TActionGroup := IntegerArray([
+ActionGroupFormat: TActionGroup = [
 faFormatLandscape,
 faFormatPortrait,
 faFormatIPhoneLandscape,
-faFormatIPhonePortrait]);
+faFormatIPhonePortrait];
 
-ActionGroupIconSize: TActionGroup := IntegerArray([
+ActionGroupIconSize: TActionGroup = [
 faIconSize016,
 faIconSize032,
 faIconSize048,
@@ -504,15 +446,15 @@ faIconSize256,
 faIconSize512,
 faIconSize640,
 faIconSize960,
-faIconSize01K]);
+faIconSize01K];
 
-ActionGroupReset: TActionGroup := IntegerArray([
+ActionGroupReset: TActionGroup = [
 faReset,
 faResetPosition,
 faResetRotation,
-faResetZoom]);
+faResetZoom];
 
-ActionGroupCopyOptions: TActionGroup := IntegerArray([
+ActionGroupCopyOptions: TActionGroup = [
 faToggleHardCopy,
 faHardCopyOn,
 faHardCopyOff,
@@ -523,8 +465,9 @@ faPngCopyOff,
 
 faToggleNoCopy,
 faNoCopyOn,
-faNoCopyOff]);
+faNoCopyOff];
 *)
 
+implementation
 
 end.

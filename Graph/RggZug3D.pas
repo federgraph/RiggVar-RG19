@@ -191,23 +191,22 @@ begin
       PolyLine(ZugSalingDS);
 
     { Mast }
-    if Props.Coloriert then
+    if Props.Coloriert and Props.Bogen then
     begin
       Pen.Color := clMast;
-      if Props.Bogen then
-      begin
-        PolyLine(ZugMastKurve);
-        Pen.Color := clNavy;
-        MoveTo(ZugMast[2].X, ZugMast[2].Y);
-        LineTo(ZugMast[3].X, ZugMast[3].Y);
+      PolyLine(ZugMastKurve);
+      Pen.Color := clNavy;
+      MoveTo(ZugMast[2].X, ZugMast[2].Y);
+      LineTo(ZugMast[3].X, ZugMast[3].Y);
       end
-      else
-      begin
-        PolyLine(ZugMast);
-      end;
+    else if Props.Coloriert then
+    begin
+      Pen.Color := clMast;
+      PolyLine(ZugMast);
     end
     else
     begin
+      Pen.Color := Props.Color;
       PolyLine(ZugMast);
     end;
 
@@ -222,19 +221,25 @@ begin
     { Wante Stb }
     if Props.Coloriert then
     begin
-      Pen.Color := clGreen;
       if Props.Gestrichelt then
-        Pen.Color := TRggColors.Antiquewhite;
-    end;
+        Pen.Color := TRggColors.Antiquewhite
+      else
+        Pen.Color := clGreen;
+    end
+    else
+      Pen.Color := Props.Color;
     PolyLine(ZugWanteStb);
 
     { Wante Bb }
     if Props.Coloriert then
     begin
-      Pen.Color := clRed;
       if Props.Gestrichelt then
-        Pen.Color := TRggColors.Antiquewhite;
-    end;
+        Pen.Color := TRggColors.Antiquewhite
+      else
+        Pen.Color := clRed;
+    end
+    else
+      Pen.Color := Props.Color;
     PolyLine(ZugWanteBb);
 
     { Vorstag }

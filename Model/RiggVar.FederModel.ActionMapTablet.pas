@@ -348,7 +348,7 @@ begin
       InitAC(cl, 3, faNoop, cla);
       InitAC(cl, 4, faNoop, cla);
       InitAC(cl, 5, faDemo, cla);
-      InitAC(cl, 6, faHull, claOption);
+      InitAC(cl, 6, faRggHull, claOption);
     end;
 
     5:
@@ -511,8 +511,8 @@ begin
       InitAC(cl, 2, faGrauBtn, cla);
       InitAC(cl, 3, faBlauBtn, cla);
       InitAC(cl, 4, faMultiBtn, cla);
-      InitAC(cl, 5, faKoppelBtn, cla);
-      InitAC(cl, 6, faNoop, cla);
+      InitAC(cl, 5, faRggKoppel, cla);
+      InitAC(cl, 6, faRggBogen, cla);
     end;
 
     9:
