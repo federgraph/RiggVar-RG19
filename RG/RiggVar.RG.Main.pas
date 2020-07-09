@@ -156,9 +156,14 @@ type
 
     TML: TStrings;
     FHullVisible: Boolean;
+
+    FSofortBerechnen: Boolean;
     FBtnGrauDown: Boolean;
     FBtnBlauDown: Boolean;
-    FSofortBerechnen: Boolean;
+
+    FGraphRadio: TGraphRadio;
+
+    FOnUpdateGraph: TNotifyEvent;
 
     function FormatValue(Value: single): string;
     procedure DoBiegungGF;
@@ -184,8 +189,10 @@ type
     procedure SetBtnBlauDown(const Value: Boolean);
     procedure SetBtnGrauDown(const Value: Boolean);
     procedure SetSofortBerechnen(const Value: Boolean);
+    procedure SetOnUpdateGraph(const Value: TNotifyEvent);
     procedure UpdateEAR(Value: single);
     procedure UpdateEAH(Value: single);
+    procedure SetSuperRadio(const Value: TGraphRadio);
   protected
     FAction: TFederAction;
     procedure InitFactArray;
@@ -268,6 +275,10 @@ type
     property SofortBerechnen: Boolean read FSofortBerechnen write SetSofortBerechnen;
     property BtnGrauDown: Boolean read FBtnGrauDown write SetBtnGrauDown;
     property BtnBlauDown: Boolean read FBtnBlauDown write SetBtnBlauDown;
+
+    property GraphRadio: TGraphRadio read FGraphRadio write SetSuperRadio;
+
+    property OnUpdateGraph: TNotifyEvent read FOnUpdateGraph write SetOnUpdateGraph;
   end;
 
 implementation
@@ -292,6 +303,8 @@ begin
   FSofortBerechnen := False;
   FBtnGrauDown := True;
   FBtnBlauDown := False;
+
+  FGraphRadio := gSimple;
 
   FactArray := Rigg.GSB;
   Rigg.ControllerTyp := ctOhne;
@@ -444,10 +457,15 @@ begin
   end;
 end;
 
+procedure TRggMain.SetOnUpdateGraph(const Value: TNotifyEvent);
+begin
+  FOnUpdateGraph := Value;
+end;
+
 procedure TRggMain.SetOption(fa: TFederAction);
 begin
   case fa of
-    faHull:
+    faRggHull:
     begin
       HullVisible := not HullVisible;
     end;
@@ -657,7 +675,7 @@ begin
   result := FHullVisible;
   if StrokeRigg <> nil then
   begin
-    result := StrokeRigg.QueryRenderOption(faHull);
+    result := StrokeRigg.QueryRenderOption(faRggHull);
     if result <> FHullVisible then
       FHullVisible := result;
   end;
@@ -1308,6 +1326,7 @@ begin
     fpWinkel, fpSalingW: us := GradString;
     fpEAH, fpEAR: us := KiloNewtonString;
     fpEI: us := NewtonMeterSquareString;
+    fpT1, fpT2: us := '';
   else
     us := MilimeterString;
   end;
@@ -1330,6 +1349,7 @@ begin
     fpWinkel, fpSalingW: us := GradString;
     fpEAH, fpEAR: us := KiloNewtonString;
     fpEI: us := NewtonMeterSquareString;
+    fpT1, fpT2: us := '';
   else
     us := MilimeterString;
   end;
@@ -1938,6 +1958,64 @@ end;
 procedure TRggText.UpdateText(ClearFlash: Boolean);
 begin
 
+end;
+
+procedure TRggMain.SetSuperRadio(const Value: TGraphRadio);
+begin
+  FGraphRadio := Value;
+  case Value of
+    gSimple:
+    begin
+      FSofortBerechnen := False;
+      FBtnGrauDown := False;
+      FBtnBlauDown := False;
+    end;
+
+    gNormal:
+    begin
+      FSofortBerechnen := True;
+      FBtnGrauDown := False;
+      FBtnBlauDown := False;
+    end;
+
+    gBlau:
+    begin
+      FSofortBerechnen := True;
+      FBtnGrauDown := False;
+      FBtnBlauDown := True;
+    end;
+
+    gGrau:
+    begin
+      FSofortBerechnen := True;
+      FBtnGrauDown := True;
+      FBtnBlauDown := False;
+    end;
+
+    gMulti:
+    begin
+      FSofortBerechnen := True;
+      FBtnGrauDown := True;
+      FBtnBlauDown := True;
+    end;
+
+    gDisplay:
+    begin
+      FSofortBerechnen := True;
+      FBtnGrauDown := False;
+      FBtnBlauDown := False;
+    end;
+
+    gQuick:
+    begin
+      FSofortBerechnen := True;
+      FBtnGrauDown := False;
+      FBtnBlauDown := False;
+    end;
+
+  end;
+
+  UpdateGetriebe;
 end;
 
 end.

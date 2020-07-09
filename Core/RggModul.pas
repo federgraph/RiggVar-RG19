@@ -1186,6 +1186,7 @@ begin
     Rigg.SetDefaultDocument { --> Rigg.SetDocument }
   else
     Rigg.SetDocument(Doc);
+  ViewModelM.Caption := 'Rigg';
   UpdateUI;
 end;
 
@@ -1194,6 +1195,7 @@ begin
   try
     Rigg.LoadFromDocFile(FileName); { --> Rigg.SetDocument }
     IniFileName := FileName;
+    ViewModelM.Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
     UpdateUI;
   except
     on EFileFormatError do { eat ecxeption }
@@ -1208,6 +1210,7 @@ end;
 procedure TRiggModul.Save;
 begin
   Rigg.WriteToDocFile(IniFileName);
+  ViewModelM.Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
   Modified := False;
 end;
 

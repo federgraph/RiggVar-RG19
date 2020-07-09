@@ -193,13 +193,10 @@ begin
     Zug1Saling[2].Y := -zD + OffsetY;
 
     { Controller von der Seite }
-    with Zug1Controller do
-    begin
-      Left :=  xE + OffsetX;
-      Top  := -zE - 2*ZoomFaktor + OffsetY;
-      Right :=  xE0 + OffsetX;
-      Bottom := -zE0 + 2*ZoomFaktor + OffsetY;
-    end;
+    Zug1Controller.Left :=  xE + OffsetX;
+    Zug1Controller.Top  := -zE - 2 * ZoomFaktor + OffsetY;
+    Zug1Controller.Right :=  xE0 + OffsetX;
+    Zug1Controller.Bottom := -zE0 + 2 * ZoomFaktor + OffsetY;
   end;
 end;
 
@@ -576,9 +573,9 @@ begin
     ZugSalingDS[2].y := -yB + OffsetY;
 
     { Controller }
-    ZugController[0].x := xE0 + OffsetY;
-    ZugController[0].y := -yE0 + OffsetX;
-    ZugController[1].x := xE + OffsetY;
+    ZugController[0].x := xE0 + OffsetX;
+    ZugController[0].y := -yE0 + OffsetY;
+    ZugController[1].x := xE + OffsetX;
     ZugController[1].y := -yE + OffsetY;
 
     { Vorstag }

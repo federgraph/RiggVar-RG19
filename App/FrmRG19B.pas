@@ -457,11 +457,10 @@ begin
   Main.Logger.Verbose := True;
   Main.RiggModul := RiggModul;
 
-  Caption := 'Rigg';
   StatusBar.Panels[0].Text := '';
   Application.OnHint := ShowHint;
 
-  Caption := 'Rigg - Form';
+  RiggModul.ViewModelM.Caption := 'Rigg19B';
   OnClose := FormClose;
   OnCloseQuery := FormCloseQuery;
 
@@ -581,7 +580,6 @@ begin
     end;
   end;
   RiggModul.Neu(nil);
-  Caption := 'Rigg';
 end;
 
 procedure TFormRG19B.OpenItemClick(Sender: TObject);
@@ -605,7 +603,6 @@ begin
   if OpenDialog.Execute then
   begin
     RiggModul.Open(OpenDialog.FileName);
-    Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
   end;
 end;
 
@@ -623,7 +620,6 @@ begin
   if SaveDialog.Execute then
   begin
     RiggModul.IniFileName := SaveDialog.FileName;
-    Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
     SaveItemClick(Sender);
   end;
 end;

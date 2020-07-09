@@ -536,7 +536,7 @@ begin
     faViewpointT: ViewPointT;
     faViewpoint3: ViewPoint3;
 
-    faHull: SetOption(faHull);
+    faRggHull: SetOption(faRggHull);
     faDemo: SetOption(faDemo);
 
     faTrimm0: Trimm := 0;
@@ -634,6 +634,8 @@ begin
     fa420: result := Trimm = 7;
     faLogo: result := Trimm = 8;
 
+    faRggBogen,
+    faRggKoppel,
     faWantRenderH,
     faWantRenderP,
     faWantRenderF,
@@ -646,13 +648,21 @@ begin
         result := False;
     end;
 
-    faHull: result := HullVisible;
+    faRggHull: result := HullVisible;
     faDemo: result := Demo;
 
     faSofortBtn: result := SofortBerechnen;
     faGrauBtn: result := BtnGrauDown;
     faBlauBtn: result := BtnBlauDown;
     faMemoryBtn: result := False;
+
+    faSuperSimple: result := GraphRadio = gSimple;
+    faSuperNormal: result := GraphRadio = gNormal;
+    faSuperGrau: result := GraphRadio = gGrau;
+    faSuperBlau: result := GraphRadio = gBlau;
+    faSuperMulti: result := GraphRadio = gMulti;
+    faSuperDisplay: result := GraphRadio = gDisplay;
+    faSuperQuick: result := GraphRadio = gQuick;
 
     else
       result := inherited;
@@ -692,6 +702,9 @@ begin
   ML.Add('  ResizeCounter = ' + IntToStr(ResizeCounter));
   ML.Add(Format('  ClientSize = (%d, %d)', [MainVar.ClientWidth, MainVar.ClientHeight]));
   ML.Add('---');
+  ML.Add(Format('  A = %6.2f', [Main.Rigg.Temp1]));
+  ML.Add(Format('  B = %6.2f', [Main.Rigg.Temp2]));
+  ML.Add(Format('  C = %6.2f', [Main.Rigg.Temp3]));
 end;
 
 procedure TMain1.DoCleanReport;

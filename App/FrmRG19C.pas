@@ -450,11 +450,10 @@ begin
   Main.Init420; // sets WantLogo to false
   WantLogoData := False;
 
-  Caption := 'Rigg';
   StatusBar.Panels[0].Text := '';
   Application.OnHint := ShowHint;
 
-  Caption := 'Rigg - Form';
+  RiggModul.ViewModelM.Caption := 'Rigg19C';
   OnClose := FormClose;
   OnCloseQuery := FormCloseQuery;
 
@@ -572,7 +571,6 @@ begin
     end;
   end;
   RiggModul.Neu(nil);
-  Caption := 'Rigg';
 end;
 
 procedure TFormRG19C.OpenItemClick(Sender: TObject);
@@ -596,7 +594,6 @@ begin
   if OpenDialog.Execute then
   begin
     RiggModul.Open(OpenDialog.FileName);
-    Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
   end;
 end;
 
@@ -614,7 +611,6 @@ begin
   if SaveDialog.Execute then
   begin
     RiggModul.IniFileName := SaveDialog.FileName;
-    Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
     SaveItemClick(Sender);
   end;
 end;

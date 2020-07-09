@@ -128,6 +128,22 @@ type
     procedure ControllerBtnClick(Sender: TObject);
     procedure ZweischlagBtnClick(Sender: TObject);
 
+//    procedure SofortBtnClick(Sender: TObject);
+//    procedure GrauBtnClick(Sender: TObject);
+//    procedure BlauBtnClick(Sender: TObject);
+//    procedure MultiBtnClick(Sender: TObject);
+
+//    procedure BogenBtnClick(Sender: TObject);
+//    procedure KoppelBtnClick(Sender: TObject);
+
+    procedure SuperSimpleBtnClick(Sender: TObject);
+    procedure SuperNormalBtnClick(Sender: TObject);
+    procedure SuperGrauBtnClick(Sender: TObject);
+    procedure SuperBlauBtnClick(Sender: TObject);
+    procedure SuperMultiBtnClick(Sender: TObject);
+    procedure SuperDisplayBtnClick(Sender: TObject);
+    procedure SuperQuickBtnClick(Sender: TObject);
+
     procedure M10BtnClick(Sender: TObject);
     procedure M1BtnClick(Sender: TObject);
     procedure P1BtnClick(Sender: TObject);
@@ -450,11 +466,10 @@ begin
   Main.Init420; // sets WantLogo to false
   WantLogoData := False;
 
-  Caption := 'Rigg';
   StatusBar.Panels[0].Text := '';
   Application.OnHint := ShowHint;
 
-  Caption := 'Rigg - Form';
+  RiggModul.ViewModelM.Caption := 'Rigg19';
   OnClose := FormClose;
   OnCloseQuery := FormCloseQuery;
 
@@ -572,7 +587,6 @@ begin
     end;
   end;
   RiggModul.Neu(nil);
-  Caption := 'Rigg';
 end;
 
 procedure TFormMain.OpenItemClick(Sender: TObject);
@@ -596,7 +610,6 @@ begin
   if OpenDialog.Execute then
   begin
     RiggModul.Open(OpenDialog.FileName);
-    Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
   end;
 end;
 
@@ -614,7 +627,6 @@ begin
   if SaveDialog.Execute then
   begin
     RiggModul.IniFileName := SaveDialog.FileName;
-    Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
     SaveItemClick(Sender);
   end;
 end;
@@ -773,7 +785,6 @@ begin
   ControllerBtn.Down := Value;
   RiggModul.ControllerBtnDown := Value;
   RotaForm.RaumGraph.ControllerTyp := Main.Rigg.ControllerTyp;
-//  RotaForm.RaumGraph.ControllerTyp := RiggModul.ControllerTyp;
   RotaForm.Draw;
 end;
 
@@ -1945,6 +1956,83 @@ end;
 procedure TFormMain.FixpointComboChange(Sender: TObject);
 begin
   RotaForm.FixPoint := GetComboFixPoint;
+end;
+
+//procedure TFormMain.BogenBtnClick(Sender: TObject);
+//begin
+//  RotaForm.BogenBtnClick(Sender);
+//  Main.RiggModul.UpdateUI;
+//  SpeedPanel.UpdateSpeedButtonDown;
+//  if Sender <> nil then
+//    Main.FederText.CheckState;
+//end;
+
+//procedure TFormMain.BogenBtnClick(Sender: TObject);
+//begin
+//  StrokeRigg.Bogen := not ZweischlagItem.Checked;
+//  StrokeRigg.Draw;
+//  Main.RiggModul.UpdateUI;
+//  SpeedPanel.UpdateSpeedButtonDown;
+//end;
+
+//procedure TFormMain.KoppelBtnClick(Sender: TObject);
+//begin
+//  RotaForm.KoppelBtnClick(Sender);
+//  Main.RiggModul.UpdateUI;
+//  SpeedPanel.UpdateSpeedButtonDown;
+//  if Sender <> nil then
+//    Main.FederText.CheckState;
+//end;
+
+procedure TFormMain.SuperSimpleBtnClick(Sender: TObject);
+begin
+  RotaForm.UseDisplayList := False;
+  RotaForm.WantOverlayedRiggs := False;
+  Main.GraphRadio := gSimple;
+end;
+
+procedure TFormMain.SuperNormalBtnClick(Sender: TObject);
+begin
+  RotaForm.UseDisplayList := False;
+  RotaForm.WantOverlayedRiggs := False;
+  Main.GraphRadio := gNormal;
+end;
+
+procedure TFormMain.SuperGrauBtnClick(Sender: TObject);
+begin
+  RotaForm.UseDisplayList := False;
+  RotaForm.WantOverlayedRiggs := True;
+  Main.GraphRadio := gGrau;
+end;
+
+procedure TFormMain.SuperBlauBtnClick(Sender: TObject);
+begin
+  RotaForm.UseDisplayList := False;
+  RotaForm.WantOverlayedRiggs := True;
+  Main.GraphRadio := gBlau;
+end;
+
+procedure TFormMain.SuperMultiBtnClick(Sender: TObject);
+begin
+  RotaForm.UseDisplayList := False;
+  RotaForm.WantOverlayedRiggs := True;
+  Main.GraphRadio := gMulti;
+end;
+
+procedure TFormMain.SuperDisplayBtnClick(Sender: TObject);
+begin
+  RotaForm.UseDisplayList := True;
+  RotaForm.WantOverlayedRiggs := False;
+  RotaForm.RaumGraph.DL.UseQuickSort := False;
+  Main.GraphRadio := gDisplay;
+end;
+
+procedure TFormMain.SuperQuickBtnClick(Sender: TObject);
+begin
+  RotaForm.UseDisplayList := True;
+  RotaForm.WantOverlayedRiggs := False;
+  RotaForm.RaumGraph.DL.UseQuickSort := True;
+  Main.GraphRadio := gQuick;
 end;
 
 procedure TFormMain.InitMenu;

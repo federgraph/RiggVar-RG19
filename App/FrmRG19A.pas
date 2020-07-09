@@ -315,7 +315,7 @@ begin
 
   Screen.OnActiveFormChange := UpdateMenuItems;
 
-  Caption := 'Rigg';
+  RiggModul.ViewModelM.Caption := 'Rigg19A';
   StatusBar.Panels[0].Text := '';
   Application.OnHint := ShowHint;
 
@@ -431,7 +431,6 @@ begin
     end;
   end;
   RiggModul.Neu(nil);
-  Caption := 'Rigg';
 end;
 
 procedure TFormRG19A.OpenItemClick(Sender: TObject);
@@ -455,7 +454,6 @@ begin
   if OpenDialog.Execute then
   begin
     RiggModul.Open(OpenDialog.FileName);
-    Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
   end;
 end;
 
@@ -473,7 +471,6 @@ begin
   if SaveDialog.Execute then
   begin
     RiggModul.IniFileName := SaveDialog.FileName;
-    Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
     SaveItemClick(Sender);
   end;
 end;
