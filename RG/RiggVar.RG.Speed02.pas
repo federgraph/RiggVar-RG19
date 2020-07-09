@@ -105,6 +105,7 @@ begin
     faRggZoomOut: FormMain.RotaForm.ZoomOutBtnClick(Sender);
 
     faRggBogen: FormMain.BogenBtnClick(Sender);
+    faRggKoppel: FormMain.KoppelBtnClick(Sender);
 
     faToggleChartGraph: FormMain.ChartImageBtnClick(Sender);
     faToggleSalingGraph: FormMain.SalingImageBtnClick(Sender);
@@ -122,7 +123,6 @@ begin
       FormMain.MultiBtnClick(Sender);
       UpdateSpeedButtonEnabled;
     end;
-    faKoppelBtn: FormMain.KoppelBtnClick(Sender);
   end;
 end;
 
@@ -153,7 +153,8 @@ begin
   ZoomInBtn.Down := False;
   ZoomOutBtn.Down := False;
 
-  BogenBtn.Down := FormMain.RotaForm.Bogen;
+  BogenBtn.Down := Main.GetChecked(faRggBogen);
+  KoppelBtn.Down := Main.GetChecked(faRggKoppel);
 
   ChartImageBtn.Down := FormMain.ChartControl.Visible;
   SalingImageBtn.Down := FormMain.SalingImage.Visible;
@@ -167,7 +168,6 @@ begin
   MultiBtn.Down := Main.GetChecked(faMultiBtn);
   GrauBtn.Down := Main.GetChecked(faGrauBtn);
   BlauBtn.Down := Main.GetChecked(faBlauBtn);
-  KoppelBtn.Down := Main.GetChecked(faKoppelBtn);
 end;
 
 procedure TActionSpeedBarRG02.UpdateSpeedButtonEnabled;
@@ -318,7 +318,7 @@ begin
   InitSpeedButton(sb);
 {$endif}
 
-  { Bogen }
+  { Bogen and Koppel }
 
   BtnColorValue := clvBogen;
 
@@ -327,6 +327,13 @@ begin
   sb.AllowAllUp := True;
   sb.GroupIndex := NextGroupIndex;
   sb.Tag := faRggBogen;
+  InitSpeedButton(sb);
+
+  sb := AddSpeedBtn('KoppelBtn', 0);
+  KoppelBtn := sb;
+  sb.AllowAllUp := True;
+  sb.GroupIndex := NextGroupIndex;
+  sb.Tag := faRggKoppel;
   InitSpeedButton(sb);
 
   { Image Elements, and Matrix Text }
@@ -361,7 +368,7 @@ begin
   sb.Tag := faToggleMatrixText;
   InitSpeedButton(sb);
 
-  { Original Rigg Toolbar Buttons }
+  { Memory Buttons }
 
   BtnColorValue := clvMemory;
 
@@ -374,6 +381,8 @@ begin
   MemoryRecallBtn := sb;
   sb.Tag := faMemoryRecallBtn;
   InitSpeedButton(sb);
+
+  { Rigg Buttons }
 
   BtnColorValue := clvRigg;
 
@@ -403,13 +412,6 @@ begin
   sb.AllowAllUp := True;
   sb.GroupIndex := NextGroupIndex;
   sb.Tag := faMultiBtn;
-  InitSpeedButton(sb);
-
-  sb := AddSpeedBtn('KoppelBtn', 0);
-  KoppelBtn := sb;
-  sb.AllowAllUp := True;
-  sb.GroupIndex := NextGroupIndex;
-  sb.Tag := faKoppelBtn;
   InitSpeedButton(sb);
 
   { Zoom Buttons }

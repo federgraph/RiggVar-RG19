@@ -141,7 +141,7 @@ begin
     5:
     begin
       cla := TRggColors.Beige;
-      IAC(1, faHull, TRggColors.Cyan);
+      IAC(1, faRggHull, TRggColors.Cyan);
       IAC(2, faNoop, cla);
       IAC(3, faNoop, cla);
 

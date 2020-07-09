@@ -176,7 +176,17 @@ type
     procedure GrauBtnClick(Sender: TObject);
     procedure BlauBtnClick(Sender: TObject);
     procedure MultiBtnClick(Sender: TObject);
+
+    procedure BogenBtnClick(Sender: TObject);
     procedure KoppelBtnClick(Sender: TObject);
+
+    procedure SuperSimpleBtnClick(Sender: TObject);
+    procedure SuperNormalBtnClick(Sender: TObject);
+    procedure SuperGrauBtnClick(Sender: TObject);
+    procedure SuperBlauBtnClick(Sender: TObject);
+    procedure SuperMultiBtnClick(Sender: TObject);
+    procedure SuperDisplayBtnClick(Sender: TObject);
+    procedure SuperQuickBtnClick(Sender: TObject);
   public
     procedure UpdateColorScheme;
     procedure LayoutComponents;
@@ -347,7 +357,6 @@ type
     procedure ControllerBtnClick(Sender: TObject);
     procedure UpdateBtnClick(Sender: TObject);
     procedure ReglerBtnClick(Sender: TObject);
-    procedure BogenBtnClick(Sender: TObject);
   private
     FReportLabelCaption: string;
     procedure InitMenu;
@@ -380,6 +389,7 @@ uses
   RiggVar.RG.Main,
   RiggVar.RG.Speed01,
   RiggVar.RG.Speed02,
+  RiggVar.RG.Speed03,
   RiggVar.App.Main,
   RiggVar.Util.AppUtils,
   RiggVar.FB.ActionConst,
@@ -469,7 +479,7 @@ begin
   Main.InitText;
   Main.IsUp := True;
 
-  RotaForm := TRotaForm.Create; // ownership kept by FormMain
+  RotaForm := TRotaForm.Create;
   StrokeRigg := RotaForm;
   Main.StrokeRigg := RotaForm;
   RotaForm.Image := Image;
@@ -481,7 +491,7 @@ begin
   { Set initial translation in RotatForm, FXPos and FYPos, default. }
 
   { Params }
-  Main.Param := fpVorstag; // --> TempIst wird gesetzt, SetupTrackBar() aufgerufen
+  Main.Param := fpVorstag;
   if ParamListbox <> nil then
   begin
     InitParamListbox;
@@ -577,10 +587,6 @@ begin
   Main.Free;
   Main := nil;
 
-{ RotaForm is managed via StrokeRigg interface reference }
-// RotaForm.Free;
-// StrokeRigg := nil;
-
   SalingGraph.Free;
   ControllerGraph.Free;
   ChartGraph.Free;
@@ -604,7 +610,6 @@ begin
   UpdateSalingGraph;
   UpdateControllerGraph;
   UpdateChartGraph;
-//  UpdateReport; // already done via ShowTrimm
 end;
 
 procedure TFormMain.UpdateReport;
@@ -1050,7 +1055,6 @@ begin
 
     faToggleShowLegend: RotaForm.LegendBtnClick(nil);
     faToggleUseQuickSort: RotaForm.UseQuickSortBtnClick(nil);
-    faRggBogen: RotaForm.BogenBtnClick(nil);
     faToggleChartGraph: ChartImageBtnClick(nil);
     faToggleSalingGraph: SalingImageBtnClick(nil);
     faToggleControllerGraph: ControllerImageBtnClick(nil);
@@ -1059,11 +1063,13 @@ begin
     faMemoryBtn: MemoryBtnClick(nil);
     faMemoryRecallBtn: MemoryRecallBtnClick(nil);
 
+    faRggBogen: BogenBtnClick(nil);
+    faRggKoppel: KoppelBtnClick(nil);
+
     faSofortBtn: SofortBtnClick(nil);
     faGrauBtn: GrauBtnClick(nil);
     faBlauBtn: BlauBtnClick(nil);
     faMultiBtn: MultiBtnClick(nil);
-    faKoppelBtn: KoppelBtnClick(nil);
 
     faShowActi: ActiBtnClick(nil);
     faShowMemo: MemoBtnClick(nil);
@@ -1136,7 +1142,7 @@ begin
     'G': ;
 
     'h': fa := faSalingH;
-    'H': fa := faHull;
+    'H': fa := faRggHull;
 
     'i': fa := faWheelRight;
     'I': fa := faWheelLeft;
@@ -1145,7 +1151,7 @@ begin
     'J': fa := faWheelDown;
 
     'k': ;
-    'K': fa := faKoppelBtn;
+    'K': fa := faRggKoppel;
 
     'l': fa := faMemeGotoLandscape;
     'L': fa := faToggleShowLegend;
@@ -1153,8 +1159,8 @@ begin
     'm': fa := faMemoryBtn;
     'M': fa := faCopyAndPaste;
 
-    'n': ; // fa := faRandomBlack;
-    'N': ; // fa := faRandomWhite;
+    'n': ;
+    'N': ;
 
     'r': fa := faMemeToggleReport;
     'R': fa := faReadTrimmFile;
@@ -1190,8 +1196,8 @@ begin
     '8': fa := faLogo;
     '9': ;
 
-    '!': ; //fa := faParamT1;
-    '"': ; //fa := faParamT2;
+    '!': ;
+    '"': ;
 
     '=': ; //fa := faActionPageE;
     '?': ; //fa := faActionPageX;
@@ -1199,7 +1205,7 @@ begin
     '+': fa := faActionPageP;
     '*': fa := faActionPageM;
 
-    '#': ; //fa := faBitmapEscape;
+    '#': ;
 
     else fa := faNoop;
 
@@ -1401,7 +1407,7 @@ begin
   SpeedPanel1.ShowHint := True;
   SpeedPanel1.Visible := False;
 
-  SpeedPanel2 := TActionSpeedBarRG02.Create(Self);
+  SpeedPanel2 := TActionSpeedBarRG03.Create(Self);
   SpeedPanel2.Parent := Self;
   SpeedPanel2.ShowHint := True;
   SpeedPanel2.Visible := False;
@@ -1938,13 +1944,6 @@ begin
   Main.RiggModul.UpdateUI;
 end;
 
-procedure TFormMain.KoppelBtnClick(Sender: TObject);
-begin
-  RotaForm.KoppelBtnClick(Sender);
-  Main.RiggModul.UpdateUI;
-  SpeedPanel.UpdateSpeedButtonDown;
-end;
-
 function TFormMain.GetChecked(fa: Integer): Boolean;
 begin
   result := false;
@@ -1967,14 +1966,15 @@ begin
 
     faToggleUseDisplayList: result := RotaForm.UseDisplayList;
     faToggleUseQuickSort: result := RotaForm.RaumGraph.DL.UseQuickSort;
+
     faRggBogen: result := RotaForm.Bogen;
+    faRggKoppel: result := RotaForm.RaumGraph.Koppel;
 
     faSofortBtn: result := Main.SofortBerechnen;
     faGrauBtn: result := Main.BtnGrauDown;
     faBlauBtn: result := Main.BtnBlauDown;
     faMemoryBtn: result := False;
     faMultiBtn: result := RotaForm.WantOverlayedRiggs;
-    faKoppelBtn: result := RotaForm.RaumGraph.Koppel;
 
     faToggleChartGraph: result := ChartControl.Visible;
     faToggleSalingGraph: result := SalingImage.Visible;
@@ -2105,6 +2105,83 @@ begin
 
   SalingGraph.BackgroundColor := MainVar.ColorScheme.claBackground;
   UpdateSalingGraph;
+end;
+
+procedure TFormMain.BogenBtnClick(Sender: TObject);
+begin
+  RotaForm.BogenBtnClick(Sender);
+  Main.RiggModul.UpdateUI;
+  SpeedPanel.UpdateSpeedButtonDown;
+  if Sender <> nil then
+    Main.FederText.CheckState;
+end;
+
+//procedure TFormMain.BogenBtnClick(Sender: TObject);
+//begin
+//  StrokeRigg.Bogen := not ZweischlagItem.Checked;
+//  StrokeRigg.Draw;
+//  Main.RiggModul.UpdateUI;
+//  SpeedPanel.UpdateSpeedButtonDown;
+//end;
+
+procedure TFormMain.KoppelBtnClick(Sender: TObject);
+begin
+  RotaForm.KoppelBtnClick(Sender);
+  Main.RiggModul.UpdateUI;
+  SpeedPanel.UpdateSpeedButtonDown;
+  if Sender <> nil then
+    Main.FederText.CheckState;
+end;
+
+procedure TFormMain.SuperSimpleBtnClick(Sender: TObject);
+begin
+  RotaForm.UseDisplayList := False;
+  RotaForm.WantOverlayedRiggs := False;
+  Main.GraphRadio := gSimple;
+end;
+
+procedure TFormMain.SuperNormalBtnClick(Sender: TObject);
+begin
+  RotaForm.UseDisplayList := False;
+  RotaForm.WantOverlayedRiggs := False;
+  Main.GraphRadio := gNormal;
+end;
+
+procedure TFormMain.SuperGrauBtnClick(Sender: TObject);
+begin
+  RotaForm.UseDisplayList := False;
+  RotaForm.WantOverlayedRiggs := True;
+  Main.GraphRadio := gGrau;
+end;
+
+procedure TFormMain.SuperBlauBtnClick(Sender: TObject);
+begin
+  RotaForm.UseDisplayList := False;
+  RotaForm.WantOverlayedRiggs := True;
+  Main.GraphRadio := gBlau;
+end;
+
+procedure TFormMain.SuperMultiBtnClick(Sender: TObject);
+begin
+  RotaForm.UseDisplayList := False;
+  RotaForm.WantOverlayedRiggs := True;
+  Main.GraphRadio := gMulti;
+end;
+
+procedure TFormMain.SuperDisplayBtnClick(Sender: TObject);
+begin
+  RotaForm.UseDisplayList := True;
+  RotaForm.WantOverlayedRiggs := False;
+  RotaForm.RaumGraph.DL.UseQuickSort := False;
+  Main.GraphRadio := gDisplay;
+end;
+
+procedure TFormMain.SuperQuickBtnClick(Sender: TObject);
+begin
+  RotaForm.UseDisplayList := True;
+  RotaForm.WantOverlayedRiggs := False;
+  RotaForm.RaumGraph.DL.UseQuickSort := True;
+  Main.GraphRadio := gQuick;
 end;
 
 procedure TFormMain.UpdateParent;
@@ -2702,14 +2779,6 @@ begin
   end;
 
   Main.ViewPoint := ViewPoint;
-end;
-
-procedure TFormMain.BogenBtnClick(Sender: TObject);
-begin
-  StrokeRigg.Bogen := not ZweischlagItem.Checked;
-  StrokeRigg.Draw;
-  Main.RiggModul.UpdateUI;
-  SpeedPanel.UpdateSpeedButtonDown;
 end;
 
 procedure TFormMain.WinkelItemClick(Sender: TObject);

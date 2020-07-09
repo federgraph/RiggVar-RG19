@@ -358,7 +358,7 @@ begin
   FormMain.OutputFormItem.Enabled := OutputFormItemEnabled;
 
   FormMain.KoppelkurveItem.Enabled := KoppelKurveEnabled;
-  FormMain.KoppelkurveItem.Checked := Main.GetChecked(faKoppelBtn);
+  FormMain.KoppelkurveItem.Checked := Main.GetChecked(faRggKoppel);
 
   FormMain.ZweischlagItem.Checked := Main.GetChecked(faRggBogen);
 

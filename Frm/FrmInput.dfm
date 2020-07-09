@@ -1,4 +1,4 @@
-object InputForm: TInputForm
+﻿object InputForm: TInputForm
   Left = 266
   Top = 163
   BorderStyle = bsDialog
@@ -22,7 +22,7 @@ object InputForm: TInputForm
     Top = 0
     Width = 465
     Height = 195
-    ActivePage = tsOhneStarr
+    ActivePage = tsFest
     TabOrder = 0
     OnChange = InputPagesChange
     object tsFest: TTabSheet

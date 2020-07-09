@@ -103,7 +103,8 @@ uses
   RiggVar.VM.FormMain in 'VM\RiggVar.VM.FormMain.pas',
   FrmSelect in 'Frm\FrmSelect.pas' {MemoDlg},
   FrmInfo in 'Frm\FrmInfo.pas' {FormInfo},
-  RiggVar.Util.InfoMemo in 'Util\RiggVar.Util.InfoMemo.pas';
+  RiggVar.Util.InfoMemo in 'Util\RiggVar.Util.InfoMemo.pas',
+  RiggVar.RG.Speed03 in 'RG\RiggVar.RG.Speed03.pas';
 
 {$R *.res}
 
