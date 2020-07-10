@@ -18,19 +18,18 @@
 
 interface
 
-{$ifdef fpc}
-{$mode delphi}
-{$endif}
-
 uses
-  SysUtils,
-  Classes,
-  Generics.Collections,
-  Controls,
-  ExtCtrls,
-  Forms,
-  Dialogs,
-  StdCtrls;
+  System.SysUtils,
+  System.Types,
+  System.Classes,
+  System.Generics.Collections,
+  Vcl.Controls,
+  Vcl.ExtCtrls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls,
+  System.UITypes,
+  System.UIConsts;
 
 type
   TMemoAction = record

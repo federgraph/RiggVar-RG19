@@ -1828,6 +1828,7 @@ begin
   Add(fpMastfallVorlauf);
   Add(fpBiegung);
   Add(fpD0X);
+  ParamCombo.DropDownCount := ParamCombo.Items.Count;
 end;
 
 procedure TFormMain.ParamComboChange(Sender: TObject);
@@ -2115,14 +2116,6 @@ begin
   if Sender <> nil then
     Main.FederText.CheckState;
 end;
-
-//procedure TFormMain.BogenBtnClick(Sender: TObject);
-//begin
-//  StrokeRigg.Bogen := not ZweischlagItem.Checked;
-//  StrokeRigg.Draw;
-//  Main.RiggModul.UpdateUI;
-//  SpeedPanel.UpdateSpeedButtonDown;
-//end;
 
 procedure TFormMain.KoppelBtnClick(Sender: TObject);
 begin
@@ -2611,7 +2604,7 @@ begin
   mi.Hint := '  Anteil der Salingkraft an der Mastbiegung beachten';
   mi.OnClick := KorrigiertItemClick;
 
-  { Hilfe }
+  { Help }
 
   HelpMenu := AddP('HelpMenu');;
   mi.Caption := '&Hilfe';

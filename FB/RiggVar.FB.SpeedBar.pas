@@ -2,15 +2,14 @@
 
 interface
 
-{$ifdef fpc}
-{$mode delphi}
-{$endif}
-
 uses
-  Classes,
-  StdCtrls,
-  ExtCtrls,
-  Buttons,
+  System.Classes,
+  System.UITypes,
+  System.UIConsts,
+  Graphics,
+  Vcl.StdCtrls,
+  Vcl.ExtCtrls,
+  Vcl.Buttons,
   RiggVar.FB.Color,
   RiggVar.FB.SpeedColor;
 
