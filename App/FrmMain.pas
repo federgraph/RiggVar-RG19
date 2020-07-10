@@ -1763,20 +1763,6 @@ begin
   Main.Draw;
 end;
 
-procedure TFormMain.BogenBtnClick(Sender: TObject);
-begin
-  RotaForm.BogenBtnClick(Sender);
-  if Sender <> nil then
-    Main.FederText.CheckState;
-end;
-
-procedure TFormMain.KoppelBtnClick(Sender: TObject);
-begin
-  RotaForm.KoppelBtnClick(Sender);
-  if Sender <> nil then
-    Main.FederText.CheckState;
-end;
-
 function TFormMain.GetChecked(fa: Integer): Boolean;
 begin
   result := false;
@@ -1938,6 +1924,20 @@ begin
 
   SalingGraph.BackgroundColor := MainVar.ColorScheme.claBackground;
   UpdateSalingGraph;
+end;
+
+procedure TFormMain.BogenBtnClick(Sender: TObject);
+begin
+  RotaForm.BogenBtnClick(Sender);
+  if Sender <> nil then
+    Main.FederText.CheckState;
+end;
+
+procedure TFormMain.KoppelBtnClick(Sender: TObject);
+begin
+  RotaForm.KoppelBtnClick(Sender);
+  if Sender <> nil then
+    Main.FederText.CheckState;
 end;
 
 procedure TFormMain.SuperSimpleBtnClick(Sender: TObject);

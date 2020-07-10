@@ -51,7 +51,6 @@ uses
   FrmMain,
   RiggVar.App.Main,
   RggTypes,
-  RggRaumGraph,
   RiggVar.FB.ActionConst;
 
 { TActionSpeedBarRG03 }
