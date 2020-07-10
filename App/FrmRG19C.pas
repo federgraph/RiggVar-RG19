@@ -49,7 +49,7 @@ type
     ParamCombo: TComboBox;
     FixpointCombo: TComboBox;
     TrimmMemo: TMemo;
-    ReportListbox: TListBox;
+    ReportListBox: TListBox;
     ReportMemo: TMemo;
     PaintBoxR: TPaintBox;
     OpenDialog: TOpenDialog;
@@ -109,7 +109,6 @@ type
     procedure DifferenzItemClick(Sender: TObject);
     procedure KnickenItemClick(Sender: TObject);
     procedure KorrigiertItemClick(Sender: TObject);
-    procedure AutoLoadItemClick(Sender: TObject);
 
     { Help Menu }
     procedure InfoItemClick(Sender: TObject);
@@ -225,7 +224,6 @@ type
     KraftGemessenItem: TMenuItem;
     N2: TMenuItem;
     KorrigiertItem: TMenuItem;
-    AutoLoadItem: TMenuItem;
 
     HelpMenu: TMenuItem;
     HilfeItem: TMenuItem;
@@ -769,7 +767,6 @@ begin
   ControllerBtn.Down := Value;
   RiggModul.ControllerBtnDown := Value;
   RotaForm.RaumGraph.ControllerTyp := Main.Rigg.ControllerTyp;
-//  RotaForm.RaumGraph.ControllerTyp := RiggModul.ControllerTyp;
   RotaForm.Draw;
 end;
 
@@ -957,11 +954,6 @@ procedure TFormRG19C.StatusBarItemClick(Sender: TObject);
 begin
   StatusBarItem.Checked := not StatusBarItem.Checked;
   StatusBar.Visible := StatusBarItem.Checked;
-end;
-
-procedure TFormRG19C.AutoLoadItemClick(Sender: TObject);
-begin
-  AutoLoadItem.Checked := not AutoLoadItem.Checked;
 end;
 
 function TFormRG19C.GetOpenFileName(dn, fn: string): string;
@@ -1369,7 +1361,7 @@ begin
   sb.Caption := 'Hull';
   sb.Hint := 'Hull';
   sb.AllowAllUp := True;
-  sb.Down := RotaForm.RumpfItemChecked; // Main.GetChecked(faHull);
+  sb.Down := RotaForm.RumpfItemChecked;
   sb.GroupIndex := 12;
   sb.OnClick := RotaForm.RumpfBtnClick;
 
@@ -1512,12 +1504,12 @@ begin
 //  SetupComboBox(ViewpointCombo);
   SetupComboBox(FixpointCombo);
 
-  SetupListBox(ReportListbox);
+  SetupListBox(ReportListBox);
   SetupMemo(TrimmMemo);
   SetupMemo(ReportMemo);
 
   TrimmMemo.ScrollBars := TScrollStyle.ssNone;
-  TrimmMemo.Width := ReportListbox.Width;
+  TrimmMemo.Width := ReportListBox.Width;
 
   ReportManager := TRggReportManager.Create(ReportMemo);
 
@@ -1530,7 +1522,7 @@ begin
   TrimmCombo.ItemIndex := 0;
   ParamCombo.ItemIndex := 0;
 
-  ReportListbox.ItemIndex := 0;
+  ReportListBox.ItemIndex := 0;
 
   Main.Trimm := 1;
   MT0BtnClick(nil);
@@ -1571,11 +1563,11 @@ begin
 //  ViewpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
   FixpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
 
-  ReportListbox.Left := TrimmMemo.Left;
-  ReportListbox.Top := FixpointCombo.Top + ComboHeight + Margin;
-  ReportListbox.Width := TrimmMemo.Width;
-  ReportListbox.Height := StatusBar.Top - ReportListbox.Top - Margin;
-  ReportListbox.Anchors := ReportListbox.Anchors + [akBottom];
+  ReportListBox.Left := TrimmMemo.Left;
+  ReportListBox.Top := FixpointCombo.Top + ComboHeight + Margin;
+  ReportListBox.Width := TrimmMemo.Width;
+  ReportListBox.Height := StatusBar.Top - ReportListBox.Top - Margin;
+  ReportListBox.Anchors := ReportListBox.Anchors + [akBottom];
 
   if WantConsole then
   begin
@@ -1588,7 +1580,7 @@ begin
     ConsoleHeight := 0;
   end;
 
-  ReportMemo.Left := ReportListbox.Left + ReportListbox.Width + Margin;
+  ReportMemo.Left := ReportListBox.Left + ReportListBox.Width + Margin;
   ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + Margin + ConsoleHeight;
   ReportMemo.Height := StatusBar.Top - ReportMemo.Top - Margin;
   ReportMemo.Width := ConsoleWidth;
@@ -1603,7 +1595,7 @@ end;
 
 procedure TFormRG19C.InitEventHandlers;
 begin
-  ReportListbox.OnClick := ListBoxClick;
+  ReportListBox.OnClick := ListBoxClick;
   Self.OnMouseWheel := FormMouseWheel;
 
   M1Btn.OnClick := M1BtnClick;
@@ -1727,15 +1719,15 @@ end;
 
 procedure TFormRG19C.InitReportListBox;
 begin
-  ReportListbox.Clear;
-  ReportManager.InitLB(ReportListbox.Items);
+  ReportListBox.Clear;
+  ReportManager.InitLB(ReportListBox.Items);
 end;
 
 procedure TFormRG19C.ListBoxClick(Sender: TObject);
 var
   ii: Integer;
 begin
-  ii := ReportListbox.ItemIndex;
+  ii := ReportListBox.ItemIndex;
   if ii > -1 then
   begin
     ReportManager.CurrentIndex := ii;
@@ -1805,28 +1797,27 @@ begin
 end;
 
 procedure TFormRG19C.InitParamCombo;
-  procedure ACI(fp: TFederParam);
-  var
-    s: string;
+  procedure Add(fp: TFederParam);
   begin
-    s := Main.Param2Text(fp);
-    ParamCombo.Items.AddObject(s, TObject(fp));
+    ParamCombo.Items.AddObject(Main.Param2Text(fp), TObject(fp));
   end;
 begin
-  ACI(fpVorstag);
-  ACI(fpWinkel);
-  ACI(fpController);
-  ACI(fpWante);
-  ACI(fpWoben);
-  ACI(fpSalingH);
-  ACI(fpSalingA);
-  ACI(fpSalingL);
-  ACI(fpSalingW);
-  ACI(fpMastfallF0C);
-  ACI(fpMastfallF0F);
-  ACI(fpMastfallVorlauf);
-  ACI(fpBiegung);
-  ACI(fpD0X);
+  if ParamCombo = nil then
+    Exit;
+  Add(fpVorstag);
+  Add(fpWinkel);
+  Add(fpController);
+  Add(fpWante);
+  Add(fpWoben);
+  Add(fpSalingH);
+  Add(fpSalingA);
+  Add(fpSalingL);
+  Add(fpSalingW);
+  Add(fpMastfallF0C);
+  Add(fpMastfallF0F);
+  Add(fpMastfallVorlauf);
+  Add(fpBiegung);
+  Add(fpD0X);
   ParamCombo.DropDownCount := ParamCombo.Items.Count;
 end;
 
@@ -2047,13 +2038,13 @@ begin
 
   InputFormItem := AddI('InputItem');
   mi.Caption := '&Eingabe ...';
-  mi.Hint := '  Eingabeseiten im eigenen Fenster anzeigen';
+  mi.Hint := '  Eingabeseiten anzeigen';
   mi.ShortCut := 16453;
   mi.OnClick := InputFormItemClick;
 
   OutputFormItem := AddI('OutputFormItem');
   mi.Caption := '&Ausgabe ...';
-  mi.Hint := '  Ausgabeseiten im eigenen Fenster anzeigen';
+  mi.Hint := '  Ausgabeseiten anzeigen';
   mi.ShortCut := 16449;
   mi.OnClick := OutputFormItemClick;
 
@@ -2109,7 +2100,7 @@ begin
   mi.Hint := '  Statusleiste einblenden';
   mi.OnClick := StatusBarItemClick;
 
-  { Memo }
+  { Tabellen }
 
   MemoMenu := AddP('MemoMenu');
   mi.Caption := '&Tabellen';
@@ -2253,7 +2244,7 @@ begin
   mi.Hint := '  Mast als Bogen oder Zweischlag zeichnen';
   mi.OnClick := ZweischlagBtnClick;
 
-  { Optionen }
+  { Modell }
 
   OptionenMenu := AddP('OptionenMenu');
   mi.Caption := '&Modell';
@@ -2273,13 +2264,13 @@ begin
   mi.RadioItem := True;
   mi.OnClick := SalingTypChanged;
 
-  OSBItem := AddI('OhneItem');
+  OSBItem := AddI('OSBItem');
   mi.Caption := 'ohne Salinge / Mast biegt aus';
   mi.Hint := '  Modell: Biegeknicken des Mastes ohne Salinge';
   mi.RadioItem := True;
   mi.OnClick := SalingTypChanged;
 
-  OSSItem := AddI('OSDlgItem');
+  OSSItem := AddI('OSSItem');
   mi.Caption := 'ohne Saling / Mast starr';
   mi.Hint := '  Modell: Mast steif ohne Salinge';
   mi.RadioItem := True;
@@ -2354,12 +2345,6 @@ begin
   mi.Hint := '  Anteil der Salingkraft an der Mastbiegung beachten';
   mi.OnClick := KorrigiertItemClick;
 
-  AutoLoadItem := AddI('AutoLoadItem');
-  mi.Caption := 'Datensatz automatisch laden';
-  mi.GroupIndex := 3;
-  mi.Hint := '  Datensätze aus Datenbank einlesen, wenn selektiert';
-  mi.OnClick := AutoLoadItemClick;
-
   { Help }
 
   HelpMenu := AddP('HelpMenu');;
@@ -2374,19 +2359,19 @@ begin
   mi.Enabled := False;
 
   InfoItem := AddI('InfoItem');
-  mi.Caption := '&Info...';
+  mi.Caption := '&Info ...';
   mi.Hint := '  Infofenster anzeigen';
   mi.OnClick := InfoItemClick;
+
+  AboutItem := AddI('AboutItem');
+  mi.Caption := 'About ...';
+  mi.Hint := '  KreisForm.ShowModal';
+  mi.OnClick := AboutItemClick;
 
   LogoItem := AddI('LogoItem');
   mi.Caption := 'Logo';
   mi.Hint := '  Toggle between Logo and 420 (Reset)';
   mi.OnClick := LogoItemClick;
-
-  AboutItem := AddI('DreItem');
-  mi.Caption := 'About';
-  mi.Hint := '  KreisForm.ShowModal';
-  mi.OnClick := AboutItemClick;
 end;
 
 procedure TFormRG19C.SeiteBtnClick(Sender: TObject);

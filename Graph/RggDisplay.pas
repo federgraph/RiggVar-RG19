@@ -2,17 +2,17 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  Vcl.Graphics,
-  System.UITypes,
-  System.UIConsts,
-  System.Types,
-  System.SysUtils,
-  System.Classes,
-  System.Math,
-  System.Math.Vectors,
-  System.Generics.Collections,
-  System.Generics.Defaults,
+  Types,
+  Graphics,
+  SysUtils,
+  Classes,
+  Generics.Collections,
+  Generics.Defaults,
   RggTypes,
   RggCalc,
   RggDisplayTypes,
@@ -114,6 +114,10 @@ type
 
 implementation
 
+uses
+  RiggVar.App.Main,
+  RiggVar.FB.Color;
+
 { TDisplayItem }
 
 procedure TDisplayItem.Assign(Value: TDisplayItem);
@@ -126,26 +130,33 @@ procedure TDisplayItem.DrawLegend(g: TCanvas; j: Integer);
 var
   x, y, w, h: Integer;
   R: TRect;
+  v3: Integer;
+  v4: Integer;
+  v10: Integer;
 begin
-  w := 100;
-  h := 30;
-  x := 4;
-  y := 4 + j * h;
+  v3 := Round(3 * MainVar.Scale);
+  v4 := Round(4 * MainVar.Scale);
+  v10 := Round(10 * MainVar.Scale);
+
+  w := Round(100 * MainVar.Scale);
+  h := Round(30 * MainVar.Scale);
+  x := v4;
+  y := v4 + j * h;
   if IsRod then
-    x := x + 20;
+    x := x + Round(20 * MainVar.Scale);
 
   R := Rect(x, y, x + w, (j + 1) * h);
   R.Offset(-NullpunktOffset.X, -NullpunktOffset.Y);
 
   g.Pen.Width := 3;
-  g.Pen.Color := TColors.Beige;
+  g.Pen.Color := TRggColors.Beige;
   g.Brush.Color := StrokeColor;
   g.Rectangle(R);
 
   g.Pen.Color := StrokeColor;
   g.Font.Name := 'Consolas';
   g.Font.Size := 12;
-  g.TextOut(x - NullpunktOffset.X + 10, y - NullpunktOffset.Y + 3, Name);
+  g.TextOut(x - NullpunktOffset.X + v10, y - NullpunktOffset.Y + v3, Name);
 end;
 
 procedure TDisplayItem.Draw(g: TCanvas);

@@ -109,7 +109,6 @@ type
     procedure DifferenzItemClick(Sender: TObject);
     procedure KnickenItemClick(Sender: TObject);
     procedure KorrigiertItemClick(Sender: TObject);
-    procedure AutoLoadItemClick(Sender: TObject);
 
     { Help Menu }
     procedure InfoItemClick(Sender: TObject);
@@ -136,13 +135,13 @@ type
 //    procedure BogenBtnClick(Sender: TObject);
 //    procedure KoppelBtnClick(Sender: TObject);
 
-    procedure SuperSimpleBtnClick(Sender: TObject);
-    procedure SuperNormalBtnClick(Sender: TObject);
-    procedure SuperGrauBtnClick(Sender: TObject);
-    procedure SuperBlauBtnClick(Sender: TObject);
-    procedure SuperMultiBtnClick(Sender: TObject);
-    procedure SuperDisplayBtnClick(Sender: TObject);
-    procedure SuperQuickBtnClick(Sender: TObject);
+//    procedure SuperSimpleBtnClick(Sender: TObject);
+//    procedure SuperNormalBtnClick(Sender: TObject);
+//    procedure SuperGrauBtnClick(Sender: TObject);
+//    procedure SuperBlauBtnClick(Sender: TObject);
+//    procedure SuperMultiBtnClick(Sender: TObject);
+//    procedure SuperDisplayBtnClick(Sender: TObject);
+//    procedure SuperQuickBtnClick(Sender: TObject);
 
     procedure M10BtnClick(Sender: TObject);
     procedure M1BtnClick(Sender: TObject);
@@ -241,7 +240,6 @@ type
     KraftGemessenItem: TMenuItem;
     N2: TMenuItem;
     KorrigiertItem: TMenuItem;
-    AutoLoadItem: TMenuItem;
 
     HelpMenu: TMenuItem;
     HilfeItem: TMenuItem;
@@ -408,7 +406,7 @@ begin
 {$ifdef Debug}
    ReportMemoryLeaksOnShutdown := True;
 {$endif}
-//  FormatSettings.DecimalSeparator := '.';
+  FormatSettings.DecimalSeparator := '.';
 
   FScale := 1.0;
 {$ifdef MSWindows}
@@ -972,11 +970,6 @@ procedure TFormMain.StatusBarItemClick(Sender: TObject);
 begin
   StatusBarItem.Checked := not StatusBarItem.Checked;
   StatusBar.Visible := StatusBarItem.Checked;
-end;
-
-procedure TFormMain.AutoLoadItemClick(Sender: TObject);
-begin
-  AutoLoadItem.Checked := not AutoLoadItem.Checked;
 end;
 
 function TFormMain.GetOpenFileName(dn, fn: string): string;
@@ -1820,28 +1813,27 @@ begin
 end;
 
 procedure TFormMain.InitParamCombo;
-  procedure ACI(fp: TFederParam);
-  var
-    s: string;
+  procedure Add(fp: TFederParam);
   begin
-    s := Main.Param2Text(fp);
-    ParamCombo.Items.AddObject(s, TObject(fp));
+    ParamCombo.Items.AddObject(Main.Param2Text(fp), TObject(fp));
   end;
 begin
-  ACI(fpVorstag);
-  ACI(fpWinkel);
-  ACI(fpController);
-  ACI(fpWante);
-  ACI(fpWoben);
-  ACI(fpSalingH);
-  ACI(fpSalingA);
-  ACI(fpSalingL);
-  ACI(fpSalingW);
-  ACI(fpMastfallF0C);
-  ACI(fpMastfallF0F);
-  ACI(fpMastfallVorlauf);
-  ACI(fpBiegung);
-  ACI(fpD0X);
+  if ParamCombo = nil then
+    Exit;
+  Add(fpVorstag);
+  Add(fpWinkel);
+  Add(fpController);
+  Add(fpWante);
+  Add(fpWoben);
+  Add(fpSalingH);
+  Add(fpSalingA);
+  Add(fpSalingL);
+  Add(fpSalingW);
+  Add(fpMastfallF0C);
+  Add(fpMastfallF0F);
+  Add(fpMastfallVorlauf);
+  Add(fpBiegung);
+  Add(fpD0X);
   ParamCombo.DropDownCount := ParamCombo.Items.Count;
 end;
 
@@ -1957,32 +1949,24 @@ procedure TFormMain.FixpointComboChange(Sender: TObject);
 begin
   RotaForm.FixPoint := GetComboFixPoint;
 end;
+(*
+procedure TFormMain.BogenBtnClick(Sender: TObject);
+begin
+  RotaForm.BogenBtnClick(Sender);
+  Main.RiggModul.UpdateUI;
+  SpeedPanel.UpdateSpeedButtonDown;
+  if Sender <> nil then
+    Main.FederText.CheckState;
+end;
 
-//procedure TFormMain.BogenBtnClick(Sender: TObject);
-//begin
-//  RotaForm.BogenBtnClick(Sender);
-//  Main.RiggModul.UpdateUI;
-//  SpeedPanel.UpdateSpeedButtonDown;
-//  if Sender <> nil then
-//    Main.FederText.CheckState;
-//end;
-
-//procedure TFormMain.BogenBtnClick(Sender: TObject);
-//begin
-//  StrokeRigg.Bogen := not ZweischlagItem.Checked;
-//  StrokeRigg.Draw;
-//  Main.RiggModul.UpdateUI;
-//  SpeedPanel.UpdateSpeedButtonDown;
-//end;
-
-//procedure TFormMain.KoppelBtnClick(Sender: TObject);
-//begin
-//  RotaForm.KoppelBtnClick(Sender);
-//  Main.RiggModul.UpdateUI;
-//  SpeedPanel.UpdateSpeedButtonDown;
-//  if Sender <> nil then
-//    Main.FederText.CheckState;
-//end;
+procedure TFormMain.KoppelBtnClick(Sender: TObject);
+begin
+  RotaForm.KoppelBtnClick(Sender);
+  Main.RiggModul.UpdateUI;
+  SpeedPanel.UpdateSpeedButtonDown;
+  if Sender <> nil then
+    Main.FederText.CheckState;
+end;
 
 procedure TFormMain.SuperSimpleBtnClick(Sender: TObject);
 begin
@@ -2034,7 +2018,7 @@ begin
   RotaForm.RaumGraph.DL.UseQuickSort := True;
   Main.GraphRadio := gQuick;
 end;
-
+*)
 procedure TFormMain.InitMenu;
 var
   p: TMenuItem;
@@ -2139,13 +2123,13 @@ begin
 
   InputFormItem := AddI('InputItem');
   mi.Caption := '&Eingabe ...';
-  mi.Hint := '  Eingabeseiten im eigenen Fenster anzeigen';
+  mi.Hint := '  Eingabeseiten anzeigen';
   mi.ShortCut := 16453;
   mi.OnClick := InputFormItemClick;
 
   OutputFormItem := AddI('OutputFormItem');
   mi.Caption := '&Ausgabe ...';
-  mi.Hint := '  Ausgabeseiten im eigenen Fenster anzeigen';
+  mi.Hint := '  Ausgabeseiten anzeigen';
   mi.ShortCut := 16449;
   mi.OnClick := OutputFormItemClick;
 
@@ -2201,7 +2185,7 @@ begin
   mi.Hint := '  Statusleiste einblenden';
   mi.OnClick := StatusBarItemClick;
 
-  { Memo }
+  { Tabellen }
 
   MemoMenu := AddP('MemoMenu');
   mi.Caption := '&Tabellen';
@@ -2345,7 +2329,7 @@ begin
   mi.Hint := '  Mast als Bogen oder Zweischlag zeichnen';
   mi.OnClick := ZweischlagBtnClick;
 
-  { Optionen }
+  { Modell }
 
   OptionenMenu := AddP('OptionenMenu');
   mi.Caption := '&Modell';
@@ -2365,13 +2349,13 @@ begin
   mi.RadioItem := True;
   mi.OnClick := SalingTypChanged;
 
-  OSBItem := AddI('OhneItem');
+  OSBItem := AddI('OSBItem');
   mi.Caption := 'ohne Salinge / Mast biegt aus';
   mi.Hint := '  Modell: Biegeknicken des Mastes ohne Salinge';
   mi.RadioItem := True;
   mi.OnClick := SalingTypChanged;
 
-  OSSItem := AddI('OSDlgItem');
+  OSSItem := AddI('OSSItem');
   mi.Caption := 'ohne Saling / Mast starr';
   mi.Hint := '  Modell: Mast steif ohne Salinge';
   mi.RadioItem := True;
@@ -2446,12 +2430,6 @@ begin
   mi.Hint := '  Anteil der Salingkraft an der Mastbiegung beachten';
   mi.OnClick := KorrigiertItemClick;
 
-  AutoLoadItem := AddI('AutoLoadItem');
-  mi.Caption := 'Datensatz automatisch laden';
-  mi.GroupIndex := 3;
-  mi.Hint := '  Datensätze aus Datenbank einlesen, wenn selektiert';
-  mi.OnClick := AutoLoadItemClick;
-
   { Help }
 
   HelpMenu := AddP('HelpMenu');;
@@ -2466,19 +2444,19 @@ begin
   mi.Enabled := False;
 
   InfoItem := AddI('InfoItem');
-  mi.Caption := '&Info...';
+  mi.Caption := '&Info ...';
   mi.Hint := '  Infofenster anzeigen';
   mi.OnClick := InfoItemClick;
+
+  AboutItem := AddI('AboutItem');
+  mi.Caption := 'About ...';
+  mi.Hint := '  KreisForm.ShowModal';
+  mi.OnClick := AboutItemClick;
 
   LogoItem := AddI('LogoItem');
   mi.Caption := 'Logo';
   mi.Hint := '  Toggle between Logo and 420 (Reset)';
   mi.OnClick := LogoItemClick;
-
-  AboutItem := AddI('DreItem');
-  mi.Caption := 'About';
-  mi.Hint := '  KreisForm.ShowModal';
-  mi.OnClick := AboutItemClick;
 end;
 
 procedure TFormMain.SeiteBtnClick(Sender: TObject);

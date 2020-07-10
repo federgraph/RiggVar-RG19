@@ -714,12 +714,6 @@ object FormRG19A: TFormRG19A
         Hint = '  Anteil der Salingkraft an der Mastbiegung beachten'
         OnClick = KorrigiertItemClick
       end
-      object AutoLoadItem: TMenuItem
-        Caption = 'Datensatz automatisch laden'
-        GroupIndex = 3
-        Hint = '  Datens'#228'tze aus Datenbank einlesen, wenn selektiert'
-        OnClick = AutoLoadItemClick
-      end
     end
     object WindowMenu: TMenuItem
       Caption = '&Fenster'
@@ -760,7 +754,7 @@ object FormRG19A: TFormRG19A
         OnClick = AboutItemClick
       end
       object InfoItem: TMenuItem
-        Caption = '&Info'
+        Caption = '&Info ...'
         Hint = '  Infofenster anzeigen'
         OnClick = InfoItemClick
       end

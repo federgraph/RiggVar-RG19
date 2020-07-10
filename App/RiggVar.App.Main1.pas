@@ -116,35 +116,29 @@ end;
 
 procedure TMain1.SetShowTrimmText(const Value: Boolean);
 begin
-//  FederText.TrimmVisible := Value;
 end;
 
 procedure TMain1.SetShowDiffText(const Value: Boolean);
 begin
-//  FederText.DiffVisible := Value;
 end;
 
 procedure TMain1.SetShowDataText(const Value: Boolean);
 begin
-//  FederText.DataVisible := Value;
 end;
 
 function TMain1.GetShowTrimmText: Boolean;
 begin
   result := False;
-//  result := FederText.TrimmVisible;
 end;
 
 function TMain1.GetShowDiffText: Boolean;
 begin
   result := False;
-//  result := FederText.DiffVisible;
 end;
 
 function TMain1.GetShowDataText: Boolean;
 begin
   result := True;
-//  result := FederText.DataVisible;
 end;
 
 procedure TMain1.WriteTrimmItem;

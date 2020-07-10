@@ -111,7 +111,6 @@ type
     KorrigiertItem: TMenuItem;
     ZweischlagItem: TMenuItem;
     N2: TMenuItem;
-    AutoLoadItem: TMenuItem;
     N1: TMenuItem;
 
     WindowMenu: TMenuItem;
@@ -191,7 +190,6 @@ type
     procedure DifferenzItemClick(Sender: TObject);
     procedure KnickenItemClick(Sender: TObject);
     procedure KorrigiertItemClick(Sender: TObject);
-    procedure AutoLoadItemClick(Sender: TObject);
     procedure AboutItemClick(Sender: TObject);
     procedure InfoItemClick(Sender: TObject);
 
@@ -277,11 +275,11 @@ begin
 {$endif}
 
   FormRG19A := self;
-  if (Screen.Width > FScale * 1800) then
+  if (Screen.Width > 1700 * FScale) then
   begin
     Left := Round(60 * FScale);
     Top := Round(105 * FScale);
-    Width := Round(1500 * FScale);
+    Width := Round(1600 * FScale);
     Height := Round(768 * FScale);
   end
   else
@@ -313,13 +311,13 @@ begin
   Main.RiggModul := RiggModul;
   Main.StrokeRigg := TDummyStrokeRigg.Create(RiggModul.Rigg);
 
-  Screen.OnActiveFormChange := UpdateMenuItems;
-
-  RiggModul.ViewModelM.Caption := 'Rigg19A';
   StatusBar.Panels[0].Text := '';
   Application.OnHint := ShowHint;
 
-  AutoLoadItem.Visible := False;
+  Screen.OnActiveFormChange := UpdateMenuItems;
+
+  RiggModul.ViewModelM.Caption := 'Rigg19A';
+
   LogoItem.Checked := WantLogoData;
 
   Main.IsUp := True;
@@ -338,9 +336,6 @@ procedure TFormRG19A.FormDestroy(Sender: TObject);
 begin
   Main.Free;
   Main := nil;
-
-//  RiggModul.Free;
-//  RiggModul := nil;
 end;
 
 procedure TFormRG19A.SalingTypChanged(Sender: TObject);
@@ -616,15 +611,6 @@ begin
   end;
 end;
 
-procedure TFormRG19A.SetControllerEnabled;
-var
-  tempBool: Boolean;
-begin
-  tempBool := RiggModul.ControllerEnabled;
-  ControllerItem.Enabled := tempBool;
-  ControllerBtn.Enabled := tempBool;
-end;
-
 procedure TFormRG19A.SetControllerChecked(Value: Boolean);
 begin
   ControllerItem.Checked := Value;
@@ -715,9 +701,23 @@ begin
   RiggModul.AdjustGrafik;
 end;
 
-procedure TFormRG19A.CalcOffsetItemClick(Sender: TObject);
+procedure TFormRG19A.SetControllerEnabled;
+var
+  tempBool: Boolean;
 begin
-  RiggModul.GetGBoxOffset;
+  tempBool := RiggModul.ControllerEnabled;
+  ControllerItem.Enabled := tempBool;
+  ControllerBtn.Enabled := tempBool;
+end;
+
+procedure TFormRG19A.ConsoleItemClick(Sender: TObject);
+begin
+  if RiggModul.ConsoleActive then
+  begin
+    ConsoleForm.Close;
+    Exit;
+  end;
+  ConsoleForm := TConsoleForm.Create(Self);
 end;
 
 procedure TFormRG19A.WindowCascadeItemClick(Sender: TObject);
@@ -751,6 +751,11 @@ begin
   WindowTileItem.Enabled := MDIChildCount > 0;
   WindowArrangeItem.Enabled := MDIChildCount > 0;
   WindowMinimizeItem.Enabled := MDIChildCount > 0;
+end;
+
+procedure TFormRG19A.CalcOffsetItemClick(Sender: TObject);
+begin
+  RiggModul.GetGBoxOffset;
 end;
 
 procedure TFormRG19A.InputFormItemClick(Sender: TObject);
@@ -823,16 +828,6 @@ begin
   RotaFormItem.Hint := '  3D Grafik schließen';
 end;
 
-procedure TFormRG19A.ConsoleItemClick(Sender: TObject);
-begin
-  if RiggModul.ConsoleActive then
-  begin
-    ConsoleForm.Close;
-    Exit;
-  end;
-  ConsoleForm := TConsoleForm.Create(Self);
-end;
-
 procedure TFormRG19A.SpeedBarItemClick(Sender: TObject);
 begin
   SpeedBarItem.Checked := not SpeedBarItem.Checked;
@@ -843,11 +838,6 @@ procedure TFormRG19A.StatusBarItemClick(Sender: TObject);
 begin
   StatusBarItem.Checked := not StatusBarItem.Checked;
   StatusBar.Visible := StatusBarItem.Checked;
-end;
-
-procedure TFormRG19A.AutoLoadItemClick(Sender: TObject);
-begin
-  AutoLoadItem.Checked := not AutoLoadItem.Checked;
 end;
 
 function TFormRG19A.GetOpenFileName(dn, fn: string): string;

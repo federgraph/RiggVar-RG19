@@ -311,7 +311,7 @@ object FormRG19B: TFormRG19B
         777770000000}
     end
   end
-  object Listbox: TListBox
+  object ReportListBox: TListBox
     Left = 8
     Top = 389
     Width = 169
