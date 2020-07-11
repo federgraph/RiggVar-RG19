@@ -52,7 +52,6 @@ type
   TRiggModul = class
   protected
     FBackgroundColor: TColor;
-    FKorrigiertItem: Boolean;
     FControllerBtnDown: Boolean;
     FWinkelBtnDown: Boolean;
     FDiffBtnDown: Boolean;
@@ -92,7 +91,6 @@ type
     sbPuffer: TTrimmControls;
 
     function GetControllerEnabled: Boolean;
-    procedure SetKorrigiertItem(Value: Boolean);
     procedure SetControllerBtnDown(Value: Boolean);
     procedure SetDiffBtnDown(Value: Boolean);
     procedure SetSofortBtnDown(Value: Boolean);
@@ -140,7 +138,6 @@ type
     procedure sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
 
     { Properties }
-    property KorrigiertItem: Boolean read FKorrigiertItem write SetKorrigiertItem;
     property ControllerBtnDown: Boolean read FControllerBtnDown write SetControllerBtnDown;
     property WinkelBtnDown: Boolean read FWinkelBtnDown write SetWinkelBtnDown;
     property DiffBtnDown: Boolean read FDiffBtnDown write SetDiffBtnDown;
@@ -254,7 +251,6 @@ constructor TRiggModul.Create;
 begin
   inherited;
   FBackgroundColor := clBtnFace;
-  FKorrigiertItem := True;
   FControllerBtnDown := True;
   FWinkelBtnDown := False;
   FDiffBtnDown := False;
@@ -623,68 +619,7 @@ begin
   lbSpannung := Format('Spannung = %5.0f N', [Rigg.rF[14]]);
   lbBiegung := Format('Biegung  = %5.1f cm', [Rigg.hd / 10]);
 
-  ML.Add('Trimm:');
-  ML.Add(Format('  Mastfall F0F     = %8.1f cm', [Rigg.Trimm.Mastfall / 10]));
-  ML.Add(Format('  Vorstagspannung  = %8.1f N', [Rigg.rF[14]]));
-  ML.Add(Format('  Durchbiegung hd  = %8.1f cm', [Rigg.hd / 10]));
-
-  ML.Add('');
-  ML.Add('Saling:');
-  ML.Add(Format('  Saling Länge   = %6.2f mm', [tempSalingDaten.SalingL]));
-  ML.Add(Format('  Saling Höhe    = %6.2f mm', [tempSalingDaten.SalingH]));
-  ML.Add(Format('  Saling Abstand = %6.2f mm', [tempSalingDaten.SalingA]));
-  ML.Add(Format('  Saling Winkel  = %6.2f Grad', [tempSalingDaten.SalingW]));
-  ML.Add(Format('  Wanten Winkel  = %6.2f Grad', [tempSalingDaten.WantenWinkel]));
-  ML.Add(Format('  Kraft Winkel   = %6.2f Grad', [tempSalingDaten.KraftWinkel]));
-
-  ML.Add('');
-  ML.Add('SchnittKräfte:');
-  ML.Add(Format('  FC  = %8.2f N    (Mastdruckkraft)', [Rigg.FC]));
-  ML.Add(Format('  FB  = %8.2f N    (Wanten/Vorstag)', [Rigg.FB]));
-  ML.Add(Format('  F2  = %8.2f N    (Saling)', [Rigg.F2]));
-  ML.Add(Format('  F1  = %8.2f N    (Controller)', [Rigg.F1]));
-  ML.Add(Format('  FA  = %8.2f N    (Mastfuß)', [Rigg.FA]));
-  ML.Add(Format('  hd  = %8.2f mm   (Saling Durchbiegung)', [Rigg.hd]));
-  ML.Add(Format('  he  = %8.2f mm   (Controller Durchbiegung)', [Rigg.he]));
-  ML.Add(Format('  sd  = %8.2f mm   (hd-FSalingWegKnick)', [Rigg.hd-Rigg.FSalingWegKnick]));
-
-  ML.Add('');
-  ML.Add('BiegeKnicken:');
-  ML.Add(Format('  KoppelFaktor       = %8.5f', [Rigg.FKoppelFaktor]));
-  ML.Add(Format('  SalingAlpha        = %8.5f mm/N', [Rigg.FSalingAlpha]));
-  ML.Add(Format('  ControllerAlpha    = %8.5f mm/N', [Rigg.FControllerAlpha]));
-  ML.Add(Format('  SalingWeg          = %8.2f mm', [Rigg.FSalingWeg]));
-  ML.Add(Format('  SalingWegKnick     = %8.2f mm', [Rigg.FSalingWegKnick]));
-  ML.Add(Format('  ControllerWeg      = %8.2f mm', [Rigg.FControllerWeg]));
-  ML.Add(Format('  FSchnittPunktKraft = %8.2f N', [Rigg.FSchnittPunktKraft]));
-  ML.Add(Format('  FwSchnittOhne      = %8.2f mm', [Rigg.FwSchnittOhne]));
-  ML.Add(Format('  FwSchnittMit       = %8.2f mm', [Rigg.FwSchnittMit]));
-  ML.Add(Format('  FwSchnittOffset    = %8.2f mm', [Rigg.FwSchnittOffset]));
-
-  ML.Add('');
-  ML.Add('SchnittWinkel:');
-  ML.Add(Format('  alpha1 = %6.2f Grad', [Rigg.alpha1 * 180 / pi]));
-  ML.Add(Format('  alpha2 = %6.2f Grad', [Rigg.alpha2 * 180 / pi]));
-  ML.Add(Format('  delta1 = %6.2f Grad', [Rigg.delta1 * 180 / pi]));
-  ML.Add(Format('  delta2 = %6.2f Grad', [Rigg.delta2 * 180 / pi]));
-  ML.Add(Format('  gamma  = %6.2f Grad', [Rigg.gamma * 180 / pi]));
-  ML.Add(Format('  beta   = %6.2f Grad', [Rigg.beta * 180 / pi]));
-
-  ML.Add('');
-  ML.Add('Winkel:');
-  ML.Add(Format('  phi       = %6.2f Grad', [Rigg.phi * 180 / pi]));
-  ML.Add(Format('  psi       = %6.2f Grad', [Rigg.psi * 180 / pi]));
-  ML.Add(Format('  alpha     = %6.2f Grad', [Rigg.alpha * 180 / pi]));
-  ML.Add(Format('  phi-alpha = %6.2f Grad (Mast-Neigung)', [(Rigg.phi-Rigg.alpha)*180/pi]));
-  ML.Add(Format('  psi-alpha = %6.2f Grad (Wanten-Neigung)', [(Rigg.psi-Rigg.alpha)*180/pi]));
-
-  ML.Add('');
-  ML.Add('MastWinkel:');
-  ML.Add(Format('  epsB = %6.2f Grad', [Rigg.epsB * 180 / pi]));
-  ML.Add(Format('  eps2 = %6.2f Grad', [Rigg.eps2 * 180 / pi]));
-  ML.Add(Format('  eps1 = %6.2f Grad', [Rigg.eps1 * 180 / pi]));
-  ML.Add(Format('  epsA = %6.2f Grad', [Rigg.epsA * 180 / pi]));
-  ML.Add(Format('  Epsilon  = %6.2f Grad', [epsilon * 180 / pi]));
+  Rigg.AusgabeText(ML);
 
   SendMessage(OutputForm.DisplayMemo.Handle, EM_LINESCROLL, 0, MemoPosY);
   ML.EndUpdate;
@@ -692,26 +627,13 @@ end;
 
 procedure TRiggModulG.AusgabeKommentar;
 var
-  temp: double;
   ML: TStrings;
 begin
   ML := OutputForm.KommentarMemo.Lines;
   ML.BeginUpdate;
   ML.Clear;
 
-  temp := Rigg.hd / 10; { Biegung in cm }
-  if temp < 0 then
-    ML.Add('Mastbiegung negativ!');
-  if temp < 2 then
-    ML.Add('Mast hat fast keine Vorbiegung.');
-  if temp > 10 then
-    ML.Add('Mastbiegung zu groß.');
-
-  temp := Rigg.rF[14]; { Vorstagspannung in N }
-  if temp < 800 then
-    ML.Add('Vorstagspannung zu gering.');
-  if temp > 2000 then
-    ML.Add('Vorstagspannung zu groß.');
+  Rigg.AusgabeText(ML);
 
   ML.EndUpdate;
 end;
@@ -1247,16 +1169,6 @@ end;
 procedure TRiggModul.ChartItemClick;
 begin
   ChartForm := TChartForm.Create(Application);
-end;
-
-procedure TRiggModul.SetKorrigiertItem(Value: Boolean);
-begin
-  if FKorrigiertItem <> Value then
-  begin
-    FKorrigiertItem := Value;
-    Rigg.Korrigiert := Value;
-    UpdateGetriebe;
-  end;
 end;
 
 procedure TRiggModulD.StraightLine;

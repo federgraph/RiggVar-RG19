@@ -36,6 +36,9 @@ type
     ControllerEnabled: Boolean;
     ControllerDown: Boolean;
 
+    BogenItemChecked: Boolean;
+
+    KoppelItemChecked: Boolean;
     KoppelKurveEnabled: Boolean;
 
     KnickenItemChecked: Boolean;
@@ -313,10 +316,10 @@ end;
 
 procedure TViewModelMain00.UpdateView;
 begin
-  inherited;
-
   if not IsUp then
     Exit;
+
+  KoppelKurveEnabled :=  FormMain.Rigg.SalingTyp < stOhneBiegt;
 
 //  FormMain.LEDShape.Brush.Color := LEDColor;
   FormMain.Statusbar.Panels[1].Text := StatusPanelText1;
@@ -357,10 +360,10 @@ begin
   FormMain.InputFormItem.Enabled := InputFormItemEnabled;
   FormMain.OutputFormItem.Enabled := OutputFormItemEnabled;
 
-  FormMain.KoppelkurveItem.Enabled := KoppelKurveEnabled;
-  FormMain.KoppelkurveItem.Checked := Main.GetChecked(faRggKoppel);
+  FormMain.KoppelItem.Enabled := KoppelKurveEnabled;
+  FormMain.KoppelItem.Checked := Main.GetChecked(faRggKoppel);
 
-  FormMain.ZweischlagItem.Checked := Main.GetChecked(faRggBogen);
+  FormMain.BogenItem.Checked := Main.GetChecked(faRggBogen);
 
   FormMain.ReferenzItem.Enabled := Main.GetChecked(faMultiBtn);
   FormMain.ReferenzItem.Checked := Main.BtnBlauDown;

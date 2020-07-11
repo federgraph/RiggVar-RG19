@@ -289,8 +289,8 @@ type
     N3: TMenuItem;
     ReferenzItem: TMenuItem;
     EntlastetItem: TMenuItem;
-    KoppelkurveItem: TMenuItem;
-    ZweischlagItem: TMenuItem;
+    KoppelItem: TMenuItem;
+    BogenItem: TMenuItem;
 
     OptionenMenu: TMenuItem;
     FestItem: TMenuItem;
@@ -2110,8 +2110,7 @@ end;
 
 procedure TFormMain.BogenBtnClick(Sender: TObject);
 begin
-  RotaForm.BogenBtnClick(Sender);
-  Main.RiggModul.UpdateUI;
+  Main.Bogen := not Main.Bogen;
   SpeedPanel.UpdateSpeedButtonDown;
   if Sender <> nil then
     Main.FederText.CheckState;
@@ -2119,8 +2118,7 @@ end;
 
 procedure TFormMain.KoppelBtnClick(Sender: TObject);
 begin
-  RotaForm.KoppelBtnClick(Sender);
-  Main.RiggModul.UpdateUI;
+  Main.Koppel := not Main.Koppel;
   SpeedPanel.UpdateSpeedButtonDown;
   if Sender <> nil then
     Main.FederText.CheckState;
@@ -2490,15 +2488,15 @@ begin
   mi.Hint := '  Entspanntes Rigg einblenden';
   mi.OnClick := GrauBtnClick;
 
-  KoppelkurveItem := AddI('KoppelkurveItem');
+  KoppelItem := AddI('KoppelItem');
   mi.Caption := 'Koppelkurve';
   mi.Checked := True;
   mi.GroupIndex := 1;
   mi.Hint := '  Koppelkurve einblenden';
   mi.OnClick := KoppelBtnClick;
 
-  ZweischlagItem := AddI('ZweischlagItem');
-  mi.Caption := 'Mast als Zweischlag zeichnen';
+  BogenItem := AddI('BogenItem');
+  mi.Caption := 'Bogen';
   mi.GroupIndex := 1;
   mi.Hint := '  Mast als Bogen oder Zweischlag zeichnen';
   mi.OnClick := BogenBtnClick;
@@ -2839,7 +2837,7 @@ end;
 procedure TFormMain.KorrigiertItemClick(Sender: TObject);
 begin
   KorrigiertItem.Checked := not KorrigiertItem.Checked;
-  RiggModul.KorrigiertItem := KorrigiertItem.Checked;
+  Main.Korrigiert := KorrigiertItem.Checked;
 end;
 
 procedure TFormMain.LogoItemClick(Sender: TObject);
