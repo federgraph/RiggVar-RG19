@@ -1928,14 +1928,16 @@ end;
 
 procedure TFormMain.BogenBtnClick(Sender: TObject);
 begin
-  RotaForm.BogenBtnClick(Sender);
+  Main.Bogen := not Main.Bogen;
+  SpeedPanel.UpdateSpeedButtonDown;
   if Sender <> nil then
     Main.FederText.CheckState;
 end;
 
 procedure TFormMain.KoppelBtnClick(Sender: TObject);
 begin
-  RotaForm.KoppelBtnClick(Sender);
+  Main.Koppel := not Main.Koppel;
+  SpeedPanel.UpdateSpeedButtonDown;
   if Sender <> nil then
     Main.FederText.CheckState;
 end;
