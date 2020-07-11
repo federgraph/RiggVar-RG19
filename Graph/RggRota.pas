@@ -126,6 +126,7 @@ type
     procedure SetControllerTyp(const Value: TControllerTyp);
     procedure SetWanteGestrichelt(const Value: Boolean);
     procedure SetBogen(const Value: Boolean);
+    procedure SetKoppel(const Value: Boolean);
     procedure SetBtnBlauDown(const Value: Boolean);
     procedure SetBtnGrauDown(const Value: Boolean);
     procedure SetGrauZeichnen(const Value: Boolean);
@@ -143,6 +144,7 @@ type
     procedure UpdateMatrixText;
     procedure DrawMatrix(g: TCanvas);
   private
+    FScale: single;
     EraseBK: Boolean;
     procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
     procedure Translate(x, y: Integer);
@@ -159,6 +161,7 @@ type
     FSofortBerechnen: Boolean;
     FWanteGestrichelt: Boolean;
     FBogen: Boolean;
+    FKoppel: Boolean;
     procedure InitGraph;
     procedure InitRaumGraph;
     procedure InitHullGraph;
@@ -200,6 +203,7 @@ type
     property KoppelKurve: TKoordLine write SetKoppelKurve;
     property WanteGestrichelt: Boolean read FWanteGestrichelt write SetWanteGestrichelt;
     property Bogen: Boolean read FBogen write SetBogen;
+    property Koppel: Boolean read FKoppel write SetKoppel;
 
     property RiggLED: Boolean read FRiggLED write SetRiggLED;
     property SofortBerechnen: Boolean read FSofortBerechnen write SetSofortBerechnen;
@@ -214,8 +218,9 @@ type
 implementation
 
 uses
-  RggDisplay,
+  RiggVar.App.Main,
   RiggVar.RG.Def,
+  RggDisplay,
   RggPBox, // special paintbox which captures the mouse properly
   RggZug3D,
   RggTestData;
@@ -224,6 +229,7 @@ uses
 
 constructor TRotaForm.Create;
 begin
+  FScale := MainVar.Scale;
   KeepInsideItemChecked := True;
   FBogen := True;
 
@@ -272,7 +278,9 @@ begin
 
   FZoomBase := 0.05;
   FViewPoint := vp3D;
-  FFixPoint := ooD;
+  FFixPoint := ooD0;
+//  FXPos := Round(-260 * FScale);
+//  FYPos := 0;
 
   { PaintBox }
   NewPaintBox := TRggPaintBox.Create(PaintBox3D.Owner);
@@ -401,14 +409,19 @@ begin
 end;
 
 procedure TRotaForm.DrawMatrix(g: TCanvas);
+var
+  tx: Integer;
+  th: Integer;
 begin
+  tx := Round(20 * FScale);
+  th := Round(20 * FScale);
   with g do
   begin
     Font.Name := 'Courier New';
     Font.Size := 10;
-    TextOut(20,40, MatrixTextU);
-    TextOut(20,60, MatrixTextU);
-    TextOut(20,80, MatrixTextU);
+    TextOut(tx, 2 * th, MatrixTextU);
+    TextOut(tx, 3 * th, MatrixTextV);
+    TextOut(tx, 4 * th, MatrixTextW);
   end;
 end;
 
@@ -919,6 +932,12 @@ end;
 procedure TRotaForm.SetKoordinatenR(const Value: TRealRiggPoints);
 begin
   RPR := Value;
+end;
+
+procedure TRotaForm.SetKoppel(const Value: Boolean);
+begin
+  FKoppel := Value;
+  RaumGraph.Koppel := Value;
 end;
 
 procedure TRotaForm.SetKoppelKurve(const Value: TKoordLine);

@@ -99,8 +99,13 @@ begin
   FormRG19A.ControllerItem.Checked := ControllerDown;
   FormRG19A.ControllerBtn.Down := ControllerDown;
 
-  FormRG19A.KoppelkurveItem.Checked := KoppelKurveEnabled;
-  FormRG19A.KoppelBtn.Down := KoppelKurveEnabled;
+  FormRG19A.BogenItem.Checked := BogenItemChecked;
+
+  FormRG19A.KoppelItem.Checked := KoppelItemChecked;
+  FormRG19A.KoppelItem.Enabled := KoppelKurveEnabled;
+
+  FormRG19A.KoppelBtn.Down := KoppelItemChecked;
+  FormRG19A.KoppelBtn.Enabled := KoppelKurveEnabled;
 
   FormRG19A.QuerKraftItem.Checked := QuerKraftItemChecked;
   FormRG19A.KnickenItem.Checked := KnickenItemChecked;

@@ -603,15 +603,16 @@ object FormRG19A: TFormRG19A
         Hint = '  Entspanntes Rigg einblenden'
         OnClick = BtnGrauClick
       end
-      object KoppelkurveItem: TMenuItem
+      object KoppelItem: TMenuItem
         Caption = 'Koppelkurve'
         Checked = True
         GroupIndex = 1
         Hint = '  Koppelkurve einblenden'
         OnClick = KoppelBtnClick
       end
-      object ZweischlagItem: TMenuItem
-        Caption = 'Mast als Zweischlag zeichnen'
+      object BogenItem: TMenuItem
+        Caption = 'Bogen'
+        Checked = True
         GroupIndex = 1
         Hint = '  Mast als Bogen oder Zweischlag zeichnen'
         OnClick = ZweischlagBtnClick

@@ -99,7 +99,13 @@ begin
   FormMain.WinkelItem.Enabled := WinkelEnabled;
   FormMain.WinkelBtn.Enabled := WinkelEnabled;
 
-//  FormMain.BogenBtn.Down := BogenBtnDown;
+//  FormMain.BogenItem.Checked := BogenItemChecked;
+//
+//  FormMain.KoppelItem.Checked := KoppelItemChecked;
+//  FormMain.KoppelItem.Enabled := KoppelKurveEnabled;
+
+  FormMain.KoppelBtn.Down := KoppelItemChecked;
+  FormMain.KoppelBtn.Enabled := KoppelKurveEnabled;
 
   FormMain.BiegeNeigeItem.Enabled := BiegeNeigeItemEnabled;
   FormMain.ReglerItem.Enabled := ReglerItemEnabled;
@@ -115,7 +121,7 @@ begin
   FormMain.ControllerItem.Checked := ControllerDown;
   FormMain.ControllerBtn.Down := ControllerDown;
 
-  FormMain.KoppelkurveItem.Checked := KoppelKurveEnabled;
+  FormMain.KoppelItem.Checked := KoppelKurveEnabled;
   FormMain.KoppelBtn.Down := KoppelKurveEnabled;
 
   FormMain.QuerKraftItem.Checked := QuerKraftItemChecked;

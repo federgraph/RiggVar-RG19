@@ -222,8 +222,8 @@ type
     PaintItem: TMenuItem;
     ReferenzItem: TMenuItem;
     EntlastetItem: TMenuItem;
-    KoppelkurveItem: TMenuItem;
-    ZweischlagItem: TMenuItem;
+    KoppelItem: TMenuItem;
+    BogenItem: TMenuItem;
 
     OptionenMenu: TMenuItem;
     FestItem: TMenuItem;
@@ -712,20 +712,20 @@ end;
 
 procedure TFormRG19B.SetKoppelChecked(Value: Boolean);
 begin
-  KoppelkurveItem.Checked := Value;
+  KoppelItem.Checked := Value;
   KoppelBtn.Down := Value;
   RiggModul.KoppelBtnDown := Value;
 end;
 
 procedure TFormRG19B.KoppelBtnClick(Sender: TObject);
 begin
-  SetKoppelChecked(not KoppelkurveItem.Checked);
+  SetKoppelChecked(not KoppelItem.Checked);
 end;
 
 procedure TFormRG19B.ZweischlagBtnClick(Sender: TObject);
 begin
-  ZweischlagItem.Checked := not ZweischlagItem.Checked;
-  ZweischlagBtn.Down := ZweischlagItem.Checked;
+  BogenItem.Checked := not BogenItem.Checked;
+  ZweischlagBtn.Down := not BogenItem.Checked;
   RiggModul.ZweischlagBtnDown := ZweischlagBtn.Down;
 end;
 
@@ -791,7 +791,7 @@ end;
 procedure TFormRG19B.KorrigiertItemClick(Sender: TObject);
 begin
   KorrigiertItem.Checked := not KorrigiertItem.Checked;
-  RiggModul.KorrigiertItem := KorrigiertItem.Checked;
+  Main.Korrigiert := KorrigiertItem.Checked;
 end;
 
 procedure TFormRG19B.LogoItemClick(Sender: TObject);
@@ -2172,15 +2172,15 @@ begin
   mi.Hint := '  Entspanntes Rigg einblenden';
   mi.OnClick := BtnGrauClick;
 
-  KoppelkurveItem := AddI('KoppelkurveItem');
+  KoppelItem := AddI('KoppelItem');
   mi.Caption := 'Koppelkurve';
   mi.Checked := True;
   mi.GroupIndex := 1;
   mi.Hint := '  Koppelkurve einblenden';
   mi.OnClick := KoppelBtnClick;
 
-  ZweischlagItem := AddI('ZweischlagItem');
-  mi.Caption := 'Mast als Zweischlag zeichnen';
+  BogenItem := AddI('BogenItem');
+  mi.Caption := 'Bogen';
   mi.GroupIndex := 1;
   mi.Hint := '  Mast als Bogen oder Zweischlag zeichnen';
   mi.OnClick := ZweischlagBtnClick;

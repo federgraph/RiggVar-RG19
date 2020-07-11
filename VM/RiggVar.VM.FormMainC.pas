@@ -99,7 +99,13 @@ begin
   FormRG19C.WinkelItem.Enabled := WinkelEnabled;
   FormRG19C.WinkelBtn.Enabled := WinkelEnabled;
 
-//  FormRG19C.BogenBtn.Down := BogenBtnDown;
+  FormRG19C.BogenItem.Checked := BogenItemChecked;
+
+  FormRG19C.KoppelItem.Checked := KoppelItemChecked;
+  FormRG19C.KoppelItem.Enabled := KoppelKurveEnabled;
+
+  FormRG19C.KoppelBtn.Down := KoppelItemChecked;
+  FormRG19C.KoppelBtn.Enabled := KoppelKurveEnabled;
 
   FormRG19C.BiegeNeigeItem.Enabled := BiegeNeigeItemEnabled;
   FormRG19C.ReglerItem.Enabled := ReglerItemEnabled;
@@ -115,7 +121,7 @@ begin
   FormRG19C.ControllerItem.Checked := ControllerDown;
   FormRG19C.ControllerBtn.Down := ControllerDown;
 
-  FormRG19C.KoppelkurveItem.Checked := KoppelKurveEnabled;
+  FormRG19C.KoppelItem.Checked := KoppelKurveEnabled;
   FormRG19C.KoppelBtn.Down := KoppelKurveEnabled;
 
   FormRG19C.QuerKraftItem.Checked := QuerKraftItemChecked;

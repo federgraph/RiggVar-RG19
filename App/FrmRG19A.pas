@@ -100,7 +100,7 @@ type
     WinkelItem: TMenuItem;
     SofortItem: TMenuItem;
     EntlastetItem: TMenuItem;
-    KoppelkurveItem: TMenuItem;
+    KoppelItem: TMenuItem;
     PaintItem: TMenuItem;
     N9: TMenuItem;
     ReferenzItem: TMenuItem;
@@ -109,7 +109,7 @@ type
     KnickenItem: TMenuItem;
     KraftGemessenItem: TMenuItem;
     KorrigiertItem: TMenuItem;
-    ZweischlagItem: TMenuItem;
+    BogenItem: TMenuItem;
     N2: TMenuItem;
     N1: TMenuItem;
 
@@ -560,20 +560,20 @@ end;
 
 procedure TFormRG19A.SetKoppelChecked(Value: Boolean);
 begin
-  KoppelkurveItem.Checked := Value;
+  KoppelItem.Checked := Value;
   KoppelBtn.Down := Value;
   RiggModul.KoppelBtnDown := Value;
 end;
 
 procedure TFormRG19A.KoppelBtnClick(Sender: TObject);
 begin
-  SetKoppelChecked(not KoppelkurveItem.Checked);
+  SetKoppelChecked(not KoppelItem.Checked);
 end;
 
 procedure TFormRG19A.ZweischlagBtnClick(Sender: TObject);
 begin
-  ZweischlagItem.Checked := not ZweischlagItem.Checked;
-  ZweischlagBtn.Down := ZweischlagItem.Checked;
+  BogenItem.Checked := not BogenItem.Checked;
+  ZweischlagBtn.Down := not BogenItem.Checked;
   RiggModul.ZweischlagBtnDown := ZweischlagBtn.Down;
 end;
 
@@ -636,7 +636,7 @@ end;
 procedure TFormRG19A.KorrigiertItemClick(Sender: TObject);
 begin
   KorrigiertItem.Checked := not KorrigiertItem.Checked;
-  RiggModul.KorrigiertItem := KorrigiertItem.Checked;
+  Main.Korrigiert := KorrigiertItem.Checked;
 end;
 
 procedure TFormRG19A.LogoItemClick(Sender: TObject);

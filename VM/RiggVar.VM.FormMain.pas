@@ -36,6 +36,9 @@ type
     ControllerEnabled: Boolean;
     ControllerDown: Boolean;
 
+    BogenItemChecked: Boolean;
+
+    KoppelItemChecked: Boolean;
     KoppelKurveEnabled: Boolean;
 
     KnickenItemChecked: Boolean;
