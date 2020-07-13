@@ -48,7 +48,6 @@ type
     IsUp: Boolean;
     Modified: Boolean;
     AutoSave: Boolean;
-    procedure TestStream;
   end;
 
   TRggText = class(TRggRigg)
@@ -682,7 +681,7 @@ begin
       Rigg.BiegeUndNeigeC(FactArray.MastfallF0C.Ist, Value);
 
     fpD0X:
-      Rigg.iP[ooD0, X] := Round(Value);
+      Rigg.rP[ooD0, X] := Round(Value);
   end;
 end;
 
@@ -921,7 +920,7 @@ begin
   FactArray.MastfallF0C.Ist := Rigg.RealTrimm[tiMastfallF0C];
   FactArray.MastfallF0F.Ist := Rigg.RealTrimm[tiMastfallF0F];
   FactArray.Biegung.Ist := Rigg.RealTrimm[tiBiegungS];
-  FactArray.D0X.Ist := Rigg.iP[ooD0, X];
+  FactArray.D0X.Ist := Rigg.rP[ooD0, X];
 
   FactArray.T1.Ist := 650;
   FactArray.T2.Ist := 150;
@@ -1096,7 +1095,7 @@ begin
   FactArray.MastfallF0C.Ist := Rigg.RealTrimm[tiMastfallF0C];
   FactArray.MastfallF0F.Ist := Rigg.RealTrimm[tiMastfallF0F];
   FactArray.Biegung.Ist := Rigg.RealTrimm[tiBiegungS];
-  FactArray.D0X.Ist := Rigg.iP[ooD0, X];
+  FactArray.D0X.Ist := Rigg.rP[ooD0, X];
 
   fd.F0C := Round(FactArray.MastfallF0C.Ist);
   fd.F0F := Round(FactArray.MastfallF0F.Ist);
@@ -1510,16 +1509,6 @@ end;
 function TRggWheel.GetSmallStep: single;
 begin
   result := 1;
-end;
-
-procedure TRggRigg.TestStream;
-var
-  d: TRggDocument;
-begin
-  d := TRggDocument.Create;
-  d.GetDefaultDocument;
-  d.TestStream;
-  d.Free;
 end;
 
 function TRggMain.FormatValue(Value: single): string;

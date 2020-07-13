@@ -826,15 +826,15 @@ end;
 
 procedure TChartForm.OpenItemClick(Sender: TObject);
 begin
-  if not OpenDialog.Execute then
-    Exit;
+//  if not OpenDialog.Execute then
+//    Exit;
 end;
 
 procedure TChartForm.SaveItemClick(Sender: TObject);
 begin
-  if not SaveDialog.Execute then
-    Exit;
-  ChartModel.SaveToFile(SaveDialog.FileName);
+//  if not SaveDialog.Execute then
+//    Exit;
+//  ChartModel.SaveToFile(SaveDialog.FileName);
 end;
 
 procedure TChartForm.RectangleItemClick(Sender: TObject);

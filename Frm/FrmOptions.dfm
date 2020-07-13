@@ -29,6 +29,10 @@ object OptionForm: TOptionForm
     TabOrder = 0
     object tsTrimm: TTabSheet
       Caption = 'Trimm'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBoxTrimm: TGroupBox
         Left = 16
         Top = 16
@@ -156,6 +160,10 @@ object OptionForm: TOptionForm
     end
     object tsFachwerk: TTabSheet
       Caption = 'Fachwerk'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ElementLabel: TLabel
         Left = 24
         Top = 10
@@ -346,6 +354,10 @@ object OptionForm: TOptionForm
     end
     object tsMast: TTabSheet
       Caption = 'Mast'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBoxMast: TGroupBox
         Left = 18
         Top = 23
@@ -453,6 +465,10 @@ object OptionForm: TOptionForm
     end
     object tsRumpf: TTabSheet
       Caption = 'Rumpf'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBoxRumpf: TGroupBox
         Left = 330
         Top = 65
@@ -546,6 +562,10 @@ object OptionForm: TOptionForm
     end
     object tsTabelle: TTabSheet
       Caption = 'Tabelle'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object MemoLabel: TLabel
         Left = 8
         Top = 9
@@ -759,6 +779,10 @@ object OptionForm: TOptionForm
     end
     object tsIniMemo: TTabSheet
       Caption = 'Rigg.ini'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object InifileMemo: TMemo
         Left = 0
         Top = 0

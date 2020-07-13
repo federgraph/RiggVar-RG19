@@ -146,7 +146,7 @@ type
     FTempListe: TStringList;
 
     FGSB: TRggFA;
-    FiP: TIntRiggPoints;
+    FiP: TRealRiggPoints;
     FRumpfCell: TPoint;
     FTrimmTabDaten: TTrimmTabDaten;
     FTrimmTabelle: TTrimmTab;
@@ -257,7 +257,7 @@ begin
   FiMastSaling := Round(Rigg.MastUnten);
   FiMastWante := FiMastSaling + Round(Rigg.MastOben);
   FiMastTop := Round(Rigg.MastLaenge);
-  FiP := Rigg.iP;
+  FiP := Rigg.rP;
   FTrimmTabelle := Rigg.TrimmTab;
   FTrimmTabDaten := FTrimmTabelle.TrimmTabDaten;
 
@@ -617,7 +617,7 @@ end;
 
 procedure TOptionForm.OKBtnClick(Sender: TObject);
 begin
-  Rigg.iP := FiP; { Rumpfkoordinaten}
+  Rigg.rP := FiP; { Rumpfkoordinaten}
   Rigg.MastUnten := FiMastSaling;
   Rigg.MastOben := FiMastWante - FiMastSaling;
   Rigg.MastLaenge := FiMastTop;
