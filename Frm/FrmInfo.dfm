@@ -1,4 +1,4 @@
-object FormInfo: TFormInfo
+﻿object FormInfo: TFormInfo
   Left = 265
   Top = 233
   BorderIcons = [biSystemMenu]
@@ -13,7 +13,6 @@ object FormInfo: TFormInfo
   Font.Style = []
   OldCreateOrder = True
   Position = poMainFormCenter
-  Scaled = False
   DesignSize = (
     684
     233)

@@ -258,10 +258,10 @@ begin
   FDrawAlways := True;
   AlwaysShowAngle := False;
 
-  MinTrackX := 410;
-  MinTrackY := 280;
-  MaxTrackX := 1024;
-  MaxTrackY := 768;
+  MinTrackX := Round(410 * FScale);
+  MinTrackY := Round(280 * FScale);
+  MaxTrackX := Round(1024 * FScale);
+  MaxTrackY := Round(768 * FScale);
 
   CreatedScreenWidth := Screen.Width;
   wx := GetSystemMetrics(SM_CXSCREEN);
@@ -700,7 +700,7 @@ begin
 
   { Zoom }
   FZoomIndex := RotaData.ZoomIndex;
-  FZoom := FZoomBase * LookUpRa10(FZoomIndex);
+  FZoom := FZoomBase * LookUpRa10(FZoomIndex) * FScale;
   Transformer.Zoom := FZoom;
 
   { FixPoint }
@@ -771,8 +771,8 @@ begin
   SavedYPos := FYPos;
 
   FTranslation :=
-    (Abs(NullPunktOffset.x - X) < TransKreisRadius) and
-    (Abs(NullPunktOffset.y - Y) < TransKreisRadius);
+    (Abs(NullPunktOffset.x - X) < TKR) and
+    (Abs(NullPunktOffset.y - Y) < TKR);
 end;
 
 procedure TRotaForm.PaintBox3DMouseMove(Sender: TObject;
@@ -965,14 +965,14 @@ begin
   else
     FZoomIndex := Value;
 
-  FZoom := FZoomBase * LookUpRa10(FZoomIndex);
+  FZoom := FZoomBase * LookUpRa10(FZoomIndex) * FScale;
   RaumGraph.Zoom := FZoom;
   Draw;
 end;
 
 procedure TRotaForm.Zoom(Delta: double);
 begin
-  FZoom := FZoom + FZoom * FZoomBase * Delta * 0.3;
+  FZoom := FZoom + FZoom * FZoomBase * Delta * 0.3 * FScale;
   RaumGraph.Zoom := FZoom;
   Draw;
 end;

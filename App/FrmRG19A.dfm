@@ -25,7 +25,6 @@ object FormRG19A: TFormRG19A
   Menu = MainMenu
   OldCreateOrder = True
   Position = poDefault
-  Scaled = False
   Visible = True
   WindowMenu = WindowMenu
   OnClose = FormClose

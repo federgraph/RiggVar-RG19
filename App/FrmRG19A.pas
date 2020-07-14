@@ -258,8 +258,8 @@ const
 procedure TFormRG19A.wmGetMinMaxInfo(var Msg: TMessage);
 begin
   inherited;
-  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.X := 600;
-  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.Y := 220;
+  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.X := Round(600 * FScale);
+  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.Y := Round(220 * FScale);
 end;
 
 procedure TFormRG19A.FormCreate(Sender: TObject);
@@ -290,10 +290,11 @@ begin
     Height := Round(768 * FScale);
   end;
 
-  Margin := Round(2 * FScale);
+  Margin := Round(10 * FScale);
   Raster := Round(MainVar.Raster * FScale);
   MainVar.Scale := FScale;
   MainVar.ScaledRaster := Raster;
+  TKR := Round(TKR * FScale);
 
   InputForm := TInputForm.Create(Application);
   OutputForm := TOutputForm.Create(Application);
@@ -303,7 +304,7 @@ begin
   RiggModul.RG19A := True;
   RiggModul.ViewModelM := TViewModelMainA.Create;
   RiggModul.Init;
-  RiggModul.BackgroundColor := TColors.Wheat; // call after RiggModul.Init
+  RiggModul.BackgroundColor := TColors.Gray;
   RiggModul.PBG := GrafikForm.PaintBoxG;
 
   Main := TMain.Create(RiggModul.Rigg);

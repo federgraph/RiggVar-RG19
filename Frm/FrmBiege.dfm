@@ -1,4 +1,4 @@
-object BiegeUndNeigeForm: TBiegeUndNeigeForm
+﻿object BiegeUndNeigeForm: TBiegeUndNeigeForm
   Left = 348
   Top = 211
   BorderStyle = bsDialog
@@ -13,7 +13,6 @@ object BiegeUndNeigeForm: TBiegeUndNeigeForm
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
-  Scaled = False
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96

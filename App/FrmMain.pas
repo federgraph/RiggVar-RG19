@@ -49,7 +49,7 @@ type
     ParamCombo: TComboBox;
     FixpointCombo: TComboBox;
     TrimmMemo: TMemo;
-    ReportListbox: TListBox;
+    ReportListBox: TListBox;
     ReportMemo: TMemo;
     PaintBoxR: TPaintBox;
     OpenDialog: TOpenDialog;
@@ -429,11 +429,12 @@ begin
     Height := Round(768 * FScale);
   end;
 
-  Margin := Round(5 * FScale);
+  Margin := Round(10 * FScale);
   Raster := Round(MainVar.Raster * FScale);
   MainVar.Scale := FScale;
   MainVar.ScaledRaster := Raster;
-  
+  TKR := Round(TKR * FScale);
+
   FormCreate1;
   FormCreate2;
   Main.IsUp := True;
@@ -881,8 +882,8 @@ begin
   begin
     InputForm.Parent := nil;
     InputForm.BorderStyle := bsSizeable;
-    InputForm.ClientHeight := 195;
-    InputForm.ClientWidth := 465;
+    InputForm.ClientHeight := Round(195 * FScale);
+    InputForm.ClientWidth := Round(465 * FScale);
     InputForm.Show;
   end
   else
@@ -896,8 +897,8 @@ begin
   begin
     OutputForm.Parent := nil;
     OutputForm.BorderStyle := bsSizeable;
-    OutputForm.ClientHeight := 255;
-    OutputForm.ClientWidth := 465;
+    OutputForm.ClientHeight := Round(255 * FScale);
+    OutputForm.ClientWidth := Round(465 * FScale);
     OutputForm.Show;
     if OutputForm.YComboBox.ItemIndex = -1 then
       OutputForm.YComboBox.ItemIndex := RiggModul.YComboSavedItemIndex;
@@ -1090,12 +1091,12 @@ function TFormMain.RefShapeBtn(S: TShape; AGroupSpace: Integer): TShape;
 var
   temp: Integer;
 begin
-  temp := (BtnWidth - 10) div 2;
+  temp := (BtnWidth - Margin) div 2;
   result := S;
   S.Left := BtnLeft + BtnCounter * BtnWidth + BtnSpace + temp;
   S.Top := BtnTop + 1;
   S.Width := BtnWidth - 2 * temp;
-  S.Height := BtnHeight - 2;
+  S.Height := BtnHeight - Round(2 * FScale);
   S.Brush.Color := clGreen;
   Inc(BtnCounter);
 end;
@@ -1109,11 +1110,11 @@ begin
 
   BtnCounter := 0;
   BtnLeft := 0;
-  BtnTop := 3;
-  BtnSpace := 3;
-  BtnGroupSpace := 12;
-  BtnWidth := 30;
-  BtnHeight := 30;
+  BtnTop := Round(3 * FScale);
+  BtnSpace := Round(3 * FScale);
+  BtnGroupSpace := Round(12 * FScale);
+  BtnWidth := Round(30 * FScale);
+  BtnHeight := Round(30 * FScale);
 
   SpeedPanel.Height := BtnHeight + 2 * BtnTop;
 
@@ -1251,7 +1252,7 @@ begin
 
   BtnCounter := 0;
   BtnLeft := LedShape.Left + LedShape.Width; // skip over LED shape
-  BtnWidth := 50; // new button width for new buttons
+  BtnWidth := Round(50 * FScale); // new button width for new buttons
   BtnColor := clGreen;
 
   sb := AddSpeedBtn('MT0Btn', BtnGroupSpace);
@@ -1401,7 +1402,7 @@ begin
 
   BtnCounter := 0;
   BtnLeft := sb.Left + BtnWidth;
-  BtnWidth := 30;
+  BtnWidth := Round(30 * FScale);
 
   sb := AddSpeedBtn('SeiteBtn', BtnGroupSpace);
   SeiteBtn := sb;
@@ -1491,15 +1492,15 @@ begin
 
   sp := StatusBar.Panels.Add;
   sp.Text := 'MenuText';
-  sp.Width := 353;
+  sp.Width := Round(353 * FScale);
 
   sp := StatusBar.Panels.Add;
   sp.Text := 'RiggText';
-  sp.Width := 300;
+  sp.Width := Round(300 * FScale);
 
   sp := StatusBar.Panels.Add;
   sp.Text := 'RepotLabel';
-  sp.Width := 50;
+  sp.Width := Round(50 * FScale);
 end;
 
 procedure TFormMain.FormCreate2;
@@ -1520,12 +1521,12 @@ begin
 //  SetupComboBox(ViewpointCombo);
   SetupComboBox(FixpointCombo);
 
-  SetupListBox(ReportListbox);
+  SetupListBox(ReportListBox);
   SetupMemo(TrimmMemo);
   SetupMemo(ReportMemo);
 
   TrimmMemo.ScrollBars := TScrollStyle.ssNone;
-  TrimmMemo.Width := ReportListbox.Width;
+  TrimmMemo.Width := ReportListBox.Width;
 
   ReportManager := TRggReportManager.Create(ReportMemo);
 
@@ -1538,7 +1539,7 @@ begin
   TrimmCombo.ItemIndex := 0;
   ParamCombo.ItemIndex := 0;
 
-  ReportListbox.ItemIndex := 0;
+  ReportListBox.ItemIndex := 0;
 
   Main.Trimm := 1;
   MT0BtnClick(nil);
@@ -1560,8 +1561,8 @@ var
 begin
   TrimmMemo.Left := Margin;
   TrimmMemo.Top := SpeedPanel.Height + Margin;
-  TrimmMemo.Height := 185;
-  TrimmMemo.Width := 170;
+  TrimmMemo.Height := Round(185 * FScale);
+  TrimmMemo.Width := Round(170 * FScale);
 
   TrimmCombo.Left := TrimmMemo.Left;
   ParamCombo.Left := TrimmCombo.Left;
@@ -1579,24 +1580,24 @@ begin
 //  ViewpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
   FixpointCombo.Top := TrimmCombo.Top + 2 * ComboHeight;
 
-  ReportListbox.Left := TrimmMemo.Left;
-  ReportListbox.Top := FixpointCombo.Top + ComboHeight + Margin;
-  ReportListbox.Width := TrimmMemo.Width;
-  ReportListbox.Height := StatusBar.Top - ReportListbox.Top - Margin;
-  ReportListbox.Anchors := ReportListbox.Anchors + [akBottom];
+  ReportListBox.Left := TrimmMemo.Left;
+  ReportListBox.Top := FixpointCombo.Top + ComboHeight;
+  ReportListBox.Width := TrimmMemo.Width;
+  ReportListBox.Height := StatusBar.Top - ReportListBox.Top - Margin;
+  ReportListBox.Anchors := ReportListBox.Anchors + [akBottom];
 
   if WantConsole then
   begin
-    ConsoleWidth := 770 + 1 * Margin;
-    ConsoleHeight := 457 + 2 * Margin;
+    ConsoleWidth := Round(770 * FScale) + 1 * Margin;
+    ConsoleHeight := Round(457 * FScale) + 2 * Margin;
   end
   else
   begin
-    ConsoleWidth := 500;
+    ConsoleWidth := Round(500 * FScale);
     ConsoleHeight := 0;
   end;
 
-  ReportMemo.Left := ReportListbox.Left + ReportListbox.Width + Margin;
+  ReportMemo.Left := ReportListBox.Left + ReportListBox.Width + Margin;
   ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + Margin + ConsoleHeight;
   ReportMemo.Height := StatusBar.Top - ReportMemo.Top - Margin;
   ReportMemo.Width := ConsoleWidth;
@@ -1611,7 +1612,7 @@ end;
 
 procedure TFormMain.InitEventHandlers;
 begin
-  ReportListbox.OnClick := ListBoxClick;
+  ReportListBox.OnClick := ListBoxClick;
   Self.OnMouseWheel := FormMouseWheel;
 
   M1Btn.OnClick := M1BtnClick;
@@ -1735,15 +1736,15 @@ end;
 
 procedure TFormMain.InitReportListBox;
 begin
-  ReportListbox.Clear;
-  ReportManager.InitLB(ReportListbox.Items);
+  ReportListBox.Clear;
+  ReportManager.InitLB(ReportListBox.Items);
 end;
 
 procedure TFormMain.ListBoxClick(Sender: TObject);
 var
   ii: Integer;
 begin
-  ii := ReportListbox.ItemIndex;
+  ii := ReportListBox.ItemIndex;
   if ii > -1 then
   begin
     ReportManager.CurrentIndex := ii;
@@ -2491,8 +2492,8 @@ begin
   GrafikForm.Position := poDesigned;
   GrafikForm.Left := TrimmMemo.Left + TrimmMemo.Width + Margin;
   GrafikForm.Top := SpeedPanel.Top + SpeedPanel.Height + Margin;
-  GrafikForm.ClientWidth := 305;
-  GrafikForm.ClientHeight := 457;
+  GrafikForm.ClientWidth := Round(305 * FScale);
+  GrafikForm.ClientHeight := Round(457 * FScale);
   GrafikForm.Visible := WantConsole;
   GrafikFormItem.Checked := WantConsole;
 
@@ -2504,8 +2505,8 @@ begin
   InputForm.Position := poDesigned;
   InputForm.Left := GrafikForm.Left + GrafikForm.Width + Margin;
   InputForm.Top := SpeedPanel.Top + SpeedPanel.Height + Margin;
-  InputForm.ClientHeight := 195;
-  InputForm.ClientWidth := 465;
+    InputForm.ClientHeight := Round(195 * FScale);
+    InputForm.ClientWidth := Round(465 * FScale);
   InputForm.Visible := WantConsole;
   InputFormItem.Checked := WantConsole;
 
@@ -2520,8 +2521,8 @@ begin
   OutputForm.Position := poDesigned;
   OutputForm.Left := InputForm.Left;
   OutputForm.Top := InputForm.Top + InputForm.Height + Margin;
-  OutputForm.ClientHeight := 255;
-  OutputForm.ClientWidth := 465;
+    OutputForm.ClientHeight := Round(255 * FScale);
+    OutputForm.ClientWidth := Round(465 * FScale);
   OutputForm.YComboBox.ItemIndex := temp;
   OutputForm.Visible := WantConsole;
   OutputFormItem.Checked := WantConsole;

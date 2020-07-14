@@ -41,6 +41,8 @@ type
     OffsetX3, OffsetY3: Integer;
     OffsetX4, OffsetY4: Integer;
 
+    FScale: single;
+
     procedure SetZoomFaktor(Value: Integer);
     procedure UpdateOffset;
     procedure CalcOffset(R: TRect);
@@ -61,11 +63,14 @@ type
 implementation
 
 uses
+  RiggVar.App.Main,
   RiggVar.RG.Def;
 
 constructor TGetriebeGraph.Create(AZug3D: TZug3DBase);
 begin
   inherited Create(AZug3D);
+
+  FScale := MainVar.Scale;
 
 //  InitZoom; // needs injected Transformer
 
@@ -83,17 +88,17 @@ begin
   Zug3.Props := RaumGraphProps;
 
   { Offset }
-  cOffsetX1 := 130;
-  cOffsetY1 := 410;
+  cOffsetX1 := Round(130 * FScale);
+  cOffsetY1 := Round(410 * FScale);
 
-  cOffsetX2 := 130;
-  cOffsetY2 := 410;
+  cOffsetX2 := Round(130 * FScale);
+  cOffsetY2 := Round(410 * FScale);
 
-  cOffsetX3 := 130;
-  cOffsetY3 := 150;
+  cOffsetX3 := Round(130 * FScale);
+  cOffsetY3 := Round(150 * FScale);
 
-  cOffsetX4 := 150;
-  cOffsetY4 := 250;
+  cOffsetX4 := Round(150 * FScale);
+  cOffsetY4 := Round(250 * FScale);
 
   UpdateOffset;
 
@@ -125,7 +130,7 @@ begin
   begin
     { Zoom und! Zoom2D werden verändert in SetZoom() }
     Zoom := Zoom / ZoomFaktor * Value;
-    FZoomFaktor := Value;
+    FZoomFaktor := Round(Value * FScale);
     { Im Gegensatz zu Zoom wird mit Zoomfaktor auch der Offset verschoben!
       Dies ist für die Ausgabe nach Preview und auf Drucker notwendig. }
     UpdateOffset;
@@ -203,7 +208,7 @@ begin
     RelationZoom2D := 5.5 / 12;
     FZoomFaktor := 1;
     { wird z.Bsp. für höhere Auflösung auf 10 umgeschaltet }
-    Zoom := 1 / 5.5;
+    Zoom := 1 / 5.5 * FScale;
     { als allgemeiner Skalierungsfaktor benutzt }
     FZoom2D := RelationZoom2D * Zoom;
 
@@ -385,7 +390,7 @@ begin
     tempf2 := tempz/h;
     if tempf2 > tempf1 then
       tempf1 := tempf2;
-    tempf1 := tempf1*FZoom2D;
+    tempf1 := tempf1 * FZoom2D;
     Zoom := 0.95 * Zoom / tempf1;
 
     { Offset festlegen }

@@ -98,6 +98,8 @@ type
     FReportFormActive: Boolean;
     FRotaFormActive: Boolean;
 
+    FScale: single;
+
     procedure StraightLine;
     procedure GetCurves;
     procedure UpdateGetriebePunkt;
@@ -147,7 +149,9 @@ type
     ChartFormActive: Boolean;
 
     IniFileName: string;
-    lbMastfall, lbSpannung, lbBiegung: string;
+    lbMastfall: string;
+    lbSpannung: string;
+    lbBiegung: string;
     Modified: Boolean;
 
     GetriebeGraph: TGetriebeGraph;
@@ -218,8 +222,8 @@ type
     procedure BiegeNeigeItemClick;
     procedure ReglerBtnClick;
     procedure FestItemClick;
-    procedure OSBItemClick;
     procedure OSSItemClick;
+    procedure OSBItemClick;
     procedure DrehbarItemClick;
     procedure ChartItemClick;
     procedure About;
@@ -300,7 +304,7 @@ uses
 
 constructor TRiggModul.Create;
 begin
-  inherited;
+  FScale := MainVar.Scale;
 end;
 
 procedure TRiggModul.Init;
@@ -310,7 +314,7 @@ begin
   FBtnGrauDown := True;
   FKoppelBtnDown := True;
   FZweischlagBtnDown := False;
-  FBackgroundColor := clBtnFace;
+  FBackgroundColor := TColors.Gray;
   FControllerBtnDown := True;
   FWinkelBtnDown := False;
   FDiffBtnDown := False;
@@ -358,30 +362,30 @@ begin
   GetriebeGraph.ControllerTyp := Rigg.ControllerTyp;
 
   BitmapG := TBitmap.Create;
-  BitmapG.Width := 293;
-  BitmapG.Height := 422;
+  BitmapG.Width := Round(293 * FScale);
+  BitmapG.Height := Round(422 * FScale);
   BitmapG.Canvas.Font.Name := 'Arial';
   BitmapG.Canvas.Font.Height := 14;
   PaintBackGround(BitmapG);
 
   MetaGMaxCount := 50;
   MetaFileG := TRiggMetaFile.Create;
-  MetaFileG.Width := 293;
-  MetaFileG.Height := 422;
+  MetaFileG.Width := BitmapG.Width;
+  MetaFileG.Height := BitmapG.Height;
 
   { SalingCtrls }
   SalingGraph := TSalingGraph.Create;
   SalingGraph.BackgroundColor := FBackgroundColor;
-  SalingGraph.PBSize := Point(453, 220);
+  SalingGraph.PBSize := Point(Round(453 * FScale), Round(220 * FScale));
 
   BitmapS := TBitmap.Create;
-  BitmapS.Width := 453;
-  BitmapS.Height := 220;
+  BitmapS.Width := Round(453 * FScale);
+  BitmapS.Height := Round(220 * FScale);
   PaintBackGround(BitmapS);
 
   BitmapC := TBitmap.Create;
-  BitmapC.Width := 453;
-  BitmapC.Height := 220;
+  BitmapC.Width := BitmapS.Width;
+  BitmapC.Height := BitmapS.Height;
   PaintBackGround(BitmapC);
 
   { Berichte }
@@ -437,6 +441,7 @@ begin
   SetupGCtrl(InputForm.sbController, fpController);
   SetupGCtrl(InputForm.sbControllerD, fpController);
   SetupGCtrl(InputForm.sbControllerOhne, fpController);
+
   { Vorstag/Winkel }
   if WinkelBtnDown then
     SetupGCtrl(InputForm.sbWinkel, fpWinkel)
@@ -444,17 +449,21 @@ begin
     SetupGCtrl(InputForm.sbWinkel, fpVorstag);
   SetupGCtrl(InputForm.sbVorstagD, fpVorstag);
   SetupGCtrl(InputForm.sbVorstagOhne, fpVorstag);
+
   { Wante }
   SetupGCtrl(InputForm.sbWante, fpWante);
   SetupGCtrl(InputForm.sbWanteD, fpWante);
   SetupGCtrl(InputForm.sbWanteOhne, fpWante);
+
   { Woben }
   SetupGCtrl(InputForm.sbWoben, fpWoben);
   SetupGCtrl(InputForm.sbWobenD, fpWoben);
+
   { Saling }
   SetupGCtrl(InputForm.sbSalingH, fpSalingH);
   SetupGCtrl(InputForm.sbSalingA, fpSalingA);
   SetupGCtrl(InputForm.sbSalingLD, fpSalingL);
+
   { Ohne Saling starr }
   SetupGCtrl(InputForm.sbVorstagOS, fpVorstagOS);
   InputForm.sbVorstagOS.Position := Round(Rigg.GSB.Find(fpVorstag).Ist);
@@ -709,7 +718,7 @@ begin
       LEDShape := False;
     ViewModelM.StatusPanelText1 := Rigg.GetriebeStatusText;
     DrawPaintBoxM;
-//    Draw;
+
     if Rigg.GetriebeOK and not Rigg.MastOK then
     begin
       LEDShape := False;
@@ -724,20 +733,10 @@ begin
     if AniRotationForm.Visible then
     begin
       { Trackbar und Labels flackern zu sehr, daher nicht immer aktualisieren }
-      //if SofortBerechnen then
-      //  Modified := True;
       AniRotationForm.UpdateAll(Rigg);
       AniRotationForm.Draw;
-//      AniRotationForm.Invalidate;
     end;
   end;
-{
-  if (Main <> nil) and (Main.StrokeRigg <> nil) then
-  begin
-    Main.UpdateStrokeRigg;
-    Main.StrokeRigg.Draw;
-  end;
-}
 end;
 
 procedure TRiggModul.Draw;
@@ -745,6 +744,7 @@ var
   MetaCanvas: TMetaFileCanvas;
   c: TCanvas;
   g: TCanvas;
+  ox, oy, th: Integer;
 begin
   if PBG = nil then
     Exit;
@@ -753,9 +753,15 @@ begin
   if PaintBtnDown = False then
   begin
     PaintBackGround(BitmapG);
-    c.Textout(180, 16, lbMastfall);
-    c.Textout(180, 32, lbSpannung);
-    c.Textout(180, 48, lbBiegung);
+    ox := Round(10 * FScale);
+    oy := Round(10 * FScale);
+    th := Round(20 * FScale);
+    c.Font.Size := 11;
+    c.Font.Name := 'Consolas';
+    c.Font.Color := TColors.Beige;
+    c.TextOut(ox, oy + 1 * th, lbMastfall);
+    c.TextOut(ox, oy + 2 * th, lbSpannung);
+    c.TextOut(ox, oy + 3 * th, lbBiegung);
   end
   else if TextFlipFlop then
     PaintBackGround(BitmapG);
@@ -813,7 +819,6 @@ begin
   end;
 
   { gespanntes Rigg farbig zeichnen}
-//  GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta); // see above
   GetriebeGraph.Coloriert := True;
   GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
   GetriebeGraph.Koordinaten := Rigg.rP;
@@ -845,7 +850,6 @@ begin
   end;
 
   { gespanntes Rigg farbig zeichnen}
-  // GetriebeGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta); // see above
   GetriebeGraph.Coloriert := True;
   GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
   GetriebeGraph.Koordinaten := Rigg.rP;
@@ -898,8 +902,8 @@ begin
 
   { Text setzen }
   lbMastFall := Format('Mastfall = %5.1f cm', [Rigg.Trimm.Mastfall / 10]);
-  lbSpannung := Format('Spannung = %5.0f N', [Rigg.rF[14]]);
-  lbBiegung := Format('Biegung  = %5.1f cm', [Rigg.hd / 10]);
+  lbSpannung := Format('Spannung = %5.1f  N', [Rigg.rF[14]]);
+  lbBiegung :=  Format('Biegung  = %5.1f cm', [Rigg.hd / 10]);
 
   Rigg.AusgabeText(ML);
 
@@ -1593,7 +1597,12 @@ end;
 procedure TRiggModul.OptionItemClick;
 begin
   Rigg.UpdateGSB;
-  { Istwerte in GSB aktualisieren für aktuelle Werte in Optionform! }
+  if OptionForm = nil then
+  begin
+    OptionForm := TOptionForm.Create(Application);
+  end;
+
+  { Istwerte in GSB aktualisieren für aktuelle Werte in Optionform }
   OptionForm.ShowModal;
   if OptionForm.ModalResult = mrOK then
   begin
@@ -1601,7 +1610,6 @@ begin
     Rigg.Reset; { neue Integerwerte --> neue Gleitkommawerte }
     KurveValid := False;
     UpdateGetriebe;
-    // Rigg.UpdateGSB; { enfällt hier, da GSB schon aktuell }
     SetupGCtrls;
     sbPuffer := Rigg.Glieder; { weil Istwerte nicht über Scrollbar verändert }
   end;
@@ -1611,15 +1619,6 @@ procedure TRiggModul.RotaFormItemClick;
 begin
   AniRotationForm := TAniRotationForm.Create(Application.MainForm);
   AniRotationForm.UpdateAll(Rigg);
-
-  (*
-  { dies wird durch AniRotationForm.UpdateAll(Rigg) ersetzt
-    beachte, dass Draw nicht aufgerufen wird }
-  RotationForm.RaumGrafik.Salingtyp := Salingtyp;
-  RotationForm.RaumGrafik.ControllerTyp := ControllerTyp;
-  RotationForm.RaumGrafik.Koordinaten := Rigg.rP;
-  RotationForm.RaumGrafik.SetMastKurve(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  *)
 end;
 
 procedure TRiggModul.About;
@@ -1723,7 +1722,7 @@ begin
 
   Rgn := CreateRectRgnIndirect(EnvPos);
   SelectClipRgn(Printer.Canvas.Handle, Rgn);
-  { SelectClipRgn() arbeitet mit Kopie von Rgn! }
+  { SelectClipRgn() arbeitet mit Kopie von Rgn }
   DeleteObject(Rgn);
 
   { Metafile schreiben; mit Pen.Width = Zoom, wenn Box gecheckt }
@@ -1765,8 +1764,7 @@ begin
   ThickPenWidth := 1;
   Zoom := 10;
 
-  { wenn notwendig MetafileG schreiben,
-      falls Box gecheckt mit Pen.Width = 4 * Zoom }
+  { wenn notwendig MetafileG schreiben, falls Box gecheckt mit Pen.Width = 4 * Zoom }
   if not PaintBtnDown then
   begin
     SavedZoomFaktor := GetriebeGraph.ZoomFaktor;
@@ -1811,7 +1809,7 @@ begin
   R := Rect(0, 0, WindowExtX, WindowExtY);
   LPTODP(h, R, 2);
   Rgn := CreateRectRgnIndirect(R);
-  SelectClipRgn(h, Rgn); { SelectClipRgn arbeitet mit Kopie von Rgn! }
+  SelectClipRgn(h, Rgn); { SelectClipRgn arbeitet mit Kopie von Rgn }
   DeleteObject(Rgn);
 
   pb.Canvas.Draw(0, 0, MetaFileG)
@@ -2530,7 +2528,7 @@ begin
           t := InputForm.sbControllerD.Tag;
           InputForm.lbD1.Caption := ls;
         end;
-        stOhneBiegt:
+        stOhneStarr:
         begin
           InputForm.lbOhne1.Caption := ls;
         end;
@@ -2694,32 +2692,7 @@ end;
 procedure TRiggModul.UpdateGetriebe;
 begin
   Main.UpdateGetriebe;
-
-//  Rigg.UpdateGetriebe;
-//  if NeedPaint then
-//    DoGraphics;
-//  NeedPaint := True;
-//  if (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK) then
-//    UpdateRigg;
 end;
-
-//procedure TRiggModul.UpdateRigg;
-//begin
-//  Rigg.UpdateRigg;
-//
-//  if Rigg.RiggOK then
-//  begin
-//    FGrauZeichnen := True;
-//    LEDShape := True;
-//  end
-//  else
-//  begin
-//    FGrauZeichnen := False;
-//    LEDShape := False;
-//  end;
-//
-//  DoOnUpdateRigg;
-//end;
 
 procedure TRiggModul.DoOnUpdateRigg;
 begin

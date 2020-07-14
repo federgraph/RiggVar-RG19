@@ -20,6 +20,13 @@ type
     Left, Top, Width, Height: Integer;
     Step: Integer;
     GoLeft,GoRight,GoUp,GoDown: Boolean;
+
+    class var
+    KR: Integer; { Radius der großen Kreise }
+    SR: Integer; { Radius der kleinen Kreise }
+    Rand: Integer; { Randabstand der Reflektionskante }
+    Margin: Integer;
+
     constructor Create;
     procedure DrawSprite;
   end;
@@ -59,6 +66,10 @@ type
     TL1, TL2, TL3, TL4: TPoint;
     RB1, RB2, RB3, RB4: TPoint;
     TheImage: TBitMap;
+
+    FScale: single;
+    function Scale(Value: Integer): Integer;
+
     procedure MoveSprite;
     procedure DrawShape(TopLeft, BottomRight: TPoint; AColor: TColor);
     procedure ZeichneKreise;
@@ -70,20 +81,20 @@ type
 
 var
   KreisForm: TKreisForm;
-  KR: Integer; { Radius der großen Kreise }
-  SR: Integer; { Radius der kleinen Kreise }
-  Rand: Integer; { Randabstand der Reflektionskante }
 
 implementation
 
 {$R *.DFM}
 
+uses
+  RiggVar.App.Main;
+
 { TSprite }
 
 constructor TSprite.Create;
 begin
-  Left := 10; { beliebiger Anfangswert }
-  Top := 10; { beliebiger Anfangswert }
+  Left := Margin; { beliebiger Anfangswert }
+  Top := Margin; { beliebiger Anfangswert }
   Height := 2 * (Rand + KR);
   Width := 2 * (Rand + KR);
   Step := 1;
@@ -132,6 +143,13 @@ end;
 
 procedure TKreisForm.FormCreate(Sender: TObject);
 begin
+  FScale := MainVar.Scale;
+
+  TSprite.KR := Scale(100); { Radius große Kreise }
+  TSprite.SR := Scale(5); { Radius kleine Kreise }
+  TSprite.Rand := Scale(5) + TSprite.SR; { Randabstand der Reflektionskante }
+  TSprite.Margin := Scale(10);
+
   Caption := 'RiggVar About Form';
   ControlPanel.Font.Name := 'Courier New';
   ControlPanel.Caption := ' (c) federgraph.de';
@@ -150,8 +168,8 @@ begin
   with SchnittKK do
   begin
     SchnittEbene := seXY;
-    Radius1 := KR;
-    Radius2 := KR;
+    Radius1 := TSprite.KR;
+    Radius2 := TSprite.KR;
   end;
 
   { Sprite }
@@ -199,14 +217,14 @@ begin
   with Sprite1 do
   begin
     DrawSprite;
-    FiM1.x := Left + Rand + KR;
-    FiM1.y := Top  + Rand + KR;
+    FiM1.X := Left + Rand + KR;
+    FiM1.Y := Top  + Rand + KR;
   end;
   with Sprite2 do
   begin
     DrawSprite;
-    FiM2.x := Left + Rand + KR;
-    FiM2.y := Top  + Rand + KR;
+    FiM2.X := Left + Rand + KR;
+    FiM2.Y := Top  + Rand + KR;
   end;
 end;
 
@@ -214,10 +232,10 @@ procedure TKreisForm.Action;
 begin
   MoveSprite;
   { neue MittelPunkte übernehmen }
-  FrM1[x] := FiM1.x;
-  FrM1[y] := FiM1.y;
-  FrM2[x] := FiM2.x;
-  FrM2[y] := FiM2.y;
+  FrM1[x] := FiM1.X;
+  FrM1[y] := FiM1.Y;
+  FrM2[x] := FiM2.X;
+  FrM2[y] := FiM2.Y;
   { Schnittpunkte ausrechnen }
   with SchnittKK do
   begin
@@ -227,14 +245,14 @@ begin
     FrPos2 := SchnittPunkt2;
   end;
   { Integer - Mittelpunkte der kleinen Kreise }
-  FiPos1.x := Round(FrPos1[x]);
-  FiPos1.y := Round(FrPos1[y]);
-  FiPos2.x := Round(FrPos2[x]);
-  FiPos2.y := Round(FrPos2[y]);
+  FiPos1.X := Round(FrPos1[x]);
+  FiPos1.Y := Round(FrPos1[y]);
+  FiPos2.X := Round(FrPos2[x]);
+  FiPos2.Y := Round(FrPos2[y]);
   if not(SchnittKK.Status = bmZwei) then
   begin
-    FiPos1.x := -3 * SR; { kleine Kreise aus dem Bild schieben }
-    FiPos2.x := -3 * SR;
+    FiPos1.X := Scale(-3) * TSprite.SR; { kleine Kreise aus dem Bild schieben }
+    FiPos2.X := Scale(-3) * TSprite.SR;
   end;
   { kleine Kreise zeichnen }
   if SchnittKK.Status = bmZwei then
@@ -258,10 +276,10 @@ procedure TKreisform.ZeichneKreise;
 begin
   DrawShape(TL3, RB3, clBlack);
   DrawShape(TL4, RB4, clBlack);
-  TL3 := Point(Sprite1.Left+Rand, Sprite1.Top+Rand);
-  TL4 := Point(Sprite2.Left+Rand, Sprite2.Top+Rand);
-  RB3 := Point(TL3.x+2*KR, TL3.y+2*KR);
-  RB4 := Point(TL4.x+2*KR, TL4.y+2*KR);
+  TL3 := Point(Sprite1.Left + TSprite.Rand, Sprite1.Top + TSprite.Rand);
+  TL4 := Point(Sprite2.Left + TSprite.Rand, Sprite2.Top + TSprite.Rand);
+  RB3 := Point(TL3.X + 2 * TSprite.KR, TL3.Y + 2 * TSprite.KR);
+  RB4 := Point(TL4.X + 2 * TSprite.KR, TL4.Y + 2 * TSprite.KR);
   if FKreise then
   begin
     DrawShape(TL3, RB3, clTeal);
@@ -276,10 +294,10 @@ end;
 
 procedure TKreisForm.ZeichneSchnittPunkte;
 begin
-  TL1 := Point(FiPos1.x-SR, FiPos1.y-SR);
-  TL2 := Point(FiPos2.x-SR, FiPos2.y-SR);
-  RB1 := Point(FiPos1.x+SR, FiPos1.y+SR);
-  RB2 := Point(FiPos2.x+SR, FiPos2.y+SR);
+  TL1 := Point(FiPos1.X - TSprite.SR, FiPos1.Y - TSprite.SR);
+  TL2 := Point(FiPos2.X - TSprite.SR, FiPos2.Y - TSprite.SR);
+  RB1 := Point(FiPos1.X + TSprite.SR, FiPos1.Y + TSprite.SR);
+  RB2 := Point(FiPos2.X + TSprite.SR, FiPos2.Y + TSprite.SR);
 
   if FSchnittOK then
   begin
@@ -372,9 +390,9 @@ begin
   FKreise := not FKreise;
 end;
 
-initialization
-  KR := 100; { Radius große Kreise }
-  SR := 5; { Radius kleine Kreise }
-  Rand := 5 + SR; { Randabstand der Reflektionskante }
-  
+function TKreisForm.Scale(Value: Integer): Integer;
+begin
+  result := Round(Value * FScale);
+end;
+
 end.

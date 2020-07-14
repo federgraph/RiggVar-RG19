@@ -31,6 +31,7 @@ implementation
 {$R *.DFM}
 
 uses
+  RiggVar.App.Main,
   RggTypes,
   RggModul;
 
@@ -67,7 +68,7 @@ end;
 
 procedure TGrafikForm.FormShow(Sender: TObject);
 begin
-  ClientHeight := 457;
+  ClientHeight := Round(457 * MainVar.Scale);
 end;
 
 end.

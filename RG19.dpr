@@ -102,7 +102,6 @@ begin
   Application.CreateForm(TFormRegler, FormRegler);
   Application.CreateForm(TFormReglerGraph, FormReglerGraph);
   Application.CreateForm(TMemoDlg, MemoDlg);
-  Application.CreateForm(TOptionForm, OptionForm);
   Application.CreateForm(TPreviewGForm, PreviewGForm);
   Application.CreateForm(TYAuswahlDlg, YAuswahlDlg);
   Application.Run;

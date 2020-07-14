@@ -101,6 +101,9 @@ type
     BtnCounter: Integer;
     BtnColor: TColor;
 
+    FScale: single;
+    function Scale(Value: Integer): Integer;
+
     procedure SetupMemo(Memo: TMemo);
     procedure InitListBox;
     procedure InitTrimmCombo;
@@ -113,7 +116,7 @@ type
     procedure ShowCurrentReport;
     procedure InitViewpointCombo;
     procedure LayoutComponents;
-public
+  public
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
     function GetOpenFileName(dn, fn: string): string;
@@ -134,8 +137,12 @@ uses
 
 procedure TTextForm.FormCreate(Sender: TObject);
 begin
-  Left := 810;
-  Height := 640;
+  FScale := MainVar.Scale;
+
+  Margin := Scale(10);
+
+  Left := Scale(810);
+  Height := Scale(640);
   TL := TrimmMemo.Lines;
   ML := ReportMemo.Lines;
 
@@ -517,11 +524,10 @@ procedure TTextForm.LayoutComponents;
 begin
   LeftPos := TrimmMemo.Left + TrimmMemo.Width + Margin;
 
-  Margin := 10;
-  BtnMargin := 3;
+  BtnMargin := Scale(3);
   BtnCounter := 0;
-  BtnWidth := 45;
-  BtnHeight := 30;
+  BtnWidth := Scale(45);
+  BtnHeight := Scale(30);
   BtnLeft := LeftPos;
   BtnTop := Margin;
   BtnColor := clGreen;
@@ -560,6 +566,11 @@ begin
   cbSandboxed.Left := CopyAndPasteBtn.Left + CopyAndPasteBtn.Width + 2 * Margin;
   cbAllProps.Left := cbSandboxed.Left;
   cbAllTags.Left := cbSandboxed.Left;
+end;
+
+function TTextForm.Scale(Value: Integer): Integer;
+begin
+  result := Round(Value * FScale);
 end;
 
 end.

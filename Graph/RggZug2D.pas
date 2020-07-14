@@ -78,7 +78,7 @@ begin
      Pen.Color := clKoppelKurve;
      Polyline(Zug1Koppelkurve);
      { Kreisbogen mit Radius Vorstaglänge um C0 }
-     Pen.Color := clBlack;
+     Pen.Color := TColors.Antiquewhite;
      Arc(MP.x-IntR, MP.y-IntR,
          MP.x+IntR, MP.y+IntR,
          MP.x     , MP.y-IntR,
@@ -428,11 +428,7 @@ begin
       Pen.Color := clLime
     else
       Pen.Color := clYellow;
-    Ellipse(
-      -TransKreisRadius,
-      -TransKreisRadius,
-      TransKreisRadius,
-      TransKreisRadius);
+    Ellipse(-TKR, -TKR, TKR, TKR);
 
     { Rumpf }
     if Props.Coloriert then

@@ -12,7 +12,6 @@ object GrafikForm: TGrafikForm
   Font.Style = []
   FormStyle = fsStayOnTop
   OldCreateOrder = True
-  Scaled = False
   OnHide = FormHide
   OnShow = FormShow
   PixelsPerInch = 96

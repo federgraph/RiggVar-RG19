@@ -381,8 +381,8 @@ const
 procedure TFormRG19C.wmGetMinMaxInfo(var Msg: TMessage);
 begin
   inherited;
-  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.X := 900;
-  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.Y := 700;
+  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.X := Round(900 * FScale);
+  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.Y := Round(700 * FScale);
 end;
 
 procedure TFormRG19C.FormCreate(Sender: TObject);
@@ -413,11 +413,12 @@ if (Screen.Width > 1700 * FScale) then
     Height := Round(768 * FScale);
   end;
 
-  Margin := Round(5 * FScale);
+  Margin := Round(10 * FScale);
   Raster := Round(MainVar.Raster * FScale);
   MainVar.Scale := FScale;
   MainVar.ScaledRaster := Raster;
-  
+  TKR := Round(TKR * FScale);
+
   FormCreate1;
   FormCreate2;
   Main.IsUp := True;
@@ -708,12 +709,6 @@ begin
   RiggModul.KoppelBtnDown := Value;
 end;
 
-procedure TFormRG19C.SetReportLabelCaption(const Value: string);
-begin
-  FReportLabelCaption := Value;
-  StatusBar.Panels[2].Text := Value;
-end;
-
 procedure TFormRG19C.KoppelBtnClick(Sender: TObject);
 begin
   SetKoppelChecked(not KoppelItem.Checked);
@@ -865,8 +860,8 @@ begin
   begin
     InputForm.Parent := nil;
     InputForm.BorderStyle := bsSizeable;
-    InputForm.ClientHeight := 195;
-    InputForm.ClientWidth := 465;
+    InputForm.ClientHeight := Round(195 * FScale);
+    InputForm.ClientWidth := Round(465 * FScale);
     InputForm.Show;
   end
   else
@@ -880,8 +875,8 @@ begin
   begin
     OutputForm.Parent := nil;
     OutputForm.BorderStyle := bsSizeable;
-    OutputForm.ClientHeight := 255;
-    OutputForm.ClientWidth := 465;
+    OutputForm.ClientHeight := Round(255 * FScale);
+    OutputForm.ClientWidth := Round(465 * FScale);
     OutputForm.Show;
     if OutputForm.YComboBox.ItemIndex = -1 then
       OutputForm.YComboBox.ItemIndex := RiggModul.YComboSavedItemIndex;
@@ -897,8 +892,8 @@ begin
   begin
     GrafikForm.Parent := nil;
     GrafikForm.BorderStyle := bsSizeable;
-    GrafikForm.ClientWidth := 305;
-    GrafikForm.ClientHeight := 457;
+    GrafikForm.ClientWidth := Round(305 * FScale);
+    GrafikForm.ClientHeight := Round(457 * FScale);
     GrafikForm.Show;
   end
   else
@@ -1093,11 +1088,11 @@ begin
 
   BtnCounter := 0;
   BtnLeft := 0;
-  BtnTop := 3;
-  BtnSpace := 3;
-  BtnGroupSpace := 12;
-  BtnWidth := 30;
-  BtnHeight := 30;
+  BtnTop := Round(3 * FScale);
+  BtnSpace := Round(3 * FScale);
+  BtnGroupSpace := Round(12 * FScale);
+  BtnWidth := Round(30 * FScale);
+  BtnHeight := Round(30 * FScale);
 
   SpeedPanel.Height := BtnHeight + 2 * BtnTop;
 
@@ -1235,7 +1230,7 @@ begin
 
   BtnCounter := 0;
   BtnLeft := LedShape.Left + LedShape.Width; // skip over LED shape
-  BtnWidth := 50; // new button width for new buttons
+  BtnWidth := Round(50 * FScale); // new button width for new buttons
   BtnColor := clGreen;
 
   sb := AddSpeedBtn('MT0Btn', BtnGroupSpace);
@@ -1385,7 +1380,7 @@ begin
 
   BtnCounter := 0;
   BtnLeft := sb.Left + BtnWidth;
-  BtnWidth := 30;
+  BtnWidth := Round(30 * FScale);
 
   sb := AddSpeedBtn('SeiteBtn', BtnGroupSpace);
   SeiteBtn := sb;
@@ -1475,15 +1470,15 @@ begin
 
   sp := StatusBar.Panels.Add;
   sp.Text := 'MenuText';
-  sp.Width := 353;
+  sp.Width := Round(353 * FScale);
 
   sp := StatusBar.Panels.Add;
   sp.Text := 'RiggText';
-  sp.Width := 300;
+  sp.Width := Round(300 * FScale);
 
   sp := StatusBar.Panels.Add;
   sp.Text := 'RepotLabel';
-  sp.Width := 50;
+  sp.Width := Round(50 * FScale);
 end;
 
 procedure TFormRG19C.FormCreate2;
@@ -1544,8 +1539,8 @@ var
 begin
   TrimmMemo.Left := Margin;
   TrimmMemo.Top := SpeedPanel.Height + Margin;
-  TrimmMemo.Height := 185;
-  TrimmMemo.Width := 170;
+  TrimmMemo.Height := Round(185 * FScale);
+  TrimmMemo.Width := Round(170 * FScale);
 
   TrimmCombo.Left := TrimmMemo.Left;
   ParamCombo.Left := TrimmCombo.Left;
@@ -1571,8 +1566,8 @@ begin
 
   if WantConsole then
   begin
-    ConsoleWidth := 770 + 1 * Margin;
-    ConsoleHeight := 457 + 2 * Margin;
+    ConsoleWidth := Round(770 * FScale) + 1 * Margin;
+    ConsoleHeight := Round(457 * FScale) + 2 * Margin;
   end
   else
   begin
@@ -1581,7 +1576,7 @@ begin
   end;
 
   ReportMemo.Left := ReportListBox.Left + ReportListBox.Width + Margin;
-  ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + Margin + ConsoleHeight;
+  ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + ConsoleHeight;
   ReportMemo.Height := StatusBar.Top - ReportMemo.Top - Margin;
   ReportMemo.Width := ConsoleWidth;
   ReportMemo.Anchors := ReportMemo.Anchors + [akBottom];
@@ -1770,7 +1765,7 @@ begin
   cl.Add('E');
   cl.Add('F0');
   cl.Add('F');
-  FixpointCombo.ItemIndex := cl.IndexOf('D');
+  FixpointCombo.ItemIndex := cl.IndexOf('D0');
   FixpointCombo.DropDownCount := cl.Count;
 end;
 
@@ -2406,8 +2401,8 @@ begin
   GrafikForm.Position := poDesigned;
   GrafikForm.Left := TrimmMemo.Left + TrimmMemo.Width + Margin;
   GrafikForm.Top := SpeedPanel.Top + SpeedPanel.Height + Margin;
-  GrafikForm.ClientWidth := 305;
-  GrafikForm.ClientHeight := 457;
+  GrafikForm.ClientWidth := Round(305 * FScale);
+  GrafikForm.ClientHeight := Round(457 * FScale);
   GrafikForm.Visible := WantConsole;
   GrafikFormItem.Checked := WantConsole;
 
@@ -2419,8 +2414,8 @@ begin
   InputForm.Position := poDesigned;
   InputForm.Left := GrafikForm.Left + GrafikForm.Width + Margin;
   InputForm.Top := SpeedPanel.Top + SpeedPanel.Height + Margin;
-  InputForm.ClientHeight := 195;
-  InputForm.ClientWidth := 465;
+    InputForm.ClientHeight := Round(195 * FScale);
+    InputForm.ClientWidth := Round(465 * FScale);
   InputForm.Visible := WantConsole;
   InputFormItem.Checked := WantConsole;
 
@@ -2435,8 +2430,8 @@ begin
   OutputForm.Position := poDesigned;
   OutputForm.Left := InputForm.Left;
   OutputForm.Top := InputForm.Top + InputForm.Height + Margin;
-  OutputForm.ClientHeight := 255;
-  OutputForm.ClientWidth := 465;
+    OutputForm.ClientHeight := Round(255 * FScale);
+    OutputForm.ClientWidth := Round(465 * FScale);
   OutputForm.YComboBox.ItemIndex := temp;
   OutputForm.Visible := WantConsole;
   OutputFormItem.Checked := WantConsole;
@@ -2448,6 +2443,12 @@ begin
   ConsoleItem.Checked := WantConsole;
   LayoutComponents;
   InitOutputForm;
+end;
+
+procedure TFormRG19C.SetReportLabelCaption(const Value: string);
+begin
+  FReportLabelCaption := Value;
+  StatusBar.Panels[2].Text := Value;
 end;
 
 end.

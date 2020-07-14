@@ -1043,7 +1043,6 @@ begin
     sb := FactArray.Find(fpWinkel);
     sb.Ist := Rigg.RealGlied[fpWinkel] * 180 / pi;
   end;
-
 end;
 
 function TRggMain.GetPlotValue(PlotID: Integer; x, y: single): single;

@@ -25,14 +25,10 @@ object OptionForm: TOptionForm
     Top = 3
     Width = 521
     Height = 265
-    ActivePage = tsTabelle
+    ActivePage = tsTrimm
     TabOrder = 0
     object tsTrimm: TTabSheet
       Caption = 'Trimm'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBoxTrimm: TGroupBox
         Left = 16
         Top = 16
@@ -118,7 +114,7 @@ object OptionForm: TOptionForm
         end
         object MinEdit: TEdit
           Left = 48
-          Top = 64
+          Top = 68
           Width = 41
           Height = 21
           MaxLength = 4
@@ -540,7 +536,7 @@ object OptionForm: TOptionForm
           OnChanging = RumpfSpinEditChanging
         end
       end
-      object RumpfGrid: TStringGrid
+      object Grid: TStringGrid
         Left = 40
         Top = 32
         Width = 263
@@ -557,7 +553,7 @@ object OptionForm: TOptionForm
         ParentFont = False
         ScrollBars = ssNone
         TabOrder = 0
-        OnSelectCell = RumpfGridSelectCell
+        OnSelectCell = GridSelectCell
       end
     end
     object tsTabelle: TTabSheet
@@ -783,7 +779,7 @@ object OptionForm: TOptionForm
       ExplicitTop = 0
       ExplicitWidth = 0
       ExplicitHeight = 0
-      object InifileMemo: TMemo
+      object IniMemo: TMemo
         Left = 0
         Top = 0
         Width = 393
@@ -792,7 +788,7 @@ object OptionForm: TOptionForm
         ScrollBars = ssVertical
         TabOrder = 0
       end
-      object Speichern: TButton
+      object SaveIniBtn: TButton
         Left = 408
         Top = 16
         Width = 81

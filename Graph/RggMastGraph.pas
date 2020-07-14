@@ -1,4 +1,4 @@
-unit RggMastGraph;
+ï»¿unit RggMastGraph;
 
 interface
 
@@ -14,6 +14,7 @@ uses
 type
   TMastGraph = class(TMastGraphModel)
   private
+    FScale: single;
     procedure PaintBackGround(g: TCanvas);
   public
     Image: TImage;
@@ -27,6 +28,9 @@ type
   end;
 
 implementation
+
+uses
+  RiggVar.App.Main;
 
 procedure TMastGraph.PaintBackGround(g: TCanvas);
 var
@@ -45,8 +49,8 @@ var
   PlotLine: Linie;
   StraightLine: Boolean;
 begin
-  { Skalieren:  PlotLine soll Integerbereich gut ausfüllen.
-    Es ist garantiert, daß Anfangs- und Endpunkt der Linie
+  { Skalieren:  PlotLine soll Integerbereich gut ausfï¿½llen.
+    Es ist garantiert, daï¿½ Anfangs- und Endpunkt der Linie
     Null sind }
   StraightLine := False;
   max := LineData[0];
@@ -96,8 +100,10 @@ end;
 
 constructor TMastGraph.Create;
 begin
-  Width := 60;
-  Height := 163;
+  FScale := MainVar.Scale;
+
+  Width := Round(60 * FScale);
+  Height := Round(163 * FScale);
 
   Bitmap := TBitmap.Create;
   Bitmap.Width := Width;

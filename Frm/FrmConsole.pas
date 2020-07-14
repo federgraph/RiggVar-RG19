@@ -20,6 +20,8 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
   private
+    FScale: single;
+    function Scale(Value: Integer): Integer;
   end;
 
 var
@@ -28,6 +30,7 @@ var
 implementation
 
 uses
+  RiggVar.App.Main,
   RggModul,
   FrmInput,
   FrmOutput,
@@ -80,8 +83,10 @@ var
 begin
   ConsoleForm := self;
 
-  ClientWidth := 788;
-  ClientHeight :=  470;
+  FScale := MainVar.Scale;
+
+  ClientWidth := Scale(788);
+  ClientHeight :=  Scale(470);
 
   { GrafikForm }
 
@@ -89,10 +94,10 @@ begin
   GrafikForm.BorderStyle := bsNone;
   GrafikForm.Parent := ConsoleForm;
   GrafikForm.Position := poDesigned;
-  GrafikForm.Left := 6;
-  GrafikForm.Top := 8;
-  GrafikForm.ClientWidth := 305;
-  GrafikForm.ClientHeight := 457;
+  GrafikForm.Left := Scale(6);
+  GrafikForm.Top := Scale(8);
+  GrafikForm.ClientWidth := Scale(305);
+  GrafikForm.ClientHeight := Scale(457);
   GrafikForm.Visible := True;
 
   { InputForm }
@@ -101,10 +106,10 @@ begin
   InputForm.BorderStyle := bsNone;
   InputForm.Parent := ConsoleForm;
   InputForm.Position := poDesigned;
-  InputForm.Left := 318;
-  InputForm.Top := 8;
-  InputForm.ClientHeight := 195;
-  InputForm.ClientWidth := 465;
+  InputForm.Left := Scale(318);
+  InputForm.Top := Scale(8);
+  InputForm.ClientHeight := Scale(195);
+  InputForm.ClientWidth := Scale(465);
   InputForm.Visible := True;
 
   { OutputForm}
@@ -116,14 +121,19 @@ begin
   OutputForm.BorderStyle := bsNone;
   OutputForm.Parent := ConsoleForm;
   OutputForm.Position := poDesigned;
-  OutputForm.Left := 318;
-  OutputForm.Top := 210;
-  OutputForm.ClientHeight := 255;
-  OutputForm.ClientWidth := 465;
+  OutputForm.Left := Scale(318);
+  OutputForm.Top := Scale(210);
+  OutputForm.ClientHeight := Scale(255);
+  OutputForm.ClientWidth := Scale(465);
   OutputForm.YComboBox.ItemIndex := temp;
   OutputForm.Visible := True;
 
   RiggModul.ConsoleActive := True;
+end;
+
+function TConsoleForm.Scale(Value: Integer): Integer;
+begin
+  result := Round(Value * FScale);
 end;
 
 end.
