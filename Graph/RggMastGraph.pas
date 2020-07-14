@@ -14,6 +14,7 @@ uses
 type
   TMastGraph = class(TMastGraphModel)
   private
+    FScale: single;
     procedure PaintBackGround(g: TCanvas);
   public
     Image: TImage;
@@ -27,6 +28,9 @@ type
   end;
 
 implementation
+
+uses
+  RiggVar.App.Main;
 
 procedure TMastGraph.PaintBackGround(g: TCanvas);
 var
@@ -96,8 +100,10 @@ end;
 
 constructor TMastGraph.Create;
 begin
-  Width := 60;
-  Height := 163;
+  FScale := MainVar.Scale;
+
+  Width := Round(60 * FScale);
+  Height := Round(163 * FScale);
 
   Bitmap := TBitmap.Create;
   Bitmap.Width := Width;

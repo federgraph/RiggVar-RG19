@@ -1,4 +1,4 @@
-﻿object InputForm: TInputForm
+object InputForm: TInputForm
   Left = 266
   Top = 163
   BorderStyle = bsDialog
@@ -336,7 +336,8 @@
           Width = 60
           Height = 163
           Align = alClient
-          ExplicitHeight = 160
+          ExplicitLeft = 4
+          ExplicitTop = -2
         end
       end
     end
@@ -691,7 +692,7 @@
         end
         object lbOhne3: TLabel
           Left = 287
-          Top = 60
+          Top = 58
           Width = 53
           Height = 16
           Alignment = taRightJustify

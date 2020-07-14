@@ -162,11 +162,7 @@ begin
       Pen.Color := clLime
     else
       Pen.Color := clYellow;
-    Ellipse(
-      -TransKreisRadius,
-      -TransKreisRadius,
-      TransKreisRadius,
-      TransKreisRadius);
+    Ellipse(-TKR, -TKR, TKR, TKR);
 
     Pen.Color := Props.Color;
 

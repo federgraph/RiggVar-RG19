@@ -77,6 +77,9 @@ type
 
     Margin: Integer;
 
+    FScale: single;
+    function Scale(Value: Integer): Integer;
+
     procedure RecordMax;
     procedure AnchorVertical(c: TControl);
     procedure StackH(c: TControl);
@@ -111,11 +114,15 @@ implementation
   {$R *.lfm}
 {$ENDIF}
 
+uses
+  RiggVar.App.Main;
+
 { TFormTrimmTab }
 
 procedure TFormTrimmTab.FormCreate(Sender: TObject);
 begin
-  Margin := 10;
+  FScale := MainVar.Scale;
+  Margin := Scale(10);
 
   CreateComponents;
   InitComponentSize;
@@ -280,11 +287,11 @@ procedure TFormTrimmTab.InitComponentSize;
 var
   w, h: Integer;
 begin
-  ClientHeight := 400;
-  ClientWidth := 600;
+  ClientHeight := Scale(400);
+  ClientWidth := Scale(600);
 
-  w := 75;
-  h := 17;
+  w := Scale(75);
+  h := Scale(17);
   rbKonstante.Width := w;
   rbKonstante.Height := h;
   rbGerade.Width := w;
@@ -294,17 +301,17 @@ begin
   rbBezier.Width := w;
   rbBezier.Height := h;
 
-  Memo.Width := 130;
-  Memo.Height := 200;
+  Memo.Width := Scale(130);
+  Memo.Height := Scale(200);
 
-  Image.Width := 319;
-  Image.Height := 158;
+  Image.Width := Scale(319);
+  Image.Height := Scale(158);
 
-  MemoLabel.Width := 108;
-  MemoLabel.Height := 13;
+  MemoLabel.Width := Scale(108);
+  MemoLabel.Height := Scale(13);
 
-  w := 25;
-  h := 25;
+  w := Scale(25);
+  h := Scale(25);
   WriteMemoBtn.Width := w;
   WriteMemoBtn.Height := h;
   ReadMemoBtn.Width := w;
@@ -312,8 +319,8 @@ begin
   EvalOptionBtn.Width := w;
   EvalOptionBtn.Height := h;
 
-  w := 10;
-  h := 13;
+  w := Scale(10);
+  h := Scale(13);
   X1Label.Width := w;
   X1Label.Height := h;
   Y1Label.Width := w;
@@ -323,8 +330,8 @@ begin
   Y2Label.Width := w;
   Y2Label.Height := h;
 
-  w := 40;
-  h := 21;
+  w := Scale(40);
+  h := Scale(21);
   W1Edit.Width := w;
   W1Edit.Height := h;
   K1Edit.Width := w;
@@ -334,15 +341,15 @@ begin
   K2Edit.Width := w;
   K2Edit.Height := h;
 
-  w := 15;
-  h := 21;
+  w := Scale(15);
+  h := Scale(21);
   W1UpDown.Width := w;
   W1UpDown.Height := h;
   K1UpDown.Width := w;
   K1UpDown.Height := h;
 
-  w := 100;
-  h := 27;
+  w := Scale(100);
+  h := Scale(27);
   OKBtn.Width := w;
   OKBtn.Height := h;
 
@@ -403,7 +410,7 @@ begin
 
   cr := W1Edit;
   StackV(OKBtn);
-  OKBtn.Left := 80;
+  OKBtn.Left := Scale(80);
   OKBtn.Top := OKBtn.Top + Margin;
   StackH(CancelBtn);
 
@@ -647,6 +654,11 @@ procedure TFormTrimmTab.AnchorVertical(c: TControl);
 begin
   c.Height := ClientHeight - c.Top - Margin;
   c.Anchors := c.Anchors + [TAnchorKind.akBottom];
+end;
+
+function TFormTrimmTab.Scale(Value: Integer): Integer;
+begin
+  result := Round(Value * FScale);
 end;
 
 end.

@@ -156,6 +156,9 @@ type
     FiP: TRealRiggPoints;
     FRumpfCell: TPoint;
 
+    FScale: single;
+    function Scale(Value: Integer): Integer;
+
     procedure GetKeyList(Source, Dest: TStringList);
     procedure FillIniLists;
     procedure FillRiggLists;
@@ -192,11 +195,14 @@ implementation
 {$ENDIF}
 
 uses
+  RiggVar.App.Main,
   RiggVar.RG.Def;
 
 procedure TFormConfig.FormCreate(Sender: TObject);
 begin
   Caption := 'Form Config';
+
+  FScale := MainVar.Scale;
 
   FMastTypList := TStringList.Create;
   FMastMassList := TStringList.Create;
@@ -210,8 +216,10 @@ begin
   FirstRowIndex := 1; // 0 in FMX and 1 in VCL/LCL
   SecondRowIndex := FirstRowIndex + 1;
 
-  Margin := 10;
-  Raster := 70;
+  FScale := MainVar.Scale;
+
+  Margin := Round(10 * FScale);
+  Raster := Round(70 * FScale);
 
   CreateComponents;
 
@@ -246,13 +254,13 @@ procedure TFormConfig.InitGrid;
 begin
   Grid.Left := Margin;
   Grid.Top := Margin;
-  Grid.Width := 263;
-  Grid.Height := 178;
+  Grid.Width := Scale(263);
+  Grid.Height := Scale(178);
 
   Grid.ColCount := 4;
   Grid.RowCount := 7;
   Grid.Options := [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected];
-  Grid.ParentFont := False;
+  Grid.ParentFont := True;
   Grid.ScrollBars := ssNone;
   Grid.TabOrder := 0;
   Grid.OnSelectCell := GridSelectCell;
@@ -267,6 +275,11 @@ begin
   Grid.Cells[0,4] := '   D0';
   Grid.Cells[0,5] := '   E0';
   Grid.Cells[0,6] := '   F0';
+end;
+
+function TFormConfig.Scale(Value: Integer): Integer;
+begin
+  result := Round(Value * FScale);
 end;
 
 procedure TFormConfig.SelectInitialCell;
@@ -288,7 +301,7 @@ begin
   FillRiggLists;
   LoadRiggCombos;
   FillIniLists;
-  LoadInifileCombos;
+  LoadIniFileCombos;
 end;
 
 procedure TFormConfig.FillRiggLists;
@@ -711,7 +724,7 @@ begin
   FillRiggLists;
   LoadRiggCombos;
   RumpfSpinEdit.Position := StrToIntDef(Grid.Cells[FRumpfCell.X,FRumpfCell.Y], 0);
-  RumpfEdit.Text := Format('%4d mm',[RumpfSpinEdit.Position]);
+  RumpfEdit.Text := Format('%4d mm', [RumpfSpinEdit.Position]);
 end;
 
 procedure TFormConfig.GridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
@@ -794,11 +807,13 @@ begin
   BorderIcons := [biSystemMenu, biMinimize];
   BorderStyle := bsDialog;
   Color := clBtnFace;
-  Font.Charset := DEFAULT_CHARSET;
-  Font.Color := clWindowText;
-  Font.Height := -11;
-  Font.Name := 'Tahoma';
-  Font.Style := [];
+
+//  Font.Charset := DEFAULT_CHARSET;
+//  Font.Color := clWindowText;
+//  Font.Height := -11;
+//  Font.Name := 'Tahoma';
+//  Font.Style := [];
+
   FormStyle := fsStayOnTop;
   Position := poScreenCenter;
   PixelsPerInch := 96;
@@ -1070,253 +1085,253 @@ end;
 
 procedure TFormConfig.LayoutComponents;
 begin
-  Left := 230;
-  Top := 113;
+  Left := Scale(230);
+  Top := Scale(113);
 
-  PageControl.Left := 8;
-  PageControl.Top := 8;
-  PageControl.Width := 521;
-  PageControl.Height := 265;
+  PageControl.Left := Scale(8);
+  PageControl.Top := Scale(8);
+  PageControl.Width := Scale(521);
+  PageControl.Height := Scale(265);
   PageControl.TabOrder := 0;
 
   { Trimm }
 
-  GroupBoxTrimm.Left := 16;
-  GroupBoxTrimm.Top := 16;
-  GroupBoxTrimm.Width := 473;
-  GroupBoxTrimm.Height := 169;
+  GroupBoxTrimm.Left := Scale(16);
+  GroupBoxTrimm.Top := Scale(16);
+  GroupBoxTrimm.Width := Scale(473);
+  GroupBoxTrimm.Height := Scale(169);
   GroupBoxTrimm.TabOrder := 0;
 
-  LabelMin.Left := 48;
-  LabelMin.Top := 46;
-  LabelMin.Width := 21;
-  LabelMin.Height := 16;
+  LabelMin.Left := Scale(48);
+  LabelMin.Top := Scale(46);
+  LabelMin.Width := Scale(21);
+  LabelMin.Height := Scale(16);
 
-  LabelPos.Left := 112;
-  LabelPos.Top := 46;
-  LabelPos.Width := 24;
-  LabelPos.Height := 16;
+  LabelPos.Left := Scale(112);
+  LabelPos.Top := Scale(46);
+  LabelPos.Width := Scale(24);
+  LabelPos.Height := Scale(16);
 
-  LabelMax.Left := 176;
-  LabelMax.Top := 46;
-  LabelMax.Width := 25;
-  LabelMax.Height := 16;
+  LabelMax.Left := Scale(176);
+  LabelMax.Top := Scale(46);
+  LabelMax.Width := Scale(25);
+  LabelMax.Height := Scale(16);
 
-  MinEdit.Left := 48;
-  MinEdit.Top := 64;
-  MinEdit.Width := 41;
-  MinEdit.Height := 21;
+  MinEdit.Left := Scale(48);
+  MinEdit.Top := Scale(64);
+  MinEdit.Width := Scale(41);
+  MinEdit.Height := Scale(21);
   MinEdit.MaxLength := 4;
   MinEdit.TabOrder := 1;
   MinEdit.OnExit := MinEditExit;
   MinEdit.OnKeyDown := MinEditKeyDown;
 
-  PosEdit.Left := 112;
-  PosEdit.Top := 64;
-  PosEdit.Width := 41;
-  PosEdit.Height := 21;
+  PosEdit.Left := Scale(112);
+  PosEdit.Top := Scale(64);
+  PosEdit.Width := Scale(41);
+  PosEdit.Height := Scale(21);
   PosEdit.MaxLength := 4;
   PosEdit.TabOrder := 2;
   PosEdit.OnExit := MinEditExit;
   PosEdit.OnKeyDown := MinEditKeyDown;
 
-  MaxEdit.Left := 176;
-  MaxEdit.Top := 64;
-  MaxEdit.Width := 41;
-  MaxEdit.Height := 21;
+  MaxEdit.Left := Scale(176);
+  MaxEdit.Top := Scale(64);
+  MaxEdit.Width := Scale(41);
+  MaxEdit.Height := Scale(21);
   MaxEdit.MaxLength := 4;
   MaxEdit.TabOrder := 0;
   MaxEdit.OnExit := MinEditExit;
   MaxEdit.OnKeyDown := MinEditKeyDown;
 
-  LengthEditLabel.Left := 228;
-  LengthEditLabel.Top := 65;
-  LengthEditLabel.Width := 125;
-  LengthEditLabel.Height := 16;
+  LengthEditLabel.Left := Scale(228);
+  LengthEditLabel.Top := Scale(65);
+  LengthEditLabel.Width := Scale(125);
+  LengthEditLabel.Height := Scale(16);
 
-  TrimmComboLabel.Left := 223;
-  TrimmComboLabel.Top := 112;
-  TrimmComboLabel.Width := 87;
-  TrimmComboLabel.Height := 16;
+  TrimmComboLabel.Left := Scale(223);
+  TrimmComboLabel.Top := Scale(112);
+  TrimmComboLabel.Width := Scale(87);
+  TrimmComboLabel.Height := Scale(16);
 
-  TrimmCombo.Left := 48;
-  TrimmCombo.Top := 111;
-  TrimmCombo.Width := 169;
-  TrimmCombo.Height := 21;
+  TrimmCombo.Left := Scale(48);
+  TrimmCombo.Top := Scale(111);
+  TrimmCombo.Width := Scale(169);
+  TrimmCombo.Height := Scale(21);
   TrimmCombo.TabOrder := 3;
   TrimmCombo.OnChange := TrimmComboChange;
 
   { Fachwerk }
 
-  ElementLabel.Left := 24;
-  ElementLabel.Top := 10;
-  ElementLabel.Width := 92;
-  ElementLabel.Height := 16;
+  ElementLabel.Left := Scale(24);
+  ElementLabel.Top := Scale(10);
+  ElementLabel.Width := Scale(92);
+  ElementLabel.Height := Scale(16);
 
-  ElementCombo.Left := 24;
-  ElementCombo.Top := 32;
-  ElementCombo.Width := 161;
-  ElementCombo.Height := 21;
+  ElementCombo.Left := Scale(24);
+  ElementCombo.Top := Scale(32);
+  ElementCombo.Width := Scale(161);
+  ElementCombo.Height := Scale(21);
   ElementCombo.TabOrder := 0;
   ElementCombo.OnChange := ElementComboChange;
 
-  EAEdit.Left := 200;
-  EAEdit.Top := 32;
-  EAEdit.Width := 105;
-  EAEdit.Height := 21;
+  EAEdit.Left := Scale(200);
+  EAEdit.Top := Scale(32);
+  EAEdit.Width := Scale(105);
+  EAEdit.Height := Scale(21);
   EAEdit.TabStop := False;
   EAEdit.TabOrder := 1;
 
-  EAEditLabel.Left := 200;
-  EAEditLabel.Top := 10;
-  EAEditLabel.Width := 52;
-  EAEditLabel.Height := 16;
+  EAEditLabel.Left := Scale(200);
+  EAEditLabel.Top := Scale(10);
+  EAEditLabel.Width := Scale(52);
+  EAEditLabel.Height := Scale(16);
 
-  TakeOverBtn.Left := 319;
-  TakeOverBtn.Top := 30;
-  TakeOverBtn.Width := 170;
-  TakeOverBtn.Height := 25;
+  TakeOverBtn.Left := Scale(319);
+  TakeOverBtn.Top := Scale(30);
+  TakeOverBtn.Width := Scale(170);
+  TakeOverBtn.Height := Scale(25);
   TakeOverBtn.TabOrder := 2;
   TakeOverBtn.OnClick := TakeOverBtnClick;
 
-  GroupBoxMaterial.Left := 24;
-  GroupBoxMaterial.Top := 74;
-  GroupBoxMaterial.Width := 477;
-  GroupBoxMaterial.Height := 151;
-  GroupBoxMaterial.TabOrder := 3;
+  GroupBoxMaterial.Left := Scale(24);
+  GroupBoxMaterial.Top := Scale(74);
+  GroupBoxMaterial.Width := Scale(477);
+  GroupBoxMaterial.Height := Scale(151);
+  GroupBoxMaterial.TabOrder := Scale(3);
 
-  MaterialComboLabel.Left := 31;
-  MaterialComboLabel.Top := 30;
-  MaterialComboLabel.Width := 48;
-  MaterialComboLabel.Height := 16;
+  MaterialComboLabel.Left := Scale(31);
+  MaterialComboLabel.Top := Scale(30);
+  MaterialComboLabel.Width := Scale(48);
+  MaterialComboLabel.Height := Scale(16);
 
-  MaterialCombo.Left := 31;
-  MaterialCombo.Top := 52;
-  MaterialCombo.Width := 153;
-  MaterialCombo.Height := 21;
+  MaterialCombo.Left := Scale(31);
+  MaterialCombo.Top := Scale(52);
+  MaterialCombo.Width := Scale(153);
+  MaterialCombo.Height := Scale(21);
   MaterialCombo.TabOrder := 0;
   MaterialCombo.OnChange := MaterialComboChange;
 
-  ELabel.Left := 198;
-  ELabel.Top := 31;
-  ELabel.Width := 9;
-  ELabel.Height := 16;
+  ELabel.Left := Scale(198);
+  ELabel.Top := Scale(31);
+  ELabel.Width := Scale(9);
+  ELabel.Height := Scale(16);
 
-  EEdit.Left := 198;
-  EEdit.Top := 53;
-  EEdit.Width := 73;
-  EEdit.Height := 21;
+  EEdit.Left := Scale(198);
+  EEdit.Top := Scale(53);
+  EEdit.Width := Scale(73);
+  EEdit.Height := Scale(21);
   EEdit.TabStop := False;
   EEdit.TabOrder := 3;
 
   EEditLabel.Left := EEdit.Left + EEdit.Width + Margin;
   EEditLabel.Top := EEdit.Top;
-  EEditLabel.Width := 124;
-  EEditLabel.Height := 16;
+  EEditLabel.Width := Scale(124);
+  EEditLabel.Height := Scale(16);
 
-  QuerschnittComboLabel.Left := 31;
-  QuerschnittComboLabel.Top := 92;
-  QuerschnittComboLabel.Width := 66;
-  QuerschnittComboLabel.Height := 16;
+  QuerschnittComboLabel.Left := Scale(31);
+  QuerschnittComboLabel.Top := Scale(92);
+  QuerschnittComboLabel.Width := Scale(66);
+  QuerschnittComboLabel.Height := Scale(16);
 
-  QuerschnittCombo.Left := 31;
-  QuerschnittCombo.Top := 114;
-  QuerschnittCombo.Width := 153;
-  QuerschnittCombo.Height := 21;
+  QuerschnittCombo.Left := Scale(31);
+  QuerschnittCombo.Top := Scale(114);
+  QuerschnittCombo.Width := Scale(153);
+  QuerschnittCombo.Height := Scale(21);
   QuerschnittCombo.TabOrder := 1;
   QuerschnittCombo.OnChange := QuerschnittComboChange;
 
-  ALabel.Left := 198;
-  ALabel.Top := 92;
-  ALabel.Width := 9;
-  ALabel.Height := 16;
+  ALabel.Left := Scale(198);
+  ALabel.Top := Scale(92);
+  ALabel.Width := Scale(9);
+  ALabel.Height := Scale(16);
 
-  AEdit.Left := 198;
-  AEdit.Top := 114;
-  AEdit.Width := 73;
-  AEdit.Height := 21;
+  AEdit.Left := Scale(198);
+  AEdit.Top := Scale(114);
+  AEdit.Width := Scale(73);
+  AEdit.Height := Scale(21);
   AEdit.TabStop := False;
   AEdit.TabOrder := 2;
 
   AEditLabel.Left := AEdit.Left + AEdit.Width + Margin;
   AEditLabel.Top := AEdit.Top;
-  AEditLabel.Width := 118;
-  AEditLabel.Height := 16;
+  AEditLabel.Width := Scale(118);
+  AEditLabel.Height := Scale(16);
 
   { Mast }
 
-  GroupBoxMast.Left := 18;
-  GroupBoxMast.Top := 23;
-  GroupBoxMast.Width := 471;
-  GroupBoxMast.Height := 194;
+  GroupBoxMast.Left := Scale(18);
+  GroupBoxMast.Top := Scale(23);
+  GroupBoxMast.Width := Scale(471);
+  GroupBoxMast.Height := Scale(194);
   GroupBoxMast.TabOrder := 0;
 
-  MastTypeComboLabel.Left := 24;
-  MastTypeComboLabel.Top := 38;
-  MastTypeComboLabel.Width := 30;
-  MastTypeComboLabel.Height := 16;
+  MastTypeComboLabel.Left := Scale(24);
+  MastTypeComboLabel.Top := Scale(38);
+  MastTypeComboLabel.Width := Scale(30);
+  MastTypeComboLabel.Height := Scale(16);
 
-  MastTypeCombo.Left := 24;
-  MastTypeCombo.Top := 56;
-  MastTypeCombo.Width := 145;
-  MastTypeCombo.Height := 21;
+  MastTypeCombo.Left := Scale(24);
+  MastTypeCombo.Top := Scale(56);
+  MastTypeCombo.Width := Scale(145);
+  MastTypeCombo.Height := Scale(21);
   MastTypeCombo.TabOrder := 2;
   MastTypeCombo.OnChange := MastTypeComboChange;
 
-  EIEdit.Left := 185;
-  EIEdit.Top := 56;
-  EIEdit.Width := 73;
-  EIEdit.Height := 21;
+  EIEdit.Left := Scale(185);
+  EIEdit.Top := Scale(56);
+  EIEdit.Width := Scale(73);
+  EIEdit.Height := Scale(21);
   EIEdit.TabStop := False;
   EIEdit.TabOrder := 3;
 
-  EILabel.Left := 264;
-  EILabel.Top := 57;
-  EILabel.Width := 158;
-  EILabel.Height := 16;
+  EILabel.Left := Scale(264);
+  EILabel.Top := Scale(57);
+  EILabel.Width := Scale(158);
+  EILabel.Height := Scale(16);
 
-  MastMassComboLabel.Left := 24;
-  MastMassComboLabel.Top := 110;
-  MastMassComboLabel.Width := 87;
-  MastMassComboLabel.Height := 16;
+  MastMassComboLabel.Left := Scale(24);
+  MastMassComboLabel.Top := Scale(110);
+  MastMassComboLabel.Width := Scale(87);
+  MastMassComboLabel.Height := Scale(16);
 
-  MastMassCombo.Left := 24;
-  MastMassCombo.Top := 132;
-  MastMassCombo.Width := 145;
-  MastMassCombo.Height := 21;
+  MastMassCombo.Left := Scale(24);
+  MastMassCombo.Top := Scale(132);
+  MastMassCombo.Width := Scale(145);
+  MastMassCombo.Height := Scale(21);
   MastMassCombo.TabOrder := 0;
   MastMassCombo.OnChange := MastMassComboChange;
 
-  MastMassEdit.Left := 185;
-  MastMassEdit.Top := 132;
-  MastMassEdit.Width := 73;
-  MastMassEdit.Height := 21;
+  MastMassEdit.Left := Scale(185);
+  MastMassEdit.Top := Scale(132);
+  MastMassEdit.Width := Scale(73);
+  MastMassEdit.Height := Scale(21);
   MastMassEdit.MaxLength := 4;
   MastMassEdit.TabOrder := 1;
   MastMassEdit.OnExit := MastMassEditExit;
   MastMassEdit.OnKeyDown := MastMassEditKeyDown;
 
-  MassMassEditLabel.Left := 264;
-  MassMassEditLabel.Top := 133;
-  MassMassEditLabel.Width := 167;
-  MassMassEditLabel.Height := 16;
+  MassMassEditLabel.Left := Scale(264);
+  MassMassEditLabel.Top := Scale(133);
+  MassMassEditLabel.Width := Scale(167);
+  MassMassEditLabel.Height := Scale(16);
 
   { Hull }
 
   GroupBoxRumpf.Left := Grid.Left + Grid.Width + Margin;
   GroupBoxRumpf.Top := Grid.Top;
-  GroupBoxRumpf.Width := 161;
-  GroupBoxRumpf.Height := 145;
+  GroupBoxRumpf.Width := Scale(161);
+  GroupBoxRumpf.Height := Scale(145);
 
-  RumpfLabel.Left := 24;
+  RumpfLabel.Left := Scale(24);
   RumpfLabel.Top := 2 * Margin;
-  RumpfLabel.Width := 73;
-  RumpfLabel.Height := 16;
+  RumpfLabel.Width := Scale(73);
+  RumpfLabel.Height := Scale(16);
 
   RumpfEdit.Left := RumpfLabel.Left;
   RumpfEdit.Top := RumpfLabel.Top + RumpfLabel.Height + Margin;
-  RumpfEdit.Width := 81;
-  RumpfEdit.Height := 24;
+  RumpfEdit.Width := Scale(81);
+  RumpfEdit.Height := Scale(24);
   RumpfEdit.TabOrder := 1;
 
   RumpfSpinEdit.TabOrder := 2;
@@ -1326,8 +1341,8 @@ begin
 
   RumpfBtn.Left := RumpfLabel.Left;
   RumpfBtn.Top := RumpfEdit.Top + RumpfEdit.Height + Margin;
-  RumpfBtn.Width := 129;
-  RumpfBtn.Height := 25;
+  RumpfBtn.Width := Scale(129);
+  RumpfBtn.Height := Scale(25);
   RumpfBtn.TabOrder := 0;
   RumpfBtn.OnClick := RumpfBtnClick;
 
@@ -1335,43 +1350,43 @@ begin
 
   IniMemo.Left := 0;
   IniMemo.Top := 0;
-  IniMemo.Width := 393;
-  IniMemo.Height := 237;
+  IniMemo.Width := Scale(393);
+  IniMemo.Height := Scale(237);
   IniMemo.Align := alLeft;
   IniMemo.ScrollBars := ssVertical;
   IniMemo.TabOrder := 0;
 
-  SaveIniBtn.Left := 408;
-  SaveIniBtn.Top := 16;
-  SaveIniBtn.Width := 81;
-  SaveIniBtn.Height := 25;
+  SaveIniBtn.Left := Scale(408);
+  SaveIniBtn.Top := Scale(16);
+  SaveIniBtn.Width := Scale(81);
+  SaveIniBtn.Height := Scale(25);
   SaveIniBtn.TabOrder := 1;
   SaveIniBtn.OnClick := StoreItemClick;
 
-  LoadIniBtn.Left := 408;
-  LoadIniBtn.Top := 47;
-  LoadIniBtn.Width := 81;
-  LoadIniBtn.Height := 25;
+  LoadIniBtn.Left := Scale(408);
+  LoadIniBtn.Top := Scale(47);
+  LoadIniBtn.Width := Scale(81);
+  LoadIniBtn.Height := Scale(25);
   LoadIniBtn.TabOrder := 2;
   LoadIniBtn.OnClick := LoadItemClick;
 
   { Buttons }
 
-  OKBtn.Left := 169;
-  OKBtn.Top := 283;
-  OKBtn.Width := 81;
-  OKBtn.Height := 27;
+  OKBtn.Left := Scale(169);
+  OKBtn.Top := Scale(283);
+  OKBtn.Width := Scale(81);
+  OKBtn.Height := Scale(27);
   OKBtn.TabOrder := 1;
   OKBtn.OnClick := OKBtnClick;
 
-  CancelBtn.Left := 268;
-  CancelBtn.Top := 283;
-  CancelBtn.Width := 101;
-  CancelBtn.Height := 27;
+  CancelBtn.Left := Scale(268);
+  CancelBtn.Top := Scale(283);
+  CancelBtn.Width := Scale(101);
+  CancelBtn.Height := Scale(27);
   CancelBtn.TabOrder := 2;
 
-  ClientHeight := 318;
-  ClientWidth := 529;
+  ClientHeight := Scale(318);
+  ClientWidth := Scale(529);
 end;
 
 end.

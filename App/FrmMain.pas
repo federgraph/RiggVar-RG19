@@ -453,6 +453,7 @@ begin
   Raster := Round(MainVar.Raster * FScale);
   MainVar.Scale := FScale;
   MainVar.ScaledRaster := Raster;
+  TKR := Round(TKR * FScale);
 
   SpeedPanelHeight := Raster - Round(FScale * Margin);
   ListboxWidth := Round(200 * FScale);
@@ -2904,8 +2905,8 @@ begin
 
     InputForm.Parent := nil;
     InputForm.BorderStyle := bsSizeable;
-    InputForm.ClientHeight := 195;
-    InputForm.ClientWidth := 465;
+    InputForm.ClientHeight := Round(195 * FScale);
+    InputForm.ClientWidth := Round(465 * FScale);
     InputForm.Show;
   end
   else
@@ -2924,8 +2925,8 @@ begin
 
     OutputForm.Parent := nil;
     OutputForm.BorderStyle := bsSizeable;
-    OutputForm.ClientHeight := 255;
-    OutputForm.ClientWidth := 465;
+    OutputForm.ClientHeight := Round(255 * FScale);
+    OutputForm.ClientWidth := Round(465 * FScale);
     OutputForm.Show;
     if OutputForm.YComboBox.ItemIndex = -1 then
       OutputForm.YComboBox.ItemIndex := RiggModul.YComboSavedItemIndex;
@@ -3016,9 +3017,9 @@ begin
   else if Sender = DrehbarItem then
     Main.RiggModul.DrehbarItemClick
   else if Sender = OSBItem then
-    Main.RiggModul.OhneBiegtItemClick
+    Main.RiggModul.OSBItemClick
   else if Sender = OSSItem then
-    Main.RiggModul.OhneStarrItemClick
+    Main.RiggModul.OSSItemClick
 end;
 
 procedure TFormMain.InitStatusBar;

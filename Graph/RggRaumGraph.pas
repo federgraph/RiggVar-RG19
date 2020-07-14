@@ -326,7 +326,7 @@ begin
     begin
       DI.StrokeColor := clYellow;
       DI.StrokeWidth := 1;
-      DL.Ellipse('Fixpunkt', deFixPunkt, FixPunkt, FixPunkt, Point(0, 0), TransKreisRadius);
+      DL.Ellipse('Fixpunkt', deFixPunkt, FixPunkt, FixPunkt, Point(0, 0), TKR);
     end;
 
     { Rumpf }

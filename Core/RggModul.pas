@@ -130,8 +130,8 @@ type
     procedure BiegeNeigeItemClick;
     procedure ReglerBtnClick;
     procedure FestItemClick;
-    procedure OhneStarrItemClick;
-    procedure OhneBiegtItemClick;
+    procedure OSSItemClick;
+    procedure OSBItemClick;
     procedure DrehbarItemClick;
     procedure ChartItemClick;
     procedure WriteReportToMemo(Memo: TMemo);
@@ -1056,7 +1056,7 @@ begin
   Main.Param := Main.Param;
 end;
 
-procedure TRiggModul.OhneBiegtItemClick;
+procedure TRiggModul.OSBItemClick;
 begin
   InputForm.pnOhneBK.Update;
   InputForm.pnMastOhne.Update;
@@ -1147,7 +1147,7 @@ begin
   ViewModelM.UpdateView;
 end;
 
-procedure TRiggModul.OhneStarrItemClick;
+procedure TRiggModul.OSSItemClick;
 begin
   InputForm.pnOhne.Update;
 
@@ -1855,14 +1855,14 @@ begin
           t := InputForm.sbVorstagD.Tag;
           InputForm.lbD2.Caption := ls;
         end;
-        stOhneStarr:
+        stOhneBiegt:
         begin
           InputRec.Vorstag := ScrollPos;
           InputForm.sbVorstagOhne.Position := ScrollPos;
           t := InputForm.sbVorstagOhne.Tag;
           InputForm.lbOhne1.Caption := ls;
         end;
-        stOhneBiegt:
+        stOhneStarr:
         begin
           InputForm.sbVorstagOS.Position := ScrollPos;
           t := InputForm.sbVorstagOS.Tag;
@@ -1888,7 +1888,7 @@ begin
           t := InputForm.sbWanteD.Tag;
           InputForm.lbD3.Caption := ls;
         end;
-        stOhneStarr:
+        stOhneBiegt:
         begin
           InputForm.sbWanteOhne.Position := ScrollPos;
           t := InputForm.sbWanteOhne.Tag;
@@ -1996,13 +1996,13 @@ begin
   SalingGraph.BackgroundColor := FBackgroundColor;
 
   BitmapS := TBitmap.Create;
-  BitmapS.Width := 453;
-  BitmapS.Height := 220;
+  BitmapS.Width := Round(453 * MainVar.Scale);
+  BitmapS.Height := Round(220 * MainVar.Scale);
   PaintBackGround(BitmapS);
 
   BitmapC := TBitmap.Create;
-  BitmapC.Width := 453;
-  BitmapC.Height := 220;
+  BitmapC.Width := Round(453 * MainVar.Scale);
+  BitmapC.Height := Round(220 * MainVar.Scale);
   PaintBackGround(BitmapC);
 
   MastGraph := TMastGraph.Create;
@@ -2042,32 +2042,7 @@ end;
 procedure TRiggModul.UpdateGetriebe;
 begin
   Main.UpdateGetriebe;
-
-//  Rigg.UpdateGetriebe;
-//  if NeedPaint then
-//    DoGraphics;
-//  NeedPaint := True;
-//  if (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK) then
-//    UpdateRigg;
 end;
-
-//procedure TRiggModulA.UpdateRigg;
-//begin
-//  Rigg.UpdateRigg;
-//
-//  if Rigg.RiggOK then
-//  begin
-//    FGrauZeichnen := True;
-//    LEDShape := True;
-//  end
-//  else
-//  begin
-//    FGrauZeichnen := False;
-//    LEDShape := False;
-//  end;
-//
-//  DoOnUpdateRigg;
-//end;
 
 procedure TRiggModulA.DoOnUpdateRigg;
 begin

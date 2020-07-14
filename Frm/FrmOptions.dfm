@@ -25,7 +25,7 @@ object OptionForm: TOptionForm
     Top = 3
     Width = 521
     Height = 265
-    ActivePage = tsTabelle
+    ActivePage = tsIniMemo
     TabOrder = 0
     object tsTrimm: TTabSheet
       Caption = 'Trimm'
@@ -524,7 +524,7 @@ object OptionForm: TOptionForm
           OnChanging = RumpfSpinEditChanging
         end
       end
-      object RumpfGrid: TStringGrid
+      object Grid: TStringGrid
         Left = 40
         Top = 32
         Width = 263
@@ -541,7 +541,7 @@ object OptionForm: TOptionForm
         ParentFont = False
         ScrollBars = ssNone
         TabOrder = 0
-        OnSelectCell = RumpfGridSelectCell
+        OnSelectCell = GridSelectCell
       end
     end
     object tsTabelle: TTabSheet
@@ -759,7 +759,7 @@ object OptionForm: TOptionForm
     end
     object tsIniMemo: TTabSheet
       Caption = 'Rigg.ini'
-      object InifileMemo: TMemo
+      object IniMemo: TMemo
         Left = 0
         Top = 0
         Width = 393
@@ -768,12 +768,12 @@ object OptionForm: TOptionForm
         ScrollBars = ssVertical
         TabOrder = 0
       end
-      object Speichern: TButton
+      object SaveIniBtn: TButton
         Left = 408
         Top = 16
         Width = 81
         Height = 25
-        Caption = 'Speichern'
+        Caption = 'SaveIniBtn'
         TabOrder = 1
         OnClick = StoreItemClick
       end
