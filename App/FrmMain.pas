@@ -311,6 +311,7 @@ begin
   Raster := Round(MainVar.Raster * FScale);
   MainVar.Scale := FScale;
   MainVar.ScaledRaster := Raster;
+  TKR := Round(TKR * FScale);
 
   SpeedPanelHeight := Raster - Round(FScale * Margin);
   ListboxWidth := Round(200 * FScale);
@@ -1650,6 +1651,7 @@ begin
   Add(fpMastfallVorlauf);
   Add(fpBiegung);
   Add(fpD0X);
+  ParamCombo.DropDownCount := ParamCombo.Items.Count;
 end;
 
 procedure TFormMain.ParamComboChange(Sender: TObject);

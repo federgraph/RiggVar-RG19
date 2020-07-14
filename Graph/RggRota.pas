@@ -771,8 +771,8 @@ begin
   SavedYPos := FYPos;
 
   FTranslation :=
-    (Abs(NullPunktOffset.x - X) < TransKreisRadius) and
-    (Abs(NullPunktOffset.y - Y) < TransKreisRadius);
+    (Abs(NullPunktOffset.x - X) < TKR) and
+    (Abs(NullPunktOffset.y - Y) < TKR);
 end;
 
 procedure TRotaForm.PaintBox3DMouseMove(Sender: TObject;
