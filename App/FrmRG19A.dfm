@@ -765,18 +765,15 @@ object FormRG19A: TFormRG19A
     end
   end
   object OpenDialog: TOpenDialog
-    DefaultExt = 'ini'
-    Filter = 'Alle Dateien (*.*)|*.*|Rigg Einstellungen (*.rgg)|*.rgg'
-    FilterIndex = 2
+    DefaultExt = 'rgi'
+    Filter = 'Rigg Ini File (*.rgi)|*.rgi|Alle Dateien (*.*)|*.*'
     Options = [ofOverwritePrompt, ofPathMustExist, ofFileMustExist]
     Left = 199
     Top = 70
   end
   object SaveDialog: TSaveDialog
-    DefaultExt = 'rgg'
-    Filter = 
-      'Rigg Einstellungen (*.rgg)|*.rgg|Rigg IniFile (*.rgi)|*.rgi|Alle' +
-      ' Dateien (*.*)|*.*'
+    DefaultExt = 'rgi'
+    Filter = 'Rigg Ini File (*.rgi)|*.rgi|Alle Dateien (*.*)|*.*'
     Options = [ofOverwritePrompt, ofPathMustExist]
     Left = 336
     Top = 70

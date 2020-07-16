@@ -99,18 +99,15 @@ object FormMain: TFormMain
     Text = 'FixpointCombo'
   end
   object OpenDialog: TOpenDialog
-    DefaultExt = 'ini'
-    Filter = 'Alle Dateien (*.*)|*.*|Rigg Einstellungen (*.rgg)|*.rgg'
-    FilterIndex = 2
+    DefaultExt = 'rgi'
+    Filter = 'Alle Dateien (*.*)|*.*|Rigg Ini File (*.rgi)|*.rgi'
     Options = [ofOverwritePrompt, ofPathMustExist, ofFileMustExist]
     Left = 303
     Top = 550
   end
   object SaveDialog: TSaveDialog
-    DefaultExt = 'rgg'
-    Filter = 
-      'Rigg Einstellungen (*.rgg)|*.rgg|Rigg IniFile (*.rgi)|*.rgi|Alle' +
-      ' Dateien (*.*)|*.*'
+    DefaultExt = 'rgi'
+    Filter = 'Rigg Ini File (*.rgi)|*.rgi|Alle Dateien (*.*)|*.*'
     Options = [ofOverwritePrompt, ofPathMustExist]
     Left = 408
     Top = 550

@@ -1,7 +1,7 @@
 object FormRG19B: TFormRG19B
   Left = 0
   Top = 0
-  Caption = 'RG19'
+  Caption = 'RG19B'
   ClientHeight = 695
   ClientWidth = 1094
   Color = clBtnFace
@@ -372,18 +372,15 @@ object FormRG19B: TFormRG19B
     Text = 'FixpointCombo'
   end
   object OpenDialog: TOpenDialog
-    DefaultExt = 'ini'
-    Filter = 'Alle Dateien (*.*)|*.*|Rigg Einstellungen (*.rgg)|*.rgg'
-    FilterIndex = 2
+    DefaultExt = 'rgi'
+    Filter = 'Rigg Ini File (*.rgi)|*.rgi|Alle Dateien (*.*)|*.*'
     Options = [ofOverwritePrompt, ofPathMustExist, ofFileMustExist]
     Left = 303
     Top = 550
   end
   object SaveDialog: TSaveDialog
-    DefaultExt = 'rgg'
-    Filter = 
-      'Rigg Einstellungen (*.rgg)|*.rgg|Rigg IniFile (*.rgi)|*.rgi|Alle' +
-      ' Dateien (*.*)|*.*'
+    DefaultExt = 'rgi'
+    Filter = 'Rigg Ini File (*.rgi)|*.rgi|Alle Dateien (*.*)|*.*'
     Options = [ofOverwritePrompt, ofPathMustExist]
     Left = 408
     Top = 550

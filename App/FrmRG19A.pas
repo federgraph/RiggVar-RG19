@@ -225,6 +225,7 @@ type
     procedure SetControllerEnabled;
     procedure SetControllerChecked(Value: Boolean);
     procedure SetKoppelChecked(Value: Boolean);
+    procedure UpdateOnParamValueChanged;
   end;
 
 var
@@ -239,6 +240,7 @@ uses
   RiggVar.FB.ActionConst,
   RiggVar.VM.FormMainA,
   RiggVar.RG.Main,
+  RiggVar.RG.Data,
   RggModul,
   FrmInfo,
   FrmConsole,
@@ -437,19 +439,24 @@ begin
   if RiggModul.Modified then
   begin
     FName := Caption;
-    DialogValue := MessageDlg(Format(SWarningText, [FName]), mtConfirmation,
-      mbYesNoCancel, 0);
+    DialogValue := MessageDlg(Format(SWarningText, [FName]), mtConfirmation, mbYesNoCancel, 0);
     case DialogValue of
-      mrYes:
-        SaveItemClick(Sender);
-      { mrNo: weiter ohne speichern }
-      mrCancel:
-        Exit;
+      mrYes: SaveItemClick(Sender);
+      mrCancel: Exit;
     end;
   end;
   if OpenDialog.Execute then
   begin
     RiggModul.Open(OpenDialog.FileName);
+    RiggModul.UpdateGControls;
+
+    { do the new way of loading data }
+    Main.Rigg.SaveToFederData(Main.RggData);
+    Main.LoadTrimm(Main.RggData);
+
+    { trigger update of new UI }
+    Main.ParamValue[Main.Param] := Main.ParamValue[Main.Param];
+    UpdateOnParamValueChanged;
   end;
 end;
 
@@ -494,14 +501,12 @@ begin
       mbYesNoCancel, 0);
     case DialogValue of
       mrYes:
-        begin
-          SaveItemClick(Sender);
-          CanClose := not RiggModul.Modified;
-        end;
-      mrNo:
-        CanClose := True;
-      mrCancel:
-        CanClose := False;
+      begin
+        SaveItemClick(Sender);
+        CanClose := not RiggModul.Modified;
+      end;
+      mrNo: CanClose := True;
+      mrCancel: CanClose := False;
     end;
   end;
 end;
@@ -880,6 +885,12 @@ begin
     result := SaveDialog.FileName
   else
     result := '';
+end;
+
+procedure TFormRG19A.UpdateOnParamValueChanged;
+begin
+  if (TextForm <> nil) and TextForm.Visible then
+    TextForm.ShowTrimm;
 end;
 
 end.

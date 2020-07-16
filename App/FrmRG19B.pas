@@ -358,6 +358,7 @@ type
     Margin: Integer;
     function GetOpenFileName(dn, fn: string): string;
     function GetSaveFileName(dn, fn: string): string;
+    procedure UpdateOnParamValueChanged;
 
     property ReportLabelCaption: string read FReportLabelCaption write SetReportLabelCaption;
   private
@@ -394,8 +395,8 @@ const
 procedure TFormRG19B.wmGetMinMaxInfo(var Msg: TMessage);
 begin
   inherited;
-  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.X := 900;
-  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.Y := 700;
+  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.X := Round(900 * FScale);
+  PMinMaxInfo(Msg.lParam)^.ptMinTrackSize.Y := Round(700 * FScale);
 end;
 
 procedure TFormRG19B.FormCreate(Sender: TObject);
@@ -588,19 +589,24 @@ begin
   if RiggModul.Modified then
   begin
     FName := Caption;
-    DialogValue := MessageDlg(Format(SWarningText, [FName]), mtConfirmation,
-      mbYesNoCancel, 0);
+    DialogValue := MessageDlg(Format(SWarningText, [FName]), mtConfirmation, mbYesNoCancel, 0);
     case DialogValue of
-      mrYes:
-        SaveItemClick(Sender);
-      { mrNo: weiter ohne speichern }
-      mrCancel:
-        Exit;
+      mrYes: SaveItemClick(Sender);
+      mrCancel: Exit;
     end;
   end;
   if OpenDialog.Execute then
   begin
     RiggModul.Open(OpenDialog.FileName);
+    RiggModul.UpdateGControls;
+
+    { do the new way of loading data }
+    Main.Rigg.SaveToFederData(Main.RggData);
+    Main.LoadTrimm(Main.RggData);
+
+    { trigger update of new UI }
+    Main.ParamValue[Main.Param] := Main.ParamValue[Main.Param];
+    UpdateOnParamValueChanged;
   end;
 end;
 
@@ -645,14 +651,12 @@ begin
       mbYesNoCancel, 0);
     case DialogValue of
       mrYes:
-        begin
-          SaveItemClick(Sender);
-          CanClose := not RiggModul.Modified;
-        end;
-      mrNo:
-        CanClose := True;
-      mrCancel:
-        CanClose := False;
+      begin
+        SaveItemClick(Sender);
+        CanClose := not RiggModul.Modified;
+      end;
+      mrNo: CanClose := True;
+      mrCancel: CanClose := False;
     end;
   end;
 end;
@@ -901,8 +905,8 @@ begin
   begin
     GrafikForm.Parent := nil;
     GrafikForm.BorderStyle := bsSizeable;
-    GrafikForm.ClientWidth := 305;
-    GrafikForm.ClientHeight := 457;
+    GrafikForm.ClientWidth := Round(305 * FScale);
+    GrafikForm.ClientHeight := Round(457 * FScale);
     GrafikForm.Show;
   end
   else
@@ -1026,16 +1030,17 @@ end;
 
 procedure TFormRG19B.InitOpenDialog;
 begin
-  OpenDialog.DefaultExt := 'ini';
-  OpenDialog.Filter := 'Alle Dateien (*.*)|*.*|Rigg Einstellungen (*.rgg)|*.rgg';
-  OpenDialog.FilterIndex := 2;
+  OpenDialog.DefaultExt := 'rgi';
+  OpenDialog.Filter := 'Rigg Ini File (*.rgi)|*.rgi|Alle Dateien (*.*)|*.*';
+  OpenDialog.FilterIndex := 1;
   OpenDialog.Options := [ofOverwritePrompt, ofPathMustExist, ofFileMustExist];
 end;
 
 procedure TFormRG19B.InitSaveDialog;
 begin
-  SaveDialog.DefaultExt := 'rgg';
-  SaveDialog.Filter := 'Rigg Einstellungen (*.rgg)|*.rgg|Rigg IniFile (*.rgi)|*.rgi|Alle Dateien (*.*)|*.*';
+  SaveDialog.DefaultExt := 'rgi';
+  SaveDialog.Filter := 'Rigg Ini File (*.rgi)|*.rgi|Alle Dateien (*.*)|*.*';
+  SaveDialog.FilterIndex := 1;
   SaveDialog.Options := [ofOverwritePrompt, ofPathMustExist];
 end;
 
@@ -2396,6 +2401,11 @@ procedure TFormRG19B.SetReportLabelCaption(const Value: string);
 begin
   FReportLabelCaption := Value;
   StatusBar.Panels[2].Text := Value;
+end;
+
+procedure TFormRG19B.UpdateOnParamValueChanged;
+begin
+  ShowTrimm;
 end;
 
 end.

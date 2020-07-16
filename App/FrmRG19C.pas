@@ -345,6 +345,7 @@ type
     Margin: Integer;
     function GetOpenFileName(dn, fn: string): string;
     function GetSaveFileName(dn, fn: string): string;
+    procedure UpdateOnParamValueChanged;
 
     property ReportLabelCaption: string read FReportLabelCaption write SetReportLabelCaption;
   private
@@ -580,19 +581,24 @@ begin
   if RiggModul.Modified then
   begin
     FName := Caption;
-    DialogValue := MessageDlg(Format(SWarningText, [FName]), mtConfirmation,
-      mbYesNoCancel, 0);
+    DialogValue := MessageDlg(Format(SWarningText, [FName]), mtConfirmation, mbYesNoCancel, 0);
     case DialogValue of
-      mrYes:
-        SaveItemClick(Sender);
-      { mrNo: weiter ohne speichern }
-      mrCancel:
-        Exit;
+      mrYes: SaveItemClick(Sender);
+      mrCancel: Exit;
     end;
   end;
   if OpenDialog.Execute then
   begin
     RiggModul.Open(OpenDialog.FileName);
+    RiggModul.UpdateGControls;
+
+    { do the new way of loading data }
+    Main.Rigg.SaveToFederData(Main.RggData);
+    Main.LoadTrimm(Main.RggData);
+
+    { trigger update of new UI }
+    Main.ParamValue[Main.Param] := Main.ParamValue[Main.Param];
+    UpdateOnParamValueChanged;
   end;
 end;
 
@@ -1013,16 +1019,17 @@ end;
 
 procedure TFormRG19C.InitOpenDialog;
 begin
-  OpenDialog.DefaultExt := 'ini';
-  OpenDialog.Filter := 'Alle Dateien (*.*)|*.*|Rigg Einstellungen (*.rgg)|*.rgg';
-  OpenDialog.FilterIndex := 2;
+  OpenDialog.DefaultExt := 'rgi';
+  OpenDialog.Filter := 'Rigg Ini File (*.rgi)|*.rgi|Alle Dateien (*.*)|*.*';
+  OpenDialog.FilterIndex := 1;
   OpenDialog.Options := [ofOverwritePrompt, ofPathMustExist, ofFileMustExist];
 end;
 
 procedure TFormRG19C.InitSaveDialog;
 begin
-  SaveDialog.DefaultExt := 'rgg';
-  SaveDialog.Filter := 'Rigg Einstellungen (*.rgg)|*.rgg|Rigg IniFile (*.rgi)|*.rgi|Alle Dateien (*.*)|*.*';
+  SaveDialog.DefaultExt := 'rgi';
+  SaveDialog.Filter := 'Rigg Ini File (*.rgi)|*.rgi|Alle Dateien (*.*)|*.*';
+  SaveDialog.FilterIndex := 1;
   SaveDialog.Options := [ofOverwritePrompt, ofPathMustExist];
 end;
 
@@ -1074,7 +1081,7 @@ begin
   S.Left := BtnLeft + BtnCounter * BtnWidth + BtnSpace + temp;
   S.Top := BtnTop + 1;
   S.Width := BtnWidth - 2 * temp;
-  S.Height := BtnHeight - 2;
+  S.Height := BtnHeight - Round(2 * FScale);
   S.Brush.Color := clGreen;
   Inc(BtnCounter);
 end;
@@ -1571,7 +1578,7 @@ begin
   end
   else
   begin
-    ConsoleWidth := 500;
+    ConsoleWidth := Round(500 * FScale);
     ConsoleHeight := 0;
   end;
 
@@ -2449,6 +2456,11 @@ procedure TFormRG19C.SetReportLabelCaption(const Value: string);
 begin
   FReportLabelCaption := Value;
   StatusBar.Panels[2].Text := Value;
+end;
+
+procedure TFormRG19C.UpdateOnParamValueChanged;
+begin
+  ShowTrimm;
 end;
 
 end.

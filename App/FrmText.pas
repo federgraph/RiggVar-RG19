@@ -112,7 +112,6 @@ type
     procedure SetupListBox(LB: TListBox);
     procedure SetupLabel(L: TLabel);
     procedure AddBtn(B: TSpeedButton);
-    procedure ShowTrimm;
     procedure ShowCurrentReport;
     procedure InitViewpointCombo;
     procedure LayoutComponents;
@@ -121,6 +120,7 @@ type
     SaveDialog: TSaveDialog;
     function GetOpenFileName(dn, fn: string): string;
     function GetSaveFileName(dn, fn: string): string;
+    procedure ShowTrimm;
   end;
 
 var

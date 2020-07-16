@@ -114,9 +114,9 @@ begin
     end
     else if s = RGG_File_Extension then
     begin
-      { write as .rgi }
+      { write as .rgi, .rgg no longer supported }
       s := ChangeFileExt(FileName, RGI_File_Extension);
-      Document.WriteToIniFile(FileName);
+      Document.WriteToIniFile(s);
       // Document.SaveToFile(FileName);
     end;
   finally
