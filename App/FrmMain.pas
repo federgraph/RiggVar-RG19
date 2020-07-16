@@ -99,6 +99,8 @@ type
   public
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
+    procedure InitOpenDialog;
+    procedure InitSaveDialog;
     function GetOpenFileName(dn, fn: string): string;
     function GetSaveFileName(dn, fn: string): string;
   public
@@ -231,7 +233,6 @@ type
     procedure UpdateChartGraph;
     procedure LayoutImages;
   protected
-    procedure ShowChartForm;
     procedure ShowDiagramC;
     procedure ShowDiagramE;
     procedure ShowDiagramQ;
@@ -377,7 +378,6 @@ uses
   FrmAction,
   FrmConfig,
   FrmTrimmTab,
-  FrmChart,
   FrmDiagramC,
   FrmDiagramE,
   FrmDiagramQ,
@@ -1088,7 +1088,6 @@ begin
     faTR02: ShowDiagramC;
     faTR03: ShowDiagramQ;
     faTR04: ShowDiagramE;
-    faTR05: ShowChartForm;
 
     faBR01: ShowKreisForm;
     faBR02: RotaForm.WantCircles := True;
@@ -2224,15 +2223,6 @@ begin
   FormDiagramC.Visible := True;
 end;
 
-procedure TFormMain.ShowChartForm;
-begin
-  if not Assigned(ChartForm) then
-  begin
-    ChartForm := TChartForm.Create(Application);
-  end;
-  ChartForm.Show;
-end;
-
 procedure TFormMain.ShowKreisForm;
 begin
   if not Assigned(KreisForm) then
@@ -2640,18 +2630,13 @@ begin
   if (Caption <> 'Rigg') and Main.Modified then
   begin
     FName := Caption;
-    DialogValue := MessageDlg(Format(SWarningText, [FName]), mtConfirmation,
-      [mbYes, mbNo, mbCancel], 0);
+    DialogValue := MessageDlg(Format(SWarningText, [FName]), mtConfirmation, [mbYes, mbNo, mbCancel], 0);
     case DialogValue of
-      mrYes:
-        SaveItemClick(Sender);
-      { mrNo: weiter ohne speichern }
-      mrCancel:
-        Exit;
+      mrYes: SaveItemClick(Sender);
+      mrCancel: Exit;
     end;
   end;
-//  RiggModul.Neu(nil);
-//  Caption := 'Rigg';
+  RiggModul.Neu(nil);
 end;
 
 procedure TFormMain.OpenItemClick(Sender: TObject);
@@ -2662,51 +2647,75 @@ begin
   if Main.Modified then
   begin
     FName := Caption;
-    DialogValue := MessageDlg(Format(SWarningText, [FName]), mtConfirmation,
-      mbYesNoCancel, 0);
+    DialogValue := MessageDlg(Format(SWarningText, [FName]), mtConfirmation, mbYesNoCancel, 0);
     case DialogValue of
-      mrYes:
-        SaveItemClick(Sender);
-      { mrNo: weiter ohne speichern }
-      mrCancel:
-        Exit;
+      mrYes: SaveItemClick(Sender);
+      mrCancel: Exit;
     end;
   end;
 
   if not Assigned(OpenDialog) then
     OpenDialog := TOpenDialog.Create(self);
-   if OpenDialog.Execute then
+
+  InitOpenDialog;
+
+  if OpenDialog.Execute then
   begin
-//    RiggModul.Open(OpenDialog.FileName);
-//    Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
+    RiggModul.Open(OpenDialog.FileName);
+    RiggModul.UpdateGControls;
+
+    { do the new way of loading data }
+    Main.Rigg.SaveToFederData(Main.RggData);
+    Main.LoadTrimm(Main.RggData);
+
+    { trigger update of new UI }
+    Main.ParamValue[Main.Param] := Main.ParamValue[Main.Param];
+    UpdateOnParamValueChanged;
   end;
 end;
 
 procedure TFormMain.SaveItemClick(Sender: TObject);
 begin
-//  if RiggModul.IniFileName = '' then
-//    SaveAsItemClick(Sender)
-//  else
-//    RiggModul.Save;
+  if RiggModul.IniFileName = '' then
+    SaveAsItemClick(Sender)
+  else
+    RiggModul.Save;
 end;
 
 procedure TFormMain.SaveAsItemClick(Sender: TObject);
 begin
-//  if not Assigned(SaveDialog) then
-//    SaveDialog := TSaveDialog.Create(self);
-//
-//  SaveDialog.FileName := RiggModul.IniFileName;
-//  if SaveDialog.Execute then
-//  begin
-//    RiggModul.IniFileName := SaveDialog.FileName;
-//    Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
-//    SaveItemClick(Sender);
-//  end;
+  if not Assigned(SaveDialog) then
+    SaveDialog := TSaveDialog.Create(self);
+
+  InitSaveDialog;
+
+  SaveDialog.FileName := RiggModul.IniFileName;
+  if SaveDialog.Execute then
+  begin
+    RiggModul.IniFileName := SaveDialog.FileName;
+    SaveItemClick(Sender);
+  end;
 end;
 
 procedure TFormMain.ExitItemClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TFormMain.InitOpenDialog;
+begin
+  OpenDialog.DefaultExt := 'rgi';
+  OpenDialog.Filter := 'Rigg Ini File (*.rgi)|*.rgi|Alle Dateien (*.*)|*.*';
+  OpenDialog.FilterIndex := 1;
+  OpenDialog.Options := [ofOverwritePrompt, ofPathMustExist, ofFileMustExist];
+end;
+
+procedure TFormMain.InitSaveDialog;
+begin
+  SaveDialog.DefaultExt := 'rgi';
+  SaveDialog.Filter := 'Rigg Ini File (*.rgi)|*.rgi|Alle Dateien (*.*)|*.*';
+  SaveDialog.FilterIndex := 1;
+  SaveDialog.Options := [ofOverwritePrompt, ofPathMustExist];
 end;
 
 procedure TFormMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);

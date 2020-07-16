@@ -133,7 +133,6 @@ type
     procedure OSSItemClick;
     procedure OSBItemClick;
     procedure DrehbarItemClick;
-    procedure ChartItemClick;
     procedure WriteReportToMemo(Memo: TMemo);
     procedure sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
 
@@ -243,7 +242,6 @@ uses
   FrmSelect,
   FrmRegler,
   FrmReglerGraph,
-  FrmChart,
   FrmBiege,
   FrmKreis;
 
@@ -1164,11 +1162,6 @@ begin
   ViewModelM.OSSItemClick;
   ViewModelM.ControllerEnabled := ControllerEnabled;
   ViewModelM.UpdateView;
-end;
-
-procedure TRiggModul.ChartItemClick;
-begin
-  ChartForm := TChartForm.Create(Application);
 end;
 
 procedure TRiggModulD.StraightLine;

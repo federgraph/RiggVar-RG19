@@ -197,12 +197,7 @@
             <Form>YAuswahlDlg</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Frm\FrmChart.pas">
-            <Form>ChartForm</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="Graph\RggChartModel01.pas"/>
-        <DCCReference Include="Graph\RggChartModel02.pas"/>
         <DCCReference Include="Frm\FrmDiagramQ.pas">
             <Form>FormDiagramQ</Form>
             <FormType>dfm</FormType>
