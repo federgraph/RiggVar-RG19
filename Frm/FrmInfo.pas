@@ -25,6 +25,9 @@ type
 
 procedure ShowInfo;
 
+var
+  FormInfo: TFormInfo;
+
 implementation
 
 {$R *.DFM}

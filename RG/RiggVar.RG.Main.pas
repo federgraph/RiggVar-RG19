@@ -233,6 +233,8 @@ type
 
     procedure Init420;
     procedure InitLogo;
+    procedure InitWithDefaultDoc(AWantLogoData: Boolean; TargetSlot: Integer);
+    procedure DoAfterInitDefault(ATrimmSlot: Integer);
     procedure InitSalingTyp(fa: Integer); override;
 
     procedure MemoryBtnClick;
@@ -1201,36 +1203,29 @@ begin
 end;
 
 procedure TRggMain.Init420;
-var
-  doc: TRggDocument;
 begin
-  doc := TRggDocument.Create;
-  WantLogoData := False;
-  doc.GetDefaultDocument;
-  Rigg.SetDocument(doc);
-  doc.Free;
-
-  Rigg.ControllerTyp := TControllerTyp.ctOhne;
-  InitFactArray();
-  if StrokeRigg <> nil then
-    StrokeRigg.SalingTyp := Rigg.SalingTyp;
-  SetParam(FParam);
-  FixPoint := ooD;
-
-  SaveTrimm(Trimm7);
-  TrimmNoChange := 7;
+  InitWithDefaultDoc(False, 7);
 end;
 
 procedure TRggMain.InitLogo;
+begin
+  InitWithDefaultDoc(True, 8);
+end;
+
+procedure TRggMain.InitWithDefaultDoc(AWantLogoData: Boolean; TargetSlot: Integer);
 var
   doc: TRggDocument;
 begin
   doc := TRggDocument.Create;
-  WantLogoData := True;
+  WantLogoData := AWantLogoData;
   doc.GetDefaultDocument;
   Rigg.SetDocument(doc);
   doc.Free;
+  DoAfterInitDefault(TargetSlot);
+end;
 
+procedure TRggMain.DoAfterInitDefault(ATrimmSlot: Integer);
+begin
   Rigg.ControllerTyp := TControllerTyp.ctOhne;
   InitFactArray();
   if StrokeRigg <> nil then
@@ -1238,8 +1233,21 @@ begin
   SetParam(FParam);
   FixPoint := ooD;
 
-  SaveTrimm(Trimm8);
-  TrimmNoChange := 8;
+  case ATrimmSlot of
+    7:
+    begin
+      SaveTrimm(Trimm7);
+      TrimmNoChange := 7;
+    end;
+    8:
+    begin
+      SaveTrimm(Trimm8);
+      TrimmNoChange := 8;
+    end;
+  end;
+
+  ParamValue[Param] := ParamValue[Param];
+  FormMain.UpdateOnParamValueChanged;
 end;
 
 procedure TRggMain.InitSalingTyp(fa: Integer);
