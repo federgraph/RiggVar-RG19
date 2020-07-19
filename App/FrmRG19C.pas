@@ -437,7 +437,6 @@ begin
   RiggModul.RG19A := False;
   RiggModul.ViewModelM := TViewModelMainC.Create;
   RiggModul.Init;
-  RiggModul.BackgroundColor := TColors.Wheat; // call after RiggModul.Init
   RiggModul.PBG := GrafikForm.PaintBoxG;
   RiggModul.SofortBtnDown := False;
   RiggModul.BtnGrauDown := True;
@@ -589,33 +588,25 @@ begin
   end;
   if OpenDialog.Execute then
   begin
-    RiggModul.Open(OpenDialog.FileName);
-    RiggModul.UpdateGControls;
-
-    { do the new way of loading data }
-    Main.Rigg.SaveToFederData(Main.RggData);
-    Main.LoadTrimm(Main.RggData);
-
-    { trigger update of new UI }
-    Main.ParamValue[Main.Param] := Main.ParamValue[Main.Param];
+    Main.Open(OpenDialog.FileName);
     UpdateOnParamValueChanged;
   end;
 end;
 
 procedure TFormRG19C.SaveItemClick(Sender: TObject);
 begin
-  if RiggModul.IniFileName = '' then
+  if Main.IniFileName = '' then
     SaveAsItemClick(Sender)
   else
-    RiggModul.Save;
+    Main.Save;
 end;
 
 procedure TFormRG19C.SaveAsItemClick(Sender: TObject);
 begin
-  SaveDialog.FileName := RiggModul.IniFileName;
+  SaveDialog.FileName := Main.IniFileName;
   if SaveDialog.Execute then
   begin
-    RiggModul.IniFileName := SaveDialog.FileName;
+    Main.IniFileName := SaveDialog.FileName;
     SaveItemClick(Sender);
   end;
 end;

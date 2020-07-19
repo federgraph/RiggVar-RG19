@@ -1,7 +1,7 @@
-object RiggSplash: TRiggSplash
+object FormSplash: TFormSplash
   Left = 304
   Top = 121
-  ActiveControl = Panel1
+  ActiveControl = Panel
   BorderStyle = bsNone
   ClientHeight = 454
   ClientWidth = 372
@@ -15,9 +15,10 @@ object RiggSplash: TRiggSplash
   Position = poScreenCenter
   Scaled = False
   OnClose = FormClose
+  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel1: TPanel
+  object Panel: TPanel
     Left = 8
     Top = 8
     Width = 353
@@ -28,7 +29,7 @@ object RiggSplash: TRiggSplash
     object Shape1: TShape
       Left = 56
       Top = 16
-      Width = 225
+      Width = 241
       Height = 401
       Brush.Color = clBtnFace
       Shape = stRoundRect
@@ -62,7 +63,7 @@ object RiggSplash: TRiggSplash
       Height = 33
       Brush.Color = clAqua
     end
-    object ProctorImage: TImage
+    object MastImage: TImage
       Left = 69
       Top = 121
       Width = 212
@@ -981,7 +982,7 @@ object RiggSplash: TRiggSplash
       Transparent = True
     end
     object Shape4: TShape
-      Left = 152
+      Left = 157
       Top = 336
       Width = 33
       Height = 33
@@ -991,10 +992,10 @@ object RiggSplash: TRiggSplash
     object Label2: TLabel
       Left = 80
       Top = 96
-      Width = 183
+      Width = 140
       Height = 19
       Cursor = crArrow
-      Caption = 'Look and Feel: Version 1'
+      Caption = 'www.federgraph.de'
       Color = clAqua
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
@@ -1007,8 +1008,9 @@ object RiggSplash: TRiggSplash
     end
   end
   object DelayTimer: TTimer
+    Interval = 2000
     OnTimer = DelayTimerTimer
     Left = 24
-    Top = 216
+    Top = 272
   end
 end

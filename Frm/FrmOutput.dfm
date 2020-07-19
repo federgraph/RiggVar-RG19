@@ -22,7 +22,7 @@
     Top = 0
     Width = 465
     Height = 255
-    ActivePage = ControllerSheet
+    ActivePage = KraftSheet
     TabOrder = 0
     OnChange = OutputPagesChange
     object MasterMemo: TTabSheet
@@ -142,14 +142,14 @@
           OnPaint = ControllerPaintBoxPaint
           ExplicitHeight = 220
         end
-        object ZustellBtn: TButton
+        object ZustellenBtn: TButton
           Left = 72
           Top = 8
           Width = 75
           Height = 25
           Caption = 'Zustellen'
           TabOrder = 0
-          OnClick = ZustellBtnClick
+          OnClick = ZustellenBtnClick
         end
       end
     end
@@ -340,14 +340,14 @@
           Align = alLeft
           ExplicitHeight = 220
         end
-        object TestBtn: TButton
+        object UpdateKraftGraphBtn: TButton
           Left = 368
           Top = 8
           Width = 75
           Height = 25
           Caption = 'Update'
           TabOrder = 0
-          OnClick = TestBtnClick
+          OnClick = UpdateKraftGraphBtnClick
         end
       end
     end

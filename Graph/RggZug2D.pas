@@ -78,7 +78,7 @@ begin
      Pen.Color := clKoppelKurve;
      Polyline(Zug1Koppelkurve);
      { Kreisbogen mit Radius Vorstaglänge um C0 }
-     Pen.Color := TColors.Antiquewhite;
+     Pen.Color := TColors.Black;
      Arc(MP.x-IntR, MP.y-IntR,
          MP.x+IntR, MP.y+IntR,
          MP.x     , MP.y-IntR,

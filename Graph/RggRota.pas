@@ -279,8 +279,8 @@ begin
   FZoomBase := 0.05;
   FViewPoint := vp3D;
   FFixPoint := ooD0;
-//  FXPos := Round(-260 * FScale);
-//  FYPos := 0;
+  FXPos := Round(-200 * FScale);
+  FYPos := 0;
 
   { PaintBox }
   NewPaintBox := TRggPaintBox.Create(PaintBox3D.Owner);

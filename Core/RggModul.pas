@@ -86,11 +86,20 @@ type
 
     { Diagram.Begin }
     sbPuffer: TTrimmControls;
-    TopTitel, LeftTitel, BottomTitel, RightTitel: string;
-    Xmin, Xmax, Ymin, Ymax, YGap: single;
-    ChartPunktX, ChartPunktY: single;
+    TopTitel: string;
+    LeftTitel: string;
+    BottomTitel: string;
+    RightTitel: string;
+    Xmin: single;
+    Xmax: single;
+    Ymin: single;
+    Ymax: single;
+    YGap: single;
+    ChartPunktX: single;
+    ChartPunktY: single;
     PunktColor: TColor;
-    f, TestF: TChartLineData;
+    f: TChartLineData;
+    TestF: TChartLineData;
     af: ChartArray;
     bf: array[0..ANr - 1] of double;
     ShowTriangle: Boolean;
@@ -148,7 +157,6 @@ type
 
     ChartFormActive: Boolean;
 
-    IniFileName: string;
     lbMastfall: string;
     lbSpannung: string;
     lbBiegung: string;
@@ -181,6 +189,8 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Init;
+
+    procedure Neu(Doc: TRggDocument);
 
     procedure DoOnWheelScroll(fp: TFederParam; ScrollPos: Integer);
     procedure DoOnUpdateSalingTyp(Value: TSalingTyp);
@@ -215,9 +225,6 @@ type
 
     { former event handlers }
     procedure UpdateUI;
-    procedure Neu(Doc: TRggDocument);
-    procedure Open(FileName: string);
-    procedure Save;
     procedure rLItemClick(Item: TReportItem);
     procedure BiegeNeigeItemClick;
     procedure ReglerBtnClick;
@@ -229,12 +236,12 @@ type
     procedure About;
     procedure MemoryBtnClick;
     procedure MemoryRecallBtnClick;
-    procedure ZustellBtnClick;
+    procedure ControllerZustellenBtnClick;
     procedure OutputPagesChange(Seite: Integer);
     procedure YComboBoxChange(ItemIndex: Integer);
     procedure KurveBtnClick;
     procedure SalingPaintBoxClick;
-    procedure TestBtnClick;
+    procedure UpdateKraftGraphBtnClick;
     procedure ReportItemClick;
     procedure OptionItemClick;
     procedure RotaFormItemClick;
@@ -314,7 +321,7 @@ begin
   FBtnGrauDown := True;
   FKoppelBtnDown := True;
   FZweischlagBtnDown := False;
-  FBackgroundColor := TColors.Gray;
+  FBackgroundColor := clBtnFace;
   FControllerBtnDown := True;
   FWinkelBtnDown := False;
   FDiffBtnDown := False;
@@ -329,8 +336,6 @@ begin
   FCursorSB := fpVorstag;
   FSalingTyp := stFest;
   FControllerTyp := ctOhne;
-
-  IniFileName := '';
 
   RiggModul := Self;
   ControllerPaintBox := OutputForm.ControllerPaintBox;
@@ -392,9 +397,9 @@ begin
   RiggReport := TRiggReport.Create;
   FWReport := TFWReport.Create;
 
-  {Chart}
-  YComboBox.ItemIndex := 1; { sonst Exception, wenn ItemIndex := -1 }
-  YComboSavedItemIndex := 1;
+  { Chart }
+  YComboBox.ItemIndex := 3; { Exception when ItemIndex = -1 }
+  YComboSavedItemIndex := YComboBox.ItemIndex;
   StraightLine;
   DrawChart;
 
@@ -705,7 +710,9 @@ begin
 
   { Diagramm aktuellen Punkt setzen }
   if OutputForm.OutputPages.ActivePage = OutputForm.ChartSheet then
+  begin
     UpdateGetriebePunkt;
+  end;
 
   TextFlipFlop := False;
   { Grafik aktualisieren, aber nicht zweimal!}
@@ -889,12 +896,9 @@ end;
 
 procedure TRiggModul.AusgabeText;
 var
-  tempSalingDaten: TSalingDaten;
   MemoPosY: LongInt;
   ML: TStrings;
 begin
-  tempSalingDaten := Rigg.SalingDaten;
-
   MemoPosY := SendMessage(OutputForm.DisplayMemo.Handle, EM_GETFIRSTVISIBLELINE, 0, 0);
   ML := OutputForm.DisplayMemo.Lines;
   ML.BeginUpdate;
@@ -902,7 +906,7 @@ begin
 
   { Text setzen }
   lbMastFall := Format('Mastfall = %5.1f cm', [Rigg.Trimm.Mastfall / 10]);
-  lbSpannung := Format('Spannung = %5.1f  N', [Rigg.rF[14]]);
+  lbSpannung := Format('Spannung = %5.0f  N', [Rigg.rF[14]]);
   lbBiegung :=  Format('Biegung  = %5.1f cm', [Rigg.hd / 10]);
 
   Rigg.AusgabeText(ML);
@@ -919,7 +923,7 @@ begin
   ML.BeginUpdate;
   ML.Clear;
 
-  Rigg.AusgabeText(ML);
+  Rigg.AusgabeKommentar(ML);
 
   ML.EndUpdate;
 end;
@@ -1103,41 +1107,6 @@ begin
   ViewModelM.ControllerDown := ControllerBtnDown;
 
   ViewModelM.UpdateView;
-end;
-
-procedure TRiggModul.Neu(Doc: TRggDocument);
-begin
-  IniFileName := '';
-  if Doc = nil then
-    Rigg.SetDefaultDocument { --> Rigg.SetDocument }
-  else
-    Rigg.SetDocument(Doc);
-  ViewModelM.Caption := 'Rigg';
-  UpdateUI;
-end;
-
-procedure TRiggModul.Open(FileName: string);
-begin
-  try
-    Rigg.LoadFromDocFile(FileName); { --> Rigg.SetDocument }
-    IniFileName := FileName;
-    ViewModelM.Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
-    UpdateUI;
-  except
-    on EFileFormatError do { eat ecxeption }
-      if IniFileName = '' then
-      begin
-        ViewModelM.Caption := 'Rigg';
-        ViewModelM.UpdateView;
-      end;
-  end;
-end;
-
-procedure TRiggModul.Save;
-begin
-  Rigg.WriteToDocFile(IniFileName);
-  ViewModelM.Caption := 'Rigg - ' + ExtractFileName(RiggModul.IniFileName);
-  Modified := False;
 end;
 
 procedure TRiggModul.SetViewPoint(Value: TViewPoint);
@@ -1876,7 +1845,7 @@ begin
       { Antrieb ansteuern }
       case SBName of
         fpController: Rigg.RealGlied[fpController] := Antrieb;
-        fpWinkel: Rigg.RealGlied[fpWinkel] := Antrieb / 10 * pi / 180;
+        fpWinkel: Rigg.RealGlied[fpWinkel] := Antrieb * pi / 180;
         fpVorstag: Rigg.RealGlied[fpVorstag] := Antrieb;
         fpWante: Rigg.RealGlied[fpWante] := Antrieb;
         fpWoben: Rigg.RealGlied[fpWoben] := Antrieb;
@@ -1945,7 +1914,7 @@ begin
       else
       begin
 {$ifdef debug}
-        MessageBeep(MB_ICONASTERISK);
+//        MessageBeep(MB_ICONASTERISK);
 {$endif}
       end;
 
@@ -1994,7 +1963,13 @@ begin
   { Punkte im Diagramm aktualisieren }
   if OutputForm.cbFollowPoint.Checked and not
     (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK) then
+  begin
     DrawPoint;
+  end
+  else
+  begin
+    { DrawPoint will be called from UpdateRiggPunkt }
+  end;
 end;
 
 procedure TRiggModul.UpdateRiggPunkt;
@@ -2036,7 +2011,7 @@ begin
     f := af[i];
     case SBName of
       fpController: ChartPunktX := sbPuffer.Controller;
-      fpWinkel: ChartPunktX := sbPuffer.Winkel / 10;
+      fpWinkel: ChartPunktX := sbPuffer.Winkel;
       fpVorstag: ChartPunktX := sbPuffer.Vorstag;
       fpWante: ChartPunktX := sbPuffer.Wanten;
       fpWoben: ChartPunktX := sbPuffer.Woben;
@@ -2230,7 +2205,7 @@ begin
   { Koordinaten des Punktes }
   case SBName of
     fpController: ChartPunktX := sbPuffer.Controller;
-    fpWinkel: ChartPunktX := sbPuffer.Winkel / 10;
+    fpWinkel: ChartPunktX := sbPuffer.Winkel;
     fpVorstag: ChartPunktX := sbPuffer.Vorstag;
     fpWante: ChartPunktX := sbPuffer.Wanten;
     fpWoben: ChartPunktX := sbPuffer.Woben;
@@ -2288,44 +2263,44 @@ end;
 
 function TRiggModul.GetXText(sbn: TsbName): string;
 var
-  S: string;
+  s: string;
 begin
   if sbn = fpController then
-    S := 'Zustellung Mast-Controller [mm]'
+    s := 'Zustellung Mast-Controller [mm]'
   else if sbn = fpWinkel then
-    S := 'Winkel [Grad]'
+    s := 'Winkel [Grad]'
   else if (sbn = fpVorstag) or (sbn = fpVorstagOS) then
-    S := 'Vorstaglänge [mm]'
+    s := 'Vorstaglänge [mm]'
   else if sbn = fpWante then
-    S := 'Wantenlänge [mm]'
+    s := 'Wantenlänge [mm]'
   else if sbn = fpWoben then
-    S := 'Länge des oberen Wantenabschnitts [mm]'
+    s := 'Länge des oberen Wantenabschnitts [mm]'
   else if sbn = fpSalingH then
-    S := 'Höhe des Salingdreiecks [mm]'
+    s := 'Höhe des Salingdreiecks [mm]'
   else if sbn = fpSalingA then
-    S := 'Saling-Abstand [mm]'
+    s := 'Saling-Abstand [mm]'
   else if sbn = fpSalingL then
-    S := 'Saling-Länge [mm]';
-  Result := S;
+    s := 'Saling-Länge [mm]';
+  Result := s;
 end;
 
 function TRiggModul.GetYText(Text: string): string;
 var
-  S: string;
+  s: string;
 begin
   if Text = 'Wanten-Spannung' then
-    S := 'Wantenspannung [N]'
+    s := 'Wantenspannung [N]'
   else if Text = 'Vorstag-Spannung' then
-    S := 'Vorstagspannung [N]'
+    s := 'Vorstagspannung [N]'
   else if Text = 'Elastizität Punkt C' then
-    S := 'Auslenkung Punkt C [mm]'
+    s := 'Auslenkung Punkt C [mm]'
   else if Text = 'Durchbiegung hd' then
-    S := 'Mastbiegung hd [mm]'
+    s := 'Mastbiegung hd [mm]'
   else if Text = 'Mastfall F0F' then
-    S := 'Mastfall F0F [mm]'
+    s := 'Mastfall F0F [mm]'
   else if Text = 'Mastfall F0C' then
-    S := 'Mastfall F0C [mm]';
-  Result := S;
+    s := 'Mastfall F0C [mm]';
+  Result := s;
 end;
 
 procedure TRiggModul.SetSBName(Value: TSBName);
@@ -2381,11 +2356,6 @@ begin
   cr := Rigg.GSB.Find(SBName);
   Xmin := cr.Min;
   Xmax := cr.Max;
-  if SBName = fpWinkel then
-  begin
-    Xmin := Xmin / 10;
-    Xmax := Xmax / 10;
-  end;
   CursorSB := SBName;
   GetCurves;
 end;
@@ -2440,7 +2410,7 @@ begin
   end;
 end;
 
-procedure TRiggModul.ZustellBtnClick;
+procedure TRiggModul.ControllerZustellenBtnClick;
 var
   TrimmRec: TTrimmControls;
 begin
@@ -2457,7 +2427,7 @@ begin
   UpdateGetriebe;
 end;
 
-procedure TRiggModul.TestBtnClick;
+procedure TRiggModul.UpdateKraftGraphBtnClick;
 begin
   Screen.Cursor := crHourGlass;
   KraftGraph.GetTestKurven;
@@ -2722,6 +2692,11 @@ begin
   end;
   GetriebeGraph.ControllerTyp := Value;
   SalingGraph.ControllerTyp := Value;
+end;
+
+procedure TRiggModul.Neu(Doc: TRggDocument);
+begin
+  Main.Neu(Doc);
 end;
 
 end.

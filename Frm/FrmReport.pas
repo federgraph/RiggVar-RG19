@@ -123,18 +123,8 @@ begin
 end;
 
 procedure TReportForm.PrintToFileItemClick(Sender: TObject);
-var
-  s: string;
 begin
-  S := RiggModul.InifileName;
-  if s <> '' then
-  begin
-    s := ExtractFileName(s);
-    s := ChangeFileExt(S,'.txt');
-  end
-  else
-    s := 'RggReprt.txt';
-  SaveDialog.FileName := s;
+  SaveDialog.FileName := 'RggReport.txt';
   if SaveDialog.Execute then
     ReportMemo.Lines.SaveToFile(SaveDialog.FileName);
 end;

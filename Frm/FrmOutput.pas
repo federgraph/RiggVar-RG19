@@ -25,11 +25,11 @@ type
     ControllerSheet: TTabSheet;
     pnController: TPanel;
     ControllerPaintBox: TPaintBox;
-    ZustellBtn: TButton;
+    ZustellenBtn: TButton;
     KraftSheet: TTabSheet;
     pnKraft: TPanel;
     KraftPaintBox: TImage;
-    TestBtn: TButton;
+    UpdateKraftGraphBtn: TButton;
     ChartSheet: TTabSheet;
     pnChart2: TPanel;
     KurveBtn: TSpeedButton;
@@ -53,8 +53,8 @@ type
     procedure KurveBtnClick(Sender: TObject);
     procedure PunktBtnClick(Sender: TObject);
     procedure cbFollowPointClick(Sender: TObject);
-    procedure TestBtnClick(Sender: TObject);
-    procedure ZustellBtnClick(Sender: TObject);
+    procedure UpdateKraftGraphBtnClick(Sender: TObject);
+    procedure ZustellenBtnClick(Sender: TObject);
     procedure SalingPaintBoxClick(Sender: TObject);
     procedure SalingPaintBoxPaint(Sender: TObject);
     procedure ChartPaintBoxPaint(Sender: TObject);
@@ -77,7 +77,7 @@ uses
 procedure TOutputForm.FormCreate(Sender: TObject);
 begin
   cbFollowPoint.Checked := False;
-  YComboBox.ItemIndex := 1; { sonst Exception, wenn ItemIndex := -1 }
+  YComboBox.ItemIndex := 3; { Exception when ItemIndex = -1 }
   OutputPages.ActivePage := OutputPages.Pages[0];
 end;
 
@@ -138,14 +138,14 @@ begin
   RiggModul.DrawPaintBoxC(ControllerPaintBox.Canvas);
 end;
 
-procedure TOutputForm.ZustellBtnClick(Sender: TObject);
+procedure TOutputForm.ZustellenBtnClick(Sender: TObject);
 begin
-  RiggModul.ZustellBtnClick;
+  RiggModul.ControllerZustellenBtnClick;
 end;
 
-procedure TOutputForm.TestBtnClick(Sender: TObject);
+procedure TOutputForm.UpdateKraftGraphBtnClick(Sender: TObject);
 begin
-  RiggModul.TestBtnClick;
+  RiggModul.UpdateKraftGraphBtnClick;
 end;
 
 procedure TOutputForm.OutputPagesChange(Sender: TObject);

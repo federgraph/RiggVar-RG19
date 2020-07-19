@@ -1,8 +1,4 @@
 ﻿unit FrmSplash;
-{ Projekt: Rigg19
-  Autor: Gustav Schubert
-  LastUpdate: 10.10.97
-}
 
 interface
 
@@ -18,38 +14,44 @@ uses
   Controls;
 
 type
-  TRiggSplash = class(TForm)
-    Panel1: TPanel;
+  TFormSplash = class(TForm)
+    Panel: TPanel;
     Shape1: TShape;
     Shape3: TShape;
     Label1: TLabel;
     Label2: TLabel;
     Shape2: TShape;
-    ProctorImage: TImage;
+    MastImage: TImage;
     Label4: TLabel;
     Label3: TLabel;
     Shape4: TShape;
     DelayTimer: TTimer;
     procedure DelayTimerTimer(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormDestroy(Sender: TObject);
   end;
 
 var
-  RiggSplash: TRiggSplash;
+  FormSplash: TFormSplash;
 
 implementation
 
 {$r *.DFM}
 
-procedure TRiggSplash.DelayTimerTimer(Sender: TObject);
+procedure TFormSplash.DelayTimerTimer(Sender: TObject);
 begin
   DelayTimer.Enabled := False;
   Close;
 end;
 
-procedure TRiggSplash.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TFormSplash.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action := caFree;
+end;
+
+procedure TFormSplash.FormDestroy(Sender: TObject);
+begin
+  FormSplash := nil;
 end;
 
 end.
