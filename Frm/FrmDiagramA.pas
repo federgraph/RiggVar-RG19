@@ -4,7 +4,6 @@ interface
 
 uses
   Winapi.Windows,
-  Winapi.Messages,
   System.SysUtils,
   System.Classes,
   System.Types,
@@ -58,7 +57,7 @@ type
     FChartValid: Boolean;
 
     ShowTriangle: Boolean;
-    sbPuffer: TTrimmControls;
+    InputBuffer: TTrimmControls;
 
     TopTitel: string;
     LeftTitel: string;
@@ -134,7 +133,7 @@ begin
 
   StraightLine;
 
-  sbPuffer := Rigg.Glieder;
+  InputBuffer := Rigg.Glieder;
 
   XCombo.OnChange := nil;
   InitXComboItems;
@@ -216,20 +215,17 @@ begin
     if i = -1 then
     begin
       i := YComboSavedItemIndex;
-{$ifdef debug}
-      MessageBeep(MB_ICONASTERISK);
-{$endif}
     end;
     f := af[i];
     case SBName of
-      fpController: ChartPunktX := sbPuffer.Controller;
-      fpWinkel: ChartPunktX := sbPuffer.Winkel;
-      fpVorstag: ChartPunktX := sbPuffer.Vorstag;
-      fpWante: ChartPunktX := sbPuffer.Wanten;
-      fpWoben: ChartPunktX := sbPuffer.Woben;
-      fpSalingH: ChartPunktX := sbPuffer.SalingH;
-      fpSalingA: ChartPunktX := sbPuffer.SalingA;
-      fpVorstagOS: ChartPunktX := sbPuffer.Vorstag;
+      fpController: ChartPunktX := InputBuffer.Controller;
+      fpWinkel: ChartPunktX := InputBuffer.Winkel;
+      fpVorstag: ChartPunktX := InputBuffer.Vorstag;
+      fpWante: ChartPunktX := InputBuffer.Wanten;
+      fpWoben: ChartPunktX := InputBuffer.Woben;
+      fpSalingH: ChartPunktX := InputBuffer.SalingH;
+      fpSalingA: ChartPunktX := InputBuffer.SalingA;
+      fpVorstagOS: ChartPunktX := InputBuffer.Vorstag;
     end;
     ChartPunktY := bf[i];
     LookForYMinMax;
@@ -414,14 +410,14 @@ begin
     Exit;
   { Koordinaten des Punktes }
   case SBName of
-    fpController: ChartPunktX := sbPuffer.Controller;
-    fpWinkel: ChartPunktX := sbPuffer.Winkel;
-    fpVorstag: ChartPunktX := sbPuffer.Vorstag;
-    fpWante: ChartPunktX := sbPuffer.Wanten;
-    fpWoben: ChartPunktX := sbPuffer.Woben;
-    fpSalingH: ChartPunktX := sbPuffer.SalingH;
-    fpSalingA: ChartPunktX := sbPuffer.SalingA;
-    fpVorstagOS: ChartPunktX := sbPuffer.Vorstag;
+    fpController: ChartPunktX := InputBuffer.Controller;
+    fpWinkel: ChartPunktX := InputBuffer.Winkel;
+    fpVorstag: ChartPunktX := InputBuffer.Vorstag;
+    fpWante: ChartPunktX := InputBuffer.Wanten;
+    fpWoben: ChartPunktX := InputBuffer.Woben;
+    fpSalingH: ChartPunktX := InputBuffer.SalingH;
+    fpSalingA: ChartPunktX := InputBuffer.SalingA;
+    fpVorstagOS: ChartPunktX := InputBuffer.Vorstag;
   end;
   i := YCombo.ItemIndex;
   if i = -1 then
@@ -644,7 +640,7 @@ procedure TFormDiagramA.UpdateGetriebePunkt;
 var
   tempIndex: Integer;
 begin
-  sbPuffer := Rigg.Glieder;
+  InputBuffer := Rigg.Glieder;
 
   if not cbFollowPoint.Checked then
     Exit;

@@ -49,110 +49,109 @@ type
     Log_Item
   );
 
-  TRiggModul = class
+  TRiggModulBase = class
   protected
-    FBackgroundColor: TColor;
     FControllerBtnDown: Boolean;
     FWinkelBtnDown: Boolean;
     FDiffBtnDown: Boolean;
-    FSofortBtnDown: Boolean;
-    FReportItem: TReportItem;
     FCalcTyp: TCalcTyp;
-    FKurveValid: Boolean;
-    FChartValid: Boolean;
     FViewPoint: TViewPoint;
     FLEDShape: Boolean;
-    FSBName: TsbName;
-    FCursorSB: TsbName;
     FSalingTyp: TSalingTyp;
     FControllerTyp: TControllerTyp;
-
-    { private variables, not properties }
-    NeedPaint: Boolean;
+    FBackgroundColor: TColor;
+    FSofortBtnDown: Boolean;
     FGrauZeichnen: Boolean;
-    TextFlipFlop: Boolean;
+    FNeedPaint: Boolean;
+    procedure PaintBackGround(Image: TBitmap);
+    procedure UpdateGetriebe;
   public
+    Modified: Boolean;
+    AutoSave: Boolean;
     ViewModelM: TViewModelMain00;
-
     Rigg: TRigg;
-    RiggReport: TRiggReport;
-    FWReport: TFWReport;
+    InputBuffer: TTrimmControls;
     MemCtrl: TTrimmControls;
     RefCtrl: TTrimmControls;
     RefPoints: TRealRiggPoints;
+    constructor Create;
+    property SofortBerechnen: Boolean read FSofortBtnDown;
+  end;
 
-    lbMastfall: string;
-    lbSpannung: string;
-    lbBiegung: string;
-    Modified: Boolean;
-
-    AutoSave: Boolean;
+  TRiggModulInput = class(TRiggModulBase)
   protected
     ShowTriangle: Boolean;
-    sbPuffer: TTrimmControls;
+    FCursorSB: TsbName;
+    FKurveValid: Boolean;
 
-    function GetControllerEnabled: Boolean;
-    procedure SetControllerBtnDown(Value: Boolean);
-    procedure SetDiffBtnDown(Value: Boolean);
-    procedure SetSofortBtnDown(Value: Boolean);
-    procedure SetReportItem(Value: TReportItem);
-    procedure SetCalcTyp(Value: TCalcTyp);
-    procedure SetKurveValid(Value: Boolean);
-    procedure SetLEDShape(Value: Boolean);
-    procedure SetSBName(Value: TSBName);
-    procedure SetSalingTyp(Value: TSalingTyp);
-    procedure SetControllerTyp(Value: TControllerTyp); virtual; abstract;
-    procedure SetWinkelBtnDown(Value: Boolean);
-  protected
-    procedure UpdateGetriebe;
-    procedure DrawPoint; virtual; abstract;
-    procedure DrawChart; virtual; abstract;
-    procedure PaintBackGround(Image: TBitmap);
+    MastGraph: TMastGraph;
+
+    procedure SetupGCtrl(a: TScrollBar; b: TsbName);
+    procedure SetupGCtrls;
+    procedure UpdateGCtrls(InputRec: TTrimmControls);
+    procedure UpdateGCtrlLabels(InputRec: TTrimmControls);
   public
     constructor Create;
     destructor Destroy; override;
 
-    procedure DoOnWheelScroll(fp: TFederParam; ScrollPos: Integer);
-    procedure DoResetForTrimmData;
-
-    procedure SetupGCtrl(a: TScrollBar; b: TsbName);
-    procedure SetupGCtrls;
+    procedure HandleScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
     procedure UpdateGControls;
-    procedure UpdateGCtrls(InputRec: TTrimmControls);
-    procedure UpdateGCtrlLabels(InputRec: TTrimmControls);
-
-    { former event handlers }
-    procedure UpdateUI;
-    procedure rLItemClick(Item: TReportItem);
-    procedure UpdateBtnClick;
-    procedure BiegeNeigeItemClick;
-    procedure ReglerBtnClick;
-    procedure FestItemClick;
-    procedure OSSItemClick;
-    procedure OSBItemClick;
-    procedure DrehbarItemClick;
-    procedure WriteReportToMemo(Memo: TMemo);
-    procedure sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
-
-    { Properties }
-    property ControllerBtnDown: Boolean read FControllerBtnDown write SetControllerBtnDown;
-    property WinkelBtnDown: Boolean read FWinkelBtnDown write SetWinkelBtnDown;
-    property DiffBtnDown: Boolean read FDiffBtnDown write SetDiffBtnDown;
-    property SofortBtnDown: Boolean read FSofortBtnDown write SetSofortBtnDown;
-    property ReportItem: TReportItem read FReportItem write SetReportItem;
-    property CalcTyp: TCalcTyp read FCalcTyp write SetCalcTyp;
-    property ControllerEnabled: Boolean read GetControllerEnabled;
-    property KurveValid: Boolean read FKurveValid write SetKurveValid;
-    property LEDShape: Boolean read FLEDShape write SetLEDShape;
-    property SBName: TSBName read FSBName write SetSBName;
-    property CursorSB: TSBName read FCursorSB write FCursorSB;
-    property SalingTyp: TSalingTyp read FSalingTyp write SetSalingTyp;
-    property ControllerTyp: TControllerTyp read FControllerTyp write SetControllerTyp;
-    property SofortBerechnen: Boolean read FSofortBtnDown;
-    property GrauZeichnen: Boolean read FGrauZeichnen;
   end;
 
-  TRiggModulD = class(TRiggModul)
+  TRiggModulKraft = class(TRiggModulInput)
+  protected
+    KraftPaintBox: TImage;
+    KraftGraph: TKraftGraph;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure UpdateKraftGraphBtnClick;
+  end;
+
+  TRiggModulGetriebe = class(TRiggModulKraft)
+  public
+    SalingGraph: TSalingGraph;
+    BitmapS: TBitmap;
+    BitmapC: TBitmap;
+    ControllerPaintBox: TPaintBox;
+    SalingPaintBox: TPaintBox;
+
+    lbMastfall: string;
+    lbSpannung: string;
+    lbBiegung: string;
+
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure ControllerZustellenBtnClick;
+    procedure OutputPagesChange(Seite: Integer);
+    procedure SalingPaintBoxClick;
+
+    procedure DoOnUpdateSalingTyp(Value: TSalingTyp);
+    procedure DrawPaintBoxM;
+    procedure DrawPaintBoxS(Canvas: TCanvas);
+    procedure DrawPaintBoxC(Canvas: TCanvas);
+  end;
+
+  TRiggModulReport = class(TRiggModulGetriebe)
+  protected
+    FReportItem: TReportItem;
+    procedure SetReportItem(Value: TReportItem);
+  public
+    RiggReport: TRiggReport;
+    FWReport: TFWReport;
+
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure AusgabeText;
+    procedure AusgabeKommentar;
+    procedure rLItemClick(Item: TReportItem);
+    procedure WriteReportToMemo(Memo: TMemo);
+    property ReportItem: TReportItem read FReportItem write SetReportItem;
+  end;
+
+  TRiggModulDiagram = class(TRiggModulReport)
   private
     TopTitel: string;
     LeftTitel: string;
@@ -170,14 +169,22 @@ type
     TestF: TChartLineData;
     af: ChartArray;
     bf: array[0..ANr - 1] of double;
+  protected
+    FSBName: TsbName;
+    FChartValid: Boolean;
+    procedure SetKurveValid(Value: Boolean);
+    procedure SetSBName(Value: TSBName);
   public
     YComboBox: TComboBox;
     YComboSavedItemIndex: Integer;
 
     ChartPaintBox: TPaintBox;
 
+    constructor Create;
+    destructor Destroy; override;
+
     procedure DoUpdateChartBuffer;
-    procedure DrawPoint; override;
+    procedure DrawPoint;
     procedure DrawChartPaintBox(Canvas: TCanvas; Rect: TRect);
     procedure YComboBoxChange(ItemIndex: Integer);
     procedure KurveBtnClick;
@@ -186,51 +193,63 @@ type
     procedure GetCurves;
     procedure UpdateGetriebePunkt;
     procedure UpdateRiggPunkt;
-    procedure DrawChart; override;
+    procedure DrawChart;
     procedure LookForYMinMax;
     function GetXText(sbn: TsbName): string;
     function GetYText(Text: string): string;
     function GetPunktColor: TColor;
+
+    property SBName: TSBName read FSBName write SetSBName;
+    property KurveValid: Boolean read FKurveValid write SetKurveValid;
+    property CursorSB: TSBName read FCursorSB write FCursorSB;
   end;
 
-  TRiggModulG = class(TRiggModulD)
+  TRiggModul = class(TRiggModulDiagram)
+  protected
+    function GetControllerEnabled: Boolean;
+    procedure SetControllerBtnDown(Value: Boolean);
+    procedure SetDiffBtnDown(Value: Boolean);
+    procedure SetSofortBtnDown(Value: Boolean);
+    procedure SetCalcTyp(Value: TCalcTyp);
+    procedure SetLEDShape(Value: Boolean);
+    procedure SetSalingTyp(Value: TSalingTyp);
+    procedure SetControllerTyp(Value: TControllerTyp);
+    procedure SetWinkelBtnDown(Value: Boolean);
   public
-    SalingGraph: TSalingGraph;
-    BitmapS: TBitmap;
-    BitmapC: TBitmap;
-    ControllerPaintBox: TPaintBox;
-    SalingPaintBox: TPaintBox;
-    KraftPaintBox: TImage;
-
-    MastGraph: TMastGraph;
-    KraftGraph: TKraftGraph;
-
     constructor Create;
     destructor Destroy; override;
 
-    procedure UpdateKraftGraphBtnClick;
-
-    procedure ControllerZustellenBtnClick;
-    procedure OutputPagesChange(Seite: Integer);
-    procedure SalingPaintBoxClick;
-
-    procedure DoOnUpdateSalingTyp(Value: TSalingTyp);
-    procedure AusgabeText;
-    procedure AusgabeKommentar;
-    procedure DrawPaintBoxM;
-    procedure DrawPaintBoxS(Canvas: TCanvas);
-    procedure DrawPaintBoxC(Canvas: TCanvas);
     procedure DoGraphics;
+
+    procedure DoOnWheelScroll(fp: TFederParam; ScrollPos: Integer);
+    procedure DoResetForTrimmData;
+
+    procedure UpdateUI;
+    procedure UpdateBtnClick;
+    procedure BiegeNeigeItemClick;
+    procedure ReglerBtnClick;
+    procedure FestItemClick;
+    procedure OSSItemClick;
+    procedure OSBItemClick;
+    procedure DrehbarItemClick;
+
+    property ControllerBtnDown: Boolean read FControllerBtnDown write SetControllerBtnDown;
+    property WinkelBtnDown: Boolean read FWinkelBtnDown write SetWinkelBtnDown;
+    property DiffBtnDown: Boolean read FDiffBtnDown write SetDiffBtnDown;
+    property SofortBtnDown: Boolean read FSofortBtnDown write SetSofortBtnDown;
+    property CalcTyp: TCalcTyp read FCalcTyp write SetCalcTyp;
+    property ControllerEnabled: Boolean read GetControllerEnabled;
+    property LEDShape: Boolean read FLEDShape write SetLEDShape;
+    property SalingTyp: TSalingTyp read FSalingTyp write SetSalingTyp;
+    property ControllerTyp: TControllerTyp read FControllerTyp write SetControllerTyp;
+    property GrauZeichnen: Boolean read FGrauZeichnen;
   end;
 
-  TRiggModulA = class(TRiggModulG)
-  protected
-    procedure SetControllerTyp(Value: TControllerTyp); override;
+  TRiggModulA = class(TRiggModul)
   public
     constructor Create(ARigg: TRigg);
     destructor Destroy; override;
     procedure Init;
-
     procedure DoOnUpdateRigg;
   end;
 
@@ -252,38 +271,7 @@ uses
   FrmBiege,
   FrmKreis;
 
-constructor TRiggModul.Create;
-begin
-  inherited;
-  FBackgroundColor := clBtnFace;
-  FControllerBtnDown := True;
-  FWinkelBtnDown := False;
-  FDiffBtnDown := False;
-  FSofortBtnDown := False;
-  FReportItem := rF_Item;
-  FCalcTyp := ctBiegeKnicken;
-  FKurveValid := False;
-  FChartValid := False;
-  FViewPoint := vpSeite;
-  FLEDShape := False;
-  FSBName := fpVorstag;
-  FCursorSB := fpVorstag;
-  FSalingTyp := stFest;
-  FControllerTyp := ctOhne;
-end;
-
-destructor TRiggModul.Destroy;
-begin
-  RiggReport.Free;
-  FWReport.Free;
-
-  ViewModelM.Free;
-
-  RiggModul := nil;
-  inherited;
-end;
-
-procedure TRiggModul.SetupGCtrl(a: TScrollBar; b: TsbName);
+procedure TRiggModulInput.SetupGCtrl(a: TScrollBar; b: TsbName);
 var
   cr: TRggSB;
 begin
@@ -293,7 +281,7 @@ begin
   a.SmallChange := Round(cr.SmallStep);
 end;
 
-procedure TRiggModul.SetupGCtrls;
+procedure TRiggModulInput.SetupGCtrls;
 begin
   { Controller }
   SetupGCtrl(InputForm.sbController, fpController);
@@ -301,7 +289,7 @@ begin
   SetupGCtrl(InputForm.sbControllerOhne, fpController);
 
   { Vorstag/Winkel }
-  if WinkelBtnDown then
+  if FWinkelBtnDown then
     SetupGCtrl(InputForm.sbWinkel, fpWinkel)
   else
     SetupGCtrl(InputForm.sbWinkel, fpVorstag);
@@ -329,15 +317,15 @@ begin
   UpdateGCtrlLabels(Rigg.Glieder);
 end;
 
-procedure TRiggModul.UpdateGControls;
+procedure TRiggModulInput.UpdateGControls;
 begin
   UpdateGCtrls(Rigg.Glieder);
 end;
 
-procedure TRiggModul.UpdateGCtrlLabels(InputRec: TTrimmControls);
+procedure TRiggModulInput.UpdateGCtrlLabels(InputRec: TTrimmControls);
 begin
   InputForm.lbValue1.Caption := Format('%d mm', [InputRec.Controller - MemCtrl.Controller]);
-  if WinkelBtnDown then
+  if FWinkelBtnDown then
   begin
     InputForm.lbWinkel.Caption := 'Winkel';
     InputForm.lbValue2.Caption := Format('%5.2f Grad', [(InputRec.Winkel - MemCtrl.Winkel) / 10]);
@@ -366,15 +354,15 @@ begin
   InputForm.lbOhne3.Caption := InputForm.lbValue3.Caption;
 end;
 
-procedure TRiggModul.UpdateGCtrls(InputRec: TTrimmControls);
+procedure TRiggModulInput.UpdateGCtrls(InputRec: TTrimmControls);
 begin
-  sbPuffer := InputRec;
+  InputBuffer := InputRec;
 
   InputForm.sbController.Position := InputRec.Controller;
   InputForm.sbControllerD.Position := InputRec.Controller;
   InputForm.sbControllerOhne.Position := InputRec.Controller;
 
-  if WinkelBtnDown then
+  if FWinkelBtnDown then
     InputForm.sbWinkel.Position := InputRec.Winkel
   else
     InputForm.sbWinkel.Position := InputRec.Vorstag;
@@ -398,7 +386,7 @@ begin
   UpdateGCtrlLabels(InputRec);
 end;
 
-procedure TRiggModul.sbControllerScroll(Sender: TObject;
+procedure TRiggModulInput.HandleScroll(Sender: TObject;
   ScrollCode: TScrollCode; var ScrollPos: Integer);
 var
   InputRec: TTrimmControls;
@@ -410,30 +398,29 @@ begin
   begin
     InputRec.Controller := ScrollPos;
     InputForm.lbValue1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
-    if not ControllerBtnDown then
-      NeedPaint := False;
+    if not FControllerBtnDown then
+      FNeedPaint := False;
   end
   else if Sender = InputForm.sbControllerD then
   begin
     InputRec.Controller := ScrollPos;
     InputForm.lbD1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
-    if not ControllerBtnDown then
-      NeedPaint := False;
+    if not FControllerBtnDown then
+      FNeedPaint := False;
   end
   else if Sender = InputForm.sbControllerOhne then
   begin
     InputRec.Controller := ScrollPos;
     InputForm.lbOhne1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
-    if not ControllerBtnDown then
-      NeedPaint := False;
+    if not FControllerBtnDown then
+      FNeedPaint := False;
   end
   else if Sender = InputForm.sbWinkel then
   begin
-    if WinkelBtnDown then
+    if FWinkelBtnDown then
     begin
       InputRec.Winkel := ScrollPos;
-      InputForm.lbValue2.Caption := Format('%5.2f Grad', [(InputRec.Winkel - MemCtrl.Winkel) /
-        10]);
+      InputForm.lbValue2.Caption := Format('%5.2f Grad', [(InputRec.Winkel - MemCtrl.Winkel) / 10]);
     end
     else
     begin
@@ -500,25 +487,25 @@ begin
   begin
     InputRec.WPowerOS := ScrollPos;
     InputForm.lbValue8.Caption := Format('%d N', [ScrollPos - MemCtrl.WPowerOS]);
-    NeedPaint := False;
+    FNeedPaint := False;
   end;
 
   if (ScrollCode = TScrollCode.scEndScroll) or not SofortBerechnen then
   begin
-    if (Sender as TScrollbar).Tag = SBMappingArray[CursorSB] then
+    if (Sender as TScrollbar).Tag = SBMappingArray[FCursorSB] then
       ShowTriangle := True
     else
     begin
       ShowTriangle := False;
-      KurveValid := False;
+      FKurveValid := False;
     end;
-    sbPuffer := InputRec;
-    Rigg.Glieder := InputRec;
-    UpdateGetriebe;
   end;
+  InputBuffer := InputRec;
+  Rigg.Glieder := InputRec;
+  UpdateGetriebe;
 end;
 
-procedure TRiggModulG.DoGraphics;
+procedure TRiggModul.DoGraphics;
 var
   TrimmRec: TTrimmControls;
 begin
@@ -559,8 +546,7 @@ begin
     UpdateGetriebePunkt;
   end;
 
-  TextFlipFlop := False;
-  { Grafik aktualisieren, aber nicht zweimal!}
+  { Grafik aktualisieren }
   if not (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK) then
   begin
     FGrauZeichnen := False;
@@ -580,7 +566,7 @@ begin
   ViewModelM.UpdateView;
 end;
 
-procedure TRiggModul.PaintBackGround(Image: TBitmap);
+procedure TRiggModulBase.PaintBackGround(Image: TBitmap);
 var
   R: TRect;
 begin
@@ -592,7 +578,7 @@ begin
   Image.Canvas.FillRect(R);
 end;
 
-procedure TRiggModulG.DrawPaintBoxM;
+procedure TRiggModulGetriebe.DrawPaintBoxM;
 var
   img: TImage;
 begin
@@ -608,7 +594,7 @@ begin
   MastGraph.Draw;
 end;
 
-procedure TRiggModulG.AusgabeText;
+procedure TRiggModulReport.AusgabeText;
 var
   MemoPosY: LongInt;
   ML: TStrings;
@@ -618,7 +604,7 @@ begin
   ML.BeginUpdate;
   ML.Clear;
 
-  { Text setzen }
+  { Text for GetriebeGraph }
   lbMastFall := Format('Mastfall = %5.1f cm', [Rigg.Trimm.Mastfall / 10]);
   lbSpannung := Format('Spannung = %5.0f N', [Rigg.rF[14]]);
   lbBiegung := Format('Biegung  = %5.1f cm', [Rigg.hd / 10]);
@@ -629,7 +615,7 @@ begin
   ML.EndUpdate;
 end;
 
-procedure TRiggModulG.AusgabeKommentar;
+procedure TRiggModulReport.AusgabeKommentar;
 var
   ML: TStrings;
 begin
@@ -642,7 +628,7 @@ begin
   ML.EndUpdate;
 end;
 
-procedure TRiggModul.SetReportItem(Value: TReportItem);
+procedure TRiggModulReport.SetReportItem(Value: TReportItem);
 begin
   if FReportItem <> Value then
   begin
@@ -655,7 +641,7 @@ begin
     OutputForm.Visible := True;
 end;
 
-procedure TRiggModul.rLItemClick(Item: TReportItem);
+procedure TRiggModulReport.rLItemClick(Item: TReportItem);
 var
   ML: TStrings;
 begin
@@ -703,7 +689,7 @@ begin
   RiggReport.ML.Clear;
 end;
 
-procedure TRiggModul.WriteReportToMemo(Memo: TMemo);
+procedure TRiggModulReport.WriteReportToMemo(Memo: TMemo);
 var
   i: Integer;
   SavedIndexAuswahl: set of TRiggLIndexRange;
@@ -764,9 +750,6 @@ begin
   FWReport.ML.Add('');
   for i := 0 to MemoDlg.DstList.Items.Count - 1 do
   begin
-    { output all}
-//     FWReport.Ausgabe(Rigg.Fachwerk);
-
     { output selected reports }
     if MemoDlg.DstList.Items[i] = 'FW_Geometrie' then
       FWReport.AusgabeGeometrie(Rigg.Fachwerk.G, Rigg.Fachwerk.S);
@@ -925,7 +908,7 @@ begin
   end;
 end;
 
-procedure TRiggModulG.DoOnUpdateSalingTyp(Value: TSalingTyp);
+procedure TRiggModulGetriebe.DoOnUpdateSalingTyp(Value: TSalingTyp);
 begin
   if FSalingTyp <> Value then
   begin
@@ -968,12 +951,12 @@ begin
   if SalingTyp = stFest then
   begin
     InputForm.sbController.Position := ControllerAnschlag;
-    sbControllerScroll(InputForm.sbController, TScrollCode.scEndScroll, ControllerAnschlag);
+    HandleScroll(InputForm.sbController, TScrollCode.scEndScroll, ControllerAnschlag);
   end
   else if SalingTyp = stDrehbar then
   begin
     InputForm.sbControllerD.Position := ControllerAnschlag;
-    sbControllerScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
+    HandleScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
   end;
 
   if BiegeUndNeigeForm = nil then
@@ -998,12 +981,12 @@ begin
   if SalingTyp = stFest then
   begin
     InputForm.sbController.Position := ControllerAnschlag;
-    sbControllerScroll(InputForm.sbController, TScrollCode.scEndScroll, ControllerAnschlag);
+    HandleScroll(InputForm.sbController, TScrollCode.scEndScroll, ControllerAnschlag);
   end
   else if SalingTyp = stDrehbar then
   begin
     InputForm.sbControllerD.Position := ControllerAnschlag;
-    sbControllerScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
+    HandleScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
   end;
 
   if Rigg.CalcTyp = ctKraftGemessen then
@@ -1138,7 +1121,7 @@ begin
   ViewModelM.UpdateView;
 end;
 
-procedure TRiggModulD.StraightLine;
+procedure TRiggModulDiagram.StraightLine;
 var
   i: Integer;
 begin
@@ -1147,7 +1130,7 @@ begin
   TestF := f;
 end;
 
-procedure TRiggModulD.GetCurves;
+procedure TRiggModulDiagram.GetCurves;
 var
   i, tempIndex: Integer;
   Antrieb, Anfang, Ende: double;
@@ -1234,13 +1217,7 @@ begin
 
     if OutputForm.OutputPages.ActivePage = OutputForm.ChartSheet then
       if Screen.ActiveForm = OutputForm then
-        OutputForm.ActiveControl := OutputForm.YComboBox
-      else
-      begin
-{$ifdef debug}
-//        MessageBeep(MB_ICONASTERISK);
-{$endif}
-      end;
+        OutputForm.ActiveControl := OutputForm.YComboBox;
 
   finally
     { restore Model (Getriebe) }
@@ -1252,11 +1229,11 @@ begin
   end;
 end;
 
-procedure TRiggModulD.UpdateGetriebePunkt;
+procedure TRiggModulDiagram.UpdateGetriebePunkt;
 var
   tempIndex: Integer;
 begin
-  sbPuffer := Rigg.Glieder;
+  InputBuffer := Rigg.Glieder;
 
   if not OutputForm.cbFollowPoint.Checked then
     Exit;
@@ -1300,7 +1277,7 @@ begin
   end;
 end;
 
-procedure TRiggModulD.UpdateRiggPunkt;
+procedure TRiggModulDiagram.UpdateRiggPunkt;
 var
   tempIndex: Integer;
 begin
@@ -1324,7 +1301,7 @@ begin
   DrawPoint;
 end;
 
-procedure TRiggModulD.DrawChart;
+procedure TRiggModulDiagram.DrawChart;
 var
   i: Integer;
 begin
@@ -1341,15 +1318,15 @@ begin
     end;
     f := af[i];
     case SBName of
-      fpController: ChartPunktX := sbPuffer.Controller;
-      fpWinkel: ChartPunktX := sbPuffer.Winkel;
-      fpVorstag: ChartPunktX := sbPuffer.Vorstag;
-      fpWante: ChartPunktX := sbPuffer.Wanten;
-      fpWoben: ChartPunktX := sbPuffer.Woben;
-      fpSalingH: ChartPunktX := sbPuffer.SalingH;
-      fpSalingA: ChartPunktX := sbPuffer.SalingA;
-      fpSalingL: ChartPunktX := sbPuffer.SalingL;
-      fpVorstagOS: ChartPunktX := sbPuffer.Vorstag;
+      fpController: ChartPunktX := InputBuffer.Controller;
+      fpWinkel: ChartPunktX := InputBuffer.Winkel;
+      fpVorstag: ChartPunktX := InputBuffer.Vorstag;
+      fpWante: ChartPunktX := InputBuffer.Wanten;
+      fpWoben: ChartPunktX := InputBuffer.Woben;
+      fpSalingH: ChartPunktX := InputBuffer.SalingH;
+      fpSalingA: ChartPunktX := InputBuffer.SalingA;
+      fpSalingL: ChartPunktX := InputBuffer.SalingL;
+      fpVorstagOS: ChartPunktX := InputBuffer.Vorstag;
     end;
     ChartPunktY := bf[i];
     LookForYMinMax;
@@ -1387,7 +1364,7 @@ begin
     DrawChartPaintBox(ChartPaintBox.Canvas, ChartPaintBox.BoundsRect);
 end;
 
-procedure TRiggModulD.DrawChartPaintBox(Canvas: TCanvas; Rect: TRect);
+procedure TRiggModulDiagram.DrawChartPaintBox(Canvas: TCanvas; Rect: TRect);
 
   function Limit(a: double): double;
   begin
@@ -1501,7 +1478,7 @@ begin
   OutputForm.lbYTop.Caption := IntToStr(Round(Ymax));
 end;
 
-function TRiggModulD.GetPunktColor: TColor;
+function TRiggModulDiagram.GetPunktColor: TColor;
 var
   i: Integer;
   ML: TStrings;
@@ -1527,7 +1504,7 @@ begin
   end;
 end;
 
-procedure TRiggModulD.DrawPoint;
+procedure TRiggModulDiagram.DrawPoint;
 var
   i: Integer;
 begin
@@ -1535,15 +1512,15 @@ begin
     Exit;
   { Koordinaten des Punktes }
   case SBName of
-    fpController: ChartPunktX := sbPuffer.Controller;
-    fpWinkel: ChartPunktX := sbPuffer.Winkel;
-    fpVorstag: ChartPunktX := sbPuffer.Vorstag;
-    fpWante: ChartPunktX := sbPuffer.Wanten;
-    fpWoben: ChartPunktX := sbPuffer.Woben;
-    fpSalingH: ChartPunktX := sbPuffer.SalingH;
-    fpSalingA: ChartPunktX := sbPuffer.SalingA;
-    fpSalingL: ChartPunktX := sbPuffer.SalingL;
-    fpVorstagOS: ChartPunktX := sbPuffer.Vorstag;
+    fpController: ChartPunktX := InputBuffer.Controller;
+    fpWinkel: ChartPunktX := InputBuffer.Winkel;
+    fpVorstag: ChartPunktX := InputBuffer.Vorstag;
+    fpWante: ChartPunktX := InputBuffer.Wanten;
+    fpWoben: ChartPunktX := InputBuffer.Woben;
+    fpSalingH: ChartPunktX := InputBuffer.SalingH;
+    fpSalingA: ChartPunktX := InputBuffer.SalingA;
+    fpSalingL: ChartPunktX := InputBuffer.SalingL;
+    fpVorstagOS: ChartPunktX := InputBuffer.Vorstag;
   end;
   i := YComboBox.ItemIndex;
   if i = -1 then
@@ -1560,7 +1537,7 @@ begin
     DrawChartPaintBox(ChartPaintBox.Canvas, ChartPaintBox.BoundsRect);
 end;
 
-procedure TRiggModulD.LookForYMinMax;
+procedure TRiggModulDiagram.LookForYMinMax;
 var
   i: Integer;
 begin
@@ -1592,7 +1569,7 @@ begin
   end;
 end;
 
-function TRiggModulD.GetXText(sbn: TsbName): string;
+function TRiggModulDiagram.GetXText(sbn: TsbName): string;
 var
   s: string;
 begin
@@ -1615,7 +1592,7 @@ begin
   Result := s;
 end;
 
-function TRiggModulD.GetYText(Text: string): string;
+function TRiggModulDiagram.GetYText(Text: string): string;
 var
   s: string;
 begin
@@ -1634,7 +1611,7 @@ begin
   Result := s;
 end;
 
-procedure TRiggModul.SetSBName(Value: TSBName);
+procedure TRiggModulDiagram.SetSBName(Value: TSBName);
 begin
   if FSBName <> Value then
   begin
@@ -1649,20 +1626,8 @@ begin
     DrawChart;
 end;
 
-procedure TRiggModulD.YComboBoxChange(ItemIndex: Integer);
+procedure TRiggModulDiagram.YComboBoxChange(ItemIndex: Integer);
 begin
-  (*
-  if YComboBox.ItemIndex <> YComboBox2.ItemIndex then
-  begin
-    if Sender = YComboBox then YComboBox2.ItemIndex := YComboBox.ItemIndex;
-    if Sender = YComboBox2 then YComboBox.ItemIndex := YComboBox2.ItemIndex;
-    if (YComboBox.ItemIndex > -1) and (YComboBox.ItemIndex < ANr) then
-      f := af[YComboBox.ItemIndex]
-    else
-      f := TestF;
-    DrawChart;
-  end;
-  *)
   if (ItemIndex > -1) and (ItemIndex < ANr) then
     f := af[ItemIndex]
   else
@@ -1670,7 +1635,7 @@ begin
   DrawChart;
 end;
 
-procedure TRiggModul.SetKurveValid(Value: Boolean);
+procedure TRiggModulDiagram.SetKurveValid(Value: Boolean);
 begin
   if FKurveValid <> Value then
   begin
@@ -1679,7 +1644,7 @@ begin
   end;
 end;
 
-procedure TRiggModulD.KurveBtnClick;
+procedure TRiggModulDiagram.KurveBtnClick;
 var
   cr: TRggSB;
 begin
@@ -1691,12 +1656,12 @@ begin
   GetCurves;
 end;
 
-procedure TRiggModulG.SalingPaintBoxClick;
+procedure TRiggModulGetriebe.SalingPaintBoxClick;
 begin
   SalingGraph.SalingDetail := not SalingGraph.SalingDetail;
 end;
 
-procedure TRiggModulG.DrawPaintBoxS(Canvas: TCanvas);
+procedure TRiggModulGetriebe.DrawPaintBoxS(Canvas: TCanvas);
 begin
   PaintBackGround(BitmapS);
   SalingGraph.DrawSaling(BitmapS.Canvas);
@@ -1704,7 +1669,7 @@ begin
   Canvas.Draw(0, 0, BitMapS);
 end;
 
-procedure TRiggModulG.DrawPaintBoxC(Canvas: TCanvas);
+procedure TRiggModulGetriebe.DrawPaintBoxC(Canvas: TCanvas);
 begin
   PaintBackGround(BitmapC);
   SalingGraph.DrawController(BitmapC.Canvas);
@@ -1712,7 +1677,7 @@ begin
   Canvas.Draw(0, 0, BitMapC);
 end;
 
-procedure TRiggModulG.OutputPagesChange(Seite: Integer);
+procedure TRiggModulGetriebe.OutputPagesChange(Seite: Integer);
 var
   TrimmRec: TTrimmControls;
 begin
@@ -1738,7 +1703,7 @@ begin
   end;
 end;
 
-procedure TRiggModulG.ControllerZustellenBtnClick;
+procedure TRiggModulGetriebe.ControllerZustellenBtnClick;
 var
   TrimmRec: TTrimmControls;
 begin
@@ -1753,7 +1718,7 @@ begin
   UpdateGetriebe;
 end;
 
-procedure TRiggModulG.UpdateKraftGraphBtnClick;
+procedure TRiggModulKraft.UpdateKraftGraphBtnClick;
 begin
   Screen.Cursor := crHourGlass;
   KraftGraph.GetTestKurven;
@@ -1799,7 +1764,7 @@ begin
         end;
       end;
       if not ControllerBtnDown then
-        NeedPaint := False;
+        FNeedPaint := False;
     end;
 
     fpVorstag, fpWinkel:
@@ -1936,15 +1901,15 @@ begin
       ShowTriangle := False;
       KurveValid := False;
     end;
-    sbPuffer := InputRec;
+    InputBuffer := InputRec;
     Rigg.Glieder := InputRec;
     UpdateGetriebe;
   end;
 end;
 
-procedure TRiggModulD.DoUpdateChartBuffer;
+procedure TRiggModulDiagram.DoUpdateChartBuffer;
 begin
-  sbPuffer := Rigg.Glieder;
+  InputBuffer := Rigg.Glieder;
 end;
 
 procedure TRiggModul.DoResetForTrimmData;
@@ -1954,67 +1919,12 @@ begin
   CalcTyp := ctQuerKraftBiegung;
 end;
 
-{ RiggModulG }
-
-constructor TRiggModulG.Create;
-begin
-  inherited;
-
-  ControllerPaintBox := OutputForm.ControllerPaintBox;
-  SalingPaintBox := OutputForm.SalingPaintBox;
-  KraftPaintBox := OutputForm.KraftPaintBox;
-  ChartPaintBox := OutputForm.ChartPaintBox;
-  YComboBox := OutputForm.YComboBox;
-
-  { SalingCtrls }
-  SalingGraph := TSalingGraph.Create;
-  SalingGraph.BackgroundColor := FBackgroundColor;
-
-  BitmapS := TBitmap.Create;
-  BitmapS.Width := Round(453 * MainVar.Scale);
-  BitmapS.Height := Round(220 * MainVar.Scale);
-  PaintBackGround(BitmapS);
-
-  BitmapC := TBitmap.Create;
-  BitmapC.Width := Round(453 * MainVar.Scale);
-  BitmapC.Height := Round(220 * MainVar.Scale);
-  PaintBackGround(BitmapC);
-
-  MastGraph := TMastGraph.Create;
-  KraftGraph := TKraftGraph.Create(Rigg);
-end;
-
-destructor TRiggModulG.Destroy;
-begin
-  MastGraph.Free;
-  KraftGraph.Free;
-  SalingGraph.Free;
-
-  BitmapS.Free;
-  BitmapC.Free;
-  inherited;
-end;
-
-{ RiggModulA }
-
-constructor TRiggModulA.Create(ARigg: TRigg);
-begin
-  Rigg := ARigg;
-  RiggModul := Self;
-  inherited Create;
-end;
-
-destructor TRiggModulA.Destroy;
-begin
-  inherited;
-end;
-
 procedure TRiggModul.UpdateBtnClick;
 begin
   UpdateGetriebe;
 end;
 
-procedure TRiggModul.UpdateGetriebe;
+procedure TRiggModulBase.UpdateGetriebe;
 begin
   Main.UpdateGetriebe;
 end;
@@ -2038,7 +1948,7 @@ begin
   end;
 end;
 
-procedure TRiggModulA.SetControllerTyp(Value: TControllerTyp);
+procedure TRiggModul.SetControllerTyp(Value: TControllerTyp);
 begin
   if FControllerTyp <> Value then
   begin
@@ -2053,21 +1963,145 @@ begin
   SetupGCtrls;
 
   MemCtrl := ZeroCtrl;
-  sbPuffer := Rigg.Glieder;
+  InputBuffer := Rigg.Glieder;
   RefCtrl := Rigg.Glieder;
   RefPoints := Rigg.rP;
 
-  { Berichte }
-  RiggReport := TRiggReport.Create;
-  FWReport := TFWReport.Create;
+  FNeedPaint := True;
 
-  NeedPaint := True;
-
-  { avoid Exception when ItemIndex = -1 }
   YComboBox.ItemIndex := 3;
   YComboSavedItemIndex := YComboBox.ItemIndex;
   StraightLine;
   DrawChart;
+end;
+
+constructor TRiggModulInput.Create;
+begin
+  inherited;
+  MastGraph := TMastGraph.Create;
+end;
+
+destructor TRiggModulInput.Destroy;
+begin
+  MastGraph.Free;
+  inherited;
+end;
+
+constructor TRiggModulKraft.Create;
+begin
+  inherited;
+  KraftPaintBox := OutputForm.KraftPaintBox;
+  KraftGraph := TKraftGraph.Create(Rigg);
+end;
+
+destructor TRiggModulKraft.Destroy;
+begin
+  KraftGraph.Free;
+  inherited;
+end;
+
+constructor TRiggModulGetriebe.Create;
+begin
+  inherited;
+  ControllerPaintBox := OutputForm.ControllerPaintBox;
+  SalingPaintBox := OutputForm.SalingPaintBox;
+
+  SalingGraph := TSalingGraph.Create;
+  SalingGraph.BackgroundColor := FBackgroundColor;
+
+  BitmapS := TBitmap.Create;
+  BitmapS.Width := Round(453 * MainVar.Scale);
+  BitmapS.Height := Round(220 * MainVar.Scale);
+  PaintBackGround(BitmapS);
+
+  BitmapC := TBitmap.Create;
+  BitmapC.Width := Round(453 * MainVar.Scale);
+  BitmapC.Height := Round(220 * MainVar.Scale);
+  PaintBackGround(BitmapC);
+end;
+
+destructor TRiggModulGetriebe.Destroy;
+begin
+  SalingGraph.Free;
+
+  BitmapS.Free;
+  BitmapC.Free;
+  inherited;
+end;
+
+constructor TRiggModulReport.Create;
+begin
+  inherited;
+  FReportItem := rF_Item;
+  RiggReport := TRiggReport.Create;
+  FWReport := TFWReport.Create;
+end;
+
+destructor TRiggModulReport.Destroy;
+begin
+  RiggReport.Free;
+  FWReport.Free;
+  inherited;
+end;
+
+constructor TRiggModulDiagram.Create;
+begin
+  inherited;
+  FKurveValid := False;
+  FChartValid := False;
+  FSBName := fpVorstag;
+  FCursorSB := fpVorstag;
+
+  ChartPaintBox := OutputForm.ChartPaintBox;
+  YComboBox := OutputForm.YComboBox;
+end;
+
+destructor TRiggModulDiagram.Destroy;
+begin
+  inherited;
+end;
+
+constructor TRiggModulA.Create(ARigg: TRigg);
+begin
+  Rigg := ARigg;
+  RiggModul := Self;
+  inherited Create;
+end;
+
+destructor TRiggModulA.Destroy;
+begin
+  inherited;
+end;
+
+constructor TRiggModulBase.Create;
+begin
+  FBackgroundColor := clBtnFace;
+
+  FSalingTyp := stFest;
+  FControllerTyp := ctOhne;
+  FCalcTyp := ctBiegeKnicken;
+
+  FControllerBtnDown := True;
+  FWinkelBtnDown := False;
+  FDiffBtnDown := False;
+  FSofortBtnDown := False;
+
+  FViewPoint := vpSeite;
+
+  FLEDShape := False;
+end;
+
+constructor TRiggModul.Create;
+begin
+  inherited;
+end;
+
+destructor TRiggModul.Destroy;
+begin
+  ViewModelM.Free;
+
+  RiggModul := nil;
+  inherited;
 end;
 
 end.

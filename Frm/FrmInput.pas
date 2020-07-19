@@ -95,10 +95,8 @@ type
     sbWPowerOS: TScrollBar;
     procedure FormCreate(Sender: TObject);
     procedure rbWinkelClick(Sender: TObject);
-    procedure rbWinkelMouseDown(Sender: TObject;
-      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode;
-      var ScrollPos: Integer);
+    procedure rbWinkelMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
     procedure InputPagesChange(Sender: TObject);
     procedure FormHide(Sender: TObject);
   end;
@@ -194,7 +192,7 @@ end;
 procedure TInputForm.sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode;
   var ScrollPos: Integer);
 begin
-  RiggModul.sbControllerScroll(Sender, ScrollCode, ScrollPos);
+  RiggModul.HandleScroll(Sender, ScrollCode, ScrollPos);
 end;
 
 procedure TInputForm.FormHide(Sender: TObject);
