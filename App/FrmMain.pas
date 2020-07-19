@@ -205,6 +205,7 @@ type
     Rigg: TRigg;
     ReportManager: TRggReportManager;
     FViewPoint: TViewPoint;
+    procedure UpdateOnParamChanged;
     procedure UpdateOnParamValueChanged;
     procedure SetIsUp(const Value: Boolean);
     function GetIsUp: Boolean;
@@ -233,10 +234,17 @@ type
     procedure UpdateChartGraph;
     procedure LayoutImages;
   protected
+    procedure ShowDiagramA;
     procedure ShowDiagramC;
     procedure ShowDiagramE;
     procedure ShowDiagramQ;
-    procedure ShowKreisForm;
+    procedure ShowFormKreis;
+    procedure ShowFormDetail;
+    procedure ShowFormSplash;
+    procedure ShowFormKraft;
+    procedure ShowFormTabelle;
+    procedure ShowFormSaling;
+    procedure ShowFormController;
     procedure DestroyForms;
     procedure MemoBtnClick(Sender: TObject);
     procedure ActiBtnClick(Sender: TObject);
@@ -378,6 +386,7 @@ uses
   FrmAction,
   FrmConfig,
   FrmTrimmTab,
+  FrmDiagramA,
   FrmDiagramC,
   FrmDiagramE,
   FrmDiagramQ,
@@ -385,6 +394,12 @@ uses
   FrmInput,
   FrmKreis,
   FrmOutput,
+  FrmSplash,
+  FrmKraft,
+  FrmDetail,
+  FrmTabelle,
+  FrmSaling,
+  FrmController,
   RggModul,
   RiggVar.RG.Main,
   RiggVar.RG.Speed01,
@@ -605,12 +620,32 @@ begin
   ShowTrimm;
 end;
 
+procedure TFormMain.UpdateOnParamChanged;
+begin
+  if (FormController <> nil) and (FormController.Visible = True) then
+    FormController.UpdateGraph;
+
+  if (FormDiagramA <> nil) and (FormDiagramA.Visible) then
+  begin
+    FormDiagramA.UpdateOnParamChanged;
+  end;
+end;
+
 procedure TFormMain.UpdateOnParamValueChanged;
 begin
   ShowTrimm;
   UpdateSalingGraph;
   UpdateControllerGraph;
   UpdateChartGraph;
+
+  if (FormDetail <> nil) and (FormDetail.Visible = True) then
+    FormDetail.AusgabeText;
+
+  if (FormSaling <> nil) and (FormSaling.Visible = True) then
+    FormSaling.UpdateGraph;
+
+  if (FormController <> nil) and (FormController.Visible = True) then
+    FormController.UpdateGraph;
 end;
 
 procedure TFormMain.UpdateReport;
@@ -1077,9 +1112,19 @@ begin
     faShowConf: ConfigBtnClick(nil);
     faShowTrimmTab: TrimmTabBtnClick(nil);
 
+    faShowDiagA: ShowDiagramA;
     faShowDiagC: ShowDiagramC;
     faShowDiagE: ShowDiagramE;
     faShowDiagQ: ShowDiagramQ;
+
+    faShowKreis: ShowFormKreis;
+    faShowInfo: ShowInfo;
+    faShowSplash: ShowFormSplash;
+    faShowForce: ShowFormKraft;
+    faShowDetail: ShowFormDetail;
+    faShowTabelle: ShowFormTabelle;
+    faShowSaling: ShowFormSaling;
+    faShowController: ShowFormController;
 
     faToggleSandboxed: IsSandboxed := not IsSandboxed;
     faToggleAllProps: AllProps := not AllProps;
@@ -1089,7 +1134,6 @@ begin
     faTR03: ShowDiagramQ;
     faTR04: ShowDiagramE;
 
-    faBR01: ShowKreisForm;
     faBR02: RotaForm.WantCircles := True;
     faBR03: RotaForm.WantCircles := False;
     faBR04: RotaForm.CircleGraph.Kreise := True;
@@ -2074,6 +2118,9 @@ begin
     FormDiagramC.Free;
     FormDiagramC := nil;
   end;
+
+  { Forms owned by Application not freed here. }
+  { FormSplash is disposing of itself. }
 end;
 
 procedure TFormMain.InitSpeedButtons;
@@ -2223,13 +2270,78 @@ begin
   FormDiagramC.Visible := True;
 end;
 
-procedure TFormMain.ShowKreisForm;
+procedure TFormMain.ShowDiagramA;
+begin
+  if not Assigned(FormDiagramA) then
+  begin
+    FormDiagramA := TFormDiagramA.Create(Application);
+  end;
+  FormDiagramA.Show;
+end;
+
+procedure TFormMain.ShowFormKreis;
 begin
   if not Assigned(KreisForm) then
   begin
     KreisForm := TKreisForm.Create(Application);
   end;
   KreisForm.Show;
+end;
+
+procedure TFormMain.ShowFormTabelle;
+begin
+  if not Assigned(FormTabelle) then
+  begin
+    FormTabelle := TFormTabelle.Create(Application);
+  end;
+  FormTabelle.Show;
+end;
+
+procedure TFormMain.ShowFormDetail;
+begin
+  if not Assigned(FormDetail) then
+  begin
+    FormDetail := TFormDetail.Create(Application);
+  end;
+  FormDetail.Show;
+end;
+
+procedure TFormMain.ShowFormController;
+begin
+  if not Assigned(FormController) then
+  begin
+    FormController := TFormController.Create(Application);
+  end;
+  FormController.Show;
+  FormController.UpdateGraph;
+end;
+
+procedure TFormMain.ShowFormSaling;
+begin
+  if not Assigned(FormSaling) then
+  begin
+    FormSaling := TFormSaling.Create(Application);
+  end;
+  FormSaling.Show;
+  FormSaling.UpdateGraph;
+end;
+
+procedure TFormMain.ShowFormKraft;
+begin
+  if not Assigned(FormKraft) then
+  begin
+    FormKraft := TFormKraft.Create(Application);
+  end;
+  FormKraft.Show;
+end;
+
+procedure TFormMain.ShowFormSplash;
+begin
+  if not Assigned(FormSplash) then
+  begin
+    FormSplash := TFormSplash.Create(Application);
+    FormSplash.Show;
+  end;
 end;
 
 procedure TFormMain.InitMenu;
@@ -2636,7 +2748,7 @@ begin
       mrCancel: Exit;
     end;
   end;
-  RiggModul.Neu(nil);
+  Main.Neu(nil);
 end;
 
 procedure TFormMain.OpenItemClick(Sender: TObject);
@@ -2660,26 +2772,15 @@ begin
   InitOpenDialog;
 
   if OpenDialog.Execute then
-  begin
-    RiggModul.Open(OpenDialog.FileName);
-    RiggModul.UpdateGControls;
-
-    { do the new way of loading data }
-    Main.Rigg.SaveToFederData(Main.RggData);
-    Main.LoadTrimm(Main.RggData);
-
-    { trigger update of new UI }
-    Main.ParamValue[Main.Param] := Main.ParamValue[Main.Param];
-    UpdateOnParamValueChanged;
-  end;
+    Main.Open(OpenDialog.FileName);
 end;
 
 procedure TFormMain.SaveItemClick(Sender: TObject);
 begin
-  if RiggModul.IniFileName = '' then
+  if Main.IniFileName = '' then
     SaveAsItemClick(Sender)
   else
-    RiggModul.Save;
+    Main.Save;
 end;
 
 procedure TFormMain.SaveAsItemClick(Sender: TObject);
@@ -2689,10 +2790,10 @@ begin
 
   InitSaveDialog;
 
-  SaveDialog.FileName := RiggModul.IniFileName;
+  SaveDialog.FileName := Main.IniFileName;
   if SaveDialog.Execute then
   begin
-    RiggModul.IniFileName := SaveDialog.FileName;
+    Main.IniFileName := SaveDialog.FileName;
     SaveItemClick(Sender);
   end;
 end;

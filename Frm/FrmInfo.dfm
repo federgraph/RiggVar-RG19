@@ -1,4 +1,4 @@
-﻿object FormInfo: TFormInfo
+object FormInfo: TFormInfo
   Left = 265
   Top = 233
   BorderIcons = [biSystemMenu]

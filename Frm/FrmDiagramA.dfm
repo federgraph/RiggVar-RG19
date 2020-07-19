@@ -1,7 +1,7 @@
-object OutputForm: TOutputForm
+object FormDiagramA: TFormDiagramA
   Left = 282
   Top = 186
-  Caption = 'OutputForm'
+  Caption = 'FormDiagramA'
   ClientHeight = 255
   ClientWidth = 465
   Color = clBtnFace
@@ -13,8 +13,6 @@ object OutputForm: TOutputForm
   FormStyle = fsStayOnTop
   OldCreateOrder = False
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
-  OnHide = FormHide
   PixelsPerInch = 96
   TextHeight = 13
   object OutputPages: TPageControl
@@ -22,140 +20,11 @@ object OutputForm: TOutputForm
     Top = 0
     Width = 465
     Height = 255
-    ActivePage = ControllerSheet
+    ActivePage = ChartSheet
     TabOrder = 0
-    OnChange = OutputPagesChange
-    object MasterMemo: TTabSheet
-      Caption = 'Tabellen'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object Memo: TMemo
-        Left = 0
-        Top = 0
-        Width = 457
-        Height = 227
-        TabStop = False
-        Align = alClient
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlack
-        Font.Height = -13
-        Font.Name = 'Courier New'
-        Font.Style = []
-        Lines.Strings = (
-          'Memo')
-        ParentFont = False
-        ScrollBars = ssVertical
-        TabOrder = 0
-      end
-    end
-    object DetailsSheet: TTabSheet
-      Caption = 'Details'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object DisplayMemo: TMemo
-        Left = 0
-        Top = 0
-        Width = 457
-        Height = 227
-        Align = alClient
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlue
-        Font.Height = -13
-        Font.Name = 'Courier New'
-        Font.Style = []
-        Lines.Strings = (
-          'DisplayMemo')
-        ParentFont = False
-        ScrollBars = ssVertical
-        TabOrder = 0
-      end
-    end
-    object Salingsheet: TTabSheet
-      Tag = 3
-      Caption = 'Saling'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object pnSaling: TPanel
-        Left = 0
-        Top = 0
-        Width = 457
-        Height = 227
-        Align = alClient
-        BevelOuter = bvNone
-        BorderStyle = bsSingle
-        Color = clSilver
-        TabOrder = 0
-        object SalingPaintBox: TPaintBox
-          Left = 0
-          Top = 0
-          Width = 453
-          Height = 223
-          Align = alClient
-          Color = clWhite
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -16
-          Font.Name = 'Arial Narrow'
-          Font.Style = []
-          ParentColor = False
-          ParentFont = False
-          OnClick = SalingPaintBoxClick
-          OnPaint = SalingPaintBoxPaint
-          ExplicitHeight = 220
-        end
-      end
-    end
-    object ControllerSheet: TTabSheet
-      Tag = 1
-      Caption = 'Controller'
-      object pnController: TPanel
-        Left = 0
-        Top = 0
-        Width = 457
-        Height = 227
-        Align = alClient
-        BevelOuter = bvNone
-        BorderStyle = bsSingle
-        TabOrder = 0
-        object ControllerPaintBox: TPaintBox
-          Left = 0
-          Top = 0
-          Width = 453
-          Height = 223
-          Align = alClient
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -13
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
-          OnPaint = ControllerPaintBoxPaint
-          ExplicitHeight = 220
-        end
-        object ZustellenBtn: TButton
-          Left = 72
-          Top = 8
-          Width = 75
-          Height = 25
-          Caption = 'Zustellen'
-          TabOrder = 0
-          OnClick = ZustellenBtnClick
-        end
-      end
-    end
     object ChartSheet: TTabSheet
       Tag = 4
       Caption = 'Diagramm'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnChart2: TPanel
         Left = 0
         Top = 0
@@ -269,14 +138,14 @@ object OutputForm: TOutputForm
           Height = 124
           OnPaint = ChartPaintBoxPaint
         end
-        object YComboBox: TComboBox
+        object YCombo: TComboBox
           Left = 126
           Top = 8
           Width = 145
           Height = 21
           Style = csDropDownList
           TabOrder = 0
-          OnChange = YComboBoxChange
+          OnChange = YComboChange
           Items.Strings = (
             'Durchbiegung hd'
             'Elastizit'#228't Punkt C'
@@ -286,65 +155,22 @@ object OutputForm: TOutputForm
             'Wanten-Spannung')
         end
         object cbFollowPoint: TCheckBox
-          Left = 8
-          Top = 16
+          Left = 280
+          Top = 39
           Width = 113
           Height = 17
           Caption = 'Punkt verfolgen'
           TabOrder = 1
           OnClick = cbFollowPointClick
         end
-      end
-    end
-    object CommentSheet: TTabSheet
-      Caption = 'Kommentar'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object KommentarMemo: TMemo
-        Left = 0
-        Top = 0
-        Width = 457
-        Height = 227
-        Align = alClient
-        Lines.Strings = (
-          'KommentarMemo')
-        TabOrder = 0
-      end
-    end
-    object KraftSheet: TTabSheet
-      Caption = 'Kr'#228'fte'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object pnKraft: TPanel
-        Left = 0
-        Top = 0
-        Width = 457
-        Height = 227
-        Align = alClient
-        BevelOuter = bvNone
-        BorderStyle = bsSingle
-        TabOrder = 0
-        object KraftPaintBox: TImage
-          Left = 0
-          Top = 0
-          Width = 345
-          Height = 223
-          Align = alLeft
-          ExplicitLeft = -2
-          ExplicitTop = -2
-        end
-        object UpdateKraftGraphBtn: TButton
-          Left = 368
+        object XCombo: TComboBox
+          Left = 8
           Top = 8
-          Width = 75
-          Height = 25
-          Caption = 'Update'
-          TabOrder = 0
-          OnClick = UpdateKraftGraphBtnClick
+          Width = 112
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 2
+          OnChange = XComboChange
         end
       end
     end

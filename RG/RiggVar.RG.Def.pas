@@ -19,6 +19,7 @@
 interface
 
 uses
+  System.UITypes,
   Vcl.Graphics;
 
 type
@@ -200,12 +201,12 @@ const
   clRumpf: TColor = clSilver;
   clMast: TColor = clBlue;
   clWanten: TColor = clRed;
-  clVorstag: TColor = clYellow;
+  clVorstag: TColor = TColors.Orange;
   clSaling: TColor = clLime;
   clController: TColor = clAqua;
   clEntspannt: TColor = clSilver;
   clNullStellung: TColor = clAqua;
-  clKoppelKurve: TColor = clYellow;
+  clKoppelKurve: TColor = TColors.Orange;
   clGestrichelt: TColor = clWhite;
   clFixPont: TColor = clYellow;
 

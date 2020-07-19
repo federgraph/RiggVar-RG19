@@ -91,18 +91,24 @@ uses
   RggModul in 'Core\RggModul.pas',
   FrmConfig in 'Frm\FrmConfig.pas' {FormConfig},
   FrmInput in 'Frm\FrmInput.pas' {InputForm},
-  FrmOutput in 'Frm\FrmOutput.pas' {OutputForm},
+  FrmDiagramA in 'Frm\FrmDiagramA.pas' {FormDiagramA},
   RggKraftGraph in 'Graph\RggKraftGraph.pas',
   RggMastGraph in 'Graph\RggMastGraph.pas',
   FrmBiege in 'Frm\FrmBiege.pas' {BiegeUndNeigeForm},
   FrmRegler in 'Frm\FrmRegler.pas' {FormRegler},
   FrmReglerGraph in 'Frm\FrmReglerGraph.pas' {FormReglerGraph},
-  FrmSplash in 'Frm\FrmSplash.pas' {RiggSplash},
+  FrmSplash in 'Frm\FrmSplash.pas' {FormSplash},
   RiggVar.VM.FormMain in 'VM\RiggVar.VM.FormMain.pas',
   FrmSelect in 'Frm\FrmSelect.pas' {MemoDlg},
   FrmInfo in 'Frm\FrmInfo.pas' {FormInfo},
   RiggVar.Util.InfoMemo in 'Util\RiggVar.Util.InfoMemo.pas',
-  RiggVar.RG.Speed03 in 'RG\RiggVar.RG.Speed03.pas';
+  RiggVar.RG.Speed03 in 'RG\RiggVar.RG.Speed03.pas',
+  FrmKraft in 'Frm\FrmKraft.pas' {FormKraft},
+  FrmDetail in 'Frm\FrmDetail.pas' {FormDetail},
+  FrmTabelle in 'Frm\FrmTabelle.pas' {FormTabelle},
+  FrmController in 'Frm\FrmController.pas' {FormController},
+  FrmOutput in 'Frm\FrmOutput.pas' {OutputForm},
+  FrmSaling in 'Frm\FrmSaling.pas' {FormSaling};
 
 {$R *.res}
 

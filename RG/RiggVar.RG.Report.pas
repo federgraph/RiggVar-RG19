@@ -25,6 +25,7 @@ type
     rgDataText,
     rgDiffText,
 
+    rgAusgabe,
     rgAusgabeRL,
     rgAusgabeRP,
     rgAusgabeRLE,
@@ -107,6 +108,7 @@ begin
     rgJsonText: result := 'Json Text';
     rgDataText: result := 'Data Text';
     rgDiffText: result := 'Diff Text';
+    rgAusgabe: result := 'Ausgabe Detail';
     rgAusgabeRL: result := 'Ausgabe rL';
     rgAusgabeRP: result := 'Ausgabe rP';
     rgAusgabeRLE: result := 'Ausgabe rLE';
@@ -137,6 +139,7 @@ begin
     faReportJsonText: rg := rgJsonText;
     faReportDataText: rg := rgDataText;
     faReportDiffText: rg := rgDiffText;
+    faReportAusgabeDetail: rg := rgAusgabe;
     faReportAusgabeRL: rg := rgAusgabeRL;
     faReportAusgabeRP: rg := rgAusgabeRP;
     faReportAusgabeRLE: rg := rgAusgabeRLE;
@@ -169,6 +172,7 @@ begin
     faReportJsonText: result := CurrentReport = rgJsonText;
     faReportDataText: result := CurrentReport = rgDataText;
     faReportDiffText: result := CurrentReport = rgDiffText;
+    faReportAusgabeDetail: result := CurrentReport = rgAusgabe;
     faReportAusgabeRL: result := CurrentReport = rgAusgabeRL;
     faReportAusgabeRP: result := CurrentReport = rgAusgabeRP;
     faReportAusgabeRLE: result := CurrentReport = rgAusgabeRLE;
@@ -234,6 +238,10 @@ begin
       rgLog: ML.Text := Main.Logger.TL.Text;
       rgJson: Main.RggData.WriteJSon(ML);
       rgData: Main.RggData.WriteReport(ML);
+      rgAusgabe:
+      begin
+        Main.Rigg.AusgabeText(ML, False);
+      end;
       rgAusgabeRL:
       begin
         RiggReport.ML.Clear;
@@ -313,11 +321,12 @@ begin
   Include(rs, rgDataText);
   Include(rs, rgDiffText);
 
+  Include(rs, rgAusgabe);
   Include(rs, rgAusgabeRL);
-  Include(rs, rgAusgabeRP);
+//  Include(rs, rgAusgabeRP);
 //  Include(rs, rgAusgabeRLE);
 //  Include(rs, rgAusgabeRPE);
-  Include(rs, rgAusgabeDiffL);
+//  Include(rs, rgAusgabeDiffL);
 //  Include(rs, rgAusgabeDiffP);
 
   //Include(rs, rgXML);

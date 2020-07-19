@@ -70,7 +70,7 @@ CornerLocation: relative positions
 implementation
 
 const
-  PageCountRG = 9;
+  PageCountRG = 10;
 
 constructor TActionMapTablet.Create;
 begin
@@ -553,6 +553,46 @@ begin
       InitAC(cl, 4, faShowDiagE, cla);
       InitAC(cl, 5, faShowDiagQ, cla);
       InitAC(cl, 6, faShowDiagC, cla);
+    end;
+
+    10:
+    begin
+      cla := TRggColors.White;
+      cl := TopLeft;
+      //InitAC(cl, 1, faActionPageM, TRggColors.Yellow);
+      InitAC(cl, 2, faShowInfo, claForm);
+      InitAC(cl, 3, faShowKreis, claForm);
+      InitAC(cl, 4, faShowSplash, claForm);
+      InitAC(cl, 5, faNoop, cla);
+      InitAC(cl, 6, faNoop, cla);
+
+      cl := TopRight;
+      InitAC(cl, 1, faShowSaling, claForm);
+      InitAC(cl, 2, faShowController, claForm);
+      InitAC(cl, 3, faShowForce, claForm);
+      InitAC(cl, 4, faNoop, cla);
+      //InitAC(cl, 5, faActionPageP, TRggColors.Yellow);
+      InitAC(cl, 6, faShowTabelle, claForm);
+      InitAC(cl, 7, faShowDetail, claForm);
+      InitAC(cl, 8, faNoop, cla);
+
+      cl := BottomLeft;
+      InitAC(cl, 1, faParamValuePlus10, cla);
+      InitAC(cl, 2, faShowActi, claForm);
+      InitAC(cl, 3, faShowMemo, claForm);
+      InitAC(cl, 4, faShowConf, claForm);
+      InitAC(cl, 5, faShowTrimmTab, claForm);
+      InitAC(cl, 6, faParamValuePlus1, cla);
+      InitAC(cl, 7, faParamValueMinus1, cla);
+      InitAC(cl, 8, faParamValueMinus10, cla);
+
+      cl := BottomRight;
+      InitAC(cl, 1, faNoop, cla);
+      InitAC(cl, 2, faNoop, cla);
+      InitAC(cl, 3, faShowDiagA, claForm);
+      InitAC(cl, 4, faShowDiagE, claForm);
+      InitAC(cl, 5, faShowDiagQ, claForm);
+      InitAC(cl, 6, faShowDiagC, claForm);
     end;
 
   end;

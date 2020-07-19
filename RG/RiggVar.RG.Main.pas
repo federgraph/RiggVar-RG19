@@ -46,6 +46,7 @@ type
     IsUp: Boolean;
     Modified: Boolean;
     AutoSave: Boolean;
+    IniFileName: string;
   end;
 
   TRggText = class(TRggRigg)
@@ -226,6 +227,10 @@ type
     constructor Create;
     destructor Destroy; override;
 
+    procedure Neu(Doc: TRggDocument);
+    procedure Open(FileName: string);
+    procedure Save;
+
     procedure Reset;
     procedure UpdateGetriebe;
     procedure UpdateGraph;
@@ -236,6 +241,8 @@ type
 
     procedure Init420;
     procedure InitLogo;
+    procedure InitWithDefaultDoc(AWantLogoData: Boolean; TargetSlot: Integer);
+    procedure DoAfterInitDefault(ATrimmSlot: Integer);
     procedure InitSalingTyp(fa: Integer); override;
 
     procedure MemoryBtnClick;
@@ -278,6 +285,7 @@ type
     property Visible: Boolean read FVisible write SetVisible;
 
     property Korrigiert: Boolean read FKorrigiert write SetKorrigiert;
+    property SofortBerechnenNoChange: Boolean read FSofortBerechnen write FSofortBerechnen;
     property SofortBerechnen: Boolean read FSofortBerechnen write SetSofortBerechnen;
     property BtnGrauDown: Boolean read FBtnGrauDown write SetBtnGrauDown;
     property BtnBlauDown: Boolean read FBtnBlauDown write SetBtnBlauDown;
@@ -291,7 +299,8 @@ implementation
 
 uses
   Clipbrd,
-  FrmMain;
+  FrmMain,
+  FrmDiagramA;
 
 const
   tfs = '%-3s %s %8s %6s';
@@ -794,6 +803,8 @@ begin
   CurrentValue := FactArray.Find(FParam).Ist;
   SetupTrackBarForRgg;
   UpdateGraph;
+
+  FormMain.UpdateOnParamChanged;
 end;
 
 function TRggMain.Text2Param(T: string): TFederParam;
@@ -1206,36 +1217,29 @@ begin
 end;
 
 procedure TRggMain.Init420;
-var
-  doc: TRggDocument;
 begin
-  doc := TRggDocument.Create;
-  WantLogoData := False;
-  doc.GetDefaultDocument;
-  Rigg.SetDocument(doc);
-  doc.Free;
-
-  Rigg.ControllerTyp := TControllerTyp.ctOhne;
-  InitFactArray();
-  if StrokeRigg <> nil then
-    StrokeRigg.SalingTyp := Rigg.SalingTyp;
-  SetParam(FParam);
-  FixPoint := ooD;
-
-  SaveTrimm(Trimm7);
-  TrimmNoChange := 7;
+  InitWithDefaultDoc(False, 7);
 end;
 
 procedure TRggMain.InitLogo;
+begin
+  InitWithDefaultDoc(True, 8);
+end;
+
+procedure TRggMain.InitWithDefaultDoc(AWantLogoData: Boolean; TargetSlot: Integer);
 var
   doc: TRggDocument;
 begin
   doc := TRggDocument.Create;
-  WantLogoData := True;
+  WantLogoData := AWantLogoData;
   doc.GetDefaultDocument;
   Rigg.SetDocument(doc);
   doc.Free;
+  DoAfterInitDefault(TargetSlot);
+end;
 
+procedure TRggMain.DoAfterInitDefault(ATrimmSlot: Integer);
+begin
   Rigg.ControllerTyp := TControllerTyp.ctOhne;
   InitFactArray();
   if StrokeRigg <> nil then
@@ -1243,8 +1247,21 @@ begin
   SetParam(FParam);
   FixPoint := ooD;
 
-  SaveTrimm(Trimm8);
-  TrimmNoChange := 8;
+  case ATrimmSlot of
+    7:
+    begin
+      SaveTrimm(Trimm7);
+      TrimmNoChange := 7;
+    end;
+    8:
+    begin
+      SaveTrimm(Trimm8);
+      TrimmNoChange := 8;
+    end;
+  end;
+
+  ParamValue[Param] := ParamValue[Param];
+  FormMain.UpdateOnParamValueChanged;
 end;
 
 procedure TRggMain.InitSalingTyp(fa: Integer);
@@ -1689,6 +1706,12 @@ begin
   begin
     RiggModul.DoOnUpdateRigg;
   end;
+
+  if (FormDiagramA <> nil) and (FormDiagramA.Visible) then
+  begin
+    FormDiagramA.UpdateGetriebePunkt;
+    FormDiagramA.UpdateRiggPunkt;
+  end;
 end;
 
 procedure TRggMain.MemoryBtnClick;
@@ -2039,6 +2062,47 @@ begin
   end;
 
   UpdateGetriebe;
+end;
+
+procedure TRggMain.Neu(Doc: TRggDocument);
+begin
+  IniFileName := '';
+  if Doc = nil then
+    Rigg.SetDefaultDocument { --> Rigg.SetDocument }
+  else
+    Rigg.SetDocument(Doc);
+  RiggModul.UpdateUI;
+end;
+
+procedure TRggMain.Open(FileName: string);
+begin
+  try
+    Rigg.LoadFromDocFile(FileName); { --> Rigg.SetDocument }
+    IniFileName := FileName;
+    RiggModul.UpdateUI;
+    RiggModul.UpdateGControls;
+
+    { do the new way of loading data }
+    Rigg.SaveToFederData(RggData);
+    LoadTrimm(RggData);
+
+    { trigger update of new UI }
+    ParamValue[Param] := ParamValue[Param];
+    FormMain.UpdateOnParamValueChanged;
+  except
+    on EFileFormatError do { eat ecxeption }
+      if IniFileName = '' then
+      begin
+        RiggModul.ViewModelM.Caption := 'Rigg';
+        RiggModul.ViewModelM.UpdateView;
+      end;
+  end;
+end;
+
+procedure TRggMain.Save;
+begin
+  Rigg.WriteToDocFile(IniFileName);
+  Modified := False;
 end;
 
 end.

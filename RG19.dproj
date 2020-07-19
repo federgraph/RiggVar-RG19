@@ -223,8 +223,8 @@
             <Form>InputForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Frm\FrmOutput.pas">
-            <Form>OutputForm</Form>
+        <DCCReference Include="Frm\FrmDiagramA.pas">
+            <Form>FormDiagramA</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Graph\RggKraftGraph.pas"/>
@@ -242,7 +242,7 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Frm\FrmSplash.pas">
-            <Form>RiggSplash</Form>
+            <Form>FormSplash</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="VM\RiggVar.VM.FormMain.pas"/>
@@ -256,6 +256,30 @@
         </DCCReference>
         <DCCReference Include="Util\RiggVar.Util.InfoMemo.pas"/>
         <DCCReference Include="RG\RiggVar.RG.Speed03.pas"/>
+        <DCCReference Include="Frm\FrmKraft.pas">
+            <Form>FormKraft</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Frm\FrmDetail.pas">
+            <Form>FormDetail</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Frm\FrmTabelle.pas">
+            <Form>FormTabelle</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Frm\FrmController.pas">
+            <Form>FormController</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Frm\FrmOutput.pas">
+            <Form>OutputForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Frm\FrmSaling.pas">
+            <Form>FormSaling</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
