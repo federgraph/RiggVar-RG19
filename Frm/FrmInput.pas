@@ -194,7 +194,7 @@ end;
 procedure TInputForm.sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode;
   var ScrollPos: Integer);
 begin
-  RiggModul.sbControllerScroll(Sender, ScrollCode, ScrollPos);
+  RiggModul.HandleScroll(Sender, ScrollCode, ScrollPos);
 end;
 
 procedure TInputForm.FormHide(Sender: TObject);

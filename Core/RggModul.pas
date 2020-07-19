@@ -79,13 +79,11 @@ type
     FSalingTyp: TSalingTyp;
     FControllerTyp: TControllerTyp;
 
-    { private variables, not properties }
-    NeedPaint: Boolean;
+    FNeedPaint: Boolean;
     FGrauZeichnen: Boolean;
-    TextFlipFlop: Boolean;
+    FTextFlipFlop: Boolean;
 
-    { Diagram.Begin }
-    sbPuffer: TTrimmControls;
+    InputBuffer: TTrimmControls;
     TopTitel: string;
     LeftTitel: string;
     BottomTitel: string;
@@ -118,9 +116,7 @@ type
     function GetXText(sbn: TsbName): string;
     function GetYText(Text: string): string;
     function GetPunktColor: TColor;
-    { Diagram.End }
 
-    { private Getters and Setters }
     function GetControllerEnabled: Boolean;
     procedure SetViewPoint(Value: TViewPoint);
     procedure SetPaintBtnDown(Value: Boolean);
@@ -210,7 +206,7 @@ type
     procedure PreviewPaintBoxG;
     procedure DrawPaintBoxG(Canvas: TCanvas);
     procedure DrawToMetaG(Canvas: TMetaFileCanvas);
-    procedure CopyMetaFileG; { --> Clipboard }
+    procedure CopyMetaFileG;
     procedure DrawPaintBoxM;
     procedure DrawPaintBoxS(Canvas: TCanvas);
     procedure DrawPaintBoxC(Canvas: TCanvas);
@@ -223,7 +219,6 @@ type
     procedure AdjustGBox(Sender: TObject);
     procedure GetGBoxOffset;
 
-    { former event handlers }
     procedure UpdateUI;
     procedure rLItemClick(Item: TReportItem);
     procedure BiegeNeigeItemClick;
@@ -247,11 +242,10 @@ type
     procedure RotaFormItemClick;
     procedure PrintGrafik;
     procedure WriteReportToMemo(Memo: TMemo);
-    procedure sbControllerScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
+    procedure HandleScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
 
     procedure DoOnUpdateRigg;
 
-    { Properties }
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property PaintBtnDown: Boolean read FPaintBtnDown write SetPaintBtnDown;
     property BtnBlauDown: Boolean read FBtnBlauDown write SetBtnBlauDown;
@@ -278,7 +272,6 @@ type
     property ConsoleActive: Boolean read FConsoleActive write SetConsoleActive;
     property ReportFormActive: Boolean read FReportFormActive write SetReportFormActive;
     property RotaFormActive: Boolean read FRotaFormActive write SetRotaFormActive;
-
   end;
 
 var
@@ -351,7 +344,7 @@ begin
 
   MemCtrl := ZeroCtrl;
   RefCtrl := Rigg.Glieder;
-  sbPuffer := Rigg.Glieder;
+  InputBuffer := Rigg.Glieder;
   RefPoints := Rigg.rP;
 
   { GetriebeGrafik }
@@ -406,7 +399,7 @@ begin
   MastGraph := TMastGraph.Create;
   KraftGraph := TKraftGraph.Create(Rigg);
 
-  NeedPaint := True;
+  FNeedPaint := True;
 end;
 
 destructor TRiggModul.Destroy;
@@ -484,7 +477,7 @@ end;
 procedure TRiggModul.UpdateGCtrlLabels(InputRec: TTrimmControls);
 begin
   InputForm.lbValue1.Caption := Format('%d mm', [InputRec.Controller - MemCtrl.Controller]);
-  if WinkelBtnDown then
+  if FWinkelBtnDown then
   begin
     InputForm.lbWinkel.Caption := 'Winkel';
     InputForm.lbValue2.Caption := Format('%5.2f Grad', [(InputRec.Winkel - MemCtrl.Winkel) / 10]);
@@ -515,7 +508,7 @@ end;
 
 procedure TRiggModul.UpdateGCtrls(InputRec: TTrimmControls);
 begin
-  sbPuffer := InputRec;
+  InputBuffer := InputRec;
 
   InputForm.sbController.Position := InputRec.Controller;
   InputForm.sbControllerD.Position := InputRec.Controller;
@@ -547,7 +540,7 @@ begin
     AniRotationForm.Modified := True;
 end;
 
-procedure TRiggModul.sbControllerScroll(Sender: TObject;
+procedure TRiggModul.HandleScroll(Sender: TObject;
   ScrollCode: TScrollCode; var ScrollPos: Integer);
 var
   InputRec: TTrimmControls;
@@ -560,29 +553,28 @@ begin
     InputRec.Controller := ScrollPos;
     InputForm.lbValue1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
     if not ControllerBtnDown then
-      NeedPaint := False;
+      FNeedPaint := False;
   end
   else if Sender = InputForm.sbControllerD then
   begin
     InputRec.Controller := ScrollPos;
     InputForm.lbD1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
     if not ControllerBtnDown then
-      NeedPaint := False;
+      FNeedPaint := False;
   end
   else if Sender = InputForm.sbControllerOhne then
   begin
     InputRec.Controller := ScrollPos;
     InputForm.lbOhne1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
     if not ControllerBtnDown then
-      NeedPaint := False;
+      FNeedPaint := False;
   end
   else if Sender = InputForm.sbWinkel then
   begin
     if WinkelBtnDown then
     begin
       InputRec.Winkel := ScrollPos;
-      InputForm.lbValue2.Caption := Format('%5.2f Grad', [(InputRec.Winkel - MemCtrl.Winkel) /
-        10]);
+      InputForm.lbValue2.Caption := Format('%5.2f Grad', [(InputRec.Winkel - MemCtrl.Winkel) / 10]);
     end
     else
     begin
@@ -649,7 +641,7 @@ begin
   begin
     InputRec.WPowerOS := ScrollPos;
     InputForm.lbValue8.Caption := Format('%d N', [ScrollPos - MemCtrl.WPowerOS]);
-    NeedPaint := False;
+    FNeedPaint := False;
   end;
 
   if (ScrollCode = TScrollCode.scEndScroll) or not SofortBerechnen then
@@ -661,7 +653,7 @@ begin
       ShowTriangle := False;
       KurveValid := False;
     end;
-    sbPuffer := InputRec;
+    InputBuffer := InputRec;
     Rigg.Glieder := InputRec;
     UpdateGetriebe;
   end;
@@ -714,8 +706,8 @@ begin
     UpdateGetriebePunkt;
   end;
 
-  TextFlipFlop := False;
-  { Grafik aktualisieren, aber nicht zweimal!}
+  FTextFlipFlop := False;
+  { Grafik aktualisieren }
   if not (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK) then
   begin
     FGrauZeichnen := False;
@@ -770,7 +762,7 @@ begin
     c.TextOut(ox, oy + 2 * th, lbSpannung);
     c.TextOut(ox, oy + 3 * th, lbBiegung);
   end
-  else if TextFlipFlop then
+  else if FTextFlipFlop then
     PaintBackGround(BitmapG);
 
   DrawPaintBoxG(c);
@@ -904,7 +896,7 @@ begin
   ML.BeginUpdate;
   ML.Clear;
 
-  { Text setzen }
+  { Text for GetriebeGraph }
   lbMastFall := Format('Mastfall = %5.1f cm', [Rigg.Trimm.Mastfall / 10]);
   lbSpannung := Format('Spannung = %5.0f  N', [Rigg.rF[14]]);
   lbBiegung :=  Format('Biegung  = %5.1f cm', [Rigg.hd / 10]);
@@ -1061,9 +1053,6 @@ begin
   FWReport.ML.Add('');
   for i := 0 to MemoDlg.DstList.Items.Count - 1 do
   begin
-    { output all}
-//     FWReport.Ausgabe(Rigg.Fachwerk);
-
     { output selected reports }
     if MemoDlg.DstList.Items[i] = 'FW_Geometrie' then
       FWReport.AusgabeGeometrie(Rigg.Fachwerk.G, Rigg.Fachwerk.S);
@@ -1115,7 +1104,7 @@ begin
   begin
     FViewPoint := Value;
     GetriebeGraph.ViewPoint := Value;
-    TextFlipFlop := True;
+    FTextFlipFlop := True;
     ResetPaintBoxG;
     if RG19A and (GrafikForm <> nil) then
       GrafikForm.ViewTab.TabIndex := Ord(FViewPoint);
@@ -1129,7 +1118,7 @@ begin
   DataInMeta := False;
   ThickPenWidth := 1;
   MetaGPaintCount := 0;
-  TextFlipFlop := True;
+  FTextFlipFlop := True;
   Draw;
 end;
 
@@ -1363,12 +1352,12 @@ begin
   if SalingTyp = stFest then
   begin
     InputForm.sbController.Position := ControllerAnschlag;
-    sbControllerScroll(InputForm.sbController, TScrollCode.scEndScroll, ControllerAnschlag);
+    HandleScroll(InputForm.sbController, TScrollCode.scEndScroll, ControllerAnschlag);
   end
   else if SalingTyp = stDrehbar then
   begin
     InputForm.sbControllerD.Position := ControllerAnschlag;
-    sbControllerScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
+    HandleScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
   end;
 
   if BiegeUndNeigeForm = nil then
@@ -1393,12 +1382,12 @@ begin
   if SalingTyp = stFest then
   begin
     InputForm.sbController.Position := ControllerAnschlag;
-    sbControllerScroll(InputForm.sbController, TScrollCode.scEndScroll, ControllerAnschlag);
+    HandleScroll(InputForm.sbController, TScrollCode.scEndScroll, ControllerAnschlag);
   end
   else if SalingTyp = stDrehbar then
   begin
     InputForm.sbControllerD.Position := ControllerAnschlag;
-    sbControllerScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
+    HandleScroll(InputForm.sbControllerD, TScrollCode.scEndScroll, ControllerAnschlag);
   end;
 
   if Rigg.CalcTyp = ctKraftGemessen then
@@ -1580,7 +1569,7 @@ begin
     KurveValid := False;
     UpdateGetriebe;
     SetupGCtrls;
-    sbPuffer := Rigg.Glieder; { weil Istwerte nicht über Scrollbar verändert }
+    InputBuffer := Rigg.Glieder; { weil Istwerte nicht über Scrollbar verändert }
   end;
 end;
 
@@ -1910,13 +1899,7 @@ begin
       if Screen.ActiveForm = OutputForm then
         OutputForm.ActiveControl := OutputForm.YComboBox
       else if Screen.ActiveForm = ConsoleForm then
-        ConsoleForm.ActiveControl := OutputForm.YComboBox
-      else
-      begin
-{$ifdef debug}
-//        MessageBeep(MB_ICONASTERISK);
-{$endif}
-      end;
+        ConsoleForm.ActiveControl := OutputForm.YComboBox;
 
   finally
     { restore Model (Getriebe) }
@@ -2010,15 +1993,15 @@ begin
     end;
     f := af[i];
     case SBName of
-      fpController: ChartPunktX := sbPuffer.Controller;
-      fpWinkel: ChartPunktX := sbPuffer.Winkel;
-      fpVorstag: ChartPunktX := sbPuffer.Vorstag;
-      fpWante: ChartPunktX := sbPuffer.Wanten;
-      fpWoben: ChartPunktX := sbPuffer.Woben;
-      fpSalingH: ChartPunktX := sbPuffer.SalingH;
-      fpSalingA: ChartPunktX := sbPuffer.SalingA;
-      fpSalingL: ChartPunktX := sbPuffer.SalingL;
-      fpVorstagOS: ChartPunktX := sbPuffer.Vorstag;
+      fpController: ChartPunktX := InputBuffer.Controller;
+      fpWinkel: ChartPunktX := InputBuffer.Winkel;
+      fpVorstag: ChartPunktX := InputBuffer.Vorstag;
+      fpWante: ChartPunktX := InputBuffer.Wanten;
+      fpWoben: ChartPunktX := InputBuffer.Woben;
+      fpSalingH: ChartPunktX := InputBuffer.SalingH;
+      fpSalingA: ChartPunktX := InputBuffer.SalingA;
+      fpSalingL: ChartPunktX := InputBuffer.SalingL;
+      fpVorstagOS: ChartPunktX := InputBuffer.Vorstag;
     end;
     ChartPunktY := bf[i];
     LookForYMinMax;
@@ -2204,15 +2187,15 @@ begin
     Exit;
   { Koordinaten des Punktes }
   case SBName of
-    fpController: ChartPunktX := sbPuffer.Controller;
-    fpWinkel: ChartPunktX := sbPuffer.Winkel;
-    fpVorstag: ChartPunktX := sbPuffer.Vorstag;
-    fpWante: ChartPunktX := sbPuffer.Wanten;
-    fpWoben: ChartPunktX := sbPuffer.Woben;
-    fpSalingH: ChartPunktX := sbPuffer.SalingH;
-    fpSalingA: ChartPunktX := sbPuffer.SalingA;
-    fpSalingL: ChartPunktX := sbPuffer.SalingL;
-    fpVorstagOS: ChartPunktX := sbPuffer.Vorstag;
+    fpController: ChartPunktX := InputBuffer.Controller;
+    fpWinkel: ChartPunktX := InputBuffer.Winkel;
+    fpVorstag: ChartPunktX := InputBuffer.Vorstag;
+    fpWante: ChartPunktX := InputBuffer.Wanten;
+    fpWoben: ChartPunktX := InputBuffer.Woben;
+    fpSalingH: ChartPunktX := InputBuffer.SalingH;
+    fpSalingA: ChartPunktX := InputBuffer.SalingA;
+    fpSalingL: ChartPunktX := InputBuffer.SalingL;
+    fpVorstagOS: ChartPunktX := InputBuffer.Vorstag;
   end;
   i := YComboBox.ItemIndex;
   if i = -1 then
@@ -2320,18 +2303,6 @@ end;
 
 procedure TRiggModul.YComboBoxChange(ItemIndex: Integer);
 begin
-  (*
-  if YComboBox.ItemIndex <> YComboBox2.ItemIndex then
-  begin
-    if Sender = YComboBox then YComboBox2.ItemIndex := YComboBox.ItemIndex;
-    if Sender = YComboBox2 then YComboBox.ItemIndex := YComboBox2.ItemIndex;
-    if (YComboBox.ItemIndex > -1) and (YComboBox.ItemIndex < ANr) then
-      f := af[YComboBox.ItemIndex]
-    else
-      f := TestF;
-    DrawChart;
-  end;
-  *)
   if (ItemIndex > -1) and (ItemIndex < ANr) then
     f := af[ItemIndex]
   else
@@ -2447,7 +2418,7 @@ begin
     ViewPoint := GetriebeGraph.ViewPoint
   else
   begin
-    TextFlipFlop := True;
+    FTextFlipFlop := True;
     ResetPaintBoxG;
     if RG19A and (GrafikForm <> nil) then
       GrafikForm.ViewTab.TabIndex := Ord(FViewPoint);
@@ -2504,7 +2475,7 @@ begin
         end;
       end;
       if not ControllerBtnDown then
-        NeedPaint := False;
+        FNeedPaint := False;
     end;
 
     fpVorstag, fpWinkel:
@@ -2641,7 +2612,7 @@ begin
       ShowTriangle := False;
       KurveValid := False;
     end;
-    sbPuffer := InputRec;
+    InputBuffer := InputRec;
     Rigg.Glieder := InputRec;
     UpdateGetriebe;
   end;
@@ -2649,7 +2620,7 @@ end;
 
 procedure TRiggModul.DoUpdateChartBuffer;
 begin
-  sbPuffer := Rigg.Glieder;
+  InputBuffer := Rigg.Glieder;
 end;
 
 procedure TRiggModul.DoResetForTrimmData;
