@@ -51,8 +51,8 @@ type
     procedure ChartPaintBoxPaint(Sender: TObject);
     procedure XComboChange(Sender: TObject);
   private
-    FSBName: TsbName;
-    FCursorSB: TsbName;
+    FIntendedX: TsbName;
+    FActualX: TsbName;
     FKurveValid: Boolean;
     FChartValid: Boolean;
 
@@ -96,7 +96,8 @@ type
     function GetPunktColor: TColor;
     procedure SetKurveValidLED(Value: Boolean);
     procedure SetKurveValid(Value: Boolean);
-    procedure SetSBName(Value: TSBName);
+    procedure SetIntendedX(Value: TSBName);
+
     function GetXComboIndexOfParam(Value: TFederParam): Integer;
     function XComboIndexToParam(Value: Integer): TFederParam;
   public
@@ -108,9 +109,10 @@ type
 
     procedure UpdateOnParamChanged;
 
-    property CursorSB: TSBName read FCursorSB write FCursorSB;
     property KurveValid: Boolean read FKurveValid write SetKurveValid;
-    property SBName: TSBName read FSBName write SetSBName;
+    property IntendedX: TSBName read FIntendedX write SetIntendedX;
+    property ActualX: TSBName read FActualX write FActualX;
+
     property Param: TFederParam write SetParam;
   end;
 
@@ -140,8 +142,8 @@ begin
   XCombo.ItemIndex := 2;
   XCombo.OnChange := XComboChange;
 
-  FSBName := fpVorstag;
-  FCursorSB := fpVorstag;
+  FIntendedX := fpVorstag;
+  FActualX := fpVorstag;
 
   YCombo.ItemIndex := YCombo.Items.IndexOf('Mastfall F0F');
   YComboSavedItemIndex := YCombo.ItemIndex;
@@ -167,11 +169,11 @@ procedure TFormDiagramA.KurveBtnClick(Sender: TObject);
 var
   cr: TRggSB;
 begin
-  BottomTitel := GetXText(SBName);
-  cr := Rigg.GSB.Find(SBName);
+  BottomTitel := GetXText(IntendedX);
+  cr := Rigg.GSB.Find(IntendedX);
   Xmin := cr.Min;
   Xmax := cr.Max;
-  CursorSB := SBName;
+  ActualX := IntendedX;
   GetCurves;
 end;
 
@@ -201,7 +203,7 @@ end;
 procedure TFormDiagramA.SetParam(const Value: TFederParam);
 begin
   if (Value >= Low(TSBName))and (Value <= High(TSBName))then
-    SBName := Value;
+    IntendedX := Value;
 end;
 
 procedure TFormDiagramA.DrawChart;
@@ -217,7 +219,7 @@ begin
       i := YComboSavedItemIndex;
     end;
     f := af[i];
-    case SBName of
+    case IntendedX of
       fpController: ChartPunktX := InputBuffer.Controller;
       fpWinkel: ChartPunktX := InputBuffer.Winkel;
       fpVorstag: ChartPunktX := InputBuffer.Vorstag;
@@ -409,7 +411,7 @@ begin
   if not FChartValid then
     Exit;
   { Koordinaten des Punktes }
-  case SBName of
+  case IntendedX of
     fpController: ChartPunktX := InputBuffer.Controller;
     fpWinkel: ChartPunktX := InputBuffer.Winkel;
     fpVorstag: ChartPunktX := InputBuffer.Vorstag;
@@ -505,14 +507,14 @@ begin
   Result := s;
 end;
 
-procedure TFormDiagramA.SetSBName(Value: TSBName);
+procedure TFormDiagramA.SetIntendedX(Value: TSBName);
 begin
-  if FSBName <> Value then
+  if FIntendedX <> Value then
   begin
-    FSBName := Value;
+    FIntendedX := Value;
     KurveValid := False;
   end;
-  if CursorSB = SBName then
+  if ActualX = IntendedX then
     ShowTriangle := True
   else
     ShowTriangle := False;
@@ -556,13 +558,13 @@ begin
     Rigg.ProofRequired := False;
 
     { Definitionsbereich bestimmen und Berechnungsschleife starten }
-    Anfang := Rigg.GSB.Find(SBName).Min;
-    Ende := Rigg.GSB.Find(SBName).Max;
+    Anfang := Rigg.GSB.Find(IntendedX).Min;
+    Ende := Rigg.GSB.Find(IntendedX).Max;
     for i := 0 to CPMax do
     begin
       Antrieb := Anfang + (Ende - Anfang) * i / CPMax;
       { Antrieb ansteuern }
-      case SBName of
+      case IntendedX of
         fpController: Rigg.RealGlied[fpController] := Antrieb;
         fpWinkel: Rigg.RealGlied[fpWinkel] := Antrieb * pi / 180;
         fpVorstag: Rigg.RealGlied[fpVorstag] := Antrieb;
@@ -766,7 +768,7 @@ var
 begin
   ii := XCombo.ItemIndex;
   sbn := XComboIndexToParam(ii);
-  SBName := sbn;
+  IntendedX := sbn;
 end;
 
 procedure TFormDiagramA.UpdateOnParamChanged;

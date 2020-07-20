@@ -33,7 +33,6 @@ type
 
 const
   ANr = 6;
-  SBMappingArray: TSBMappingArray = (0, 1, 1, 2, 3, 4, 5, 5, 6, 7);
 
 type
   ChartArray = array[0..ANr - 1] of TChartLineData;
@@ -79,12 +78,17 @@ type
   end;
 
   TRiggModulInput = class(TRiggModulBase)
+  private
+    function MatchesCurrentlyShown(SB: TScrollBar): Boolean;
+    function TagForSBName(Value: TSBName): Integer;
   protected
-    ShowTriangle: Boolean;
-    FCursorSB: TsbName;
+    FShowTriangle: Boolean;
+    FActualX: TsbName;
     FKurveValid: Boolean;
 
     MastGraph: TMastGraph;
+
+    procedure OriginalHandleScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
 
     procedure SetupGCtrl(a: TScrollBar; b: TsbName);
     procedure SetupGCtrls;
@@ -93,7 +97,6 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-
     procedure HandleScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
     procedure UpdateGControls;
   end;
@@ -170,10 +173,10 @@ type
     af: ChartArray;
     bf: array[0..ANr - 1] of double;
   protected
-    FSBName: TsbName;
+    FIntendedX: TsbName;
     FChartValid: Boolean;
     procedure SetKurveValid(Value: Boolean);
-    procedure SetSBName(Value: TSBName);
+    procedure SetIntendedX(Value: TSBName);
   public
     YComboBox: TComboBox;
     YComboSavedItemIndex: Integer;
@@ -199,9 +202,9 @@ type
     function GetYText(Text: string): string;
     function GetPunktColor: TColor;
 
-    property SBName: TSBName read FSBName write SetSBName;
     property KurveValid: Boolean read FKurveValid write SetKurveValid;
-    property CursorSB: TSBName read FCursorSB write FCursorSB;
+    property IntendedX: TSBName read FIntendedX write SetIntendedX;
+    property ActualX: TSBName read FActualX write FActualX;
   end;
 
   TRiggModul = class(TRiggModulDiagram)
@@ -389,13 +392,97 @@ end;
 procedure TRiggModulInput.HandleScroll(Sender: TObject;
   ScrollCode: TScrollCode; var ScrollPos: Integer);
 var
+  fp: TFederParam;
+begin
+  fp := fpVorstag;
+
+  if Sender = InputForm.sbController then
+  begin
+    fp := fpController;
+  end
+  else if Sender = InputForm.sbControllerD then
+  begin
+    fp := fpController;
+  end
+  else if Sender = InputForm.sbControllerOhne then
+  begin
+    fp := fpController;
+  end
+  else if Sender = InputForm.sbWinkel then
+  begin
+    if FWinkelBtnDown then
+    begin
+      fp := fpWinkel;
+    end
+    else
+    begin
+      fp := fpVorstag;
+    end
+  end
+  else if Sender = InputForm.sbVorstagD then
+  begin
+    fp := fpVorstag;
+  end
+  else if Sender = InputForm.sbVorstagOhne then
+  begin
+    fp := fpVorstag;
+  end
+  else if Sender = InputForm.sbWante then
+  begin
+    fp := fpWante;
+  end
+  else if Sender = InputForm.sbWanteD then
+  begin
+    fp := fpWante;
+  end
+  else if Sender = InputForm.sbWanteOhne then
+  begin
+    fp := fpWante;
+  end
+  else if Sender = InputForm.sbWoben then
+  begin
+    fp := fpWoben;
+  end
+  else if Sender = InputForm.sbWobenD then
+  begin
+    fp := fpWoben;
+  end
+  else if Sender = InputForm.sbSalingH then
+  begin
+    fp := fpSalingH;
+  end
+  else if Sender = InputForm.sbSalingA then
+  begin
+    fp := fpSalingA;
+  end
+  else if Sender = InputForm.sbSalingLD then
+  begin
+    fp := fpSalingL;
+  end
+  else if Sender = InputForm.sbVorstagOS then
+  begin
+    fp := fpVorstagOS;
+  end
+  else if Sender = InputForm.sbWPowerOS then
+  begin
+    fp := fpWPowerOS;
+  end;
+
+  RiggModul.DoOnWheelScroll(fp, ScrollPos);
+end;
+
+procedure TRiggModulInput.OriginalHandleScroll(Sender: TObject;
+  ScrollCode: TScrollCode; var ScrollPos: Integer);
+var
   InputRec: TTrimmControls;
+//  fp: TFederParam;
 begin
   Modified := True;
   InputRec := Rigg.Glieder;
 
   if Sender = InputForm.sbController then
   begin
+//    fp := fpController;
     InputRec.Controller := ScrollPos;
     InputForm.lbValue1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
     if not FControllerBtnDown then
@@ -403,6 +490,7 @@ begin
   end
   else if Sender = InputForm.sbControllerD then
   begin
+//    fp := fpController;
     InputRec.Controller := ScrollPos;
     InputForm.lbD1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
     if not FControllerBtnDown then
@@ -410,6 +498,7 @@ begin
   end
   else if Sender = InputForm.sbControllerOhne then
   begin
+//    fp := fpController;
     InputRec.Controller := ScrollPos;
     InputForm.lbOhne1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
     if not FControllerBtnDown then
@@ -419,72 +508,86 @@ begin
   begin
     if FWinkelBtnDown then
     begin
+//      fp := fpWinkel;
       InputRec.Winkel := ScrollPos;
       InputForm.lbValue2.Caption := Format('%5.2f Grad', [(InputRec.Winkel - MemCtrl.Winkel) / 10]);
     end
     else
     begin
+//      fp := fpVorstag;
       InputRec.Vorstag := ScrollPos;
       InputForm.lbValue2.Caption := Format('%d mm', [InputRec.Vorstag - MemCtrl.Vorstag]);
     end
   end
   else if Sender = InputForm.sbVorstagD then
   begin
+//    fp := fpVorstag;
     InputRec.Vorstag := ScrollPos;
     InputForm.lbD2.Caption := Format('%d mm', [InputRec.Vorstag - MemCtrl.Vorstag]);
   end
   else if Sender = InputForm.sbVorstagOhne then
   begin
+//    fp := fpVorstag;
     InputRec.Vorstag := ScrollPos;
     InputForm.lbOhne2.Caption := Format('%d mm', [InputRec.Vorstag - MemCtrl.Vorstag]);
   end
   else if Sender = InputForm.sbWante then
   begin
+//    fp := fpWante;
     InputRec.Wanten := ScrollPos;
     InputForm.lbValue3.Caption := Format('%d mm', [ScrollPos - MemCtrl.Wanten]);
   end
   else if Sender = InputForm.sbWanteD then
   begin
+//    fp := fpWante;
     InputRec.Wanten := ScrollPos;
     InputForm.lbD3.Caption := Format('%d mm', [ScrollPos - MemCtrl.Wanten]);
   end
   else if Sender = InputForm.sbWanteOhne then
   begin
+//    fp := fpWante;
     InputRec.Wanten := ScrollPos;
     InputForm.lbOhne3.Caption := Format('%d mm', [ScrollPos - MemCtrl.Wanten]);
   end
   else if Sender = InputForm.sbWoben then
   begin
+//    fp := fpWoben;
     InputRec.Woben := ScrollPos;
     InputForm.lbValue4.Caption := Format('%d mm', [ScrollPos - MemCtrl.Woben]);
   end
   else if Sender = InputForm.sbWobenD then
   begin
+//    fp := fpWoben;
     InputRec.Woben := ScrollPos;
     InputForm.lbD4.Caption := Format('%d mm', [ScrollPos - MemCtrl.Woben]);
   end
   else if Sender = InputForm.sbSalingH then
   begin
+//    fp := fpSalingH;
     InputRec.SalingH := ScrollPos;
     InputForm.lbValue5.Caption := Format('%d mm', [ScrollPos - MemCtrl.SalingH]);
   end
   else if Sender = InputForm.sbSalingA then
   begin
+//    fp := fpSalingA;
     InputRec.SalingA := ScrollPos;
     InputForm.lbValue6.Caption := Format('%d mm', [ScrollPos - MemCtrl.SalingA]);
   end
   else if Sender = InputForm.sbSalingLD then
   begin
+//    fp := fpSalingL;
     InputRec.SalingL := ScrollPos;
     InputForm.lbD5.Caption := Format('%d mm', [ScrollPos - MemCtrl.SalingL]);
   end
-  else if Sender = InputForm.sbVorstagOs then
+  else if Sender = InputForm.sbVorstagOS then
   begin
+//    fp := fpVorstagOS;
     InputRec.Vorstag := ScrollPos;
     InputForm.lbValue7.Caption := Format('%d mm', [ScrollPos - MemCtrl.Vorstag])
   end
   else if Sender = InputForm.sbWPowerOS then
   begin
+//    fp := fpWPowerOS;
     InputRec.WPowerOS := ScrollPos;
     InputForm.lbValue8.Caption := Format('%d N', [ScrollPos - MemCtrl.WPowerOS]);
     FNeedPaint := False;
@@ -492,17 +595,40 @@ begin
 
   if (ScrollCode = TScrollCode.scEndScroll) or not SofortBerechnen then
   begin
-    if (Sender as TScrollbar).Tag = SBMappingArray[FCursorSB] then
-      ShowTriangle := True
+    if MatchesCurrentlyShown(Sender as TScrollbar) then
+      FShowTriangle := True
     else
     begin
-      ShowTriangle := False;
-      FKurveValid := False;
+      FShowTriangle := False;
+      FKurveValid := False; // <-- should be assignment to property with setter called
     end;
+    InputBuffer := InputRec;
+    Rigg.Glieder := InputRec;
+    UpdateGetriebe;
   end;
-  InputBuffer := InputRec;
-  Rigg.Glieder := InputRec;
-  UpdateGetriebe;
+end;
+
+function TRiggModulInput.MatchesCurrentlyShown(SB: TScrollBar): Boolean;
+begin
+  result := SB.Tag = TagForSBName(FActualX);
+end;
+
+function TRiggModulInput.TagForSBName(Value: TSBName): Integer;
+begin
+  { SBMappingArray: TSBMappingArray = (0, 1, 1, 2, 3, 4, 5, 5, 6, 7); }
+  case Value of
+    fpController: result := 0;
+    fpWinkel: result := 1;
+    fpVorstag: result := 1;
+    fpWante: result := 2;
+    fpWoben: result := 3;
+    fpSalingH: result := 4;
+    fpSalingA: result := 5;
+    fpSalingL: result := 5;
+    fpVorstagOS: result := 6;
+    fpWPowerOS: result := 7;
+    else result := 1;
+  end;
 end;
 
 procedure TRiggModul.DoGraphics;
@@ -858,9 +984,9 @@ begin
     Rigg.UpdateGSB;
     SetupGCtrls;
     if Value and InputForm.rbWinkel.Checked then
-      SBName := fpWinkel
+      IntendedX := fpWinkel
     else if not Value and InputForm.rbWinkel.Checked then
-      SBName := fpVorstag;
+      IntendedX := fpVorstag;
     KurveValid := False;
     UpdateGetriebe;
     ViewModelM.WinkelDown := FWinkelBtnDown;
@@ -1022,11 +1148,11 @@ begin
 
   KurveValid := False;
   if InputForm.rbControllerOhne.Checked then
-    SBName := fpController
+    IntendedX := fpController
   else if InputForm.rbVorstagOhne.Checked then
-    SBName := fpVorstag
+    IntendedX := fpVorstag
   else if InputForm.rbWanteOhne.Checked then
-    SBName := fpWante;
+    IntendedX := fpWante;
 
   UpdateGetriebe;
   Rigg.UpdateGSB;
@@ -1049,15 +1175,15 @@ begin
 
   KurveValid := False;
   if InputForm.rbControllerD.Checked then
-    SBName := fpController
+    IntendedX := fpController
   else if InputForm.rbVorstagD.Checked then
-    SBName := fpVorstag
+    IntendedX := fpVorstag
   else if InputForm.rbWanteD.Checked then
-    SBName := fpWante
+    IntendedX := fpWante
   else if InputForm.rbWobenD.Checked then
-    SBName := fpWoben
+    IntendedX := fpWoben
   else if InputForm.rbSalingLD.Checked then
-    SBName := fpSalingL;
+    IntendedX := fpSalingL;
 
   UpdateGetriebe;
   Rigg.UpdateGSB;
@@ -1078,19 +1204,19 @@ begin
 
   KurveValid := False;
   if InputForm.rbController.Checked then
-    SBName := fpController
+    IntendedX := fpController
   else if InputForm.rbWinkel.Checked and WinkelBtnDown then
-    SBName := fpWinkel
+    IntendedX := fpWinkel
   else if InputForm.rbWinkel.Checked and not WinkelBtnDown then
-    SBName := fpVorstag
+    IntendedX := fpVorstag
   else if InputForm.rbWante.Checked then
-    SBName := fpWante
+    IntendedX := fpWante
   else if InputForm.rbWoben.Checked then
-    SBName := fpWoben
+    IntendedX := fpWoben
   else if InputForm.rbSalingH.Checked then
-    SBName := fpSalingH
+    IntendedX := fpSalingH
   else if InputForm.rbSalingA.Checked then
-    SBName := fpSalingA;
+    IntendedX := fpSalingA;
 
   UpdateGetriebe;
   Rigg.UpdateGSB;
@@ -1110,7 +1236,7 @@ begin
   SalingTyp := stOhneStarr;
   ControllerBtnDown := False;
   KurveValid := False;
-  SBName := fpVorstag;
+  IntendedX := fpVorstag;
 
   UpdateGetriebe;
   Rigg.UpdateGSB;
@@ -1146,13 +1272,13 @@ begin
     Rigg.ProofRequired := False;
 
     { Definitionsbereich bestimmen und Berechnungsschleife starten }
-    Anfang := Rigg.GSB.Find(SBName).Min;
-    Ende := Rigg.GSB.Find(SBName).Max;
+    Anfang := Rigg.GSB.Find(IntendedX).Min;
+    Ende := Rigg.GSB.Find(IntendedX).Max;
     for i := 0 to CPMax do
     begin
       Antrieb := Anfang + (Ende - Anfang) * i / CPMax;
       { Antrieb ansteuern }
-      case SBName of
+      case IntendedX of
         fpController: Rigg.RealGlied[fpController] := Antrieb;
         fpWinkel: Rigg.RealGlied[fpWinkel] := Antrieb * pi / 180;
         fpVorstag: Rigg.RealGlied[fpVorstag] := Antrieb;
@@ -1317,7 +1443,7 @@ begin
 {$endif}
     end;
     f := af[i];
-    case SBName of
+    case IntendedX of
       fpController: ChartPunktX := InputBuffer.Controller;
       fpWinkel: ChartPunktX := InputBuffer.Winkel;
       fpVorstag: ChartPunktX := InputBuffer.Vorstag;
@@ -1439,7 +1565,7 @@ begin
       c.Brush.Style := bsSolid;
       c.Ellipse(P.X - RadiusX, P.Y - RadiusY, P.X + RadiusX, P.Y + RadiusY);
     end
-    else if ShowTriangle then
+    else if FShowTriangle then
     begin
       { Positionsdreieck X }
       c.Pen.Color := clBlack;
@@ -1511,7 +1637,7 @@ begin
   if not FChartValid then
     Exit;
   { Koordinaten des Punktes }
-  case SBName of
+  case IntendedX of
     fpController: ChartPunktX := InputBuffer.Controller;
     fpWinkel: ChartPunktX := InputBuffer.Winkel;
     fpVorstag: ChartPunktX := InputBuffer.Vorstag;
@@ -1611,17 +1737,17 @@ begin
   Result := s;
 end;
 
-procedure TRiggModulDiagram.SetSBName(Value: TSBName);
+procedure TRiggModulDiagram.SetIntendedX(Value: TSBName);
 begin
-  if FSBName <> Value then
+  if FIntendedX <> Value then
   begin
-    FSBName := Value;
+    FIntendedX := Value;
     KurveValid := False;
   end;
-  if CursorSB = SBName then
-    ShowTriangle := True
+  if ActualX = IntendedX then
+    FShowTriangle := True
   else
-    ShowTriangle := False;
+    FShowTriangle := False;
   if OutputForm.OutputPages.ActivePage = OutputForm.ChartSheet then
     DrawChart;
 end;
@@ -1648,11 +1774,11 @@ procedure TRiggModulDiagram.KurveBtnClick;
 var
   cr: TRggSB;
 begin
-  BottomTitel := GetXText(SBName);
-  cr := Rigg.GSB.Find(SBName);
+  BottomTitel := GetXText(IntendedX);
+  cr := Rigg.GSB.Find(IntendedX);
   Xmin := cr.Min;
   Xmax := cr.Max;
-  CursorSB := SBName;
+  ActualX := IntendedX;
   GetCurves;
 end;
 
@@ -1767,7 +1893,7 @@ begin
         FNeedPaint := False;
     end;
 
-    fpVorstag, fpWinkel:
+    fpVorstag, fpWinkel, fpVorstagOS:
     begin
       ls := Format('%d mm', [ScrollPos - MemCtrl.Vorstag]);
       case SalingTyp of
@@ -1892,19 +2018,17 @@ begin
 
   end;
 
-  // if not SofortBerechnen then
+  if t = TagForSBName(FActualX) then
+    FShowTriangle := True
+  else
   begin
-    if t = SBMappingArray[CursorSB] then
-      ShowTriangle := True
-    else
-    begin
-      ShowTriangle := False;
-      KurveValid := False;
-    end;
-    InputBuffer := InputRec;
-    Rigg.Glieder := InputRec;
-    UpdateGetriebe;
+    FShowTriangle := False;
+    KurveValid := False;
   end;
+
+  InputBuffer := InputRec;
+  Rigg.Glieder := InputRec;
+  UpdateGetriebe;
 end;
 
 procedure TRiggModulDiagram.DoUpdateChartBuffer;
@@ -2049,8 +2173,8 @@ begin
   inherited;
   FKurveValid := False;
   FChartValid := False;
-  FSBName := fpVorstag;
-  FCursorSB := fpVorstag;
+  FIntendedX := fpVorstag;
+  FActualX := fpVorstag;
 
   ChartPaintBox := OutputForm.ChartPaintBox;
   YComboBox := OutputForm.YComboBox;
@@ -2075,6 +2199,7 @@ end;
 
 constructor TRiggModulBase.Create;
 begin
+//  FBackgroundColor := TColor($333333);
   FBackgroundColor := clBtnFace;
 
   FSalingTyp := stFest;
