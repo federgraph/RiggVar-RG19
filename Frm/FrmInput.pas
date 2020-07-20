@@ -165,7 +165,7 @@ begin
   else
     SBName := fpVorstag;
 
-  RiggModul.SBName := SBName;
+  RiggModul.IntendedX := SBName;
 end;
 
 procedure TInputForm.rbWinkelMouseDown(Sender: TObject;
