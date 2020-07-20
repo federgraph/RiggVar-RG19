@@ -107,13 +107,6 @@ end;
 
 procedure TOutputForm.cbFollowPointClick(Sender: TObject);
 begin
-  (*
-  if cbFollowPoint.Checked <> cbFollowPoint2.Checked then begin
-    if Sender = cbFollowPoint then cbFollowPoint2.Checked := cbFollowPoint.Checked;
-    if Sender = cbFollowPoint2 then cbFollowPoint.Checked := cbFollowPoint2.Checked;
-    DrawPoint;
-  end;
-  *)
   RiggModul.DrawPoint;
 end;
 
