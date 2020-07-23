@@ -91,21 +91,21 @@ begin
     ZugMast[3].x := xF;
     ZugMast[3].y := -yF;
 
-    { WanteStb }
-    ZugWanteStb[0].x := xA0;
-    ZugWanteStb[0].y := -yA0;
-    ZugWanteStb[1].x := xA;
-    ZugWanteStb[1].y := -yA;
-    ZugWanteStb[2].x := xC;
-    ZugWanteStb[2].y := -yC;
-
     { WanteBb }
-    ZugWanteBb[0].x := xB0;
-    ZugWanteBb[0].y := -yB0;
-    ZugWanteBb[1].x := xB;
-    ZugWanteBb[1].y := -yB;
+    ZugWanteBb[0].x := xA0;
+    ZugWanteBb[0].y := -yA0;
+    ZugWanteBb[1].x := xA;
+    ZugWanteBb[1].y := -yA;
     ZugWanteBb[2].x := xC;
     ZugWanteBb[2].y := -yC;
+
+    { WanteStb }
+    ZugWanteStb[0].x := xB0;
+    ZugWanteStb[0].y := -yB0;
+    ZugWanteStb[1].x := xB;
+    ZugWanteStb[1].y := -yB;
+    ZugWanteStb[2].x := xC;
+    ZugWanteStb[2].y := -yC;
 
     { SalingFS }
     ZugSalingFS[0].x := xA;
@@ -214,18 +214,6 @@ begin
       PolyLine(ZugController);
     end;
 
-    { Wante Stb }
-    if Props.Coloriert then
-    begin
-      if Props.Gestrichelt then
-        Pen.Color := TRggColors.Antiquewhite
-      else
-        Pen.Color := clGreen;
-    end
-    else
-      Pen.Color := Props.Color;
-    PolyLine(ZugWanteStb);
-
     { Wante Bb }
     if Props.Coloriert then
     begin
@@ -237,6 +225,18 @@ begin
     else
       Pen.Color := Props.Color;
     PolyLine(ZugWanteBb);
+
+    { Wante Stb }
+    if Props.Coloriert then
+    begin
+      if Props.Gestrichelt then
+        Pen.Color := TRggColors.Antiquewhite
+      else
+        Pen.Color := clGreen;
+    end
+    else
+      Pen.Color := Props.Color;
+    PolyLine(ZugWanteStb);
 
     { Vorstag }
     if Props.Coloriert then
