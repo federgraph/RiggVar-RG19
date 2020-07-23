@@ -299,8 +299,8 @@ begin
   FZoomBase := 0.05;
   FViewPoint := vp3D;
   FFixPoint := ooD0;
-  FXPos := Round(-100 * FScale);
-  FYPos := 0;
+  FXPos := Round(-150 * FScale);
+  FYPos := -50;
 
   Image.OnMouseDown := PaintBox3DMouseDown;
   Image.OnMouseMove := PaintBox3DMouseMove;
