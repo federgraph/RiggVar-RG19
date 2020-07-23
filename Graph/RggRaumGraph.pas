@@ -366,15 +366,15 @@ begin
     if WantWante then
     begin
       { Wante Stb }
-      DI.StrokeColor := clRed;
+      DI.StrokeColor := clGreen;
       DI.StrokeWidth := StrokeWidthS;
-      DL.Line('A0-A', deA0A, A0, A, ZugWanteStb[0], ZugWanteStb[1], clRed);
+      DL.Line('A0-A', deA0A, A0, A, ZugWanteStb[0], ZugWanteStb[1], clGreen);
       DL.Line('A-C', deAC, A, C, ZugWanteStb[1], ZugWanteStb[2], clLime);
 
       { Wante Bb }
-      DI.StrokeColor := clGreen;
+      DI.StrokeColor := clRed;
       DI.StrokeWidth := StrokeWidthS;
-      DL.Line('B0-B', deB0B, B0, B, ZugWanteBb[0], ZugWanteBb[1], clGreen);
+      DL.Line('B0-B', deB0B, B0, B, ZugWanteBb[0], ZugWanteBb[1], clRed);
       DL.Line('B-C', deBC, B, C, ZugWanteBb[1], ZugWanteBb[2], clLime);
     end;
 

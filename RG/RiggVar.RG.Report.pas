@@ -323,10 +323,10 @@ begin
 
   Include(rs, rgAusgabe);
   Include(rs, rgAusgabeRL);
-  Include(rs, rgAusgabeRP);
+//  Include(rs, rgAusgabeRP);
 //  Include(rs, rgAusgabeRLE);
 //  Include(rs, rgAusgabeRPE);
-  Include(rs, rgAusgabeDiffL);
+//  Include(rs, rgAusgabeDiffL);
 //  Include(rs, rgAusgabeDiffP);
 
   //Include(rs, rgXML);

@@ -277,6 +277,7 @@ type
     property Visible: Boolean read FVisible write SetVisible;
 
     property Korrigiert: Boolean read FKorrigiert write SetKorrigiert;
+    property SofortBerechnenNoChange: Boolean read FSofortBerechnen write FSofortBerechnen;
     property SofortBerechnen: Boolean read FSofortBerechnen write SetSofortBerechnen;
     property BtnGrauDown: Boolean read FBtnGrauDown write SetBtnGrauDown;
     property BtnBlauDown: Boolean read FBtnBlauDown write SetBtnBlauDown;
