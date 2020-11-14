@@ -23,9 +23,9 @@ interface
 {$endif}
 
 uses
-  System.SysUtils,
-  System.Classes,
-  System.UITypes,
+  SysUtils,
+  Classes,
+  UITypes,
   RiggVar.FB.ActionConst,
   RiggVar.FB.ActionName,
   RiggVar.FB.Action;

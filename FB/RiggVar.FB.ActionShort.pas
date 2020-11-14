@@ -19,7 +19,7 @@
 interface
 
 uses
-  System.SysUtils,
+  SysUtils,
   RiggVar.FB.ActionConst;
 
 function GetFederActionShort(fa: TFederAction): string;
@@ -107,17 +107,18 @@ begin
     faViewpoint3: result := 'vp3';
 
     faShowMemo: result := 'FM';
-    faShowActi: result := 'FA';
-    faShowOpti: result := 'FO';
-    faShowConf: result := 'FC';
+    faShowActions: result := 'FA';
+    faShowOptions: result := 'FO';
+    faShowDrawings: result := 'FD';
+    faShowConfig: result := 'FC';
     faShowTrimmTab: result := 'TT';
-
-    faShowForce: result := 'FF';
     faShowKreis: result := 'FK';
     faShowInfo: result := 'FI';
     faShowSplash: result := 'FS';
-    faShowDetail: result := 'FD';
-    faShowTabelle: result := 'FT';
+
+    faShowForce: result := 'sF';
+    faShowDetail: result := 'sD';
+    faShowTabelle: result := 'sT';
     faShowSaling: result := 'sS';
     faShowController: result := 'sC';
 
@@ -126,7 +127,7 @@ begin
     faShowDiagE: result := 'DE';
     faShowDiagQ: result := 'DQ';
 
-    faShowChart: result := 'CF'; // old ChartForm
+    faShowChart: result := 'CF';
     faShowText: result := 'TA';
 
     faWheelLeft: result := 'wl';
@@ -162,10 +163,10 @@ begin
     faTouchPhone: result := 'pho';
     faTouchDesk: result := 'dsk';
 
-    faButtonFrameReport: result := 'bfr';
+    faToggleButtonReport: result := 'bfr';
 
-    faMemeToggleHelp: result := 'h';
-    faMemeToggleReport: result := 'r';
+    faToggleHelp: result := 'h';
+    faToggleReport: result := 'r';
 
     faMemeGotoLandscape: result := '[L]';
     faMemeGotoSquare: result := '[S]';
@@ -226,9 +227,9 @@ begin
     faReportDebugReport: result := '~';
     faReportReadme: result := '~R';
 
-    faToggleSandboxed: result := 'SB';
-    faToggleAllProps: result := 'ATP';
-    faToggleAllTags: result := 'AXT';
+    faToggleSandboxed: result := 'SX';
+    faToggleAllProps: result := 'AP';
+    faToggleAllTags: result := 'AT';
 
     faToggleLineColor: result := 'LC';
 
@@ -262,7 +263,7 @@ begin
     faMemoryRecallBtn: result := 'MR';
 
     faKorrigiertItem: result := 'KI';
-    faSofortBtn: result := 'SF';
+    faSofortBtn: result := 'SB';
     faGrauBtn: result := 'GB';
     faBlauBtn: result := 'BB';
     faMultiBtn: result := 'MB';
@@ -350,20 +351,49 @@ begin
     faParamRZ: result := 'rz';
     faParamCZ: result := 'cz';
 
-    faBlackText: result := 'btx';
-    faGrayText: result := 'gtx';
-    faWhiteText: result := 'wtx';
-
     faParamAPW: result := 'APW';
     faParamEAH: result := 'EAH';
     faParamEAR: result := 'EAR';
     faParamEI: result := 'EI';
 
-    faParamT1: result := 't1';
-    faParamT2: result := 't2';
-    faParamT3: result := 't3';
-    faParamT4: result := 't4';
+    faRotaForm1: result := 'RF1';
+    faRotaForm2: result := 'RF2';
+    faRotaForm3: result := 'RF3';
 
+    faReset: result := 'res';
+    faResetPosition: result := 'rpo';
+    faResetRotation: result := 'rro';
+    faResetZoom: result := 'rzo';
+
+    faToggleLanguage: result := 'lan';
+
+    faToggleDropTarget: result := 'tdt';
+
+    faSave: result := 'sav';
+    faLoad: result := 'loa';
+    faOpen: result := 'ope';
+    faCopy: result := '^c';
+    faPaste: result := '^v';
+    faShare: result := 'sha';
+
+    faToggleMoveMode: result := 'mm';
+    faLinearMove: result := 'lmm';
+    faExpoMove: result := 'emm';
+
+    faToggleViewType: result := 'vt';
+    faViewTypeOrtho: result := 'vto';
+    faViewTypePerspective: result := 'vtp';
+
+    faHullMesh: result := 'hm';
+    faHullMeshOn: result := 'hm1';
+    faHullMeshOff: result := 'hm0';
+
+    faShowHelpText: result := 'sh';
+    faShowInfoText: result := 'si';
+    faShowNormalKeyInfo: result := 'nki';
+    faShowSpecialKeyInfo: result := 'ski';
+    faShowDebugInfo: result := 'sdi';
+    faShowZOrderInfo: result := 'zoi';
   end;
 end;
 

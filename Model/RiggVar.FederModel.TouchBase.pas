@@ -349,8 +349,8 @@ begin
   FShape.Left := Left;
   FShape.Top := Top;
 
-  FText.Left := Left + Round(10 * Main.Scale);
-  FText.Top := Top + Round(10 * Main.Scale);
+  FText.Left := Left + Round(10 * MainVar.Scale);
+  FText.Top := Top + Round(10 * MainVar.Scale);
 end;
 
 { TCornerMenu }
@@ -518,8 +518,8 @@ begin
     Top := Round(V * MainVar.ScaledRaster);
 
   { Corner buttons }
-  FShape.Left := Left + Round(Main.Scale * 2);
-  FShape.Top := Top + Round(Main.Scale * 2);
+  FShape.Left := Left + Round(MainVar.Scale * 2);
+  FShape.Top := Top + Round(MainVar.Scale * 2);
 
   FText.Left := Left + Round(MainVar.Scale * 10);
   FText.Top := Top + Round(MainVar.Scale * 20);
@@ -528,10 +528,10 @@ end;
 procedure TTouchBtn.UpdatePosition;
 begin
   { Touchbars between Corner buttons }
-  Shape.Left := Left + Round(Main.Scale * 2);
-  Shape.Top := Top + Round(Main.Scale * 2);
-  Shape.Width := Width - Round(Main.Scale * 5); // 5 = (2 + 2 - 1)
-  Shape.Height := Height - Round(Main.Scale * 5);
+  Shape.Left := Left + Round(MainVar.Scale * 2);
+  Shape.Top := Top + Round(MainVar.Scale * 2);
+  Shape.Width := Width - Round(MainVar.Scale * 5); // 5 = (2 + 2 - 1)
+  Shape.Height := Height - Round(MainVar.Scale * 5);
 end;
 
 { TFederTouchBase }

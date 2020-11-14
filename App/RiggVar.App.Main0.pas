@@ -70,7 +70,6 @@ type
     ActionTest: TActionTest;
     FederBinding: TFederBinding;
 
-    Scale: single;
     IsRetina: Boolean;
 
     constructor Create;
@@ -90,10 +89,6 @@ type
     procedure CycleColorSchemeM; virtual;
     procedure CycleColorSchemeP; virtual;
     procedure ToggleDarkMode;
-
-    procedure BlackText;
-    procedure GrayText;
-    procedure WhiteText;
 
     procedure InitTouch;
     procedure UpdateTouch;
@@ -132,8 +127,7 @@ uses
 constructor TMain0.Create;
 begin
   inherited;
-  Scale := MainVar.Scale;
-  IsRetina := Scale > 1;
+  IsRetina := MainVar.Scale > 1;
 
   ActionGroupList := TActionGroupList.Create;
   ActionTest := TActionTest.Create;
@@ -168,24 +162,6 @@ begin
   FederBinding.Free;
 
   inherited;
-end;
-
-procedure TMain0.BlackText;
-begin
-  MainVar.ColorScheme.BlackText;
-  FederText.UpdateColorScheme;
-end;
-
-procedure TMain0.WhiteText;
-begin
-  MainVar.ColorScheme.WhiteText;
-  FederText.UpdateColorScheme;
-end;
-
-procedure TMain0.GrayText;
-begin
-  MainVar.ColorScheme.GrayText;
-  FederText.UpdateColorScheme;
 end;
 
 procedure TMain0.InitFederText(ft: TFederTouch0);
@@ -282,9 +258,6 @@ begin
   begin
     MainVar.ColorScheme.Scheme := Value;
     MainVar.ColorScheme.Init(Value);
-//    if MainVar.ColorScheme.claBackground = claNull then
-//      BlackText;
-    FormMain.UpdateBackgroundColor(MainVar.ColorScheme.claBackground);
     FederText.UpdateColorScheme;
   end;
 
@@ -331,8 +304,8 @@ begin
   i := ColorScheme;
   Dec(i);
   if (i < 1) then
-    i := ColorSchemeCount;
-  if i > ColorSchemeCount then
+    i := MainConst.ColorSchemeCount;
+  if i > MainConst.ColorSchemeCount then
     i := 1;
 
   MainVar.ColorScheme.SchemeDefault := i;
@@ -350,8 +323,8 @@ begin
   i := ColorScheme;
   Inc(i);
   if (i < 1) then
-    i := ColorSchemeCount;
-  if i > ColorSchemeCount then
+    i := MainConst.ColorSchemeCount;
+  if i > MainConst.ColorSchemeCount then
     i := 1;
 
   MainVar.ColorScheme.SchemeDefault := i;
@@ -419,8 +392,8 @@ begin
     Exit;
 
   case fa of
-    faMemeToggleReport: result := F.ReportText.Visible;
-    faButtonFrameReport: result := F.WantButtonFrameReport;
+    faToggleReport: result := F.ReportText.Visible;
+    faToggleButtonReport: result := F.WantButtonReport;
     faChartRect..faChartReset: result := F.ChartGraph.GetChecked(fa);
     faReportNone..faReportReadme: result := F.ReportManager.GetChecked(fa);
 

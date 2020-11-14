@@ -89,7 +89,7 @@ type
 //    WPowerOS
 //    );
 
-  TsbParam = (Ist, Min, Max, TinyStep, BigStep);
+  TsbParam = (IstValue, MinValue, MaxValue, TinyStep, BigStep);
 //  TsbArray = array [TsbName, TsbParam] of Integer;
   TsbLabelArray = array [TsbName] of string;
   TTabellenTyp = (itKonstante, itGerade, itParabel, itBezier);
@@ -120,6 +120,7 @@ type
 
   TKoord = (x, y, z);
   TRealPoint = array [TKoord] of double;
+
   TKoordLine = array [0 .. 100] of TRealPoint;
   TIntPoint = array [TKoord] of double;
 
@@ -143,12 +144,12 @@ type
     );
 
   TIntRiggPoints = array [TRiggPoint] of TIntPoint;
-  TRealRiggPoints = array [TRiggPoint] of TRealPoint;
+  TRiggPoints = array [TRiggPoint] of TRealPoint;
   TMastKurve = array [0..BogenMax] of TRealPoint;
-  TRggPolyLine = array of TPoint;
+  TZugPolyLine = array of TPoint;
 
-  TRiggLvektor = array [0 .. 19] of double;
   TRiggLIndexRange = 0 .. 19;
+  TRiggLvektor = array [0 .. 19] of double;
 
   TTrimm = record
     Mastfall: Integer;

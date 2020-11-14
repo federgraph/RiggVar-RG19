@@ -169,7 +169,7 @@ begin
   rP[ooD, z] := rP[ooD0, z] + FrMastUnten * sin(FrPsi - FrAlpha);
 
   { Berechnung Punkt C }
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := FrWoben2D;
@@ -185,9 +185,6 @@ begin
 end;
 
 procedure TGetriebeFS.Rest;
-//var
-//  i: TRiggPoint;
-//  j: TKoord;
 begin
   { Berechnung Punkt ooE }
   rP[ooE, x] := rP[ooE0, x] - FrController;
@@ -195,17 +192,8 @@ begin
   rP[ooE, z] := rP[ooE0, z];
 
   { Berechnung Punkt ooF, ooM }
-  BerechneF; { virtuelle Methode }
+  BerechneF; { virtual }
   BerechneM;
-
-  { zweite Hälfte von iP füllen }
-//  for i := ooA to ooP do
-//  begin
-//    for j := x to z do
-//    begin
-//      iP[i, j] := rP[i, j];
-//    end;
-//  end;
 end;
 
 procedure TGetriebeFS.BerechneF;
@@ -248,7 +236,7 @@ var
     rP[ooD, y] := 0;
     rP[ooD, z] := rP[ooD0, z] + FrMastUnten * sin(psi - FrAlpha);
 
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       Radius1 := FrWunten2D;
@@ -258,7 +246,7 @@ var
       rP[ooP] := SchnittPunkt1;
     end;
 
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       Radius1 := FrWoben2D;
@@ -277,7 +265,7 @@ begin
   { 1. Startwinkel ermitteln }
   { Durchbiegung Null, Mast gerade,
     linke Totlage für Winkel psi im Viergelenk D0 D C C0 }
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := FrMastUnten + FrMastOben;
@@ -296,7 +284,7 @@ begin
   rP[ooD, x] := rP[ooD0, x] + FrMastUnten * cos(FrPsi - FrAlpha);
   rP[ooD, y] := 0;
   rP[ooD, z] := rP[ooD0, z] + FrMastUnten * sin(FrPsi - FrAlpha);
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := FrSalingH;
@@ -330,7 +318,7 @@ begin
 
     { 2. Endwinkel ermitteln - Mastoben parallel zu Vorstag
       rechte Totlage für Winkel psi im Viergelenk D0 D C C0 }
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       Radius1 := FrMastUnten;
@@ -401,13 +389,13 @@ var
   i: Integer;
   phiA, phiE, phiM, psiM, WinkelStep: double;
   ooTemp: TRealPoint;
-  oooTemp: TRealRiggPoints;
+  oooTemp: TRiggPoints;
 begin
   oooTemp := rP; { aktuelle Koordinaten sichern }
   Wanten3dTo2d;
 
   { 1. Startwinkel }
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := FrWunten2D + FrSalingH;
@@ -420,7 +408,7 @@ begin
   phiA := phiA + pi / 2 + FrAlpha;
 
   { 2. Endwinkel }
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := FrWunten2D;
@@ -429,7 +417,7 @@ begin
     MittelPunkt2 := rP[ooD0];
     ooTemp := SchnittPunkt1;
   end;
-  if SchnittKK.Status = bmK1inK2 then
+  if SKK.Status = bmK1inK2 then
     phiE := FrAlpha + 130 * pi / 180
   else
   begin
@@ -450,7 +438,7 @@ begin
     rP[ooD, x] := rP[ooD0, x] + FrMastUnten * cos(psiM - FrAlpha);
     rP[ooD, z] := rP[ooD0, z] + FrMastUnten * sin(psiM - FrAlpha);
     { Berechnung Punkt C }
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       Radius1 := FrWoben2D;
@@ -481,7 +469,7 @@ procedure TGetriebeFS.MakeSalingHBiggerFS(SalingHplus: double);
 begin
   FrSalingH := SalingHplus;
 
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := FrSalingH; { neuer Wert }
@@ -525,7 +513,7 @@ var
     rP[ooD, z] := rP[ooD0, z] + FrMastUnten * sin(psi - FrAlpha);
 
     { 2. Berechnung Punkt C }
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       Radius1 := FrMastOben;
@@ -543,7 +531,7 @@ var
     TempD := Null;
     TempD[x] := Basis;
     { Berechnung TempC }
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       Radius1 := WStrich;
@@ -553,7 +541,7 @@ var
       TempC := SchnittPunkt1;
     end;
     { Berechnung TempA }
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       Radius1 := FrWunten3D;
@@ -570,7 +558,7 @@ begin
 
   { Vorstag gegeben, Winkel numerisch ermitteln! }
   { Startwinkel }
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := FrMastUnten;
@@ -583,7 +571,7 @@ begin
   psiStart := psiStart + pi / 2 + FrAlpha + 0.1 * pi / 180;
 
   { Endwinkel }
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := FrMastUnten + FrMastOben;
@@ -699,7 +687,7 @@ begin
   TempD := Null;
   TempD[x] := Basis;
   { Berechnung TempC }
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := WStrich;
@@ -709,7 +697,7 @@ begin
     TempC := SchnittPunkt1; { bleibt beim Regeln unverändert }
   end;
   { Berechnung TempA }
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := FrSalingL; { verändert sich beim Regeln }
@@ -759,7 +747,7 @@ var
 begin
   ResetStatus;
   { Berechnung Punkt C }
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := FrMastUnten + FrMastOben;
@@ -812,7 +800,7 @@ begin
   TempWunten2d := TempW * Skalar;
   TempWoben2d := TempW * (1 - Skalar);
   { Berechnung Punkt C }
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := TempWunten2d + TempWoben2d;
@@ -826,7 +814,7 @@ begin
   if Abstand(rP[ooD0], rP[ooC]) > FrMastUnten + FrMastOben then
   begin
     { Punkt C }
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       Radius1 := FrMastUnten + FrMastOben;
@@ -856,7 +844,7 @@ begin
   begin
     { Punkt C oben schon berechnet }
     { Punkt D }
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       Radius1 := FrMastOben;
@@ -922,7 +910,7 @@ var
 begin
   result := 0;
   try
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
 
@@ -1082,7 +1070,7 @@ begin
   { compute new Point F }
 
   newF0F := Mastfall + FrMastfallVorlauf;
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := newF0F;
@@ -1155,7 +1143,7 @@ begin
   KorrekturF(Biegung, k1, k2, k3, tempBeta, tempGamma); { virtuelle Methode }
 
   { 2. Berechnung Punkt F mit Mastfall }
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := Mastfall + FrMastfallVorlauf;
@@ -1241,7 +1229,7 @@ begin
   tempAlpha := arctan2(Biegung, k1);
 
   { Punkt C }
-  with SchnittKK do
+  with SKK do
   begin
     SchnittEbene := seXZ;
     Radius1 := MastfallC;

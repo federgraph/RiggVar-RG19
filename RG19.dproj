@@ -164,7 +164,7 @@
         <DCCReference Include="Graph\RggDisplay.pas"/>
         <DCCReference Include="Graph\RggPolarKar.pas"/>
         <DCCReference Include="Graph\RggRota.pas"/>
-        <DCCReference Include="Graph\RggTestData.pas"/>
+        <DCCReference Include="Core\RggTestData.pas"/>
         <DCCReference Include="Graph\RggBootGraph.pas"/>
         <DCCReference Include="Graph\RggGraph.pas"/>
         <DCCReference Include="Graph\RggRaumGraph.pas"/>

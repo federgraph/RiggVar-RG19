@@ -82,7 +82,7 @@ type
     FiControllerAnschlag: Integer;
     FiReserved: Integer;
     { Rumpf: Koordinaten in mm }
-    iP: TRealRiggPoints; { Array enthält auch die Riggkoordinaten }
+    iP: TRiggPoints; { Array enthält auch die Riggkoordinaten }
     { Festigkeitswerte }
     rEA: TRiggLvektor; { N }
     EI: double; { Nmm^2 }
@@ -113,6 +113,7 @@ type
 implementation
 
 uses
+  RiggVar.App.Main,
   RiggVar.RG.Def,
   RiggVar.FB.Classes;
 
@@ -135,7 +136,15 @@ end;
 
 procedure TRggDocument.SaveToFile(FileName: string);
 begin
+  { The intention is to never call this method in FR38!
+    But please double check again, convince yourself,
+    with Ctrl-Shift-Enter on 'SaveToFile'. }
+  if not MainConst.MustBeSandboxed then
+  begin
+    { This is how it used to be. }
   WriteToIniFile(FileName);
+    { How should that be done in the future, if at all? }
+  end;
 end;
 
 procedure TRggDocument.LoadFromIniFile(FileName: string);
@@ -506,8 +515,6 @@ begin
   GSB.SalingL.Ist := Round(sqrt(sqr(GSB.SalingH.Ist) + sqr(GSB.SalingA.Ist / 2)));
   GSB.VorstagOS.Ist := GSB.Vorstag.Ist;
   GSB.WPowerOS.Ist := 1000; { angenommene Wantenspannung 3d }
-  GSB.T1.Ist := 650;
-  GSB.T2.Ist := 150;
 
   GSB.InitStepDefault;
 
@@ -534,10 +541,6 @@ begin
   GSB.VorstagOS.Max := 4700;
   GSB.WPowerOS.Min := 100;
   GSB.WPowerOS.Max := 3000;
-  GSB.T1.Min := 0;
-  GSB.T1.Max := 800;
-  GSB.T2.Min := 1;
-  GSB.T2.Max := 800;
 
   { TrimmTab.TrimmTabDaten := DefaultTrimmTabDaten; } { siehe RggTypes }
   with TrimmTabDaten do
@@ -643,7 +646,7 @@ begin
   { Grenzwerte und Istwerte }
 
   GSB.Controller.Ist := 100; { Controllerposition bzw. Abstand E0-E }
-  GSB.Winkel.Ist := Round(90 + arctan2(1, 3) * 180 / pi);
+  GSB.Winkel.Ist := Round(90 + RadToDeg(arctan2(1, 3)));
   { Winkel der unteren Wantabschnitte Winkel in Grad }
   GSB.Vorstag.Ist := Round(sqrt(288) * 10 * f);
   GSB.Wante.Ist := Round((sqrt(40) + sqrt(56)) * 10 * f);
@@ -653,8 +656,6 @@ begin
   GSB.SalingL.Ist := Round(sqrt(sqr(GSB.SalingH.Ist) + sqr(GSB.SalingA.Ist / 2)));
   GSB.VorstagOS.Ist := GSB.Vorstag.Ist;
   GSB.WPowerOS.Ist := 1000; { angenommene Wantenspannung 3d }
-  GSB.T1.Ist := 500;
-  GSB.T2.Ist := 100;
   GSB.MastfallVorlauf.Ist := FiMastfallVorlauf;
 
   GSB.InitStepDefault;
@@ -682,10 +683,6 @@ begin
   GSB.VorstagOS.Max := GSB.VorstagOS.Ist + 10 * f;
   GSB.WPowerOS.Min := 100;
   GSB.WPowerOS.Max := 3000;
-  GSB.T1.Min := 0;
-  GSB.T1.Max := 800;
-  GSB.T2.Min := 1;
-  GSB.T2.Max := 800;
   GSB.MastfallVorlauf.Min := GSB.MastfallVorlauf.Ist - 10 * f;
   GSB.MastfallVorlauf.Max := GSB.MastfallVorlauf.Ist + 10 * f;
 

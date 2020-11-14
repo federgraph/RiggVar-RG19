@@ -354,10 +354,10 @@ end;
 function TRggLine.HasVisibleCrossing(SP: TRealPoint): Boolean;
 var
   vSP: TRealPoint;
-  vAB: TRealPoint; // Rgg Vector 3D
+  vAB: TRealPoint;
 
   vABxz: vec2;
-  vSPxz: vec2; // Delphi 2D Vectors
+  vSPxz: vec2;
   lengthABxz, lengthSPxz: double;
   RatioSPtoAB, g: double;
 begin

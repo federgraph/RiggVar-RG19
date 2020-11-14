@@ -73,7 +73,7 @@ type
     rLe: TRiggLvektor; { Längen entlastet 3d in mm }
     rF: TRiggLvektor; { Stabkräfte 3d in N }
     rEA: TRiggLvektor; { EA Werte 3d in KN }
-    rPe: TRealRiggPoints; { Koordinaten entlastet 3d in mm }
+    rPe: TRiggPoints; { Koordinaten entlastet 3d in mm }
     iPe: TIntRiggPoints; { Integerkoordinaten entlastet 3d in mm }
 
     { Daten für RegelGrafik }
@@ -287,27 +287,24 @@ begin
       end;
   end;
 
-  with FTrimm do
+  { Mastfall }
+  FTrimm.Mastfall := Round(Abstand(rP[ooF0], rP[ooF])); { in mm }
+  { Vorstagspannung }
+  if abs(rF[14]) < 32000 then
+    FTrimm.Spannung := Round(rF[14]) { in N }
+  else
   begin
-    { Mastfall }
-    Mastfall := Round(Abstand(rP[ooF0], rP[ooF])); { in mm }
-    { Vorstagspannung }
-    if abs(rF[14]) < 32000 then
-      Spannung := Round(rF[14]) { in N }
-    else
-    begin
-      if rF[14] > 32000 then
-        Spannung := 32000;
-      if rF[14] < -32000 then
-        Spannung := -32000;
-    end;
-    { Biegung an den Salingen }
-    BiegungS := Round(hd); { in mm }
-    { Biegung am Controller }
-    BiegungC := Round(he); { in mm }
-    { "Elastizität" }
-    FlexWert := Round(Abstand(rP[ooC], rPe[ooC])); { in mm }
+    if rF[14] > 32000 then
+      FTrimm.Spannung := 32000;
+    if rF[14] < -32000 then
+      FTrimm.Spannung := -32000;
   end;
+  { Biegung an den Salingen }
+  FTrimm.BiegungS := Round(hd); { in mm }
+  { Biegung am Controller }
+  FTrimm.BiegungC := Round(he); { in mm }
+  { "Elastizität" }
+  FTrimm.FlexWert := Round(Abstand(rP[ooC], rPe[ooC])); { in mm }
 end;
 
 procedure TRiggFS.Kraefte;
@@ -477,25 +474,21 @@ procedure TRiggFS.Probe;
 
   function Probe(o, a, b, c, d: TRiggPoint; al, bl, cl, dl: Integer): Boolean;
   begin
-    with TetraF do
-    begin
-      d1 := vsub(rP[a], rP[o]);
-      d2 := vsub(rP[b], rP[o]);
-      d3 := vsub(rP[c], rP[o]);
-      d4 := vsub(rP[d], rP[o]);
+    TetraF.d1 := vsub(rP[a], rP[o]);
+    TetraF.d2 := vsub(rP[b], rP[o]);
+    TetraF.d3 := vsub(rP[c], rP[o]);
+    TetraF.d4 := vsub(rP[d], rP[o]);
 
-      l1 := rL[al];
-      l2 := rL[bl];
-      l3 := rL[cl];
-      l4 := rL[dl];
+    TetraF.l1 := rL[al];
+    TetraF.l2 := rL[bl];
+    TetraF.l3 := rL[cl];
+    TetraF.l4 := rL[dl];
 
-      F1 := rF[al];
-      F2 := rF[bl];
-      F3 := rF[cl];
-      F4 := rF[dl];
-
-      Result := Probe; { Aufruf von Probe in class TetraF }
-    end;
+    TetraF.F1 := rF[al];
+    TetraF.F2 := rF[bl];
+    TetraF.F3 := rF[cl];
+    TetraF.F4 := rF[dl];
+    Result := TetraF.Probe; { Aufruf von Probe in class TetraF }
   end;
 
 var
@@ -644,7 +637,7 @@ begin
     Exit;
   end;
   try
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       { 1. Aufruf SchnittKK: ooP0, ooA0, ooB0 ermitteln }
@@ -673,7 +666,7 @@ begin
       Exit;
     end;
 
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       { 2. Aufruf SchnittKK: ooC0 ermitteln }
@@ -708,7 +701,7 @@ begin
     end;
     r1 := sqrt(s1);
     r2 := sqrt(s2);
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       { 1. Aufruf SchnittKK: Saling2d und WanteOben2d;
@@ -739,7 +732,7 @@ begin
       MittelPunkt1 := rPe[ooA0];
       MittelPunkt2 := rPe[ooD0];
       rPe[ooA] := SchnittPunkt1;
-      rPe[ooA, y] := rLe[11] / 2;
+      rPe[ooA, y] := -rLe[11] / 2;
       s := Bemerkung;
       s := Format(LogList_Format_String_MakeKoord, [2, s]);
       LogList.Add(s);
@@ -800,7 +793,7 @@ begin
   MakeRumpfKoord;
   rPe[ooE] := rP[ooE];
   try
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
 
@@ -1042,7 +1035,7 @@ begin
   MakeRumpfKoord;
   rPe[ooE] := rP[ooE];
   try
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
 

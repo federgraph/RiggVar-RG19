@@ -34,7 +34,7 @@ type
     Height: Integer;
     FScale: single;
 
-    LineData: TRggPolyLine;
+    LineData: TZugPolyLine;
 
     CM: TChartModel; // injected, not owned
 
@@ -68,7 +68,7 @@ constructor TRggDiagram.Create(Model: TChartModel);
 begin
   CM := Model;
 
-  FScale := Main.Scale;
+  FScale := MainVar.Scale;
 
   SetLength(LineData, LNr + 1);
 

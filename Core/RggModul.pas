@@ -72,7 +72,7 @@ type
     InputBuffer: TTrimmControls;
     MemCtrl: TTrimmControls;
     RefCtrl: TTrimmControls;
-    RefPoints: TRealRiggPoints;
+    RefPoints: TRiggPoints;
     constructor Create;
     property SofortBerechnen: Boolean read FSofortBtnDown;
   end;

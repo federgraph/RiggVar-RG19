@@ -59,14 +59,15 @@ type
     function GetSchnittPunkt2: TRealPoint;
     function GetBem: TBemerkungKK;
     function GetBemerkung: string;
+    function GetRemark: string;
     function Vorhanden: Boolean;
     procedure SetM1(const Value: TPointF);
     procedure SetM2(const Value: TPointF);
-//    function GetM1: TPointF;
-//    function GetM2: TPointF;
   protected
     procedure Schnitt; virtual;
   public
+    Watch1: Integer;
+    Watch2: Integer;
     property Radius1: double read R1 write SetRadius1;
     property Radius2: double read R2 write SetRadius2;
     property M1: TPointF write SetM1;
@@ -76,6 +77,7 @@ type
     property SchnittPunkt1: TRealPoint read GetSchnittPunkt1;
     property SchnittPunkt2: TRealPoint read GetSchnittPunkt2;
     property Status: TBemerkungKK read GetBem;
+    property Remark: string read GetRemark;
     property Bemerkung: string read GetBemerkung;
     property SPVorhanden: Boolean read Vorhanden;
     property SchnittEbene: TSchnittEbene read Ebene write Ebene;
@@ -152,6 +154,7 @@ end;
 
 procedure TSchnittKK.SetMittelPunkt1(Value: TRealPoint);
 begin
+  { if not Value.EqualsTo(FM1) then }
   if (Value[x] <> FM1[x]) or (Value[y] <> FM1[y]) or (Value[z] <> FM1[z]) then
   begin
     FM1 := Value;
@@ -161,6 +164,7 @@ end;
 
 procedure TSchnittKK.SetMittelPunkt2(Value: TRealPoint);
 begin
+  { if not Value.EqualsTo(FM2) then }
   if (Value[x] <> FM2[x]) or (Value[y] <> FM2[y]) or (Value[z] <> FM2[z]) then
   begin
     FM2 := Value;
@@ -222,29 +226,19 @@ begin
   end;
 end;
 
-//function TSchnittKK.GetM1: TPointF;
-//begin
-//  result.X := Mittelpunkt1[x];
-//  result.Y := Mittelpunkt1[y];
-//end;
-//
-//function TSchnittKK.GetM2: TPointF;
-//begin
-//  result.X := Mittelpunkt2[x];
-//  result.Y := Mittelpunkt2[y];
-//end;
-
 procedure TSchnittKK.Schnitt;
-label
-  M;
 var
-  a, b, h1, h2, h3, p, q, Entfernung: Extended;
+  a, b, h1, h2, p, q, Entfernung: Extended;
+  DeltaX, DeltaY: single;
+  AbsDeltaX, AbsDeltaY: Extended;
   DeltaNullx, DeltaNully: Boolean;
   M1M2, M1S1, KreuzProd: TRealPoint;
   M1, M2, SP: TRealPoint;
 begin
   NeedCalc := False;
   sv := False;
+  Watch1 := 0;
+  Watch2 := 0;
 
   S1 := Null;
   S2 := Null;
@@ -284,8 +278,13 @@ begin
     Exit;
   end;
 
-  DeltaNullx := M2[x] - M1[x] = 0;
-  DeltaNully := M2[y] - M1[y] = 0;
+  DeltaX := M2[x] - M1[x];
+  DeltaY := M2[y] - M1[y];
+  DeltaNullx := DeltaX = 0;
+  DeltaNully := DeltaY = 0;
+  AbsDeltaX := abs(DeltaX);
+  AbsDeltaY := abs(DeltaY);
+
   { Spezialfall konzentrische Kreise }
   if DeltaNullx and DeltaNully then
   begin
@@ -294,51 +293,46 @@ begin
   end;
 
   h1 := (R1 * R1 - R2 * R2) + (M2[x] * M2[x] - M1[x] * M1[x]) + (M2[y] * M2[y] - M1[y] * M1[y]);
-  { Spezialfall Mittelpunkte auf gleicher Höhe }
-  if DeltaNully then { Rechnung vermeidet Division durch Null }
-  begin
-    S1[x] := h1 / (2 * (M2[x] - M1[x]));
-    S2[x] := S1[x];
-    h3 := R1 * R1 - sqr(S1[x] - M1[x]);
-    if h3 < 0 then { kein Schnittpunkt }
-    begin
-      S1 := Null;
-      S2 := Null;
-      goto M;
-    end;
-    if h3 = 0 then { ein Schnittpunkt bzw. zwei identische }
-    begin
-      S1[y] := M1[y];
-      S2[y] := S1[y];
-      sv := True;
-      goto M;
-    end;
-    if h3 > 0 then { zwei verschiedene Schnittpunkte }
-    begin
-      S1[y] := M1[y] + sqrt(h3);
-      S2[y] := M1[y] - sqrt(h3);
-      sv := True;
-      goto M;
-    end;
-  end; { if DeltaNully }
 
   { Rechnung im Normalfall }
-  a := (-1) * (M2[x] - M1[x]) / (M2[y] - M1[y]);
-  b := h1 / (2 * (M2[y] - M1[y]));
-  p := 2 * (a * b - M1[x] - a * M1[y]) / (1 + a * a);
-  q := (M1[x] * M1[x] + b * b - 2 * b * M1[y] + M1[y] * M1[y] - R1 * R1) / (1 + a * a);
-  h2 := p * p / 4 - q;
-  if h2 >= 0 then
+
+  if AbsDeltaY > AbsDeltaX then
   begin
-    h2 := sqrt(h2);
-    S1[x] := -p / 2 + h2;
-    S2[x] := -p / 2 - h2;
-    S1[y] := a * S1[x] + b;
-    S2[y] := a * S2[x] + b;
-    sv := True;
+    Watch1 := 1;
+    a := - DeltaX / DeltaY;
+    b := h1 / (2 * DeltaY);
+    p := 2 * (a * b - M1[x] - a * M1[y]) / (1 + a * a);
+    q := (M1[x] * M1[x] + b * b - 2 * b * M1[y] + M1[y] * M1[y] - R1 * R1) / (1 + a * a);
+    h2 := p * p / 4 - q;
+    if h2 >= 0 then
+    begin
+      h2 := sqrt(h2);
+      S1[x] := -p / 2 + h2;
+      S2[x] := -p / 2 - h2;
+      S1[y] := a * S1[x] + b;
+      S2[y] := a * S2[x] + b;
+      sv := True;
+    end;
+  end
+  else
+    begin
+    Watch1 := 2;
+    a := - DeltaY / DeltaX;
+    b := h1 / (2 * DeltaX);
+    p := 2 * (a * b - M1[y] - a * M1[x]) / (1 + a * a);
+    q := (M1[y] * M1[y] + b * b - 2 * b * M1[x] + M1[x] * M1[x] - R1 * R1) / (1 + a * a);
+    h2 := p * p / 4 - q;
+    if h2 >= 0 then
+    begin
+      h2 := sqrt(h2);
+      S1[y] := -p / 2 + h2;
+      S2[y] := -p / 2 - h2;
+      S1[x] := a * S1[y] + b;
+      S2[x] := a * S2[y]+ b;
+      sv := True;
+    end;
   end;
 
-M:
   Entfernung := Abstand(M1, M2);
 
   if sv = False then
@@ -366,11 +360,13 @@ M:
   { den "richtigen" SchnittPunkt ermitteln }
   if Bem = bmZwei then
   begin
+    Watch2 := 1;
     M1M2 := vsub(M2, M1);
     M1S1 := vsub(S1, M1);
     KreuzProd := vprod(M1M2, M1S1);
     if KreuzProd[z] < 0 then
     begin
+      Watch2 := 2;
       SP := S2;
       S2 := S1;
       S1 := SP;
@@ -434,7 +430,8 @@ begin
   FR[z] := F1 * d1[z] + F2 * d2[z] + F3 * d3[z];
 
   F4 := Abstand(FR, Null);
-  if FR[y] < 0 then
+  { > or < depending on the use of left handed system or right handed system }
+  if FR[y] > 0 then
     F4 := -F4;
 end;
 
@@ -484,8 +481,8 @@ var
 begin
   if RectangleMode then
   begin
-    S1 := Null; //vcopy(S1, Null);
-    S2 := Null; //vcopy(S2, Null);
+    S1 := Null;
+    S2 := Null;
     try
       t1.Left := Round(FM1[x] - R1);
       t1.Right := Round(FM1[x] + R1);
@@ -516,6 +513,30 @@ begin
   end
   else
     inherited Schnitt;
+end;
+
+function TSchnittKK.GetRemark: string;
+begin
+  case Status of
+    bmKonzentrisch:
+      result := 'concentric circles';
+    bmZwei:
+      result := 'two intersections';
+    bmEntfernt:
+      result := 'two distant circles';
+    bmEinerAussen:
+      result := 'touching outside';
+    bmEinerK1inK2:
+      result := 'touching inside, C1 in C2';
+    bmEinerK2inK1:
+      result := 'touching inside, C2 in C1';
+    bmK1inK2:
+      result := 'C1 inside C2';
+    bmK2inK1:
+      result := 'C2 inside C1';
+    bmRadiusFalsch:
+      result := 'invalid radius';
+  end;
 end;
 
 end.

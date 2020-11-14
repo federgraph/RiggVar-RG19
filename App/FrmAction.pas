@@ -121,7 +121,7 @@ end;
 
 procedure TFormAction.FormCreate(Sender: TObject);
 begin
-  FScale := Main.Scale;
+  FScale := MainVar.Scale;
 
   Caption := 'Form Actions';
   ML := TStringList.Create;

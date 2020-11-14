@@ -20,7 +20,7 @@ type
     FViewPoint: TViewPoint;
     FRiggLED: Boolean;
     procedure SetKoppel(const Value: Boolean);
-    procedure SetKoordinaten(const Value: TRealRiggPoints);
+    procedure SetKoordinaten(const Value: TRiggPoints);
     procedure SetSalingTyp(const Value: TSalingTyp);
     procedure SetControllerTyp(const Value: TControllerTyp);
     procedure SetViewPoint(const Value: TViewPoint);
@@ -32,7 +32,7 @@ type
     function FindBogenIndexOf(P: TRealPoint): Integer;
     function GetFreshRiggPoints: TIntRiggPoints;
   public
-    rP: TRealRiggPoints;
+    rP: TRiggPoints;
     Kurve: TMastKurve;
 
     constructor Create;
@@ -44,7 +44,7 @@ type
     procedure SetKoppelKurve(const Value: TKoordLine);
     function GetMastKurvePoint(const Index: Integer): TRealPoint;
 
-    property Koordinaten: TRealRiggPoints read rP write SetKoordinaten;
+    property Koordinaten: TRiggPoints read rP write SetKoordinaten;
     property KoppelKurve: TKoordLine read FKoppelKurve write SetKoppelKurve;
     property Koppel: Boolean read FKoppel write SetKoppel;
     property ControllerTyp: TControllerTyp read FControllerTyp write SetControllerTyp;
@@ -64,7 +64,7 @@ begin
   FControllerTyp := ctOhne;
 end;
 
-procedure TBootGraph.SetKoordinaten(const Value: TRealRiggPoints);
+procedure TBootGraph.SetKoordinaten(const Value: TRiggPoints);
 begin
   rP := Value;
   GrafikOK := True;

@@ -838,10 +838,6 @@ begin
     result := fpBiegung
   else if T = MastFootD0XString then
     result := fpD0X
-  else if T = T1String then
-    result := fpT1
-  else if T = T2String then
-    result := fpT2
   else if T = APWidthString then
     result := fpAPW
   else if T = EAHullString then
@@ -884,10 +880,6 @@ begin
     result := BiegungString
   else if P = fpD0X then
     result := MastfootD0XString
-  else if P = fpT1 then
-    result := T1String
-  else if P = fpT2 then
-    result := T2String
   else if P = fpAPW then
     result := APWidthString
   else if P = fpEAH then
@@ -929,9 +921,6 @@ begin
   FactArray.MastfallF0F.Ist := Rigg.RealTrimm[tiMastfallF0F];
   FactArray.Biegung.Ist := Rigg.RealTrimm[tiBiegungS];
   FactArray.D0X.Ist := Rigg.rP[ooD0, X];
-
-  FactArray.T1.Ist := 650;
-  FactArray.T2.Ist := 150;
 
   { allgemein setzen }
   for i := fpController to fpD0X do

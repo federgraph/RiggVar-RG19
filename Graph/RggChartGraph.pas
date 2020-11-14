@@ -33,7 +33,7 @@ type
     Height: Integer;
     FScale: single;
 
-    LineData: TRggPolyLine;
+    LineData: TZugPolyLine;
 
     procedure InitBitmap;
     procedure SetImage(const Value: TImage);
@@ -65,7 +65,7 @@ constructor TChartGraph.Create;
 begin
   inherited;
 
-  FScale := Main.Scale;
+  FScale := MainVar.Scale;
 
   SetLength(LineData, LNr + 1);
 

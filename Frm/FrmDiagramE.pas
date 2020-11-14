@@ -1,4 +1,4 @@
-unit FrmDiagramE;
+﻿unit FrmDiagramE;
 
 interface
 
@@ -94,7 +94,7 @@ uses
 
 procedure TFormDiagramE.FormCreate(Sender: TObject);
 begin
-  FScale := Main.Scale;
+  FScale := MainVar.Scale;
 
   Margin := Round(10 * FScale);
   Width := Round(1500 * FScale);

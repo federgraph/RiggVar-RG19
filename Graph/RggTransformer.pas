@@ -98,7 +98,7 @@ procedure TRggTransformer4x4.BuildMatrix;
 var
   scaledZoom: double;
 begin
-  scaledZoom := Zoom * Main.Scale;
+  scaledZoom := Zoom * MainVar.Scale;
   if Assigned(OnGetFixPunkt) then
     FFixPunkt := OnGetFixPunkt;
 

@@ -441,16 +441,16 @@ begin
     if Theta90 then
     begin
       tempVec := Normalize3D(Cross(uy, zVec));
-      tempcos := tempVec.x; //tempcos := -uz.x;
-      tempsin := tempVec.y; //tempsin := -uz.y;
+      tempcos := tempVec.x;
+      tempsin := tempVec.y;
     end
     else
     begin
       tempVec := ux;
       tempVec.z := 0;
-      tempVec := Normalize3D(tempVec); //d := Hypot(ux.x,ux.y);
-      tempcos := dot(xVec, tempVec); //tempcos := ux.x/d;
-      tempsin := dot(yVec, tempVec); //tempsin := ux.y/d;
+      tempVec := Normalize3D(tempVec);
+      tempcos := dot(xVec, tempVec);
+      tempsin := dot(yVec, tempVec);
     end;
     wp := ArcCos(CheckSinCos(tempcos));
     if tempsin < 0 then

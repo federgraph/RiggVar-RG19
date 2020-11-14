@@ -68,6 +68,7 @@ type
     procedure UpdateDisplayList;
     procedure DrawToCanvas(g: TCanvas); override;
 
+    procedure SetChecked(fa: Integer; Value: Boolean);
     function GetChecked(fa: Integer): Boolean;
     procedure GetPlotList(ML: TStrings); override;
     property FixPunkt: TRealPoint read GetFixPunkt;
@@ -147,7 +148,7 @@ procedure TRaumGraph.Update2;
 var
   i: TRiggPoint;
   j: Integer;
-  RPT: TRealRiggPoints;
+  RPT: TRiggPoints;
   MKT: array [0 .. BogenMax] of TRealPoint;
   KKT: TKoordLine;
 begin
@@ -471,6 +472,20 @@ begin
     faRggKoppel: result := Koppel;
     else
       result := False;
+  end;
+end;
+
+procedure TRaumGraph.SetChecked(fa: Integer; Value: Boolean);
+begin
+  case fa of
+    faToggleSegmentF: WantFixPunkt := Value;
+    faToggleSegmentR: WantRumpf := Value;
+    faToggleSegmentS: WantSaling := Value;
+    faToggleSegmentM: WantMast := Value;
+    faToggleSegmentV: WantVorstag := Value;
+    faToggleSegmentW: WantWante := Value;
+    faToggleSegmentC: WantController := Value;
+    faToggleSegmentA: WantAchsen := Value;
   end;
 end;
 

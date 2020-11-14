@@ -93,10 +93,10 @@ type
     procedure WriteToIniFile(ini: TIniFile); virtual;
   public
     LogList: TStringList;
-    SchnittKK: TSchnittKK;
+    SKK: TSchnittKK;
     TrimmTab: TTrimmTab;
     GSB: TRggFA;
-    rP: TRealRiggPoints;
+    rP: TRiggPoints;
 
     constructor Create;
     destructor Destroy; override;
@@ -140,7 +140,7 @@ begin
   GSB := TRggFA.Create;
   WantLogoData := false;
   LogList := TStringList.Create;
-  SchnittKK := TSchnittKK.Create;
+  SKK := TSchnittKK.Create;
   TrimmTab := TTrimmTab.Create;
   FSalingTyp := stFest;
   FManipulatorMode := false;
@@ -152,7 +152,7 @@ end;
 destructor TGetriebe.Destroy;
 begin
   LogList.Free;
-  SchnittKK.Free;
+  SKK.Free;
   TrimmTab.Free;
   GSB.Free;
   inherited Destroy;
@@ -296,9 +296,9 @@ begin
   SD.SalingH := FrSalingH;
   SD.SalingA := FrSalingA;
   SD.SalingL := FrSalingL;
-  SD.SalingW := arctan2(FrSalingA / 2, FrSalingH) * 180 / pi;
-  SD.WantenWinkel := tempWW * 180 / pi;
-  SD.KraftWinkel := tempWS * 180 / pi;
+  SD.SalingW := RadToDeg(arctan2(FrSalingA / 2, FrSalingH));
+  SD.WantenWinkel := RadToDeg(tempWW);
+  SD.KraftWinkel := RadToDeg(tempWS);
 
   result := SD;
 end;
@@ -306,14 +306,14 @@ end;
 procedure TGetriebe.IntGliederToReal;
 begin
   { Integer Glieder have been eliminated. }
-  FrWinkel := FWinkelDegrees * pi / 180;
+  FrWinkel := DegToRad(FWinkelDegrees);
   FrMastEnde := FrMastLength - FrMastOben - FrMastUnten;
 end;
 
 procedure TGetriebe.RealGliederToInt;
 begin
   { Integer Glieder have been eliminated. }
-  FWinkelDegrees := FrWinkel * 180 / pi;
+  FWinkelDegrees := RadToDeg(FrWinkel);
   FrMastLength := FrMastUnten + FrMastOben + FrMastEnde;
 end;
 
@@ -510,7 +510,7 @@ begin
   FrSalingA := 80 * f; { Abstand der Salingnocken }
   FrSalingL := Round(sqrt(sqr(FrSalingH) + sqr(FrSalingA / 2)));
   FrVorstag := Round(sqrt(288) * 10 * f); { Vorstaglänge }
-  FWinkelDegrees := Round(90 + arctan2(1, 3) * 180 / pi); { Winkel Wunten }
+  FWinkelDegrees := Round(90 + RadToDeg(arctan2(1, 3))); { Winkel Wunten }
   FWPowerOS := 1000; { angenommene Wantenspannung 3d }
 
   { RumpfKoordinaten in mm }

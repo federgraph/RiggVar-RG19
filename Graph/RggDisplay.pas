@@ -36,7 +36,7 @@ type
     CenterPoint: TPoint;
     Radius: Integer;
 
-    PolyArray: TRggPolyLine;
+    PolyArray: TZugPolyLine;
 
     Bemerkung: TLineSegmentCompareCase;
 
@@ -99,7 +99,7 @@ type
     procedure Clear;
     procedure Ellipse(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; CenterPoint: TPoint; Radius: Integer = 10);
     procedure Line(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; A, B: TPoint; Color: TColor);
-    procedure PolyLine(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; A: TRggPolyLine; Color: TColor);
+    procedure PolyLine(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; A: TZugPolyLine; Color: TColor);
     procedure Draw(Canvas: TCanvas);
     procedure Draw1(Canvas: TCanvas);
     procedure Draw2(Canvas: TCanvas);
@@ -594,7 +594,7 @@ begin
   end;
 end;
 
-procedure TRggDisplayList.PolyLine(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; A: TRggPolyLine; Color: TColor);
+procedure TRggDisplayList.PolyLine(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; A: TZugPolyLine; Color: TColor);
 var
   cr: TDisplayItem;
 begin

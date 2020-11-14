@@ -204,9 +204,9 @@ begin
       cl := BottomLeft;
       cla := TRggColors.White;
       InitAC(cl, 1, faParamValuePlus10, cla);
-      InitAC(cl, 2, faShowActi, claForm);
+      InitAC(cl, 2, faShowActions, claForm);
       InitAC(cl, 3, faShowMemo, claForm);
-      InitAC(cl, 4, faShowConf, claForm);
+      InitAC(cl, 4, faShowConfig, claForm);
       InitAC(cl, 5, faShowTrimmTab, claForm);
       InitAC(cl, 6, faParamValuePlus1, cla);
       InitAC(cl, 7, faParamValueMinus1, cla);
@@ -217,7 +217,7 @@ begin
       InitAC(cl, 1, faCycleColorSchemeM, cla);
       InitAC(cl, 2, faCycleColorSchemeP, cla);
       InitAC(cl, 3, faToggleSpeedPanel, cla);
-      InitAC(cl, 4, faToggleSandboxed, cla);
+      InitAC(cl, 4, faShowKreis, claForm);
       InitAC(cl, 5, faMemoryRecallBtn, cla);
       InitAC(cl, 6, faMemoryBtn, cla);
     end;
@@ -305,7 +305,7 @@ begin
       InitAC(cl, 3, faSalingTypOhne, claOption);
       InitAC(cl, 4, faSalingTypOhneStarr, claOption);
       InitAC(cl, 5, faNoop, cla);
-      InitAC(cl, 6, faNoop, cla);
+      InitAC(cl, 6, faShowInfo, claForm);
     end;
 
     4:
@@ -353,46 +353,6 @@ begin
 
     5:
     begin
-      cla := TRggColors.White;
-      cl := TopLeft;
-      //InitAC(cl, 1, faActionPageM, claYellow);
-      InitAC(cl, 2, faMemeGotoLandscape, TRggColors.Plum);
-      InitAC(cl, 3, faMemeGotoSquare, TRggColors.Plum);
-      InitAC(cl, 4, faMemeGotoPortrait, TRggColors.Plum);
-      InitAC(cl, 5, faNoop, TRggColors.Plum);
-      InitAC(cl, 6, faNoop, cla);
-
-      cl := TopRight;
-      InitAC(cl, 1, faMemeFormat0, cla);
-      InitAC(cl, 2, faMemeFormat1, TRggColors.White);
-      InitAC(cl, 3, faMemeFormat2, cla);
-      InitAC(cl, 4, faMemeFormat3, cla);
-      //InitAC(cl, 5, faActionPageP, TRggColors.Yellow);
-      InitAC(cl, 6, faMemeFormat4, cla);
-      InitAC(cl, 7, faMemeFormat5, cla);
-      InitAC(cl, 8, faNoop, cla);
-
-      cl := BottomLeft;
-      InitAC(cl, 1, faMemeFormat6, cla);
-      InitAC(cl, 2, faMemeFormat7, cla);
-      InitAC(cl, 3, faMemeFormat8, cla);
-      InitAC(cl, 4, faNoop, cla);
-      InitAC(cl, 5, faNoop, cla);
-      InitAC(cl, 6, faMemeFormat9, cla);
-      InitAC(cl, 7, faNoop, cla);
-      InitAC(cl, 8, faNoop, cla);
-
-      cl := BottomRight;
-      InitAC(cl, 1, faCycleColorSchemeM, cla);
-      InitAC(cl, 2, faCycleColorSchemeP, cla);
-      InitAC(cl, 3, faNoop, cla);
-      InitAC(cl, 4, faNoop, cla);
-      InitAC(cl, 5, faNoop, cla);
-      InitAC(cl, 6, faNoop, cla);
-    end;
-
-    6:
-    begin
       cla := TRggColors.Goldenrod;
       cl := TopLeft;
       //InitAC(cl, 1, faActionPageM, claYellow);
@@ -430,6 +390,46 @@ begin
       InitAC(cl, 4, faReportDebugReport, TRggColors.Goldenrod);
       InitAC(cl, 5, faReportReadme, TRggColors.Goldenrod);
       InitAC(cl, 6, faReportNone, TRggColors.Goldenrod);
+    end;
+
+    6:
+    begin
+      cla := TRggColors.White;
+      cl := TopLeft;
+      //InitAC(cl, 1, faActionPageM, claYellow);
+      InitAC(cl, 2, faMemeGotoLandscape, TRggColors.Plum);
+      InitAC(cl, 3, faMemeGotoSquare, TRggColors.Plum);
+      InitAC(cl, 4, faMemeGotoPortrait, TRggColors.Plum);
+      InitAC(cl, 5, faNoop, TRggColors.Plum);
+      InitAC(cl, 6, faNoop, cla);
+
+      cl := TopRight;
+      InitAC(cl, 1, faMemeFormat0, cla);
+      InitAC(cl, 2, faMemeFormat1, TRggColors.White);
+      InitAC(cl, 3, faMemeFormat2, cla);
+      InitAC(cl, 4, faMemeFormat3, cla);
+      //InitAC(cl, 5, faActionPageP, TRggColors.Yellow);
+      InitAC(cl, 6, faMemeFormat4, cla);
+      InitAC(cl, 7, faMemeFormat5, cla);
+      InitAC(cl, 8, faNoop, cla);
+
+      cl := BottomLeft;
+      InitAC(cl, 1, faMemeFormat6, cla);
+      InitAC(cl, 2, faMemeFormat7, cla);
+      InitAC(cl, 3, faMemeFormat8, cla);
+      InitAC(cl, 4, faNoop, cla);
+      InitAC(cl, 5, faNoop, cla);
+      InitAC(cl, 6, faMemeFormat9, cla);
+      InitAC(cl, 7, faNoop, cla);
+      InitAC(cl, 8, faNoop, cla);
+
+      cl := BottomRight;
+      InitAC(cl, 1, faCycleColorSchemeM, cla);
+      InitAC(cl, 2, faCycleColorSchemeP, cla);
+      InitAC(cl, 3, faNoop, cla);
+      InitAC(cl, 4, faNoop, cla);
+      InitAC(cl, 5, faNoop, cla);
+      InitAC(cl, 6, faNoop, cla);
     end;
 
     7:
@@ -578,9 +578,9 @@ begin
 
       cl := BottomLeft;
       InitAC(cl, 1, faParamValuePlus10, cla);
-      InitAC(cl, 2, faShowActi, claForm);
+      InitAC(cl, 2, faShowActions, claForm);
       InitAC(cl, 3, faShowMemo, claForm);
-      InitAC(cl, 4, faShowConf, claForm);
+      InitAC(cl, 4, faShowConfig, claForm);
       InitAC(cl, 5, faShowTrimmTab, claForm);
       InitAC(cl, 6, faParamValuePlus1, cla);
       InitAC(cl, 7, faParamValueMinus1, cla);

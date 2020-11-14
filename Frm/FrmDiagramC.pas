@@ -1,4 +1,4 @@
-unit FrmDiagramC;
+﻿unit FrmDiagramC;
 
 interface
 
@@ -81,7 +81,7 @@ uses
 
 procedure TFormDiagramC.FormCreate(Sender: TObject);
 begin
-  FScale := Main.Scale;
+  FScale := MainVar.Scale;
 
   Margin := Round(10 * FScale);
   Width := Round(1024 * FScale);

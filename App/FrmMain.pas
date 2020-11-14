@@ -23,10 +23,11 @@ interface
 {$endif}
 
 uses
+  RiggVar.FB.Color,
+  RiggVar.FB.SpeedColor,
+  RiggVar.FB.SpeedBar,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
-  RiggVar.FB.SpeedBar,
-  RiggVar.FB.Color,
   RiggVar.RG.Graph,
   RggTypes,
   RggUnit4,
@@ -51,9 +52,6 @@ uses
   Vcl.ComCtrls;
 
 type
-
-  { TFormMain }
-
   TFormMain = class(TForm)
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -69,20 +67,27 @@ type
     procedure GotoNormal;
     procedure GotoPortrait;
     procedure GotoSquare;
+  protected
+    procedure InitScreenPos;
   private
     FScale: single;
     DefaultCaption: string;
     FormShown: Boolean;
     procedure ApplicationEventsException(Sender: TObject; E: Exception);
+    procedure FormCreate2(Sender: TObject);
+    procedure FormDestroy2(Sender: TObject);
     procedure HandleShowHint(Sender: TObject);
     procedure Flash(s: string);
     procedure Reset;
     procedure PlaceImage(PosLeft, PosTop: Integer);
+    procedure InitDebugInfo;
+    procedure InitZOrderInfo;
+    procedure ShowHelpText(fa: Integer);
   protected
+    ShowingHelp: Boolean;
     HL: TStringList;
     RL: TStrings;
     TL: TStrings;
-    procedure InitHelpText;
     procedure InitParamListbox;
     procedure InitTrimmCombo;
     procedure InitParamCombo;
@@ -92,10 +97,9 @@ type
     procedure ShowTrimm;
     procedure ShowTrimmData;
   public
-    FWantButtonFrameReport: Boolean;
+    FWantButtonReport: Boolean;
     procedure UpdateReport;
-    procedure UpdateBackgroundColor(AColor: TColor);
-    property WantButtonFrameReport: Boolean read FWantButtonFrameReport;
+    property WantButtonReport: Boolean read FWantButtonReport;
   public
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
@@ -138,6 +142,7 @@ type
     property ShowDataText: Boolean read GetShowDataText write SetShowDataText;
   public
     ComponentsCreated: Boolean;
+    procedure UpdateParent;
     procedure CreateComponents;
     procedure CheckSpaceForImages;
     procedure CheckSpaceForMemo;
@@ -145,7 +150,6 @@ type
     procedure SetupMemo(MM: TMemo);
     procedure SetupCombobox(CB: TComboBox);
     procedure SetupListbox(LB: TListBox);
-    procedure UpdateParent;
   public
     Raster: Integer;
     Margin: Integer;
@@ -153,13 +157,15 @@ type
     ReportMemoWidth: Integer;
     SpeedPanelHeight: Integer;
     SpeedPanel: TActionSpeedBar;
-    SpeedPanel1: TActionSpeedBar;
-    SpeedPanel2: TActionSpeedBar;
+    SpeedPanel01: TActionSpeedBar;
+    SpeedPanel03: TActionSpeedBar;
+    SpeedColorScheme: TSpeedColorScheme;
     procedure InitSpeedButtons;
     procedure LayoutSpeedPanel(SP: TActionSpeedBar);
     procedure UpdateSpeedButtonDown;
     procedure UpdateSpeedButtonEnabled;
     procedure ToggleSpeedPanel;
+    procedure ToggleSpeedPanelFontSize;
   public
     procedure ChartImageBtnClick(Sender: TObject);
     procedure SalingImageBtnClick(Sender: TObject);
@@ -181,6 +187,7 @@ type
 
     procedure BogenBtnClick(Sender: TObject);
     procedure KoppelBtnClick(Sender: TObject);
+    procedure HullBtnClick(Sender: TObject);
 
     procedure SuperSimpleBtnClick(Sender: TObject);
     procedure SuperNormalBtnClick(Sender: TObject);
@@ -192,13 +199,13 @@ type
   public
     procedure UpdateColorScheme;
     procedure LayoutComponents;
-    function GetActionFromKey(Key: Word): Integer;
+    function GetActionFromKey(Shift: TShiftState; Key: Word): Integer;
     function GetActionFromKeyChar(KeyChar: char): Integer;
     function GetChecked(fa: Integer): Boolean;
     procedure HandleAction(fa: Integer);
   public
     DL: TRggDisplayList;
-    RotaForm: TRotaForm;
+    RotaForm: TRotaForm1;
     StrokeRigg: IStrokeRigg;
     procedure HandleSegment(fa: Integer);
   public
@@ -223,9 +230,9 @@ type
     SalingGraph: TSalingGraph;
     ControllerImage: TImage;
     ControllerGraph: TSalingGraph;
-    ChartControl: TWinControl;
     ChartImage: TImage;
     ChartGraph: TChartGraph;
+    ChartControl: TWinControl;
     procedure InitSalingGraph;
     procedure InitControllerGraph;
     procedure InitChartGraph;
@@ -247,7 +254,7 @@ type
     procedure ShowFormController;
     procedure DestroyForms;
     procedure MemoBtnClick(Sender: TObject);
-    procedure ActiBtnClick(Sender: TObject);
+    procedure ActionsBtnClick(Sender: TObject);
     procedure ConfigBtnClick(Sender: TObject);
     procedure TrimmTabBtnClick(Sender: TObject);
     procedure CheckFormBounds(AForm: TForm);
@@ -391,8 +398,8 @@ uses
   FrmDiagramE,
   FrmDiagramQ,
   FrmInfo,
-  FrmInput,
   FrmKreis,
+  FrmInput,
   FrmOutput,
   FrmSplash,
   FrmKraft,
@@ -412,7 +419,7 @@ uses
   RiggVar.VM.FormMain;
 
 const
-  HelpCaptionText = 'press h for help';
+  HelpCaptionText = 'press ? for help';
   ApplicationTitleText = 'RG68';
 
 { TFormMain }
@@ -423,6 +430,26 @@ begin
     Main.Logger.Info(E.Message);
 end;
 
+procedure TFormMain.FormCreate(Sender: TObject);
+begin
+  FormatSettings.DecimalSeparator := '.';
+
+  SpeedColorScheme := TSpeedColorScheme.Create;
+  SpeedColorScheme.InitDark;
+  TActionSpeedBar.SpeedColorScheme := SpeedColorScheme;
+
+  FormCreate2(Sender);
+end;
+
+procedure TFormMain.FormDestroy(Sender: TObject);
+begin
+  MainVar.AppIsClosing := True;
+
+  FormDestroy2(Sender);
+
+  SpeedColorScheme.Free;
+end;
+
 procedure TFormMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action := caFree;
@@ -430,12 +457,11 @@ begin
   // Application.HelpCommand(HELP_QUIT,0);
 end;
 
-procedure TFormMain.FormCreate(Sender: TObject);
+procedure TFormMain.FormCreate2(Sender: TObject);
 begin
 {$ifdef Debug}
   ReportMemoryLeaksOnShutdown := True;
 {$endif}
-  FormatSettings.DecimalSeparator := '.';
 
   FScale := 1.0;
 {$ifdef MSWindows}
@@ -445,24 +471,7 @@ begin
   Application.OnException := ApplicationEventsException;
 
   FormMain := self;
-  if (Screen.Width >= FScale * 1920) and (Screen.Height >= FScale * 1024) then
-  begin
-    { Tested on normal HD screen }
-    Left := Round(100 * FScale);
-    Top := Round(30 * FScale);
-    Width := Round(1700 * FScale);
-    Height := Round(960 * FScale);
-    ReportMemoWidth := Round(480 * FScale);
-  end
-  else
-  begin
-    { Tested on Microsoft Surface Tablet }
-    Left := Round(20 * FScale);
-    Top := Round(30 * FScale);
-    Width := Round(1336 * FScale);
-    Height := Round(800 * FScale);
-    ReportMemoWidth := Round(320 * FScale);
-  end;
+  InitScreenPos;
 
   Margin := Round(2 * FScale);
   Raster := Round(MainVar.Raster * FScale);
@@ -495,7 +504,7 @@ begin
   Main.InitText;
   Main.IsUp := True;
 
-  RotaForm := TRotaForm.Create;
+  RotaForm := TRotaForm1.Create;
   StrokeRigg := RotaForm;
   Main.StrokeRigg := RotaForm;
   RotaForm.Image := Image;
@@ -504,7 +513,6 @@ begin
   RotaForm.ViewPoint := vp3D;
   RotaForm.ZoomIndex := 8;
   RotaForm.FixPoint := ooD0;
-  { Set initial translation in RotatForm, FXPos and FYPos, default. }
 
   { Params }
   Main.Param := fpVorstag;
@@ -522,6 +530,7 @@ begin
   end;
 
   { Reports }
+  HL := TStringList.Create;
   RL := TStringList.Create;
   ReportManager := TRggReportManager.Create(RL);
   ReportManager.CurrentReport := rgDiffText;
@@ -546,9 +555,6 @@ begin
     TrimmCombo.OnChange := TrimmComboChange;
   end;
 
-  HL := TStringList.Create;
-  InitHelpText;
-
   TL := TStringList.Create;
   Main.UpdateTrimm0;
   ShowTrimm;
@@ -562,7 +568,6 @@ begin
   Main.ChartGraph := ChartGraph;
   Main.Draw;
   Main.MemoryBtnClick;
-  Main.FederText.CheckState;
 
   Application.OnHint := HandleShowHint;
   InitSpeedButtons;
@@ -587,17 +592,18 @@ begin
   Main.RiggModul.UpdateUI;
 
   OnCloseQuery := FormCloseQuery;
+  Main.FederText.CheckState;
 end;
 
-procedure TFormMain.FormDestroy(Sender: TObject);
+procedure TFormMain.FormDestroy2(Sender: TObject);
 begin
   DestroyForms;
 
   RiggModul.Free;
 
-  HL.Free;
   TL.Free;
   RL.Free;
+  HL.Free;
   ReportManager.Free;
 
   Main.Free;
@@ -608,11 +614,12 @@ begin
   ChartGraph.Free;
 end;
 
-procedure TFormMain.FormKeyPress(Sender: TObject; var Key: char);
+procedure TFormMain.FormKeyPress(Sender: TObject; var Key: Char);
 var
   fa: Integer;
 begin
   fa := GetActionFromKeyChar(Key);
+
   if fa <> faNoop then
   begin
     Main.ActionHandler.Execute(fa);
@@ -653,6 +660,8 @@ begin
   if not FormShown then
     Exit;
 
+  if ShowingHelp then
+    Exit;
   if ReportText = nil then
     Exit;
   if not ReportText.Visible then
@@ -666,7 +675,7 @@ begin
 
   RL.Clear;
 
-  if WantButtonFrameReport then
+  if WantButtonReport then
   begin
     Main.FederText.Report(RL);
     ReportText.Text := RL.Text;
@@ -797,6 +806,9 @@ begin
     LayoutComponents;
     LayoutImages;
 
+    UpdateSpeedButtonDown;
+    UpdateReport;
+
     RotaForm.IsUp := True;
     RotaForm.Draw;
   end;
@@ -804,15 +816,9 @@ end;
 
 procedure TFormMain.FormResize(Sender: TObject);
 begin
-  //if not FormShown then
-  //   Exit;
-
-  { will be done via Resize and UpdateTouch }
-  //MainVar.ClientWidth := ClientWidth;
-  //MainVar.ClientHeight := ClientHeight;
-
   if (Main <> nil) and Main.IsUp then
   begin
+    MainVar.Scale := ScaleFactor;
     Inc(Main.ResizeCounter);
     Main.UpdateTouch;
     Main.UpdateText;
@@ -820,11 +826,12 @@ begin
 
   if FormShown then
   begin
-    SpeedPanel.UpdateLayout;
-    UpdateReport;
     CheckSpaceForListbox;
     CheckSpaceForMemo;
     CheckSpaceForImages;
+
+    UpdateReport;
+    SpeedPanel.UpdateLayout;
   end;
 end;
 
@@ -943,11 +950,6 @@ begin
   UpdateSpeedButtonDown;
 end;
 
-procedure TFormMain.UpdateBackgroundColor(AColor: TColor);
-begin
-//  Self.Fill.Color := AColor;
-end;
-
 procedure TFormMain.Reset;
 begin
   DefaultCaption := ApplicationTitleText;
@@ -1031,19 +1033,20 @@ begin
   case fa of
     faToggleSpeedPanel: ToggleSpeedPanel;
 
-    faMemeToggleHelp:
+    faToggleHelp:
     begin
-      ReportText.Visible := False;
+      ShowingHelp := True;
+      UpdateReport;
     end;
 
     faMemeGotoLandscape: GotoLandscape;
     faMemeGotoPortrait: GotoPortrait;
     faMemeGotoSquare: GotoSquare;
 
-    faMemeToggleReport:
+    faToggleReport:
     begin
       Flash(HelpCaptionText);
-      ReportText.Visible := not ReportText.Visible;
+      ShowingHelp := False;
       UpdateReport;
     end;
 
@@ -1062,9 +1065,9 @@ begin
       UpdateFormat(750, 1000)
     end;
 
-    faButtonFrameReport:
+    faToggleButtonReport:
     begin
-      FWantButtonFrameReport := not WantButtonFrameReport;
+      FWantButtonReport := not WantButtonReport;
       UpdateReport;
     end;
 
@@ -1091,9 +1094,9 @@ begin
 
     faToggleShowLegend: RotaForm.LegendBtnClick(nil);
     faToggleUseQuickSort: RotaForm.UseQuickSortBtnClick(nil);
-    faToggleChartGraph: ChartImageBtnClick(nil);
     faToggleSalingGraph: SalingImageBtnClick(nil);
     faToggleControllerGraph: ControllerImageBtnClick(nil);
+    faToggleChartGraph: ChartImageBtnClick(nil);
     faToggleMatrixText: RotaForm.MatrixItemClick(nil);
 
     faMemoryBtn: MemoryBtnClick(nil);
@@ -1101,15 +1104,16 @@ begin
 
     faRggBogen: BogenBtnClick(nil);
     faRggKoppel: KoppelBtnClick(nil);
+    faRggHull: HullBtnClick(nil);
 
     faSofortBtn: SofortBtnClick(nil);
     faGrauBtn: GrauBtnClick(nil);
     faBlauBtn: BlauBtnClick(nil);
     faMultiBtn: MultiBtnClick(nil);
 
-    faShowActi: ActiBtnClick(nil);
     faShowMemo: MemoBtnClick(nil);
-    faShowConf: ConfigBtnClick(nil);
+    faShowActions: ActionsBtnClick(nil);
+    faShowConfig: ConfigBtnClick(nil);
     faShowTrimmTab: TrimmTabBtnClick(nil);
 
     faShowDiagA: ShowDiagramA;
@@ -1126,9 +1130,16 @@ begin
     faShowSaling: ShowFormSaling;
     faShowController: ShowFormController;
 
-    faToggleSandboxed: IsSandboxed := not IsSandboxed;
+    faToggleSandboxed: MainVar.IsSandboxed := MainConst.MustBeSandboxed or (not MainVar.IsSandboxed);
     faToggleAllProps: AllProps := not AllProps;
     faToggleAllTags: ReportManager.XmlAllTags := not ReportManager.XmlAllTags;
+
+    faShowZOrderInfo,
+    faShowNormalKeyInfo,
+    faShowSpecialKeyInfo,
+    faShowDebugInfo,
+    faShowInfoText,
+    faShowHelpText: ShowHelpText(fa);
 
     faTR02: ShowDiagramC;
     faTR03: ShowDiagramQ;
@@ -1148,13 +1159,20 @@ begin
   UpdateSpeedButtonDown;
 end;
 
-function TFormMain.GetActionFromKey(Key: Word): Integer;
+function TFormMain.GetActionFromKey(Shift: TShiftState; Key: Word): Integer;
 begin
   result := faNoop;
   case Key of
-    vkF12: ; // result := faMemeSaveBitmap;
-    vkC: ; // result := faMemeCopyBitmap;
-    vkV: ; // result := faMemePasteBitmap;
+    vkF12: result := faMemeGotoSquare;
+//    vkC: result := faCopyTrimmItem;
+//    vkV: result := faPasteTrimmItem;
+    vkEscape:
+    begin
+      if Shift = [ssShift] then
+        result := faResetPosition
+      else
+        result := faReset;
+    end;
   end;
 end;
 
@@ -1167,11 +1185,11 @@ begin
     'a': fa := faSalingA;
     'A': fa := faFixpointA0;
 
-    'b': fa := faFixpointB;
+    'b': fa := faBiegung;
     'B': fa := faFixpointB0;
 
-    'c': fa := faCycleColorSchemeP;
-    'C': fa := faCycleColorSchemeM;
+    'c': fa := faMastfallF0C;
+    'C': fa := faFixpointC0;
 
     'd': fa := faFixpointD;
     'D': fa := faFixpointD0;
@@ -1179,14 +1197,13 @@ begin
     'e': fa := faFixpointE;
     'E': fa := faFixpointE0;
 
-    'f': fa := faFixpointF;
+    'f': fa := faMastfallF0F;
     'F': fa := faFixpointF0;
 
-    'g': ;
-    'G': ;
+    'g': fa := faMastfallVorlauf;
 
     'h': fa := faSalingH;
-    'H': fa := faRggHull;
+    'H': fa := faToggleHelp;
 
     'i': fa := faWheelRight;
     'I': fa := faWheelLeft;
@@ -1197,36 +1214,38 @@ begin
     'k': ;
     'K': fa := faRggKoppel;
 
-    'l': fa := faMemeGotoLandscape;
-    'L': fa := faToggleShowLegend;
+    'l': fa := faToggleShowLegend;
+    'L': fa := faMemeGotoLandscape;
 
     'm': fa := faMemoryBtn;
     'M': fa := faCopyAndPaste;
 
-    'n': ;
-    'N': ;
-
-    'r': fa := faMemeToggleReport;
-    'R': fa := faReadTrimmFile;
+    'n': fa := faShowNormalKeyInfo;
 
     'o': fa := faWoben;
 
-    'p': fa := faMemeGotoPortrait;
+    'p': fa := faPan;
+    'P': fa := faMemeGotoPortrait;
 
-    'Q': fa := faToggleUseQuickSort;
+    'q': fa := faToggleAllText;
 
-    's': fa := faMemeGotoSquare;
+    'r': fa := faToggleReport;
+    'R': fa := faReadTrimmFile;
+
+    's': fa := faShowSpecialKeyInfo;
+    'S': fa := faMemeGotoSquare;
 
     't': fa := faToggleFontColor;
-    'T': fa := FaToggleSpeedPanel;
+    'T': fa := faToggleSpeedPanel;
 
     'u': fa := faToggleDataText;
     'U': fa := faToggleDiffText;
 
     'v': fa := faVorstag;
+
     'w': fa := faWante;
 
-    'z': ; // fa := faResetZoom;
+    'z': fa := faShowInfoText;
     'Z': fa := faUpdateTrimm0;
 
     '0': fa := faTrimm0;
@@ -1240,16 +1259,17 @@ begin
     '8': fa := faLogo;
     '9': ;
 
-    '!': ;
-    '"': ;
-
-    '=': ; //fa := faActionPageE;
-    '?': ; //fa := faActionPageX;
+    '!': fa := faShowNormalKeyInfo;
+    '"': fa := faShowSpecialKeyInfo;
+    '§': fa := faShowInfoText;
+    '$': fa := faShowDebugInfo;
+    '=': fa := faShowZOrderInfo;
+    '?': fa := faShowHelpText;
 
     '+': fa := faActionPageP;
     '*': fa := faActionPageM;
 
-    '#': ;
+    '#': fa := faActionPage4;
 
     else fa := faNoop;
 
@@ -1268,26 +1288,6 @@ end;
 procedure TFormMain.SetIsUp(const Value: Boolean);
 begin
   Main.IsUp := Value;
-end;
-
-procedure TFormMain.InitHelpText;
-begin
-  HL.Add('Toggle Text with Keys:');
-  HL.Add('  h    - toggle help');
-  HL.Add('  r    - toggle Report');
-  HL.Add('');
-  HL.Add('Select current param with Button:');
-  HL.Add('');
-  HL.Add('Change param value with Wheel!');
-  HL.Add('  Shift-Wheel = small step');
-  HL.Add('  Ctrl-Wheel  = bigger step');
-  HL.Add('');
-  HL.Add('Another Test: change Format of Window.');
-  HL.Add('  1..8, 0 - Trimm selection');
-  HL.Add('  l, p, s - Landscape, Portrait, Square');
-  HL.Add('');
-  HL.Add('Window Status:');
-  HL.Add(Format('  Client-W-H = (%d, %d)', [ClientWidth, ClientHeight]));
 end;
 
 function TFormMain.GetOpenFileName(dn, fn: string): string;
@@ -1430,9 +1430,11 @@ begin
   StatusBar.Parent := Self;
 
   HintContainer := TWinControl.Create(Self);
+  HintContainer.Name := 'HintContainer';
   HintContainer.Parent := Self;
 
   HintText := TLabel.Create(Self);
+  HintText.Name := 'HintText';
   HintText.Parent := HintContainer;
   HintText.Font.Name := 'Consolas';
   HintText.Font.Size := 14;
@@ -1441,40 +1443,43 @@ begin
   HintText.WordWrap := False;
 
   ReportText := TMemo.Create(Self);
+  ReportText.Name := 'ReportText';
   SetupMemo(ReportText);
 
   TrimmText := TMemo.Create(Self);
   SetupMemo(TrimmText);
 
-  SpeedPanel1 := TActionSpeedBarRG01.Create(Self);
-  SpeedPanel1.Parent := Self;
-  SpeedPanel1.ShowHint := True;
-  SpeedPanel1.Visible := False;
+  Image := TImage.Create(Self);
+  Image.Name := 'Image';
+  Image.Parent := Self;
 
-  SpeedPanel2 := TActionSpeedBarRG03.Create(Self);
-  SpeedPanel2.Parent := Self;
-  SpeedPanel2.ShowHint := True;
-  SpeedPanel2.Visible := False;
+  SpeedPanel01 := TActionSpeedBarRG01.Create(Self);
+  SpeedPanel01.Name := 'SpeedPanel01';
+  SpeedPanel01.Parent := Self;
+  SpeedPanel01.ShowHint := True;
+  SpeedPanel01.Visible := False;
 
-  SpeedPanel := SpeedPanel2;
+  SpeedPanel03 := TActionSpeedBarRG03.Create(Self);
+  SpeedPanel03.Name := 'SpeedPanel03';
+  SpeedPanel03.Parent := Self;
+  SpeedPanel03.ShowHint := True;
+  SpeedPanel03.Visible := False;
+
+  SpeedPanel := SpeedPanel03;
   SpeedPanel.Visible := True;
 
   if ParamListbox = nil then
   begin
     ParamListbox := TListbox.Create(Self);
+    ParamListbox.Name := 'ParamListbox';
     ParamListbox.Parent := Self;
   end;
 
   if ReportListbox = nil then
   begin
     ReportListbox := TListbox.Create(Self);
+    ReportListbox.Name := 'ReportListbox';
     ReportListbox.Parent := Self;
-  end;
-
-  if Image = nil then
-  begin
-    Image := TImage.Create(Self);
-    Image.Parent := Self;
   end;
 
   ComponentsCreated := True;
@@ -1484,14 +1489,16 @@ procedure TFormMain.ToggleSpeedPanel;
 begin
   SpeedPanel.Visible := False;
 
-  if SpeedPanel = SpeedPanel1 then
-    SpeedPanel := SpeedPanel2
+  if SpeedPanel = SpeedPanel01 then
+    SpeedPanel := SpeedPanel03
   else
-    SpeedPanel := SpeedPanel1;
+    SpeedPanel := SpeedPanel01;
 
   SpeedPanel.Visible := True;
   SpeedPanel.UpdateSpeedButtonEnabled;
   SpeedPanel.UpdateSpeedButtonDown;
+  SpeedPanel.DarkMode := MainVar.ColorScheme.IsDark;
+  SpeedPanel.UpdateColor;
 
   Main.RiggModul.ViewModelM.UpdateView;
 end;
@@ -1517,8 +1524,8 @@ begin
   { Then it only 'works' if these values are big enough, }
   { so that computed values for Height and Width are > 0 }
 
-  LayoutSpeedPanel(SpeedPanel1);
-  LayoutSpeedPanel(SpeedPanel2);
+  LayoutSpeedPanel(SpeedPanel01);
+  LayoutSpeedPanel(SpeedPanel03);
 
   TrimmText.Left := Raster + Margin;
   TrimmText.Top := 2 * Raster + Margin;
@@ -1593,6 +1600,26 @@ begin
   RotaForm.Draw;
 end;
 
+procedure TFormMain.SeiteBtnClick(Sender: TObject);
+begin
+  RotaForm.ViewPoint := vpSeite;
+end;
+
+procedure TFormMain.AchternBtnClick(Sender: TObject);
+begin
+  RotaForm.ViewPoint := vpAchtern;
+end;
+
+procedure TFormMain.TopBtnClick(Sender: TObject);
+begin
+  RotaForm.ViewPoint := vpTop;
+end;
+
+procedure TFormMain.NullBtnClick(Sender: TObject);
+begin
+  RotaForm.ViewPoint := vp3D;
+end;
+
 procedure TFormMain.ChartImageBtnClick(Sender: TObject);
 begin
   ChartControl.Visible := not ChartControl.Visible;
@@ -1630,29 +1657,10 @@ begin
   Main.FederText.Repaint;
 end;
 
-procedure TFormMain.SeiteBtnClick(Sender: TObject);
-begin
-  RotaForm.ViewPoint := vpSeite;
-end;
-
-procedure TFormMain.AchternBtnClick(Sender: TObject);
-begin
-  RotaForm.ViewPoint := vpAchtern;
-end;
-
-procedure TFormMain.TopBtnClick(Sender: TObject);
-begin
-  RotaForm.ViewPoint := vpTop;
-end;
-
-procedure TFormMain.NullBtnClick(Sender: TObject);
-begin
-  RotaForm.ViewPoint := vp3D;
-end;
-
 procedure TFormMain.InitSalingGraph;
 begin
   SalingImage := TImage.Create(Self);
+  SalingImage.Name := 'SalingImage';
   SalingImage.Parent := Self;
   SalingImage.Visible := False;
 
@@ -1681,6 +1689,7 @@ end;
 procedure TFormMain.InitControllerGraph;
 begin
   ControllerImage := TImage.Create(Self);
+  ControllerImage.Name := 'ControllerImage';
   ControllerImage.Parent := Self;
   ControllerImage.Visible := False;
 
@@ -1715,10 +1724,12 @@ end;
 procedure TFormMain.InitChartGraph;
 begin
   ChartControl := TWinControl.Create(Self);
+  ChartControl.Name := 'ChartControl';
   ChartControl.Parent := Self;
   ChartControl.Visible := False;
 
   ChartImage := TImage.Create(Self);
+  ChartImage.Name := 'ChartImage';
   ChartImage.Parent := ChartControl;
   ChartImage.Visible := False;
 
@@ -1956,6 +1967,8 @@ end;
 procedure TFormMain.SofortBtnClick(Sender: TObject);
 begin
   Main.SofortBerechnen := not Main.SofortBerechnen;
+  Main.FederText.CheckState;
+  UpdateReport;
 end;
 
 procedure TFormMain.GrauBtnClick(Sender: TObject);
@@ -1989,6 +2002,29 @@ begin
   Main.RiggModul.UpdateUI;
 end;
 
+procedure TFormMain.BogenBtnClick(Sender: TObject);
+begin
+  Main.Bogen := not Main.Bogen;
+  SpeedPanel.UpdateSpeedButtonDown;
+  if Sender <> nil then
+    Main.FederText.CheckState;
+end;
+
+procedure TFormMain.KoppelBtnClick(Sender: TObject);
+begin
+  Main.Koppel := not Main.Koppel;
+  SpeedPanel.UpdateSpeedButtonDown;
+  if Sender <> nil then
+    Main.FederText.CheckState;
+end;
+
+procedure TFormMain.HullBtnClick(Sender: TObject);
+begin
+  Main.HullVisible := not Main.HullVisible;
+  if Sender <> nil then
+    Main.FederText.CheckState;
+end;
+
 function TFormMain.GetChecked(fa: Integer): Boolean;
 begin
   result := false;
@@ -1996,13 +2032,13 @@ begin
     Exit;
 
   case fa of
-    faToggleSandboxed: result := IsSandboxed;
+    faToggleSandboxed: result := MainVar.IsSandboxed;
     faToggleAllProps: result := AllProps;
     faToggleAllTags: result := ReportManager.XmlAllTags;
 
-    faMemeToggleReport: result := ReportText.Visible;
-    faButtonFrameReport: result := WantButtonFrameReport;
-    faChartRect..faChartReset: result := ChartGraph.GetChecked(fa);
+    faToggleHelp: result := ShowingHelp;
+    faToggleReport: result := ReportText.Visible;
+    faToggleButtonReport: result := WantButtonReport;
     faReportNone..faReportReadme: result := ReportManager.GetChecked(fa);
     faToggleSegmentF..faToggleSegmentA: result := RotaForm.RaumGraph.GetChecked(fa);
 
@@ -2021,6 +2057,7 @@ begin
     faMemoryBtn: result := False;
     faMultiBtn: result := RotaForm.WantOverlayedRiggs;
 
+    faChartRect..faChartReset: result := ChartGraph.GetChecked(fa);
     faToggleChartGraph: result := ChartControl.Visible;
     faToggleSalingGraph: result := SalingImage.Visible;
     faToggleControllerGraph: result := ControllerImage.Visible;
@@ -2040,6 +2077,28 @@ begin
     AForm.Height := Screen.Width - AForm.Top - 20;
 end;
 
+procedure TFormMain.InitScreenPos;
+begin
+  if (Screen.Width >= FScale * 1920) and (Screen.Height >= FScale * 1024) then
+  begin
+    { Tested on normal HD screen }
+    Left := Round(100 * FScale);
+    Top := Round(30 * FScale);
+    Width := Round(1700 * FScale);
+    Height := Round(960 * FScale);
+    ReportMemoWidth := Round(480 * FScale);
+  end
+  else
+  begin
+    { Tested on Microsoft Surface Tablet with FScale = 2.0 }
+    Left := Round(20 * FScale);
+    Top := Round(30 * FScale);
+    Width := Round(1336 * FScale);
+    Height := Round(800 * FScale);
+    ReportMemoWidth := Round(320 * FScale);
+  end;
+end;
+
 procedure TFormMain.MemoBtnClick(Sender: TObject);
 begin
   if not Assigned(FormMemo) then
@@ -2052,7 +2111,7 @@ begin
   FormMemo.Visible := True;
 end;
 
-procedure TFormMain.ActiBtnClick(Sender: TObject);
+procedure TFormMain.ActionsBtnClick(Sender: TObject);
 begin
   if not Assigned(FormAction) then
   begin
@@ -2096,7 +2155,6 @@ begin
   FormTrimmTab.ShowModal;
   if FormTrimmTab.ModalResult = mrOK then
   begin
-//    Main.RggMain.UpdateGetriebe;
     UpdateReport;
   end;
 end;
@@ -2125,10 +2183,11 @@ end;
 
 procedure TFormMain.InitSpeedButtons;
 begin
-  if SpeedPanel1 <> nil then
-    SpeedPanel1.InitSpeedButtons;
-  if SpeedPanel2 <> nil then
-    SpeedPanel2.InitSpeedButtons;
+  if SpeedPanel01 <> nil then
+    SpeedPanel01.InitSpeedButtons;
+
+  if SpeedPanel03 <> nil then
+    SpeedPanel03.InitSpeedButtons;
 end;
 
 procedure TFormMain.UpdateSpeedButtonDown;
@@ -2153,22 +2212,6 @@ begin
 
   SalingGraph.BackgroundColor := MainVar.ColorScheme.claBackground;
   UpdateSalingGraph;
-end;
-
-procedure TFormMain.BogenBtnClick(Sender: TObject);
-begin
-  Main.Bogen := not Main.Bogen;
-  SpeedPanel.UpdateSpeedButtonDown;
-  if Sender <> nil then
-    Main.FederText.CheckState;
-end;
-
-procedure TFormMain.KoppelBtnClick(Sender: TObject);
-begin
-  Main.Koppel := not Main.Koppel;
-  SpeedPanel.UpdateSpeedButtonDown;
-  if Sender <> nil then
-    Main.FederText.CheckState;
 end;
 
 procedure TFormMain.SuperSimpleBtnClick(Sender: TObject);
@@ -2230,6 +2273,57 @@ begin
   Image.Parent := ft;
   SalingImage.Parent := ft;
   ControllerImage.Parent := ft;
+  ReportText.Parent := ft;
+  ParamListbox.Parent := ft;
+  ReportListbox.Parent := ft;
+  TrimmText.Parent := ft;
+  HintContainer.Parent := ft;
+  SpeedPanel01.Parent := ft;
+  SpeedPanel03.Parent := ft;
+end;
+
+procedure TFormMain.InitZOrderInfo;
+var
+  i: Integer;
+  c: TControl;
+begin
+  for i := 0 to Self.ControlCount-1 do
+  begin
+    c := Controls[i];
+    HL.Add(Format('%2d - %s: %s', [i, c.Name, c.ClassName]));
+  end;
+end;
+
+procedure TFormMain.InitDebugInfo;
+begin
+  HL.Add('Window-Info:');
+  HL.Add(Format('  Initial-Client-W-H = (%d, %d)', [ClientWidth, ClientHeight]));
+  HL.Add(Format('  Handle.Scale = %.1f', [MainVar.Scale]));
+end;
+
+procedure TFormMain.ShowHelpText(fa: Integer);
+begin
+  HL.Clear;
+
+  case fa of
+    faShowHelpText: Main.FederBinding.InitSplashText(HL);
+    faShowInfoText: Main.FederBinding.InitInfoText(HL);
+    faShowNormalKeyInfo: Main.FederBinding.InitNormalKeyInfo(HL);
+    faShowSpecialKeyInfo: Main.FederBinding.InitSpecialKeyInfo(HL);
+    faShowDebugInfo: InitDebugInfo;
+    faShowZOrderInfo: InitZOrderInfo;
+  end;
+
+  ShowingHelp := True;
+  ReportText.Text := HL.Text;
+end;
+
+procedure TFormMain.ToggleSpeedPanelFontSize;
+begin
+  SpeedPanel.ToggleBigMode;
+  LayoutComponents;
+  CheckSpaceForMemo;
+  CheckSpaceForImages;
 end;
 
 procedure TFormMain.ShowDiagramE;
@@ -2270,15 +2364,6 @@ begin
   FormDiagramC.Visible := True;
 end;
 
-procedure TFormMain.ShowDiagramA;
-begin
-  if not Assigned(FormDiagramA) then
-  begin
-    FormDiagramA := TFormDiagramA.Create(Application);
-  end;
-  FormDiagramA.Show;
-end;
-
 procedure TFormMain.ShowFormKreis;
 begin
   if not Assigned(KreisForm) then
@@ -2286,6 +2371,15 @@ begin
     KreisForm := TKreisForm.Create(Application);
   end;
   KreisForm.Show;
+end;
+
+procedure TFormMain.ShowDiagramA;
+begin
+  if not Assigned(FormDiagramA) then
+  begin
+    FormDiagramA := TFormDiagramA.Create(Application);
+  end;
+  FormDiagramA.Show;
 end;
 
 procedure TFormMain.ShowFormTabelle;

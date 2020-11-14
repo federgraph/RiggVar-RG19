@@ -8,22 +8,22 @@ uses
 type
   TRggTestData = class
   public
-    class function GetKoordinaten420: TRealRiggPoints; static;
+    class function GetKoordinaten420: TRiggPoints; static;
     class function GetMastKurve420: TMastKurve; static;
   end;
 
 implementation
 
-class function TRggTestData.GetKoordinaten420: TRealRiggPoints;
+class function TRggTestData.GetKoordinaten420: TRiggPoints;
 var
-  rp: TRealRiggPoints;
+  rp: TRiggPoints;
 begin
   rp[ooA, x] := 2398;
-  rp[ooA, y] := 425;
+  rp[ooA, y] := -425;
   rp[ooA, z] := 2496;
 
   rp[ooB, x] := 2398;
-  rp[ooB, y] := -425;
+  rp[ooB, y] := 425;
   rp[ooB, z] := 2496;
 
   rp[ooC, x] := 2354;
@@ -47,11 +47,11 @@ begin
   rp[ooP, z] := 2496;
 
   rp[ooA0, x] := 2560;
-  rp[ooA0, y] := 765;
+  rp[ooA0, y] := -765;
   rp[ooA0, z] := 430;
 
   rp[ooB0, x] := 2560;
-  rp[ooB0, y] := -765;
+  rp[ooB0, y] := 765;
   rp[ooB0, z] := 430;
 
   rp[ooC0, x] := 4140;

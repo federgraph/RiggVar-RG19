@@ -170,7 +170,7 @@ type
     FTempList: TStringList;
 
     FGSB: TRggFA;
-    FiP: TRealRiggPoints;
+    FiP: TRiggPoints;
     FRumpfCell: TPoint;
 
     procedure GetKeyList(Source, Dest: TStringList);

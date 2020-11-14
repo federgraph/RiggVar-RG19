@@ -199,10 +199,18 @@ begin
 end;
 
 function Hoehe(a, b, c: double; out k: double): double;
+var
+  t: double;
 begin
   k := sqr(a) + sqr(b) - sqr(c);
   k := k / 2 / a / a;
-  result := sqrt(sqr(b) - sqr(k) * sqr(a));
+  t := sqr(b) - sqr(k) * sqr(a);
+  if t < 0.001 then
+    result := 0
+  else
+    result := sqrt(t);
+  if IsNan(result) then
+    result := 0;
 end;
 
 function PsiVonPhi(phi, l1, l2, l3, l4: double; out sv: Boolean): double;

@@ -26,7 +26,7 @@ uses
   RiggVar.FB.Color;
 
 type
-  TColorScheme = class
+  TColorScheme = record
   public
     WantBlackText: Boolean;
 
@@ -34,15 +34,10 @@ type
     SchemeDefault: Integer;
     claBackground: TRggColor;
 
-    claLabelText: TRggColor;
-    claSampleText: TRggColor;
-    claOptionText: TRggColor;
     claToolBtnFill: TRggColor;
     claTouchBtnFill: TRggColor;
     claCornerScrollbar: TRggColor;
     claCornerBtnText: TRggColor;
-    claEquationFill: TRggColor;
-    claEquationText: TRggColor;
     claTouchbarText: TRggColor;
     claNull: TRggColor;
 
@@ -66,44 +61,26 @@ implementation
 
 procedure TColorScheme.BlackText;
 begin
-  claLabelText := TRggColors.Black;
-  claSampleText := TRggColors.Black;
   claToolBtnFill := TRggColors.Gray;
   claTouchBtnFill := TRggColors.Gray;
   claCornerScrollbar := TRggColors.Gray;
   claCornerBtnText:= TRggColors.Blue;
-  claEquationFill := TRggColors.Null;
-  claEquationText := TRggColors.Black;
-
-  claOptionText := claSampleText;
 end;
 
 procedure TColorScheme.GrayText;
 begin
-  claLabelText := TRggColors.Gray;
-  claSampleText := TRggColors.Gray;
   claToolBtnFill := TRggColors.Gray;
   claTouchBtnFill := TRggColors.Gray;
   claCornerScrollbar := TRggColors.Gray;
   claCornerBtnText:= TRggColors.Blue;
-  claEquationFill := TRggColors.Null;
-  claEquationText := TRggColors.Black;
-
-  claOptionText := claSampleText;
 end;
 
 procedure TColorScheme.WhiteText;
 begin
-  claLabelText := TRggColors.White;
-  claSampleText := TRggColors.White;
   claToolBtnFill := TRggColors.White;
   claTouchBtnFill := TRggColors.White;
   claCornerScrollbar := TRggColors.Gray;
   claCornerBtnText:= TRggColors.White;
-  claEquationFill := TRggColors.Null;
-  claEquationText := TRggColors.White;
-
-  claOptionText := claSampleText;
 end;
 
 constructor TColorScheme.Create(cs: Integer);
@@ -128,103 +105,70 @@ begin
       if WantBlackText then
       begin
         claBackground := TRggColors.Slateblue;
-        claLabelText := TRggColors.Black;
-        claSampleText := TRggColors.Black;
         claToolBtnFill := TRggColors.Gray;
         claTouchBtnFill := TRggColors.Gray;
         claCornerScrollbar := TRggColors.Lightsalmon;
         claCornerBtnText:= TRggColors.Blue;
-        claEquationFill := TRggColors.Null;
-        claEquationText := TRggColors.Black;
       end
       else
       begin
         claBackground := TRggColors.Lavender;
-        claLabelText := TRggColors.Gray;
-        claSampleText := TRggColors.Gray;
         claToolBtnFill := TRggColors.Gray;
         claTouchBtnFill := TRggColors.Gray;
         claCornerScrollbar := TRggColors.Gray;
         claCornerBtnText:= TRggColors.Blue;
-        claEquationFill := TRggColors.Null;
-        claEquationText := TRggColors.Black;
       end;
     end;
     2:
     begin
       IsDark := False;
       claBackground := TRggColors.ColorF9F9F9;
-      claLabelText := TRggColors.White;
-      claSampleText := TRggColors.White;
       claToolBtnFill := TRggColors.Gray;
       claTouchBtnFill := TRggColors.Gray;
       claCornerScrollbar := TRggColors.Lavender;
       claCornerBtnText:= TRggColors.Blue;
-      claEquationFill := TRggColors.Null;
-      claEquationText := TRggColors.Black;
     end;
     3:
     begin
       claBackground := TRggColors.Cornflowerblue;
-      claLabelText := TRggColors.White;
-      claSampleText := TRggColors.White;
       claToolBtnFill := TRggColors.White;
       claTouchBtnFill := TRggColors.White;
       claCornerScrollbar := TRggColors.White;
       claCornerBtnText:= TRggColors.Black;
-      claEquationFill := TRggColors.Null;
-      claEquationText := TRggColors.Black;
     end;
     4:
     begin
       claBackground := TRggColors.Color372E69;
-      claLabelText := TRggColors.White;
-      claSampleText := TRggColors.White;
       claToolBtnFill := TRggColors.White;
       claTouchBtnFill := TRggColors.White;
       claCornerScrollbar := TRggColors.Antiquewhite;
       claCornerBtnText:= TRggColors.Blue;
-      claEquationFill := TRggColors.Null;
-      claEquationText := TRggColors.White;
     end;
     5:
     begin
       claBackground := TRggColors.Color333333;
-      claLabelText := TRggColors.White;
-      claSampleText := TRggColors.White;
       claToolBtnFill := TRggColors.White;
       claTouchBtnFill := TRggColors.White;
       claCornerScrollbar := TRggColors.WindowWhite;
       claCornerBtnText:= TRggColors.Blue;
-      claEquationFill := TRggColors.Null;
-      claEquationText := TRggColors.White;
     end;
     6:
     begin
       claBackground := TRggColors.Black;
-      claLabelText := TRggColors.White;
-      claSampleText := TRggColors.White;
       claToolBtnFill := TRggColors.White;
       claTouchBtnFill := TRggColors.White;
       claCornerScrollbar := TRggColors.Lightgray;
       claCornerBtnText:= TRggColors.Blue;
-      claEquationFill := TRggColors.Null;
-      claEquationText := TRggColors.White;
     end;
     7:
     begin
       claBackground := TRggColors.Purple; //TRggColors.Null;
-      claLabelText := TRggColors.Black;
-      claSampleText := TRggColors.Black;
       claToolBtnFill := TRggColors.Gray;
       claTouchBtnFill := TRggColors.Gray;
       claCornerScrollbar := TRggColors.Lightgoldenrodyellow;
       claCornerBtnText:= TRggColors.Blue;
-      claEquationFill := TRggColors.Null;
-      claEquationText := TRggColors.Black;
     end;
   end;
-  claOptionText := claSampleText;
 end;
 
 end.

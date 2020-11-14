@@ -19,7 +19,7 @@
 interface
 
 uses
-  System.SysUtils,
+  SysUtils,
   RiggVar.FB.ActionConst;
 
 function GetFederActionLong(fa: TFederAction): string;
@@ -110,10 +110,14 @@ begin
     faPasteTrimmItem: result := 'Paste Trimm-Item or Trimm-File';
 
     faShowMemo: result := 'Form Memo';
-    faShowActi: result := 'Form Actions';
-    faShowOpti: result := 'Form Options';
-    faShowConf: result := 'Form Config';
+    faShowActions: result := 'Form Actions';
+    faShowOptions: result := 'Form Options';
+    faShowDrawings: result := 'Form Drawings';
+    faShowConfig: result := 'Form Config';
     faShowTrimmTab: result := 'Form Trimm Tab';
+    faShowKreis: result := 'Form Kreis';
+    faShowInfo: result := 'Form Info';
+    faShowSplash: result := 'Form Splash';
 
     faShowDiagA: result := 'Form Diagramm';
     faShowDiagC: result := 'Form Live Diagramm Controls';
@@ -124,9 +128,6 @@ begin
     faShowText: result := 'Form Text-Ausgabe';
 
     faShowForce: result := 'Form Force';
-    faShowKreis: result := 'Form Kreis';
-    faShowInfo: result := 'Form Info';
-    faShowSplash: result := 'Form Splash';
     faShowDetail: result := 'Form Detail';
     faShowTabelle: result := 'Form Tabelle';
     faShowSaling: result := 'Form Saling';
@@ -153,22 +154,22 @@ begin
     faToggleTouchFrame: result := 'Toggle Touch Frame';
     faToggleSpeedPanel: result := 'Toggle Speed Panel';
 
-    faCycleColorSchemeM: result := 'cycle 3D color scheme -';
-    faCycleColorSchemeP: result := 'cycle 3D color scheme +';
+    faCycleColorSchemeM: result := 'cycle color scheme -';
+    faCycleColorSchemeP: result := 'cycle color scheme +';
 
     faTouchDesk: result := 'Touch Desk';
     faTouchTablet: result := 'Touch Tablet';
     faTouchPhone: result := 'Touch Phone';
 
-    faButtonFrameReport: result := 'Button Frame Report';
+    faToggleButtonReport: result := 'Button Frame Report';
 
     faParamValuePlus1: result := 'Param Value + 1';
     faParamValueMinus1: result := 'Param Value - 1';
     faParamValuePlus10: result := 'Param Value + 10';
     faParamValueMinus10: result := 'Param Value - 10';
 
-    faMemeToggleHelp: result := 'Toggle Help Text';
-    faMemeToggleReport: result := 'Toggle Report';
+    faToggleHelp: result := 'Toggle Help Text';
+    faToggleReport: result := 'Toggle Report';
 
     faMemeGotoLandscape: result := 'Goto Landscape';
     faMemeGotoSquare: result := 'Goto Square';
@@ -338,10 +339,6 @@ begin
     faPlusOne: result := 'Plus One';
     faPlusTen: result := 'Plus Ten';
 
-    faBlackText: result := 'Black Text';
-    faGrayText: result := 'Gray Text';
-    faWhiteText: result := 'White Text';
-
     faPan: result := 'Pan';
 
     faParamORX: result := 'Param OrthoRot X';
@@ -357,10 +354,45 @@ begin
     faParamEAR: result := 'Param EA Rigg';
     faParamEI: result := 'Param EI Mast';
 
-    faParamT1: result := 'Param T1';
-    faParamT2: result := 'Param T2';
-    faParamT3: result := 'Param T3';
-    faParamT4: result := 'Param T4';
+    faRotaForm1: result := 'use RotaForm 1';
+    faRotaForm2: result := 'use RotaForm 2';
+    faRotaForm3: result := 'use RotaForm 3';
+
+    faReset: result := 'Reset';
+    faResetPosition: result := 'Reset Position';
+    faResetRotation: result := 'Reset Rotation';
+    faResetZoom: result := 'Reset Zoom';
+
+    faToggleLanguage: result := 'Toggle Language';
+
+    faToggleDropTarget: result := 'Drop target';
+
+    faSave: result := 'Save';
+    faLoad: result := 'Load';
+    faOpen: result := 'Open';
+    faCopy: result := 'Copy';
+    faPaste: result := 'Paste';
+    faShare: result := 'Share';
+
+    faToggleViewType: result := 'Toggle view type';
+    faViewTypeOrtho: result := 'Set view type to orthographic';
+    faViewTypePerspective: result := 'Set view type to perspective';
+
+    faHullMesh :result := 'toggle hull mesh';
+    faHullMeshOn :result := 'hull mesh on';
+    faHullMeshOff :result := 'hull mesh off';
+
+    faToggleMoveMode: result := 'Toggle move mode';
+    faLinearMove: result := 'Linear move';
+    faExpoMove: result := 'Exponential move';
+
+    faShowHelpText: result := 'Show Help Text';
+    faShowInfoText: result := 'Show Info Text';
+    faShowNormalKeyInfo: result := 'Show normal key info';
+    faShowSpecialKeyInfo: result := 'Show special key info';
+    faShowDebugInfo: result := 'Show Debug Info';
+    faShowZOrderInfo: result := 'Show Z-Order';
+
   end;
 end;
 

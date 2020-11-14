@@ -56,7 +56,7 @@ uses
   RggDisplay in 'Graph\RggDisplay.pas',
   RggPolarKar in 'Graph\RggPolarKar.pas',
   RggRota in 'Graph\RggRota.pas',
-  RggTestData in 'Graph\RggTestData.pas',
+  RggTestData in 'Core\RggTestData.pas',
   RggBootGraph in 'Graph\RggBootGraph.pas',
   RggGraph in 'Graph\RggGraph.pas',
   RggRaumGraph in 'Graph\RggRaumGraph.pas',

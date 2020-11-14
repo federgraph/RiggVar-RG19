@@ -96,7 +96,7 @@ uses
 
 procedure TFormDiagramQ.FormCreate(Sender: TObject);
 begin
-  FScale := Main.Scale;
+  FScale := MainVar.Scale;
 
   Margin := Round(10 * FScale);
   Width := Round(1500 * FScale);
