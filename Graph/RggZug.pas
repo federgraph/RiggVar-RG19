@@ -3,8 +3,8 @@
 interface
 
 uses
-  System.Classes,
-  Vcl.Graphics,
+  Classes,
+  Graphics,
   RggTypes;
 
 type

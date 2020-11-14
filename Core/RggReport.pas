@@ -18,9 +18,13 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  System.SysUtils,
-  System.Classes,
+  SysUtils,
+  Classes,
   RggTypes,
   RggFachwerk;
 
@@ -67,7 +71,7 @@ type
     procedure AusgabeDiffP(rP, rPe: TRiggPoints);
     procedure AusgabeRF(rF: TRiggLvektor);
     procedure AusgabeWinkel(alpha, alpha1, alpha2, beta, gamma,
-      delta1, delta2, epsilon, phi, psi: double);
+      delta1, delta2, epsilon, phi, psi: single);
     procedure AusgabeTrimmControls(Ctrls: TTrimmControls);
     procedure AusgabeSalingDaten(SData: TSalingDaten);
     procedure AusgabeLog(Liste: TStringList);
@@ -267,7 +271,7 @@ begin
     begin
       if i in IndexAuswahlL then
       Add(Format('  rL[%2d] %10.3f  (%s)',
-      [i, rL[i], AbstandLabels[i]]));
+      [i, rL.V[i], AbstandLabels[i]]));
     end;
     Add('');
   end;
@@ -285,7 +289,7 @@ begin
     begin
       if i in IndexAuswahlL then
       Add(Format('  rLe[%2d]  %10.3f  (%s)',
-      [i, rLe[i], AbstandLabels[i]]));
+      [i, rLe.V[i], AbstandLabels[i]]));
     end;
     PrintUnderlineE;
     Add('');
@@ -304,7 +308,7 @@ begin
     begin
       if i in IndexAuswahlL then
       Add(Format('  %2d %10.3f  (%s)',
-      [i, (rLe[i]-rL[i]), AbstandLabels[i]]));
+      [i, (rLe.V[i]-rL.V[i]), AbstandLabels[i]]));
     end;
     PrintUnderlineE;
     Add('');
@@ -325,7 +329,7 @@ begin
     begin
       if i in IndexAuswahlP then
       Add(Format('  rP[%s] %8.2f %8.2f %8.2f  (%s)',
-      [KoordTexte[i], rP[i,x], rP[i,y], rP[i,z], KoordLabels[i]]));
+      [KoordTexte[i], rP.V[i].X, rP.V[i].Y, rP.V[i].Z, KoordLabels[i]]));
     end;
     Add('');
   end;
@@ -345,7 +349,7 @@ begin
     begin
       if i in IndexAuswahlP then
       Add(Format('  rPe[%s] %8.2f %8.2f %8.2f  (%s)',
-      [KoordTexte[i], rPe[i,x], rPe[i,y], rPe[i,z], KoordLabels[i]]));
+      [KoordTexte[i], rPe.V[i].X, rPe.V[i].Y, rPe.V[i].Z, KoordLabels[i]]));
     end;
     PrintUnderlineE;
     Add('');
@@ -365,7 +369,7 @@ begin
     begin
       if i in IndexAuswahlP then
       Add(Format('  %s  %8.2f %8.2f %8.2f  (%s)',
-      [KoordTexte[i], rPe[i,x]-rP[i,x], rPe[i,y]-rP[i,y], rPe[i,z]-rP[i,z],
+      [KoordTexte[i], rPe.V[i].X-rP.V[i].X, rPe.V[i].Y-rP.V[i].Y, rPe.V[i].Z-rP.V[i].Z,
       KoordLabels[i]]));
     end;
     Add('');
@@ -384,14 +388,14 @@ begin
     begin
       if i in IndexAuswahlL then
       Add(Format('  rF[%2d] %10.0f  (%s)',
-      [Ord(i), rF[i], AbstandLabels[i]]));
+      [Ord(i), rF.V[i], AbstandLabels[i]]));
     end;
     Add('');
   end;
 end;
 
 procedure TRiggReport.AusgabeWinkel(alpha, alpha1, alpha2, beta, gamma,
-  delta1, delta2, epsilon, phi, psi: double);
+  delta1, delta2, epsilon, phi, psi: single);
 begin
   with FML do
   begin

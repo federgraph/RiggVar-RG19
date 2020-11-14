@@ -18,29 +18,33 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
   Math,
   RggTypes;
 
 type
   TGeometrie = array [0 .. 1, 1 .. 9] of Integer;
-  TKnotenVektor = array [1 .. 6] of double;
-  TStabVektor = array [1 .. 9] of double;
+  TKnotenVektor = array [1 .. 6] of single;
+  TStabVektor = array [1 .. 9] of single;
   Lagerkraefte = (AX, AY, BX, BY);
-  TAufLager = array [Lagerkraefte] of double;
+  TAufLager = array [Lagerkraefte] of single;
 
 const
   { Geometriematrix, Stab in Spalte verbindet die beiden Knoten }
   constantG: TGeometrie =
-    ((1, 1, 2, 2, 3, 3, 4, 4, 5),
-     (4, 5, 6, 3, 5, 4, 6, 5, 6));
+   ((1, 1, 2, 2, 3, 3, 4, 4, 5),
+    (4, 5, 6, 3, 5, 4, 6, 5, 6));
 
   { EA in N }
   constantEA: TStabVektor = (1E6, 1E6, 2E6, 2E6, 2E6, 2E6, 10E6, 10E6, 10E6);
 
   { Anfangswerte für Knotenpunkt-Koordinaten in mm }
   InitX: TKnotenVektor = (2870, 2300, 2800, 4140, 2870, 2560);
-  InitY: TKnotenVektor = ( 400, 2600, 4600,  340, -100,  430);
+  InitY: TKnotenVektor = ( 400, 2600, 4600, 340, -100, 430);
 
   { Anfangswert für äußere Belastung in N }
   BelastungX: TKnotenVektor = (0.00, 0.00, 0.00, 0, 0.00, 0);
@@ -52,7 +56,7 @@ const
 
   { Vektoren zum bequemen Löschen der Arrays }
   ClearVektorK: TKnotenVektor = (0, 0, 0, 0, 0, 0);
-  ClearVektorS: TStabVektor   = (0, 0, 0, 0, 0, 0, 0, 0, 0);
+  ClearVektorS: TStabVektor = (0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 type
   TFachwerk = class
@@ -60,7 +64,7 @@ type
     K: Integer; { Anzahl der Knoten }
     K1: Integer; { KnotenNr. des Festlagers A }
     K2: Integer; { KnotenNr. des Loslagers B }
-    Phi: double; { Winkel von FB in Grad }
+    Phi: single; { Winkel von FB in Grad }
     S: Integer; { Anzahl der Staebe }
     G: TGeometrie; { Geometriematrix }
     vektorEA: TStabVektor; { Vektor EA }
@@ -69,19 +73,19 @@ type
     FXsaved, FYsaved: TKnotenVektor; { Kopie des Belastungsvektors }
     FO, FO1, FO2: TKnotenVektor; { Verschiebungen }
     Lager: TAufLager; { Auflagerreaktionen }
-    P: double; { Winkel der Auflagekraft im Loslager B in Rad }
+    P: single; { Winkel der Auflagekraft im Loslager B in Rad }
     Q: TStabVektor; { l/EA Vektor }
     FS1: TStabVektor; { Puffer für Stabkräfte }
     FS: TStabVektor; { Speicher-Vektor der Stabkräfte bei äußerer Last }
-    SummeFX, SummeFY, SummeMO: double; { summierte Belastungen }
-    DX1, DY1, W1: double;
-    DX2, DY2, W2: double;
-    DX3, DY3, W3: double;
-    DX4, DY4, W4: double;
-    D, D1, D2, W: double;
-    BekanntFX, BekanntFY: double;
-    WantenPower: double;
-    MastDruck: double;
+    SummeFX, SummeFY, SummeMO: single; { summierte Belastungen }
+    DX1, DY1, W1: single;
+    DX2, DY2, W2: single;
+    DX3, DY3, W3: single;
+    DX4, DY4, W4: single;
+    D, D1, D2, W: single;
+    BekanntFX, BekanntFY: single;
+    WantenPower: single;
+    MastDruck: single;
     SalingTyp: TSalingTyp;
     BerechneVerschiebungen: Boolean;
     constructor Create;
@@ -90,7 +94,7 @@ type
     procedure KG21(l, l1, l2, l3, i1, i2, i3: Integer);
     procedure Stabkraefte;
     procedure StabkraefteOSB;
-    procedure Auflagerkraefte(SumFX, SumFY, SumMO: double; out Lager: TAuflager);
+    procedure Auflagerkraefte(SumFX, SumFY, SumMO: single; out Lager: TAuflager);
     procedure Verschiebungen;
     procedure ActionF;
   end;
@@ -224,7 +228,7 @@ begin
     KG20(2, 3, 6, 4, 3);
 
   KG21(3, 4, 5, 2, 6, 5, 4);
-  KG22(4, 5, 6, 3, 1,  8, 7, 6, 1);
+  KG22(4, 5, 6, 3, 1, 8, 7, 6, 1);
   KG21(6, 5, 4, 2, 9, 7, 3);
 end;
 
@@ -240,13 +244,13 @@ begin
   { Punkt P, weil Ohne Saling: }
   FS1[3] := FS1[4];
 
-  KG22(4, 5, 6, 3, 1,  8, 7, 6, 1);
+  KG22(4, 5, 6, 3, 1, 8, 7, 6, 1);
   KG21(6, 5, 4, 2, 9, 7, 3);
 end;
 
-procedure TFachwerk.Auflagerkraefte(SumFX, SumFY, SumMO: double; out Lager: TAuflager);
+procedure TFachwerk.Auflagerkraefte(SumFX, SumFY, SumMO: single; out Lager: TAuflager);
 var
-  FB: double;
+  FB: single;
 begin
   FB := -SumMO / ((KX[K2] - KX[K1]) * sin(P) - (KY[K2] - KY[K1]) * cos(P));
   Lager[BX] := FB * cos(P);
@@ -258,10 +262,10 @@ end;
 procedure TFachwerk.Verschiebungen;
 var
   i, j, l: Integer;
-  Sum1FX, Sum1FY, Sum1MO: double;
+  Sum1FX, Sum1FY, Sum1MO: single;
   Lager1: TAufLager;
-  PORad: double;
-  F: double;
+  PORad: single;
+  F: single;
 begin
   PORad := 0;
   for l := 1 To K do
@@ -367,10 +371,10 @@ begin
 
   if (SalingTyp = stOhneStarr)  or (SalingTyp = stOhneBiegt) and
     (BerechneVerschiebungen = True) then
-  { Verschiebungen ausrechnen }
+    { Verschiebungen ausrechnen }
     Verschiebungen; { jetzt sind die Stabkräfte unter Last "1" im
     Vektor FS1 gespeichert, die Stabkräfte unter der wirklichen Last
-  immer noch in Vektor FS }
+    immer noch in Vektor FS }
 end;
 
 end.

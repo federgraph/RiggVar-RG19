@@ -7,6 +7,7 @@ uses
   SysUtils,
   Classes,
   Graphics,
+  RiggVar.FD.Point,
   RggCalc,
   RggTypes,
   RggDisplayTypes,
@@ -19,25 +20,25 @@ type
   TRaumGraph = class(TBootGraph)
   protected
     { original definition of Achsen }
-    AchseN: TRealPoint;
-    AchseX: TRealPoint;
-    AchseY: TRealPoint;
-    AchseZ: TRealPoint;
+    AchseN: TPoint3D;
+    AchseX: TPoint3D;
+    AchseY: TPoint3D;
+    AchseZ: TPoint3D;
 
     { transformed coordinates Achsen }
-    AchseNT: TRealPoint;
-    AchseXT: TRealPoint;
-    AchseYT: TRealPoint;
-    AchseZT: TRealPoint;
+    AchseNT: TPoint3D;
+    AchseXT: TPoint3D;
+    AchseYT: TPoint3D;
+    AchseZT: TPoint3D;
 
     { transformed coordinates of Rigg }
-    A0, B0, C0, D0, E0, F0, P0: TRealPoint;
-    A,  B,  C,  D,  E,  F,  P:  TRealPoint;
-    M, N: TRealPoint;
+    A0, B0, C0, D0, E0, F0, P0: TPoint3D;
+    A,  B,  C,  D,  E,  F,  P:  TPoint3D;
+    M, N: TPoint3D;
   protected
     Zug3D: TZug3DBase; // injected via constructor
   private
-    function GetFixPunkt: TRealPoint;
+    function GetFixPunkt: TPoint3D;
     function GetStrokeWidthS: Integer;
   protected
     procedure UpdateZugProps;
@@ -71,7 +72,7 @@ type
     procedure SetChecked(fa: Integer; Value: Boolean);
     function GetChecked(fa: Integer): Boolean;
     procedure GetPlotList(ML: TStrings); override;
-    property FixPunkt: TRealPoint read GetFixPunkt;
+    property FixPunkt: TPoint3D read GetFixPunkt;
 
     property WantRenderH: Boolean read WantRumpf write WantRumpf;
     property StrokeWidthS: Integer read GetStrokeWidthS;
@@ -107,25 +108,25 @@ begin
   DL := TRggDisplayList.Create;
   DL.DF := DF;
 
-  AchseN[x] := 0;
-  AchseN[y] := 0;
-  AchseN[z] := 0;
+  AchseN.X := 0;
+  AchseN.Y := 0;
+  AchseN.Z := 0;
 
-  AchseX[x] := 1;
-  AchseX[y] := 0;
-  AchseX[z] := 0;
+  AchseX.X := 1;
+  AchseX.Y := 0;
+  AchseX.Z := 0;
 
-  AchseY[x] := 0;
-  AchseY[y] := 1;
-  AchseY[z] := 0;
+  AchseY.X := 0;
+  AchseY.Y := 1;
+  AchseY.Z := 0;
 
-  AchseZ[x] := 0;
-  AchseZ[y] := 0;
-  AchseZ[z] := 1;
+  AchseZ.X := 0;
+  AchseZ.Y := 0;
+  AchseZ.Z := 1;
 
-  AchseX := SkalarMult(AchseX, 1000);
-  AchseY := SkalarMult(AchseY, 1000);
-  AchseZ := SkalarMult(AchseZ, 1000);
+  AchseX := AchseX * 1000;
+  AchseY := AchseY * 1000;
+  AchseZ := AchseZ * 1000;
 end;
 
 destructor TRaumGraph.Destroy;
@@ -149,14 +150,14 @@ var
   i: TRiggPoint;
   j: Integer;
   RPT: TRiggPoints;
-  MKT: array [0 .. BogenMax] of TRealPoint;
+  MKT: array [0 .. BogenMax] of TPoint3D;
   KKT: TKoordLine;
 begin
   { Graph drehen }
   if Assigned(Transformer) then
   begin
     for i := Low(TRiggPoint) to High(TRiggPoint) do
-      RPT[i] := Transformer.TransformPoint(rP[i]);
+      RPT.V[i] := Transformer.TransformPoint(rP.V[i]);
     for j := 0 to BogenMax do
       MKT[j] := Transformer.TransformPoint(Kurve[j]);
 
@@ -172,77 +173,77 @@ begin
   AchseYT := Transformer.TransformPoint(AchseY);
   AchseZT := Transformer.TransformPoint(AchseZ);
 
-  A0 := RPT[ooA0];
-  B0 := RPT[ooB0];
-  C0 := RPT[ooC0];
-  D0 := RPT[ooD0];
-  E0 := RPT[ooE0];
-  F0 := RPT[ooF0];
-  P0 := RPT[ooP0];
+  A0 := RPT.A0;
+  B0 := RPT.B0;
+  C0 := RPT.C0;
+  D0 := RPT.D0;
+  E0 := RPT.E0;
+  F0 := RPT.F0;
+  P0 := RPT.P0;
 
-  A := RPT[ooA];
-  B := RPT[ooB];
-  C := RPT[ooC];
-  D := RPT[ooD];
-  E := RPT[ooE];
-  F := RPT[ooF];
-  P := RPT[ooP];
+  A := RPT.A;
+  B := RPT.B;
+  C := RPT.C;
+  D := RPT.D;
+  E := RPT.E;
+  F := RPT.F;
+  P := RPT.P;
 
-  M := RPT[ooM];
+  M := RPT.M;
 
   { Es wurde nicht nur rotiert,
     sondern bereits auch verschoben und skaliert }
 
   with RaumGraphData do
   begin
-    xA0 := Round(RPT[ooA0, x]);
-    yA0 := Round(RPT[ooA0, z]);
-    xB0 := Round(RPT[ooB0, x]);
-    yB0 := Round(RPT[ooB0, z]);
-    xC0 := Round(RPT[ooC0, x]);
-    yC0 := Round(RPT[ooC0, z]);
-    xD0 := Round(RPT[ooD0, x]);
-    yD0 := Round(RPT[ooD0, z]);
-    xE0 := Round(RPT[ooE0, x]);
-    yE0 := Round(RPT[ooE0, z]);
-    xF0 := Round(RPT[ooF0, x]);
-    yF0 := Round(RPT[ooF0, z]);
+    xA0 := Round(RPT.A0.X);
+    yA0 := Round(RPT.A0.Z);
+    xB0 := Round(RPT.B0.X);
+    yB0 := Round(RPT.B0.Z);
+    xC0 := Round(RPT.C0.X);
+    yC0 := Round(RPT.C0.Z);
+    xD0 := Round(RPT.D0.X);
+    yD0 := Round(RPT.D0.Z);
+    xE0 := Round(RPT.E0.X);
+    yE0 := Round(RPT.E0.Z);
+    xF0 := Round(RPT.F0.X);
+    yF0 := Round(RPT.F0.Z);
 
-    xA := Round(RPT[ooA, x]);
-    yA := Round(RPT[ooA, z]);
-    xB := Round(RPT[ooB, x]);
-    yB := Round(RPT[ooB, z]);
-    xC := Round(RPT[ooC, x]);
-    yC := Round(RPT[ooC, z]);
-    xD := Round(RPT[ooD, x]);
-    yD := Round(RPT[ooD, z]);
-    xE := Round(RPT[ooE, x]);
-    yE := Round(RPT[ooE, z]);
-    xF := Round(RPT[ooF, x]);
-    yF := Round(RPT[ooF, z]);
+    xA := Round(RPT.A.X);
+    yA := Round(RPT.A.Z);
+    xB := Round(RPT.B.X);
+    yB := Round(RPT.B.Z);
+    xC := Round(RPT.C.X);
+    yC := Round(RPT.C.Z);
+    xD := Round(RPT.D.X);
+    yD := Round(RPT.D.Z);
+    xE := Round(RPT.E.X);
+    yE := Round(RPT.E.Z);
+    xF := Round(RPT.F.X);
+    yF := Round(RPT.F.Z);
 
-    xP0 := Round(RPT[ooP0, x]);
-    yP0 := Round(RPT[ooP0, z]);
-    xP := Round(RPT[ooP, x]);
-    yP := Round(RPT[ooP, z]);
-    xM := Round(RPT[ooM, x]);
-    yM := Round(RPT[ooM, z]);
-    xN := Round(AchseNT[x]);
-    yN := Round(AchseNT[z]);
+    xP0 := Round(RPT.P0.X);
+    yP0 := Round(RPT.P0.Z);
+    xP := Round(RPT.P.X);
+    yP := Round(RPT.P.Z);
+    xM := Round(RPT.M.X);
+    yM := Round(RPT.M.Z);
+    xN := Round(AchseNT.X);
+    yN := Round(AchseNT.Z);
 
-    xX := Round(AchseXT[x]);
-    yX := Round(AchseXT[z]);
-    xY := Round(AchseYT[x]);
-    yY := Round(AchseYT[z]);
-    xZ := Round(AchseZT[x]);
-    yZ := Round(AchseZT[z]);
+    xX := Round(AchseXT.X);
+    yX := Round(AchseXT.Z);
+    xY := Round(AchseYT.X);
+    yY := Round(AchseYT.Z);
+    xZ := Round(AchseZT.X);
+    yZ := Round(AchseZT.Z);
   end;
 
   { MastKurve }
   for j := 0 to BogenMax do
   begin
-    Zug3D.ZugMastKurve[j].x := Round(MKT[j, x]);
-    Zug3D.ZugMastKurve[j].y := -Round(MKT[j, z]);
+    Zug3D.ZugMastKurve[j].x := Round(MKT[j].X);
+    Zug3D.ZugMastKurve[j].y := -Round(MKT[j].Z);
   end;
 
   { Koppelkurve }
@@ -250,8 +251,8 @@ begin
   begin
     for j := 0 to 100 do
     begin
-      Zug3D.ZugKoppelKurve[j].X := Round(KKT[j, x]);
-      Zug3D.ZugKoppelKurve[j].Y := -Round(KKT[j, z]);
+      Zug3D.ZugKoppelKurve[j].X := Round(KKT[j].X);
+      Zug3D.ZugKoppelKurve[j].Y := -Round(KKT[j].Z);
     end;
   end;
 end;
@@ -267,7 +268,7 @@ begin
   Zug3D.DrawToCanvas(g);
 end;
 
-function TRaumGraph.GetFixPunkt: TRealPoint;
+function TRaumGraph.GetFixPunkt: TPoint3D;
 begin
   result := Transformer.TransformedFixPunkt;
 end;
@@ -294,7 +295,7 @@ procedure TRaumGraph.UpdateZugProps;
 var
   cr: TRaumGraphProps;
 begin
-  BogenIndexD := FindBogenIndexOf(rP[ooD]);
+  BogenIndexD := FindBogenIndexOf(rP.D);
 
   cr := RaumGraphProps;
 

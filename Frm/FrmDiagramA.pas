@@ -585,7 +585,7 @@ begin
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
         if PunktOK then
-          af[tempIndex, i] := Rigg.rF[14]
+          af[tempIndex, i] := Rigg.rF.V[14]
         else
           af[tempIndex, i] := 0;
       end;
@@ -593,25 +593,25 @@ begin
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
         if PunktOK then
-          af[tempIndex, i] := Rigg.rF[8]
+          af[tempIndex, i] := Rigg.rF.V[8]
         else
           af[tempIndex, i] := 0;
       end;
       tempIndex := YCombo.Items.IndexOf('Mastfall F0F');
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
-        af[tempIndex, i] := Abstand(Rigg.rP[ooF0], Rigg.rP[ooF]);
+        af[tempIndex, i] := Rigg.rP.F0.Distance(Rigg.rP.F);
       end;
       tempIndex := YCombo.Items.IndexOf('Mastfall F0C');
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
-        af[tempIndex, i] := Abstand(Rigg.rP[ooF0], Rigg.rP[ooC]);
+        af[tempIndex, i] := Rigg.rP.F0.Distance(Rigg.rP.C);
       end;
       tempIndex := YCombo.Items.IndexOf('Elastizität Punkt C');
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
         if PunktOK then
-          af[tempIndex, i] := Abstand(Rigg.rP[ooC], Rigg.rPe[ooC])
+          af[tempIndex, i] := Rigg.rP.C.Distance(Rigg.rPe.C)
         else
           af[tempIndex, i] := 0;
       end;
@@ -651,12 +651,12 @@ begin
   tempIndex := YCombo.Items.IndexOf('Mastfall F0F');
   if (tempIndex <> -1) and (tempIndex < ANr) then
   begin
-    bf[tempIndex] := Abstand(Rigg.rP[ooF0], Rigg.rP[ooF]);
+    bf[tempIndex] := Rigg.rP.F0.Distance(Rigg.rP.F);
   end;
   tempIndex := YCombo.Items.IndexOf('Mastfall F0C');
   if (tempIndex <> -1) and (tempIndex < ANr) then
   begin
-    bf[tempIndex] := Abstand(Rigg.rP[ooF0], Rigg.rP[ooC]);
+    bf[tempIndex] := Rigg.rP.F0.Distance(Rigg.rP.C);
   end;
   tempIndex := YCombo.Items.IndexOf('Durchbiegung hd');
   if (tempIndex <> -1) and (tempIndex < ANr) then
@@ -696,13 +696,13 @@ begin
   begin
     tempIndex := YCombo.Items.IndexOf('Vorstag-Spannung');
     if (tempIndex <> -1) and (tempIndex < ANr) then
-      bf[tempIndex] := Rigg.rF[14];
+      bf[tempIndex] := Rigg.rF.V[14];
     tempIndex := YCombo.Items.IndexOf('Wanten-Spannung');
     if (tempIndex <> -1) and (tempIndex < ANr) then
-      bf[tempIndex] := Rigg.rF[13];
+      bf[tempIndex] := Rigg.rF.V[13];
     tempIndex := YCombo.Items.IndexOf('Elastizität Punkt C');
     if (tempIndex <> -1) and (tempIndex < ANr) then
-      bf[tempIndex] := Abstand(Rigg.rP[ooC], Rigg.rPe[ooC]);
+      bf[tempIndex] := Rigg.rP.C.Distance(Rigg.rPe.C);
   end;
 
   DrawPoint;

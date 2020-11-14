@@ -19,7 +19,7 @@
 interface
 
 uses
-  System.Classes;
+  Classes;
 
 type
   TTraceDestination = (

@@ -26,6 +26,10 @@ object FormController: TFormController
     object ControllerSheet: TTabSheet
       Tag = 1
       Caption = 'Controller'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnController: TPanel
         Left = 0
         Top = 0

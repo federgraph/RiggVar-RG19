@@ -6,6 +6,7 @@ uses
   Winapi.Windows,
   System.Classes,
   System.Types,
+  RiggVar.FD.Point,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -56,9 +57,9 @@ type
   private
     SchnittKK: TSchnittKK;
     Sprite1, Sprite2: TSprite;
-    FrM1, FrM2: TRealPoint; { double - Mittelpunkte der großen Kreise }
+    FrM1, FrM2: TPoint3D; { double - Mittelpunkte der großen Kreise }
     FiM1, FiM2: TPoint; { Integer - Mittelpunkte der großen Kreise }
-    FrPos1, FrPos2: TRealPoint; { double - Mittelpunkte der kleinen Kreise }
+    FrPos1, FrPos2: TPoint3D; { double - Mittelpunkte der kleinen Kreise }
     FiPos1, FiPos2: TPoint; { Integer - Mittelpunkte der kleinen Kreise }
     FSchnittOK: Boolean;
     FKreise: Boolean;
@@ -232,10 +233,10 @@ procedure TKreisForm.Action;
 begin
   MoveSprite;
   { neue MittelPunkte übernehmen }
-  FrM1[x] := FiM1.X;
-  FrM1[y] := FiM1.Y;
-  FrM2[x] := FiM2.X;
-  FrM2[y] := FiM2.Y;
+  FrM1.X := FiM1.X;
+  FrM1.Y := FiM1.Y;
+  FrM2.X := FiM2.X;
+  FrM2.Y := FiM2.Y;
   { Schnittpunkte ausrechnen }
   with SchnittKK do
   begin
@@ -245,10 +246,10 @@ begin
     FrPos2 := SchnittPunkt2;
   end;
   { Integer - Mittelpunkte der kleinen Kreise }
-  FiPos1.X := Round(FrPos1[x]);
-  FiPos1.Y := Round(FrPos1[y]);
-  FiPos2.X := Round(FrPos2[x]);
-  FiPos2.Y := Round(FrPos2[y]);
+  FiPos1.X := Round(FrPos1.X);
+  FiPos1.Y := Round(FrPos1.Y);
+  FiPos2.X := Round(FrPos2.X);
+  FiPos2.Y := Round(FrPos2.Y);
   if not(SchnittKK.Status = bmZwei) then
   begin
     FiPos1.X := Scale(-3) * TSprite.SR; { kleine Kreise aus dem Bild schieben }

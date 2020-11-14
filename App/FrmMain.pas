@@ -28,20 +28,15 @@ uses
   RiggVar.FB.SpeedBar,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
-  RiggVar.RG.Graph,
+  RiggVar.RG.Rota,
+  RggCtrls,
+  RggChartGraph,
   RggTypes,
   RggUnit4,
   System.SysUtils,
   System.Classes,
   System.Types,
   System.UITypes,
-  RggDisplayTypes,
-  RggDisplay,
-  RggStrings,
-  RggRaumGraph,
-  RggRota,
-  RggCtrls,
-  RggChartGraph,
   Vcl.Controls,
   Vcl.Forms,
   Vcl.StdCtrls,
@@ -50,6 +45,8 @@ uses
   Vcl.Graphics,
   Vcl.Menus,
   Vcl.ComCtrls;
+
+{$define Vcl}
 
 type
   TFormMain = class(TForm)
@@ -89,9 +86,6 @@ type
     RL: TStrings;
     TL: TStrings;
     procedure InitParamListbox;
-    procedure InitTrimmCombo;
-    procedure InitParamCombo;
-    procedure InitReportCombo;
   public
     AllProps: Boolean;
     procedure ShowTrimm;
@@ -115,20 +109,13 @@ type
     ParamListbox: TListBox;
     ReportListbox: TListBox;
     ReportLabel: TLabel;
-    TrimmCombo: TComboBox;
-    ParamCombo: TComboBox;
-    ReportCombo: TComboBox;
     function FindItemIndexOfParam(ML: TStrings): Integer;
     procedure UpdateItemIndexParams;
     procedure UpdateItemIndexParamsLB;
-    procedure UpdateItemIndexParamsCB;
     procedure UpdateItemIndexReports;
     procedure UpdateItemIndexTrimms;
     procedure ParamListboxChange(Sender: TObject);
     procedure ReportListboxChange(Sender: TObject);
-    procedure TrimmComboChange(Sender: TObject);
-    procedure ParamComboChange(Sender: TObject);
-    procedure ReportComboChange(Sender: TObject);
   public
     procedure ShowReport(const Value: TRggReport);
     function GetShowDataText: Boolean;
@@ -148,7 +135,6 @@ type
     procedure CheckSpaceForMemo;
     procedure CheckSpaceForListbox;
     procedure SetupMemo(MM: TMemo);
-    procedure SetupCombobox(CB: TComboBox);
     procedure SetupListbox(LB: TListBox);
   public
     Raster: Integer;
@@ -158,6 +144,7 @@ type
     SpeedPanelHeight: Integer;
     SpeedPanel: TActionSpeedBar;
     SpeedPanel01: TActionSpeedBar;
+    SpeedPanel02: TActionSpeedBar;
     SpeedPanel03: TActionSpeedBar;
     SpeedColorScheme: TSpeedColorScheme;
     procedure InitSpeedButtons;
@@ -166,6 +153,8 @@ type
     procedure UpdateSpeedButtonEnabled;
     procedure ToggleSpeedPanel;
     procedure ToggleSpeedPanelFontSize;
+    procedure SwapSpeedPanel(Value: Integer);
+    procedure SwapRota(Value: Integer);
   public
     procedure ChartImageBtnClick(Sender: TObject);
     procedure SalingImageBtnClick(Sender: TObject);
@@ -204,9 +193,7 @@ type
     function GetChecked(fa: Integer): Boolean;
     procedure HandleAction(fa: Integer);
   public
-    DL: TRggDisplayList;
-    RotaForm: TRotaForm1;
-    StrokeRigg: IStrokeRigg;
+    RotaForm: TRotaForm;
     procedure HandleSegment(fa: Integer);
   public
     Rigg: TRigg;
@@ -220,11 +207,16 @@ type
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property IsUp: Boolean read GetIsUp write SetIsUp;
   public
+    BitmapWidth: Integer;
+    BitmapHeight: Integer;
     Image: TImage;
     ImagePositionX: Integer;
     ImagePositionY: Integer;
     TextPositionX: Integer;
     TextPositionY: Integer;
+    procedure UpdateFederText;
+    procedure CenterRotaForm;
+    procedure ToggleAllText;
   public
     SalingImage: TImage;
     SalingGraph: TSalingGraph;
@@ -233,6 +225,7 @@ type
     ChartImage: TImage;
     ChartGraph: TChartGraph;
     ChartControl: TWinControl;
+    procedure DoOnUpdateChart(Sender: TObject);
     procedure InitSalingGraph;
     procedure InitControllerGraph;
     procedure InitChartGraph;
@@ -255,6 +248,7 @@ type
     procedure DestroyForms;
     procedure MemoBtnClick(Sender: TObject);
     procedure ActionsBtnClick(Sender: TObject);
+    procedure ChartBtnClick(Sender: TObject);
     procedure ConfigBtnClick(Sender: TObject);
     procedure TrimmTabBtnClick(Sender: TObject);
     procedure CheckFormBounds(AForm: TForm);
@@ -408,15 +402,16 @@ uses
   FrmSaling,
   FrmController,
   RggModul,
+  RggStrings,
+  RiggVar.Util.AppUtils,
+  RiggVar.VM.FormMain,
   RiggVar.RG.Main,
   RiggVar.RG.Speed01,
   RiggVar.RG.Speed02,
   RiggVar.RG.Speed03,
   RiggVar.App.Main,
-  RiggVar.Util.AppUtils,
   RiggVar.FB.ActionConst,
-  RiggVar.FB.Classes,
-  RiggVar.VM.FormMain;
+  RiggVar.FB.Classes;
 
 const
   HelpCaptionText = 'press ? for help';
@@ -482,6 +477,9 @@ begin
   SpeedPanelHeight := Raster - Round(FScale * Margin);
   ListboxWidth := Round(200 * FScale);
 
+  BitmapWidth := Screen.Width;
+  BitmapHeight := Screen.Height;
+
   CreateComponents;
 
   SetupMemo(ReportText);
@@ -496,37 +494,19 @@ begin
 
   Main := TMain.Create(Rigg);
   Main.Logger.Verbose := True;
-  Main.InitLogo; // sets WantLogoData to true
-  Main.Init420; // resets WantLogoData to false
-
-  Main.Trimm := 1;
-
-  Main.InitText;
   Main.IsUp := True;
 
-  RotaForm := TRotaForm1.Create;
-  StrokeRigg := RotaForm;
-  Main.StrokeRigg := RotaForm;
+  RotaForm := TRotaForm.Create;
   RotaForm.Image := Image;
   RotaForm.Init;
-  DL := RotaForm.RaumGraph.DL;
-  RotaForm.ViewPoint := vp3D;
-  RotaForm.ZoomIndex := 8;
-  RotaForm.FixPoint := ooD0;
+  RotaForm.SwapRota(1);
 
   { Params }
-  Main.Param := fpVorstag;
   if ParamListbox <> nil then
   begin
     InitParamListbox;
     ParamListbox.OnClick := ParamListboxChange;
     ParamListbox.ItemIndex := ParamListbox.Items.IndexOf('Vorstag');
-  end;
-  if ParamCombo <> nil then
-  begin
-    InitParamCombo;
-    ParamCombo.ItemIndex := ParamCombo.Items.IndexOf('Vorstag');
-    ParamCombo.OnChange := ParamComboChange;
   end;
 
   { Reports }
@@ -541,19 +521,6 @@ begin
     ReportListbox.ItemIndex := ReportListbox.Items.IndexOf(
     ReportManager.GetReportCaption(ReportManager.CurrentReport));
   end;
-  if ReportCombo <> nil then
-  begin
-    InitReportCombo;
-    ReportCombo.OnChange := ReportComboChange;
-    ReportManager.InitLB(ReportListbox.Items);
-  end;
-
-  if TrimmCombo <> nil then
-  begin
-    InitTrimmCombo;
-    TrimmCombo.ItemIndex := 0;
-    TrimmCombo.OnChange := TrimmComboChange;
-  end;
 
   TL := TStringList.Create;
   Main.UpdateTrimm0;
@@ -565,7 +532,6 @@ begin
   InitControllerGraph;
   InitChartGraph;
 
-  Main.ChartGraph := ChartGraph;
   Main.Draw;
   Main.MemoryBtnClick;
 
@@ -574,8 +540,14 @@ begin
   UpdateSpeedButtonDown;
   UpdateSpeedButtonEnabled;
   UpdateColorScheme;
-  Main.FederText1.SendToBack;
-  Main.FederText2.SendToBack;
+
+  SwapSpeedPanel(RotaForm.Current);
+
+  Main.InitDefaultData;
+  CenterRotaForm;
+  Main.FixPoint := ooD0;
+  Main.HullVisible := False;
+  Main.OnUpdateChart := DoOnUpdateChart;
 
   InitMenu;
   InitStatusBar;
@@ -589,7 +561,7 @@ begin
 
   Main.RiggModul := RiggModul;
   RiggModul.ViewModelM.IsUp := True;
-  Main.RiggModul.UpdateUI;
+  RiggModul.UpdateUI;
 
   OnCloseQuery := FormCloseQuery;
   Main.FederText.CheckState;
@@ -612,6 +584,8 @@ begin
   SalingGraph.Free;
   ControllerGraph.Free;
   ChartGraph.Free;
+
+  RotaForm.Free;
 end;
 
 procedure TFormMain.FormKeyPress(Sender: TObject; var Key: Char);
@@ -697,7 +671,6 @@ end;
 procedure TFormMain.UpdateItemIndexParams;
 begin
   UpdateItemIndexParamsLB;
-  UpdateItemIndexParamsCB;
   ShowTrimm;
 end;
 
@@ -715,23 +688,6 @@ begin
     ParamListbox.OnClick := nil;
     ParamListbox.ItemIndex := ik;
     ParamListbox.OnClick := ParamListboxChange;
-  end;
-end;
-
-procedure TFormMain.UpdateItemIndexParamsCB;
-var
-  ii: Integer;
-  ik: Integer;
-begin
-  if ParamCombo = nil then
-    Exit;
-  ii := ParamCombo.ItemIndex;
-  ik := FindItemIndexOfParam(ParamCombo.Items);
-  if ii <> ik then
-  begin
-    ParamCombo.OnClick := nil;
-    ParamCombo.ItemIndex := ik;
-    ParamCombo.OnClick := ParamComboChange;
   end;
 end;
 
@@ -770,20 +726,7 @@ begin
 end;
 
 procedure TFormMain.UpdateItemIndexTrimms;
-var
-  ii: Integer;
-  ij: Integer;
 begin
-  if TrimmCombo = nil then
-    Exit;
-  ii := TrimmCombo.ItemIndex;
-  ij := Main.Trimm-1;
-  if ii <> ij then
-  begin
-    TrimmCombo.OnChange := nil;
-    TrimmCombo.ItemIndex := ij;
-    TrimmCombo.OnChange := TrimmComboChange;
-  end;
 end;
 
 procedure TFormMain.FormMouseWheel(Sender: TObject; Shift: TShiftState;
@@ -821,7 +764,6 @@ begin
     MainVar.Scale := ScaleFactor;
     Inc(Main.ResizeCounter);
     Main.UpdateTouch;
-    Main.UpdateText;
   end;
 
   if FormShown then
@@ -848,10 +790,10 @@ begin
   Image.Top := PosTop;
   Image.Width := ClientWidth - Image.Left - Raster - Margin;
   Image.Height := ClientHeight - Image.Top - Raster - Margin - StatusBar.Height;
-  if Image.Width > RotaForm.BitmapWidth * FScale then
-     Image.Width := Round(RotaForm.BitmapWidth * FScale);
-  if Image.Height > RotaForm.BitmapHeight * FScale then
-     Image.Height := Round(RotaForm.BitmapHeight * FScale);
+  if Image.Width > RotaForm.RotaForm1.BitmapWidth * FScale then
+     Image.Width := Round(RotaForm.RotaForm1.BitmapWidth * FScale);
+  if Image.Height > RotaForm.RotaForm1.BitmapHeight * FScale then
+     Image.Height := Round(RotaForm.RotaForm1.BitmapHeight * FScale);
 end;
 
 procedure TFormMain.CheckSpaceForMemo;
@@ -1134,21 +1076,27 @@ begin
     faToggleAllProps: AllProps := not AllProps;
     faToggleAllTags: ReportManager.XmlAllTags := not ReportManager.XmlAllTags;
 
+    faRotaForm1: SwapRota(1);
+    faRotaForm2: SwapRota(2);
+    faRotaForm3: SwapRota(3);
+
+    faReset,
+    faResetPosition,
+    faResetRotation,
+    faResetZoom: RotaForm.HandleAction(fa);
+
+    faPan:
+    begin
+      Main.SetParameter(faPan);
+      ShowTrimm;
+    end;
+
     faShowZOrderInfo,
     faShowNormalKeyInfo,
     faShowSpecialKeyInfo,
     faShowDebugInfo,
     faShowInfoText,
     faShowHelpText: ShowHelpText(fa);
-
-    faTR02: ShowDiagramC;
-    faTR03: ShowDiagramQ;
-    faTR04: ShowDiagramE;
-
-    faBR02: RotaForm.WantCircles := True;
-    faBR03: RotaForm.WantCircles := False;
-    faBR04: RotaForm.CircleGraph.Kreise := True;
-    faBR05: RotaForm.CircleGraph.Kreise := False;
 
     else
     begin
@@ -1390,18 +1338,6 @@ begin
   end;
 end;
 
-procedure TFormMain.SetupCombobox(CB: TComboBox);
-begin
-  if CB = nil then
-    Exit;
-
-  CB.Style := csDropDownList;
-  CB.DropDownCount := Integer(High(TFederParam));
-  CB.Font.Name := 'Consolas';
-  CB.Font.Size := 11;
-  CB.Font.Color := TRggColors.Red;
-end;
-
 procedure TFormMain.SetupListbox(LB: TListBox);
 begin
   if LB = nil then
@@ -1459,6 +1395,12 @@ begin
   SpeedPanel01.ShowHint := True;
   SpeedPanel01.Visible := False;
 
+  SpeedPanel02 := TActionSpeedBarRG02.Create(Self);
+  SpeedPanel02.Name := 'SpeedPanel02';
+  SpeedPanel02.Parent := Self;
+  SpeedPanel02.ShowHint := True;
+  SpeedPanel02.Visible := False;
+
   SpeedPanel03 := TActionSpeedBarRG03.Create(Self);
   SpeedPanel03.Name := 'SpeedPanel03';
   SpeedPanel03.Parent := Self;
@@ -1468,31 +1410,36 @@ begin
   SpeedPanel := SpeedPanel03;
   SpeedPanel.Visible := True;
 
-  if ParamListbox = nil then
-  begin
-    ParamListbox := TListbox.Create(Self);
-    ParamListbox.Name := 'ParamListbox';
-    ParamListbox.Parent := Self;
-  end;
+  ParamListbox := TListbox.Create(Self);
+  ParamListbox.Name := 'ParamListbox';
+  ParamListbox.Parent := Self;
 
-  if ReportListbox = nil then
-  begin
-    ReportListbox := TListbox.Create(Self);
-    ReportListbox.Name := 'ReportListbox';
-    ReportListbox.Parent := Self;
-  end;
+  ReportListbox := TListbox.Create(Self);
+  ReportListbox.Name := 'ReportListbox';
+  ReportListbox.Parent := Self;
 
   ComponentsCreated := True;
 end;
 
 procedure TFormMain.ToggleSpeedPanel;
 begin
+  if SpeedPanel = SpeedPanel01 then
+    SwapSpeedPanel(RotaForm.Current)
+  else
+    SwapSpeedPanel(0);
+end;
+
+procedure TFormMain.SwapSpeedPanel(Value: Integer);
+begin
   SpeedPanel.Visible := False;
 
-  if SpeedPanel = SpeedPanel01 then
-    SpeedPanel := SpeedPanel03
+    case Value of
+      1: SpeedPanel := SpeedPanel03;
+      2: SpeedPanel := SpeedPanel01;
+      3: SpeedPanel := SpeedPanel01;
   else
     SpeedPanel := SpeedPanel01;
+  end;
 
   SpeedPanel.Visible := True;
   SpeedPanel.UpdateSpeedButtonEnabled;
@@ -1500,7 +1447,8 @@ begin
   SpeedPanel.DarkMode := MainVar.ColorScheme.IsDark;
   SpeedPanel.UpdateColor;
 
-  Main.RiggModul.ViewModelM.UpdateView;
+  if Main.RiggModul <> nil then
+    Main.RiggModul.ViewModelM.UpdateView;
 end;
 
 procedure TFormMain.LayoutSpeedPanel(SP: TActionSpeedBar);
@@ -1525,6 +1473,7 @@ begin
   { so that computed values for Height and Width are > 0 }
 
   LayoutSpeedPanel(SpeedPanel01);
+  LayoutSpeedPanel(SpeedPanel02);
   LayoutSpeedPanel(SpeedPanel03);
 
   TrimmText.Left := Raster + Margin;
@@ -1571,31 +1520,19 @@ begin
 end;
 
 procedure TFormMain.LineColorBtnClick(Sender: TObject);
-var
-  b: Boolean;
 begin
-  b := not DL.WantLineColors;
-  DL.WantLineColors := b;
+  RotaForm.WantLineColors := not RotaForm.WantLineColors;
   UpdateSpeedButtonDown;
   RotaForm.Draw;
 end;
 
 procedure TFormMain.HandleSegment(fa: Integer);
 var
-  rg: TRaumGraph;
+  b: Boolean;
 begin
-  rg := RotaForm.RaumGraph;
-
-  case fa of
-    faToggleSegmentF: rg.WantFixpunkt := not rg.WantFixPunkt;
-    faToggleSegmentM: rg.WantMast:= not rg.WantMast;
-    faToggleSegmentW: rg.WantWante:= not rg.WantWante;
-    faToggleSegmentV: rg.WantVorstag := not rg.WantVorstag;
-    faToggleSegmentS: rg.WantSaling := not rg.WantSaling;
-    faToggleSegmentR: rg.WantRumpf := not rg.WantRumpf;
-    faToggleSegmentC: rg.WantController := not rg.WantController;
-    faToggleSegmentA: rg.WantAchsen := not rg.WantAchsen;
-  end;
+  b := RotaForm.GetChecked(fa);
+  b := not b;
+  RotaForm.SetChecked(fa, b);
 
   RotaForm.Draw;
 end;
@@ -1714,7 +1651,7 @@ begin
     ControllerGraph.ControllerTyp := Rigg.ControllerTyp;
     ControllerGraph.ControllerPos := Round(Main.ParamValue[fpController]);
     ControllerGraph.ParamXE := Rigg.MastPositionE;
-    ControllerGraph.ParamXE0 := Round(Rigg.rP[ooE0, x] - Rigg.rP[ooD0, x]);
+    ControllerGraph.ParamXE0 := Round(Rigg.rP.E0.X - Rigg.rP.D0.X);
     ControllerGraph.EdgePos := Round(Rigg.GSB.Find(fpController).Min);
 
     ControllerGraph.Draw(TFigure.dtController);
@@ -1797,24 +1734,6 @@ begin
   ReportLabelCaption := ReportManager.GetCurrentCaption;
 end;
 
-procedure TFormMain.InitReportCombo;
-begin
-  ReportManager.InitLB(ReportCombo.Items);
-end;
-
-procedure TFormMain.ReportComboChange(Sender: TObject);
-var
-  ii: Integer;
-begin
-  if ReportCombo <> nil then
-  begin
-    ii := ReportCombo.ItemIndex;
-    ReportManager.CurrentIndex := ii;
-    UpdateReport;
-    Main.FederText.CheckState;
-  end;
-end;
-
 procedure TFormMain.ParamListboxChange(Sender: TObject);
 begin
   if ParamListbox.ItemIndex <> -1 then
@@ -1859,82 +1778,6 @@ begin
   fp := rm.Param;
   s := rm.Param2Text(fp);
   ParamListbox.ItemIndex := LI.IndexOf(s);
-end;
-
-procedure TFormMain.InitParamCombo;
-  procedure Add(fp: TFederParam);
-  begin
-    ParamCombo.Items.AddObject(Main.Param2Text(fp), TObject(fp));
-  end;
-begin
-  if ParamCombo <> nil then
-    Exit;
-  Add(fpVorstag);
-  Add(fpWinkel);
-  Add(fpController);
-  Add(fpWante);
-  Add(fpWoben);
-  Add(fpSalingH);
-  Add(fpSalingA);
-  Add(fpSalingL);
-  Add(fpSalingW);
-  Add(fpMastfallF0C);
-  Add(fpMastfallF0F);
-  Add(fpMastfallVorlauf);
-  Add(fpBiegung);
-  Add(fpD0X);
-  ParamCombo.DropDownCount := ParamCombo.Items.Count;
-end;
-
-procedure TFormMain.ParamComboChange(Sender: TObject);
-var
-  ii: Integer;
-  fp: TFederParam;
-begin
-  if ParamCombo <> nil then
-  begin
-    ii := ParamCombo.ItemIndex;
-    fp := TFederParam(ParamCombo.Items.Objects[ii]);
-    Main.Param := fp;
-    ShowTrimm;
-  end;
-end;
-
-procedure TFormMain.InitTrimmCombo;
-var
-  cl: TStrings;
-begin
-  if TrimmCombo <> nil then
-  begin
-    cl := TrimmCombo.Items;
-    cl.AddObject('Trimm1', TObject(1));
-    cl.AddObject('Trimm2', TObject(2));
-    cl.AddObject('Trimm3', TObject(3));
-    cl.AddObject('Trimm4', TObject(4));
-    cl.AddObject('Trimm5', TObject(5));
-    cl.AddObject('Trimm6', TObject(6));
-    cl.AddObject('Trimm7 (420)', TObject(7));
-    cl.AddObject('Trimm8 (Logo)', TObject(8));
-  end;
-end;
-
-procedure TFormMain.TrimmComboChange(Sender: TObject);
-var
-  t: Integer;
-  ii: Integer;
-begin
-  if TrimmCombo <> nil then
-  begin
-    ii := TrimmCombo.ItemIndex;
-    t := Integer(TrimmCombo.Items.Objects[ii]);
-    Main.Trimm := t;
-    Main.FederText.CheckState;
-    if ReportText.Visible then
-    begin
-    ShowTrimmData;
-      ReportText.Text := RL.Text;
-    end;
-  end;
 end;
 
 procedure TFormMain.ShowTrimmData;
@@ -2005,7 +1848,6 @@ end;
 procedure TFormMain.BogenBtnClick(Sender: TObject);
 begin
   Main.Bogen := not Main.Bogen;
-  SpeedPanel.UpdateSpeedButtonDown;
   if Sender <> nil then
     Main.FederText.CheckState;
 end;
@@ -2013,7 +1855,6 @@ end;
 procedure TFormMain.KoppelBtnClick(Sender: TObject);
 begin
   Main.Koppel := not Main.Koppel;
-  SpeedPanel.UpdateSpeedButtonDown;
   if Sender <> nil then
     Main.FederText.CheckState;
 end;
@@ -2040,16 +1881,16 @@ begin
     faToggleReport: result := ReportText.Visible;
     faToggleButtonReport: result := WantButtonReport;
     faReportNone..faReportReadme: result := ReportManager.GetChecked(fa);
-    faToggleSegmentF..faToggleSegmentA: result := RotaForm.RaumGraph.GetChecked(fa);
+    faToggleSegmentF..faToggleSegmentA: result := RotaForm.GetChecked(fa);
 
-    faToggleLineColor: result := DL.WantLineColors;
+    faToggleLineColor: result := RotaForm.WantLineColors;
     faToggleShowLegend: result := RotaForm.LegendItemChecked;
 
     faToggleUseDisplayList: result := RotaForm.UseDisplayList;
-    faToggleUseQuickSort: result := RotaForm.RaumGraph.DL.UseQuickSort;
+    faToggleUseQuickSort: result := RotaForm.UseQuickSort;
 
-    faRggBogen: result := RotaForm.Bogen;
-    faRggKoppel: result := RotaForm.RaumGraph.Koppel;
+    faRggBogen: result := Main.Bogen;
+    faRggKoppel: result := Main.Koppel;
 
     faSofortBtn: result := Main.SofortBerechnen;
     faGrauBtn: result := Main.BtnGrauDown;
@@ -2062,6 +1903,10 @@ begin
     faToggleSalingGraph: result := SalingImage.Visible;
     faToggleControllerGraph: result := ControllerImage.Visible;
     faToggleMatrixText: result := RotaForm.MatrixItemChecked;
+
+    faRotaForm1: result := RotaForm.Current = 1;
+    faRotaForm2: result := RotaForm.Current = 2;
+    faRotaForm3: result := RotaForm.Current = 3;
   end;
 end;
 
@@ -2090,7 +1935,7 @@ begin
   end
   else
   begin
-    { Tested on Microsoft Surface Tablet with FScale = 2.0 }
+    { Tested on Microsoft Surface Tablet }
     Left := Round(20 * FScale);
     Top := Round(30 * FScale);
     Width := Round(1336 * FScale);
@@ -2120,6 +1965,11 @@ begin
     CheckFormBounds(FormAction);
   end;
   FormAction.Visible := True;
+end;
+
+procedure TFormMain.ChartBtnClick(Sender: TObject);
+begin
+  ShowDiagramQ;
 end;
 
 procedure TFormMain.ConfigBtnClick(Sender: TObject);
@@ -2186,6 +2036,9 @@ begin
   if SpeedPanel01 <> nil then
     SpeedPanel01.InitSpeedButtons;
 
+  if SpeedPanel02 <> nil then
+    SpeedPanel02.InitSpeedButtons;
+
   if SpeedPanel03 <> nil then
     SpeedPanel03.InitSpeedButtons;
 end;
@@ -2212,6 +2065,8 @@ begin
 
   SalingGraph.BackgroundColor := MainVar.ColorScheme.claBackground;
   UpdateSalingGraph;
+
+  RotaForm.DarkMode := SpeedColorScheme.IsDark;
 end;
 
 procedure TFormMain.SuperSimpleBtnClick(Sender: TObject);
@@ -2253,7 +2108,7 @@ procedure TFormMain.SuperDisplayBtnClick(Sender: TObject);
 begin
   RotaForm.UseDisplayList := True;
   RotaForm.WantOverlayedRiggs := False;
-  RotaForm.RaumGraph.DL.UseQuickSort := False;
+  RotaForm.UseQuickSort := False;
   Main.GraphRadio := gDisplay;
 end;
 
@@ -2261,7 +2116,7 @@ procedure TFormMain.SuperQuickBtnClick(Sender: TObject);
 begin
   RotaForm.UseDisplayList := True;
   RotaForm.WantOverlayedRiggs := False;
-  RotaForm.RaumGraph.DL.UseQuickSort := True;
+  RotaForm.UseQuickSort := True;
   Main.GraphRadio := gQuick;
 end;
 
@@ -2279,6 +2134,7 @@ begin
   TrimmText.Parent := ft;
   HintContainer.Parent := ft;
   SpeedPanel01.Parent := ft;
+  SpeedPanel02.Parent := ft;
   SpeedPanel03.Parent := ft;
 end;
 
@@ -2316,6 +2172,66 @@ begin
 
   ShowingHelp := True;
   ReportText.Text := HL.Text;
+  ReportText.Visible := True;
+end;
+
+procedure TFormMain.SwapRota(Value: Integer);
+begin
+  RotaForm.SwapRota(Value);
+  RotaForm.BackgroundColor := MainVar.ColorScheme.claBackground;
+  RotaForm.DarkMode := MainVar.ColorScheme.IsDark;
+  SwapSpeedPanel(RotaForm.Current);
+end;
+
+procedure TFormMain.DoOnUpdateChart(Sender: TObject);
+begin
+  if (ChartGraph <> nil) and (Main.Param = fpAPW)  then
+  begin
+    ChartGraph.APWidth := Round(Main.CurrentValue);
+    ChartGraph.UpdateXMinMax;
+  end;
+end;
+
+procedure TFormMain.UpdateFederText;
+begin
+  if Main.Action = faPan then
+  begin
+    Main.FederText1.ST00.Text.Caption := 'Pan';
+    Main.FederText.SB00.Text.Caption := '';
+  end
+  else
+  begin
+    Main.FederText.ST00.Text.Caption := Main.ParamCaption;
+    Main.FederText.SB00.Text.Caption := Main.ParamValueString[Main.Param];
+  end;
+end;
+
+procedure TFormMain.CenterRotaForm;
+begin
+  RotaForm.InitPosition(Width, Height, 0, 0);
+  if FormShown then
+    RotaForm.Draw;
+end;
+
+procedure TFormMain.ToggleAllText;
+var
+  b: Boolean;
+begin
+  b := not ParamListbox.Visible;
+
+  SpeedPanel.Visible := b;
+  ParamListbox.Visible := b;
+  ReportListbox.Visible := b;
+  TrimmText.Visible := b;
+
+  if not b then
+  begin
+    ReportText.Visible := False;
+  end
+  else
+  begin
+    ReportText.Visible := True;
+  end;
 end;
 
 procedure TFormMain.ToggleSpeedPanelFontSize;
@@ -3017,7 +2933,7 @@ begin
   ControllerItem.Checked := Value;
 //  ControllerBtn.Down := Value;
   RiggModul.ControllerBtnDown := Value;
-  RotaForm.RaumGraph.ControllerTyp := Main.Rigg.ControllerTyp;
+  RotaForm.RotaForm1.ControllerTyp := Main.Rigg.ControllerTyp;
 //  RotaForm.RaumGraph.ControllerTyp := RiggModul.ControllerTyp;
   RotaForm.Draw;
 end;
@@ -3071,7 +2987,7 @@ end;
 procedure TFormMain.ReglerBtnClick(Sender: TObject);
 begin
   RiggModul.ReglerBtnClick;
-  StrokeRigg.Bogen := False;
+  Main.StrokeRigg.Bogen := False;
 end;
 
 procedure TFormMain.ConfigItemClick(Sender: TObject);

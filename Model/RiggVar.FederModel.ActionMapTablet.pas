@@ -299,12 +299,12 @@ begin
       InitAC(cl, 8, faMastfallF0C, cla);
 
       cl := BottomRight;
-      cla := TRggColors.White;
+//      cla := TRggColors.White;
       InitAC(cl, 1, faSalingTypFest, claOption);
       InitAC(cl, 2, faSalingTypDrehbar, claOption);
       InitAC(cl, 3, faSalingTypOhne, claOption);
       InitAC(cl, 4, faSalingTypOhneStarr, claOption);
-      InitAC(cl, 5, faNoop, cla);
+      InitAC(cl, 5, faShowKreis, claForm);
       InitAC(cl, 6, faShowInfo, claForm);
     end;
 

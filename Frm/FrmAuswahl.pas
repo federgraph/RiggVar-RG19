@@ -4,12 +4,12 @@ interface
 
 uses
   Winapi.Windows,
-  System.Classes,
-  Vcl.Graphics,
-  Vcl.Forms,
-  Vcl.Controls,
-  Vcl.Buttons,
-  Vcl.StdCtrls,
+  Classes,
+  Graphics,
+  Forms,
+  Controls,
+  Buttons,
+  StdCtrls,
   RggTypes;
 
 type

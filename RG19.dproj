@@ -113,78 +113,6 @@
         <DCCReference Include="App\FrmMemo.pas">
             <Form>FormMemo</Form>
         </DCCReference>
-        <DCCReference Include="Core\RggCalc.pas"/>
-        <DCCReference Include="Core\RggDoc.pas"/>
-        <DCCReference Include="Core\RggFachwerk.pas"/>
-        <DCCReference Include="Core\RggReport.pas"/>
-        <DCCReference Include="Core\RggSchnittKK.pas"/>
-        <DCCReference Include="Core\RggScroll.pas"/>
-        <DCCReference Include="Core\RggTrimmTab.pas"/>
-        <DCCReference Include="Core\RggTypes.pas"/>
-        <DCCReference Include="Core\RggUnit0.pas"/>
-        <DCCReference Include="Core\RggUnit1.pas"/>
-        <DCCReference Include="Core\RggUnit2.pas"/>
-        <DCCReference Include="Core\RggUnit3.pas"/>
-        <DCCReference Include="Core\RggUnit4.pas"/>
-        <DCCReference Include="App\RiggVar.App.Main.pas"/>
-        <DCCReference Include="App\RiggVar.App.Main0.pas"/>
-        <DCCReference Include="App\RiggVar.App.Main1.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.Action.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.ActionConst.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.Classes.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.ActionGroup.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.ActionGroups.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.ActionLong.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.ActionKeys.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.ActionMap.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.ActionName.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.SpeedBar.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.ActionShort.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.ActionTable.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.ActionTest.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.Scheme.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.SpeedColor.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.TextBase.pas"/>
-        <DCCReference Include="Model\RiggVar.FederModel.Action.pas"/>
-        <DCCReference Include="Model\RiggVar.FederModel.ActionMapPhone.pas"/>
-        <DCCReference Include="Model\RiggVar.FederModel.ActionMapTablet.pas"/>
-        <DCCReference Include="Model\RiggVar.FederModel.Binding.pas"/>
-        <DCCReference Include="Model\RiggVar.FederModel.Keyboard01.pas"/>
-        <DCCReference Include="Model\RiggVar.FederModel.Touch.pas"/>
-        <DCCReference Include="Model\RiggVar.FederModel.TouchBase.pas"/>
-        <DCCReference Include="Model\RiggVar.FederModel.TouchPhone.pas"/>
-        <DCCReference Include="RG\RiggVar.RG.Data.pas"/>
-        <DCCReference Include="RG\RiggVar.RG.Def.pas"/>
-        <DCCReference Include="RG\RiggVar.RG.Graph.pas"/>
-        <DCCReference Include="RG\RiggVar.RG.Main.pas"/>
-        <DCCReference Include="RG\RiggVar.RG.Report.pas"/>
-        <DCCReference Include="RG\RiggVar.RG.Speed01.pas"/>
-        <DCCReference Include="RG\RiggVar.RG.Speed02.pas"/>
-        <DCCReference Include="RG\RiggVar.RG.Track.pas"/>
-        <DCCReference Include="Graph\RggDisplay.pas"/>
-        <DCCReference Include="Graph\RggPolarKar.pas"/>
-        <DCCReference Include="Graph\RggRota.pas"/>
-        <DCCReference Include="Core\RggTestData.pas"/>
-        <DCCReference Include="Graph\RggBootGraph.pas"/>
-        <DCCReference Include="Graph\RggGraph.pas"/>
-        <DCCReference Include="Graph\RggRaumGraph.pas"/>
-        <DCCReference Include="Graph\RggMatrix.pas"/>
-        <DCCReference Include="Graph\RggCtrls.pas"/>
-        <DCCReference Include="Graph\RggHull.pas"/>
-        <DCCReference Include="Graph\RggZug.pas"/>
-        <DCCReference Include="Graph\RggTransformer.pas"/>
-        <DCCReference Include="Core\RggSaling3Eck.pas"/>
-        <DCCReference Include="Graph\RggZug3D.pas"/>
-        <DCCReference Include="Core\RggSchnittGG.pas"/>
-        <DCCReference Include="Graph\RggDisplayOrder.pas"/>
-        <DCCReference Include="Graph\RggDisplayTypes.pas"/>
-        <DCCReference Include="Graph\RggChart.pas"/>
-        <DCCReference Include="Graph\RggChartGraph.pas"/>
-        <DCCReference Include="Graph\RggVector.pas"/>
-        <DCCReference Include="Util\RiggVar.Util.AppUtils.pas"/>
-        <DCCReference Include="Util\RiggVar.Util.Logger.pas"/>
-        <DCCReference Include="FB\RiggVar.FB.Color.pas"/>
-        <DCCReference Include="Graph\RggProfile.pas"/>
         <DCCReference Include="Frm\FrmTrimmTab.pas">
             <Form>FormTrimmTab</Form>
             <FormType>dfm</FormType>
@@ -197,38 +125,34 @@
             <Form>YAuswahlDlg</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Graph\RggChartModel01.pas"/>
         <DCCReference Include="Frm\FrmDiagramQ.pas">
             <Form>FormDiagramQ</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Frm\FrmConfig.pas">
+            <Form>FormConfig</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Frm\FrmDiagramE.pas">
             <Form>FormDiagramE</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Core\RggStrings.pas"/>
-        <DCCReference Include="Graph\RggDiagram.pas"/>
-        <DCCReference Include="Graph\RggTrimmTabGraph.pas"/>
         <DCCReference Include="Frm\FrmKreis.pas">
             <Form>KreisForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Graph\RggCircleGraph.pas"/>
-        <DCCReference Include="Core\RggModul.pas"/>
-        <DCCReference Include="Frm\FrmConfig.pas">
-            <Form>FormConfig</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="Frm\FrmInput.pas">
-            <Form>InputForm</Form>
+        <DCCReference Include="Frm\FrmInfo.pas">
+            <Form>FormInfo</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Frm\FrmDiagramA.pas">
             <Form>FormDiagramA</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Graph\RggKraftGraph.pas"/>
-        <DCCReference Include="Graph\RggMastGraph.pas"/>
+        <DCCReference Include="Frm\FrmInput.pas">
+            <Form>InputForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <DCCReference Include="Frm\FrmBiege.pas">
             <Form>BiegeUndNeigeForm</Form>
             <FormType>dfm</FormType>
@@ -245,17 +169,10 @@
             <Form>FormSplash</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="VM\RiggVar.VM.FormMain.pas"/>
         <DCCReference Include="Frm\FrmSelect.pas">
             <Form>MemoDlg</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Frm\FrmInfo.pas">
-            <Form>FormInfo</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="Util\RiggVar.Util.InfoMemo.pas"/>
-        <DCCReference Include="RG\RiggVar.RG.Speed03.pas"/>
         <DCCReference Include="Frm\FrmKraft.pas">
             <Form>FormKraft</Form>
             <FormType>dfm</FormType>
@@ -280,6 +197,88 @@
             <Form>FormSaling</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="Core\RggCalc.pas"/>
+        <DCCReference Include="Core\RggDoc.pas"/>
+        <DCCReference Include="Core\RggFachwerk.pas"/>
+        <DCCReference Include="Core\RggReport.pas"/>
+        <DCCReference Include="Core\RggSchnittGG.pas"/>
+        <DCCReference Include="Core\RggSchnittKK.pas"/>
+        <DCCReference Include="Core\RggScroll.pas"/>
+        <DCCReference Include="Core\RggStrings.pas"/>
+        <DCCReference Include="Core\RggSaling3Eck.pas"/>
+        <DCCReference Include="Core\RggTestData.pas"/>
+        <DCCReference Include="Core\RggTrimmTab.pas"/>
+        <DCCReference Include="Core\RggTypes.pas"/>
+        <DCCReference Include="Core\RggUnit0.pas"/>
+        <DCCReference Include="Core\RggUnit1.pas"/>
+        <DCCReference Include="Core\RggUnit2.pas"/>
+        <DCCReference Include="Core\RggUnit3.pas"/>
+        <DCCReference Include="Core\RggUnit4.pas"/>
+        <DCCReference Include="Core\RggModul.pas"/>
+        <DCCReference Include="VM\RiggVar.VM.FormMain.pas"/>
+        <DCCReference Include="App\RiggVar.App.Main.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.Action.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.ActionConst.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.Classes.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.ActionGroup.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.ActionGroups.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.ActionLong.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.ActionKeys.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.ActionMap.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.ActionName.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.SpeedBar.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.ActionShort.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.ActionTable.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.ActionTest.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.Color.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.Scheme.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.SpeedColor.pas"/>
+        <DCCReference Include="FB\RiggVar.FB.TextBase.pas"/>
+        <DCCReference Include="Model\RiggVar.FederModel.Action.pas"/>
+        <DCCReference Include="Model\RiggVar.FederModel.ActionMapPhone.pas"/>
+        <DCCReference Include="Model\RiggVar.FederModel.ActionMapTablet.pas"/>
+        <DCCReference Include="Model\RiggVar.FederModel.Binding.pas"/>
+        <DCCReference Include="Model\RiggVar.FederModel.Keyboard01.pas"/>
+        <DCCReference Include="Model\RiggVar.FederModel.Touch.pas"/>
+        <DCCReference Include="Model\RiggVar.FederModel.TouchBase.pas"/>
+        <DCCReference Include="Model\RiggVar.FederModel.TouchPhone.pas"/>
+        <DCCReference Include="RG\RiggVar.RG.Data.pas"/>
+        <DCCReference Include="RG\RiggVar.RG.Def.pas"/>
+        <DCCReference Include="RG\RiggVar.RG.Graph.pas"/>
+        <DCCReference Include="RG\RiggVar.RG.Main.pas"/>
+        <DCCReference Include="RG\RiggVar.RG.Report.pas"/>
+        <DCCReference Include="RG\RiggVar.RG.Speed01.pas"/>
+        <DCCReference Include="RG\RiggVar.RG.Speed02.pas"/>
+        <DCCReference Include="RG\RiggVar.RG.Speed03.pas"/>
+        <DCCReference Include="RG\RiggVar.RG.Track.pas"/>
+        <DCCReference Include="Graph\RggCircleGraph.pas"/>
+        <DCCReference Include="Graph\RggKraftGraph.pas"/>
+        <DCCReference Include="Graph\RggMastGraph.pas"/>
+        <DCCReference Include="Graph\RggDisplay.pas"/>
+        <DCCReference Include="Graph\RggPolarKar.pas"/>
+        <DCCReference Include="Graph\RggRota.pas"/>
+        <DCCReference Include="Graph\RggBootGraph.pas"/>
+        <DCCReference Include="Graph\RggGraph.pas"/>
+        <DCCReference Include="Graph\RggRaumGraph.pas"/>
+        <DCCReference Include="Graph\RggMatrix.pas"/>
+        <DCCReference Include="Graph\RggCtrls.pas"/>
+        <DCCReference Include="Graph\RggHull.pas"/>
+        <DCCReference Include="Graph\RggZug.pas"/>
+        <DCCReference Include="Graph\RggTransformer.pas"/>
+        <DCCReference Include="Graph\RggChartModel01.pas"/>
+        <DCCReference Include="Graph\RggZug3D.pas"/>
+        <DCCReference Include="Graph\RggDisplayOrder.pas"/>
+        <DCCReference Include="Graph\RggDisplayTypes.pas"/>
+        <DCCReference Include="Graph\RggChart.pas"/>
+        <DCCReference Include="Graph\RggChartGraph.pas"/>
+        <DCCReference Include="Util\RiggVar.Util.AppUtils.pas"/>
+        <DCCReference Include="Util\RiggVar.Util.InfoMemo.pas"/>
+        <DCCReference Include="Util\RiggVar.Util.Logger.pas"/>
+        <DCCReference Include="Graph\RggProfile.pas"/>
+        <DCCReference Include="Graph\RggDiagram.pas"/>
+        <DCCReference Include="Graph\RggTrimmTabGraph.pas"/>
+        <DCCReference Include="RG\RiggVar.RG.Rota.pas"/>
+        <DCCReference Include="Graph2\RiggVar.FD.Point.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

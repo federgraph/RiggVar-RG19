@@ -19,8 +19,7 @@
 interface
 
 uses
-  System.Classes,
-  System.UITypes,
+  Classes,
   RiggVar.FB.ActionConst,
   RiggVar.FB.ActionKeys;
 

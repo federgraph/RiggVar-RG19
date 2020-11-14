@@ -18,8 +18,12 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  System.Classes,
+  Classes,
   RiggVar.RG.Def,
   RggTypes;
 
@@ -47,13 +51,13 @@ type
 
   TRggSB = class
   private
-    FMin: double;
-    FIst: double;
-    FMax: double;
+    FMin: single;
+    FIst: single;
+    FMax: single;
   public
-    Ist: double;
-    Min: double;
-    Max: double;
+    Ist: single;
+    Min: single;
+    Max: single;
     SmallStep: Integer;
     BigStep: Integer;
 
@@ -65,7 +69,7 @@ type
     procedure Assign(Value: TRggSB);
     procedure SaveToStream(s: TStream);
     procedure LoadFromStream(s: TStream);
-    function GetValue(n: TsbParam): double;
+    function GetValue(n: TsbParam): single;
 
     procedure Save;
     procedure Reset;
@@ -138,7 +142,7 @@ begin
   BigStep := 10;
 end;
 
-function TRggSB.GetValue(n: TsbParam): double;
+function TRggSB.GetValue(n: TsbParam): single;
 begin
   case n of
     TsbParam.IstValue: result := Ist;

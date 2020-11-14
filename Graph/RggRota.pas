@@ -23,11 +23,11 @@ uses
   StdCtrls,
   ExtCtrls,
   ComCtrls,
-  RggVector,
+  Math,
+  RiggVar.FD.Point,
   RiggVar.RG.Graph,
   RggTypes,
   RggMatrix,
-  RggCircleGraph,
   RggRaumGraph,
   RggGraph,
   RggHull,
@@ -41,7 +41,7 @@ type
     RPE: TRiggPoints;
     RPR: TRiggPoints;
     SkipOnceFlag: Boolean;
-    function OnGetFixPunkt: TRealPoint;
+    function OnGetFixPunkt: TPoint3D;
     procedure DrawToCanvasEx(g: TCanvas);
     procedure DrawToCanvas(g: TCanvas);
     procedure DrawToImage(g: TCanvas);
@@ -78,12 +78,12 @@ type
     procedure PaintBox3DPaint(Sender: TObject);
   private
     FViewPoint: TViewPoint;
-    FZoomBase: double;
-    FZoom: double;
+    FZoomBase: single;
+    FZoom: single;
 
-    FPhi: double;
-    FTheta: double;
-    FGamma: double;
+    FPhi: single;
+    FTheta: single;
+    FGamma: single;
 
     xmin: Integer;
     ymin: Integer;
@@ -92,7 +92,7 @@ type
 
     FXpos: Integer;
     FYpos: Integer;
-    FIncrementW: double;
+    FIncrementW: single;
     FIncrementT: Integer;
     FZoomIndex: Integer;
 
@@ -138,10 +138,13 @@ type
     procedure SetRiggLED(const Value: Boolean);
     procedure SetSofortBerechnen(const Value: Boolean);
 
-    procedure SetMastLineData(const Value: TLineDataR100; L: double; Beta: double);
-    function GetMastKurvePoint(const Index: Integer): TRealPoint;
+    procedure SetMastLineData(const Value: TLineDataR100; L: single; Beta: single);
+    function GetMastKurvePoint(const Index: Integer): TPoint3D;
     procedure ToggleRenderOption(const fa: Integer);
     function QueryRenderOption(const fa: Integer): Boolean;
+    procedure UpdateHullTexture;
+    procedure UpdateCameraX(Delta: single);
+    procedure UpdateCameraY(Delta: single);
   public
     MatrixTextU: string;
     MatrixTextV: string;
@@ -154,7 +157,7 @@ type
     FBitmapHeight: Integer;
     Bitmap: TBitmap;
     EraseBK: Boolean;
-    procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
+    procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: single);
     procedure Translate(x, y: Integer);
     procedure InitRotaData;
   private
@@ -170,6 +173,10 @@ type
     FWanteGestrichelt: Boolean;
     FBogen: Boolean;
     FKoppel: Boolean;
+    FWantLineColors: Boolean;
+    FDarkMode: Boolean;
+    FWantOverlayedRiggs: Boolean;
+    FUseQuickSort: Boolean;
     procedure InitGraph;
     procedure InitRaumGraph;
     procedure InitHullGraph;
@@ -180,24 +187,36 @@ type
     procedure SetOnBeforeDraw(const Value: TNotifyEvent);
     procedure SetOnAfterDraw(const Value: TNotifyEvent);
     function SingleDraw: Boolean;
+    procedure SetWantLineColors(const Value: Boolean);
+    procedure SetDarkMode(const Value: Boolean);
+    procedure SetWantOverlayedRiggs(const Value: Boolean);
+    procedure SetUseQuickSort(const Value: Boolean);
   public
     IsUp: Boolean;
     Image: TImage; // injected
 
-    CircleGraph: TCircleGraph;
     HullGraph: THullGraph0;
     RaumGraph: TRaumGraph;
     UseDisplayList: Boolean;
-    WantOverlayedRiggs: Boolean;
-    WantCircles: Boolean;
+    BackgroundColor: TColor;
 
     constructor Create;
     destructor Destroy; override;
-    procedure Init;
-    procedure Draw;
 
-    procedure RotateZ(Delta: double);
-    procedure Zoom(Delta: double);
+    procedure HandleAction(fa: Integer);
+    function GetChecked(fa: Integer): Boolean;
+    procedure SetChecked(fa: Integer; Value: Boolean);
+
+    procedure Init;
+    procedure InitPosition(w, h, x, y: single);
+    procedure Swap;
+    procedure Draw;
+    procedure ImageScreenScaleChanged(Sender: TObject);
+
+    procedure RotateZ(Delta: single);
+    procedure Zoom(Delta: single);
+
+    procedure DoOnUpdateStrokeRigg;
 
     property ZoomIndex: Integer read FZoomIndex write SetZoomIndex;
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
@@ -223,6 +242,11 @@ type
 
     property OnBeforeDraw: TNotifyEvent read FOnBeforeDraw write SetOnBeforeDraw;
     property OnAfterDraw: TNotifyEvent read FOnAfterDraw write SetOnAfterDraw;
+
+    property WantOverlayedRiggs: Boolean read FWantOverlayedRiggs write SetWantOverlayedRiggs;
+    property WantLineColors: Boolean read FWantLineColors write SetWantLineColors;
+    property DarkMode: Boolean read FDarkMode write SetDarkMode;
+    property UseQuickSort: Boolean read FUseQuickSort write SetUseQuickSort;
 
     property BitmapWidth: Integer read FBitmapWidth;
     property BitmapHeight: Integer read FBitmapHeight;
@@ -250,8 +274,6 @@ begin
     - Image reference needs to be injected first,
     later Init must be called, from the outside.
   }
-
-  CircleGraph := TCircleGraph.Create;
 end;
 
 destructor TRotaForm1.Destroy;
@@ -260,7 +282,6 @@ begin
   Bitmap.Free;
   RaumGraph.Free;
   HullGraph.Free;
-  CircleGraph.Free;
   Rotator.Free;
   Transformer.Free;
   inherited;
@@ -313,6 +334,22 @@ begin
   SetViewPoint(FViewPoint);
 end;
 
+procedure TRotaForm1.InitPosition(w, h, x, y: single);
+begin
+  FBitmapWidth := Round(w);
+  FBitmapHeight := Round(h);
+  FXPos := Round(x);
+  FYPos := Round(y);
+end;
+
+procedure TRotaForm1.Swap;
+begin
+  Image.OnMouseDown := PaintBox3DMouseDown;
+  Image.OnMouseMove := PaintBox3DMouseMove;
+  Image.OnMouseUp := PaintBox3DMouseUp;
+//  Image.OnScreenScaleChanged := ImageScreenScaleChanged;
+end;
+
 procedure TRotaForm1.InitGraph;
 begin
   Rotator := TPolarKar.Create;
@@ -351,7 +388,7 @@ end;
 
 procedure TRotaForm1.InitRotaData;
 
-  function GetMatrix(Theta, Xrot: double): Matrix4x4;
+  function GetMatrix(Theta, Xrot: single): TMatrix3D;
   begin
     Rotator.Reset;
     Rotator.DeltaTheta := Theta;
@@ -408,12 +445,12 @@ end;
 
 procedure TRotaForm1.UpdateMatrixText;
 var
-  m4x4: Matrix4x4;
+  m4x4: TMatrix3D;
 begin
-  m4x4 := Rotator.Mat.Mat;
-  MatrixTextU := Format('%8.4f %8.4f %8.4f',[m4x4[1,1],m4x4[1,2], m4x4[1,3]]);
-  MatrixTextV := Format('%8.4f %8.4f %8.4f',[m4x4[2,1],m4x4[2,2], m4x4[2,3]]);
-  MatrixTextW := Format('%8.4f %8.4f %8.4f',[m4x4[3,1],m4x4[3,2], m4x4[3,3]]);
+  m4x4 := Rotator.Mat;
+  MatrixTextU := Format('%8.4f %8.4f %8.4f',[m4x4.m11, m4x4.m12, m4x4.m13]);
+  MatrixTextV := Format('%8.4f %8.4f %8.4f',[m4x4.m21, m4x4.m22, m4x4.m23]);
+  MatrixTextW := Format('%8.4f %8.4f %8.4f',[m4x4.m31, m4x4.m32, m4x4.m33]);
 end;
 
 procedure TRotaForm1.DrawMatrix(g: TCanvas);
@@ -452,12 +489,6 @@ begin
   { Bitmap auf den Bildschirm kopieren }
   Image.Canvas.CopyMode := cmSrcCopy;
   Image.Canvas.Draw(0, 0, Bitmap);
-
-  if WantCircles then
-  begin
-    CircleGraph.Action;
-    CircleGraph.Draw(Image.Canvas, 0, 0);
-  end;
 
   Painted := True;
 end;
@@ -634,6 +665,12 @@ begin
   FSofortBerechnen := Value;
 end;
 
+procedure TRotaForm1.SetUseQuickSort(const Value: Boolean);
+begin
+  FUseQuickSort := Value;
+  RaumGraph.DL.UseQuickSort := True;
+end;
+
 procedure TRotaForm1.SetOnAfterDraw(const Value: TNotifyEvent);
 begin
   FOnAfterDraw := Value;
@@ -691,8 +728,8 @@ begin
   end;
   RaumGraph.Viewpoint := Value; // for GetriebeGraph
 
-  FIncrementT := RotaData.IncrementT;
-  FIncrementW := RotaData.IncrementW;
+  FIncrementT := Round(RotaData.IncrementT);
+  FIncrementW := (RotaData.IncrementW);
 
   { Rotationmatrix }
   Rotator.Matrix := RotaData.Matrix;
@@ -700,7 +737,7 @@ begin
 
   { Zoom }
   FZoomIndex := RotaData.ZoomIndex;
-  FZoom := FZoomBase * LookUpRa10(FZoomIndex);
+  FZoom := FZoomBase * TRotaParams.LookUpRa10(FZoomIndex);
   Transformer.Zoom := FZoom;
 
   { FixPoint }
@@ -817,7 +854,7 @@ begin
   Draw;
 end;
 
-procedure TRotaForm1.Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
+procedure TRotaForm1.Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: single);
 begin
   Rotator.DeltaPhi := Phi;
   Rotator.DeltaTheta := Theta;
@@ -832,6 +869,11 @@ begin
   FXpos := SavedXpos - (MouseDownX - x);
   FYpos := SavedYpos - (MouseDownY - y);
   DoTrans;
+end;
+
+procedure TRotaForm1.ImageScreenScaleChanged(Sender: TObject);
+begin
+  Draw;
 end;
 
 procedure TRotaForm1.Draw;
@@ -863,9 +905,9 @@ begin
   Draw;
 end;
 
-function TRotaForm1.OnGetFixPunkt: TRealPoint;
+function TRotaForm1.OnGetFixPunkt: TPoint3D;
 begin
-  result := RPN[FFixPoint];
+  result := RPN.V[FFixPoint];
 end;
 
 procedure TRotaForm1.PaintBackGround(g: TCanvas);
@@ -910,12 +952,12 @@ begin
   end;
 end;
 
-function TRotaForm1.GetMastKurvePoint(const Index: Integer): TRealPoint;
+function TRotaForm1.GetMastKurvePoint(const Index: Integer): TPoint3D;
 begin
   result := RaumGraph.GetMastKurvePoint(Index);
 end;
 
-procedure TRotaForm1.SetMastLineData(const Value: TLineDataR100; L, Beta: double);
+procedure TRotaForm1.SetMastLineData(const Value: TLineDataR100; L, Beta: single);
 begin
   RaumGraph.SetMastLineData(Value, L, Beta);
 end;
@@ -934,6 +976,11 @@ end;
 procedure TRotaForm1.SetControllerTyp(const Value: TControllerTyp);
 begin
   RaumGraph.ControllerTyp := Value;
+end;
+
+procedure TRotaForm1.SetDarkMode(const Value: Boolean);
+begin
+  FDarkMode := Value;
 end;
 
 procedure TRotaForm1.SetKoordinaten(const Value: TRiggPoints);
@@ -973,6 +1020,17 @@ begin
   RaumGraph.WanteGestrichelt := Value;
 end;
 
+procedure TRotaForm1.SetWantLineColors(const Value: Boolean);
+begin
+  FWantLineColors := Value;
+  RaumGraph.DL.WantLineColors := Value;
+end;
+
+procedure TRotaForm1.SetWantOverlayedRiggs(const Value: Boolean);
+begin
+  FWantOverlayedRiggs := Value;
+end;
+
 procedure TRotaForm1.SetZoomIndex(const Value: Integer);
 begin
   if (Value < 1) then
@@ -982,21 +1040,21 @@ begin
   else
     FZoomIndex := Value;
 
-  FZoom := FZoomBase * LookUpRa10(FZoomIndex);
+  FZoom := FZoomBase * TRotaParams.LookUpRa10(FZoomIndex);
   RaumGraph.Zoom := FZoom;
   Draw;
 end;
 
-procedure TRotaForm1.Zoom(Delta: double);
+procedure TRotaForm1.Zoom(Delta: single);
 begin
-  FZoom := FZoom + FZoom * FZoomBase * Delta * 0.3;
+  FZoom := FZoom + FZoom * FZoomBase * Sign(Delta);
   RaumGraph.Zoom := FZoom;
   Draw;
 end;
 
-procedure TRotaForm1.RotateZ(Delta: double);
+procedure TRotaForm1.RotateZ(Delta: single);
 begin
-  Rotate(0, 0, 0, 0, 0, Delta);
+  Rotate(0, 0, 0, 0, 0, Delta * 0.3);
   Draw;
 end;
 
@@ -1064,6 +1122,78 @@ begin
     { ok, MultiDraw, draw relaxed position in gray }
     result := False;
   end;
+end;
+
+function TRotaForm1.GetChecked(fa: Integer): Boolean;
+begin
+  result := RaumGraph.GetChecked(fa);
+end;
+
+procedure TRotaForm1.SetChecked(fa: Integer; Value: Boolean);
+begin
+  RaumGraph.SetChecked(fa, Value);
+end;
+
+procedure TRotaForm1.UpdateHullTexture;
+begin
+
+end;
+
+procedure TRotaForm1.UpdateCameraX(Delta: single);
+begin
+  FXPos := FXPos + Round(Delta) * 5;
+  Draw;
+end;
+
+procedure TRotaForm1.UpdateCameraY(Delta: single);
+begin
+  FYPos := FYPos - Round(Delta) * 5;
+  Draw;
+end;
+
+procedure TRotaForm1.HandleAction(fa: Integer);
+begin
+  case fa of
+    faReset:
+    begin
+      ViewPoint := FViewPoint;
+    end;
+
+    faResetPosition:
+    begin
+      FXPos := 0;
+      FYPos := 0;
+    end;
+
+    faResetRotation:
+    begin
+      Rotator.Matrix := RotaData.Matrix;
+      Rotator.GetAngle(FPhi, FTheta, FGamma);
+    end;
+
+    faResetZoom:
+    begin
+      FZoomIndex := RotaData.ZoomIndex;
+      FZoom := FZoomBase * TRotaParams.LookUpRa10(FZoomIndex);
+      Transformer.Zoom := FZoom;
+    end;
+
+    else
+      Exit;
+  end;
+
+  FIncrementT := Round(RotaData.IncrementT);
+  FIncrementW := Round(RotaData.IncrementW);
+
+  RaumGraph.Update;
+  HullGraph.Update;
+  EraseBK := True;
+  Draw;
+end;
+
+procedure TRotaForm1.DoOnUpdateStrokeRigg;
+begin
+
 end;
 
 end.

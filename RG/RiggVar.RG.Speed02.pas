@@ -53,9 +53,6 @@ type
     KoppelBtn: TSpeedButton;
 
     MatrixBtn: TSpeedButton;
-    ChartImageBtn: TSpeedButton;
-    SalingImageBtn: TSpeedButton;
-    ControllerImageBtn: TSpeedButton;
   private
     procedure ToggleColorModeBtnClick(Sender: TObject);
     procedure ToggleFontSizeBtnClick(Sender: TObject);
@@ -73,7 +70,6 @@ uses
   FrmMain,
   RiggVar.App.Main,
   RggTypes,
-  RggRaumGraph,
   RiggVar.FB.ActionConst;
 
 { TActionSpeedBarRG02 }
@@ -107,9 +103,6 @@ begin
     faRggBogen: FormMain.BogenBtnClick(Sender);
     faRggKoppel: FormMain.KoppelBtnClick(Sender);
 
-    faToggleChartGraph: FormMain.ChartImageBtnClick(Sender);
-    faToggleSalingGraph: FormMain.SalingImageBtnClick(Sender);
-    faToggleControllerGraph: FormMain.ControllerImageBtnClick(Sender);
     faToggleMatrixText: FormMain.RotaForm.MatrixItemClick(Sender);
 
     faMemoryBtn: FormMain.MemoryBtnClick(Sender);
@@ -130,7 +123,7 @@ procedure TActionSpeedBarRG02.UpdateSpeedButtonDown;
 begin
   UseDisplayListBtn.Down := FormMain.RotaForm.UseDisplayList;
 
-  UseQuickSortBtn.Down := FormMain.RotaForm.RaumGraph.DL.UseQuickSort;
+  UseQuickSortBtn.Down := FormMain.RotaForm.UseQuickSort;
   LegendBtn.Down := FormMain.RotaForm.LegendItemChecked;
   LineColorBtn.Down := Main.GetChecked(faToggleLineColor);
 
@@ -156,9 +149,6 @@ begin
   BogenBtn.Down := Main.GetChecked(faRggBogen);
   KoppelBtn.Down := Main.GetChecked(faRggKoppel);
 
-  ChartImageBtn.Down := FormMain.ChartControl.Visible;
-  SalingImageBtn.Down := FormMain.SalingImage.Visible;
-  ControllerImageBtn.Down := FormMain.ControllerImage.Visible;
   MatrixBtn.Down := FormMain.RotaForm.MatrixItemChecked;
 
   MemoryBtn.Down := False;
@@ -339,27 +329,6 @@ begin
   { Image Elements, and Matrix Text }
 
   BtnColorValue := clvImage;
-
-  sb := AddSpeedBtn('ChartImageBtn', BtnGroupSpace);
-  ChartImageBtn := sb;
-  sb.AllowAllUp := True;
-  sb.GroupIndex := NextGroupIndex;
-  sb.Tag := faToggleChartGraph;
-  InitSpeedButton(sb);
-
-  sb := AddSpeedBtn('SalingImageBtn', 0);
-  SalingImageBtn := sb;
-  sb.AllowAllUp := True;
-  sb.GroupIndex := NextGroupIndex;
-  sb.Tag := faToggleSalingGraph;
-  InitSpeedButton(sb);
-
-  sb := AddSpeedBtn('ControllerImageBtn', 0);
-  ControllerImageBtn := sb;
-  sb.AllowAllUp := True;
-  sb.GroupIndex := NextGroupIndex;
-  sb.Tag := faToggleControllerGraph;
-  InitSpeedButton(sb);
 
   sb := AddSpeedBtn('MatrixBtn', 0);
   MatrixBtn := sb;

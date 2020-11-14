@@ -13,8 +13,8 @@ uses
   Classes,
   Generics.Collections,
   Generics.Defaults,
+  RiggVar.FD.Point,
   RggTypes,
-  RggCalc,
   RggDisplayTypes,
   RggDisplayOrder;
 
@@ -24,8 +24,8 @@ type
     Name: string;
     Edge: TDisplayEdge;
     ItemType: TDisplayItemType;
-    P1: TRealPoint;
-    P2: TRealPoint;
+    P1: TPoint3D;
+    P2: TPoint3D;
 
     StrokeWidth: Integer;
     StrokeColor: TColor;
@@ -97,9 +97,9 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
-    procedure Ellipse(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; CenterPoint: TPoint; Radius: Integer = 10);
-    procedure Line(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; A, B: TPoint; Color: TColor);
-    procedure PolyLine(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; A: TZugPolyLine; Color: TColor);
+    procedure Ellipse(const Name: string; EdgeName: TDisplayEdge; P1, P2: TPoint3D; CenterPoint: TPoint; Radius: Integer = 10);
+    procedure Line(const Name: string; EdgeName: TDisplayEdge; P1, P2: TPoint3D; A, B: TPoint; Color: TColor);
+    procedure PolyLine(const Name: string; EdgeName: TDisplayEdge; P1, P2: TPoint3D; A: TZugPolyLine; Color: TColor);
     procedure Draw(Canvas: TCanvas);
     procedure Draw1(Canvas: TCanvas);
     procedure Draw2(Canvas: TCanvas);
@@ -224,7 +224,7 @@ begin
     Exit;
   end;
 
-  LP.SP := Null;
+  LP.SP := TPoint3D.Zero;
   LP.L1.A.P := Left.P1;
   LP.L1.B.P := Left.P2;
   LP.L1.Name := Left.Name;
@@ -553,7 +553,7 @@ begin
   result.Assign(DI);
 end;
 
-procedure TRggDisplayList.Ellipse(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; CenterPoint: TPoint; Radius: Integer = 10);
+procedure TRggDisplayList.Ellipse(const Name: string; EdgeName: TDisplayEdge; P1, P2: TPoint3D; CenterPoint: TPoint; Radius: Integer = 10);
 var
   cr: TDisplayItem;
 begin
@@ -564,13 +564,13 @@ begin
   cr.ItemType := diEllipse;
   cr.P1 := P1;
   cr.P2 := P2;
-  cr.P1[x] := cr.P1[x] - Radius;
-  cr.P2[x] := cr.P2[x] + Radius;
+  cr.P1.X := cr.P1.X - Radius;
+  cr.P2.X := cr.P2.X + Radius;
   cr.CenterPoint := CenterPoint;
   cr.Radius := Radius;
 end;
 
-procedure TRggDisplayList.Line(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; A, B: TPoint; Color: TColor);
+procedure TRggDisplayList.Line(const Name: string; EdgeName: TDisplayEdge; P1, P2: TPoint3D; A, B: TPoint; Color: TColor);
 var
   cr: TDisplayItem;
 begin
@@ -594,7 +594,7 @@ begin
   end;
 end;
 
-procedure TRggDisplayList.PolyLine(const Name: string; EdgeName: TDisplayEdge; P1, P2: TRealPoint; A: TZugPolyLine; Color: TColor);
+procedure TRggDisplayList.PolyLine(const Name: string; EdgeName: TDisplayEdge; P1, P2: TPoint3D; A: TZugPolyLine; Color: TColor);
 var
   cr: TDisplayItem;
 begin

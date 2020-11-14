@@ -104,7 +104,7 @@ begin
   { Position des Mastes in Deckshöhe von D0 aus in mm }
   SalingGraph.ParamXE := Round(Rigg.MastPositionE);
   { Abstand(iP[ooD0,x], iP[ooE0,x]) in mm }
-  SalingGraph.ParamXE0 := Round(Rigg.rP[ooE0, x] - Rigg.rP[ooD0, x]);
+  SalingGraph.ParamXE0 := Round(Rigg.rP.E0.X - Rigg.rP.D0.X);
   { Abstand von E0 zur Anschlagkante Deck + Klotzdicke }
   SalingGraph.EdgePos := Round(Rigg.GSB.Find(fpController).Min);
 end;
