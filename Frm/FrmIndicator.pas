@@ -234,10 +234,10 @@ begin
     { From - At }
     vert1.X := 0;
     vert1.Y := -tempDist;
-    vert1.z := 0;
+    vert1.Z := 0;
     vert2.X := 0;
     vert2.Y := 0;
-    vert2.z := 1;
+    vert2.Z := 1;
     amat.TransformPoint(vert1);
     amat.TransformPoint(vert2);
     From.X := vert1.X + At.X;

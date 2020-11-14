@@ -29,6 +29,10 @@ object OptionForm: TOptionForm
     TabOrder = 0
     object tsTrimm: TTabSheet
       Caption = 'Trimm'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBoxTrimm: TGroupBox
         Left = 16
         Top = 16

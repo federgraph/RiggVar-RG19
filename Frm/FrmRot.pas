@@ -573,9 +573,9 @@ var
   m4x4: Matrix4x4;
 begin
   m4x4 := Rotator.Mat.Mat;
-  S1 := Format('%8.4f %8.4f %8.4f',[m4x4[1,1],m4x4[1,2], m4x4[1,3]]);
-  S2 := Format('%8.4f %8.4f %8.4f',[m4x4[2,1],m4x4[2,2], m4x4[2,3]]);
-  S3 := Format('%8.4f %8.4f %8.4f',[m4x4[3,1],m4x4[3,2], m4x4[3,3]]);
+  S1 := Format('%8.4f %8.4f %8.4f',[m4x4[1,1], m4x4[1,2], m4x4[1,3]]);
+  S2 := Format('%8.4f %8.4f %8.4f',[m4x4[2,1], m4x4[2,2], m4x4[2,3]]);
+  S3 := Format('%8.4f %8.4f %8.4f',[m4x4[3,1], m4x4[3,2], m4x4[3,3]]);
   with Canvas do
   begin
     Font.Name := 'Courier New';
@@ -2193,7 +2193,6 @@ end;
 procedure TRotationForm.PrintIt;
 var
   PrintOffset: TPoint;
-//  SavedOffset: TPoint;
   PrintZoom: double;
   RandX, RandY: Integer;
   Rgn: THandle;

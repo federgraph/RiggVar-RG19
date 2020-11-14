@@ -96,7 +96,7 @@ type
     SchnittKK: TSchnittKK;
     TrimmTab: TTrimmTab;
     GSB: TRggFA;
-    rP: TRealRiggPoints;
+    rP: TRiggPoints;
 
     constructor Create;
     destructor Destroy; override;

@@ -188,7 +188,7 @@ uses
 
 procedure TChartForm.FormCreate(Sender: TObject);
 begin
-  FScale := Main.Scale;
+  FScale := MainVar.Scale;
 
   ChartForm := self; { wird schon in AchsForm.Create benötigt }
   HorzScrollBar.Position := 0;

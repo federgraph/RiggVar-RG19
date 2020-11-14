@@ -44,7 +44,7 @@ uses
 
 constructor TTrimmTabGraph.Create;
 begin
-  FScale := Main.Scale;
+  FScale := MainVar.Scale;
   Margin := 5;
   BackgroundColor := clWhite;
 

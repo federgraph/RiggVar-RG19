@@ -82,7 +82,7 @@ type
     FiControllerAnschlag: Integer;
     FiReserved: Integer;
     { Rumpf: Koordinaten in mm }
-    iP: TRealRiggPoints; { Array enthält auch die Riggkoordinaten }
+    iP: TRiggPoints; { Array enthält auch die Riggkoordinaten }
     { Festigkeitswerte }
     rEA: TRiggLvektor; { N }
     EI: double; { Nmm^2 }
@@ -506,8 +506,6 @@ begin
   GSB.SalingL.Ist := Round(sqrt(sqr(GSB.SalingH.Ist) + sqr(GSB.SalingA.Ist / 2)));
   GSB.VorstagOS.Ist := GSB.Vorstag.Ist;
   GSB.WPowerOS.Ist := 1000; { angenommene Wantenspannung 3d }
-  GSB.T1.Ist := 650;
-  GSB.T2.Ist := 150;
 
   GSB.InitStepDefault;
 
@@ -534,10 +532,6 @@ begin
   GSB.VorstagOS.Max := 4700;
   GSB.WPowerOS.Min := 100;
   GSB.WPowerOS.Max := 3000;
-  GSB.T1.Min := 0;
-  GSB.T1.Max := 800;
-  GSB.T2.Min := 1;
-  GSB.T2.Max := 800;
 
   { TrimmTab.TrimmTabDaten := DefaultTrimmTabDaten; } { siehe RggTypes }
   with TrimmTabDaten do
@@ -653,8 +647,6 @@ begin
   GSB.SalingL.Ist := Round(sqrt(sqr(GSB.SalingH.Ist) + sqr(GSB.SalingA.Ist / 2)));
   GSB.VorstagOS.Ist := GSB.Vorstag.Ist;
   GSB.WPowerOS.Ist := 1000; { angenommene Wantenspannung 3d }
-  GSB.T1.Ist := 500;
-  GSB.T2.Ist := 100;
   GSB.MastfallVorlauf.Ist := FiMastfallVorlauf;
 
   GSB.InitStepDefault;
@@ -682,10 +674,6 @@ begin
   GSB.VorstagOS.Max := GSB.VorstagOS.Ist + 10 * f;
   GSB.WPowerOS.Min := 100;
   GSB.WPowerOS.Max := 3000;
-  GSB.T1.Min := 0;
-  GSB.T1.Max := 800;
-  GSB.T2.Min := 1;
-  GSB.T2.Max := 800;
   GSB.MastfallVorlauf.Min := GSB.MastfallVorlauf.Ist - 10 * f;
   GSB.MastfallVorlauf.Max := GSB.MastfallVorlauf.Ist + 10 * f;
 

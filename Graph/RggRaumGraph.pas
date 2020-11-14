@@ -148,7 +148,7 @@ procedure TRaumGraph.Update2;
 var
   i: TRiggPoint;
   j: Integer;
-  RPT: TRealRiggPoints;
+  RPT: TRiggPoints;
   MKT: array [0 .. BogenMax] of TRealPoint;
   KKT: TKoordLine;
 begin

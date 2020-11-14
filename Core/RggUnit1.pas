@@ -401,7 +401,7 @@ var
   i: Integer;
   phiA, phiE, phiM, psiM, WinkelStep: double;
   ooTemp: TRealPoint;
-  oooTemp: TRealRiggPoints;
+  oooTemp: TRiggPoints;
 begin
   oooTemp := rP; { aktuelle Koordinaten sichern }
   Wanten3dTo2d;

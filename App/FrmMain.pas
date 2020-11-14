@@ -127,22 +127,6 @@ type
     procedure ControllerBtnClick(Sender: TObject);
     procedure ZweischlagBtnClick(Sender: TObject);
 
-//    procedure SofortBtnClick(Sender: TObject);
-//    procedure GrauBtnClick(Sender: TObject);
-//    procedure BlauBtnClick(Sender: TObject);
-//    procedure MultiBtnClick(Sender: TObject);
-
-//    procedure BogenBtnClick(Sender: TObject);
-//    procedure KoppelBtnClick(Sender: TObject);
-
-//    procedure SuperSimpleBtnClick(Sender: TObject);
-//    procedure SuperNormalBtnClick(Sender: TObject);
-//    procedure SuperGrauBtnClick(Sender: TObject);
-//    procedure SuperBlauBtnClick(Sender: TObject);
-//    procedure SuperMultiBtnClick(Sender: TObject);
-//    procedure SuperDisplayBtnClick(Sender: TObject);
-//    procedure SuperQuickBtnClick(Sender: TObject);
-
     procedure M10BtnClick(Sender: TObject);
     procedure M1BtnClick(Sender: TObject);
     procedure P1BtnClick(Sender: TObject);
@@ -365,7 +349,7 @@ type
 
     property ReportLabelCaption: string read FReportLabelCaption write SetReportLabelCaption;
   private
-    RotaForm: TRotaForm;
+    RotaForm: TRotaForm1;
     StrokeRigg: IStrokeRigg;
   end;
 
@@ -374,7 +358,7 @@ var
 
 implementation
 
-{$R *.DFM}
+{$R *.dfm}
 
 uses
   RiggVar.App.Main,
@@ -472,7 +456,7 @@ begin
   OnClose := FormClose;
   OnCloseQuery := FormCloseQuery;
 
-  RotaForm := TRotaForm.Create;
+  RotaForm := TRotaForm1.Create;
   StrokeRigg := RotaForm;
   Main.StrokeRigg := RotaForm;
   RotaForm.PaintBox3D := PaintboxR;
@@ -1341,7 +1325,7 @@ begin
   sb.Caption := 'SB';
   sb.Hint := 'Sandboxed';
   sb.AllowAllUp := True;
-  sb.Down := IsSandboxed;
+  sb.Down := MainVar.IsSandboxed;
   sb.GroupIndex := 11;
   sb.OnClick := SandboxedBtnClick;
 
@@ -1723,7 +1707,7 @@ end;
 
 procedure TFormMain.SandboxedBtnClick(Sender: TObject);
 begin
-  IsSandboxed := SandboxedBtn.Down;
+  MainVar.IsSandboxed := SandboxedBtn.Down;
 end;
 
 procedure TFormMain.InitReportListBox;

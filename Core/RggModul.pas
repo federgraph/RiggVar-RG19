@@ -151,7 +151,7 @@ type
     FWReport: TFWReport;
     MemCtrl: TTrimmControls;
     RefCtrl: TTrimmControls;
-    RefPoints: TRealRiggPoints;
+    RefPoints: TRiggPoints;
 
     ChartFormActive: Boolean;
 
@@ -865,7 +865,7 @@ begin
     th := Round(20 * FScale);
     c.Font.Size := 11;
     c.Font.Name := 'Consolas';
-    c.Font.Color := TColors.Beige;
+    c.Font.Color := TColors.Navy;
     c.TextOut(ox, oy + 1 * th, lbMastfall);
     c.TextOut(ox, oy + 2 * th, lbSpannung);
     c.TextOut(ox, oy + 3 * th, lbBiegung);

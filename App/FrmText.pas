@@ -327,7 +327,7 @@ end;
 
 procedure TTextForm.cbSandboxedClick(Sender: TObject);
 begin
-  IsSandboxed := cbSandboxed.Checked;
+  MainVar.IsSandboxed := cbSandboxed.Checked;
 end;
 
 procedure TTextForm.InitListBox;

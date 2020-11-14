@@ -349,7 +349,7 @@ type
 
     property ReportLabelCaption: string read FReportLabelCaption write SetReportLabelCaption;
   private
-    RotaForm: TRotaForm;
+    RotaForm: TRotaForm1;
     StrokeRigg: IStrokeRigg;
   end;
 
@@ -456,7 +456,7 @@ begin
   OnClose := FormClose;
   OnCloseQuery := FormCloseQuery;
 
-  RotaForm := TRotaForm.Create;
+  RotaForm := TRotaForm1.Create;
   StrokeRigg := RotaForm;
   Main.StrokeRigg := RotaForm;
   RotaForm.PaintBox3D := PaintboxR;
@@ -1325,7 +1325,7 @@ begin
   sb.Caption := 'SB';
   sb.Hint := 'Sandboxed';
   sb.AllowAllUp := True;
-  sb.Down := IsSandboxed;
+  sb.Down := MainVar.IsSandboxed;
   sb.GroupIndex := 11;
   sb.OnClick := SandboxedBtnClick;
 
@@ -1707,7 +1707,7 @@ end;
 
 procedure TFormRG19C.SandboxedBtnClick(Sender: TObject);
 begin
-  IsSandboxed := SandboxedBtn.Down;
+  MainVar.IsSandboxed := SandboxedBtn.Down;
 end;
 
 procedure TFormRG19C.InitReportListBox;

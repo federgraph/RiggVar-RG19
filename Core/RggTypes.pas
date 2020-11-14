@@ -97,7 +97,7 @@ type
 //    WPowerOS
 //    );
 
-  TsbParam = (Ist, Min, Max, TinyStep, BigStep);
+  TsbParam = (IstValue, MinValue, MaxValue, TinyStep, BigStep);
 //  TsbArray = array [TsbName, TsbParam] of Integer;
   TsbLabelArray = array [TsbName] of string;
   TTabellenTyp = (itKonstante, itGerade, itParabel, itBezier);
@@ -151,9 +151,9 @@ type
     );
 
   TIntRiggPoints = array [TRiggPoint] of TIntPoint;
-  TRealRiggPoints = array [TRiggPoint] of TRealPoint;
+  TRiggPoints = array [TRiggPoint] of TRealPoint;
   TMastKurve = array [0..BogenMax] of TRealPoint;
-  TRggPolyLine = array of TPoint;
+  TZugPolyLine = array of TPoint;
 
   TRiggLvektor = array [0 .. 19] of double;
   TRiggLIndexRange = 0 .. 19;

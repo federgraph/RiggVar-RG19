@@ -206,10 +206,8 @@
         <DCCReference Include="Graph\RggRaumGraph.pas"/>
         <DCCReference Include="Graph\RggRota.pas"/>
         <DCCReference Include="Graph\RggDisplay.pas"/>
-        <DCCReference Include="Graph\RggTestData.pas"/>
+        <DCCReference Include="Core\RggTestData.pas"/>
         <DCCReference Include="App\RiggVar.App.Main.pas"/>
-        <DCCReference Include="App\RiggVar.App.Main0.pas"/>
-        <DCCReference Include="App\RiggVar.App.Main1.pas"/>
         <DCCReference Include="FB\RiggVar.FB.Classes.pas"/>
         <DCCReference Include="RG\RiggVar.RG.Main.pas"/>
         <DCCReference Include="RG\RiggVar.RG.Def.pas"/>

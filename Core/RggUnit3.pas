@@ -73,7 +73,7 @@ type
     rLe: TRiggLvektor; { Längen entlastet 3d in mm }
     rF: TRiggLvektor; { Stabkräfte 3d in N }
     rEA: TRiggLvektor; { EA Werte 3d in KN }
-    rPe: TRealRiggPoints; { Koordinaten entlastet 3d in mm }
+    rPe: TRiggPoints; { Koordinaten entlastet 3d in mm }
     iPe: TIntRiggPoints; { Integerkoordinaten entlastet 3d in mm }
 
     { Daten für RegelGrafik }
