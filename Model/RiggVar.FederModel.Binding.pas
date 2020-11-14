@@ -19,7 +19,7 @@
 interface
 
 uses
-  System.Classes;
+  Classes;
 
 type
   TFederBinding = class
@@ -32,6 +32,10 @@ type
     procedure InitSpecialKeys(SL: TStrings);
 
     procedure InitHullPoints(ML: TStrings);
+
+    procedure InitNormalKeyInfo(SL: TStrings);
+    procedure InitSpecialKeyInfo(SL: TStrings);
+    procedure InitSplashText(HL: TStrings);
   end;
 
 implementation
@@ -83,10 +87,7 @@ begin
   SL.Add('Info about Trimm 420 App');
   SL.Add('');
   SL.Add('see www.federgraph.de');
-  SL.Add('project source has GPL 3.0 license');
   SL.Add('see federgraph''s GitHub repository: RiggVar-RG38');
-  SL.Add('');
-  SL.Add('( Wanted: Hull data and sample "TrimmFile" for similarly rigged boats. )');
 
 {$ifdef MSWINDOWS}
   SL.Add('');
@@ -111,9 +112,9 @@ begin
   SL.Add('Help Text');
   SL.Add('=========');
   SL.Add('Tip: Use space bar instead of Enter in left List.');
-SL.Add('');
+  SL.Add('');
   SL.Add('ToDo: Update manually written shortcut list.');
-  SL.Add('--- old manually written key binding report below ---');
+  SL.Add('--- manually written key binding report below ---');
   SL.Add('');
   InitNormalKeys(SL);
   SL.Add('');
@@ -123,13 +124,13 @@ end;
 procedure TFederBinding.InitNormalKeys(SL: TStrings);
 begin
   SL.Add('Taste a : faSalingA');
-  SL.Add('Taste A : ');
-//  SL.Add('');
-//  SL.Add('Taste b : faCycleBitmapP');
-//  SL.Add('Taste B : faCycleBitmapM');
+  SL.Add('Taste A : faFixpointA0');
   SL.Add('');
-  SL.Add('Taste c : faCycleColorSchemeP');
-  SL.Add('Taste C : faCycleColorSchemeM');
+  SL.Add('Taste b : faBiegung');
+  SL.Add('Taste B : faFixpointB0');
+  SL.Add('');
+  SL.Add('Taste c : faMastfallF0C');
+  SL.Add('Taste C : faFixPointC0');
   SL.Add('');
   SL.Add('Taste d : faFixpointD');
   SL.Add('Taste D : faFixpointD0');
@@ -137,50 +138,50 @@ begin
   SL.Add('Taste e : faFixpointE');
   SL.Add('Taste E : faFixpointE0');
   SL.Add('');
-  SL.Add('Taste f : faFixpointF');
+  SL.Add('Taste f : faMastfallF0F');
   SL.Add('Taste F : faFixpointF0');
   SL.Add('');
-  SL.Add('Taste g : ');
+  SL.Add('Taste g : faMastfallVorlauf');
   SL.Add('Taste G : ');
   SL.Add('');
   SL.Add('Taste h : faSalingH');
-  SL.Add('Taste H : faHull');
+  SL.Add('Taste H : faToggleHelp');
   SL.Add('');
   SL.Add('Taste i : faWheelRight');
-  SL.Add('Taste I : faWheelUp');
+  SL.Add('Taste I : faWheelLeft');
   SL.Add('');
-  SL.Add('Taste j : faWheelLeft');
+  SL.Add('Taste j : faWheelUp');
   SL.Add('Taste J : faWheelDown');
   SL.Add('');
-  SL.Add('Taste k : ');
-  SL.Add('Taste K : ');
+  SL.Add('Taste k : faShowNormalKeyInfo');
+  SL.Add('Taste K : faRggKoppel');
   SL.Add('');
-  SL.Add('Taste l : ');
-  SL.Add('Taste L : ');
+  SL.Add('Taste l : faToggleShowLegend');
+  SL.Add('Taste L : faMemeGotoLandscape');
   SL.Add('');
-  SL.Add('Taste m : ');
+  SL.Add('Taste m : faMemoryBtn');
   SL.Add('Taste M : faCopyAndPaste');
   SL.Add('');
-  SL.Add('Taste n : faRandomBlack');
-  SL.Add('Taste N : faRandomWhite');
+  SL.Add('Taste n : faShowNormalKeyInfo');
+  SL.Add('Taste N : ');
   SL.Add('');
   SL.Add('Taste o : faWoben');
   SL.Add('Taste O : ');
   SL.Add('');
-  SL.Add('Taste p : faResetPosition');
-  SL.Add('Taste P : ');
+  SL.Add('Taste p : faPan');
+  SL.Add('Taste P : faMemeGotoPortrait');
   SL.Add('');
-  SL.Add('Taste q : ');
+  SL.Add('Taste q : faToggleAllText');
   SL.Add('Taste Q : ');
   SL.Add('');
-  SL.Add('Taste r : '); //debug: toggle resizing mode');
+  SL.Add('Taste r : faToggleReport');
   SL.Add('Taste R : faReadTrimmFile');
   SL.Add('');
-  SL.Add('Taste s : ');
-  SL.Add('Taste S : ');
+  SL.Add('Taste s : faShowSpecialKeyInfo');
+  SL.Add('Taste S : faMemeGotoSquare');
   SL.Add('');
-  SL.Add('Taste t : faParamT1');
-  SL.Add('Taste T : faParamT2');
+  SL.Add('Taste t : faToggleFontColor');
+  SL.Add('Taste T : faToggleSpeedPanel');
   SL.Add('');
   SL.Add('Taste u : faToggleDataText');
   SL.Add('Taste U : faToggleDiffText');
@@ -197,9 +198,8 @@ begin
   SL.Add('Taste y : ');
   SL.Add('Taste Y : ');
   SL.Add('');
-  SL.Add('Taste z : faResetZoom');
+  SL.Add('Taste z : faShowInfoText');
   SL.Add('Taste Z : faUpdateTrimm0');
-
 end;
 
 procedure TFederBinding.InitSpecialKeys(SL: TStrings);
@@ -216,12 +216,22 @@ begin
   SL.Add('');
   SL.Add('Taste * : faActionPageM');
   SL.Add('Taste + : faActionPageP');
-  SL.Add('Taste = : faActionPageE');
   SL.Add('');
-  SL.Add('Taste # : faBitmapEscape');
+//  SL.Add('Taste ! : faShowNormalKeyInfo');
+//  SL.Add('Taste " : faShowSpecialKeyInfo');
+//  SL.Add('Taste § : faShowInfoText');
+//  SL.Add('Taste $ : faShowDebugInfo');
+  SL.Add('Taste ? : faShowHelpText');
+//  SL.Add('Taste = : faShowZOrderInfo');
+  SL.Add('Taste # : faActionPage4');
   SL.Add('');
-  SL.Add('Taste ! : faParamT1');
-  SL.Add('Taste " : faParamT2');
+  SL.Add('Taste ; : faRotaForm1');
+  SL.Add('Taste : : faRotaForm2');
+  SL.Add('Taste _ : faRotaForm3');
+  SL.Add('');
+  SL.Add('Taste , : faRotaForm1');
+  SL.Add('Taste . : faRotaForm2');
+  SL.Add('Taste - : faRotaForm3');
 end;
 
 (*
@@ -381,6 +391,109 @@ begin
   ML.Add('  Punkt(0, 580, 250);');
   ML.Add('end;');
   ML.Add('');
+end;
+
+procedure TFederBinding.InitNormalKeyInfo(SL: TStrings);
+begin
+  SL.Add('Normal Key Info (subset):');
+  SL.Add('a : faSalingA');
+  SL.Add('b : faBiegung');
+  SL.Add('c : faMastfallF0C');
+  SL.Add('f : faMastfallF0F');
+  SL.Add('g : faMastfallVorlauf');
+  SL.Add('h : faSalingH');
+  SL.Add('o : faWoben');
+  SL.Add('p : faPan');
+  SL.Add('v : faVorstag');
+  SL.Add('w : faWante');
+
+  SL.Add('');
+  SL.Add('A : faFixpointA0');
+  SL.Add('B : faFixpointB0');
+  SL.Add('d : faFixpointD');
+  SL.Add('D : faFixpointD0');
+  SL.Add('f : faFixpointF');
+  SL.Add('F : faFixpointF0');
+
+  SL.Add('');
+  SL.Add('i : faWheelRight');
+  SL.Add('I : faWheelLeft');
+  SL.Add('j : faWheelUp');
+  SL.Add('J : faWheelDown');
+
+  SL.Add('');
+  SL.Add('m : faMemoryBtn');
+  SL.Add('M : faCopyAndPaste');
+  SL.Add('R : faReadTrimmFile');
+  SL.Add('T : faToggleSpeedPanel');
+  SL.Add('Z : faUpdateTrimm0');
+end;
+
+procedure TFederBinding.InitSpecialKeyInfo(SL: TStrings);
+begin
+  SL.Add('Special Key Info (subset):');
+  SL.Add('0 : faTrimm0');
+  SL.Add('1 : faTrimm1');
+  SL.Add('2 : faTrimm2');
+  SL.Add('3 : faTrimm3');
+  SL.Add('4 : faTrimm4');
+  SL.Add('5 : faTrimm5');
+  SL.Add('6 : faTrimm6');
+  SL.Add('');
+  SL.Add('7 : fa420');
+  SL.Add('8 : faLogo');
+
+  SL.Add('');
+  SL.Add('* : faActionPageM');
+  SL.Add('+ : faActionPageP');
+
+  SL.Add('');
+  SL.Add('! : ShowNormalKeyInfo');
+  SL.Add('" : ShowSpecialKeyInfo');
+  SL.Add('§ : ShowInfoText');
+  SL.Add('= : faShowZOrder');
+  SL.Add('? : faHelp');
+
+  SL.Add('');
+  SL.Add('# : faActionPage4');
+
+  SL.Add('');
+  SL.Add(', : faRotaForm1');
+  SL.Add('. : faRotaForm2');
+  SL.Add('- : faRotaForm3');
+end;
+
+procedure TFederBinding.InitSplashText(HL: TStrings);
+begin
+  HL.Clear;
+  HL.Add('Control Text with Keys:');
+  HL.Add('  n    - show Normal key info');
+  HL.Add('  H    - toggle Help text');
+  HL.Add('  q    - toggle All text');
+  HL.Add('  r    - toggle Report text');
+  HL.Add('  s    - show Special key info');
+  HL.Add('  u    - toggle Data Text');
+  HL.Add('  U    - toggle Diff Text');
+  HL.Add('  z    - show Info text');
+  HL.Add('  ?    - show Help text');
+  HL.Add('');
+  HL.Add('Select current parameter:');
+  HL.Add('  with Button, Key, or in ListBox');
+  HL.Add('');
+  HL.Add('Change param value with Wheel!');
+  HL.Add('  Wheel = small step');
+  HL.Add('  Shift-Wheel  = bigger step');
+  HL.Add('  Ctrl-Wheel = zoom in and out');
+  HL.Add('');
+  HL.Add('Goto stored Trimm');
+  HL.Add('  1..8, 0 - Trimm selection');
+  HL.Add('Change Format of Window');
+  HL.Add('  L, P, S - Landscape, Portrait, Square');
+  HL.Add('');
+  HL.Add('Forms:');
+  HL.Add('  FA - search in Actions');
+  HL.Add('  FM - show Text in Memo');
+  HL.Add('  FD - show documentation drawings');
 end;
 
 end.

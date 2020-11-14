@@ -18,8 +18,12 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  System.Classes,
+  Classes,
   RiggVar.FB.ActionConst;
 
 type

@@ -40,7 +40,8 @@ type
     clvZoom
   );
 
-  TSpeedColorScheme = record
+  TSpeedColorScheme = class
+  public
     claScheme: TRggColor;
 
     claBack: TRggColor;
@@ -179,7 +180,6 @@ begin
   claScheme := TRggColors.Orange;
 
   claBack := TRggColors.WindowWhite;
-
   claHot := TRggColors.Black;
   claLog := TRggColors.Orange;
   claReport := TRggColors.Burlywood;

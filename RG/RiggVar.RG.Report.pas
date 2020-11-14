@@ -25,7 +25,7 @@ type
     rgDataText,
     rgDiffText,
 
-    rgAusgabe,
+    rgAusgabeDetail,
     rgAusgabeRL,
     rgAusgabeRP,
     rgAusgabeRLE,
@@ -108,7 +108,7 @@ begin
     rgJsonText: result := 'Json Text';
     rgDataText: result := 'Data Text';
     rgDiffText: result := 'Diff Text';
-    rgAusgabe: result := 'Ausgabe Detail';
+    rgAusgabeDetail: result := 'Ausgabe Detail';
     rgAusgabeRL: result := 'Ausgabe rL';
     rgAusgabeRP: result := 'Ausgabe rP';
     rgAusgabeRLE: result := 'Ausgabe rLE';
@@ -139,7 +139,7 @@ begin
     faReportJsonText: rg := rgJsonText;
     faReportDataText: rg := rgDataText;
     faReportDiffText: rg := rgDiffText;
-    faReportAusgabeDetail: rg := rgAusgabe;
+    faReportAusgabeDetail: rg := rgAusgabeDetail;
     faReportAusgabeRL: rg := rgAusgabeRL;
     faReportAusgabeRP: rg := rgAusgabeRP;
     faReportAusgabeRLE: rg := rgAusgabeRLE;
@@ -172,7 +172,7 @@ begin
     faReportJsonText: result := CurrentReport = rgJsonText;
     faReportDataText: result := CurrentReport = rgDataText;
     faReportDiffText: result := CurrentReport = rgDiffText;
-    faReportAusgabeDetail: result := CurrentReport = rgAusgabe;
+    faReportAusgabeDetail: result := CurrentReport = rgAusgabeDetail;
     faReportAusgabeRL: result := CurrentReport = rgAusgabeRL;
     faReportAusgabeRP: result := CurrentReport = rgAusgabeRP;
     faReportAusgabeRLE: result := CurrentReport = rgAusgabeRLE;
@@ -225,22 +225,23 @@ begin
   ML.BeginUpdate;
   try
     ML.Clear;
+    RiggReport.SofortFlag := Main.SofortBerechnen;
     case CurrentReport of
       rgNone: ;
       rgReadme:
       begin
         ML.Add('On the desktop - use scroll Wheel of the mouse!');
+        ML.Add('On touch screen - use touch bar on button frame');
         ML.Add('');
-        ML.Add('Wheel by itself will scroll Text in Controls.');
-        ML.Add('Shift-Wheel changes current param value (small step)');
-        ML.Add('Ctrl-Wheel changes current param value (big step)');
+        ML.Add('Wheel = small step change of current param value');
+        ML.Add('Shift-Wheel = big step change of current param value');
       end;
       rgLog: ML.Text := Main.Logger.TL.Text;
       rgJson: Main.RggData.WriteJSon(ML);
       rgData: Main.RggData.WriteReport(ML);
-      rgAusgabe:
+      rgAusgabeDetail:
       begin
-        Main.Rigg.AusgabeText(ML, False);
+        Main.Rigg.AusgabeText(ML, False, Main.SofortBerechnen);
       end;
       rgAusgabeRL:
       begin
@@ -310,26 +311,28 @@ var
 begin
   rs := [];
 
+//  { there is not enough space to show all in listbox }
+
   Include(rs, rgLog);
-//  Include(rs, rgJson);
-//  Include(rs, rgData);
+  Include(rs, rgJson);
+  Include(rs, rgData);
   Include(rs, rgShort);
-//  Include(rs, rgLong);
+  Include(rs, rgLong);
 
   Include(rs, rgTrimmText);
   Include(rs, rgJsonText);
   Include(rs, rgDataText);
   Include(rs, rgDiffText);
 
-  Include(rs, rgAusgabe);
+  Include(rs, rgAusgabeDetail);
   Include(rs, rgAusgabeRL);
-//  Include(rs, rgAusgabeRP);
-//  Include(rs, rgAusgabeRLE);
-//  Include(rs, rgAusgabeRPE);
-//  Include(rs, rgAusgabeDiffL);
-//  Include(rs, rgAusgabeDiffP);
+  Include(rs, rgAusgabeRP);
+  Include(rs, rgAusgabeRLE);
+  Include(rs, rgAusgabeRPE);
+  Include(rs, rgAusgabeDiffL);
+  Include(rs, rgAusgabeDiffP);
 
-  //Include(rs, rgXML);
+//  Include(rs, rgXML);
   Include(rs, rgDebugReport);
   Include(rs, rgReadme);
   Include(rs, rgNone);

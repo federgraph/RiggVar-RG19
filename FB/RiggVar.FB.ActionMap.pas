@@ -18,10 +18,13 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  System.SysUtils,
-  System.Classes,
-  System.UITypes,
+  SysUtils,
+  Classes,
   RiggVar.FB.Color;
 
 type

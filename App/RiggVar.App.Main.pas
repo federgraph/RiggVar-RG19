@@ -20,10 +20,10 @@ interface
 
 uses
   RiggVar.FB.Scheme,
-  RiggVar.App.Main1;
+  RiggVar.RG.Main;
 
 type
-  TMain = TMain1;
+  TMain = TRggMain;
 
 var
   Main: TMain;
@@ -31,14 +31,18 @@ var
 type
   MainConst = class
   const
+    ColorSchemeCount = 7;
     DefaultBtnFontSize = 18;
     TrackbarFrequency = 0.1;
+    MustBeSandboxed: Boolean = true;
+    TrimmFileName = 'Trimm-File.txt';
+    TrimmFileNameAuto = 'Trimm-File-Auto.txt';
   end;
 
   MainVar = class
   public
   class var
-    RG: Boolean;
+    IsSandboxed: Boolean;
     AppIsClosing: Boolean;
     ShowDebugData: Boolean;
     WantOnResize: Boolean;
@@ -49,17 +53,7 @@ type
     ClientWidth: Integer;
     ClientHeight: Integer;
     class constructor Create;
-    class destructor Destroy;
   end;
-
-var
-  IsSandboxed: Boolean = false;
-
-const
-  ColorSchemeCount = 7;
-
-  TrimmFileName = 'Trimm-File.txt';
-  TrimmFileNameAuto = 'Trimm-File-Auto.txt';
 
 implementation
 
@@ -67,14 +61,9 @@ implementation
 
 class constructor MainVar.Create;
 begin
+  IsSandboxed := true;
   ColorScheme := TColorScheme.Create(5);
   Raster := 70;
-end;
-
-class destructor MainVar.Destroy;
-begin
-  ColorScheme.Free;
-  inherited;
 end;
 
 end.

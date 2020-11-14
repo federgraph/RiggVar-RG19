@@ -2,14 +2,15 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  System.Classes,
-  System.UITypes,
-  System.UIConsts,
-  Graphics,
-  Vcl.StdCtrls,
-  Vcl.ExtCtrls,
-  Vcl.Buttons,
+  Classes,
+  StdCtrls,
+  ExtCtrls,
+  Buttons,
   RiggVar.FB.Color,
   RiggVar.FB.SpeedColor;
 
@@ -53,15 +54,15 @@ type
     procedure SpeedButtonClick(Sender: TObject); virtual;
     procedure UpdateCaptions;
     procedure UpdateHints;
-    procedure ToggleBigMode;
     function NextGroupIndex: Integer;
   public
-    SpeedColorScheme: TSpeedColorScheme;
+    class var SpeedColorScheme: TSpeedColorScheme; // injected
 
     constructor Create(AOwner: TComponent); override;
 
     procedure UpdateLayout;
     procedure UpdateColor;
+    procedure ToggleBigMode;
 
     procedure InitSpeedButtons; virtual;
     procedure UpdateSpeedButtonDown; virtual;
@@ -96,6 +97,7 @@ begin
 //  InitSpeedButtons; // Main is still nil (by design)
   DarkMode := True;
   BigMode := True;
+  ShowCaption := False;
 end;
 
 procedure TActionSpeedBar.InitLayoutProps;

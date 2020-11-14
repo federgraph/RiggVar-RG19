@@ -47,11 +47,15 @@ faActionPage5: result := 'faActionPage5';
 faActionPage6: result := 'faActionPage6';
 
 { Forms }
-faShowActi: result := 'faShowActi';
 faShowMemo: result := 'faShowMemo';
-faShowOpti: result := 'faShowOpti';
-faShowConf: result := 'faShowConf';
+faShowActions: result := 'faShowActions';
+faShowOptions: result := 'faShowOptions';
+faShowDrawings: result := 'faShowDrawings';
+faShowConfig: result := 'faShowConfig';
 faShowTrimmTab: result := 'faShowTrimmTab';
+faShowKreis: result := 'faShowKreis';
+faShowInfo: result := 'faShowInfo';
+faShowSplash: result := 'faShowSplash';
 faShowText: result := 'faShowText';
 faShowChart: result := 'faShowChart';
 faShowDiagA: result := 'faShowDiagA';
@@ -59,9 +63,6 @@ faShowDiagC: result := 'faShowDiagC';
 faShowDiagE: result := 'faShowDiagE';
 faShowDiagQ: result := 'faShowDiagQ';
 faShowForce: result := 'faShowForce';
-faShowKreis: result := 'faShowKreis';
-faShowInfo: result := 'faShowInfo';
-faShowSplash: result := 'faShowSplash';
 faShowDetail: result := 'faShowDetail';
 faShowTabelle: result := 'faShowTabelle';
 faShowSaling: result := 'faShowSaling';
@@ -87,9 +88,6 @@ faParamValueMinus10: result := 'faParamValueMinus10';
 { ColorScheme }
 faCycleColorSchemeM: result := 'faCycleColorSchemeM';
 faCycleColorSchemeP: result := 'faCycleColorSchemeP';
-faBlackText: result := 'faBlackText';
-faGrayText: result := 'faGrayText';
-faWhiteText: result := 'faWhiteText';
 
 { FederText }
 faToggleAllText: result := 'faToggleAllText';
@@ -104,12 +102,6 @@ faParamRX: result := 'faParamRX';
 faParamRY: result := 'faParamRY';
 faParamRZ: result := 'faParamRZ';
 faParamCZ: result := 'faParamCZ';
-
-{ ParamT }
-faParamT1: result := 'faParamT1';
-faParamT2: result := 'faParamT2';
-faParamT3: result := 'faParamT3';
-faParamT4: result := 'faParamT4';
 
 { RggControls }
 faController: result := 'faController';
@@ -283,9 +275,9 @@ faToggleDebugText: result := 'faToggleDebugText';
 faUpdateReportText: result := 'faUpdateReportText';
 
 { RggSonstiges }
-faMemeToggleHelp: result := 'faMemeToggleHelp';
-faMemeToggleReport: result := 'faMemeToggleReport';
-faButtonFrameReport: result := 'faButtonFrameReport';
+faToggleHelp: result := 'faToggleHelp';
+faToggleReport: result := 'faToggleReport';
+faToggleButtonReport: result := 'faToggleButtonReport';
 faToggleFontColor: result := 'faToggleFontColor';
 faToggleSandboxed: result := 'faToggleSandboxed';
 faToggleSpeedPanel: result := 'faToggleSpeedPanel';
@@ -365,69 +357,9 @@ faMemeFormat7: result := 'faMemeFormat7';
 faMemeFormat8: result := 'faMemeFormat8';
 faMemeFormat9: result := 'faMemeFormat9';
 
-(*
-{ ViewType }
-faToggleViewType: result := 'faToggleViewType';
-faViewTypeOrtho: result := 'faViewTypeOrtho';
-faViewTypePerspective: result := 'faViewTypePerspective';
-
-{ ViewFlags }
-faToggleBMap: result := 'faToggleBMap';
-faToggleZoom: result := 'faToggleZoom';
-faToggleMapK: result := 'faToggleMapK';
-faMapKOn: result := 'faMapKOn';
-faMapKOff: result := 'faMapKOff';
-faToggleTouchMenu: result := 'faToggleTouchMenu';
-faToggleEquationText: result := 'faToggleEquationText';
-faTogglePrimeText: result := 'faTogglePrimeText';
-faToggleSecondText: result := 'faToggleSecondText';
-faToggleLabelText: result := 'faToggleLabelText';
-faLabelBatchM: result := 'faLabelBatchM';
-faLabelBatchP: result := 'faLabelBatchP';
-faLabelTextP: result := 'faLabelTextP';
-faLabelTextM: result := 'faLabelTextM';
-
-{ Texture Param }
-faParamT1: result := 'faParamT1';
-faParamT2: result := 'faParamT2';
-faParamT3: result := 'faParamT3';
-faParamT4: result := 'faParamT4';
-
-{ LastLine }
-faELLOn: result := 'faELLOn';
-faELLOff: result := 'faELLOff';
-
-{ Help }
-faCycleHelpM: result := 'faCycleHelpM';
-faCycleHelpP: result := 'faCycleHelpP';
-faHelpCycle: result := 'faHelpCycle';
-faHelpList: result := 'faHelpList';
-faHelpHome: result := 'faHelpHome';
-faToggleLanguage: result := 'faToggleLanguage';
-
-{ Format }
-faFormatLandscape: result := 'faFormatLandscape';
-faFormatPortrait: result := 'faFormatPortrait';
-faFormatIPhoneLandscape: result := 'faFormatIPhoneLandscape';
-faFormatIPhonePortrait: result := 'faFormatIPhonePortrait';
-
-{ IconSize }
-faIconSize016: result := 'faIconSize016';
-faIconSize032: result := 'faIconSize032';
-faIconSize048: result := 'faIconSize048';
-faIconSize064: result := 'faIconSize064';
-faIconSize096: result := 'faIconSize096';
-faIconSize128: result := 'faIconSize128';
-faIconSize256: result := 'faIconSize256';
-faIconSize512: result := 'faIconSize512';
-faIconSize640: result := 'faIconSize640';
-faIconSize960: result := 'faIconSize960';
-faIconSize01K: result := 'faIconSize01K';
-
-{ ViewOptions }
-faToggleMoveMode: result := 'faToggleMoveMode';
-faLinearMove: result := 'faLinearMove';
-faExpoMove: result := 'faExpoMove';
+faRotaForm1: result := 'faRotaForm1';
+faRotaForm2: result := 'faRotaForm2';
+faRotaForm3: result := 'faRotaForm3';
 
 { Reset }
 faReset: result := 'faReset';
@@ -435,14 +367,11 @@ faResetPosition: result := 'faResetPosition';
 faResetRotation: result := 'faResetRotation';
 faResetZoom: result := 'faResetZoom';
 
-{ BitmapCycle }
-faCycleBitmapM: result := 'faCycleBitmapM';
-faCycleBitmapP: result := 'faCycleBitmapP';
-faRandom: result := 'faRandom';
-faRandomWhite: result := 'faRandomWhite';
-faRandomBlack: result := 'faRandomBlack';
-faBitmapEscape: result := 'faBitmapEscape';
-faToggleContour: result := 'faToggleContour';
+{ DropTarget }
+faToggleDropTarget: result := 'faToggleDropTarget';
+
+{ Language }
+faToggleLanguage: result := 'faToggleLanguage';
 
 { CopyPaste }
 faSave: result := 'faSave';
@@ -452,31 +381,27 @@ faCopy: result := 'faCopy';
 faPaste: result := 'faPaste';
 faShare: result := 'faShare';
 
-{ CopyImage }
-faCopyScreenshot: result := 'faCopyScreenshot';
-faCopyBitmap: result := 'faCopyBitmap';
-faCopyBitmap3D: result := 'faCopyBitmap3D';
+{ ViewType }
+faToggleViewType: result := 'faToggleViewType';
+faViewTypeOrtho: result := 'faViewTypeOrtho';
+faViewTypePerspective: result := 'faViewTypePerspective';
 
-{ CopyOptions }
-faToggleHardCopy: result := 'faToggleHardCopy';
-faHardCopyOn: result := 'faHardCopyOn';
-faHardCopyOff: result := 'faHardCopyOff';
-faTogglePngCopy: result := 'faTogglePngCopy';
-faPngCopyOn: result := 'faPngCopyOn';
-faPngCopyOff: result := 'faPngCopyOff';
-faToggleNoCopy: result := 'faToggleNoCopy';
-faNoCopyOn: result := 'faNoCopyOn';
-faNoCopyOff: result := 'faNoCopyOff';
-
-{ Input }
-faToggleDropTarget: result := 'faToggleDropTarget';
+{ ViewOptions }
+faToggleMoveMode: result := 'faToggleMoveMode';
+faLinearMove: result := 'faLinearMove';
+faExpoMove: result := 'faExpoMove';
 
 { RggHullMesh }
 faHullMesh: result := 'faHullMesh';
 faHullMeshOn: result := 'faHullMeshOn';
 faHullMeshOff: result := 'faHullMeshOff';
-*)
 
+faShowHelpText: result := 'faShowHelpText';
+faShowInfoText: result := 'faShowInfoText';
+faShowNormalKeyInfo: result := 'faShowNormalKeyInfo';
+faShowSpecialKeyInfo: result := 'faShowSpecialKeyInfo';
+faShowZOrderInfo: result := 'faShowZOrderInfo';
+faShowDebugInfo: result := 'faShowDebugInfo';
     else
       result := '??';
   end;

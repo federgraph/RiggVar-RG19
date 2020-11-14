@@ -18,10 +18,14 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  System.SysUtils,
-  System.Classes,
-  System.Generics.Collections,
+  SysUtils,
+  Classes,
+  Generics.Collections,
   RiggVar.FB.ActionGroup;
 
 type
@@ -93,7 +97,6 @@ begin
   { View }
   AddSpecial(ActionGroupFederText, 'FederText');
   AddSpecial(ActionGroupViewParams, 'ViewParams');
-  AddSpecial(ActionGroupParamT, 'ParamT');
 
   { RG }
   AddSpecial(ActionGroupRggControls, 'RggControls');
@@ -112,6 +115,7 @@ begin
   AddSpecial(ActionGroupRggTrimmFile, 'RggTrimmFile');
   AddSpecial(ActionGroupRggTrimmText, 'RggTrimmText');
   AddSpecial(ActionGroupRggSonstiges, 'RggSonstiges');
+  AddSpecial(ActionGroupRggInfo, 'RggInfo');
 
   { TouchFrame Buttons }
   AddSpecial(ActionGroupBtnLegendTablet, 'BtnLegendTablet');
@@ -120,27 +124,17 @@ begin
   { SK }
   AddSpecial(ActionGroupCircles, 'Circles');
 
-  {Meme }
+  { Meme }
   AddSpecial(ActionGroupMemeFormat, 'MemeFormat');
 
-  { Rgg3D }
-(*
-  AddSpecial(ActionGroupViewType, 'ViewType');
-  AddSpecial(ActionGroupViewFlags, 'ViewFlags');
-  AddSpecial(ActionGroupEmptyLastLine, 'LastLine');
-  AddSpecial(ActionGroupHelp, 'Help');
-  AddSpecial(ActionGroupFormat, 'Format');
-  AddSpecial(ActionGroupIconSize, 'IconSize');
-  AddSpecial(ActionGroupViewOptions, 'ViewOptions');
+  { RotaForm3 }
   AddSpecial(ActionGroupReset, 'Reset');
-  AddSpecial(ActionGroupBitmapCycle, 'BitmapCycle');
+  AddSpecial(ActionGroupDropTarget, 'DropTarget');
+  AddSpecial(ActionGroupLanguage, 'Language');
   AddSpecial(ActionGroupCopyPaste, 'CopyPaste');
-  AddSpecial(ActionGroupCopyImage, 'CopyImage');
-  AddSpecial(ActionGroupCopyOptions, 'CopyOptions');
-  AddSpecial(ActionGroupInput, 'Input');
-  AddSpecial(ActionGroupRggHullMesh, 'RggHullMesh');
-*)
-
+  AddSpecial(ActionGroupViewType, 'ViewType');
+  AddSpecial(ActionGroupViewOptions, 'ViewOptions');
+  AddSpecial(ActionGroupHullMesh, 'HullMesh');
 end;
 
 function TActionGroupList.GetGroup(fa: Integer): Integer;

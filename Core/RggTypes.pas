@@ -18,10 +18,16 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  System.SysUtils,
-  System.Classes,
-  System.Types,
+  SysUtils,
+  Classes,
+  Types,
+  Math,
+  RiggVar.FD.Point,
   RiggVar.RG.Def;
 
 const
@@ -89,7 +95,7 @@ type
 //    WPowerOS
 //    );
 
-  TsbParam = (Ist, Min, Max, TinyStep, BigStep);
+  TsbParam = (IstValue, MinValue, MaxValue, TinyStep, BigStep);
 //  TsbArray = array [TsbName, TsbParam] of Integer;
   TsbLabelArray = array [TsbName] of string;
   TTabellenTyp = (itKonstante, itGerade, itParabel, itBezier);
@@ -115,13 +121,10 @@ type
   Linie = array [0 .. LineCount] of TPoint;
   TLineDataR100 = array [0 .. 100] of single;
   TLineDataR50 = array [0 .. 50] of single;
-  TChartLine = array [0 .. CLMax] of double;
-  TChartLineData = array [0 .. CPMax] of double;
+  TChartLine = array [0 .. CLMax] of single;
+  TChartLineData = array [0 .. CPMax] of single;
 
-  TKoord = (x, y, z);
-  TRealPoint = array [TKoord] of double;
-  TKoordLine = array [0 .. 100] of TRealPoint;
-  TIntPoint = array [TKoord] of double;
+  TKoordLine = array [0 .. 100] of TPoint3D;
 
   TRiggPoint = (
     ooN0,
@@ -142,13 +145,59 @@ type
     ooM
     );
 
-  TIntRiggPoints = array [TRiggPoint] of TIntPoint;
-  TRealRiggPoints = array [TRiggPoint] of TRealPoint;
-  TMastKurve = array [0..BogenMax] of TRealPoint;
-  TRggPolyLine = array of TPoint;
+  TRiggPoints = record
+    case Integer of
+      0: (V: array [TRiggPoint] of TPoint3D);
+      1: (
+        N0: TPoint3D;
+        A0: TPoint3D;
+        B0: TPoint3D;
+        C0: TPoint3D;
+        D0: TPoint3D;
+        E0: TPoint3D;
+        F0: TPoint3D;
+        P0: TPoint3D;
+        A: TPoint3D;
+        B: TPoint3D;
+        C: TPoint3D;
+        D: TPoint3D;
+        E: TPoint3D;
+        F: TPoint3D;
+        P: TPoint3D;
+        M: TPoint3D;)
+  end;
 
-  TRiggLvektor = array [0 .. 19] of double;
+  TMastKurve = array [0..BogenMax] of TPoint3D;
+  TZugPolyLine = array of TPoint;
+
   TRiggLIndexRange = 0 .. 19;
+  TRiggLvektor = record
+    class function AbstandName(Index: TRiggLIndexRange): string; static;
+    case Integer of
+      0: (V: array [0 .. 19] of single);
+      1: (
+        D0C: single; // Mast
+        C0D0: single; // Vorstag - Mastfuß
+        B0C0: single; // Pütting Bb - Vorstag
+        A0C0: single; // Pütting Stb - Vorstag
+        B0D0: single; // Pütting Bb - Mastfuß
+        A0D0: single; // Pütting Stb - Mastfuß
+        A0B0: single; // Püttingabstand
+        B0B: single; // Wante unten Bb
+        A0A: single; // Wante unten Stb
+        BD: single; // Saling Bb
+        AD: single; // Saling Stb
+        AB: single; // Saling-Verbindung
+        BC: single; // Wante oben Bb
+        AC: single; // Wante oben Stb
+        C0C: single; // Vorstag
+        DC: single; // Mast Oben
+        D0D: single; // Mast Unten
+        ED: single;
+        D0E: single;
+        E0E: single; // Controller
+      );
+  end;
 
   TTrimm = record
     Mastfall: Integer;
@@ -171,14 +220,14 @@ type
     );
 
   TRealTrimm = record
-    MastfallF0F: double;
-    VorstagDiff: double;
-    VorstagDiffE: double;
-    SpannungW: double;
-    SpannungV: double;
-    BiegungS: double;
-    BiegungC: double;
-    FlexWert: double;
+    MastfallF0F: single;
+    VorstagDiff: single;
+    VorstagDiffE: single;
+    SpannungW: single;
+    SpannungV: single;
+    BiegungS: single;
+    BiegungC: single;
+    FlexWert: single;
   end;
 
   TTrimmControls = record
@@ -210,30 +259,30 @@ type
   end;
 
   TSalingDaten = record
-    SalingH: double;
-    SalingA: double;
-    SalingL: double;
-    SalingW: double;
-    WantenWinkel: double; { in degrees }
-    KraftWinkel: double; { in degrees }
+    SalingH: single;
+    SalingA: single;
+    SalingL: single;
+    SalingW: single;
+    WantenWinkel: single; { in degrees }
+    KraftWinkel: single; { in degrees }
   end;
 
   TTrimmTabDaten = record { y = a0 + a1*(x-x0) + a2*(x-x1)(x-x0) }
     TabellenTyp: TTabellenTyp;
-    a0: double; { a0 = y0 } { a0 ist immer Null }
-    a1: double; { a1 = (y1-y0)/(x1-x0) }
-    a2: double; { a2 = ((y2-y1)/(x2-x1) - a1)/(x2-x0) }
-    x0: double; { KraftAnfang - immer Null }
-    x1: double; { KraftMitte }
-    x2: double; { KraftEnde } { wird benötigt für Begrenzung }
+    a0: single; { a0 = y0 } { a0 ist immer Null }
+    a1: single; { a1 = (y1-y0)/(x1-x0) }
+    a2: single; { a2 = ((y2-y1)/(x2-x1) - a1)/(x2-x0) }
+    x0: single; { KraftAnfang - immer Null }
+    x1: single; { KraftMitte }
+    x2: single; { KraftEnde } { wird benötigt für Begrenzung }
   end;
-    { Biegeknicken }
-    (* wird in der Trimmtabelle untergebracht:
+  { Biegeknicken }
+  (* wird in der Trimmtabelle untergebracht:
     FKorrigiert: Boolean;
-    FExcenter: double; { in mm }
-    FKnicklaenge: double; { in mm }
-    FKorrekturFaktor: double; { dimensionslos }
-    *)
+    FExcenter: single; { in mm }
+    FKnicklaenge: single; { in mm }
+    FKorrekturFaktor: single; { dimensionslos }
+  *)
 
   TKoordLabels = array [TRiggPoint] of string;
 
@@ -350,14 +399,14 @@ const
   ParamLabels: TsbLabelArray = (
     { Controller: } 'Zustellung Mast-Controller [mm]',
     { Winkel: } 'Winkel [Grad]',
-    { Vorstag:    } 'Vorstaglänge [mm]',
-    { Wante:      } 'Wantenlänge [mm]',
-    { Woben:      } 'Länge des oberen Wantenabschnitts [mm]',
-    { SalingH:    } 'Höhe des Salingdreiecks [mm]',
-    { SalingA:    } 'Saling-Abstand [mm]',
-    { SalingL:    } 'Saling-Länge [mm]',
-    { VorstagOS:  } 'Vorstaglänge [mm]', { wird nicht benutzt }
-    { WPowerOS:   } 'Wantenspannung [N]' { wird nicht benutzt }
+    { Vorstag: } 'Vorstaglänge [mm]',
+    { Wante: } 'Wantenlänge [mm]',
+    { Woben: } 'Länge des oberen Wantenabschnitts [mm]',
+    { SalingH: } 'Höhe des Salingdreiecks [mm]',
+    { SalingA: } 'Saling-Abstand [mm]',
+    { SalingL: } 'Saling-Länge [mm]',
+    { VorstagOS: } 'Vorstaglänge [mm]', { wird nicht benutzt }
+    { WPowerOS: } 'Wantenspannung [N]' { wird nicht benutzt }
     );
 
   XMLSBName: array[TsbName] of string = (
@@ -528,6 +577,35 @@ begin
     result := ooE
   else if s = 'F' then
     result := ooF;
+end;
+
+{ TRiggLrecord }
+
+class function TRiggLvektor.AbstandName(Index: TRiggLIndexRange): string;
+begin
+
+  case Index of
+    0: result := 'D0C Mast';
+    1: result := 'C0D0 Vorstag - Mastfuß';
+    2: result := 'B0C0 Pütting Bb - Vorstag';
+    3: result := 'A0C0 Pütting Stb - Vorstag';
+    4: result := 'B0D0 Pütting Bb - Mastfuß';
+    5: result := 'A0D0 Pütting Stb - Mastfuß';
+    6: result := 'A0B0 Püttingabstand';
+    7: result := 'B0B Wante unten Bb';
+    8: result := 'A0A Wante unten Stb';
+    9: result := 'BD Saling Bb';
+    10: result := 'AD Saling Stb';
+    11: result := 'AB Saling-Verbindung';
+    12: result := 'BC Wante oben Bb';
+    13: result := 'AC Wante oben Stb';
+    14: result := 'C0C Vorstag';
+    15: result := 'DC';
+    16: result := 'D0D';
+    17: result := 'ED';
+    18: result := 'D0E';
+    19: result := 'E0E Controller';
+  end;
 end;
 
 end.

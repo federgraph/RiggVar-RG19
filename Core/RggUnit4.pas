@@ -18,25 +18,30 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  System.SysUtils,
-  System.Classes,
+  SysUtils,
+  Classes,
+  Math,
+  RiggVar.FD.Point,
   RggStrings,
   RggTypes,
   RggUnit3,
   RggDoc,
-  RggCalc,
   RiggVar.RG.Data;
 
 type
   TRigg = class(TRiggFS)
   private
-    function GetRealTrimm(Index: TTrimmIndex): double;
+    function GetRealTrimm(Index: TTrimmIndex): single;
   public
-{$ifdef MSWindows}
+{$ifdef MSWindowsDelphi}
     procedure WriteXml(ML: TStrings; AllTags: Boolean = False);
 {$endif}
-    procedure AusgabeText(ML: TStrings; WantAll: Boolean = True);
+    procedure AusgabeText(ML: TStrings; WantAll: Boolean = True; WantForce: Boolean = False);
     procedure AusgabeKommentar(ML: TStrings);
 
     procedure SaveToFederData(fd: TRggData);
@@ -48,7 +53,7 @@ type
     procedure SetDocument(Doc: TRggDocument);
     procedure SetDefaultDocument;
     procedure GetRealTrimmRecord(var RealTrimm: TRealTrimm);
-    property RealTrimm[Index: TTrimmIndex]: double read GetRealTrimm;
+    property RealTrimm[Index: TTrimmIndex]: single read GetRealTrimm;
     property Trimm: TTrimm read FTrimm;
   end;
 
@@ -61,10 +66,10 @@ implementation
   var
   IniFile: TIniFile;
   begin
-    IniFile := TIniFile.Create(FileName);
-    try
-      inherited WriteToIniFile(IniFile);
-    finally
+  IniFile := TIniFile.Create(FileName);
+  try
+    inherited WriteToIniFile(IniFile);
+   finally
       IniFile.Free;
     end;
   end;
@@ -75,14 +80,14 @@ implementation
   begin
     IniFile := TIniFile.Create(FileName);
     try
-      inherited LoadFromIniFile(IniFile);
+    inherited LoadFromIniFile(IniFile);
     finally
       IniFile.Free;
     end;
   end;
 }
 
-{$ifdef MSWindows}
+{$ifdef MSWindowsDelphi}
 procedure TRigg.WriteXml(ML: TStrings; AllTags: Boolean);
 var
   Document: TRggDocument;
@@ -139,8 +144,8 @@ begin
     end;
     // if S = RGG_File_Extension then
     // begin
-    //   Document.LoadFromFile(FileName);
-    //   SetDocument(Document);
+    // Document.LoadFromFile(FileName);
+    // SetDocument(Document);
     // end;
   finally
     Document.Free;
@@ -262,15 +267,15 @@ begin
   with RealTrimm do
    begin
     { Mastfall }
-    MastfallF0F := Abstand(rP[ooF0], rP[ooF]); { in mm }
+    MastfallF0F := rP.F0.Distance(rP.F); { in mm }
     { Vorstagspannung }
-    if abs(rF[14]) < 32000 then
-      SpannungV := rF[14] { in N }
+    if abs(rF.C0C) < 32000 then
+      SpannungV := rF.C0C { in N }
     else
     begin
-      if rF[14] > 32000 then
+      if rF.C0C > 32000 then
         SpannungV := 32000;
-      if rF[14] < -32000 then
+      if rF.C0C < -32000 then
         SpannungV := -32000;
     end;
     { Biegung an den Salingen }
@@ -278,61 +283,61 @@ begin
     { Biegung am Controller }
     BiegungC := he; { in mm }
     { "Elastizität" }
-    FlexWert := Abstand(rP[ooC], rPe[ooC]); { in mm }
+    FlexWert := rP.C.Distance(rPe.C); { in mm }
   end;
 end;
 
-function TRigg.GetRealTrimm(Index: TTrimmIndex): double;
+function TRigg.GetRealTrimm(Index: TTrimmIndex): single;
 var
-  temp: double;
+  temp: single;
 begin
   temp := 0;
   case Index of
-    tiMastfallF0F: temp := Abstand(rP[ooF0], rP[ooF]);
-    tiMastfallF0C: temp := Abstand(rP[ooF0], rP[ooC]);
+    tiMastfallF0F: temp := rP.F0.Distance(rP.F);
+    tiMastfallF0C: temp := rP.F0.Distance(rP.C);
     tiVorstagDiff: temp := VorstagDiff;
-    tiVorstagDiffE: temp := Abstand(rPe[ooC0], rPe[ooC]) - rL[14];
+    tiVorstagDiffE: temp := rPe.C0.Distance(rPe.C) - rL.C0C;
     tiSpannungW: temp := SpannungW;
     tiSpannungV:
       begin
-        if abs(rF[14]) < 32000 then
-          temp := rF[14] { in N }
+        if abs(rF.C0C) < 32000 then
+          temp := rF.C0C { in N }
         else
         begin
-          if rF[14] > 32000 then
+          if rF.C0C > 32000 then
             temp := 32000;
-          if rF[14] < -32000 then
+          if rF.C0C < -32000 then
             temp := -32000;
       end;
     end;
     tiBiegungS: temp := hd;
     tiBiegungC: temp := he;
-    tiFlexWert: temp := Abstand(rP[ooC], rPe[ooC]); { in mm }
+    tiFlexWert: temp := rP.C.Distance(rPe.C); { in mm }
   end;
   result := temp;
 end;
 
 procedure TRigg.SaveToFederData(fd: TRggData);
 begin
-  fd.A0X := Round(rP[ooA0, X]);
-  fd.A0Y := Round(rP[ooA0, Y]);
-  fd.A0Z := Round(rP[ooA0, Z]);
+  fd.A0X := Round(rP.A0.X);
+  fd.A0Y := -Round(rP.A0.Y);
+  fd.A0Z := Round(rP.A0.Z);
 
-  fd.C0X := Round(rP[ooC0, X]);
-  fd.C0Y := Round(rP[ooC0, Y]);
-  fd.C0Z := Round(rP[ooC0, Z]);
+  fd.C0X := Round(rP.C0.X);
+  fd.C0Y := Round(rP.C0.Y);
+  fd.C0Z := Round(rP.C0.Z);
 
-  fd.D0X := Round(rP[ooD0, X]);
-  fd.D0Y := Round(rP[ooD0, Y]);
-  fd.D0Z := Round(rP[ooD0, Z]);
+  fd.D0X := Round(rP.D0.X);
+  fd.D0Y := Round(rP.D0.Y);
+  fd.D0Z := Round(rP.D0.Z);
 
-  fd.E0X := Round(rP[ooE0, X]);
-  fd.E0Y := Round(rP[ooE0, Y]);
-  fd.E0Z := Round(rP[ooE0, Z]);
+  fd.E0X := Round(rP.E0.X);
+  fd.E0Y := Round(rP.E0.Y);
+  fd.E0Z := Round(rP.E0.Z);
 
-  fd.F0X := Round(rP[ooF0, X]);
-  fd.F0Y := Round(rP[ooF0, Y]);
-  fd.F0Z := Round(rP[ooF0, Z]);
+  fd.F0X := Round(rP.F0.X);
+  fd.F0Y := Round(rP.F0.Y);
+  fd.F0Z := Round(rP.F0.Z);
 
   fd.MU := Round(FrMastUnten);
   fd.MO := Round(FrMastOben);
@@ -392,31 +397,31 @@ begin
   { Rumpf: Koordinaten }
 
   //rP := Doc.iP;
-  rP[ooA0, x] := fd.A0X;
-  rP[ooA0, y] := -fd.A0Y;
-  rP[ooA0, z] := fd.A0Z;
-  rP[ooB0, x] := fd.A0X;
-  rP[ooB0, y] := fd.A0Y;
-  rP[ooB0, z] := fd.A0Z;
-  rP[ooC0, x] := fd.C0X;
-  rP[ooC0, y] := fd.C0Y;
-  rP[ooC0, z] := fd.C0Z;
-  rP[ooD0, x] := fd.D0X;
-  rP[ooD0, y] := fd.D0Y;
-  rP[ooD0, z] := fd.D0Z;
-  rP[ooE0, x] := fd.E0X;
-  rP[ooE0, y] := fd.E0Y;
-  rP[ooE0, z] := fd.E0Z;
-  rP[ooF0, x] := fd.F0X;
-  rP[ooF0, y] := fd.F0Y;
-  rP[ooF0, z] := fd.F0Z;
-  rP[ooP0, x] := fd.A0X;
-  rP[ooP0, y] := 0;
-  rP[ooP0, z] := fd.A0Z;
+  rP.A0.X := fd.A0X;
+  rP.A0.Y := -fd.A0Y;
+  rP.A0.Z := fd.A0Z;
+  rP.B0.X := fd.A0X;
+  rP.B0.Y := fd.A0Y;
+  rP.B0.Z := fd.A0Z;
+  rP.C0.X := fd.C0X;
+  rP.C0.Y := fd.C0Y;
+  rP.C0.Z := fd.C0Z;
+  rP.D0.X := fd.D0X;
+  rP.D0.Y := fd.D0Y;
+  rP.D0.Z := fd.D0Z;
+  rP.E0.X := fd.E0X;
+  rP.E0.Y := fd.E0Y;
+  rP.E0.Z := fd.E0Z;
+  rP.F0.X := fd.F0X;
+  rP.F0.Y := fd.F0Y;
+  rP.F0.Z := fd.F0Z;
+  rP.P0.X := fd.A0X;
+  rP.P0.Y := 0;
+  rP.P0.Z := fd.A0Z;
 
-  rP[ooP, x] := fd.A0X;
-  rP[ooP, y] := 0;
-  rP[ooP, z] := fd.A0Z;
+  rP.P.X := fd.A0X;
+  rP.P.Y := 0;
+  rP.P.Z := fd.A0Z;
 
   { Festigkeitswerte }
 //  rEA := Doc.rEA;
@@ -485,7 +490,7 @@ begin
   UpdateGSB;
 end;
 
-procedure TRigg.AusgabeText(ML: TStrings; WantAll: Boolean = True);
+procedure TRigg.AusgabeText(ML: TStrings; WantAll: Boolean = True; WantForce: Boolean = False);
 var
   tempSalingDaten: TSalingDaten;
 begin
@@ -502,9 +507,10 @@ begin
 //  lbBiegung := Format('Biegung  = %5.1f cm', [Rigg.hd / 10]);
 
   ML.Add('Trimm:');
-  ML.Add(Format('  Mastfall F0F     = %8.1f cm', [Trimm.Mastfall / 10]));
-  ML.Add(Format('  Vorstagspannung  = %8.1f N', [rF[14]]));
-  ML.Add(Format('  Durchbiegung hd  = %8.1f cm', [hd / 10]));
+  ML.Add(Format('  Mastfall F0F     = %8.0f mm', [rP.F0.Distance(rP.F)]));
+  if WantForce then
+  ML.Add(Format('  Vorstagspannung  = %8.0f N', [rF.C0C]));
+  ML.Add(Format('  Durchbiegung hd  = %8.0f mm', [hd]));
 
   ML.Add('');
   ML.Add('Saling:');
@@ -517,28 +523,28 @@ begin
 
   ML.Add('');
   ML.Add('Winkel:');
-  ML.Add(Format('  phi       = %6.2f Grad', [Phi * 180 / pi]));
-  ML.Add(Format('  psi       = %6.2f Grad', [psi * 180 / pi]));
-  ML.Add(Format('  alpha     = %6.2f Grad', [alpha * 180 / pi]));
-  ML.Add(Format('  phi-alpha = %6.2f Grad (Mast-Neigung)', [(Phi-alpha)*180/pi]));
-  ML.Add(Format('  psi-alpha = %6.2f Grad (Wanten-Neigung)', [(psi-alpha)*180/pi]));
+  ML.Add(Format('  phi       = %6.2f Grad', [RadToDeg(Phi)]));
+  ML.Add(Format('  psi       = %6.2f Grad', [RadToDeg(psi)]));
+  ML.Add(Format('  alpha     = %6.2f Grad', [RadToDeg(alpha)]));
+  ML.Add(Format('  phi-alpha = %6.2f Grad (Mast-Neigung)', [RadToDeg(Phi-alpha)]));
+  ML.Add(Format('  psi-alpha = %6.2f Grad (Wanten-Neigung)', [RadToDeg(psi-alpha)]));
 
   ML.Add('');
   ML.Add('MastWinkel:');
-  ML.Add(Format('  epsB = %6.2f Grad', [epsB * 180 / pi]));
-  ML.Add(Format('  eps2 = %6.2f Grad', [eps2 * 180 / pi]));
-  ML.Add(Format('  eps1 = %6.2f Grad', [eps1 * 180 / pi]));
-  ML.Add(Format('  epsA = %6.2f Grad', [epsA * 180 / pi]));
-  ML.Add(Format('  Epsilon  = %6.2f Grad', [epsilon * 180 / pi]));
+  ML.Add(Format('  epsB = %6.2f Grad', [RadToDeg(epsB)]));
+  ML.Add(Format('  eps2 = %6.2f Grad', [RadToDeg(eps2)]));
+  ML.Add(Format('  eps1 = %6.2f Grad', [RadToDeg(eps1)]));
+  ML.Add(Format('  epsA = %6.2f Grad', [RadToDeg(epsA)]));
+  ML.Add(Format('  Epsilon  = %6.2f Grad', [RadToDeg(epsilon)]));
 
   ML.Add('');
   ML.Add('SchnittWinkel:');
-  ML.Add(Format('  alpha1 = %6.2f Grad', [alpha1 * 180 / pi]));
-  ML.Add(Format('  alpha2 = %6.2f Grad', [alpha2 * 180 / pi]));
-  ML.Add(Format('  delta1 = %6.2f Grad', [delta1 * 180 / pi]));
-  ML.Add(Format('  delta2 = %6.2f Grad', [delta2 * 180 / pi]));
-  ML.Add(Format('  gamma  = %6.2f Grad', [gamma * 180 / pi]));
-  ML.Add(Format('  beta   = %6.2f Grad', [beta * 180 / pi]));
+  ML.Add(Format('  alpha1 = %6.2f Grad', [RadToDeg(alpha1)]));
+  ML.Add(Format('  alpha2 = %6.2f Grad', [RadToDeg(alpha2)]));
+  ML.Add(Format('  delta1 = %6.2f Grad', [RadToDeg(delta1)]));
+  ML.Add(Format('  delta2 = %6.2f Grad', [RadToDeg(delta2)]));
+  ML.Add(Format('  gamma  = %6.2f Grad', [RadToDeg(gamma)]));
+  ML.Add(Format('  beta   = %6.2f Grad', [RadToDeg(beta)]));
 
   if not WantAll then
     Exit;
@@ -573,7 +579,7 @@ end;
 
 procedure TRigg.AusgabeKommentar(ML: TStrings);
 var
-  temp: double;
+  temp: single;
 begin
 //  ML := OutputForm.KommentarMemo.Lines;
 //  ML.BeginUpdate;
@@ -587,7 +593,7 @@ begin
   if temp > 10 then
     ML.Add('Mastbiegung zu groß.');
 
-  temp := rF[14]; { Vorstagspannung in N }
+  temp := rF.C0C; { Vorstagspannung in N }
   if temp < 800 then
     ML.Add('Vorstagspannung zu gering.');
   if temp > 2000 then

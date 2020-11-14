@@ -170,7 +170,7 @@ type
     FTempList: TStringList;
 
     FGSB: TRggFA;
-    FiP: TRealRiggPoints;
+    FiP: TRiggPoints;
     FRumpfCell: TPoint;
 
     procedure GetKeyList(Source, Dest: TStringList);
@@ -338,12 +338,12 @@ begin
   FMastMassList.Add(Format(fs, [MastComboTextTop, FiMastTop]));
 
   fs := '%s=%.6g';
-  FElementList.Add(Format(fs, [ComboTextSpreader, FEAarray[7]]));
-  FElementList.Add(Format(fs, [ComboTextVorstag, FEAarray[14]]));
-  FElementList.Add(Format(fs, [ComboTextMast, FEAarray[0]]));
-  FElementList.Add(Format(fs, [ComboTextSpreader, FEAarray[9]]));
-  FElementList.Add(Format(fs, [ComboTextSpreaderConnection, FEAarray[11]]));
-  FElementList.Add(Format(fs, [ComboTextHullRods, FEAarray[1]]));
+  FElementList.Add(Format(fs, [ComboTextSpreader, FEAarray.B0B]));
+  FElementList.Add(Format(fs, [ComboTextVorstag, FEAarray.C0C]));
+  FElementList.Add(Format(fs, [ComboTextMast, FEAarray.D0C]));
+  FElementList.Add(Format(fs, [ComboTextSpreader, FEAarray.BD]));
+  FElementList.Add(Format(fs, [ComboTextSpreaderConnection, FEAarray.AB]));
+  FElementList.Add(Format(fs, [ComboTextHullRods, FEAarray.C0D0]));
 
   FTrimmList.Add(ControllerString);
   FTrimmList.Add(WinkelString);
@@ -430,8 +430,7 @@ end;
 procedure TFormConfig.LoadRiggCombos;
 var
   m: TRiggPoint;
-  n: TKoord;
-  c, r: Integer;
+  r: Integer;
 begin
   { Trimm }
   TrimmCombo.Items := FTrimmList;
@@ -457,11 +456,9 @@ begin
   for m := ooA0 to ooF0 do
   begin
     Inc(r);
-    for n := x to z do
-    begin
-      c := Ord(n) + 1;
-      Grid.Cells[c, r] := Format('%4.0f', [FiP[m, n]]);
-    end;
+    Grid.Cells[1, r] := Format('%4.0f', [FiP.V[m].X]);
+    Grid.Cells[2, r] := Format('%4.0f', [FiP.V[m].Y]);
+    Grid.Cells[3, r] := Format('%4.0f', [FiP.V[m].Z]);
   end;
 end;
 
@@ -557,29 +554,29 @@ begin
 
   if s = ComboTextHullRods then
   begin
-    FEAarray[1] := c;
-    FEAarray[2] := c;
-    FEAarray[3] := c;
-    FEAarray[4] := c;
-    FEAarray[5] := c;
-    FEAarray[6] := c;
+    FEAarray.C0D0 := c;
+    FEAarray.B0C0 := c;
+    FEAarray.A0C0 := c;
+    FEAarray.B0D0 := c;
+    FEAarray.A0D0 := c;
+    FEAarray.A0B0 := c;
   end
   else if s = ComboTextWanten then
   begin
-    FEAarray[7] := c;
-    FEAarray[8] := c;
-    FEAarray[12] := c;
-    FEAarray[13] := c;
+    FEAarray.B0B := c;
+    FEAarray.A0A := c;
+    FEAarray.BC := c;
+    FEAarray.AC := c;
   end
   else if s = ComboTextVorstag then
-    FEAarray[14] := c
+    FEAarray.C0C := c
   else if s = ComboTextSpreader then
   begin
-    FEAarray[9] := c;
-    FEAarray[10] := c;
+    FEAarray.BD := c;
+    FEAarray.AD := c;
   end
   else if s = ComboTextSpreaderConnection then
-    FEAarray[11] := c;
+    FEAarray.AB := c;
 
   FElementList.Values[s] := EAEdit.Text;
 end;
@@ -771,28 +768,28 @@ end;
 procedure TFormConfig.RumpfBtnClick(Sender: TObject);
 var
   oo: TRiggPoint;
-  kk: TKoord;
+  kk: Integer;
 begin
   oo := TRiggPoint(FRumpfCell.Y - FirstRowIndex + Ord(ooA0));
-  kk := TKoord(FRumpfCell.X - FirstColumnIndex);
+  kk := FRumpfCell.X - FirstColumnIndex;
 
-  FiP[oo, kk] :=  RumpfSpinEdit.Position;
+  FiP.V[oo].V[kk] :=  RumpfSpinEdit.Position;
   Grid.Cells[FRumpfCell.X, FRumpfCell.Y] := Format('%4d', [RumpfSpinEdit.Position]);
   if FRumpfCell.Y = SecondRowIndex then
   begin
-    FiP[ooA0] := FiP[ooB0];
-    FiP[ooA0, y] := -FiP[ooB0, y];
-    Grid.Cells[1, FirstRowIndex] := Format('%4.0f', [FiP[ooA0, x]]);
-    Grid.Cells[2, FirstRowIndex] := Format('%4.0f', [FiP[ooA0, y]]);
-    Grid.Cells[3, FirstRowIndex] := Format('%4.0f', [FiP[ooA0, z]]);
+    FiP.A0 := FiP.B0;
+    FiP.A0.Y := -FiP.B0.Y;
+    Grid.Cells[1, FirstRowIndex] := Format('%4.0f', [FiP.A0.X]);
+    Grid.Cells[2, FirstRowIndex] := Format('%4.0f', [FiP.A0.Y]);
+    Grid.Cells[3, FirstRowIndex] := Format('%4.0f', [FiP.A0.Z]);
   end;
   if FRumpfCell.Y = FirstRowIndex then
   begin
-    FiP[ooB0] := FiP[ooA0];
-    FiP[ooB0, y] := -FiP[ooA0, y];
-    Grid.Cells[1, SecondRowIndex] := Format('%4.0f', [FiP[ooB0, x]]);
-    Grid.Cells[2, SecondRowIndex] := Format('%4.0f', [FiP[ooB0, y]]);
-    Grid.Cells[3, SecondRowIndex] := Format('%4.0f', [FiP[ooB0, z]]);
+    FiP.B0 := FiP.A0;
+    FiP.B0.Y := -FiP.A0.Y;
+    Grid.Cells[1, SecondRowIndex] := Format('%4.0f', [FiP.B0.X]);
+    Grid.Cells[2, SecondRowIndex] := Format('%4.0f', [FiP.B0.Y]);
+    Grid.Cells[3, SecondRowIndex] := Format('%4.0f', [FiP.B0.Z]);
   end;
 end;
 
@@ -823,25 +820,19 @@ begin
   BorderStyle := bsDialog;
   Color := clBtnFace;
 
-//  Font.Charset := DEFAULT_CHARSET;
-//  Font.Color := clWindowText;
-//  Font.Height := -11;
-//  Font.Name := 'Tahoma';
-//  Font.Style := [];
-
   FormStyle := fsStayOnTop;
   Position := poScreenCenter;
   PixelsPerInch := 96;
 
   OKBtn :=  TButton.Create(Self);
   OKBtn.Parent := Self;
-  OKBtn.Caption := OKBtnCaption; //'OK';
+  OKBtn.Caption := OKBtnCaption;
   OKBtn.ModalResult := 1;
 
   CancelBtn := TButton.Create(Self);
   CancelBtn.Parent := Self;
   CancelBtn.Cancel := True;
-  CancelBtn.Caption := CancelBtnCaption; //'Abbrechen';
+  CancelBtn.Caption := CancelBtnCaption;
   CancelBtn.Default := True;
   CancelBtn.ModalResult := 2;
 
@@ -852,12 +843,12 @@ begin
   { Page Trimm }
 
   tsTrimm := TTabSheet.Create(pc);
-  tsTrimm.Caption := TrimmPageCaption; // 'Trimm';
+  tsTrimm.Caption := TrimmPageCaption;
   ts := tsTrimm;
   ts.PageControl := pc;
 
   GroupBoxTrimm := TGroupBox.Create(Self);
-  GroupBoxTrimm.Caption := TrimmGroupBoxCaption; // 'Längen';
+  GroupBoxTrimm.Caption := TrimmGroupBoxCaption;
   gb := GroupBoxTrimm;
   gb.Parent := ts;
 

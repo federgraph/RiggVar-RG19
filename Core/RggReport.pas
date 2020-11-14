@@ -18,9 +18,13 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  System.SysUtils,
-  System.Classes,
+  SysUtils,
+  Classes,
   RggTypes,
   RggFachwerk;
 
@@ -51,20 +55,23 @@ type
   TRiggReport = class
   private
     FML: TStrings;
+    procedure PrintUnderline;
+    procedure PrintUnderlineE;
   public
     IndexAuswahlL: set of TRiggLIndexRange;
     IndexAuswahlP: set of TRiggPoint;
+    SofortFlag: Boolean;
     constructor Create;
     destructor Destroy; override;
     procedure AusgabeRL(rL: TRiggLvektor);
     procedure AusgabeRLE(rLe: TRiggLvektor);
     procedure AusgabeDiffL(rL, rLe: TRiggLvektor);
-    procedure AusgabeRP(rP: TRealRiggPoints);
-    procedure AusgabeRPE(rPe: TRealRiggPoints);
-    procedure AusgabeDiffP(rP, rPe: TRealRiggPoints);
+    procedure AusgabeRP(rP: TRiggPoints);
+    procedure AusgabeRPE(rPe: TRiggPoints);
+    procedure AusgabeDiffP(rP, rPe: TRiggPoints);
     procedure AusgabeRF(rF: TRiggLvektor);
     procedure AusgabeWinkel(alpha, alpha1, alpha2, beta, gamma,
-      delta1, delta2, epsilon, phi, psi: double);
+      delta1, delta2, epsilon, phi, psi: single);
     procedure AusgabeTrimmControls(Ctrls: TTrimmControls);
     procedure AusgabeSalingDaten(SData: TSalingDaten);
     procedure AusgabeLog(Liste: TStringList);
@@ -259,12 +266,12 @@ begin
   with FML do
   begin
     Add('  Längen belastet in mm (Vektor rL):');
-    Add('  -------------------------------------------------');
+    PrintUnderline;
     for i := 0 to 19 do
     begin
       if i in IndexAuswahlL then
       Add(Format('  rL[%2d] %10.3f  (%s)',
-      [i, rL[i], AbstandLabels[i]]));
+      [i, rL.V[i], AbstandLabels[i]]));
     end;
     Add('');
   end;
@@ -277,13 +284,14 @@ begin
   with FML do
   begin
     Add('  Längen entlastet in mm (Vektor rLe):');
-    Add('  -------------------------------------------------');
+    PrintUnderline;
     for i:=0 to 19 do
     begin
       if i in IndexAuswahlL then
       Add(Format('  rLe[%2d]  %10.3f  (%s)',
-      [i, rLe[i], AbstandLabels[i]]));
+      [i, rLe.V[i], AbstandLabels[i]]));
     end;
+    PrintUnderlineE;
     Add('');
   end;
 end;
@@ -295,18 +303,19 @@ begin
   with FML do
   begin
     Add('  Längenänderungen in mm  (rLe[i]-rL[i]):');
-    Add('  -------------------------------------------------');
+    PrintUnderline;
     for i:=0 to 19 do
     begin
       if i in IndexAuswahlL then
       Add(Format('  %2d %10.3f  (%s)',
-      [i, (rLe[i]-rL[i]), AbstandLabels[i]]));
+      [i, (rLe.V[i]-rL.V[i]), AbstandLabels[i]]));
     end;
+    PrintUnderlineE;
     Add('');
   end;
 end;
 
-procedure TRiggReport.AusgabeRP(rP: TRealRiggPoints);
+procedure TRiggReport.AusgabeRP(rP: TRiggPoints);
 var
   i: TRiggPoint;
 begin
@@ -315,18 +324,18 @@ begin
     Add('  Koordinaten belastet in mm (Vektor rP):');
     Add(Format
        ('  rP[%2s] %8s %8s %8s', ['i ','x','y','z']));
-    Add('  -------------------------------------------------');
+    PrintUnderline;
     for i := ooA0 to ooP do
     begin
       if i in IndexAuswahlP then
       Add(Format('  rP[%s] %8.2f %8.2f %8.2f  (%s)',
-      [KoordTexte[i], rP[i,x], rP[i,y], rP[i,z], KoordLabels[i]]));
+      [KoordTexte[i], rP.V[i].X, rP.V[i].Y, rP.V[i].Z, KoordLabels[i]]));
     end;
     Add('');
   end;
 end;
 
-procedure TRiggReport.AusgabeRPE(rPe: TRealRiggPoints);
+procedure TRiggReport.AusgabeRPE(rPe: TRiggPoints);
 var
   i: TRiggPoint;
 begin
@@ -335,18 +344,19 @@ begin
     Add('  Koordinaten entlastet in mm (Vektor rPe):');
     Add(Format
        ('  rPe[%2s] %8s %8s %8s', ['i ','x','y','z']));
-    Add('  -------------------------------------------------');
+    PrintUnderline;
     for i := ooA0 to ooP do
     begin
       if i in IndexAuswahlP then
       Add(Format('  rPe[%s] %8.2f %8.2f %8.2f  (%s)',
-      [KoordTexte[i], rPe[i,x], rPe[i,y], rPe[i,z], KoordLabels[i]]));
+      [KoordTexte[i], rPe.V[i].X, rPe.V[i].Y, rPe.V[i].Z, KoordLabels[i]]));
     end;
+    PrintUnderlineE;
     Add('');
   end;
 end;
 
-procedure TRiggReport.AusgabeDiffP(rP, rPe: TRealRiggPoints);
+procedure TRiggReport.AusgabeDiffP(rP, rPe: TRiggPoints);
 var
   i: TRiggPoint;
 begin
@@ -354,12 +364,12 @@ begin
   begin
     Add('  Punktverschiebungen in mm (rPe[i]-rP[i]):');
     Add(Format('  %2s  %8s %8s %8s', ['i ','x','y','z']));
-    Add('  -------------------------------------------------');
+    PrintUnderline;
     for i := ooA0 to ooP do
     begin
       if i in IndexAuswahlP then
       Add(Format('  %s  %8.2f %8.2f %8.2f  (%s)',
-      [KoordTexte[i], rPe[i,x]-rP[i,x], rPe[i,y]-rP[i,y], rPe[i,z]-rP[i,z],
+      [KoordTexte[i], rPe.V[i].X-rP.V[i].X, rPe.V[i].Y-rP.V[i].Y, rPe.V[i].Z-rP.V[i].Z,
       KoordLabels[i]]));
     end;
     Add('');
@@ -373,24 +383,24 @@ begin
   with FML do
   begin
     Add('  Kräfte in N (Vektor rF):');
-    Add('  -------------------------------------------------');
+    PrintUnderline;
     for i := 0 to 19 do
     begin
       if i in IndexAuswahlL then
       Add(Format('  rF[%2d] %10.0f  (%s)',
-      [Ord(i), rF[i], AbstandLabels[i]]));
+      [Ord(i), rF.V[i], AbstandLabels[i]]));
     end;
     Add('');
   end;
 end;
 
 procedure TRiggReport.AusgabeWinkel(alpha, alpha1, alpha2, beta, gamma,
-  delta1, delta2, epsilon, phi, psi: double);
+  delta1, delta2, epsilon, phi, psi: single);
 begin
   with FML do
   begin
     Add('  Winkel:');
-    Add('  -------------------------------------------------');
+    PrintUnderline;
     Add(Format('%s phi = %4.2f Grad', [LinkerRand, phi*180/pi]));
     Add(Format('%s psi = %4.2f Grad', [LinkerRand, psi*180/pi]));
     Add(Format('%s alpha = %4.2f Grad', [LinkerRand, alpha*180/pi]));
@@ -412,7 +422,7 @@ begin
   with FML do
   begin
     Add('  Einstellungen (TTrimmControls):');
-    Add('  -------------------------------------------------');
+    PrintUnderline;
     Add(Format('%s Controller = %d mm', [LinkerRand, Ctrls.Controller]));
     Add(Format('%s Winkel = %d 10E-1 Grad', [LinkerRand, Ctrls.Winkel]));
     Add(Format('%s Vorstag = %d mm', [LinkerRand, Ctrls.Vorstag]));
@@ -431,7 +441,7 @@ begin
   with FML do
   begin
     Add('  Salinge (TSalingDaten):');
-    Add('  -------------------------------------------------');
+    PrintUnderline;
     Add(Format('%s SalingH = %6.2f mm', [LinkerRand, SData.SalingH]));
     Add(Format('%s SalingA = %6.2f mm', [LinkerRand, SData.SalingA]));
     Add(Format('%s SalingL = %6.2f mm', [LinkerRand, SData.SalingL]));
@@ -451,13 +461,24 @@ begin
   with FML do
   begin
     Add('  Log:');
-    Add('  -------------------------------------------------');
+    PrintUnderline;
     for i := 0 to Liste.Count-1 do
     begin
       Add(Format('%s %s', [LinkerRand, Liste[i]]));
     end;
     Add('');
   end;
+end;
+
+procedure TRiggReport.PrintUnderlineE;
+begin
+  if not SofortFlag then
+  FML.Add('  ---- ( updated only in mode SofortBerechnen ) ---');
+end;
+
+procedure TRiggReport.PrintUnderline;
+begin
+  FML.Add('  -------------------------------------------------');
 end;
 
 end.

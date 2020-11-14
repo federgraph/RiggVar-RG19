@@ -19,8 +19,8 @@
 interface
 
 uses
-  System.SysUtils,
-  System.Classes,
+  SysUtils,
+  Classes,
   RiggVar.FB.ActionConst,
   RiggVar.FB.Action;
 

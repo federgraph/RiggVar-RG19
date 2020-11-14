@@ -3,8 +3,8 @@
 interface
 
 uses
-  System.Classes,
-  Vcl.Graphics,
+  Classes,
+  Graphics,
   RggTypes;
 
 type
@@ -46,23 +46,23 @@ type
 
   TZug3DBase = class(TZug0)
   public
-    ZugRumpf: TRggPolyLine;
-    ZugMast: TRggPolyLine;
-    ZugMastKurve: TRggPolyLine;
-    ZugSalingFS: TRggPolyLine;
-    ZugSalingDS: TRggPolyLine;
-    ZugWanteStb: TRggPolyLine;
-    ZugWanteBb: TRggPolyLine;
-    ZugController: TRggPolyLine;
-    ZugVorstag: TRggPolyLine;
-    ZugKoppelKurve: TRggPolyLine;
-    ZugAchsen: TRggPolyLine;
-    ZugMastfall: TRggPolyLine;
-    ZugRP: TRggPolyLine;
+    ZugRumpf: TZugPolyLine;
+    ZugMast: TZugPolyLine;
+    ZugMastKurve: TZugPolyLine;
+    ZugSalingFS: TZugPolyLine;
+    ZugSalingDS: TZugPolyLine;
+    ZugWanteStb: TZugPolyLine;
+    ZugWanteBb: TZugPolyLine;
+    ZugController: TZugPolyLine;
+    ZugVorstag: TZugPolyLine;
+    ZugKoppelKurve: TZugPolyLine;
+    ZugAchsen: TZugPolyLine;
+    ZugMastfall: TZugPolyLine;
+    ZugRP: TZugPolyLine;
 
     { no need to call SetLength for these, will be copied via Copy }
-    ZugMastKurveD0D: TRggPolyLine;
-    ZugMastKurveDC: TRggPolyLine;
+    ZugMastKurveD0D: TZugPolyLine;
+    ZugMastKurveDC: TZugPolyLine;
 
     constructor Create;
     procedure FillZug; virtual; abstract;
@@ -90,8 +90,6 @@ begin
   SetLength(ZugMastfall, 3);
   SetLength(ZugRP, 4);
   SetLength(ZugKoppelKurve, 101);
-//  SetLength(ZugMastKurveD0D, ...);
-//  SetLength(ZugMastKurveDC, ...);
 end;
 
 procedure TZug3DBase.GetPlotList(ML: TStrings);
