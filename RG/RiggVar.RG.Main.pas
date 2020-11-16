@@ -176,8 +176,6 @@ type
 
     InitialFixPoint: TRiggPoint;
 
-    BackgroundLock: Boolean;
-
     ReportCounter: Integer;
     ResizeCounter: Integer;
 
@@ -1647,6 +1645,7 @@ begin
   RiggLED := False;
   StatusText := '';
 
+  { part one of computation }
   Rigg.UpdateGetriebe;
 
   if RiggModul <> nil then

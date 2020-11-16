@@ -361,6 +361,7 @@ begin
   GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
   GetriebeGraph.ViewPoint := vpSeite;
   GetriebeGraph.ControllerTyp := Rigg.ControllerTyp;
+  GetriebeGraph.Transformer.OnGetFixPunkt := GetriebeGraph.OnGetFixPunkt;
 
   BitmapG := TBitmap.Create;
   BitmapG.Width := Round(293 * FScale);

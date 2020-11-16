@@ -472,6 +472,7 @@ begin
   RaumGraph.Zoom := FZoom;
   RaumGraph.ViewPoint := vp3D;
   RaumGraph.Bogen := True;
+  Transformer.OnGetFixPunkt := RaumGraph.OnGetFixPunkt;
 end;
 
 procedure TRotationForm.InitHullGraph;
@@ -507,7 +508,7 @@ end;
 
 procedure TRotationForm.InitRotaData;
 
-  function GetMatrix(Theta, Xrot: single): Matrix4x4;
+  function GetMatrix(Theta, Xrot: single): TMatrix3D;
   begin
     Rotator.Reset;
     Rotator.DeltaTheta := Theta;
@@ -570,12 +571,12 @@ end;
 procedure TRotationForm.DrawMatrix(Canvas: TCanvas);
 var
   S1, S2, S3: string;
-  m: Matrix4x4;
+  m: TMatrix3D;
 begin
-  m := Rotator.Mat.Mat;
-  S1 := Format('%8.4f %8.4f %8.4f',[m[1,1], m[1,2], m[1,3]]);
-  S2 := Format('%8.4f %8.4f %8.4f',[m[2,1], m[2,2], m[2,3]]);
-  S3 := Format('%8.4f %8.4f %8.4f',[m[3,1], m[3,2], m[3,3]]);
+  m := Rotator.Mat;
+  S1 := Format('%8.4f %8.4f %8.4f',[m.m12, m.m11, m.m13]);
+  S2 := Format('%8.4f %8.4f %8.4f',[m.m22, m.m22, m.m23]);
+  S3 := Format('%8.4f %8.4f %8.4f',[m.m32, m.m33, m.m33]);
   with Canvas do
   begin
     Font.Name := 'Courier New';

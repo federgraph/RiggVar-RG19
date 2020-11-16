@@ -7,20 +7,17 @@ interface
 {$endif}
 
 uses
-  Winapi.Windows,
-  System.SysUtils,
-  System.Classes,
-  System.Types,
+  SysUtils,
+  Classes,
+  Types,
+  Graphics,
   RiggVar.FD.Point,
-  Vcl.Graphics,
   RggTypes,
   RggCalc,
   RggMatrix,
-  RggDisplayTypes,
   RggDisplay,
-  RggGraph,
-  RggBootGraph,
-  RggRaumGraph;
+  RggDisplayTypes,
+  RggGraph;
 
 type
   TConColors = array [0 .. 15] of TColor;
@@ -28,6 +25,7 @@ type
   THullGraph0 = class(TRggGraph)
   private
     procedure MessageBeep(Value: Integer);
+    procedure Transform;
   protected
     { Vertices }
     vert: TVertArrayF; { Gleitkomma-Koordinaten }
@@ -43,6 +41,8 @@ type
     procedure Paint(g: TCanvas);
   protected
     {Palette}
+    ColorArray: array of TColor;
+    procedure InitColorArray;
     function GetColor(i: Integer): TColor;
   protected
     procedure ReadVerts420;
@@ -101,6 +101,8 @@ uses
 constructor THullGraph0.Create;
 begin
   inherited Create;
+
+  InitColorArray;
 
   Factor := Point3D(1.0, 1.0, 1.0);
   ModelFactor := Factor;
@@ -178,8 +180,31 @@ begin
     Exit;
   if nvert <= 0 then
     Exit;
-  Transformer.Mat.Transform(vert, tvert, nvert);
+  Transform;
   Updated := True;
+end;
+
+procedure THullGraph0.Transform;
+var
+  i, j: Integer;
+  x, y, z: single;
+  FMat: TMatrix3D;
+  P: TPoint3D;
+begin
+  FMat := Transformer.Matrix;
+  for j := nvert downto 0 do
+  begin
+    i := j * 3;
+    x := vert[i + 0];
+    y := vert[i + 1];
+    z := vert[i + 2];
+
+    P := TPoint3D.Create(x, y, z) * FMat;
+
+    tvert[i + 0] := Round(P.X);
+    tvert[i + 1] := Round(P.Y);
+    tvert[i + 2] := Round(P.Z);
+  end;
 end;
 
 procedure THullGraph0.DrawToCanvas(Canvas: TCanvas);
@@ -309,7 +334,13 @@ begin
   G := 0;
   B := 1;
   idx := Round(R * 32 + G * 64 + B * 96 + i * 2);
-  result := PaletteIndex(idx);
+
+//  result := PaletteIndex(idx);
+
+  if i < Length(ColorArray) then
+    result := ColorArray[idx]
+  else
+    result := clRed;
 end;
 
 procedure THullGraph0.ReadVerts420;
@@ -519,6 +550,33 @@ end;
 procedure THullGraph0.MessageBeep(Value: Integer);
 begin
 
+end;
+
+procedure THullGraph0.InitColorArray;
+var
+  i: Integer;
+  ac: TColor;
+  bc: TColor;
+begin
+  ac := clRed;
+  bc := clRed;
+  SetLength(ColorArray, 257);
+  for i := 0 to 256 do
+  begin
+    if i mod 100 = 0 then
+    begin
+      if ac = clRed then
+      begin
+        bc := TRggColors.ColorFromRGB(255, i, 0);
+      end
+      else
+      begin
+        ac := clRed;
+        bc := ac;
+      end;
+    end;
+    ColorArray[i] := bc;
+  end;
 end;
 
 { THullGraph2 }

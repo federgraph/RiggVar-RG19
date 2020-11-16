@@ -42,6 +42,8 @@ type
 
     constructor Create;
 
+    function OnGetFixPunkt: TPoint3D;
+
     procedure LoadFromIniFile(FileName: string);
 
     procedure SetMastLineData(const Value: TLineDataR100; L: single; Beta: single);
@@ -69,10 +71,14 @@ begin
   FControllerTyp := ctOhne;
 end;
 
+function TBootGraph.OnGetFixPunkt: TPoint3D;
+begin
+  result := rP.V[FixPoint];
+end;
+
 procedure TBootGraph.SetKoordinaten(const Value: TRiggPoints);
 begin
   rP := Value;
-  Transformer.FixPunkt := rP.V[FixPoint];
   GrafikOK := True;
   Updated := False;
 end;

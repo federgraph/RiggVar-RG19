@@ -2,12 +2,12 @@
 
 interface
 
+{.$define WantUserConfusingReports}
+{$define WantXMLReports}
+
 {$ifdef fpc}
 {$mode delphi}
 {$endif}
-
-{.$define WantUserConfusingReports}
-{$define WantXMLReports}
 
 uses
   SysUtils,

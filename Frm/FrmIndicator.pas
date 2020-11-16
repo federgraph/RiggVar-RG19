@@ -211,7 +211,7 @@ procedure TIndicatorForm.PaintBoxMouseUp(Sender: TObject; Button: TMouseButton;
 begin
   MousDown := False;
   Draw;
-  Rotator.Matrix := bmat.Mat;
+//  Rotator.Matrix := bmat.Mat;
   if Assigned(OnChanged) then
     OnChanged(Self);
 end;
@@ -323,8 +323,8 @@ begin
     Exit;
   if not Assigned(Rotator) then
     Exit;
-  bmat.Mat := Rotator.Matrix;
-  tempmat.CopyFrom(bmat);
+//  bmat.Mat := Rotator.Matrix;
+//  tempmat.CopyFrom(bmat);
   tempmat.Transpose;
   amat.identity;
   amat.PreMultiply(tempmat.Mat);

@@ -353,7 +353,7 @@ end;
 
 procedure TRotaForm1.InitRotaData;
 
-  function GetMatrix(Theta, Xrot: single): Matrix4x4;
+  function GetMatrix(Theta, Xrot: single): TMatrix3D;
   begin
     Rotator.Reset;
     Rotator.DeltaTheta := Theta;
@@ -410,12 +410,12 @@ end;
 
 procedure TRotaForm1.UpdateMatrixText;
 var
-  m: Matrix4x4;
+  m: TMatrix3D;
 begin
-  m := Rotator.Mat.Mat;
-  MatrixTextU := Format('%8.4f %8.4f %8.4f',[m[1,1],m[1,2], m[1,3]]);
-  MatrixTextV := Format('%8.4f %8.4f %8.4f',[m[2,1],m[2,2], m[2,3]]);
-  MatrixTextW := Format('%8.4f %8.4f %8.4f',[m[3,1],m[3,2], m[3,3]]);
+  m := Rotator.Mat;
+  MatrixTextU := Format('%8.4f %8.4f %8.4f',[m.m11, m.m12, m.m13]);
+  MatrixTextV := Format('%8.4f %8.4f %8.4f',[m.m21, m.m22, m.m23]);
+  MatrixTextW := Format('%8.4f %8.4f %8.4f',[m.m31, m.m32, m.m33]);
 end;
 
 procedure TRotaForm1.DrawMatrix(g: TCanvas);

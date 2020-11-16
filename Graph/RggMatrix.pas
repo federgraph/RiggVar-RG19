@@ -54,7 +54,7 @@ type
     IncrementW: single;
     ZoomIndex: Integer;
     FixpunktIndex: Integer;
-    Matrix: Matrix4x4;
+    Matrix: TMatrix3D;
   end;
 
   TRotaParams = class
@@ -85,7 +85,6 @@ type
   end;
 
 const
-  NullVec: TPoint3D = (x: 0; y: 0; z: 0);
   xVec: TPoint3D = (x: 1; y: 0; z: 0);
   yVec: TPoint3D = (x: 0; y: 1; z: 0);
   zVec: TPoint3D = (x: 0; y: 0; z: 1);

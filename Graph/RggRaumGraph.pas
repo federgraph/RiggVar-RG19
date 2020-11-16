@@ -153,8 +153,6 @@ var
   MKT: array [0 .. BogenMax] of TPoint3D;
   KKT: TKoordLine;
 begin
-  Transformer.UpdateTransformedFixPunkt;
-
   { Graph drehen }
   if Assigned(Transformer) then
   begin
