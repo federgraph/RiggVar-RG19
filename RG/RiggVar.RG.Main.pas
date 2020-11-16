@@ -891,7 +891,7 @@ end;
 
 function TRggMain.Text2Param(T: string): TFederParam;
 begin
-  result := fpT1;
+  result := fpVorstag;
   if T = ControllerString then
     result := fpController
   else if T = WinkelString then
@@ -1091,7 +1091,7 @@ begin
       fpController:
         sb.Ist := Rigg.RealGlied[fpController];
       fpWinkel:
-        sb.Ist := Rigg.RealGlied[fpWinkel] * 180 / pi;
+        sb.Ist := RadToDeg(Rigg.RealGlied[fpWinkel]);
       fpVorstag:
         sb.Ist := Rigg.RealGlied[fpVorstag];
       fpWante:
@@ -1105,7 +1105,7 @@ begin
       fpSalingL:
         sb.Ist := Rigg.RealGlied[fpSalingL];
       fpSalingW:
-        sb.Ist := arctan2(Rigg.RealGlied[fpSalingH] * 2, Rigg.RealGlied[fpSalingA]) * 180 / pi;
+        sb.Ist := RadToDeg(arctan2(Rigg.RealGlied[fpSalingH] * 2, Rigg.RealGlied[fpSalingA]));
       fpMastfallF0C:
         sb.Ist := Abstand(Rigg.rP[ooF0], Rigg.rP[ooC]);
       fpMastfallF0F:
@@ -1120,7 +1120,7 @@ begin
   if Param <> fpWinkel then
   begin
     sb := FactArray.Find(fpWinkel);
-    sb.Ist := Rigg.RealGlied[fpWinkel] * 180 / pi;
+    sb.Ist := RadToDeg(Rigg.RealGlied[fpWinkel]);
   end;
 end;
 
@@ -1168,7 +1168,7 @@ begin
     tempA := Rigg.GSB.SalingA.Ist;
 //  FactArray.SalingA.Ist := tempA;
 //  FactArray.SalingL.Ist := Rigg.GSB.SalingL.Ist;
-  FactArray.SalingW.Ist := Round(180 / pi * arctan2(tempH * 2, tempA));
+  FactArray.SalingW.Ist := Round(RadToDeg(arctan2(tempH * 2, tempA)));
 
   FactArray.MastfallF0C.Ist := Rigg.RealTrimm[tiMastfallF0C];
   FactArray.MastfallF0F.Ist := Rigg.RealTrimm[tiMastfallF0F];
@@ -1450,7 +1450,6 @@ begin
     fpWinkel, fpSalingW: us := GradString;
     fpEAH, fpEAR: us := KiloNewtonString;
     fpEI: us := NewtonMeterSquareString;
-    fpT1, fpT2: us := '';
   else
     us := MilimeterString;
   end;
@@ -1473,7 +1472,6 @@ begin
     fpWinkel, fpSalingW: us := GradString;
     fpEAH, fpEAR: us := KiloNewtonString;
     fpEI: us := NewtonMeterSquareString;
-    fpT1, fpT2: us := '';
   else
     us := MilimeterString;
   end;
@@ -1559,7 +1557,6 @@ end;
 
 procedure TRggWheel.DoWheel(Delta: single);
 begin
-//  RggTrackbar.Value := RggTrackbar.Value + Delta; // --> UpdateGraph;
   RggTrackbar.Delta := Delta;
 end;
 
@@ -1742,6 +1739,7 @@ begin
   RiggLED := False;
   StatusText := '';
 
+  { part one of computation }
   Rigg.UpdateGetriebe;
 
   if RiggModul <> nil then
@@ -1754,6 +1752,7 @@ begin
   if temp then
   begin
     { continue to do Rigg }
+    { part two of computation }
     Rigg.UpdateRigg;
 
   RiggLED := Rigg.RiggOK;
@@ -1808,14 +1807,6 @@ begin
 
   c := Round(Value);
 
-//  { Rumpflängen }
-//  EA[1] := c;
-//  EA[2] := c;
-//  EA[3] := c;
-//  EA[4] := c;
-//  EA[5] := c;
-//  EA[6] := c;
-
   { Wanten }
   EA[7] := c;
   EA[8] := c;
@@ -1851,22 +1842,6 @@ begin
   EA[4] := c;
   EA[5] := c;
   EA[6] := c;
-
-//  { Wanten }
-//  EA[7] := c;
-//  EA[8] := c;
-//  EA[12] := c;
-//  EA[13] := c;
-//
-//  { Vorstag }
-//  EA[14] := c;
-//
-//  { Saling }
-//  EA[9] := c;
-//  EA[10] := c;
-//
-//  { Saling-Verbindung }
-//  EA[11] := c;
 
   Rigg.EA := EA;
 end;
@@ -2475,13 +2450,13 @@ begin
 
 { On Android and iOS the Trimm-File in the known location cannot be edited, }
 { so it does not make sense to read a 'manually edited' Trimm-File.txt, }
-{ but you can manualy read a Trimm-File-Auto.txt if already saved, }
+{ but you can manually read a Trimm-File-Auto.txt if already saved, }
 { e.g. by clicking on a button. }
 {$ifdef IOS}
-  fn := TrimmFileNameAuto;
+  fn := MainConst.TrimmFileNameAuto;
 {$endif}
 {$ifdef Android}
-  fn := TrimmFileNameAuto;
+  fn := MainConst.TrimmFileNameAuto;
 {$endif}
 
   s := fp + fn;

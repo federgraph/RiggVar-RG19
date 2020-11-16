@@ -19,8 +19,8 @@
 interface
 
 uses
-  System.SysUtils,
-  System.Classes;
+  SysUtils,
+  Classes;
 
 type
   TFederTrackbar = class

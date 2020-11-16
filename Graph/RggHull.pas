@@ -222,6 +222,7 @@ begin
       g.Pen.Color := clBtnFace;
 
     g.Pen.Width := 1;
+
     { Linie zeichnen }
     g.MoveTo(v[p1], -v[p1 + 2]);
     g.LineTo(v[p2], -v[p2 + 2]);

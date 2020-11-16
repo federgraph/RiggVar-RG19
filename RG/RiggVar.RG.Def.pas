@@ -19,8 +19,7 @@
 interface
 
 uses
-  System.UITypes,
-  Vcl.Graphics;
+  Graphics;
 
 type
   TSelectedCircle = (
@@ -60,8 +59,6 @@ type
     fpMastfallVorlauf,
     fpBiegung,
     fpD0X,
-    fpT1,
-    fpT2,
     fpAPW,
     fpEAH,
     fpEAR,
@@ -201,12 +198,12 @@ const
   clRumpf: TColor = clSilver;
   clMast: TColor = clBlue;
   clWanten: TColor = clRed;
-  clVorstag: TColor = TColors.Orange;
+  clVorstag: TColor = clYellow;
   clSaling: TColor = clLime;
   clController: TColor = clAqua;
   clEntspannt: TColor = clSilver;
   clNullStellung: TColor = clAqua;
-  clKoppelKurve: TColor = TColors.Orange;
+  clKoppelKurve: TColor = clYellow;
   clGestrichelt: TColor = clWhite;
   clFixPont: TColor = clYellow;
 

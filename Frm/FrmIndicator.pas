@@ -24,12 +24,9 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure PaintBoxPaint(Sender: TObject);
-    procedure PaintBoxMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure PaintBoxMouseMove(Sender: TObject; Shift: TShiftState;
-      X, Y: Integer);
-    procedure PaintBoxMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure PaintBoxMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure PaintBoxMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure PaintBoxMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   private
     PlotWidth, PlotHeight: Integer;
     PlotExtX, PlotExtY: Integer;
