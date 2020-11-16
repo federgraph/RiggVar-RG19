@@ -18,76 +18,76 @@ class function TRggTestData.GetKoordinaten420: TRiggPoints;
 var
   rp: TRiggPoints;
 begin
-  rp[ooA, x] := 2398;
-  rp[ooA, y] := 425;
-  rp[ooA, z] := 2496;
+  rp.A.X := 2398;
+  rp.A.Y := -425;
+  rp.A.Z := 2496;
 
-  rp[ooB, x] := 2398;
-  rp[ooB, y] := -425;
-  rp[ooB, z] := 2496;
+  rp.B.X := 2398;
+  rp.B.Y := 425;
+  rp.B.Z := 2496;
 
-  rp[ooC, x] := 2354;
-  rp[ooC, y] := 0;
-  rp[ooC, z] := 4470;
+  rp.C.X := 2354;
+  rp.C.Y := 0;
+  rp.C.Z := 4470;
 
-  rp[ooD, x] := 2618;
-  rp[ooD, y] := 0;
-  rp[ooD, z] := 2488;
+  rp.D.X := 2618;
+  rp.D.Y := 0;
+  rp.D.Z := 2488;
 
-  rp[ooE, x] := 2870;
-  rp[ooE, y] := 0;
-  rp[ooE, z] := 450;
+  rp.E.X := 2870;
+  rp.E.Y := 0;
+  rp.E.Z := 450;
 
-  rp[ooF, x] := 2142;
-  rp[ooF, y] := 0;
-  rp[ooF, z] := 5970;
+  rp.F.X := 2142;
+  rp.F.Y := 0;
+  rp.F.Z := 5970;
 
-  rp[ooP, x] := 2398;
-  rp[ooP, y] := 0;
-  rp[ooP, z] := 2496;
+  rp.P.X := 2398;
+  rp.P.Y := 0;
+  rp.P.Z := 2496;
 
-  rp[ooA0, x] := 2560;
-  rp[ooA0, y] := 765;
-  rp[ooA0, z] := 430;
+  rp.A0.X := 2560;
+  rp.A0.Y := -765;
+  rp.A0.Z := 430;
 
-  rp[ooB0, x] := 2560;
-  rp[ooB0, y] := -765;
-  rp[ooB0, z] := 430;
+  rp.B0.X := 2560;
+  rp.B0.Y := 765;
+  rp.B0.Z := 430;
 
-  rp[ooC0, x] := 4140;
-  rp[ooC0, y] := 0;
-  rp[ooC0, z] := 340;
+  rp.C0.X := 4140;
+  rp.C0.Y := 0;
+  rp.C0.Z := 340;
 
-  rp[ooD0, x] := 2870;
-  rp[ooD0, y] := 0;
-  rp[ooD0, z] := -100;
+  rp.D0.X := 2870;
+  rp.D0.Y := 0;
+  rp.D0.Z := -100;
 
-  rp[ooE0, x] := 2970;
-  rp[ooE0, y] := 0;
-  rp[ooE0, z] := 450;
+  rp.E0.X := 2970;
+  rp.E0.Y := 0;
+  rp.E0.Z := 450;
 
-  rp[ooF0, x] := -30;
-  rp[ooF0, y] := 0;
-  rp[ooF0, z] := 300;
+  rp.F0.X := -30;
+  rp.F0.Y := 0;
+  rp.F0.Z := 300;
 
-  rp[ooP0, x] := 2560;
-  rp[ooP0, y] := 0;
-  rp[ooP0, z] := 430;
+  rp.P0.X := 2560;
+  rp.P0.Y := 0;
+  rp.P0.Z := 430;
 
-  rp[ooM, x] := 0;
-  rp[ooM, y] := 0;
-  rp[ooM, z] := 0;
+  rp.M.X := 0;
+  rp.M.Y := 0;
+  rp.M.Z := 0;
 
   result := rp;
 end;
 
 class function TRggTestData.GetMastKurve420: TMastKurve;
 
-  procedure Add(i: Integer; u, w: double);
+  procedure Add(i: Integer; u, w: single);
   begin
-    result[i, x] := u;
-    result[i, y] := 0;
-    result[i, z] := w;
+    result[i].X := u;
+    result[i].Y := 0;
+    result[i].Z := w;
   end;
 
 begin

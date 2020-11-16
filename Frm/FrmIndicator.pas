@@ -14,6 +14,7 @@ uses
   Vcl.Menus,
   ThreeD,
   ThreeDSolid,
+  RiggVar.FD.Point,
   RggMatrix,
   RggPolarKar;
 
@@ -60,7 +61,6 @@ type
 implementation
 
 uses
-  RggVector,
   RggPBox;
 
 {$r *.DFM}
@@ -219,7 +219,7 @@ end;
 procedure TIndicatorForm.RotateFromPoint;
 var
   tempDist: double;
-  vert1, vert2: vec3;
+  vert1, vert2: TPoint3D;
 begin
   if not Assigned(amat) then
     Exit;
@@ -227,7 +227,7 @@ begin
   begin
     { Kamera und Lichtquelle um den At-Point drehen, dadurch entsteht der
       Eindruck, daß das Model um die lokalen Achsen gedreht wird. }
-    tempDist := Mag3D(Subtract(From, At));
+    tempDist := (From - At).Length;
     { From - At }
     vert1.X := 0;
     vert1.Y := -tempDist;

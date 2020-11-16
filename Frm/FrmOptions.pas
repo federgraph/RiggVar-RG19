@@ -279,12 +279,12 @@ begin
   FMastMassList.Add(Format('Wante=%d',[FiMastWante]));
   FMastMassList.Add(Format('Top=%d',[FiMastTop]));
 
-  FElementList.Add(Format('Wanten=%.6g',[FEAarray[7]]));
-  FElementList.Add(Format('Vorstag=%.6g',[FEAarray[14]]));
-  FElementList.Add(Format('Mast=%.6g',[FEAarray[0]]));
-  FElementList.Add(Format('Saling=%.6g',[FEAarray[9]]));
-  FElementList.Add(Format('Saling-Verbindung=%.6g',[FEAarray[11]]));
-  FElementList.Add(Format('Rumpfstäbe=%.6g',[FEAarray[1]]));
+  FElementList.Add(Format('Wanten=%.6g',[FEAarray.V[7]]));
+  FElementList.Add(Format('Vorstag=%.6g',[FEAarray.V[14]]));
+  FElementList.Add(Format('Mast=%.6g',[FEAarray.V[0]]));
+  FElementList.Add(Format('Saling=%.6g',[FEAarray.V[9]]));
+  FElementList.Add(Format('Saling-Verbindung=%.6g',[FEAarray.V[11]]));
+  FElementList.Add(Format('Rumpfstäbe=%.6g',[FEAarray.V[1]]));
 
   FTrimmList.Add('Controller');
   FTrimmList.Add('Winkel');
@@ -388,7 +388,7 @@ end;
 procedure TOptionForm.LoadRiggCombos;
 var
   m: TRiggPoint;
-  n: TKoord;
+  n: Integer;
   c, r: Integer;
 begin
   { Trimm }
@@ -415,10 +415,10 @@ begin
   for m := ooA0 to ooF0 do
   begin
     Inc(r);
-    for n := x to z do
+    for n := 0 to 2 do
     begin
       c := Ord(n) + 1;
-      Grid.Cells[c, r] := Format('%4.0f', [FiP[m, n]]);
+      Grid.Cells[c, r] := Format('%4.0f', [FiP.V[m].V[n]]);
     end;
   end;
 end;
@@ -515,29 +515,29 @@ begin
 
   if s = 'Rumpflängen' then
   begin
-    FEAarray[1] := c;
-    FEAarray[2] := c;
-    FEAarray[3] := c;
-    FEAarray[4] := c;
-    FEAarray[5] := c;
-    FEAarray[6] := c;
+    FEAarray.V[1] := c;
+    FEAarray.V[2] := c;
+    FEAarray.V[3] := c;
+    FEAarray.V[4] := c;
+    FEAarray.V[5] := c;
+    FEAarray.V[6] := c;
     end
   else if s = 'Wanten' then
   begin
-    FEAarray[7] := c;
-    FEAarray[8] := c;
-    FEAarray[12] := c;
-    FEAarray[13] := c;
+    FEAarray.V[7] := c;
+    FEAarray.V[8] := c;
+    FEAarray.V[12] := c;
+    FEAarray.V[13] := c;
   end
   else if s = 'Vorstag' then
-    FEAarray[14] := c
+    FEAarray.V[14] := c
   else if s = 'Saling' then
   begin
-    FEAarray[9] := c;
-    FEAarray[10] := c;
+    FEAarray.V[9] := c;
+    FEAarray.V[10] := c;
   end
   else if s = 'Saling-Verbindung' then
-    FEAarray[11] := c;
+    FEAarray.V[11] := c;
 
   FElementList.Values[s] := EAEdit.Text;
 end;
@@ -735,28 +735,28 @@ end;
 procedure TOptionForm.RumpfBtnClick(Sender: TObject);
 var
   oo: TRiggPoint;
-  kk: TKoord;
+  kk: Integer;
 begin
   oo := TRiggPoint(FRumpfCell.Y - FirstRowIndex + Ord(ooA0));
-  kk := TKoord(FRumpfCell.X - FirstColumnIndex);
+  kk := FRumpfCell.X - FirstColumnIndex;
 
-  FiP[oo, kk] :=  RumpfSpinEdit.Position;
+  FiP.V[oo].V[kk] :=  RumpfSpinEdit.Position;
   Grid.Cells[FRumpfCell.X, FRumpfCell.Y] := Format('%4d', [RumpfSpinEdit.Position]);
   if FRumpfCell.Y = SecondRowIndex then
   begin
-    FiP[ooA0] := FiP[ooB0];
-    FiP[ooA0, y] := -FiP[ooB0, y];
-    Grid.Cells[1, FirstRowIndex] := Format('%4.0f', [FiP[ooA0, x]]);
-    Grid.Cells[2, FirstRowIndex] := Format('%4.0f', [FiP[ooA0, y]]);
-    Grid.Cells[3, FirstRowIndex] := Format('%4.0f', [FiP[ooA0, z]]);
+    FiP.V[ooA0] := FiP.V[ooB0];
+    FiP.V[ooA0].V[1] := -FiP.V[ooB0].V[1];
+    Grid.Cells[1, FirstRowIndex] := Format('%4.0f', [FiP.A0.X]);
+    Grid.Cells[2, FirstRowIndex] := Format('%4.0f', [FiP.A0.Y]);
+    Grid.Cells[3, FirstRowIndex] := Format('%4.0f', [FiP.A0.Z]);
   end;
   if FRumpfCell.Y = FirstRowIndex then
   begin
-    FiP[ooB0] := FiP[ooA0];
-    FiP[ooB0, y] := -FiP[ooA0, y];
-    Grid.Cells[1, SecondRowIndex] := Format('%4.0f', [FiP[ooB0, x]]);
-    Grid.Cells[2, SecondRowIndex] := Format('%4.0f', [FiP[ooB0, y]]);
-    Grid.Cells[3, SecondRowIndex] := Format('%4.0f', [FiP[ooB0, z]]);
+    FiP.B0 := FiP.A0;
+    FiP.B0.Y := -FiP.A0.Y;
+    Grid.Cells[1, SecondRowIndex] := Format('%4.0f', [FiP.B0.X]);
+    Grid.Cells[2, SecondRowIndex] := Format('%4.0f', [FiP.B0.Y]);
+    Grid.Cells[3, SecondRowIndex] := Format('%4.0f', [FiP.B0.Z]);
   end;
 end;
 

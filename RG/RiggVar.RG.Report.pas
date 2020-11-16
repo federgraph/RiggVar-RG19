@@ -2,10 +2,17 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
+{.$define WantUserConfusingReports}
+{$define WantXMLReports}
+
 uses
-  System.SysUtils,
-  System.Classes,
-  Vcl.StdCtrls,
+  SysUtils,
+  Classes,
+  StdCtrls,
   RiggVar.FB.ActionConst,
   RggReport;
 
@@ -227,6 +234,7 @@ begin
   try
     MemoPosY := SendMessage(FMemo.Handle, EM_GETFIRSTVISIBLELINE, 0, 0);
     ML.Clear;
+    RiggReport.SofortFlag := Main.SofortBerechnen;
     case CurrentReport of
       rgNone: ;
       rgReadme:
@@ -247,7 +255,7 @@ begin
       rgData: Main.RggData.WriteReport(ML);
       rgAusgabeDetail:
       begin
-        Main.Rigg.AusgabeText(ML, False);
+        Main.Rigg.AusgabeText(ML, False, Main.SofortBerechnen);
       end;
       rgAusgabeRL:
       begin
@@ -316,9 +324,15 @@ var
 begin
   rs := [];
 
+//  { there is not enough space to show all reports in listbox }
+
+{ It is possible to exclude reports. The UI should expect this. }
+
   Include(rs, rgLog);
-//  Include(rs, rgJson);
-//  Include(rs, rgData);
+{$ifdef WantUserConfusingReports }
+  Include(rs, rgJson);
+  Include(rs, rgData);
+{$endif}
   Include(rs, rgShort);
 //  Include(rs, rgLong);
 
@@ -333,9 +347,10 @@ begin
 //  Include(rs, rgAusgabeRLE);
 //  Include(rs, rgAusgabeRPE);
   Include(rs, rgAusgabeDiffL);
-//  Include(rs, rgAusgabeDiffP);
-
+  Include(rs, rgAusgabeDiffP);
+{$ifdef WantXMLReports }
   Include(rs, rgXML);
+{$endif}
   Include(rs, rgDebugReport);
   Include(rs, rgReadme);
   Include(rs, rgNone);

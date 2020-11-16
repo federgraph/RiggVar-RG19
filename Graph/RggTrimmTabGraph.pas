@@ -3,30 +3,31 @@
 interface
 
 uses
-  Winapi.Windows,
-  System.SysUtils,
-  System.Types,
-  Vcl.Graphics,
-  Vcl.ExtCtrls,
+  Windows,
+  SysUtils,
+  Types,
+  Graphics,
+  ExtCtrls,
   RggTypes,
   RggTrimmTab;
 
 type
   TTrimmTabGraph = class
   private
+    FScale: single;
+    Margin: Integer;
+    BackgroundColor: TColor;
+    Width: Integer;
+    Height: Integer;
     FImage: TImage;
     FBitmap: TBitmap;
+    function Scale(Value: Integer): Integer;
     procedure SetImage(const Value: TImage);
     procedure InitBitmap;
     procedure PaintBackGround(g: TCanvas);
     procedure DrawGraph(g: TCanvas; ARect: TRect);
     procedure DrawText(g: TCanvas);
   public
-    FScale: single;
-    Margin: Integer;
-    BackgroundColor: TColor;
-    Width: Integer;
-    Height: Integer;
     ImageOpacity: single;
     Model: TTrimmTabGraphModel;
 
@@ -71,6 +72,14 @@ begin
 end;
 
 procedure TTrimmTabGraph.DrawGraph(g: TCanvas; ARect: TRect);
+var
+  P: TPoint;
+  R: TRect;
+  i, RadiusX, RadiusY: Integer;
+  PlotWidth, PlotHeight: Integer;
+  PlotExtX, PlotExtY: Integer;
+  PlotOrgX, PlotOrgY: Integer;
+  tempX, tempY: double;
 
   function Limit(a: double): double;
   begin
@@ -81,14 +90,15 @@ procedure TTrimmTabGraph.DrawGraph(g: TCanvas; ARect: TRect);
     result := a;
   end;
 
-var
-  P: TPoint;
-  R: TRect;
-  i, RadiusX, RadiusY: Integer;
-  PlotWidth, PlotHeight: Integer;
-  PlotExtX, PlotExtY: Integer;
-  PlotOrgX, PlotOrgY: Integer;
-  tempX, tempY: double;
+  procedure DrawR;
+  begin
+    g.Rectangle(
+      P.X - RadiusX,
+      P.Y - RadiusY,
+      P.X + RadiusX,
+      P.Y + RadiusY);
+  end;
+
 begin
   PlotWidth := ARect.Right - ARect.Left;
   PlotHeight := ARect.Bottom - ARect.Top;
@@ -120,9 +130,9 @@ begin
         itKonstante:
           begin
             tempY := PlotExtY * (Model.x1 / Model.EndwertKraft);
-            P.y := Round(Limit(tempY));
+          P.Y := Round(Limit(tempY));
             MoveTo(0, P.y);
-            LineTo(PlotExtX, P.y);
+          LineTo(PlotExtX, P.Y);
           end;
         itGerade:
           begin
@@ -134,8 +144,8 @@ begin
             MoveTo(0, 0);
             for i := 0 to 100 do
             begin
-              P.x := Round(Limit(PlotExtX * Model.LineDataX[i]));
-              P.y := Round(Limit(PlotExtY * Model.LineDataY[i]));
+            P.X := Round(Limit(PlotExtX * Model.LineDataX[i]));
+            P.Y := Round(Limit(PlotExtY * Model.LineDataY[i]));
               LineTo(P.x, P.y);
             end;
           end;
@@ -147,15 +157,11 @@ begin
       Brush.Style := bsSolid;
       for i := 1 to Model.PunkteAnzahl do
       begin
-        tempX := PlotExtX * Model.Kurve[i].y / Model.EndwertWeg;
-        tempY := PlotExtY * Model.Kurve[i].x / Model.EndwertKraft;
-        P.x := Round(Limit(tempX));
-        P.y := Round(Limit(tempY));
-        Rectangle(
-          P.x - RadiusX,
-          P.y - RadiusY,
-          P.x + RadiusX,
-          P.y + RadiusY);
+      tempX := PlotExtX * Model.Kurve[i].Y / Model.EndwertWeg;
+      tempY := PlotExtY * Model.Kurve[i].X / Model.EndwertKraft;
+      P.X := Round(Limit(tempX));
+      P.Y := Round(Limit(tempY));
+      DrawR;
       end;
 
       Pen.Color := clBlack;
@@ -166,23 +172,19 @@ begin
       begin
         tempX := PlotExtX * Model.y1 / Model.EndwertWeg;
         tempY := PlotExtY * Model.x1 / Model.EndwertKraft;
-        P.x := Round(Limit(tempX));
-        P.y := Round(Limit(tempY));
-        Rectangle(
-          P.x - RadiusX,
-          P.y - RadiusY,
-          P.x + RadiusX,
-          P.y + RadiusY);
+      P.X := Round(Limit(tempX));
+      P.Y := Round(Limit(tempY));
+    DrawR;
       end;
 
       P := Point(0, 0);
-      Rectangle(P.x - RadiusX, P.y - RadiusY, P.x + RadiusX, P.y + RadiusY);
+  DrawR;
 
       tempX := PlotExtX * Model.y2 / Model.EndwertWeg;
       tempY := PlotExtY * Model.x2 / Model.EndwertKraft;
-      P.x := Round(Limit(tempX));
-      P.y := Round(Limit(tempY));
-      Rectangle(P.x - RadiusX, P.y - RadiusY, P.x + RadiusX, P.y + RadiusY);
+    P.X := Round(Limit(tempX));
+    P.Y := Round(Limit(tempY));
+    DrawR;
 
       SetMapMode(Handle, MM_TEXT);
       SetWindowOrgEx(Handle, 0, 0, nil);
@@ -221,6 +223,11 @@ begin
   g.Brush.Color := clBtnFace;
 end;
 
+function TTrimmTabGraph.Scale(Value: Integer): Integer;
+begin
+  result := Round(Value * FScale);
+end;
+
 procedure TTrimmTabGraph.SetImage(const Value: TImage);
 begin
   FImage := Value;
@@ -234,8 +241,8 @@ begin
     FBitmap.Free;
     end;
   FBitmap := TBitmap.Create;
-  FBitmap.Width := Round(Width * MainVar.Scale);
-  FBitmap.Height := Round(Height * MainVar.Scale);
+  FBitmap.Width := Scale(Width);
+  FBitmap.Height := Scale(Height);
   Image.Width := FBitmap.Width;
   Image.Height := FBitmap.Height;
 end;

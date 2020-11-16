@@ -275,7 +275,6 @@ uses
   RiggVar.App.Main,
   RiggVar.FB.Classes,
   RiggVar.RG.Def,
-  RggCalc,
   RggScroll;
 
 procedure TChartModel.InitXComboItems;
@@ -397,7 +396,6 @@ begin
   YLEDFillColor := TRggColors.Red;
   XLEDFillColor := TRggColors.Red;
   PLEDFillColor := TRggColors.Red;
-
   DrawInternal;
   MemoLines.Clear;
   MemoLines.Add(ResetMessageString);
@@ -496,7 +494,11 @@ function TChartModel.ComboIndexToCurve(ComboIndex: Integer): Integer;
 var
   YAV: TYAchseValue;
 begin
+  if ComboIndex = - 1 then
+    YAV := YAchseSortedList[0]
+  else
   YAV := YAchseSortedList[ComboIndex];
+
   if YAV in YAchseSet then
   begin
     if (csBerechnet in FStatus) or (csGeladen in FStatus) then
@@ -750,96 +752,96 @@ begin
         begin
           j := YAchseRecordList[yavVorstagSpannung].ArrayIndex;
           if PunktOK then
-            af[p,j,i] := Rigg.rF[14]
+            af[p, j, i] := Rigg.rF.C0C
           else
-            af[p,j,i] := 0;
+            af[p, j, i] := 0;
         end;
         if yavWantenSpannung in YAchseSet then
         begin
           j := YAchseRecordList[yavWantenSpannung].ArrayIndex;
           if PunktOK then
-            af[p,j,i] := Rigg.rF[8]
+            af[p, j, i] := Rigg.rF.A0A
           else
-            af[p,j,i] := 0;
+            af[p, j, i] := 0;
         end;
         if yavMastfallF0F in YAchseSet then
         begin
           j := YAchseRecordList[yavMastfallF0F].ArrayIndex;
-          af[p,j,i] := Abstand(Rigg.rP[ooF0],Rigg.rP[ooF]);
+          af[p, j, i] := Rigg.rP.F0.Distance(Rigg.rP.F);
         end;
         if yavMastfallF0C in YAchseSet then
         begin
           j := YAchseRecordList[yavMastfallF0C].ArrayIndex;
-          af[p,j,i] := Abstand(Rigg.rP[ooF0],Rigg.rP[ooC]);
+          af[p, j, i] := Rigg.rP.F0.Distance(Rigg.rP.C);
         end;
         if yavAuslenkungC in YAchseSet then
         begin
           j := YAchseRecordList[yavAuslenkungC].ArrayIndex;
           if PunktOK then
-            af[p,j,i] := Abstand(Rigg.rP[ooC],Rigg.rPe[ooC])
+            af[p, j, i] := Rigg.rP.C.Distance(Rigg.rPe.C)
           else
-            af[p,j,i] := 0;
+            af[p, j, i] := 0;
         end;
         if yavDurchbiegungHD in YAchseSet then
         begin
           j := YAchseRecordList[yavDurchbiegungHD].ArrayIndex;
-          af[p,j,i] := Rigg.hd;
+          af[p, j, i] := Rigg.hd;
         end;
         if yavRF00 in YAchseSet then
         begin
           j := YAchseRecordList[yavRF00].ArrayIndex;
           if PunktOK then
-            af[p,j,i] := Rigg.rF[0]
+            af[p, j, i] := Rigg.rF.D0C
           else
-            af[p,j,i] := 0;
+            af[p, j, i] := 0;
         end;
         if yavRF01 in YAchseSet then
         begin
           j := YAchseRecordList[yavRF01].ArrayIndex;
           if PunktOK then
-            af[p,j,i] := Rigg.rF[1]
+            af[p, j, i] := Rigg.rF.C0D0
           else
-            af[p,j,i] := 0;
+            af[p, j, i] := 0;
         end;
         if yavRF03 in YAchseSet then
         begin
           j := YAchseRecordList[yavRF03].ArrayIndex;
           if PunktOK then
-            af[p,j,i] := Rigg.rF[3]
+            af[p, j, i] := Rigg.rF.A0C0
           else
-            af[p,j,i] := 0;
+            af[p, j, i] := 0;
         end;
         if yavRF05 in YAchseSet then
         begin
           j := YAchseRecordList[yavRF05].ArrayIndex;
           if PunktOK then
-            af[p,j,i] := Rigg.rF[5]
+            af[p, j, i] := Rigg.rF.A0D0
           else
-            af[p,j,i] := 0;
+            af[p, j, i] := 0;
         end;
         if yavRF10 in YAchseSet then
         begin
           j := YAchseRecordList[yavRF10].ArrayIndex;
           if PunktOK then
-            af[p,j,i] := Rigg.rF[10]
+            af[p, j, i] := Rigg.rF.AD
           else
-            af[p,j,i] := 0;
+            af[p, j, i] := 0;
         end;
         if yavRF11 in YAchseSet then
         begin
           j := YAchseRecordList[yavRF11].ArrayIndex;
           if PunktOK then
-            af[p,j,i] := Rigg.rF[11]
+            af[p, j, i] := Rigg.rF.AB
           else
-            af[p,j,i] := 0;
+            af[p, j, i] := 0;
         end;
         if yavRF13 in YAchseSet then
         begin
           j := YAchseRecordList[yavRF13].ArrayIndex;
           if PunktOK then
-            af[p,j,i] := Rigg.rF[13]
+            af[p, j, i] := Rigg.rF.AC
           else
-            af[p,j,i] := 0;
+            af[p, j, i] := 0;
         end;
       end;
     end;
@@ -1273,12 +1275,12 @@ begin
     Add('Rumpf: Koordinaten (x,y,z) [mm]');
     with Rigg do
     begin
-      Add(Format('  A0(%g,%g,%g)', [rP[ooA0,x],rP[ooA0,y],rP[ooA0,z]]));
-      Add(Format('  B0(%g,%g,%g)', [rP[ooB0,x],rP[ooB0,y],rP[ooB0,z]]));
-      Add(Format('  C0(%g,%g,%g)', [rP[ooC0,x],rP[ooC0,y],rP[ooC0,z]]));
-      Add(Format('  D0(%g,%g,%g)', [rP[ooD0,x],rP[ooD0,y],rP[ooD0,z]]));
-      Add(Format('  E0(%g,%g,%g)', [rP[ooE0,x],rP[ooE0,y],rP[ooE0,z]]));
-      Add(Format('  F0(%g,%g,%g)', [rP[ooF0,x],rP[ooF0,y],rP[ooF0,z]]));
+      Add(Format('  A0(%g,%g,%g)', [rP.A0.X, rP.A0.Y, rP.A0.Z]));
+      Add(Format('  B0(%g,%g,%g)', [rP.B0.X, rP.B0.Y, rP.B0.Z]));
+      Add(Format('  C0(%g,%g,%g)', [rP.C0.X, rP.C0.Y, rP.C0.Z]));
+      Add(Format('  D0(%g,%g,%g)', [rP.D0.X, rP.D0.Y, rP.D0.Z]));
+      Add(Format('  E0(%g,%g,%g)', [rP.E0.X, rP.E0.Y, rP.E0.Z]));
+      Add(Format('  F0(%g,%g,%g)', [rP.F0.X, rP.F0.Y, rP.F0.Z]));
     end;
     { Mast }
     Add('');

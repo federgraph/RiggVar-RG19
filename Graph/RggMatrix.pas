@@ -3,8 +3,8 @@
 interface
 
 uses
-  RggTypes,
-  RggVector;
+  RiggVar.FD.Point,
+  RggTypes;
 
 const
   maxvert = 400;
@@ -24,7 +24,7 @@ type
     FMat: Matrix4x4;
   public
     constructor Create;
-    procedure GetLocals(out ux, uy, uz: vec3);
+    procedure GetLocals(out ux, uy, uz: TPoint3D);
     procedure Identity;
     procedure SetIdentity(out m: Matrix4x4);
     procedure Multiply(m: Matrix4x4);
@@ -32,14 +32,14 @@ type
     procedure Transpose;
     procedure Translate(tx, ty, tz: double);
     procedure TranslateDirect(tx, ty, tz: double);
-    procedure ScaleCenter(sx, sy, sz: double; center: vec3);
+    procedure ScaleCenter(sx, sy, sz: double; center: TPoint3D);
     procedure Scale(f: double);
     procedure ScaleXYZ(xf, yf, zf: double);
     procedure XRot(Theta: double);
     procedure YRot(Theta: double);
     procedure ZRot(Theta: double);
-    procedure Rotate(p1, p2: vec3; angle: double);
-    procedure TransformPoint(var point: vec3);
+    procedure Rotate(p1, p2: TPoint3D; angle: double);
+    procedure TransformPoint(var point: TPoint3D);
     procedure Transform(var v: TVertArrayF; var tv: TVertArrayI; nvert: Integer);
     procedure TransformF(var v: TVertArrayF; var tv: TVertArrayF; nvert: Integer);
     procedure CopyFrom(m: TMatrix4x4);
@@ -47,11 +47,11 @@ type
   end;
 
   TRotaData = record
-    Xpos: Integer;
-    Ypos: Integer;
+    Xpos: single;
+    Ypos: single;
     IncrementIndex: Integer;
-    IncrementT: Integer;
-    IncrementW: double;
+    IncrementT: single;
+    IncrementW: single;
     ZoomIndex: Integer;
     FixpunktIndex: Integer;
     Matrix: Matrix4x4;
@@ -59,16 +59,16 @@ type
 
   TRotaParams = class
   private
-    FZoomBase: double;
+    FZoomBase: single;
     FZoomIndex: Integer;
     FIncrementIndex: Integer;
     procedure SetIncrementIndex(Value: Integer);
     procedure SetFixPunktIndex(Value: Integer);
     procedure SetZoomIndex(Value: Integer);
     function GetIncrementT: Integer;
-    function GetIncrementW: double;
+    function GetIncrementW: single;
     function GetFixPunktIndex: Integer;
-    function GetZoom: double;
+    function GetZoom: single;
   public
     Xpos: Integer;
     Ypos: Integer;
@@ -80,15 +80,15 @@ type
     property FixPunktIndex: Integer read GetFixPunktIndex write SetFixPunktIndex;
     property ZoomIndex: Integer read FZoomIndex write SetZoomIndex;
     property IncrementT: Integer read GetIncrementT;
-    property IncrementW: double read GetIncrementW;
-    property Zoom: double read GetZoom;
+    property IncrementW: single read GetIncrementW;
+    property Zoom: single read GetZoom;
   end;
 
 const
-  NullVec: vec3 = (x: 0; y: 0; z: 0);
-  xVec: vec3 = (x: 1; y: 0; z: 0);
-  yVec: vec3 = (x: 0; y: 1; z: 0);
-  zVec: vec3 = (x: 0; y: 0; z: 1);
+  NullVec: TPoint3D = (x: 0; y: 0; z: 0);
+  xVec: TPoint3D = (x: 1; y: 0; z: 0);
+  yVec: TPoint3D = (x: 0; y: 1; z: 0);
+  zVec: TPoint3D = (x: 0; y: 0; z: 1);
 
 implementation
 
@@ -168,7 +168,7 @@ begin
       FMat[r, c] := tmp[r, c];
 end;
 
-procedure TMatrix4x4.ScaleCenter(sx, sy, sz: double; center: vec3);
+procedure TMatrix4x4.ScaleCenter(sx, sy, sz: double; center: TPoint3D);
 var
   m: Matrix4x4;
 begin
@@ -234,10 +234,10 @@ begin
   FMat[3, 4] := FMat[3, 4] + tz;
 end;
 
-procedure TMatrix4x4.Rotate(p1, p2: vec3; angle: double);
+procedure TMatrix4x4.Rotate(p1, p2: TPoint3D; angle: double);
 var
   m: Matrix4x4;
-  vec: vec3;
+  vec: TPoint3D;
   s, sinA2, vecLength, a, b, c: double;
 begin
   s := cos(angle / 2.0);
@@ -354,9 +354,9 @@ begin
   FMat[1, 3] := Nxz;
 end;
 
-procedure TMatrix4x4.TransformPoint(var point: vec3);
+procedure TMatrix4x4.TransformPoint(var point: TPoint3D);
 var
-  tmp: vec3;
+  tmp: TPoint3D;
 begin
   with point do
   begin
@@ -407,7 +407,7 @@ begin
   end;
 end;
 
-procedure TMatrix4x4.GetLocals(out ux, uy, uz: vec3);
+procedure TMatrix4x4.GetLocals(out ux, uy, uz: TPoint3D);
 begin
   ux.x := FMat[1, 1];
   ux.y := FMat[2, 1];
@@ -507,7 +507,7 @@ begin
   end;
 end;
 
-function TRotaParams.GetIncrementW: double;
+function TRotaParams.GetIncrementW: single;
 begin
   case IncrementIndex of
     1: result := 0.1;
@@ -520,7 +520,7 @@ begin
   end;
 end;
 
-function TRotaParams.GetZoom: double;
+function TRotaParams.GetZoom: single;
 begin
   result := FZoomBase * LookUpRa10(FZoomIndex);
 end;

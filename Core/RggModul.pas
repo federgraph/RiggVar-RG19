@@ -787,7 +787,7 @@ begin
     { Position des Mastes in Deckshöhe von D0 aus in mm }
     SalingGraph.ParamXE := Round(Rigg.MastPositionE);
     { Abstand(iP[ooD0,x], iP[ooE0,x]) in mm }
-    SalingGraph.ParamXE0 := Round(Rigg.rP[ooE0, x] - Rigg.rP[ooD0, x]);
+    SalingGraph.ParamXE0 := Round(Rigg.rP.E0.X - Rigg.rP.D0.X);
     { Abstand von E0 zur Anschlagkante Deck + Klotzdicke }
     SalingGraph.EdgePos := Round(Rigg.GSB.Find(fpController).Min);
     if Assigned(ControllerPaintBox) then
@@ -1006,7 +1006,7 @@ begin
 
   { Text for GetriebeGraph }
   lbMastFall := Format('Mastfall = %5.1f cm', [Rigg.Trimm.Mastfall / 10]);
-  lbSpannung := Format('Spannung = %5.0f  N', [Rigg.rF[14]]);
+  lbSpannung := Format('Spannung = %5.0f  N', [Rigg.rF.V[14]]);
   lbBiegung :=  Format('Biegung  = %5.1f cm', [Rigg.hd / 10]);
 
   Rigg.AusgabeText(ML);
@@ -1962,7 +1962,7 @@ begin
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
         if PunktOK then
-          af[tempIndex, i] := Rigg.rF[14]
+          af[tempIndex, i] := Rigg.rF.V[14]
         else
           af[tempIndex, i] := 0;
       end;
@@ -1970,25 +1970,25 @@ begin
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
         if PunktOK then
-          af[tempIndex, i] := Rigg.rF[8]
+          af[tempIndex, i] := Rigg.rF.V[8]
         else
           af[tempIndex, i] := 0;
       end;
       tempIndex := YComboBox.Items.IndexOf('Mastfall F0F');
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
-        af[tempIndex, i] := Abstand(Rigg.rP[ooF0], Rigg.rP[ooF]);
+        af[tempIndex, i] := Rigg.rP.F0.Distance(Rigg.rP.F);
       end;
       tempIndex := YComboBox.Items.IndexOf('Mastfall F0C');
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
-        af[tempIndex, i] := Abstand(Rigg.rP[ooF0], Rigg.rP[ooC]);
+        af[tempIndex, i] := Rigg.rP.F0.Distance(Rigg.rP.C);
       end;
       tempIndex := YComboBox.Items.IndexOf('Elastizität Punkt C');
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
         if PunktOK then
-          af[tempIndex, i] := Abstand(Rigg.rP[ooC], Rigg.rPe[ooC])
+          af[tempIndex, i] := Rigg.rP.C.Distance(Rigg.rPe.C)
         else
           af[tempIndex, i] := 0;
       end;
@@ -2027,12 +2027,12 @@ begin
   tempIndex := YComboBox.Items.IndexOf('Mastfall F0F');
   if (tempIndex <> -1) and (tempIndex < ANr) then
   begin
-    bf[tempIndex] := Abstand(Rigg.rP[ooF0], Rigg.rP[ooF]);
+    bf[tempIndex] := Rigg.rP.F0.Distance(Rigg.rP.F);
   end;
   tempIndex := YComboBox.Items.IndexOf('Mastfall F0C');
   if (tempIndex <> -1) and (tempIndex < ANr) then
   begin
-    bf[tempIndex] := Abstand(Rigg.rP[ooF0], Rigg.rP[ooC]);
+    bf[tempIndex] := Rigg.rP.F0.Distance(Rigg.rP.C);
   end;
   tempIndex := YComboBox.Items.IndexOf('Durchbiegung hd');
   if (tempIndex <> -1) and (tempIndex < ANr) then
@@ -2072,13 +2072,13 @@ begin
   begin
     tempIndex := YComboBox.Items.IndexOf('Vorstag-Spannung');
     if (tempIndex <> -1) and (tempIndex < ANr) then
-      bf[tempIndex] := Rigg.rF[14];
+      bf[tempIndex] := Rigg.rF.V[14];
     tempIndex := YComboBox.Items.IndexOf('Wanten-Spannung');
     if (tempIndex <> -1) and (tempIndex < ANr) then
-      bf[tempIndex] := Rigg.rF[13];
+      bf[tempIndex] := Rigg.rF.V[13];
     tempIndex := YComboBox.Items.IndexOf('Elastizität Punkt C');
     if (tempIndex <> -1) and (tempIndex < ANr) then
-      bf[tempIndex] := Abstand(Rigg.rP[ooC], Rigg.rPe[ooC]);
+      bf[tempIndex] := Rigg.rP.C.Distance(Rigg.rPe.C);
   end;
   if OutputForm.cbFollowPoint.Checked then
     DrawPoint;
@@ -2475,7 +2475,7 @@ begin
         SalingGraph.ControllerTyp := Rigg.ControllerTyp;
         SalingGraph.ControllerPos := TrimmRec.Controller;
         SalingGraph.ParamXE := Round(Rigg.MastPositionE);
-        SalingGraph.ParamXE0 := Round(Rigg.rP[ooE0, x] - Rigg.rP[ooD0, x]);
+        SalingGraph.ParamXE0 := Round(Rigg.rP.E0.X - Rigg.rP.D0.X);
         SalingGraph.EdgePos := Round(Rigg.GSB.Find(fpController).Min);
       end;
     3: { Saling }

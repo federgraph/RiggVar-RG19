@@ -18,11 +18,16 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
-  System.SysUtils,
-  System.Classes,
-  System.IniFiles,
-  System.Math,
+  SysUtils,
+  Classes,
+  IniFiles,
+  Math,
+  RiggVar.FD.Point,
   RggStrings,
   RggTypes,
   RggCalc,
@@ -45,7 +50,7 @@ type
     FProbe: Boolean;
     FRiggOK: Boolean;
     FHullIsFlexible: Boolean;
-    KnotenLastD0, KnotenLastC, KnotenLastC0: TRealPoint;
+    KnotenLastD0, KnotenLastC, KnotenLastC0: TPoint3D;
 
     function GetEA: TRiggLvektor;
     procedure SetEA(Value: TRiggLvektor);
@@ -74,11 +79,11 @@ type
     rF: TRiggLvektor; { Stabkräfte 3d in N }
     rEA: TRiggLvektor; { EA Werte 3d in KN }
     rPe: TRiggPoints; { Koordinaten entlastet 3d in mm }
-    iPe: TIntRiggPoints; { Integerkoordinaten entlastet 3d in mm }
+    iPe: TRiggPoints; { Integerkoordinaten entlastet 3d in mm }
 
     { Daten für RegelGrafik }
-    Anfang, Antrieb, Ende: double;
-    limitA, limitB, TrySalingH: double;
+    Anfang, Antrieb, Ende: single;
+    limitA, limitB, TrySalingH: single;
     KurveF: TChartLine;
 
     constructor Create;
@@ -116,26 +121,26 @@ begin
   FProbe := True;
   FHullIsFlexible := True;
 
-  rEA[0] := EAgross;
-  rEA[1] := EARumpf;
-  rEA[2] := EARumpf;
-  rEA[3] := EARumpf;
-  rEA[4] := EARumpf;
-  rEA[5] := EARumpf;
-  rEA[6] := EARumpf;
-  rEA[7] := 13 * EModulStahl;
-  rEA[8] := 13 * EModulStahl;
-  rEA[9] := EAgross;
-  rEA[10] := EAgross;
-  rEA[11] := EASaling;
-  rEA[12] := 13 * EModulStahl;
-  rEA[13] := 13 * EModulStahl;
-  rEA[14] := 13 * EModulStahl;
-  rEA[15] := EAgross;
-  rEA[16] := EAgross;
-  rEA[17] := EAgross;
-  rEA[18] := EAgross;
-  rEA[19] := EAgross;
+  rEA.D0C := EAgross;
+  rEA.C0D0 := EARumpf;
+  rEA.B0C0 := EARumpf;
+  rEA.A0C0 := EARumpf;
+  rEA.B0D0 := EARumpf;
+  rEA.A0D0 := EARumpf;
+  rEA.A0B0 := EARumpf;
+  rEA.B0B := 13 * EModulStahl;
+  rEA.A0A := 13 * EModulStahl;
+  rEA.BD := EAgross;
+  rEA.AD := EAgross;
+  rEA.AB := EASaling;
+  rEA.BC := 13 * EModulStahl;
+  rEA.AC := 13 * EModulStahl;
+  rEA.C0C := 13 * EModulStahl;
+  rEA.DC := EAgross;
+  rEA.D0D := EAgross;
+  rEA.ED := EAgross;
+  rEA.D0E := EAgross;
+  rEA.E0E := EAgross;
 end;
 
 destructor TRiggFS.Destroy;
@@ -158,7 +163,7 @@ begin
     for i := 0 to 19 do
     begin
       s1 := IntToStr(i);
-      s2 := Format('%.6g', [rEA[i]]);
+      s2 := Format('%.6g', [rEA.V[i]]);
       WriteString(s, s1, s2);
     end;
   end;
@@ -177,7 +182,7 @@ begin
     begin
       s1 := IntToStr(i);
       s2 := ReadString(s, s1, IntToStr(100000));
-      rEA[i] := StrToFloat(s2);
+      rEA.V[i] := StrToFloat(s2);
     end;
   end;
 end;
@@ -211,14 +216,14 @@ procedure TRiggFS.Entlasten;
 var
   i: Integer;
 begin
-  rLe[0] := rL[15] + rL[16];
+  rLe.D0C := rL.DC + rL.D0D;
   for i := 1 to 14 do
   begin
-    rLe[i] := rL[i] - rF[i] * rL[i] / rEA[i];
+    rLe.V[i] := rL.V[i] - rF.V[i] * rL.V[i] / rEA.V[i];
   end;
   for i := 15 to 19 do
   begin
-    rLe[i] := rL[i];
+    rLe.V[i] := rL.V[i];
   end;
 end;
 
@@ -228,7 +233,7 @@ var
 begin
   { EA Werte intern in N, extern in KN }
   for i := 0 to 19 do
-    Result[i] := rEA[i] / 1000;
+    Result.V[i] := rEA.V[i] / 1000;
 end;
 
 procedure TRiggFS.SetEA(Value: TRiggLvektor);
@@ -237,17 +242,14 @@ var
 begin
   { EA Werte intern in N, extern in KN }
   for i := 0 to 19 do
-    rEA[i] := Value[i] * 1000;
-  with Fachwerk do
-  begin
-    vektorEA[3] := rEA[8];
-    vektorEA[4] := rEA[13];
-    vektorEA[5] := rEA[0];
-    vektorEA[6] := rEA[14];
-    vektorEA[7] := rEA[1];
-    vektorEA[8] := rEA[1];
-    vektorEA[9] := rEA[1];
-  end;
+    rEA.V[i] := Value.V[i] * 1000;
+  Fachwerk.vektorEA[3] := rEA.A0A;
+  Fachwerk.vektorEA[4] := rEA.AC;
+  Fachwerk.vektorEA[5] := rEA.D0C;
+  Fachwerk.vektorEA[6] := rEA.C0C;
+  Fachwerk.vektorEA[7] := rEA.C0D0;
+  Fachwerk.vektorEA[8] := rEA.C0D0;
+  Fachwerk.vektorEA[9] := rEA.C0D0;
 end;
 
 procedure TRiggFS.UpdateRigg;
@@ -287,39 +289,36 @@ begin
       end;
   end;
 
-  with FTrimm do
+  { Mastfall }
+  FTrimm.Mastfall := Round(rP.F0.Distance(rP.F)); { in mm }
+  { Vorstagspannung }
+  if abs(rF.C0C) < 32000 then
+    FTrimm.Spannung := Round(rF.C0C) { in N }
+  else
   begin
-    { Mastfall }
-    Mastfall := Round(Abstand(rP[ooF0], rP[ooF])); { in mm }
-    { Vorstagspannung }
-    if abs(rF[14]) < 32000 then
-      Spannung := Round(rF[14]) { in N }
-    else
-    begin
-      if rF[14] > 32000 then
-        Spannung := 32000;
-      if rF[14] < -32000 then
-        Spannung := -32000;
-    end;
-    { Biegung an den Salingen }
-    BiegungS := Round(hd); { in mm }
-    { Biegung am Controller }
-    BiegungC := Round(he); { in mm }
-    { "Elastizität" }
-    FlexWert := Round(Abstand(rP[ooC], rPe[ooC])); { in mm }
+    if rF.C0C > 32000 then
+      FTrimm.Spannung := 32000;
+    if rF.C0C < -32000 then
+      FTrimm.Spannung := -32000;
   end;
+  { Biegung an den Salingen }
+  FTrimm.BiegungS := Round(hd); { in mm }
+  { Biegung am Controller }
+  FTrimm.BiegungC := Round(he); { in mm }
+  { "Elastizität" }
+  FTrimm.FlexWert := Round(rP.C.Distance(rPe.C)); { in mm }
 end;
 
 procedure TRiggFS.Kraefte;
 begin
   { Kräfte für Verwendung in Probe speichern: }
-  KnotenLastD0[x] := FD0x; { in N }
-  KnotenLastD0[y] := 0;
-  KnotenLastD0[z] := -FD0y;
+  KnotenLastD0.X := FD0x; { in N }
+  KnotenLastD0.Y := 0;
+  KnotenLastD0.Z := -FD0y;
 
-  KnotenLastC[x] := FCx;
-  KnotenLastC[y] := 0;
-  KnotenLastC[z] := FCy;
+  KnotenLastC.X := FCx;
+  KnotenLastC.Y := 0;
+  KnotenLastC.Z := FCy;
 
   with Fachwerk do
   begin
@@ -337,19 +336,19 @@ begin
     FY[5] := -FD0y;
 
     { neue Geometrie }
-    KX[1] := rP[ooE, x]; { Angriffspunkt Mastcontroller }
-    KY[1] := rP[ooE, z];
-    KX[2] := rP[ooA, x]; { Saling }
-    KY[2] := rP[ooA, z];
-    KX[3] := rP[ooC, x]; { Angriffspunkt Wante }
-    KY[3] := rP[ooC, z];
+    KX[1] := rP.E.X; { Angriffspunkt Mastcontroller }
+    KY[1] := rP.E.Z;
+    KX[2] := rP.A.X; { Saling }
+    KY[2] := rP.A.Z;
+    KX[3] := rP.C.X; { Angriffspunkt Wante }
+    KY[3] := rP.C.Z;
 
-    KX[4] := rP[ooC0, x];
-    KY[4] := rP[ooC0, z];
-    KX[5] := rP[ooD0, x];
-    KY[5] := rP[ooD0, z];
-    KX[6] := rP[ooA0, x];
-    KY[6] := rP[ooA0, z];
+    KX[4] := rP.C0.X;
+    KY[4] := rP.C0.Z;
+    KX[5] := rP.D0.X;
+    KY[5] := rP.D0.Z;
+    KX[6] := rP.A0.X;
+    KY[6] := rP.A0.Z;
 
     ActionF; { Fachwerk berechnen }
 
@@ -364,107 +363,107 @@ end;
 
 procedure TRiggFS.Split;
 var
-  P0P, PC, PD, P0C0, P0D0: double;
+  P0P, PC, PD, P0C0, P0D0: single;
   j: Integer;
 begin
   { Laengen bereitstellen }
-  P0C0 := Abstand(rP[ooP0], rP[ooC0]);
-  PC := Abstand(rP[ooP], rP[ooC]);
-  PD := Abstand(rP[ooP], rP[ooD]);
-  P0P := Abstand(rP[ooP0], rP[ooP]);
-  P0D0 := Abstand(rP[ooP0], rP[ooD0]);
+  P0C0 := rP.P0.Distance(rP.C0);
+  PC := rP.P.Distance(rP.C);
+  PD := rP.P.Distance(rP.D);
+  P0P := rP.P0.Distance(rP.P);
+  P0D0 := rP.P0.Distance(rP.D0);
 
   { Kräfte ermitteln }
   with SplitF do
   begin
     { Punkt C0 }
     h := P0C0;
-    l2 := rL[6]; { PüttingAbstand }
+    l2 := rL.A0B0; { PüttingAbstand }
     F := Fachwerk.FS[7];
     SplitCalc;
-    rF[2] := F1;
-    rF[3] := F1;
-    if abs(l1 - rL[2]) > 0.01 then
+    rF.B0C0 := F1;
+    rF.A0C0 := F1;
+    if abs(l1 - rL.B0C0) > 0.01 then
       LogList.Add(LogList_String_LengthDeviation);
 
     { Punkt D0 }
     h := P0D0;
-    l2 := rL[6]; { PüttingAbstand }
+    l2 := rL.A0B0; { PüttingAbstand }
     F := Fachwerk.FS[9];
     SplitCalc;
-    rF[4] := F1;
-    rF[5] := F1;
+    rF.B0D0 := F1;
+    rF.A0D0 := F1;
 
     { Punkte A, B }
     h := P0P;
-    l2 := rL[6] - rL[11]; { PüttingAbstand - SalingAbstand }
+    l2 := rL.A0B0 - rL.AB; { PüttingAbstand - SalingAbstand }
     F := Fachwerk.FS[3];
     SplitCalc;
-    rF[7] := F1;
-    rF[8] := F1;
+    rF.B0B := F1;
+    rF.A0A := F1;
 
     { Punkt D }
     h := PD;
-    l2 := rL[11]; { SalingAbstand }
+    l2 := rL.AB; { SalingAbstand }
     F := -FD;
     SplitCalc;
-    rF[9] := F1;
-    rF[10] := F1;
+    rF.BD := F1;
+    rF.AD := F1;
 
     { Punkt C }
     h := PC;
-    l2 := rL[11]; { SalingAbstand }
+    l2 := rL.AB; { SalingAbstand }
     F := Fachwerk.FS[4];
     SplitCalc;
-    rF[12] := F1;
-    rF[13] := F1;
+    rF.BC := F1;
+    rF.AC := F1;
   end;
 
   with Fachwerk do
   begin
-    rF[0] := FS[5];
-    rF[1] := FS[8];
-    rF[14] := FS[6];
-    rF[15] := 0;
-    rF[16] := 0;
-    rF[17] := 0;
-    rF[18] := FS[2];
-    rF[19] := FS[1];
+    rF.D0C := FS[5];
+    rF.C0D0 := FS[8];
+    rF.C0C := FS[6];
+    rF.DC := 0;
+    rF.D0D := 0;
+    rF.ED := 0;
+    rF.D0E := FS[2];
+    rF.E0E := FS[1];
   end;
 
   with TetraF do
   begin
-    d1 := vsub(rP[ooA], rP[ooA0]);
-    d2 := vsub(rP[ooC0], rP[ooA0]);
-    d3 := vsub(rP[ooD0], rP[ooA0]);
-    d4 := vsub(rP[ooB0], rP[ooA0]);
+    d1 := rP.A - rP.A0;
+    d2 := rP.C0 - rP.A0;
+    d3 := rP.D0 - rP.A0;
+    d4 := rP.B0 - rP.A0;
     { d4 wird zur Vorzeichenermittlung benötigt }
-    l1 := rL[8];
-    l2 := rL[3];
-    l3 := rL[5];
-    F1 := rF[8];
-    F2 := rF[3];
-    F3 := rF[5];
+    l1 := rL.A0A;
+    l2 := rL.A0C0;
+    l3 := rL.A0D0;
+    F1 := rF.A0A;
+    F2 := rF.A0C0;
+    F3 := rF.A0D0;
     VierteKraft;
-    rF[6] := F4;
+    rF.A0B0 := F4;
 
-    d1 := vsub(rP[ooA0], rP[ooA]);
-    d2 := vsub(rP[ooC], rP[ooA]);
-    d3 := vsub(rP[ooD], rP[ooA]);
-    d4 := vsub(rP[ooB], rP[ooA]);
-    l1 := rL[8];
-    l2 := rL[13];
-    l3 := rL[10];
-    F1 := rF[8];
-    F2 := rF[13];
-    F3 := rF[10];
+    d1 := rP.A0 - rP.A;
+    d2 := rP.C - rP.A;
+    d3 := rP.D - rP.A;
+    d4 := rP.B - rP.A;
+    l1 := rL.A0A;
+    l2 := rL.AC;
+    l3 := rL.AD;
+    F1 := rF.A0A;
+    F2 := rF.AC;
+    F3 := rF.AD;
     VierteKraft;
-    rF[11] := F4;
+    rF.AB := F4;
   end;
 
   for j := 0 to 19 do
   begin
-    if abs(rF[j]) > 32000 then
+    if abs(rF.V[j]) > 32000 then
     begin
       FRiggOK := False;
       Include(FRiggStatus, rsKraftZuGross);
@@ -477,29 +476,25 @@ procedure TRiggFS.Probe;
 
   function Probe(o, a, b, c, d: TRiggPoint; al, bl, cl, dl: Integer): Boolean;
   begin
-    with TetraF do
-    begin
-      d1 := vsub(rP[a], rP[o]);
-      d2 := vsub(rP[b], rP[o]);
-      d3 := vsub(rP[c], rP[o]);
-      d4 := vsub(rP[d], rP[o]);
+    TetraF.d1 := rP.V[a] - rP.V[o];
+    TetraF.d2 := rP.V[b] - rP.V[o];
+    TetraF.d3 := rP.V[c] - rP.V[o];
+    TetraF.d4 := rP.V[d] - rP.V[o];
 
-      l1 := rL[al];
-      l2 := rL[bl];
-      l3 := rL[cl];
-      l4 := rL[dl];
+    TetraF.l1 := rL.V[al];
+    TetraF.l2 := rL.V[bl];
+    TetraF.l3 := rL.V[cl];
+    TetraF.l4 := rL.V[dl];
 
-      F1 := rF[al];
-      F2 := rF[bl];
-      F3 := rF[cl];
-      F4 := rF[dl];
-
-      Result := Probe; { Aufruf von Probe in class TetraF }
-    end;
+    TetraF.F1 := rF.V[al];
+    TetraF.F2 := rF.V[bl];
+    TetraF.F3 := rF.V[cl];
+    TetraF.F4 := rF.V[dl];
+    Result := TetraF.Probe; { Aufruf von Probe in class TetraF }
   end;
 
 var
-  tempResult: double;
+  tempResult: single;
   temptest: Boolean;
   test: Boolean;
 
@@ -518,21 +513,21 @@ begin
     LogList.Add(Format(LogList_Format_String_ProbeOfPoint, [KoordTexteXML[ooB0], tempResult]));
     test := test and temptest;
     { Probe Punkt C0 }
-    KnotenLastC0[x] := rF[19] * -cos(delta1);
-    KnotenLastC0[y] := 0;
-    KnotenLastC0[z] := rF[19] * sin(delta1);
+    KnotenLastC0.X := rF.E0E * -cos(delta1);
+    KnotenLastC0.Y := 0;
+    KnotenLastC0.Z := rF.E0E * sin(delta1);
     TetraF.KnotenLast := KnotenLastC0;
     temptest := Probe(ooC0, ooA0, ooB0, ooD0, ooC, 3, 2, 1, 14);
     tempResult := TetraF.ProbeErgebnis;
     LogList.Add(Format(LogList_Format_String_ProbeOfPoint, [KoordTexteXML[ooC0], tempResult]));
-    TetraF.KnotenLast := Null;
+    TetraF.KnotenLast := TPoint3D.Zero;
     test := test and temptest;
     { Probe Punkt D0 }
     TetraF.KnotenLast := KnotenLastD0;
     temptest := Probe(ooD0, ooA0, ooB0, ooC0, ooC, 5, 4, 1, 0);
     tempResult := TetraF.ProbeErgebnis;
     LogList.Add(Format(LogList_Format_String_ProbeOfPoint, [KoordTexteXML[ooD0], tempResult]));
-    TetraF.KnotenLast := Null;
+    TetraF.KnotenLast := TPoint3D.Zero;
     test := test and temptest;
     { Probe Punkt A }
     temptest := Probe(ooA, ooA0, ooB, ooC, ooD, 8, 11, 13, 10);
@@ -549,7 +544,7 @@ begin
     temptest := Probe(ooC, ooA, ooB, ooC0, ooD0, 13, 12, 14, 0);
     tempResult := TetraF.ProbeErgebnis;
     LogList.Add(Format(LogList_Format_String_ProbeOfPoint, [KoordTexteXML[ooC], tempResult]));
-    TetraF.KnotenLast := Null;
+    TetraF.KnotenLast := TPoint3D.Zero;
     test := test and temptest;
 
     if test = False then
@@ -575,28 +570,28 @@ begin
     LogList.Add(Format(LogList_Format_String_ProbeOfPoint, [KoordTexteXML[ooB0], tempResult]));
     test := test and temptest;
     { Probe Punkt C0 }
-    KnotenLastC0[x] := rF[19] * -cos(delta1);
-    KnotenLastC0[y] := 0;
-    KnotenLastC0[z] := rF[19] * sin(delta1);
+    KnotenLastC0.X := rF.E0E * -cos(delta1);
+    KnotenLastC0.Y := 0;
+    KnotenLastC0.Z := rF.E0E * sin(delta1);
     TetraF.KnotenLast := KnotenLastC0;
     temptest := Probe(ooC0, ooA0, ooB0, ooD0, ooC, 3, 2, 1, 14);
     tempResult := TetraF.ProbeErgebnis;
     LogList.Add(Format(LogList_Format_String_ProbeOfPoint, [KoordTexteXML[ooC0], tempResult]));
-    TetraF.KnotenLast := Null;
+    TetraF.KnotenLast := TPoint3D.Zero;
     test := test and temptest;
     { Probe Punkt D0 }
     TetraF.KnotenLast := KnotenLastD0;
     temptest := Probe(ooD0, ooA0, ooB0, ooC0, ooC, 5, 4, 1, 0);
     tempResult := TetraF.ProbeErgebnis;
     LogList.Add(Format(LogList_Format_String_ProbeOfPoint, [KoordTexteXML[ooD0], tempResult]));
-    TetraF.KnotenLast := Null;
+    TetraF.KnotenLast := TPoint3D.Zero;
     test := test and temptest;
     { Probe Punkt C }
     TetraF.KnotenLast := KnotenLastC;
     temptest := Probe(ooC, ooA, ooB, ooC0, ooD0, 13, 12, 14, 0);
     tempResult := TetraF.ProbeErgebnis;
     LogList.Add(Format(LogList_Format_String_ProbeOfPoint, [KoordTexteXML[ooC], tempResult]));
-    TetraF.KnotenLast := Null;
+    TetraF.KnotenLast := TPoint3D.Zero;
     test := test and temptest;
 
     if test = False then
@@ -612,76 +607,76 @@ end;
 
 procedure TRiggFS.MakeRumpfKoord;
 var
-  r1, r2: double;
+  r1, r2: single;
 begin
   { Festpunkte übernehmen }
-  rPe[ooD0] := rP[ooD0];
-  rPe[ooE0] := rP[ooE0];
-  rPe[ooF0] := rP[ooF0];
+  rPe.D0 := rP.D0;
+  rPe.E0 := rP.E0;
+  rPe.F0 := rP.F0;
 
   if not FHullIsFlexible then
   begin
     { Rumpf steif angenommen }
-    rPe[ooA0] := rP[ooA0];
-    rPe[ooB0] := rP[ooB0];
-    rPe[ooC0] := rP[ooC0];
-    rPe[ooP0] := rP[ooP0];
+    rPe.A0 := rP.A0;
+    rPe.B0 := rP.B0;
+    rPe.C0 := rP.C0;
+    rPe.P0 := rP.P0;
     Exit;
   end;
 
-  r2 := sqr(rLe[5]) - sqr(rLe[6] / 2);
+  r2 := sqr(rLe.V[5]) - sqr(rLe.V[6] / 2);
   if (r2 < 0.1) then
   begin
     Inc(ExitCounter7);
     Exit;
   end;
 
-  r2 := sqrt(sqr(rLe[5]) - sqr(rLe[6] / 2));
-  r1 := Abstand(rP[ooP0], Null);
+  r2 := sqrt(sqr(rLe.V[5]) - sqr(rLe.V[6] / 2));
+  r1 := rP.P0.Length;
   if (r1 < 0.1) or (r2 < 0.1) then
   begin
     Inc(ExitCounter5);
     Exit;
   end;
   try
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       { 1. Aufruf SchnittKK: ooP0, ooA0, ooB0 ermitteln }
       Radius1 := r1;
       Radius2 := r2;
-      MittelPunkt1 := Null;
-      MittelPunkt2 := rPe[ooD0];
-      rPe[ooP0] := SchnittPunkt1;
-      rPe[ooA0] := rPe[ooP0];
-      rPe[ooA0, y] := -rLe[6] / 2;
-      rPe[ooB0] := rPe[ooP0];
-      rPe[ooB0, y] := rLe[6] / 2;
+      MittelPunkt1 := TPoint3D.Zero;
+      MittelPunkt2 := rPe.D0;
+      rPe.P0 := SchnittPunkt1;
+      rPe.A0 := rPe.P0;
+      rPe.A0.Y := -rLe.V[6] / 2;
+      rPe.B0 := rPe.P0;
+      rPe.B0.Y := rLe.V[6] / 2;
     end;
 
-    r1 := sqr(rLe[3]) - sqr(rLe[6] / 2);
+    r1 := sqr(rLe.V[3]) - sqr(rLe.V[6] / 2);
     if (r1 < 0.1) then
     begin
       Inc(ExitCounter7);
       Exit;
     end;
 
-    r2 := rLe[1];
+    r2 := rLe.V[1];
     if (r2 < 0.1) then
     begin
       Inc(ExitCounter7);
       Exit;
     end;
 
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       { 2. Aufruf SchnittKK: ooC0 ermitteln }
       Radius1 := sqrt(r1);
       Radius2 := r2;
-      MittelPunkt1 := rPe[ooP0];
-      MittelPunkt2 := rPe[ooD0];
-      rPe[ooC0] := SchnittPunkt1;
+      MittelPunkt1 := rPe.P0;
+      MittelPunkt2 := rPe.D0;
+      rPe.C0 := SchnittPunkt1;
     end;
   except
     on E: EMathError do
@@ -691,16 +686,16 @@ end;
 
 procedure TRiggFS.MakeKoord;
 var
-  Temp: TRealPoint;
+  Temp: TPoint3D;
   s: string;
-  s1, s2: double;
-  r1, r2: double;
+  s1, s2: single;
+  r1, r2: single;
 begin
   MakeRumpfKoord;
-  rPe[ooE] := rP[ooE];
+  rPe.E := rP.E;
   try
-    s1 := sqr(rLe[10]) - sqr(rLe[11] / 2);
-    s2 := sqr(rLe[13]) - sqr(rLe[11] / 2);
+    s1 := sqr(rLe.V[10]) - sqr(rLe.V[11] / 2);
+    s2 := sqr(rLe.V[13]) - sqr(rLe.V[11] / 2);
     if (s1 < 0.1) or (s2 < 0.1) then
     begin
       Inc(ExitCounter6);
@@ -708,18 +703,18 @@ begin
     end;
     r1 := sqrt(s1);
     r2 := sqrt(s2);
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
       { 1. Aufruf SchnittKK: Saling2d und WanteOben2d;
         Schnittpunkt Temp wird im 2. Aufruf benötigt }
       Radius1 := r1;
       Radius2 := r2;
-      Temp := Null;
-      Temp[x] := rL[16];
+      Temp := TPoint3D.Zero;
+      Temp.X := rL.D0D;
       MittelPunkt1 := Temp;
-      Temp := Null;
-      Temp[x] := rL[16] + rL[15];
+      Temp := TPoint3D.Zero;
+      Temp.X := rL.D0D + rL.DC;
       MittelPunkt2 := Temp;
       Temp := SchnittPunkt1;
       s := Bemerkung;
@@ -732,14 +727,14 @@ begin
         Include(FRiggStatus, rsNichtEntspannbar);
       end;
 
-      { 2. Aufruf SchnittKK: WanteUnten2d und Abstand rPe[ooD0]..rPe[ooP];
+      { 2. Aufruf SchnittKK: WanteUnten2d und Abstand rPe.D0]..rPe.P];
         ooA, ooB, ooP ermitteln }
-      Radius1 := sqrt(sqr(rLe[8]) - sqr((rLe[6] - rLe[11]) / 2));
-      Radius2 := Abstand(Temp, Null); { Temp unter 1. ermittelt }
-      MittelPunkt1 := rPe[ooA0];
-      MittelPunkt2 := rPe[ooD0];
-      rPe[ooA] := SchnittPunkt1;
-      rPe[ooA, y] := rLe[11] / 2;
+      Radius1 := sqrt(sqr(rLe.V[8]) - sqr((rLe.V[6] - rLe.V[11]) / 2));
+      Radius2 := Temp.Length; { Temp unter 1. ermittelt }
+      MittelPunkt1 := rPe.A0;
+      MittelPunkt2 := rPe.D0;
+      rPe.A := SchnittPunkt1;
+      rPe.A.Y := -rLe.V[11] / 2;
       s := Bemerkung;
       s := Format(LogList_Format_String_MakeKoord, [2, s]);
       LogList.Add(s);
@@ -750,39 +745,37 @@ begin
         Include(FRiggStatus, rsNichtEntspannbar);
       end;
 
-      rPe[ooB] := rPe[ooA];
-      rPe[ooB, y] := -rPe[ooA, y];
-      rPe[ooP] := rPe[ooA];
-      rPe[ooP, y] := 0;
+      rPe.B := rPe.A;
+      rPe.B.Y := -rPe.A.Y;
+      rPe.P := rPe.A;
+      rPe.P.Y := 0;
 
       { 3. Aufruf SchnittKK: Saling2d und MastUnten; ooD ermitteln }
-      Radius1 := sqrt(sqr(rLe[10]) - sqr(rLe[11] / 2));
-      Radius2 := rLe[16];
-      MittelPunkt1 := rPe[ooA];
-      MittelPunkt2 := rPe[ooD0];
-      rPe[ooD] := SchnittPunkt1;
-      rPe[ooD, y] := 0;
+      Radius1 := sqrt(sqr(rLe.V[10]) - sqr(rLe.V[11] / 2));
+      Radius2 := rLe.V[16];
+      MittelPunkt1 := rPe.A;
+      MittelPunkt2 := rPe.D0;
+      rPe.D := SchnittPunkt1;
+      rPe.D.Y := 0;
       s := Bemerkung;
       s := Format(LogList_Format_String_MakeKoord, [3, s]);
       LogList.Add(s);
 
       { 4. Aufruf SchnittKK: WanteOben2d und MastOben; ooC ermitteln }
-      Radius1 := sqrt(sqr(rLe[13]) - sqr(rLe[11] / 2));
-      Radius2 := rLe[15];
-      MittelPunkt1 := rPe[ooA];
-      MittelPunkt2 := rPe[ooD];
-      rPe[ooC] := SchnittPunkt1;
-      rPe[ooC, y] := 0;
+      Radius1 := sqrt(sqr(rLe.V[13]) - sqr(rLe.V[11] / 2));
+      Radius2 := rLe.V[15];
+      MittelPunkt1 := rPe.A;
+      MittelPunkt2 := rPe.D;
+      rPe.C := SchnittPunkt1;
+      rPe.C.Y := 0;
       s := Bemerkung;
       s := Format(LogList_Format_String_MakeKoord, [4, s]);
       LogList.Add(s);
     end;
 
     { Berechnung für Punkt ooF - Masttop }
-    gammaE := pi / 2 - arctan2((rPe[ooC, x] - rPe[ooD0, x]), (rPe[ooC, z] - rPe[ooD0, z]));
-    rPe[ooF, x] := rPe[ooD0, x] + FrMastLength * cos(gammaE);
-    rPe[ooF, y] := 0;
-    rPe[ooF, z] := rPe[ooD0, z] + FrMastLength * sin(gammaE);
+    gammaE := pi / 2 - SKK.AngleXZ(rPe.C, rPe.D0);
+    rPe.F := SKK.AnglePointXZ(rPe.D0, FrMastLength, gammaE);
 
   except
     on E: EMathError do
@@ -793,27 +786,27 @@ end;
 procedure TRiggFS.MakeKoordDS;
 var
   s: string;
-  Temp, TempA0, TempA, TempC, TempD: TRealPoint;
-  WStrich3d, WStrich2d, W1Strich, Saling1L, Skalar: double;
+  Temp, TempA0, TempA, TempC, TempD: TPoint3D;
+  WStrich3d, WStrich2d, W1Strich, Saling1L, Skalar: single;
 begin
-  Temp := Null;
+  Temp := TPoint3D.Zero;
   MakeRumpfKoord;
-  rPe[ooE] := rP[ooE];
+  rPe.E := rP.E;
   try
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
 
-      Radius1 := rLe[10]; { FrSalingL; }
-      Radius2 := rLe[13]; { FrWoben3d; }
-      TempD := Null;
-      TempD[x] := rLe[16]; { FrMastunten }
+      Radius1 := rLe.V[10]; { FrSalingL; }
+      Radius2 := rLe.V[13]; { FrWoben3d; }
+      TempD := TPoint3D.Zero;
+      TempD.X := rLe.V[16]; { FrMastunten }
       MittelPunkt1 := TempD;
-      TempC := Null;
-      TempC[x] := rLe[16] + rLe[15]; { FrMastunten+FrMastoben; }
+      TempC := TPoint3D.Zero;
+      TempC.X := rLe.V[16] + rLe.V[15]; { FrMastunten+FrMastoben; }
       MittelPunkt2 := TempC;
       TempA := SchnittPunkt1;
-      TempA[y] := 0;
+      TempA.Y := 0;
       s := Bemerkung;
       s := Format(LogList_FormatString_MakeKoordDS, [1, s]);
       LogList.Add(s);
@@ -824,12 +817,12 @@ begin
         Include(FRiggStatus, rsNichtEntspannbar);
       end;
 
-      Radius1 := rLe[5]; { Abstand(rPe[ooD0],rPe[ooA0]); }
-      Radius2 := rLe[8]; { FrWunten3d; }
-      MittelPunkt1 := Null;
+      Radius1 := rLe.V[5]; { Abstand(rPe.D0],rPe.A0]); }
+      Radius2 := rLe.V[8]; { FrWunten3d; }
+      MittelPunkt1 := TPoint3D.Zero;
       MittelPunkt2 := TempA;
       TempA0 := SchnittPunkt1;
-      TempA0[y] := 0;
+      TempA0.Y := 0;
       s := Bemerkung;
       s := Format(LogList_FormatString_MakeKoordDS, [2, s]);
       LogList.Add(s);
@@ -840,15 +833,15 @@ begin
         Include(FRiggStatus, rsNichtEntspannbar);
       end;
 
-      WStrich3d := Abstand(TempA0, TempC);
-      WStrich2d := sqrt(sqr(WStrich3d) - sqr(rPe[ooA0, y]));
+      WStrich3d := TempA0.Distance(TempC);
+      WStrich2d := sqrt(sqr(WStrich3d) - sqr(rPe.A0.Y));
 
       Radius1 := WStrich2d;
-      Radius2 := rLe[16] + rLe[15]; { FrMastunten + FrMastoben; }
-      MittelPunkt1 := rPe[ooP0];
-      MittelPunkt2 := rPe[ooD0];
-      rPe[ooC] := SchnittPunkt1;
-      rPe[ooC, y] := 0;
+      Radius2 := rLe.V[16] + rLe.V[15]; { FrMastunten + FrMastoben; }
+      MittelPunkt1 := rPe.P0;
+      MittelPunkt2 := rPe.D0;
+      rPe.C := SchnittPunkt1;
+      rPe.C.Y := 0;
       s := Bemerkung;
       s := Format(LogList_FormatString_MakeKoordDS, [3, s]);
       LogList.Add(s);
@@ -862,39 +855,36 @@ begin
       { weiter in der Ebene }
       SchnittGG(TempA0, TempC, TempD, TempA, Temp);
       { Temp enthält jetzt den Schnittpunkt der Diagonalen }
-      W1Strich := Abstand(TempA0, Temp);
-      Saling1L := Abstand(TempD, Temp);
+      W1Strich := TempA0.Distance(Temp);
+      Saling1L := TempD.Distance(Temp);
 
       { weiter räumlich: }
       Skalar := W1Strich / WStrich3d;
-      Temp := vsub(rPe[ooC], rPe[ooA0]);
-      Temp := SkalarMult(Temp, Skalar);
-      Temp := vadd(rPe[ooA0], Temp);
+      Temp := rPe.C - rPe.A0;
+      Temp := Temp * Skalar;
+      Temp := rPe.A0 + Temp;
       { Temp enthält jetzt den räumlichen Schnittpunkt der Diagonalen }
 
-      Skalar := rLe[16] / (rLe[16] + rLe[15]);
-      rPe[ooD] := vsub(rPe[ooC], rPe[ooD0]);
-      rPe[ooD] := SkalarMult(rPe[ooD], Skalar);
-      rPe[ooD] := vadd(rPe[ooD0], rPe[ooD]);
+      Skalar := rLe.V[16] / (rLe.V[16] + rLe.V[15]);
+      rPe.D := rPe.C - rPe.D0;
+      rPe.D := rPe.D * Skalar;
+      rPe.D := rPe.D0 + rPe.D;
 
       { Berechnung Punkt ooA }
-      Skalar := rLe[10] / Saling1L;
-      Temp := vsub(Temp, rPe[ooD]);
-      Temp := SkalarMult(Temp, Skalar);
-      rPe[ooA] := vadd(rPe[ooD], Temp);
+      Skalar := rLe.V[10] / Saling1L;
+      Temp := Temp - rPe.D;
+      Temp := Temp * Skalar;
+      rPe.A := rPe.D + Temp;
 
       { aktualisieren }
-      rPe[ooP] := rPe[ooA];
-      rPe[ooP, y] := 0;
-      rPe[ooB] := rPe[ooA];
-      rPe[ooB, y] := -rPe[ooA, y];
+      rPe.P := rPe.A;
+      rPe.P.Y := 0;
+      rPe.B := rPe.A;
+      rPe.B.Y := -rPe.A.Y;
 
       { Berechnung für Punkt ooF - Masttop }
-      gammaE := pi / 2 - arctan2((rPe[ooC, x] - rPe[ooD0, x]),
-        (rPe[ooC, z] - rPe[ooD0, z]));
-      rPe[ooF, x] := rPe[ooD0, x] + FrMastLength * cos(gammaE);
-      rPe[ooF, y] := 0;
-      rPe[ooF, z] := rPe[ooD0, z] + FrMastLength * sin(gammaE);
+      gammaE := pi / 2 - SKK.AngleXZ(rPe.C, rPe.D0);
+      rPe.F := SKK.AnglePointXZ(rPe.D0, FrMastLength, gammaE);
     end;
 
   except
@@ -905,16 +895,16 @@ end;
 
 procedure TRiggFS.KraefteOS;
 var
-  temp: double;
+  temp: single;
 begin
   { für Verwendung in Probe speichern }
-  KnotenLastD0[x] := FD0x; { in N }
-  KnotenLastD0[y] := 0;
-  KnotenLastD0[z] := -FD0y;
+  KnotenLastD0.X := FD0x; { in N }
+  KnotenLastD0.Y := 0;
+  KnotenLastD0.Z := -FD0y;
 
-  KnotenLastC[x] := FCx;
-  KnotenLastC[y] := 0;
-  KnotenLastC[z] := FCy;
+  KnotenLastC.X := FCx;
+  KnotenLastC.Y := 0;
+  KnotenLastC.Z := FCy;
 
   with Fachwerk do
   begin
@@ -932,24 +922,24 @@ begin
     FY[5] := -FD0y;
 
     { neue Geometrie }
-    KX[1] := rP[ooE, x]; { Angriffspunkt Mastcontroller }
-    KY[1] := rP[ooE, z];
-    KX[2] := rP[ooP, x]; { Saling }
-    KY[2] := rP[ooP, z];
-    KX[3] := rP[ooC, x]; { Angriffspunkt Wante }
-    KY[3] := rP[ooC, z];
+    KX[1] := rP.E.X; { Angriffspunkt Mastcontroller }
+    KY[1] := rP.E.Z;
+    KX[2] := rP.P.X; { Saling }
+    KY[2] := rP.P.Z;
+    KX[3] := rP.C.X; { Angriffspunkt Wante }
+    KY[3] := rP.C.Z;
 
-    KX[4] := rP[ooC0, x];
-    KY[4] := rP[ooC0, z];
-    KX[5] := rP[ooD0, x];
-    KY[5] := rP[ooD0, z];
-    KX[6] := rP[ooA0, x];
-    KY[6] := rP[ooA0, z];
+    KX[4] := rP.C0.X;
+    KY[4] := rP.C0.Z;
+    KX[5] := rP.D0.X;
+    KY[5] := rP.D0.Z;
+    KX[6] := rP.A0.X;
+    KY[6] := rP.A0.Z;
 
     if SalingTyp = stOhneStarr then
     begin
-      temp := sqrt(sqr(rL[8] + rL[13]) - sqr(rL[6] / 2));
-      temp := arctan2(rL[6] / 2, temp);
+      temp := sqrt(sqr(rL.A0A + rL.AC) - sqr(rL.A0B0 / 2));
+      temp := arctan2(rL.A0B0 / 2, temp);
       WantenPower := cos(temp) * WantenSpannung * 2;
     end;
     if SalingTyp = stOhneBiegt then
@@ -960,98 +950,98 @@ end;
 
 procedure TRiggFS.SplitOS;
 var
-  P0D0, P0C, P0C0: double;
+  P0D0, P0C, P0C0: single;
 begin
   { Laengen bereitstellen }
-  P0D0 := Abstand(rP[ooP0], rP[ooD0]);
-  P0C0 := Abstand(rP[ooP0], rP[ooC0]);
-  P0C := Abstand(rP[ooP0], rP[ooC]);
+  P0D0 := rP.P0.Distance(rP.D0);
+  P0C0 := rP.P0.Distance(rP.C0);
+  P0C := rP.P0.Distance(rP.C);
 
   { Kräfte ermitteln }
   with SplitF do
   begin
     { Punkt C0 }
     h := P0C0;
-    l2 := rL[6]; { PüttingAbstand }
+    l2 := rL.A0B0; { PüttingAbstand }
     F := Fachwerk.FS[7];
     SplitCalc;
-    rF[2] := F1;
-    rF[3] := F1;
+    rF.B0C0 := F1;
+    rF.A0C0 := F1;
 
     { Punkt D0 }
     h := P0D0;
-    l2 := rL[6]; { PüttingAbstand }
+    l2 := rL.A0B0; { PüttingAbstand }
     F := Fachwerk.FS[9];
     SplitCalc;
-    rF[4] := F1;
-    rF[5] := F1;
+    rF.B0D0 := F1;
+    rF.A0D0 := F1;
 
     { Punkt C }
     h := P0C;
-    l2 := rL[6]; { PuettingAbstand }
+    l2 := rL.A0B0; { PuettingAbstand }
     if SalingTyp = stOhneStarr then
       F := Fachwerk.WantenPower;
     if SalingTyp = stOhneBiegt then
       F := Fachwerk.FS[4];
     SplitCalc;
-    rF[ 7] := F1;
-    rF[ 8] := F1;
-    rF[12] := F1;
-    rF[13] := F1;
+    rF.B0B := F1;
+    rF.A0A := F1;
+    rF.BC := F1;
+    rF.AC := F1;
   end;
 
   with Fachwerk do
   begin
-    rF[ 0] := FS[5];
-    rF[ 1] := FS[8];
-    rF[ 9] := 0;
-    rF[10] := 0;
-    rF[11] := 0;
-    rF[14] := FS[6];
-    rF[15] := 0;
-    rF[16] := 0;
-    rF[17] := 0;
-    rF[18] := FS[2];
-    rF[19] := FS[1];
+    rF.D0C := FS[5];
+    rF.C0D0 := FS[8];
+    rF.BD := 0;
+    rF.AD := 0;
+    rF.AB := 0;
+    rF.C0C := FS[6];
+    rF.DC := 0;
+    rF.D0D := 0;
+    rF.ED := 0;
+    rF.D0E := FS[2];
+    rF.E0E := FS[1];
   end;
 
   with TetraF do
   begin
-    d1 := vsub(rP[ooC], rP[ooA0]);
-    d2 := vsub(rP[ooC0], rP[ooA0]);
-    d3 := vsub(rP[ooD0], rP[ooA0]);
-    d4 := vsub(rP[ooB0], rP[ooA0]);
+    d1 := rP.C - rP.A0;
+    d2 := rP.C0 - rP.A0;
+    d3 := rP.D0 - rP.A0;
+    d4 := rP.B0 - rP.A0;
     { d4 wird zur Vorzeichenermittlung benötigt }
-    l1 := rL[8] + rL[13];
-    l2 := rL[3];
-    l3 := rL[5];
-    F1 := rF[8];
-    F2 := rF[3];
-    F3 := rF[5];
+    l1 := rL.A0A + rL.AC;
+    l2 := rL.A0C0;
+    l3 := rL.A0D0;
+    F1 := rF.A0A;
+    F2 := rF.A0C0;
+    F3 := rF.A0D0;
     VierteKraft;
-    rF[6] := F4;
+    rF.A0B0 := F4;
   end;
 end;
 
 procedure TRiggFS.MakeKoordOS;
 var
-  Temp: TRealPoint;
-  Skalar: double;
+  Temp: TPoint3D;
+  Skalar: single;
   s: String;
 begin
   MakeRumpfKoord;
-  rPe[ooE] := rP[ooE];
+  rPe.E := rP.E;
   try
-    with SchnittKK do
+    with SKK do
     begin
       SchnittEbene := seXZ;
 
       { 1. Aufruf SchnittKK: Wante2d und Mast; ooC ermitteln }
-      Radius1 := sqrt(sqr(rLe[8] + rLe[13]) - sqr(rLe[6] / 2));
-      Radius2 := rLe[15] + rLe[16];
-      MittelPunkt1 := rPe[ooP0];
-      MittelPunkt2 := rPe[ooD0];
-      rPe[ooC] := SchnittPunkt1;
+      Radius1 := sqrt(sqr(rLe.V[8] + rLe.V[13]) - sqr(rLe.V[6] / 2));
+      Radius2 := rLe.V[15] + rLe.V[16];
+      MittelPunkt1 := rPe.P0;
+      MittelPunkt2 := rPe.D0;
+      rPe.C := SchnittPunkt1;
       s := Bemerkung;
       s := Format(LogList_Format_String_MakeKoordOS, [1, s]);
       LogList.Add(s);
@@ -1064,27 +1054,25 @@ begin
     end;
 
     { Punkte ooA, ooB, ooD und ooP ermitteln }
-    Temp := vsub(rPe[ooC], rPe[ooD0]);
-    Skalar := rLe[16] / (rLe[15] + rLe[16]); { Mastunten / Mast }
-    Temp[x] := Skalar * Temp[x];
-    Temp[z] := Skalar * Temp[z];
-    rPe[ooD] := vadd(rPe[ooD0], Temp);
+    Temp := rPe.C - rPe.D0;
+    Skalar := rLe.V[16] / (rLe.V[15] + rLe.V[16]); { Mastunten / Mast }
+    Temp.X := Skalar * Temp.X;
+    Temp.Z := Skalar * Temp.Z;
+    rPe.D := rPe.D0 + Temp;
 
-    Skalar := rLe[13] / (rLe[8] + rLe[13]); { Woben3d / Wante3d }
-    rPe[ooP, x] := rPe[ooC, x] - Skalar * (rPe[ooC, x] - rPe[ooP0, x]);
-    rPe[ooP, y] := 0;
-    rPe[ooP, z] := rPe[ooC, z] - Skalar * (rPe[ooC, z] - rPe[ooP0, z]);
+    Skalar := rLe.V[13] / (rLe.V[8] + rLe.V[13]); { Woben3d / Wante3d }
+    rPe.P.X := rPe.C.X - Skalar * (rPe.C.X - rPe.P0.X);
+    rPe.P.Y := 0;
+    rPe.P.Z := rPe.C.Z - Skalar * (rPe.C.Z - rPe.P0.Z);
 
-    rPe[ooA] := rPe[ooP];
-    rPe[ooA, y] := Skalar * rPe[ooA0, y];
-    rPe[ooB] := rPe[ooA];
-    rPe[ooB, y] := -rPe[ooA, y];
+    rPe.A := rPe.P;
+    rPe.A.Y := Skalar * rPe.A0.Y;
+    rPe.B := rPe.A;
+    rPe.B.Y := -rPe.A.Y;
 
     { Berechnung für Punkt ooF - Masttop }
-    gammaE := pi / 2 - arctan2((rPe[ooC, x] - rPe[ooD0, x]), (rPe[ooC, z] - rPe[ooD0, z]));
-    rPe[ooF, x] := rPe[ooD0, x] + FrMastLength * cos(gammaE);
-    rPe[ooF, y] := 0;
-    rPe[ooF, z] := rPe[ooD0, z] + FrMastLength * sin(gammaE);
+    gammaE := pi / 2 - SKK.AngleXZ(rPe.C, rPe.D0);
+    rPe.F := SKK.AnglePointXZ(rPe.D0, FrMastLength, gammaE);
 
   except
     on E: EMathError do
@@ -1097,7 +1085,7 @@ end;
   zurückliefert. }
 function TRiggFS.Regeln(TrimmSoll: TTrimm): Integer;
 
-  procedure Berechnen(Antrieb: double);
+  procedure Berechnen(Antrieb: single);
   begin
     case SalingTyp of
       stFest:
@@ -1110,10 +1098,10 @@ function TRiggFS.Regeln(TrimmSoll: TTrimm): Integer;
   end;
 
 var
-  Diff, Schranke: double;
+  Diff, Schranke: single;
   Zaehler, ZaehlerMax: Integer;
   i: Integer;
-  KraftMin, KraftMax: double;
+  KraftMin, KraftMax: single;
   tempFProbe, TrimmSollOut: Boolean;
 begin
   Result := 0;
@@ -1192,9 +1180,9 @@ begin
     Antrieb := Anfang + (Ende - Anfang) * i / CLMax;
     Berechnen(Antrieb);
     { FTrimm.Spannung schon begrenzt auf +/- 32000 }
-    if rF[14] < KraftMin then
+    if rF.C0C < KraftMin then
       KraftMin := FTrimm.Spannung;
-    if rF[14] > KraftMax then
+    if rF.C0C > KraftMax then
       KraftMax := FTrimm.Spannung;
     KurveF[i] := FTrimm.Spannung;
     if Assigned(FOnRegelGrafik) then
@@ -1232,7 +1220,7 @@ begin
     Inc(Zaehler);
     TrySalingH := (limitA + limitB) / 2;
     Berechnen(TrySalingH);
-    Diff := rF[14] - TrimmSoll.Spannung; { Abweichung der Vorstagspannung in N }
+    Diff := rF.C0C - TrimmSoll.Spannung; { Abweichung der Vorstagspannung in N }
     if Diff > 0 then
       limitA := TrySalingH
     else

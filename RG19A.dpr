@@ -80,7 +80,6 @@ uses
   RggDisplayOrder in 'Graph\RggDisplayOrder.pas',
   RggDisplayTypes in 'Graph\RggDisplayTypes.pas',
   RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas',
-  RggVector in 'Graph\RggVector.pas',
   RiggVar.FB.Color in 'FB\RiggVar.FB.Color.pas',
   RggChart in 'Graph\RggChart.pas',
   RggChartModel01 in 'Graph\RggChartModel01.pas',
@@ -88,7 +87,8 @@ uses
   RggStrings in 'Core\RggStrings.pas',
   RggTrimmTabGraph in 'Graph\RggTrimmTabGraph.pas',
   RggKraftGraph in 'Graph\RggKraftGraph.pas',
-  RggMastGraph in 'Graph\RggMastGraph.pas';
+  RggMastGraph in 'Graph\RggMastGraph.pas',
+  RiggVar.FD.Point in 'Graph2\RiggVar.FD.Point.pas';
 
 {$R *.res}
 

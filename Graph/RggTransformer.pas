@@ -6,10 +6,11 @@ uses
   RggCalc,
   RggTypes,
   RggMatrix,
-  RggPolarKar;
+  RggPolarKar,
+  RiggVar.FD.Point;
 
 type
-  TRggGetFixPunkt = function: TRealPoint of object;
+  TRggGetFixPunkt = function: TPoint3D of object;
 
   { Base version with OnGetFixPunkt }
   TRggTransformer00 = class
@@ -17,8 +18,8 @@ type
     Updated: Boolean;
     FFixPoint: TRiggPoint;
     FZoom: double;
-    FFixPunkt: TRealPoint;
-    FTransformedFixPunkt: TRealPoint;
+    FFixPunkt: TPoint3D;
+    FTransformedFixPunkt: TPoint3D;
     FOnGetFixPunkt: TRggGetFixPunkt;
     procedure SetFixPoint(const Value: TRiggPoint);
     procedure SetZoom(const Value: double);
@@ -28,17 +29,17 @@ type
     constructor Create;
     property Zoom: double read FZoom write SetZoom;
     property FixPoint: TRiggPoint read FFixPoint write SetFixPoint;
-    property TransformedFixPunkt: TRealPoint read FTransformedFixPunkt;
+    property TransformedFixPunkt: TPoint3D read FTransformedFixPunkt;
     property OnGetFixPunkt: TRggGetFixPunkt read FOnGetFixPunkt write SetOnGetFixPunkt;
   end;
 
   { not used, FixPunkt not acessible }
   TRggTransformer01 = class(TRggTransformer00)
   protected
-    procedure SetFixPunkt(const Value: TRealPoint);
+    procedure SetFixPunkt(const Value: TPoint3D);
   public
     procedure UpdateTransformedFixPunkt;
-    property FixPunkt: TRealPoint read FFixPunkt write SetFixPunkt;
+    property FixPunkt: TPoint3D read FFixPunkt write SetFixPunkt;
   end;
 
   { using Matrix4x4, see Hull }
@@ -49,15 +50,12 @@ type
     Mat: TMatrix4x4;
     constructor Create;
     destructor Destroy; override;
-    function TransformPoint(p: TRealPoint): TRealPoint;
+    function TransformPoint(p: TPoint3D): TPoint3D;
   end;
 
   TRggTransformer = TRggTransformer4x4;
 
 implementation
-
-uses
-  RggVector;
 
 { TRggTransformer00 }
 
@@ -86,7 +84,7 @@ end;
 
 { TRggTransformer01 }
 
-procedure TRggTransformer01.SetFixPunkt(const Value: TRealPoint);
+procedure TRggTransformer01.SetFixPunkt(const Value: TPoint3D);
 begin
   FFixPunkt := Value;
   Updated := False;
@@ -120,28 +118,28 @@ begin
 
   Mat.Identity;
   Mat.Translate(
-    -FTransformedFixPunkt[x],
-    -FTransformedFixPunkt[y],
-    -FTransformedFixPunkt[z]
+    -FTransformedFixPunkt.X,
+    -FTransformedFixPunkt.Y,
+    -FTransformedFixPunkt.Z
   );
   Mat.Multiply(Rotator.Matrix);
   Mat.ScaleXYZ(Zoom, Zoom, Zoom);
 end;
 
-function TRggTransformer4x4.TransformPoint(p: TRealPoint): TRealPoint;
+function TRggTransformer4x4.TransformPoint(p: TPoint3D): TPoint3D;
 var
-  pt: vec3;
+  pt: TPoint3D;
 begin
   if not Updated then
     BuildMatrix;
 
-  pt.x := p[x];
-  pt.y := p[y];
-  pt.z := p[z];
+  pt.x := p.X;
+  pt.y := p.Y;
+  pt.z := p.Z;
   Mat.TransformPoint(pt);
-  result[x] := pt.x;
-  result[y] := pt.y;
-  result[z] := pt.z;
+  result.X := pt.x;
+  result.Y := pt.y;
+  result.Z := pt.z;
 end;
 
 end.

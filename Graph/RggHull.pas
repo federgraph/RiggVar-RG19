@@ -2,12 +2,16 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
   Winapi.Windows,
   System.SysUtils,
   System.Classes,
   System.Types,
-  System.Math.Vectors,
+  RiggVar.FD.Point,
   Vcl.Graphics,
   RggTypes,
   RggCalc,
@@ -62,8 +66,8 @@ type
 
   THullGraph1 = class(THullGraph0)
   protected
-    xmin, xmax, ymin, ymax, zmin, zmax: double;
-    zfac: double;
+    xmin, xmax, ymin, ymax, zmin, zmax: single;
+    zfac: single;
     procedure FindBB;
   public
     constructor Create;
@@ -91,13 +95,14 @@ var
 implementation
 
 uses
-  RiggVar.FB.Classes;
+  RiggVar.FB.Classes,
+  RiggVar.FB.Color;
 
 constructor THullGraph0.Create;
 begin
   inherited Create;
 
-  Factor := TPoint3D.Create(1.0, 1.0, 1.0);
+  Factor := Point3D(1.0, 1.0, 1.0);
   ModelFactor := Factor;
 
   Load;
@@ -237,7 +242,7 @@ var
   c: TConArray;
   v: TVertArrayI;
   StartPoint, EndPoint: TPoint;
-  rp1, rp2: TRealPoint;
+  rp1, rp2: TPoint3D;
   cla: TColor;
   s: string;
 begin
@@ -280,13 +285,13 @@ begin
     StartPoint := Point(v[p1], -v[p1 + 2]);
     EndPoint := Point(v[p2], -v[p2 + 2]);
 
-    rp1[x] := v[p1 + 0];
-    rp1[y] := v[p1 + 1];
-    rp1[z] := v[p1 + 2];
+    rp1.X := v[p1 + 0];
+    rp1.Y := v[p1 + 1];
+    rp1.Z := v[p1 + 2];
 
-    rp2[x] := v[p2 + 0];
-    rp2[y] := v[p2 + 1];
-    rp2[z] := v[p2 + 2];
+    rp2.X := v[p2 + 0];
+    rp2.Y := v[p2 + 1];
+    rp2.Z := v[p2 + 2];
 
     DL.DI.StrokeWidth := 3;
     DL.DI.StrokeColor := cla;
@@ -551,7 +556,7 @@ var
   a, b, c: Integer;
 
   { local procedure }
-  procedure GetReal(var RealValue: double);
+  procedure GetReal(var RealValue: single);
   begin
     Zeile := Trim(Zeile);
     Wort := TUtils.StripFirstWord(Zeile);
@@ -677,7 +682,7 @@ var
   c: TConArray;
   v: TVertArrayI;
   s: string;
-  SavedZoom: double;
+  SavedZoom: single;
 begin
   if (ncon <= 0) or (nvert <= 0) then
     Exit;
@@ -710,7 +715,7 @@ end;
 
 constructor THullGraph1.Create;
 var
-  xw, yw, zw: double;
+  xw, yw, zw: single;
 begin
   inherited;
   FindBB();

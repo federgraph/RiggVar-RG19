@@ -22,7 +22,7 @@ uses
   RiggVar.RG.Main;
 
 type
-  TMain = TMain1;
+  TMain = TRggMain;
 
 var
   Main: TMain;

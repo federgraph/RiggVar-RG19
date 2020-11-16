@@ -9,6 +9,7 @@ uses
   Vcl.Graphics,
   Vcl.ExtCtrls,
   Vcl.Dialogs,
+  RiggVar.FD.Point,
   RggTypes,
   RggCalc,
   RggMatrix,
@@ -229,8 +230,8 @@ end;
 procedure TGetriebeGraph.Update2D;
 var
   j: Integer;
-  FixPunkt2D: TRealPoint;
-  Temp: TRealPoint;
+  FixPunkt2D: TPoint3D;
+  Temp: TPoint3D;
   xTemp: Integer;
   zTemp: Integer;
 begin
@@ -241,16 +242,16 @@ begin
 
   { Fixpunkt enthält nach Aufruf von FillZug3D den gedrehten Fixpunkt, hier wird
     aber immer der nicht gedrehte Fixpunkt benötigt! }
-  FixPunkt2D := rP[FixPoint];
+  FixPunkt2D := rP.V[FixPoint];
 
   { Koppelkurve }
   if KoppelKurveNeedFill then
   begin
     for j := 0 to 100 do
     begin
-      Temp := vsub(KoppelKurve[j], FixPunkt2D);
-      xTemp := Round(Temp[x] * FZoom2D);
-      zTemp := Round(Temp[z] * FZoom2D);
+      Temp := KoppelKurve[j] - FixPunkt2D;
+      xTemp := Round(Temp.X * FZoom2D);
+      zTemp := Round(Temp.Z * FZoom2D);
       Zug1.Zug1KoppelKurve[j+1].X :=  xTemp + OffsetX1;
       Zug1.Zug1KoppelKurve[j+1].Y := -zTemp + OffsetY1;
     end;
@@ -260,109 +261,109 @@ begin
   { Mastkurve }
   for j := 0 to BogenMax do
   begin
-    Temp := vsub(Kurve[j], FixPunkt2D);
-    xTemp := Round(Temp[x] * FZoom2D);
-    zTemp := Round(Temp[z] * FZoom2D);
+    Temp := Kurve[j] - FixPunkt2D;
+    xTemp := Round(Temp.X * FZoom2D);
+    zTemp := Round(Temp.Z * FZoom2D);
     Zug1.Zug1MastKurve[j+1].X :=  xTemp + OffsetX1;
     Zug1.Zug1MastKurve[j+1].Y := -zTemp + OffsetY1;
   end;
 
   { Radius für Kreisbogen um C0 }
-  Zug1.IntR := Round( Abstand(rP[ooC], rP[ooC0]) * FZoom2D );
+  Zug1.IntR := Round( rP.C.Distance(rP.C0) * FZoom2D );
 
-  A0 := vsub(rP[ooA0], FixPunkt2D);
-  B0 := vsub(rP[ooB0], FixPunkt2D);
-  C0 := vsub(rP[ooC0], FixPunkt2D);
-  D0 := vsub(rP[ooD0], FixPunkt2D);
-  E0 := vsub(rP[ooE0], FixPunkt2D);
-  F0 := vsub(rP[ooF0], FixPunkt2D);
-  A := vsub(rP[ooA], FixPunkt2D);
-  B := vsub(rP[ooB], FixPunkt2D);
-  C := vsub(rP[ooC], FixPunkt2D);
-  D := vsub(rP[ooD], FixPunkt2D);
-  E := vsub(rP[ooE], FixPunkt2D);
-  F := vsub(rP[ooF], FixPunkt2D);
+  A0 := rP.A0 - FixPunkt2D;
+  B0 := rP.B0 - FixPunkt2D;
+  C0 := rP.C0 - FixPunkt2D;
+  D0 := rP.D0 - FixPunkt2D;
+  E0 := rP.E0 - FixPunkt2D;
+  F0 := rP.F0 - FixPunkt2D;
+  A := rP.A - FixPunkt2D;
+  B := rP.B - FixPunkt2D;
+  C := rP.C - FixPunkt2D;
+  D := rP.D - FixPunkt2D;
+  E := rP.E - FixPunkt2D;
+  F := rP.F - FixPunkt2D;
 
   with RaumGraphData do
   begin
-    xA0 := Round(A0[x] * FZoom2D);
-    yA0 := Round(A0[y] * FZoom2D);
-    zA0 := Round(A0[z] * FZoom2D);
+    xA0 := Round(A0.X * FZoom2D);
+    yA0 := Round(A0.Y * FZoom2D);
+    zA0 := Round(A0.Z * FZoom2D);
 
     xB0 := xA0;
     yB0 := -yA0;
     zB0 := zA0;
 
-    xC0 := Round(C0[x] * FZoom2D);
+    xC0 := Round(C0.X * FZoom2D);
     yC0 := 0;
-    zC0 := Round(C0[z] * FZoom2D);
+    zC0 := Round(C0.Z * FZoom2D);
 
     Zug1.MP.x := xC0 + OffsetX1;
     Zug1.MP.y := -zC0 + OffsetY1;
 
-    xD0 := Round(D0[x] * FZoom2D);
+    xD0 := Round(D0.X * FZoom2D);
     yD0 := 0;
-    zD0 := Round(D0[z] * FZoom2D);
+    zD0 := Round(D0.Z * FZoom2D);
 
-    xE0 := Round(E0[x] * FZoom2D);
+    xE0 := Round(E0.X * FZoom2D);
     yE0 := 0;
-    zE0 := Round(E0[z] * FZoom2D);
+    zE0 := Round(E0.Z * FZoom2D);
 
-    xF0 := Round(F0[x] * FZoom2D);
+    xF0 := Round(F0.X * FZoom2D);
     yF0 := 0;
-    zF0 := Round(F0[z] * FZoom2D);
+    zF0 := Round(F0.Z * FZoom2D);
 
-    xA := Round( A[x] * FZoom2D);
-    yA := Round( A[y] * FZoom2D);
-    zA := Round( A[z] * FZoom2D);
+    xA := Round( A.X * FZoom2D);
+    yA := Round( A.Y * FZoom2D);
+    zA := Round( A.Z * FZoom2D);
 
     xB := xA;
     yB := -yA;
     zB := zA;
 
-    xC := Round(C[x] * FZoom2D);
+    xC := Round(C.X * FZoom2D);
     yC := 0;
-    zC := Round(C[z] * FZoom2D);
+    zC := Round(C.Z * FZoom2D);
 
-    xD := Round(D[x] * FZoom2D);
+    xD := Round(D.X * FZoom2D);
     yD := 0;
-    zD := Round(D[z] * FZoom2D);
+    zD := Round(D.Z * FZoom2D);
 
-    xE := Round(E[x] * FZoom2D);
+    xE := Round(E.X * FZoom2D);
     yE := 0;
-    zE := Round(E[z] * FZoom2D);
+    zE := Round(E.Z * FZoom2D);
 
-    xF := Round(F[x] * FZoom2D);
+    xF := Round(F.X * FZoom2D);
     yF := 0;
-    zF := Round(F[z] * FZoom2D);
+    zF := Round(F.Z * FZoom2D);
   end;
 end;
 
 procedure TGetriebeGraph.CalcOffset(R: TRect);
 var
   k: TRiggPoint;
-  Temp: TRealPoint;
+  Temp: TPoint3D;
   xmin, xmax, ymin, ymax, zmin, zmax: Integer;
   tempx, tempy, tempz: Integer;
   w, h: Integer;
   tempf1, tempf2: double;
 begin
   { maximale Abmessungen ermitteln }
-  Temp := rP[ooD0]; // beliebiger Eckpunkt
-  xmin := Round(Temp[x]);
+  Temp := rP.D0; // beliebiger Eckpunkt
+  xmin := Round(Temp.X);
   xmax := xmin;
-  ymin := Round(Temp[y]);
+  ymin := Round(Temp.Y);
   ymax := ymin;
-  zmin := Round(Temp[z]);
+  zmin := Round(Temp.Z);
   zmax := zmin;
   for k := ooA0 to ooF do
   begin
     if k = ooF0 then
       Continue;
-    Temp := rP[k];
-    tempx := Round(Temp[x]);
-    tempy := Round(Temp[y]);
-    tempz := Round(Temp[z]);
+    Temp := rP.V[k];
+    tempx := Round(Temp.X);
+    tempy := Round(Temp.Y);
+    tempz := Round(Temp.Z);
     if tempx < xmin then
       xmin := tempx;
     if tempy < ymin then

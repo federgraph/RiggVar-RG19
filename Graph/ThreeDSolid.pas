@@ -3,12 +3,12 @@
 interface
 
 uses
+  RiggVar.FD.Point,
   Winapi.Windows,
   Vcl.Dialogs,
   System.SysUtils,
   System.UITypes,
   Vcl.Graphics,
-  RggVector,
   ThreeD;
 
 type
@@ -97,10 +97,9 @@ procedure TTriangle.ComputeNormal;
 var
   d1, d2: Vector;
 begin
-  d1 := Subtract(V1, V2);
-  d2 := Subtract(V1, V3);
-  Normal := Cross(d1, d2);
-  Normalize3D(Normal);
+  d1 := V1 - V2;
+  d2 := V1 - V3;
+  Normal := d1.CrossProduct(d2).Normalize;
 end;
 
 procedure TTriangle.ComputeD;
@@ -583,9 +582,8 @@ begin
   if Shading then
   begin
     { zunächst den diffusen Anteil in lDotN ermitteln }
-    l := Subtract(Light, p);
-    Normalize3D(l);
-    lDotN := Dot(l, Normal);
+    l := (Light - p).Normalize;
+    lDotN := l.DotProduct(Normal);
     temp := lDotN * Diffuse * NUM_SHADES;
     if lDotN <= 0 then
       lDotN := -temp
@@ -658,8 +656,8 @@ begin
   s.x := From.x - tree.Tri.V1.x;
   s.y := From.y - tree.Tri.V1.y;
   s.z := From.z - tree.Tri.V1.z;
-  Normalize3D(s);
-  if Dot(s, tree.Tri.Normal) > 0 then
+  s.Normalize;
+  if s.DotProduct(tree.Tri.Normal) > 0 then
   begin // The eye is in front of the polygon
     TraverseTree(Canvas, tree.Inside);
     DisplayTriangle(Canvas, tree.Tri);

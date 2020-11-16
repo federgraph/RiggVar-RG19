@@ -7,7 +7,7 @@ uses
   System.SysUtils,
   System.Types,
   Vcl.Graphics,
-  RggVector;
+  RiggVar.FD.Point;
 
 const
   EM_FILEOPENERROR = -100;
@@ -31,7 +31,7 @@ const
   PiD180 = 0.017453293;
 
 type
-  VECTOR = vec3;
+  VECTOR = TPoint3D;
   TVerticeArray = array [0 .. NUMVERTICES] of VECTOR;
 
   RGBColor = record
@@ -201,19 +201,19 @@ var
   tempmag: double;
 begin
   DVal := cos(Angle / 2.0) / sin(Angle / 2.0);
-  Dist := Subtract(At, From);
+  Dist := At - From;
 
   temp := Dist;
-  tempmag := Mag3D(Dist);
-  A3 := Divide(temp, tempmag); // Einheitsvektor in Blickrichtung (z)
+  tempmag := Dist.Length;
+  A3 := temp * (1 / tempmag); // Einheitsvektor in Blickrichtung (z)
 
-  temp := Cross(Dist, Up);
-  tempmag := Mag3D(temp);
-  A1 := Divide(temp, tempmag); // Einheitsvektor auf x-Achse des Bildes
+  temp := Dist.CrossProduct(Up);
+  tempmag := temp.Length;
+  A1 := temp * (1 / tempmag); // Einheitsvektor auf x-Achse des Bildes
 
-  temp := Cross(A1, A3);
-  tempmag := Mag3D(temp);
-  A2 := Divide(temp, tempmag); // Einheitsvektor auf y-Achse des Bildes (UP)
+  temp := A1.CrossProduct(A3);
+  tempmag := temp.Length;
+  A2 := temp * (1/ tempmag); // Einheitsvektor auf y-Achse des Bildes (UP)
 
   Offsx := -(A1.x * From.x + A1.y * From.y + A1.z * From.z);
   Offsy := -(A2.x * From.x + A2.y * From.y + A2.z * From.z);

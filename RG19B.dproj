@@ -227,7 +227,6 @@
         <DCCReference Include="Graph\RggDisplayOrder.pas"/>
         <DCCReference Include="Graph\RggDisplayTypes.pas"/>
         <DCCReference Include="FB\RiggVar.FB.ActionConst.pas"/>
-        <DCCReference Include="Graph\RggVector.pas"/>
         <DCCReference Include="Graph\RggChart.pas"/>
         <DCCReference Include="FB\RiggVar.FB.Color.pas"/>
         <DCCReference Include="Graph\RggChartModel01.pas"/>
@@ -236,6 +235,7 @@
         <DCCReference Include="Graph\RggTrimmTabGraph.pas"/>
         <DCCReference Include="Graph\RggKraftGraph.pas"/>
         <DCCReference Include="Graph\RggMastGraph.pas"/>
+        <DCCReference Include="Graph2\RiggVar.FD.Point.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

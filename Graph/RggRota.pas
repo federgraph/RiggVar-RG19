@@ -18,7 +18,7 @@ uses
   Vcl.ExtCtrls,
   Vcl.ComCtrls,
   Vcl.ExtDlgs,
-  RggVector,
+  RiggVar.FD.Point,
   RiggVar.RG.Graph,
   RggTypes,
   RggMatrix,
@@ -29,16 +29,13 @@ uses
   RggTransformer;
 
 type
-
-  { TRotaForm }
-
   TRotaForm1 = class(TInterfacedObject, IStrokeRigg)
   private
     RPN: TRiggPoints;
     RPE: TRiggPoints;
     RPR: TRiggPoints;
     SkipOnceFlag: Boolean;
-    function OnGetFixPunkt: TRealPoint;
+    function OnGetFixPunkt: TPoint3D;
     procedure DrawToCanvasEx(g: TCanvas);
     procedure DrawToCanvas(g: TCanvas);
     procedure DrawToImage(g: TCanvas);
@@ -71,23 +68,25 @@ type
     MinTrackX, MinTrackY: Integer;
     MaxTrackX, MaxTrackY: Integer;
     CreatedScreenWidth: Integer;
-    Bitmap: TBitmap;
     procedure PaintBackGround(Image: TBitmap);
     procedure PaintBox3DPaint(Sender: TObject);
   private
     FViewPoint: TViewPoint;
-    FZoomBase: double;
-    FZoom: double;
+    FZoomBase: single;
+    FZoom: single;
 
-    FPhi: double;
-    FTheta: double;
-    FGamma: double;
+    FPhi: single;
+    FTheta: single;
+    FGamma: single;
 
-    xmin, ymin, xmax, ymax: Integer;
+    xmin: Integer;
+    ymin: Integer;
+    xmax: Integer;
+    ymax: Integer;
 
     FXpos: Integer;
     FYpos: Integer;
-    FIncrementW: double;
+    FIncrementW: single;
     FIncrementT: Integer;
     FZoomIndex: Integer;
 
@@ -133,10 +132,13 @@ type
     procedure SetRiggLED(const Value: Boolean);
     procedure SetSofortBerechnen(const Value: Boolean);
 
-    procedure SetMastLineData(const Value: TLineDataR100; L: double; Beta: double);
-    function GetMastKurvePoint(const Index: Integer): TRealPoint;
+    procedure SetMastLineData(const Value: TLineDataR100; L: single; Beta: single);
+    function GetMastKurvePoint(const Index: Integer): TPoint3D;
     procedure ToggleRenderOption(const fa: Integer);
     function QueryRenderOption(const fa: Integer): Boolean;
+    procedure UpdateHullTexture;
+    procedure UpdateCameraX(Delta: single);
+    procedure UpdateCameraY(Delta: single);
   public
     MatrixTextU: string;
     MatrixTextV: string;
@@ -145,8 +147,9 @@ type
     procedure DrawMatrix(g: TCanvas);
   private
     FScale: single;
+    Bitmap: TBitmap;
     EraseBK: Boolean;
-    procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
+    procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: single);
     procedure Translate(x, y: Integer);
     procedure InitRotaData;
   private
@@ -162,6 +165,7 @@ type
     FWanteGestrichelt: Boolean;
     FBogen: Boolean;
     FKoppel: Boolean;
+    FWantOverlayedRiggs: Boolean;
     procedure InitGraph;
     procedure InitRaumGraph;
     procedure InitHullGraph;
@@ -172,6 +176,7 @@ type
     procedure SetOnBeforeDraw(const Value: TNotifyEvent);
     procedure SetOnAfterDraw(const Value: TNotifyEvent);
     function SingleDraw: Boolean;
+    procedure SetWantOverlayedRiggs(const Value: Boolean);
   public
     IsUp: Boolean;
     PaintBox3D: TPaintBox; // injected
@@ -179,15 +184,16 @@ type
     HullGraph: THullGraph0;
     RaumGraph: TRaumGraph;
     UseDisplayList: Boolean;
-    WantOverlayedRiggs: Boolean;
 
     constructor Create;
     destructor Destroy; override;
     procedure Init;
     procedure Draw;
 
-    procedure RotateZ(Delta: double);
-    procedure Zoom(Delta: double);
+    procedure RotateZ(Delta: single);
+    procedure Zoom(Delta: single);
+
+    procedure DoOnUpdateStrokeRigg;
 
     property ZoomIndex: Integer read FZoomIndex write SetZoomIndex;
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
@@ -213,12 +219,16 @@ type
 
     property OnBeforeDraw: TNotifyEvent read FOnBeforeDraw write SetOnBeforeDraw;
     property OnAfterDraw: TNotifyEvent read FOnAfterDraw write SetOnAfterDraw;
+
+    property WantOverlayedRiggs: Boolean read FWantOverlayedRiggs write SetWantOverlayedRiggs;
+
   end;
 
 implementation
 
 uses
   RiggVar.App.Main,
+  RiggVar.FB.ActionConst,
   RiggVar.RG.Def,
   RggDisplay,
   RggPBox, // special paintbox which captures the mouse properly
@@ -343,7 +353,7 @@ end;
 
 procedure TRotaForm1.InitRotaData;
 
-  function GetMatrix(Theta, Xrot: double): Matrix4x4;
+  function GetMatrix(Theta, Xrot: single): Matrix4x4;
   begin
     Rotator.Reset;
     Rotator.DeltaTheta := Theta;
@@ -400,12 +410,12 @@ end;
 
 procedure TRotaForm1.UpdateMatrixText;
 var
-  m4x4: Matrix4x4;
+  m: Matrix4x4;
 begin
-  m4x4 := Rotator.Mat.Mat;
-  MatrixTextU := Format('%8.4f %8.4f %8.4f',[m4x4[1,1],m4x4[1,2], m4x4[1,3]]);
-  MatrixTextV := Format('%8.4f %8.4f %8.4f',[m4x4[2,1],m4x4[2,2], m4x4[2,3]]);
-  MatrixTextW := Format('%8.4f %8.4f %8.4f',[m4x4[3,1],m4x4[3,2], m4x4[3,3]]);
+  m := Rotator.Mat.Mat;
+  MatrixTextU := Format('%8.4f %8.4f %8.4f',[m[1,1],m[1,2], m[1,3]]);
+  MatrixTextV := Format('%8.4f %8.4f %8.4f',[m[2,1],m[2,2], m[2,3]]);
+  MatrixTextW := Format('%8.4f %8.4f %8.4f',[m[3,1],m[3,2], m[3,3]]);
 end;
 
 procedure TRotaForm1.DrawMatrix(g: TCanvas);
@@ -442,11 +452,8 @@ begin
   end;
 
   { Bitmap auf den Bildschirm kopieren }
-  with PaintBox3D.Canvas do
-  begin
-    CopyMode := cmSrcCopy;
-    Draw(0, 0, Bitmap);
-  end;
+  PaintBox3D.Canvas.CopyMode := cmSrcCopy;
+  PaintBox3D.Canvas.Draw(0, 0, Bitmap);
 
   Painted := True;
 end;
@@ -691,8 +698,8 @@ begin
   end;
   RaumGraph.Viewpoint := Value; // for GetriebeGraph
 
-  FIncrementT := RotaData.IncrementT;
-  FIncrementW := RotaData.IncrementW;
+  FIncrementT := Round(RotaData.IncrementT);
+  FIncrementW := Round(RotaData.IncrementW);
 
   { Rotationmatrix }
   Rotator.Matrix := RotaData.Matrix;
@@ -700,7 +707,7 @@ begin
 
   { Zoom }
   FZoomIndex := RotaData.ZoomIndex;
-  FZoom := FZoomBase * LookUpRa10(FZoomIndex) * FScale;
+  FZoom := FZoomBase * TRotaParams.LookUpRa10(FZoomIndex) * FScale;
   Transformer.Zoom := FZoom;
 
   { FixPoint }
@@ -817,7 +824,7 @@ begin
   Draw;
 end;
 
-procedure TRotaForm1.Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
+procedure TRotaForm1.Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: single);
 begin
   Rotator.DeltaPhi := Phi;
   Rotator.DeltaTheta := Theta;
@@ -863,9 +870,9 @@ begin
   Draw;
 end;
 
-function TRotaForm1.OnGetFixPunkt: TRealPoint;
+function TRotaForm1.OnGetFixPunkt: TPoint3D;
 begin
-  result := RPN[FFixPoint];
+  result := RPN.V[FFixPoint];
 end;
 
 procedure TRotaForm1.PaintBackGround(Image: TBitmap);
@@ -884,21 +891,38 @@ end;
 
 procedure TRotaForm1.ToggleRenderOption(const fa: Integer);
 begin
-
+  case fa of
+    faWantRenderE: RaumGraph.WantRenderE := not RaumGraph.WantRenderP;
+    faWantRenderF: RaumGraph.WantRenderF := not RaumGraph.WantRenderF;
+    faWantRenderH: RaumGraph.WantRenderH := not RaumGraph.WantRenderH;
+    faWantRenderP: RaumGraph.WantRenderP := not RaumGraph.WantRenderP;
+    faWantRenderS: RaumGraph.WantRenderS := not RaumGraph.WantRenderS;
+  end;
 end;
 
 function TRotaForm1.QueryRenderOption(const fa: Integer): Boolean;
 begin
+  case fa of
+    faWantRenderE: result := RaumGraph.WantRenderE;
+    faWantRenderF: result := RaumGraph.WantRenderF;
+    faWantRenderH: result := RaumGraph.WantRenderH;
+    faWantRenderP: result := RaumGraph.WantRenderP;
+    faWantRenderS: result := RaumGraph.WantRenderS;
+
+    faRggBogen: result := RaumGraph.Bogen;
+    faRggKoppel: result := RaumGraph.Koppel;
+    faRggHull: result := RumpfItemChecked;
+    else
   result := False;
+  end;
 end;
 
-function TRotaForm1.GetMastKurvePoint(const Index: Integer): TRealPoint;
+function TRotaForm1.GetMastKurvePoint(const Index: Integer): TPoint3D;
 begin
   result := RaumGraph.GetMastKurvePoint(Index);
 end;
 
-procedure TRotaForm1.SetMastLineData(const Value: TLineDataR100; L,
-  Beta: double);
+procedure TRotaForm1.SetMastLineData(const Value: TLineDataR100; L, Beta: single);
 begin
   RaumGraph.SetMastLineData(Value, L, Beta);
 end;
@@ -956,6 +980,11 @@ begin
   RaumGraph.WanteGestrichelt := Value;
 end;
 
+procedure TRotaForm1.SetWantOverlayedRiggs(const Value: Boolean);
+begin
+  FWantOverlayedRiggs := Value;
+end;
+
 procedure TRotaForm1.SetZoomIndex(const Value: Integer);
 begin
   if (Value < 1) then
@@ -965,19 +994,19 @@ begin
   else
     FZoomIndex := Value;
 
-  FZoom := FZoomBase * LookUpRa10(FZoomIndex) * FScale;
+  FZoom := FZoomBase * TRotaParams.LookUpRa10(FZoomIndex) * FScale;
   RaumGraph.Zoom := FZoom;
   Draw;
 end;
 
-procedure TRotaForm1.Zoom(Delta: double);
+procedure TRotaForm1.Zoom(Delta: single);
 begin
   FZoom := FZoom + FZoom * FZoomBase * Delta * 0.3 * FScale;
   RaumGraph.Zoom := FZoom;
   Draw;
 end;
 
-procedure TRotaForm1.RotateZ(Delta: double);
+procedure TRotaForm1.RotateZ(Delta: single);
 begin
   Rotate(0, 0, 0, 0, 0, Delta);
   Draw;
@@ -1047,6 +1076,28 @@ begin
     { ok, MultiDraw, draw relaxed position in gray }
     result := False;
   end;
+end;
+
+procedure TRotaForm1.UpdateCameraX(Delta: single);
+begin
+  FXPos := FXPos + Round(Delta) * 5;
+  Draw;
+end;
+
+procedure TRotaForm1.UpdateCameraY(Delta: single);
+begin
+  FYPos := FYPos - Round(Delta) * 5;
+  Draw;
+end;
+
+procedure TRotaForm1.DoOnUpdateStrokeRigg;
+begin
+
+end;
+
+procedure TRotaForm1.UpdateHullTexture;
+begin
+
 end;
 
 end.

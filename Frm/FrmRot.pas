@@ -21,7 +21,7 @@ uses
   Vcl.Printers,
   Vcl.ComCtrls,
   Vcl.ExtDlgs,
-  RggVector,
+  RiggVar.FD.Point,
   RggTypes,
   RggGetriebeGraph,
   RggMatrix,
@@ -134,18 +134,18 @@ type
     MetaCanvas: TMetaFileCanvas;
 
     FViewPoint: TViewPoint;
-    FZoomBase: double;
-    FZoom: double;
+    FZoomBase: single;
+    FZoom: single;
 
-    FPhi: double;
-    FTheta: double;
-    FGamma: double;
+    FPhi: single;
+    FTheta: single;
+    FGamma: single;
 
     xmin, ymin, xmax, ymax: Integer;
 
     FXpos: Integer;
     FYpos: Integer;
-    FIncrementW: double;
+    FIncrementW: single;
     FIncrementT: Integer;
     FZoomIndex: Integer;
 
@@ -190,7 +190,7 @@ type
     function IsButtonVisible(Button: TControl): Boolean;
     property Buttons[Index: Integer]: TControl read GetButton;
     property ButtonCount: Integer read GetButtonCount;
-    procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
+    procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: single);
     procedure Translate(x, y: Integer);
     procedure SetAngleText;
     procedure SetZoomText;
@@ -507,7 +507,7 @@ end;
 
 procedure TRotationForm.InitRotaData;
 
-  function GetMatrix(Theta, Xrot: double): Matrix4x4;
+  function GetMatrix(Theta, Xrot: single): Matrix4x4;
   begin
     Rotator.Reset;
     Rotator.DeltaTheta := Theta;
@@ -570,12 +570,12 @@ end;
 procedure TRotationForm.DrawMatrix(Canvas: TCanvas);
 var
   S1, S2, S3: string;
-  m4x4: Matrix4x4;
+  m: Matrix4x4;
 begin
-  m4x4 := Rotator.Mat.Mat;
-  S1 := Format('%8.4f %8.4f %8.4f',[m4x4[1,1], m4x4[1,2], m4x4[1,3]]);
-  S2 := Format('%8.4f %8.4f %8.4f',[m4x4[2,1], m4x4[2,2], m4x4[2,3]]);
-  S3 := Format('%8.4f %8.4f %8.4f',[m4x4[3,1], m4x4[3,2], m4x4[3,3]]);
+  m := Rotator.Mat.Mat;
+  S1 := Format('%8.4f %8.4f %8.4f',[m[1,1], m[1,2], m[1,3]]);
+  S2 := Format('%8.4f %8.4f %8.4f',[m[2,1], m[2,2], m[2,3]]);
+  S3 := Format('%8.4f %8.4f %8.4f',[m[3,1], m[3,2], m[3,3]]);
   with Canvas do
   begin
     Font.Name := 'Courier New';
@@ -728,7 +728,7 @@ end;
 
 procedure TRotationForm.LeftBtnClick(Sender: TObject);
 var
-  wp, wt, wg: double;
+  wp, wt, wg: single;
 begin
   if Mode = False then
   begin
@@ -836,7 +836,7 @@ begin
   if FZoomIndex < 11 then
   begin
     Inc(FZoomIndex);
-    FZoom := FZoomBase * LookUpRa10(FZoomIndex);
+    FZoom := FZoomBase * TRotaParams.LookUpRa10(FZoomIndex);
     HullGraph.Zoom := FZoom;
     RaumGraph.Zoom := FZoom;
     Draw;
@@ -849,7 +849,7 @@ begin
   if FZoomIndex > 1 then
   begin
     Dec(FZoomIndex);
-    FZoom := FZoomBase * LookUpRa10(FZoomIndex);
+    FZoom := FZoomBase * TRotaParams.LookUpRa10(FZoomIndex);
     HullGraph.Zoom := FZoom;
     RaumGraph.Zoom := FZoom;
     Draw;
@@ -1109,8 +1109,8 @@ begin
   end;
   FocusEdit.Text := IntToStr(Ord(FViewPoint)+1);
 
-  FXpos := RotaData.Xpos;
-  FYpos := RotaData.Ypos;
+  FXpos := Round(RotaData.Xpos);
+  FYpos := Round(RotaData.Ypos);
 
   { Increment }
   case RotaData.IncrementIndex of
@@ -1120,8 +1120,8 @@ begin
     4: Btn10Grad.Down := true;
     5: Btn30Grad.Down := true;
   end;
-  FIncrementT := RotaData.IncrementT;
-  FIncrementW := RotaData.IncrementW;
+  FIncrementT := Round(RotaData.IncrementT);
+  FIncrementW := Round(RotaData.IncrementW);
 
   { Rotationmatrix }
   Rotator.Matrix := RotaData.Matrix;
@@ -1129,7 +1129,7 @@ begin
   SetAngleText; // Rotate() hier nicht aufrufen, um Matrix nicht zu verändern!
   { Zoom }
   FZoomIndex := RotaData.ZoomIndex;
-  FZoom := FZoomBase * LookUpRa10(FZoomIndex);
+  FZoom := FZoomBase * TRotaParams.LookUpRa10(FZoomIndex);
   SetZoomText;
   Transformer.Zoom := FZoom;
 
@@ -1307,7 +1307,7 @@ begin
   IndicatorForm.UpdateIndicator;
 end;
 
-procedure TRotationForm.Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: double);
+procedure TRotationForm.Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: single);
 begin
   Rotator.DeltaPhi := Phi;
   Rotator.DeltaTheta := Theta;
@@ -1417,7 +1417,7 @@ end;
 
 procedure TRotationForm.SetZoomText;
 begin
-  StatusBar.Panels.Items[7].Text := FormatFloat('0.0#',LookUpRa10(FZoomIndex));
+  StatusBar.Panels.Items[7].Text := FormatFloat('0.0#', TRotaParams.LookUpRa10(FZoomIndex));
 end;
 
 procedure TRotationForm.SetAngleText;
@@ -2193,7 +2193,7 @@ end;
 procedure TRotationForm.PrintIt;
 var
   PrintOffset: TPoint;
-  PrintZoom: double;
+  PrintZoom: single;
   RandX, RandY: Integer;
   Rgn: THandle;
 begin

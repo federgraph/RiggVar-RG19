@@ -2,40 +2,44 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 uses
   System.SysUtils,
   System.Math,
-  RggVector,
+  RiggVar.FD.Point,
   RggTypes,
   RggMatrix;
 
 type
-  TCalcAngleEvent = procedure(Sender: TObject; var wx, wy, wz: double) of object;
+  TCalcAngleEvent = procedure(Sender: TObject; var wx, wy, wz: single) of object;
 
   TPolarKar = class
   private
-    FPhi, FTheta, FGamma, FXRot, FYRot, FZRot: double;
+    FPhi, FTheta, FGamma, FXRot, FYRot, FZRot: single;
     FValid: Boolean;
     FMode: Boolean;
     FOnCalcAngle: TCalcAngleEvent;
-    procedure SetPhi(Value: double);
-    procedure SetTheta(Value: double);
-    procedure SetGamma(Value: double);
-    procedure SetXrot(Value: double);
-    procedure SetYrot(Value: double);
-    procedure SetZrot(Value: double);
+    procedure SetPhi(Value: single);
+    procedure SetTheta(Value: single);
+    procedure SetGamma(Value: single);
+    procedure SetXrot(Value: single);
+    procedure SetYrot(Value: single);
+    procedure SetZrot(Value: single);
     procedure SetRotMode(Value: Boolean);
-    procedure SetRotAngle(index: TRotationAngle; Value: double);
-    function GetPhi: double;
-    function GetTheta: double;
-    function GetGamma: double;
-    function GetXrot: double;
-    function GetYrot: double;
-    function GetZrot: double;
-    function GetRotAngle(index: TRotationAngle): double;
+    procedure SetRotAngle(index: TRotationAngle; Value: single);
+    function GetPhi: single;
+    function GetTheta: single;
+    function GetGamma: single;
+    function GetXrot: single;
+    function GetYrot: single;
+    function GetZrot: single;
+    function GetRotAngle(index: TRotationAngle): single;
   protected
-    p1, p2: vec3;
-    Angle: double;
+    p1, p2: TPoint3D;
+    Angle: single;
     tmat: TMatrix4x4;
     procedure GetMat;
     procedure FillMatrix;
@@ -46,18 +50,18 @@ type
     Mat: TMatrix4x4;
     constructor Create;
     destructor Destroy; override;
-    function Rotiere(Punkt: TRealPoint): TRealPoint;
+    function Rotiere(Punkt: TPoint3D): TPoint3D;
     procedure Reset;
-    procedure GetAngle(var wx, wy, wz: double);
-    procedure GetAngle1(Sender: TObject; var wx, wy, wz: double);
-    procedure GetAngle2(Sender: TObject; var wp, wt, wg: double);
-    property DeltaTheta: double read GetTheta write SetTheta;
-    property DeltaPhi: double read GetPhi write SetPhi;
-    property DeltaGamma: double read GetGamma write SetGamma;
-    property XRot: double read GetXrot write SetXrot;
-    property YRot: double read GetYrot write SetYrot;
-    property ZRot: double read GetZrot write SetZrot;
-    property RotAngle[index: TRotationAngle]: double read GetRotAngle write SetRotAngle;
+    procedure GetAngle(var wx, wy, wz: single);
+    procedure GetAngle1(Sender: TObject; var wx, wy, wz: single);
+    procedure GetAngle2(Sender: TObject; var wp, wt, wg: single);
+    property DeltaTheta: single read GetTheta write SetTheta;
+    property DeltaPhi: single read GetPhi write SetPhi;
+    property DeltaGamma: single read GetGamma write SetGamma;
+    property XRot: single read GetXrot write SetXrot;
+    property YRot: single read GetYrot write SetYrot;
+    property ZRot: single read GetZrot write SetZrot;
+    property RotAngle[index: TRotationAngle]: single read GetRotAngle write SetRotAngle;
     property Matrix: Matrix4x4 read GetMatrix write SetMatrix;
     property Mode: Boolean read FMode write SetRotMode;
     property OnCalcAngle: TCalcAngleEvent read FOnCalcAngle write FOnCalcAngle;
@@ -78,77 +82,77 @@ begin
   tmat.Free;
 end;
 
-procedure TPolarKar.SetPhi(Value: double);
+procedure TPolarKar.SetPhi(Value: single);
 begin
-  FPhi := Value * pi / 180;
+  FPhi := DegToRad(Value);
   FValid := False;
 end;
 
-procedure TPolarKar.SetTheta(Value: double);
+procedure TPolarKar.SetTheta(Value: single);
 begin
   FTheta := Value * pi / 180;
   FValid := False;
 end;
 
-procedure TPolarKar.SetGamma(Value: double);
+procedure TPolarKar.SetGamma(Value: single);
 begin
-  FGamma := Value * pi / 180;
+  FGamma := DegToRad(Value);
   FValid := False;
 end;
 
-procedure TPolarKar.SetXrot(Value: double);
+procedure TPolarKar.SetXrot(Value: single);
 begin
-  FXRot := Value * pi / 180;
+  FXRot := DegToRad(Value);
   FValid := False;
 end;
 
-procedure TPolarKar.SetYrot(Value: double);
+procedure TPolarKar.SetYrot(Value: single);
 begin
-  FYRot := Value * pi / 180;
+  FYRot := DegToRad(Value);
   FValid := False;
 end;
 
-procedure TPolarKar.SetZrot(Value: double);
+procedure TPolarKar.SetZrot(Value: single);
 begin
-  FZRot := Value * pi / 180;
+  FZRot := DegToRad(Value);
   FValid := False;
 end;
 
-function TPolarKar.GetPhi: double;
+function TPolarKar.GetPhi: single;
 begin
-  Result := Int(FPhi * 180 / pi);
+  Result := Int(RadToDeg(FPhi));
 end;
 
-function TPolarKar.GetTheta: double;
+function TPolarKar.GetTheta: single;
 begin
-  Result := Int(FTheta * 180 / pi);
+  Result := Int(RadToDeg(FTheta));
 end;
 
-function TPolarKar.GetGamma: double;
+function TPolarKar.GetGamma: single;
 begin
-  Result := Int(FGamma * 180 / pi);
+  Result := Int(RadToDeg(FGamma));
 end;
 
-function TPolarKar.GetXrot: double;
+function TPolarKar.GetXrot: single;
 begin
-  Result := Int(FXRot * 180 / pi);
+  Result := Int(RadToDeg(FXRot));
 end;
 
-function TPolarKar.GetYrot: double;
+function TPolarKar.GetYrot: single;
 begin
-  Result := Int(FYRot * 180 / pi);
+  Result := Int(RadToDeg(FYRot));
 end;
 
-function TPolarKar.GetZrot: double;
+function TPolarKar.GetZrot: single;
 begin
-  Result := Int(FZRot * 180 / pi);
+  Result := Int(RadToDeg(FZRot));
 end;
 
-procedure TPolarKar.SetRotAngle(index: TRotationAngle; Value: double);
+procedure TPolarKar.SetRotAngle(index: TRotationAngle; Value: single);
 var
-  temp: double;
+  temp: single;
 begin
-  temp := Value * pi / 180;
+  temp := DegToRad(Value);
   case index of
     raPhi:
       FPhi := temp;
@@ -165,9 +169,9 @@ begin
   end;
 end;
 
-function TPolarKar.GetRotAngle(index: TRotationAngle): double;
+function TPolarKar.GetRotAngle(index: TRotationAngle): single;
 var
-  temp: double;
+  temp: single;
 begin
   temp := 0;
   case index of
@@ -184,7 +188,7 @@ begin
     raZrot:
       temp := FZRot;
   end;
-  Result := Int(temp * 180 / pi);
+  Result := Int(RadToDeg(temp));
 end;
 
 function TPolarKar.GetMatrix: Matrix4x4;
@@ -211,7 +215,7 @@ end;
 procedure TPolarKar.FillMatrixInc;
 begin
   tmat.Identity;
-  p1 := vec3Null;
+  p1 := TPoint3D.Zero;
   if FTheta <> 0 then
   begin
     p2.x := Mat.Mat[1, 2];
@@ -298,19 +302,19 @@ begin
   FValid := True;
 end;
 
-function TPolarKar.Rotiere(Punkt: TRealPoint): TRealPoint;
+function TPolarKar.Rotiere(Punkt: TPoint3D): TPoint3D;
 var
-  temp: vec3;
+  temp: TPoint3D;
 begin
   if FValid = False then
     GetMat;
-  temp.x := Punkt[x];
-  temp.y := Punkt[y];
-  temp.z := Punkt[z];
+  temp.x := Punkt.X;
+  temp.y := Punkt.Y;
+  temp.z := Punkt.Z;
   Mat.TransformPoint(temp);
-  Result[x] := temp.x;
-  Result[y] := temp.y;
-  Result[z] := temp.z;
+  Result.X := temp.x;
+  Result.Y := temp.y;
+  Result.Z := temp.z;
 end;
 
 procedure TPolarKar.Reset;
@@ -325,7 +329,7 @@ begin
   FValid := True;
 end;
 
-procedure TPolarKar.GetAngle(var wx, wy, wz: double);
+procedure TPolarKar.GetAngle(var wx, wy, wz: single);
 begin
   wx := 0;
   wy := 0;
@@ -334,22 +338,22 @@ begin
     OnCalcAngle(Self, wx, wy, wz);
 end;
 
-procedure TPolarKar.GetAngle1(Sender: TObject; var wx, wy, wz: double);
+procedure TPolarKar.GetAngle1(Sender: TObject; var wx, wy, wz: single);
 
-  function angle(a, b: vec3): double;
+  function angle(a, b: TPoint3D): single;
   var
-    temp: double;
+    temp: single;
   begin
-    temp := Dot(a, b);
+    temp := a.DotProduct(b);
     if temp > 1 then
       temp := 1;
     if temp < -1 then
       temp := -1;
-    Result := ArcCos(temp) * 180 / pi;
+    Result := RadToDeg(ArcCos(temp));
   end;
 
 var
-  FLocalX, FlocalY, FLocalZ: vec3;
+  FLocalX, FlocalY, FLocalZ: TPoint3D;
 begin
   Mat.GetLocals(FLocalX, FlocalY, FLocalZ);
   wx := angle(FLocalX, xVec);
@@ -384,12 +388,12 @@ begin
   end;
 end;
 
-procedure TPolarKar.GetAngle2(Sender: TObject; var wp, wt, wg: double);
+procedure TPolarKar.GetAngle2(Sender: TObject; var wp, wt, wg: single);
 
   function CheckSinCos(c: Extended): Extended;
   begin
-    Assert(c <= 1, Format('sincos > 1 (%6.5f)', [c]));
-    Assert(c >= -1, Format('sincos < -1 (%6.5f)', [c]));
+//    Assert(c <= 1, Format('sincos > 1 (%6.5f)', [c]));
+//    Assert(c >= -1, Format('sincos < -1 (%6.5f)', [c]));
     if c > 1 then
       c := 1;
     if c < -1 then
@@ -398,8 +402,8 @@ procedure TPolarKar.GetAngle2(Sender: TObject; var wp, wt, wg: double);
   end;
 
 var
-  tempcos, tempsin: double;
-  ux, uy, uz, tempVec, tempY, tempZ: vec3;
+  tempcos, tempsin: single;
+  ux, uy, uz, tempVec, tempY, tempZ: TPoint3D;
   tempmat: TMatrix4x4;
   Theta90: Boolean;
 begin
@@ -416,7 +420,7 @@ begin
     tempsin := -ux.z;
     //tempcos := Dot(ux,zVec); //nicht verwendet
     wt := arcsin(CheckSinCos(tempsin));
-    Theta90 := abs(tempsin * 180 / pi) > 89.9; //Theta90 := abs(tempsin) > 0.99;
+  Theta90 := abs(RadToDeg(tempsin)) > 89.9; //Theta90 := abs(tempsin) > 0.99;
 
     { Winkel Gamma ermitteln im Bereich -180..180 Grad }
     if Theta90 then
@@ -428,10 +432,10 @@ begin
     end
     else
     begin
-      tempY := Normalize3D(Cross(zVec, ux));
-      tempZ := Normalize3D(Cross(ux, tempY));
-      tempcos := dot(uz, tempZ);
-      tempsin := -dot(uz, tempY);
+      tempY := zVec.CrossProduct(ux).Normalize;
+      tempZ := ux.CrossProduct(tempY).Normalize;
+      tempcos := uz.DotProduct(tempZ);
+      tempsin := -uz.DotProduct(tempY);
       wg := ArcCos(CheckSinCos(tempcos));
       if tempsin < 0 then
         wg := -wg;
@@ -440,25 +444,25 @@ begin
     { Winkel Phi ermitteln im Bereich -180..180 Grad }
     if Theta90 then
     begin
-      tempVec := Normalize3D(Cross(uy, zVec));
-      tempcos := tempVec.x; //tempcos := -uz.x;
-      tempsin := tempVec.y; //tempsin := -uz.y;
+      tempVec := uy.CrossProduct(zVec).Normalize;
+      tempcos := tempVec.x;
+      tempsin := tempVec.y;
     end
     else
     begin
       tempVec := ux;
       tempVec.z := 0;
-      tempVec := Normalize3D(tempVec); //d := Hypot(ux.x,ux.y);
-      tempcos := dot(xVec, tempVec); //tempcos := ux.x/d;
-      tempsin := dot(yVec, tempVec); //tempsin := ux.y/d;
+      tempVec := tempVec.Normalize;
+      tempcos := xVec.DotProduct(tempVec);
+      tempsin := yVec.DotProduct(tempVec);
     end;
     wp := ArcCos(CheckSinCos(tempcos));
     if tempsin < 0 then
       wp := -wp;
 
-    wg := wg * 180 / pi;
-    wt := wt * 180 / pi;
-    wp := wp * 180 / pi;
+  wg := RadToDeg(wg);
+  wt := RadToDeg(wt);
+  wp := RadToDeg(wp);
 
     wg := Round(wg * 10) / 10;
     wt := Round(wt * 10) / 10;

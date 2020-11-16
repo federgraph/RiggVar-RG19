@@ -6,9 +6,9 @@ uses
   RggTypes,
   RggDisplayTypes,
   RiggVar.FB.Classes,
+  RiggVar.FD.Point,
   SysUtils,
-  Classes,
-  RggVector;
+  Classes;
 
 type
   TDisplayOrderReport = (
@@ -43,7 +43,7 @@ type
   public
     oo: TRiggPoint;
     Name: string;
-    Point: TRealPoint;
+    Point: TPoint3D;
     constructor Create(o: TRiggPoint);
   end;
 
@@ -57,9 +57,9 @@ type
     oo2: TRiggPoint;
     Vert1: TRggVert;
     Vert2: TRggVert;
-    V1: vec3;
-    V2: vec3;
-    Direction: vec3;
+    V1: TPoint3D;
+    V2: TPoint3D;
+    Direction: TPoint3D;
     constructor Create(Aee: TRiggEdge; Ao1, Ao2: TRiggPoint);
     procedure Init(Frame: TRggFrame);
     procedure Update;
@@ -77,9 +77,9 @@ type
     Edge2: TRggEdge;
     Edge3: TRggEdge;
     IsFrontFacing: Boolean;
-    E1: vec3;
-    E2: vec3;
-    E3: vec3;
+    E1: TPoint3D;
+    E2: TPoint3D;
+    E3: TPoint3D;
     SortedEdges: array[0..2] of TRggEdge;
     EdgeCount: Integer;
     constructor Create(Aff: TRiggFace; Ae1, Ae2, Ae3: TRiggEdge);
@@ -337,16 +337,16 @@ end;
 
 procedure TRggEdge.Update;
 begin
-  V1 := InitPoint3D(Vert1.Point[x], Vert1.Point[y], Vert1.Point[z]);
-  V2 := InitPoint3D(Vert2.Point[x], Vert2.Point[y], Vert2.Point[z]);
-  Direction := Normalize3D(Subtract(V2, V1));
+  V1 :=  Vert1.Point;
+  V2 := Vert2.Point;
+  Direction := (V2 - V1).Normalize;
 end;
 
 { TRggFace }
 
 procedure TRggFace.CheckOrientation;
 begin
-  IsFrontFacing := Cross(Edge1.Direction, Edge2.Direction).Y < 0;
+  IsFrontFacing := Edge1.Direction.CrossProduct(Edge2.Direction).Y < 0;
 end;
 
 constructor TRggFace.Create(Aff: TRiggFace; Ae1, Ae2, Ae3: TRiggEdge);
@@ -818,7 +818,7 @@ var
 begin
   FKoordinaten := Value;
   for oo := Low(TRiggPoint) to High(TRiggPoint) do
-    Verts[oo].Point := FKoordinaten[oo];
+    Verts[oo].Point := FKoordinaten.V[oo];
 
   for ee := Low(TRiggEdge) to High(TRiggEdge) do
     Edges[ee].Update;
@@ -852,7 +852,7 @@ procedure TRggFrame.CrossReport(ML: TStrings);
 var
   e1, e2: TRggEdge;
   s1, s2: string;
-  p: vec3;
+  p: TPoint3D;
 begin
   ML.Add('');
 
@@ -860,14 +860,14 @@ begin
   e2 := Edges[B0C0];
   s1 := EdgeNames[e1.ee];
   s2 := EdgeNames[e2.ee];
-  p := Cross(e1.Direction, e2.Direction);
+  p := e1.Direction.CrossProduct(e2.Direction);
   ML.Add(Format('%s x %s = (%.2f, %.2f, %.2f)', [s1, s2, p.X, p.Y, p.Z]));
 
   e1 := Edges[B0A0];
   e2 := Edges[A0C0];
   s1 := EdgeNames[e1.ee];
   s2 := EdgeNames[e2.ee];
-  p := Cross(e1.Direction, e2.Direction);
+  p := e1.Direction.CrossProduct(e2.Direction);
   ML.Add(Format('%s x %s = (%.2f, %.2f, %.2f)', [s1, s2, p.X, p.Y, p.Z]));
 end;
 
