@@ -168,17 +168,12 @@
         <DCCReference Include="Frm\FrmScale.pas">
             <Form>RumpfFaktorDlg</Form>
         </DCCReference>
-        <DCCReference Include="Frm\FrmIndicator.pas">
-            <Form>IndicatorForm</Form>
-        </DCCReference>
         <DCCReference Include="Frm\FrmKreis.pas">
             <Form>KreisForm</Form>
         </DCCReference>
         <DCCReference Include="App\FrmText.pas">
             <Form>TextForm</Form>
         </DCCReference>
-        <DCCReference Include="Graph\ThreeD.pas"/>
-        <DCCReference Include="Graph\ThreeDSolid.pas"/>
         <DCCReference Include="Core\RggReport.pas"/>
         <DCCReference Include="Core\RggTypes.pas"/>
         <DCCReference Include="Core\RggUnit0.pas"/>

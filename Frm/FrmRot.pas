@@ -28,7 +28,6 @@ uses
   RggUnit4,
   RggPrinter,
   RggPreview,
-  FrmIndicator,
   RggGraph,
   RggRaumGraph,
   RggHull,
@@ -120,9 +119,6 @@ type
     procedure FaktorDlgItemClick(Sender: TObject);
     procedure OpenBackBmpItemClick(Sender: TObject);
     procedure CloseBackBmpItemClick(Sender: TObject);
-    procedure IndicatorItemClick(Sender: TObject);
-    procedure IndicatorLocalRotItemClick(Sender: TObject);
-    procedure Options3DMenuClick(Sender: TObject);
     procedure Pos1BtnClick(Sender: TObject);
     procedure PosiToolItemClick(Sender: TObject);
     procedure MatrixItemClick(Sender: TObject);
@@ -211,7 +207,6 @@ type
     RaumGraph: TRaumGraph;
     BackBmp: TBitmap;
     Preview: TPreview;
-    IndicatorForm: TIndicatorForm;
     Mode: Boolean;
     Sample420Memo: TStrings;
     SampleDinghyMemo: TStrings;
@@ -293,8 +288,6 @@ type
     Positionen1: TMenuItem;
     MinusItem5: TMenuItem;
     MinusItem6: TMenuItem;
-    IndicatorItem: TMenuItem;
-    IndicatorLocalRotItem: TMenuItem;
     OpenBackBmpItem: TMenuItem;
     CloseBackBmpItem: TMenuItem;
     FaktorDlgItem: TMenuItem;
@@ -417,10 +410,6 @@ begin
   InitHullGraph;
   InitRigg;
   InitPreview;
-
-  IndicatorForm := TIndicatorForm.Create(Self);
-  IndicatorForm.Rotator := Rotator;
-  IndicatorForm.Onchanged := IndicatorChanged;
 
   SetViewPoint(FViewPoint);
 end;
@@ -763,7 +752,6 @@ begin
     Rotate(FPhi, FTheta, FGamma, 0, 0, 0);
   end;
   Draw;
-  IndicatorForm.UpdateIndicator;
 end;
 
 procedure TRotationForm.TransLeftItemClick(Sender: TObject);
@@ -1036,14 +1024,6 @@ begin
   DrawAlwaysItem.Checked := FDrawAlways;
 end;
 
-procedure TRotationForm.Options3DMenuClick(Sender: TObject);
-begin
-  IndicatorItem.Checked := IndicatorForm.Visible;
-  IndicatorLocalRotItem.Checked := not IndicatorForm.GlobalRot;
-//  if AngleTextItem <> nil then
-//    AngleTextItem.Enabled := Mode;
-end;
-
 procedure TRotationForm.StatusBarItemClick(Sender: TObject);
 begin
   StatusBarItem.Checked := not StatusBarItem.Checked;
@@ -1144,7 +1124,6 @@ begin
   { Neuzeichnen }
   EraseBK := True;
   Draw;
-  IndicatorForm.UpdateIndicator;
 end;
 
 procedure TRotationForm.PositionSaveItemClick(Sender: TObject);
@@ -1305,7 +1284,6 @@ begin
   if (prevx = MouseDownX) and (prevy = MouseDownY) then
     EraseBK := True;
   Draw;
-  IndicatorForm.UpdateIndicator;
 end;
 
 procedure TRotationForm.Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: single);
@@ -1638,25 +1616,6 @@ begin
 
   EraseBK := True;
   Draw;
-end;
-
-procedure TRotationForm.IndicatorItemClick(Sender: TObject);
-begin
-  IndicatorItemChecked := not IndicatorItemChecked;
-  if IndicatorItem <> nil then
-    IndicatorItem.Checked := IndicatorItemChecked;
-  if IndicatorItemChecked then
-  begin
-    IndicatorForm.Show;
-    IndicatorForm.UpdateIndicator;
-  end
-  else
-    IndicatorForm.Hide;
-end;
-
-procedure TRotationForm.IndicatorLocalRotItemClick(Sender: TObject);
-begin
-  IndicatorForm.GlobalRot := not IndicatorForm.GlobalRot;
 end;
 
 procedure TRotationForm.IndicatorChanged(Sender: TObject);
@@ -2066,7 +2025,6 @@ begin
   mi.Caption := '3D &Optionen';
   mi.GroupIndex := 8;
   mi.Hint := '  Optionen für 3D Grafik';
-  mi.OnClick := Options3DMenuClick;
 
   SelectHullItem := AddI('');
   mi.Caption := 'Rumpf auswählen';
@@ -2112,16 +2070,6 @@ begin
 
   MinusItem6 := AddI('');
   mi.Caption := '-';
-
-  IndicatorItem := AddI('');
-  mi.Caption := 'Indikator';
-  mi.Hint := '  Indikator für Drehwinkel anzeigen';
-  mi.OnClick := IndicatorItemClick;
-
-  IndicatorLocalRotItem := AddI('');
-  mi.Caption := 'Lokale Achsen (Indikator)';
-  mi.Hint := '  Indikator um lokale Achsen drehen';
-  mi.OnClick := IndicatorLocalRotItemClick;
 
   MatrixItem := AddI('');
   mi.Caption := 'Rotationmatrix';
