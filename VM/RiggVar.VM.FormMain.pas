@@ -282,36 +282,18 @@ procedure TViewModelMain00.HideDiagramm;
 begin
   ChartFormItemCaption := 'Diagramm ...';
   ChartFormItemHint := '  Diagramm aktivieren';
-
-//  if FormMain <> nil then
-//  begin
-//    FormMain.ChartFormItem.Caption := ChartFormItemCaption;
-//    FormMain.ChartFormItem.Hint := ChartFormItemHint;
-//  end;
 end;
 
 procedure TViewModelMain00.HideReport;
 begin
   ReportFormItemCaption := 'Report ...';
   ReportFormItemHint := '  Report anzeigen';
-
-//  if FormMain <> nil then
-//  begin
-//    FormMain.ReportFormItem.Caption := ReportFormItemCaption;
-//    FormMain.ReportFormItem.Hint := ReportFormItemHint;
-//  end;
 end;
 
 procedure TViewModelMain00.HideGrafik;
 begin
   RotaFormItemCaption := '3D Grafik ...';
   RotaFormItemHint := '  3D Grafik anzeigen';
-
-//  if FormMain <> nil then
-//  begin
-//    FormMain.RotaFormItem.Caption := RotaFormItemCaption;
-//    FormMain.RotaFormItem.Hint := RotaFormItemHint;
-//  end;
 end;
 
 procedure TViewModelMain00.UpdateView;

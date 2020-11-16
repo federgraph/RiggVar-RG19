@@ -2,18 +2,8 @@
 
 interface
 
-{$ifdef fpc}
-{$mode delphi}
-{$endif}
-
 uses
-{$ifdef fpc}
-  LCLIntf,
-  LCLType,
-{$endif}
-{$ifdef MSWindows}
   Windows,
-{$endif}
   SysUtils,
   Classes,
   Types,
@@ -74,7 +64,7 @@ type
     MinTrackX, MinTrackY: Integer;
     MaxTrackX, MaxTrackY: Integer;
     CreatedScreenWidth: Integer;
-    procedure PaintBackGround(g: TCanvas);
+    procedure PaintBackGround(Image: TBitmap);
     procedure PaintBox3DPaint(Sender: TObject);
   private
     FViewPoint: TViewPoint;
@@ -313,7 +303,7 @@ begin
   Bitmap := TBitmap.Create;
   Bitmap.Width := Round(FBitmapWidth * FScale);
   Bitmap.Height := Round(FBitmapHeight * FScale);
-  PaintBackGround(Bitmap.Canvas);
+  PaintBackGround(Bitmap);
 
   Image.Picture.Graphic := Bitmap;
 
@@ -332,22 +322,6 @@ begin
   InitHullGraph;
   UpdateGraphFromTestData;
   SetViewPoint(FViewPoint);
-end;
-
-procedure TRotaForm1.InitPosition(w, h, x, y: single);
-begin
-  FBitmapWidth := Round(w);
-  FBitmapHeight := Round(h);
-  FXPos := Round(x);
-  FYPos := Round(y);
-end;
-
-procedure TRotaForm1.Swap;
-begin
-  Image.OnMouseDown := PaintBox3DMouseDown;
-  Image.OnMouseMove := PaintBox3DMouseMove;
-  Image.OnMouseUp := PaintBox3DMouseUp;
-//  Image.OnScreenScaleChanged := ImageScreenScaleChanged;
 end;
 
 procedure TRotaForm1.InitGraph;
@@ -445,12 +419,12 @@ end;
 
 procedure TRotaForm1.UpdateMatrixText;
 var
-  m4x4: TMatrix3D;
+  m: TMatrix3D;
 begin
-  m4x4 := Rotator.Mat;
-  MatrixTextU := Format('%8.4f %8.4f %8.4f',[m4x4.m11, m4x4.m12, m4x4.m13]);
-  MatrixTextV := Format('%8.4f %8.4f %8.4f',[m4x4.m21, m4x4.m22, m4x4.m23]);
-  MatrixTextW := Format('%8.4f %8.4f %8.4f',[m4x4.m31, m4x4.m32, m4x4.m33]);
+  m := Rotator.Mat;
+  MatrixTextU := Format('%8.4f %8.4f %8.4f',[m.m11, m.m12, m.m13]);
+  MatrixTextV := Format('%8.4f %8.4f %8.4f',[m.m21, m.m22, m.m23]);
+  MatrixTextW := Format('%8.4f %8.4f %8.4f',[m.m31, m.m32, m.m33]);
 end;
 
 procedure TRotaForm1.DrawMatrix(g: TCanvas);
@@ -542,7 +516,7 @@ begin
   end
   else if not PaintItemChecked or EraseBK then
   begin
-    PaintBackGround(Bitmap.Canvas);
+    PaintBackGround(Bitmap);
     EraseBK := False;
   end;
 
@@ -665,12 +639,6 @@ begin
   FSofortBerechnen := Value;
 end;
 
-procedure TRotaForm1.SetUseQuickSort(const Value: Boolean);
-begin
-  FUseQuickSort := Value;
-  RaumGraph.DL.UseQuickSort := True;
-end;
-
 procedure TRotaForm1.SetOnAfterDraw(const Value: TNotifyEvent);
 begin
   FOnAfterDraw := Value;
@@ -729,7 +697,7 @@ begin
   RaumGraph.Viewpoint := Value; // for GetriebeGraph
 
   FIncrementT := Round(RotaData.IncrementT);
-  FIncrementW := (RotaData.IncrementW);
+  FIncrementW := Round(RotaData.IncrementW);
 
   { Rotationmatrix }
   Rotator.Matrix := RotaData.Matrix;
@@ -871,11 +839,6 @@ begin
   DoTrans;
 end;
 
-procedure TRotaForm1.ImageScreenScaleChanged(Sender: TObject);
-begin
-  Draw;
-end;
-
 procedure TRotaForm1.Draw;
 begin
   if IsUp then
@@ -910,13 +873,13 @@ begin
   result := RPN.V[FFixPoint];
 end;
 
-procedure TRotaForm1.PaintBackGround(g: TCanvas);
+procedure TRotaForm1.PaintBackGround(Image: TBitmap);
 var
   R: TRect;
 begin
   R := Rect(0, 0, Image.Width, Image.Height);
-  g.Brush.Color := clGray; // TRggColors.WindowWhite;
-  g.FillRect(R);
+  Image.Canvas.Brush.Color := clGray;
+  Image.Canvas.FillRect(R);
 end;
 
 procedure TRotaForm1.PaintBox3DPaint(Sender: TObject);
@@ -978,11 +941,6 @@ begin
   RaumGraph.ControllerTyp := Value;
 end;
 
-procedure TRotaForm1.SetDarkMode(const Value: Boolean);
-begin
-  FDarkMode := Value;
-end;
-
 procedure TRotaForm1.SetKoordinaten(const Value: TRiggPoints);
 begin
   RPN := Value;
@@ -1018,12 +976,6 @@ procedure TRotaForm1.SetWanteGestrichelt(const Value: Boolean);
 begin
   FWanteGestrichelt := Value;
   RaumGraph.WanteGestrichelt := Value;
-end;
-
-procedure TRotaForm1.SetWantLineColors(const Value: Boolean);
-begin
-  FWantLineColors := Value;
-  RaumGraph.DL.WantLineColors := Value;
 end;
 
 procedure TRotaForm1.SetWantOverlayedRiggs(const Value: Boolean);
@@ -1124,21 +1076,6 @@ begin
   end;
 end;
 
-function TRotaForm1.GetChecked(fa: Integer): Boolean;
-begin
-  result := RaumGraph.GetChecked(fa);
-end;
-
-procedure TRotaForm1.SetChecked(fa: Integer; Value: Boolean);
-begin
-  RaumGraph.SetChecked(fa, Value);
-end;
-
-procedure TRotaForm1.UpdateHullTexture;
-begin
-
-end;
-
 procedure TRotaForm1.UpdateCameraX(Delta: single);
 begin
   FXPos := FXPos + Round(Delta) * 5;
@@ -1149,6 +1086,32 @@ procedure TRotaForm1.UpdateCameraY(Delta: single);
 begin
   FYPos := FYPos - Round(Delta) * 5;
   Draw;
+end;
+
+procedure TRotaForm1.DoOnUpdateStrokeRigg;
+begin
+
+end;
+
+procedure TRotaForm1.UpdateHullTexture;
+begin
+
+end;
+
+procedure TRotaForm1.InitPosition(w, h, x, y: single);
+begin
+  FBitmapWidth := Round(w);
+  FBitmapHeight := Round(h);
+  FXPos := Round(x);
+  FYPos := Round(y);
+end;
+
+procedure TRotaForm1.Swap;
+begin
+  Image.OnMouseDown := PaintBox3DMouseDown;
+  Image.OnMouseMove := PaintBox3DMouseMove;
+  Image.OnMouseUp := PaintBox3DMouseUp;
+//  Image.OnScreenScaleChanged := ImageScreenScaleChanged;
 end;
 
 procedure TRotaForm1.HandleAction(fa: Integer);
@@ -1191,9 +1154,36 @@ begin
   Draw;
 end;
 
-procedure TRotaForm1.DoOnUpdateStrokeRigg;
+procedure TRotaForm1.SetDarkMode(const Value: Boolean);
 begin
+  FDarkMode := Value;
+end;
 
+function TRotaForm1.GetChecked(fa: Integer): Boolean;
+begin
+  result := RaumGraph.GetChecked(fa);
+end;
+
+procedure TRotaForm1.SetChecked(fa: Integer; Value: Boolean);
+begin
+  RaumGraph.SetChecked(fa, Value);
+end;
+
+procedure TRotaForm1.ImageScreenScaleChanged(Sender: TObject);
+begin
+  Draw;
+end;
+
+procedure TRotaForm1.SetWantLineColors(const Value: Boolean);
+begin
+  FWantLineColors := Value;
+  RaumGraph.DL.WantLineColors := Value;
+end;
+
+procedure TRotaForm1.SetUseQuickSort(const Value: Boolean);
+begin
+  FUseQuickSort := Value;
+  RaumGraph.DL.UseQuickSort := True;
 end;
 
 end.

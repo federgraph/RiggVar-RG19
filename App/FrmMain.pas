@@ -33,18 +33,18 @@ uses
   RggChartGraph,
   RggTypes,
   RggUnit4,
-  System.SysUtils,
-  System.Classes,
-  System.Types,
-  System.UITypes,
-  Vcl.Controls,
-  Vcl.Forms,
-  Vcl.StdCtrls,
-  Vcl.ExtCtrls,
-  Vcl.Dialogs,
-  Vcl.Graphics,
+  SysUtils,
+  Classes,
+  Types,
+  UITypes,
   Vcl.Menus,
-  Vcl.ComCtrls;
+  Vcl.ComCtrls,
+  Controls,
+  Forms,
+  StdCtrls,
+  ExtCtrls,
+  Dialogs,
+  Graphics;
 
 {$define Vcl}
 
@@ -732,11 +732,11 @@ end;
 procedure TFormMain.FormMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 begin
-  if (ssShift in Shift) or (ssCtrl in Shift) then
-  begin
+//  if (ssShift in Shift) or (ssCtrl in Shift) then
+//  begin
     Main.DoMouseWheel(Shift, WheelDelta);
     Handled := True;
-  end;
+//  end;
 end;
 
 procedure TFormMain.FormShow(Sender: TObject);
