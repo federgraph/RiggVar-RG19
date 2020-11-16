@@ -334,9 +334,6 @@ begin
   G := 0;
   B := 1;
   idx := Round(R * 32 + G * 64 + B * 96 + i * 2);
-
-//  result := PaletteIndex(idx);
-
   if i < Length(ColorArray) then
     result := ColorArray[idx]
   else

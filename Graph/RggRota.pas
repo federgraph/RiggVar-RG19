@@ -2,22 +2,18 @@
 
 interface
 
-{$define Rigg19}
-
 uses
-  Winapi.Windows,
-  System.SysUtils,
-  System.Classes,
-  System.Types,
-  System.UITypes,
-  Vcl.Graphics,
-  Vcl.Forms,
-  Vcl.Controls,
-  Vcl.Menus,
-  Vcl.StdCtrls,
-  Vcl.ExtCtrls,
-  Vcl.ComCtrls,
-  Vcl.ExtDlgs,
+  Windows,
+  SysUtils,
+  Classes,
+  Types,
+  Graphics,
+  Forms,
+  Controls,
+  StdCtrls,
+  ExtCtrls,
+  ComCtrls,
+  Math,
   RiggVar.FD.Point,
   RiggVar.RG.Graph,
   RggTypes,
@@ -289,8 +285,8 @@ begin
   FZoomBase := 0.05;
   FViewPoint := vp3D;
   FFixPoint := ooD0;
-  FXPos := Round(-200 * FScale);
-  FYPos := 0;
+  FXPos := Round(-150 * FScale);
+  FYPos := -50;
 
   { PaintBox }
   NewPaintBox := TRggPaintBox.Create(PaintBox3D.Owner);
@@ -707,7 +703,7 @@ begin
 
   { Zoom }
   FZoomIndex := RotaData.ZoomIndex;
-  FZoom := FZoomBase * TRotaParams.LookUpRa10(FZoomIndex) * FScale;
+  FZoom := FZoomBase * TRotaParams.LookUpRa10(FZoomIndex);
   Transformer.Zoom := FZoom;
 
   { FixPoint }
@@ -994,21 +990,21 @@ begin
   else
     FZoomIndex := Value;
 
-  FZoom := FZoomBase * TRotaParams.LookUpRa10(FZoomIndex) * FScale;
+  FZoom := FZoomBase * TRotaParams.LookUpRa10(FZoomIndex);
   RaumGraph.Zoom := FZoom;
   Draw;
 end;
 
 procedure TRotaForm1.Zoom(Delta: single);
 begin
-  FZoom := FZoom + FZoom * FZoomBase * Delta * 0.3 * FScale;
+  FZoom := FZoom + FZoom * FZoomBase * Sign(Delta);
   RaumGraph.Zoom := FZoom;
   Draw;
 end;
 
 procedure TRotaForm1.RotateZ(Delta: single);
 begin
-  Rotate(0, 0, 0, 0, 0, Delta);
+  Rotate(0, 0, 0, 0, 0, Delta * 0.3);
   Draw;
 end;
 
