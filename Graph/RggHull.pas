@@ -43,8 +43,6 @@ type
     {Palette}
     ColorArray: array of TColor;
     procedure InitColorArray;
-    procedure InitColorArray1;
-    //procedure InitColorArray2;
     function GetColor(i: Integer): TColor;
   protected
     procedure ReadVerts420;
@@ -336,7 +334,6 @@ begin
   G := 0;
   B := 1;
   idx := Round(R * 32 + G * 64 + B * 96 + i * 2);
-//  result := PaletteIndex(idx);
   if i < Length(ColorArray) then
     result := ColorArray[idx]
   else
@@ -553,11 +550,6 @@ begin
 end;
 
 procedure THullGraph0.InitColorArray;
-begin
-  InitColorArray1;
-end;
-
-procedure THullGraph0.InitColorArray1;
 var
   i: Integer;
   ac: TColor;
@@ -583,20 +575,6 @@ begin
     ColorArray[i] := bc;
   end;
 end;
-
-//procedure THullGraph0.InitColorArray2;
-//var
-//  i: Integer;
-//  ac: TAlphaColor;
-//begin
-//  SetLength(ColorArray, 257);
-//  for i := 0 to 256 do
-//  begin
-//    ac := CorrectColor(HSLtoRGB(i/256, 0.8, 0.5));
-//    TAlphaColorRec(ac).A := 200;
-//    ColorArray[i] := ac;
-//  end;
-//end;
 
 { THullGraph2 }
 

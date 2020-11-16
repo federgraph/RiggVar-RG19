@@ -170,7 +170,7 @@ begin
   MinAbstand := 1000;
   for i := 0 to j - 1 do
   begin
-    a := (P - Kurve[i]).Length;
+    a := P.Distance(Kurve[i]);
     if a < MinAbstand then
     begin
       MinAbstand := a;

@@ -2,6 +2,9 @@
 
 interface
 
+{.$define WantUserConfusingReports}
+{.$define WantXMLReports}
+
 {$ifdef fpc}
 {$mode delphi}
 {$endif}
@@ -311,11 +314,15 @@ var
 begin
   rs := [];
 
-//  { there is not enough space to show all in listbox }
+//  { there is not enough space to show all reports in listbox }
+
+{ It is possible to exclude reports. The UI should expect this. }
 
   Include(rs, rgLog);
+{$ifdef WantUserConfusingReports }
   Include(rs, rgJson);
   Include(rs, rgData);
+{$endif}
   Include(rs, rgShort);
   Include(rs, rgLong);
 
@@ -331,8 +338,9 @@ begin
   Include(rs, rgAusgabeRPE);
   Include(rs, rgAusgabeDiffL);
   Include(rs, rgAusgabeDiffP);
-
-//  Include(rs, rgXML);
+{$ifdef WantXMLReports }
+  Include(rs, rgXML);
+{$endif}
   Include(rs, rgDebugReport);
   Include(rs, rgReadme);
   Include(rs, rgNone);

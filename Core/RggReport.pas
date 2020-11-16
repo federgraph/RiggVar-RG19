@@ -29,7 +29,7 @@ uses
   RggFachwerk;
 
 const
-  LinkerRand: string[10] = ' ';
+  LinkerRand: string = '          '; // : string[10]
   Unterstrich: string = '-------------------------------------------------';
 
 type

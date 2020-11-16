@@ -1,17 +1,9 @@
 ﻿unit FrmAuswahl;
 
-{$ifdef fpc}
-{$mode delphi}
-{$endif}
-
 interface
 
 uses
-{$ifdef fpc}
-  LCLType
-{$else}
   Winapi.Windows,
-{$endif}
   Classes,
   Graphics,
   Forms,
@@ -51,11 +43,7 @@ var
 
 implementation
 
-{$IFnDEF FPC}
-  {$R *.dfm}
-{$ELSE}
-  {$R *.lfm}
-{$ENDIF}
+{$R *.dfm}
 
 procedure TYAuswahlDlg.FormCreate(Sender: TObject);
 var

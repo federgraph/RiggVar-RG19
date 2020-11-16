@@ -32,8 +32,8 @@ type
     procedure SetOnGetFixPunkt(const Value: TRggGetFixPunkt);
   public
     Rotator: TPolarKar; // injected, not owned
-    WantOffset: Boolean;
     Matrix: TMatrix3D;
+    WantOffset: Boolean;
     function TransformPoint(p: TPoint3D): TPoint3D;
     constructor Create;
     property Zoom: single read FZoom write SetZoom;
@@ -44,6 +44,9 @@ type
   end;
 
 implementation
+
+
+{ TRggTransformer }
 
 constructor TRggTransformer.Create;
 begin
@@ -94,7 +97,6 @@ begin
     -FTransformedFixPunkt.Z
   );
   mt := TMatrix3D.CreateTranslation(pt);
-
   ps := TPoint3D.Create(Zoom, Zoom, Zoom);
   ms := TMatrix3D.CreateScaling(ps);
 
