@@ -203,7 +203,7 @@
         <DCCReference Include="Graph\RggRaumGraph.pas"/>
         <DCCReference Include="Graph\RggDisplay.pas"/>
         <DCCReference Include="Core\RggTestData.pas"/>
-        <DCCReference Include="Graph\RggChart.pas"/>
+        <DCCReference Include="Graph\RggChartModel.pas"/>
         <DCCReference Include="App\RiggVar.App.Main.pas"/>
         <DCCReference Include="FB\RiggVar.FB.Classes.pas"/>
         <DCCReference Include="FB\RiggVar.FB.Color.pas"/>

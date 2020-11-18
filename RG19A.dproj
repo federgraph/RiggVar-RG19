@@ -224,7 +224,7 @@
         <DCCReference Include="Graph\RggDisplayTypes.pas"/>
         <DCCReference Include="FB\RiggVar.FB.ActionConst.pas"/>
         <DCCReference Include="FB\RiggVar.FB.Color.pas"/>
-        <DCCReference Include="Graph\RggChart.pas"/>
+        <DCCReference Include="Graph\RggChartModel.pas"/>
         <DCCReference Include="Graph\RggChartModel01.pas"/>
         <DCCReference Include="Graph\RggChartModel02.pas"/>
         <DCCReference Include="Core\RggStrings.pas"/>

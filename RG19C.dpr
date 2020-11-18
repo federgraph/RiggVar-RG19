@@ -57,7 +57,7 @@ uses
   RggRaumGraph in 'Graph\RggRaumGraph.pas',
   RggDisplay in 'Graph\RggDisplay.pas',
   RggTestData in 'Core\RggTestData.pas',
-  RggChart in 'Graph\RggChart.pas',
+  RggChartModel in 'Graph\RggChartModel.pas',
   RiggVar.App.Main in 'App\RiggVar.App.Main.pas',
   RiggVar.FB.Classes in 'FB\RiggVar.FB.Classes.pas',
   RiggVar.FB.Color in 'FB\RiggVar.FB.Color.pas',

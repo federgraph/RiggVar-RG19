@@ -6,7 +6,7 @@ uses
   SysUtils,
   Classes,
   Graphics,
-  RggChart,
+  RggChartModel,
   RggChartModel01,
   RggTypes;
 

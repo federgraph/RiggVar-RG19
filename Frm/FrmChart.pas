@@ -28,7 +28,7 @@ uses
   RggUnit4,
   RggTypes,
   RggDoc,
-  RggChart,
+  RggChartModel,
   RggChartModel02,
   RggSaling3Eck;
 

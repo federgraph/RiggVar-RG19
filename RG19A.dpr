@@ -78,7 +78,7 @@ uses
   RggDisplayTypes in 'Graph\RggDisplayTypes.pas',
   RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas',
   RiggVar.FB.Color in 'FB\RiggVar.FB.Color.pas',
-  RggChart in 'Graph\RggChart.pas',
+  RggChartModel in 'Graph\RggChartModel.pas',
   RggChartModel01 in 'Graph\RggChartModel01.pas',
   RggChartModel02 in 'Graph\RggChartModel02.pas',
   RggStrings in 'Core\RggStrings.pas',
