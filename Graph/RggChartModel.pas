@@ -1,4 +1,4 @@
-﻿unit RggChart;
+﻿unit RggChartModel;
 
 interface
 

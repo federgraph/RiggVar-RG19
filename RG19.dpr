@@ -98,7 +98,7 @@ uses
   RggZug3D in 'Graph\RggZug3D.pas',
   RggDisplayOrder in 'Graph\RggDisplayOrder.pas',
   RggDisplayTypes in 'Graph\RggDisplayTypes.pas',
-  RggChart in 'Graph\RggChart.pas',
+  RggChartModel in 'Graph\RggChartModel.pas',
   RggChartGraph in 'Graph\RggChartGraph.pas',
   RiggVar.Util.AppUtils in 'Util\RiggVar.Util.AppUtils.pas',
   RiggVar.Util.InfoMemo in 'Util\RiggVar.Util.InfoMemo.pas',

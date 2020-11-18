@@ -12,7 +12,7 @@ uses
   UITypes,
   UIConsts,
   RggStrings,
-  RggChart,
+  RggChartModel,
   RggScroll,
   RggTypes;
 

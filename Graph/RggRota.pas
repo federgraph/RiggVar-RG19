@@ -252,7 +252,7 @@ uses
   RggZug3D,
   RggTestData;
 
-{ TRotaForm }
+{ TRotaForm1 }
 
 constructor TRotaForm1.Create;
 begin
@@ -1088,11 +1088,6 @@ begin
   Draw;
 end;
 
-procedure TRotaForm1.DoOnUpdateStrokeRigg;
-begin
-
-end;
-
 procedure TRotaForm1.UpdateHullTexture;
 begin
 
@@ -1157,6 +1152,11 @@ end;
 procedure TRotaForm1.SetDarkMode(const Value: Boolean);
 begin
   FDarkMode := Value;
+end;
+
+procedure TRotaForm1.DoOnUpdateStrokeRigg;
+begin
+
 end;
 
 function TRotaForm1.GetChecked(fa: Integer): Boolean;
