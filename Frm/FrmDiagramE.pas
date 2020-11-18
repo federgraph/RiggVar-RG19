@@ -1,10 +1,12 @@
 ﻿unit FrmDiagramE;
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
 interface
 
 uses
-  Winapi.Windows,
-  Winapi.Messages,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -16,8 +18,8 @@ uses
   System.Classes,
   System.UITypes,
   RggDiagram,
-  RggChart,
-  RggChartModel01;
+  RggChartModel01,
+  RggChartModel;
 
 type
   TFormDiagramE = class(TForm)
@@ -28,33 +30,33 @@ type
     UpdateBtn: TButton;
     XBtn: TButton;
     CalcBtn: TButton;
-    AuswahlBtn: TButton;
     LayoutBtn: TButton;
-
     XBox: TListBox;
     PBox: TListBox;
     YBox: TListBox;
-
     AutoToggle: TToggleSwitch;
     AToggle: TToggleSwitch;
     GToggle: TToggleSwitch;
     UpDown: TUpDown;
-
-    Memo: TMemo;
     Image: TImage;
+    Memo: TMemo;
+    AuswahlBtn: TButton;
 
+    procedure AuswahlBtnClick(Sender: TObject);
     procedure UpdateBtnClick(Sender: TObject);
+    procedure AutoToggleClick(Sender: TObject);
+
     procedure XBtnClick(Sender: TObject);
     procedure CalcBtnClick(Sender: TObject);
-    procedure GToggleClick(Sender: TObject);
+    procedure LayoutBtnClick(Sender: TObject);
+
+    procedure XBoxClick(Sender: TObject);
     procedure YBoxClick(Sender: TObject);
-    procedure AToggleClick(Sender: TObject);
     procedure PBoxClick(Sender: TObject);
     procedure UpDownClick(Sender: TObject; Button: TUDBtnType);
-    procedure XBoxClick(Sender: TObject);
-    procedure AutoToggleClick(Sender: TObject);
-    procedure AuswahlBtnClick(Sender: TObject);
-    procedure LayoutBtnClick(Sender: TObject);
+
+    procedure AToggleClick(Sender: TObject);
+    procedure GToggleClick(Sender: TObject);
   private
     FScale: single;
     BoxWidth: Integer;
@@ -66,13 +68,19 @@ type
     FormShown: Boolean;
     function ToggleState(Value: Boolean): TToggleSwitchState;
     procedure UpdateMemo;
+  protected
+    TempR: Integer;
+    TempB: Integer;
+    FMaxRight: Integer;
+    FMaxBottom: Integer;
+    procedure RecordMax;
     procedure AnchorVertical(c: TControl);
     procedure StackH(c: TControl);
     procedure StackV(c: TControl);
     procedure LayoutComponents1;
     procedure LayoutComponents2;
-    procedure InitComponentLinks;
     procedure InitComponentSize;
+    procedure InitComponentLinks;
   public
     WantAutoUpdate: Boolean;
     ChartModel: TRggChartModel01;
@@ -149,10 +157,6 @@ begin
   CalcBtn.Parent := Self;
   CalcBtn.Caption := 'Calc';
 
-  AuswahlBtn := TButton.Create(Self);
-  AuswahlBtn.Parent := Self;
-  AuswahlBtn.Caption := 'YAV';
-
   LayoutBtn := TButton.Create(Self);
   LayoutBtn.Parent := Self;
   LayoutBtn.Caption := 'Layout';
@@ -207,6 +211,10 @@ begin
   Image := TImage.Create(Self);
   Image.Parent := Self;
 
+  AuswahlBtn := TButton.Create(Self);
+  AuswahlBtn.Parent := Self;
+  AuswahlBtn.Caption := 'YAV';
+
   InitComponentSize;
   InitComponentLinks;
 end;
@@ -227,6 +235,9 @@ end;
 
 procedure TFormDiagramE.InitComponentLinks;
 begin
+  LayoutBtn.OnClick := LayoutBtnClick;
+  AuswahlBtn.OnClick := AuswahlBtnClick;
+
   XBox.OnClick := XBoxClick;
   PBox.OnClick := PBoxClick;
   YBox.OnClick := YBoxClick;
@@ -234,8 +245,6 @@ begin
   UpdateBtn.OnClick := UpdateBtnClick;
   XBtn.OnClick := XBtnClick;
   CalcBtn.OnClick := CalcBtnClick;
-  AuswahlBtn.OnClick := AuswahlBtnClick;
-  LayoutBtn.OnClick := LayoutBtnClick;
 
   AutoToggle.OnClick := AutoToggleClick;
   GToggle.OnClick := GToggleClick;
@@ -259,7 +268,7 @@ end;
 
 procedure TFormDiagramE.UpdateUI(Sender: TObject);
 begin
-  if ChartGraph = nil then
+  if ChartModel = nil then
     Exit;
 
   if not Visible then
@@ -313,12 +322,6 @@ end;
 procedure TFormDiagramE.AutoToggleClick(Sender: TObject);
 begin
   WantAutoUpdate := AutoToggle.IsOn;
-end;
-
-procedure TFormDiagramE.AuswahlBtnClick(Sender: TObject);
-begin
-  ChartModel.YAuswahlClick;
-  YBox.Items := ChartModel.YComboItems;
 end;
 
 procedure TFormDiagramE.CalcBtnClick(Sender: TObject);
@@ -377,11 +380,23 @@ begin
   Memo.Text := ChartModel.MemoLines.Text;
 end;
 
+procedure TFormDiagramE.RecordMax;
+begin
+  TempR := cr.Left + cr.Width;
+  if TempR > FMaxRight then
+    FMaxRight := TempR;
+
+  TempB := cr.Top + cr.Height;
+  if TempB > FMaxBottom then
+    FMaxBottom := TempB;
+end;
+
 procedure TFormDiagramE.StackH(c: TControl);
 begin
   c.Left := cr.Left + cr.Width + Margin;
   c.Top := cr.Top;
   cr := c;
+  RecordMax;
 end;
 
 procedure TFormDiagramE.StackV(c: TControl);
@@ -389,6 +404,7 @@ begin
   c.Left := cr.Left;
   c.Top := cr.Top + cr.Height + Margin;
   cr := c;
+  RecordMax;
 end;
 
 procedure TFormDiagramE.AnchorVertical(c: TControl);
@@ -426,6 +442,7 @@ end;
 
 procedure TFormDiagramE.LayoutComponents1;
 begin
+  { Vertical ListBoxes }
   cr := UpdateBtn;
   StackV(XBox);
   StackV(PBox);
@@ -444,6 +461,7 @@ end;
 
 procedure TFormDiagramE.LayoutComponents2;
 begin
+  { Horizontal ListBoxes }
   cr := UpdateBtn;
   StackV(XBox);
   StackH(PBox);
@@ -458,6 +476,12 @@ begin
   StackH(Image);
 
   ClientWidth := Image.Left + Image.Width + Margin;
+end;
+
+procedure TFormDiagramE.AuswahlBtnClick(Sender: TObject);
+begin
+  ChartModel.YAuswahlClick;
+  YBox.Items := ChartModel.YComboItems;
 end;
 
 end.

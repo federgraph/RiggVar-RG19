@@ -234,7 +234,6 @@ type
     procedure DestroyForms;
     procedure MemoBtnClick(Sender: TObject);
     procedure ActionsBtnClick(Sender: TObject);
-    procedure ChartBtnClick(Sender: TObject);
     procedure ConfigBtnClick(Sender: TObject);
     procedure TrimmTabBtnClick(Sender: TObject);
     procedure CheckFormBounds(AForm: TForm);
@@ -321,9 +320,6 @@ begin
 
   SpeedPanelHeight := Raster - Round(FScale * Margin);
   ListboxWidth := Round(200 * FScale);
-
-  BitmapWidth := Screen.Width;
-  BitmapHeight := Screen.Height;
 
   CreateComponents;
 
@@ -1761,11 +1757,6 @@ begin
     CheckFormBounds(FormAction);
   end;
   FormAction.Visible := True;
-end;
-
-procedure TFormMain.ChartBtnClick(Sender: TObject);
-begin
-  ShowDiagramQ;
 end;
 
 procedure TFormMain.ConfigBtnClick(Sender: TObject);

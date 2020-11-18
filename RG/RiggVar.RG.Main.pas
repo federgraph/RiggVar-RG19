@@ -2945,7 +2945,6 @@ begin
     faSuperDisplay: result := GraphRadio = gDisplay;
     faSuperQuick: result := GraphRadio = gQuick;
 
-    faToggleHelp: result := ShowingHelp := False;
     faToggleReport: result := F.ReportText.Visible;
     faToggleButtonReport: result := F.WantButtonReport;
     faReportNone..faReportReadme: result := F.ReportManager.GetChecked(fa);

@@ -215,7 +215,7 @@
         <DCCReference Include="Graph\RggZug3D.pas"/>
         <DCCReference Include="Graph\RggDisplayOrder.pas"/>
         <DCCReference Include="Graph\RggDisplayTypes.pas"/>
-        <DCCReference Include="Graph\RggChart.pas"/>
+        <DCCReference Include="Graph\RggChartModel.pas"/>
         <DCCReference Include="Graph\RggChartGraph.pas"/>
         <DCCReference Include="Util\RiggVar.Util.AppUtils.pas"/>
         <DCCReference Include="Util\RiggVar.Util.InfoMemo.pas"/>

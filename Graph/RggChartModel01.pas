@@ -12,21 +12,20 @@ uses
   UITypes,
   UIConsts,
   RggStrings,
-  RggChart,
+  RggChartModel,
   RggScroll,
   RggTypes;
 
 type
   TRggChartModel01 = class(TChartModel)
   private
-    FSalingTyp: TSalingTyp;
+//    FSalingTyp: TSalingTyp; // declared in TChartModel
     procedure SetSalingTyp(Value: TSalingTyp);
   public
     BereichBtnDown: Boolean;
     APBtnDown: Boolean;
 
     constructor Create;
-    destructor Destroy; override;
 
     procedure UpdateXMinMax; override;
     procedure UpdatePMinMax; override;
@@ -55,16 +54,6 @@ begin
   inherited;
 
   IsUp := True;
-end;
-
-destructor TRggChartModel01.Destroy;
-begin
-  RggDocument.Free;
-  MemoLines.Free;
-  SalingDreieck.Free;
-  XComboItems.Free;
-  YComboItems.Free;
-  PComboItems.Free;
 end;
 
 procedure TRggChartModel01.UpdateXMinMax;

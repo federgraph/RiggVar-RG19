@@ -70,7 +70,7 @@ CornerLocation: relative positions
 implementation
 
 const
-  PageCountRG = 5;
+  PageCountRG = 9;
 
 constructor TActionMapTablet.Create;
 begin
@@ -217,7 +217,7 @@ begin
       InitAC(cl, 1, faCycleColorSchemeM, cla);
       InitAC(cl, 2, faCycleColorSchemeP, cla);
       InitAC(cl, 3, faToggleSpeedPanel, cla);
-      InitAC(cl, 4, faShowKreis, claForm);
+      InitAC(cl, 4, faShowDrawings, claForm);
       InitAC(cl, 5, faMemoryRecallBtn, cla);
       InitAC(cl, 6, faMemoryBtn, cla);
     end;
@@ -523,12 +523,12 @@ begin
       InitAC(cl, 2, faChartRect, TRggColors.Plum);
       InitAC(cl, 3, faChartTextRect, TRggColors.Plum);
       InitAC(cl, 4, faChartLegend, TRggColors.Plum);
-      InitAC(cl, 5, faNoop, TRggColors.Plum);
+      InitAC(cl, 5, faNoop, cla);
       InitAC(cl, 6, faChartReset, cla);
 
       cl := TopRight;
       InitAC(cl, 1, faXComboMinus, cla);
-      InitAC(cl, 2, faXComboPlus, TRggColors.White);
+      InitAC(cl, 2, faXComboPlus, cla);
       InitAC(cl, 3, faPComboMinus, cla);
       InitAC(cl, 4, faPComboPlus, cla);
       //InitAC(cl, 5, faActionPageP, TRggColors.Yellow);
@@ -549,10 +549,10 @@ begin
       cl := BottomRight;
       InitAC(cl, 1, faCycleColorSchemeM, cla);
       InitAC(cl, 2, faCycleColorSchemeP, cla);
-      InitAC(cl, 3, faToggleChartGraph, cla);
-      InitAC(cl, 4, faShowDiagE, cla);
-      InitAC(cl, 5, faShowDiagQ, cla);
-      InitAC(cl, 6, faShowDiagC, cla);
+      InitAC(cl, 3, faToggleChartGraph, claForm);
+      InitAC(cl, 4, faShowDiagE, claForm);
+      InitAC(cl, 5, faShowDiagQ, claForm);
+      InitAC(cl, 6, faShowDiagC, claForm);
     end;
 
   end;

@@ -17,28 +17,22 @@ uses
   System.SysUtils,
   System.Classes,
   System.UITypes,
-  RggChart,
-  RggChartGraph;
+  RggChartGraph,
+  RggChartModel;
 
 type
-
-  { TFormDiagramQ }
-
   TFormDiagramQ = class(TForm)
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
     LayoutBtn: TButton;
-
     XBox: TListBox;
     PBox: TListBox;
     YBox: TListBox;
-
     AToggle: TToggleSwitch;
     GToggle: TToggleSwitch;
     UpDown: TUpDown;
-
     Image: TImage;
 
     procedure XBtnClick(Sender: TObject);
@@ -48,7 +42,6 @@ type
     procedure XBoxClick(Sender: TObject);
     procedure YBoxClick(Sender: TObject);
     procedure PBoxClick(Sender: TObject);
-
     procedure UpDownClick(Sender: TObject; Button: TUDBtnType);
 
     procedure AToggleClick(Sender: TObject);
@@ -63,10 +56,6 @@ type
     FormShown: Boolean;
     function ToggleState(Value: Boolean): TToggleSwitchState;
     procedure UpdateMemo;
-    procedure LayoutComponents1;
-    procedure LayoutComponents2;
-    procedure InitComponentLinks;
-    procedure InitComponentSize;
   protected
     TempR: Integer;
     TempB: Integer;
@@ -76,9 +65,13 @@ type
     procedure AnchorVertical(c: TControl);
     procedure StackH(c: TControl);
     procedure StackV(c: TControl);
+    procedure LayoutComponents1;
+    procedure LayoutComponents2;
+    procedure InitComponentSize;
+    procedure InitComponentLinks;
   public
     WantAutoUpdate: Boolean;
-    ChartGraph: TChartGraph;
+    ChartModel: TChartGraph;
     procedure CreateComponents;
     procedure LayoutComponents;
     procedure UpdateUI(Sender: TObject);
@@ -110,13 +103,13 @@ begin
   CreateComponents;
   Layout := 2;
 
-  ChartGraph := TChartGraph.Create;
-  ChartGraph.Image := Image;
+  ChartModel := TChartGraph.Create;
+  ChartModel.Image := Image;
 end;
 
 procedure TFormDiagramQ.FormDestroy(Sender: TObject);
 begin
-  ChartGraph.Free;
+  ChartModel.Free;
 end;
 
 procedure TFormDiagramQ.FormShow(Sender: TObject);
@@ -125,8 +118,8 @@ begin
   begin
     LayoutComponents;
     FormShown := True;
-    ChartGraph.SuperCalc; // --> Draw
     UpdateUI(nil); // --> update Listboxes
+    ChartModel.SuperCalc; // --> Draw
   end;
 end;
 
@@ -200,7 +193,6 @@ begin
 
   GToggle.OnClick := GToggleClick;
   AToggle.OnClick := AToggleClick;
-
   UpDown.OnClick := UpDownClick;
 end;
 
@@ -214,32 +206,32 @@ end;
 
 procedure TFormDiagramQ.UpdateMemo;
 begin
-  ChartGraph.GetMemoText;
+  ChartModel.GetMemoText;
 end;
 
 procedure TFormDiagramQ.UpdateUI(Sender: TObject);
 begin
-  if ChartGraph = nil then
+  if ChartModel = nil then
     Exit;
 
   if not Visible then
     Exit;
 
-  AToggle.State := ToggleState(not ChartGraph.AP);
-  GToggle.State := ToggleState(ChartGraph.ShowGroup);
+  AToggle.State := ToggleState(not ChartModel.AP);
+  GToggle.State := ToggleState(ChartModel.ShowGroup);
 
-  XBox.Items := ChartGraph.XComboItems;
-  PBox.Items := ChartGraph.PComboItems;
-  YBox.Items := ChartGraph.YComboItems;
+  XBox.Items := ChartModel.XComboItems;
+  PBox.Items := ChartModel.PComboItems;
+  YBox.Items := ChartModel.YComboItems;
 
-  XBox.ItemIndex := ChartGraph.XComboItemIndex;
-  PBox.ItemIndex := ChartGraph.PComboItemIndex;
-  YBox.ItemIndex := ChartGraph.YComboItemIndex;
-  YBox.Enabled := not ChartGraph.ShowGroup;
+  XBox.ItemIndex := ChartModel.XComboItemIndex;
+  PBox.ItemIndex := ChartModel.PComboItemIndex;
+  YBox.ItemIndex := ChartModel.YComboItemIndex;
+  YBox.Enabled := not ChartModel.ShowGroup;
 
   UpdateMemo;
 
-  UpDown.Position := ChartGraph.APWidth;
+  UpDown.Position := ChartModel.APWidth;
 end;
 
 procedure TFormDiagramQ.XBoxClick(Sender: TObject);
@@ -254,31 +246,31 @@ end;
 procedure TFormDiagramQ.XBtnClick(Sender: TObject);
 begin
   { Step 1 - select X }
-  ChartGraph.XComboItemIndex := XBox.ItemIndex;
+  ChartModel.XComboItemIndex := XBox.ItemIndex;
 
-  if ChartGraph.XComboItemIndex >= ChartGraph.XComboItems.Count then
-    ChartGraph.XComboItemIndex := 0;
+  if ChartModel.XComboItemIndex >= ChartModel.XComboItems.Count then
+    ChartModel.XComboItemIndex := 0;
 
-  ChartGraph.UpdatePCombo(ChartGraph.FSalingTyp);
+  ChartModel.UpdatePCombo(ChartModel.FSalingTyp);
 
-  PBox.Items := ChartGraph.PComboItems;
-  PBox.ItemIndex := ChartGraph.PComboItemIndex;
+  PBox.Items := ChartModel.PComboItems;
+  PBox.ItemIndex := ChartModel.PComboItemIndex;
 end;
 
 procedure TFormDiagramQ.CalcBtnClick(Sender: TObject);
 begin
-  ChartGraph.PComboItemIndex := PBox.ItemIndex;
-  ChartGraph.YComboItemIndex := YBox.ItemIndex;
+  ChartModel.PComboItemIndex := PBox.ItemIndex;
+  ChartModel.YComboItemIndex := YBox.ItemIndex;
 
-  ChartGraph.AP := not AToggle.IsOn;
-  ChartGraph.ShowGroup := GToggle.IsOn;
+  ChartModel.AP := not AToggle.IsOn;
+  ChartModel.ShowGroup := GToggle.IsOn;
 
-  ChartGraph.SuperCalc;
+  ChartModel.SuperCalc;
 end;
 
 procedure TFormDiagramQ.PBoxClick(Sender: TObject);
 begin
-  ChartGraph.PComboItemIndex := PBox.ItemIndex;
+  ChartModel.PComboItemIndex := PBox.ItemIndex;
 
   if WantAutoUpdate then
   begin
@@ -290,31 +282,31 @@ procedure TFormDiagramQ.YBoxClick(Sender: TObject);
 begin
   if not GToggle.IsOn then
   begin
-    ChartGraph.YComboItemIndex := YBox.ItemIndex;
-    ChartGraph.Calc;
+    ChartModel.YComboItemIndex := YBox.ItemIndex;
+    ChartModel.Calc;
   end;
 end;
 
 procedure TFormDiagramQ.AToggleClick(Sender: TObject);
 begin
-  ChartGraph.AP := not AToggle.IsOn;
-  ChartGraph.Calc;
+  ChartModel.AP := not AToggle.IsOn;
+  ChartModel.Calc;
   Main.FederText.CheckState;
 end;
 
 procedure TFormDiagramQ.GToggleClick(Sender: TObject);
 begin
-  ChartGraph.ShowGroup := GToggle.IsOn;
-  ChartGraph.DrawGroup;
-  YBox.Enabled := not ChartGraph.ShowGroup;
+  ChartModel.ShowGroup := GToggle.IsOn;
+  ChartModel.DrawGroup;
+  YBox.Enabled := not ChartModel.ShowGroup;
   Main.FederText.CheckState;
   UpdateMemo;
 end;
 
 procedure TFormDiagramQ.UpDownClick(Sender: TObject; Button: TUDBtnType);
 begin
-  ChartGraph.APWidth := UpDown.Position;
-  ChartGraph.SuperCalc;
+  ChartModel.APWidth := UpDown.Position;
+  ChartModel.SuperCalc;
 end;
 
 procedure TFormDiagramQ.RecordMax;
@@ -379,7 +371,7 @@ end;
 
 procedure TFormDiagramQ.LayoutComponents1;
 begin
-  { Vertical Boxes }
+  { Vertical ListBoxes }
   cr := XBox;
   StackV(PBox);
   StackH(UpDown);
@@ -396,7 +388,7 @@ end;
 
 procedure TFormDiagramQ.LayoutComponents2;
 begin
-  { Horizontal Boxes }
+  { Horizontal ListBoxes }
   StackH(PBox);
   StackH(YBox);
   StackH(GToggle);
@@ -407,6 +399,5 @@ begin
   cr := XBox;
   StackV(Image);
 end;
-
 
 end.

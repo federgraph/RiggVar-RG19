@@ -1,4 +1,4 @@
-﻿unit RggChart;
+﻿unit RggChartModel;
 
 interface
 
@@ -494,7 +494,7 @@ function TChartModel.ComboIndexToCurve(ComboIndex: Integer): Integer;
 var
   YAV: TYAchseValue;
 begin
-  if ComboIndex = - 1 then
+  if ComboIndex = -1 then
     YAV := YAchseSortedList[0]
   else
     YAV := YAchseSortedList[ComboIndex];

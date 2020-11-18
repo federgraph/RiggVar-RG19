@@ -3,7 +3,7 @@
 interface
 
 {.$define WantUserConfusingReports}
-{.$define WantXMLReports}
+{$define WantXMLReports}
 
 {$ifdef fpc}
 {$mode delphi}
