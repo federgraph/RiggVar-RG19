@@ -140,6 +140,7 @@ type
     SpeedPanel01: TActionSpeedBar;
     SpeedPanel02: TActionSpeedBar;
     SpeedPanel03: TActionSpeedBar;
+    SpeedPanel04: TActionSpeedBar;
     SpeedColorScheme: TSpeedColorScheme;
     procedure InitSpeedButtons;
     procedure LayoutSpeedPanel(SP: TActionSpeedBar);
@@ -234,6 +235,7 @@ type
     procedure DestroyForms;
     procedure MemoBtnClick(Sender: TObject);
     procedure ActionsBtnClick(Sender: TObject);
+    procedure DrawingsBtnClick(Sender: TObject);
     procedure ConfigBtnClick(Sender: TObject);
     procedure TrimmTabBtnClick(Sender: TObject);
     procedure CheckFormBounds(AForm: TForm);
@@ -249,6 +251,7 @@ implementation
 uses
   FrmMemo,
   FrmAction,
+  FrmDrawing,
   FrmConfig,
   FrmTrimmTab,
   FrmDiagramC,
@@ -260,6 +263,7 @@ uses
   RiggVar.RG.Speed01,
   RiggVar.RG.Speed02,
   RiggVar.RG.Speed03,
+  RiggVar.RG.Speed04,
   RiggVar.App.Main,
   RiggVar.FB.ActionConst,
   RiggVar.FB.Classes;
@@ -856,6 +860,7 @@ begin
 
     faShowMemo: MemoBtnClick(nil);
     faShowActions: ActionsBtnClick(nil);
+    faShowDrawings: DrawingsBtnClick(nil);
     faShowConfig: ConfigBtnClick(nil);
     faShowTrimmTab: TrimmTabBtnClick(nil);
 
@@ -1206,6 +1211,12 @@ begin
   SpeedPanel03.ShowHint := True;
   SpeedPanel03.Visible := False;
 
+  SpeedPanel04 := TActionSpeedBarRG04.Create(Self);
+  SpeedPanel04.Name := 'SpeedPanel04';
+  SpeedPanel04.Parent := Self;
+  SpeedPanel04.ShowHint := True;
+  SpeedPanel04.Visible := False;
+
   SpeedPanel := SpeedPanel03;
   SpeedPanel.Visible := True;
 
@@ -1234,7 +1245,7 @@ begin
 
     case Value of
       1: SpeedPanel := SpeedPanel03;
-      2: SpeedPanel := SpeedPanel01;
+      2: SpeedPanel := SpeedPanel04;
       3: SpeedPanel := SpeedPanel01;
     else
       SpeedPanel := SpeedPanel01;
@@ -1271,6 +1282,7 @@ begin
   LayoutSpeedPanel(SpeedPanel01);
   LayoutSpeedPanel(SpeedPanel02);
   LayoutSpeedPanel(SpeedPanel03);
+  LayoutSpeedPanel(SpeedPanel04);
 
   TrimmText.Left := Raster + Margin;
   TrimmText.Top := 2 * Raster + Margin;
@@ -1759,6 +1771,17 @@ begin
   FormAction.Visible := True;
 end;
 
+procedure TFormMain.DrawingsBtnClick(Sender: TObject);
+begin
+  if not Assigned(FormDrawing) then
+  begin
+    FormDrawing := TFormDrawing.Create(nil);
+    FormDrawing.Parent := nil;
+    CheckFormBounds(FormDrawing);
+  end;
+  FormDrawing.Visible := True;
+end;
+
 procedure TFormMain.ConfigBtnClick(Sender: TObject);
 begin
   if FormConfig = nil then
@@ -1803,6 +1826,11 @@ begin
     FormAction.Free;
     FormAction := nil;
   end;
+  if FormDrawing <> nil then
+  begin
+    FormDrawing.Free;
+    FormAction := nil;
+  end;
   if FormMemo <> nil then
   begin
     FormMemo.Free;
@@ -1825,6 +1853,9 @@ begin
 
   if SpeedPanel03 <> nil then
     SpeedPanel03.InitSpeedButtons;
+
+  if SpeedPanel04 <> nil then
+    SpeedPanel04.InitSpeedButtons;
 end;
 
 procedure TFormMain.UpdateSpeedButtonDown;
@@ -1920,6 +1951,7 @@ begin
   SpeedPanel01.Parent := ft;
   SpeedPanel02.Parent := ft;
   SpeedPanel03.Parent := ft;
+  SpeedPanel04.Parent := ft;
 end;
 
 procedure TFormMain.InitZOrderInfo;

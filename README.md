@@ -43,3 +43,15 @@ This branch may end up being - or continue to be - the feature richest app, for 
 - RG19A is an MDI application (oldest)
 - RG19B is an SDI application (old)
 - RG19C is better than RG19B, in my opinion.
+
+## About sibling projects at GitHub
+
+Similar projects are available for FMX and LCL:
+- The LCL project can be built in the Lazarus IDE on iMac.
+- RG51 is currently in a private repository on GitHub.
+
+| Project | Platform | Note |
+| :-- | :- | :- |
+| RG19 | VCL | original RiggVar project |
+| [RG38](https://github.com/federgraph/RiggVar-RG38) | FMX | Trimm 420 |
+| RG51 | LCL | FPC / Lazarus project using TBGRABitmap |

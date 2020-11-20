@@ -299,11 +299,11 @@ begin
       InitAC(cl, 8, faMastfallF0C, cla);
 
       cl := BottomRight;
-//      cla := TRggColors.White;
-      InitAC(cl, 1, faSalingTypFest, claOption);
-      InitAC(cl, 2, faSalingTypDrehbar, claOption);
-      InitAC(cl, 3, faSalingTypOhne, claOption);
-      InitAC(cl, 4, faSalingTypOhneStarr, claOption);
+      cla := claOption;
+      InitAC(cl, 1, faSalingTypFest, cla);
+      InitAC(cl, 2, faSalingTypDrehbar, cla);
+      InitAC(cl, 3, faSalingTypOhne, cla);
+      InitAC(cl, 4, faSalingTypOhneStarr, cla);
       InitAC(cl, 5, faShowKreis, claForm);
       InitAC(cl, 6, faShowInfo, claForm);
     end;
@@ -321,14 +321,14 @@ begin
 
       cl := TopRight;
       cla := TRggColors.White;
-      InitAC(cl, 1, faViewpoint3, cla);
-      InitAC(cl, 2, faViewpointS, cla);
-      InitAC(cl, 3, faViewpointA, cla);
-      InitAC(cl, 4, faViewpointT, cla);
+      InitAC(cl, 1, faReset, cla);
+      InitAC(cl, 2, faResetPosition, cla);
+      InitAC(cl, 3, faResetRotation, cla);
+      InitAC(cl, 4, faResetZoom, cla);
       InitAC(cl, 5, faActionPageP, TRggColors.Yellow);
-      InitAC(cl, 6, faNoop, cla);
-      InitAC(cl, 7, faNoop, cla);
-      InitAC(cl, 8, faNoop, cla);
+      InitAC(cl, 6, faRotaForm1, claForm);
+      InitAC(cl, 7, faRotaForm2, claForm);
+      InitAC(cl, 8, faRotaForm3, claForm);
 
       cl := BottomLeft;
       cla := claSample;

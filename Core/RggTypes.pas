@@ -26,7 +26,6 @@ uses
   SysUtils,
   Classes,
   Types,
-  Math,
   RiggVar.FD.Point,
   RiggVar.RG.Def;
 

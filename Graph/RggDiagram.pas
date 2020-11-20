@@ -1,4 +1,4 @@
-unit RggDiagram;
+﻿unit RggDiagram;
 
 interface
 
@@ -25,26 +25,24 @@ type
     Height: single;
   end;
 
+  { like the Graph part in ChartGraph, with CharModel injected }
   TRggDiagram = class
   private
-    FImage: TImage; // injected, not owned
+    CM: TChartModel; // injected via constructor, not owned
+    FImage: TImage; // injected via property, not owned
     FBitmap: TBitmap;
+
+    Box: TRggBox;
+    Raster: Integer;
+    Padding: Integer;
 
     Width: Integer;
     Height: Integer;
     FScale: single;
 
     LineData: TZugPolyLine;
-
-    CM: TChartModel; // injected, not owned
-
     procedure InitBitmap;
     procedure SetImage(const Value: TImage);
-  private
-    Box: TRggBox;
-    Raster: Integer;
-    Padding: Integer;
-  private
     procedure DrawToCanvas(g: TCanvas);
     procedure DrawChart(g: TCanvas);
     procedure DrawLabels(g: TCanvas);

@@ -1,6 +1,26 @@
 ﻿unit RggRota;
 
+(*
+-
+-     F
+-    * * *
+-   *   *   G
+-  *     * *   *
+- E - - - H - - - I
+-  *     * *         *
+-   *   *   *           *
+-    * *     *             *
+-     D-------A---------------B
+-              *
+-              (C) federgraph.de
+-
+*)
+
 interface
+
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
 
 uses
   Windows,
