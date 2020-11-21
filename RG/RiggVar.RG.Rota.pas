@@ -6,12 +6,12 @@ interface
 {.$define UseViewport}
 
 {$define WantRotaForm1}
-{.$define WantRotaForm2}
+{$define WantRotaForm2}
 {.$define WantRotaForm3}
 
 uses
   RggTypes,
-  RiggVar.RG.Graph,
+  System.UITypes,
 {$ifdef WantRotaForm1}
   RggRota,
 {$endif}
@@ -19,14 +19,12 @@ uses
   RiggVar.FD.Rota,
 {$endif}
 {$ifdef WantRotaForm3}
-//  FMX.Viewport3D,
   RiggVar.FG.Rota,
 {$endif}
 {$ifdef UseImage }
-//  RiggVar.FD.Image,
-  Vcl.ExtCtrls,
+  ExtCtrls,
 {$endif}
-  System.UITypes;
+  RiggVar.RG.Graph;
 
 type
   TRotaForm = class

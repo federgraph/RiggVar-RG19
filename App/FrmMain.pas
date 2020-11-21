@@ -1875,13 +1875,15 @@ begin
   if not ComponentsCreated then
     Exit;
 
+  RotaForm.BackgroundColor := MainVar.ColorScheme.claBackground;
+
   ControllerGraph.BackgroundColor := MainVar.ColorScheme.claBackground;
   UpdateControllerGraph;
 
   SalingGraph.BackgroundColor := MainVar.ColorScheme.claBackground;
   UpdateSalingGraph;
 
-  RotaForm.DarkMode := SpeedColorScheme.IsDark;
+  RotaForm.DarkMode := MainVar.ColorScheme.IsDark;
 end;
 
 procedure TFormMain.SuperSimpleBtnClick(Sender: TObject);

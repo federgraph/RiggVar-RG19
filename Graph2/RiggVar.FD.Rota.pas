@@ -18,6 +18,14 @@
 
 interface
 
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
+
+{.$define FMX}
+{$define VCL}
+{.$define LCL}
+
 uses
   Windows,
   System.SysUtils,
@@ -26,16 +34,17 @@ uses
   System.Classes,
   System.UIConsts,
   System.Math,
-  RiggVar.FD.Point,
+  RiggVar.RG.Graph,
   RggTypes,
   RiggVar.FB.ActionConst,
   RiggVar.FB.Color,
-  RiggVar.RG.Graph,
   RiggVar.FD.Drawing00,
   RiggVar.FD.Drawings,
   RiggVar.FD.Elements,
+  RiggVar.FD.Point,
   RiggVar.FD.TransformHelper,
   Graphics,
+  Controls,
   ExtCtrls;
 
 type
@@ -175,7 +184,7 @@ end;
 
 function TRotaForm2.GetMastKurvePoint(const Index: Integer): TPoint3D;
 begin
-
+  result := TPoint3D.Zero;
 end;
 
 procedure TRotaForm2.Init;
@@ -255,7 +264,6 @@ end;
 procedure TRotaForm2.SetDarkMode(const Value: Boolean);
 begin
   FDarkMode := Value;
-  DL.UseDarkColorScheme := Value;
   RD.UseDarkColorScheme := Value;
   RD.Colors.BackgroundColor := FBackgroundColor;
   Draw;
@@ -373,7 +381,7 @@ begin
 
   RD := TRggDrawingD00.Create;
   DL := TRggDrawings.Create;
-  DL.UseDarkColorScheme := True;
+  DL.UseDarkColorScheme := False;
   DL.Add(RD);
 
   TH := TTransformHelper.Create;
@@ -456,11 +464,8 @@ begin
   DrawCounter := 0;
   g := Bitmap.Canvas;
 
-//  g.BeginScene;
-//  g.Clear(claAliceblue);
-//  g.EndScene;
   R := Rect(0, 0, Image.Width, Image.Height);
-  g.Brush.Color := clGray;
+  g.Brush.Color := TRggColors.AliceBlue;
   g.FillRect(R);
 
   Image.Repaint;
@@ -474,13 +479,37 @@ end;
 
 procedure TRotaForm2.DrawToCanvas(g: TCanvas);
 var
-//  ss: single;
+{$ifdef FMX}
+  ss: single;
+{$endif}
+{$ifdef VCL}
   R: TRect;
+{$endif}
 begin
   Inc(DrawCounter);
 
+{$ifdef FMX}
+  ss := Image.Scene.GetSceneScale;
+  g.Offset := TH.Offset;
+  if g.BeginScene then
+  try
+    g.SetMatrix(TMatrix.CreateScaling(ss, ss));
+    g.Clear(claNull);
+    g.Fill.Color := claYellow;
+    g.Stroke.Color := claAqua;
+    g.Stroke.Thickness := 1.0;
+    g.Font.Size := 16;
+    g.Font.Family := 'Consolas';
+    RD.Draw(g);
+  finally
+    g.EndScene;
+  end;
+  Image.Repaint;
+{$endif}
+
+{$ifdef VCL}
   R := Rect(0, 0, Image.Width, Image.Height);
-  g.Brush.Color := TRggColors.WindowWhite;
+  g.Brush.Color := FBackgroundColor; // TRggColors.WindowWhite;
   g.FillRect(R);
 
   g.Brush.Color := clYellow;
@@ -489,29 +518,28 @@ begin
   g.Font.Size := 24;
   g.Font.Name := 'Consolas';
 
-//  ss := Image.Scene.GetSceneScale;
-//  g.Offset := TH.Offset;
-//  if g.BeginScene then
-//  try
-//    g.SetMatrix(TMatrix.CreateScaling(ss, ss)); // dpi scaling
-//    g.Clear(claNull);
-//    g.Fill.Color := claYellow;
-//    g.Stroke.Color := claAqua;
-//    g.Stroke.Thickness := 1.0;
-//    g.Font.Size := 16;
-//    g.Font.Family := 'Consolas';
-//    RD.Draw(g);
-//  finally
-//    g.EndScene;
-//  end;
-//  Image.Repaint;
-
   SetViewPortOrgEx(g.Handle, TH.Offset.X, TH.Offset.Y, nil);
   RD.Draw(g);
   SetViewPortOrgEx(g.Handle, 0, 0, nil);
 
   Image.Canvas.CopyMode := cmSrcCopy;
   Image.Canvas.Draw(0, 0, Bitmap);
+{$endif}
+
+{$ifdef LCL}
+  g.FillRect(0, 0, g.Width, g.Height, FBackgroundColor, dmSet);
+
+  g.LineCap := TPenEndCap.pecRound;
+  g.JoinStyle := TPenJoinStyle.pjsRound;
+  g.FontHeight:= 24;
+  g.FontName := 'Consolas';
+
+  RD.Draw(g);
+
+  Bitmap.Draw(Image.Canvas, TH.Offset.X, TH.Offset.Y, True);
+  Image.Invalidate;
+{$endif}
+
 end;
 
 procedure TRotaForm2.RotaSeite;

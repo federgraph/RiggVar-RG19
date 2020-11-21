@@ -16,6 +16,10 @@
 -
 *)
 
+{$ifdef fpc}
+  {$mode delphi}
+{$endif}
+
 interface
 
 uses
@@ -627,6 +631,7 @@ begin
   g.Font.Size := 12;
   tf := [tfCenter, tfVerticalCenter];
   g.Brush.Style := bsClear;
+  g.Font.Color := Drawing.Colors.TextColor;
   g.TextRect(R, s, tf);
 end;
 
@@ -639,6 +644,7 @@ begin
   g.Font.Name := 'Consolas';
   g.Font.Size := 12;
   g.Brush.Style := bsClear;
+  g.Font.Color := Drawing.Colors.TextColor;
   g.TextOut(x, y, s);
 end;
 
@@ -707,7 +713,6 @@ begin
 
   if ShowCaption or GlobalShowCaption then
   begin
-    g.Brush.Color := Drawing.Colors.TextColor;
     TextCenter := Center.P;
     TextOut(g, Caption);
   end;
@@ -843,7 +848,6 @@ begin
 
   if ShowCaption or GlobalShowCaption then
   begin
-    g.Brush.Color := Drawing.Colors.TextColor;
     TextCenter := Point1.Center.P + (Point2.Center.P - Point1.Center.P) * 0.5;
     TextOut(g, Caption);
   end;
@@ -1226,7 +1230,6 @@ begin
 
   if ShowCaption or GlobalShowCaption then
   begin
-    g.Brush.Color := Drawing.Colors.TextColor;
     TextAngle := DegToRad(startAngle + sweepAngle / 2);
     TextRadius := Radius * FTextRadiusFactor;
     TextCenter := Point1.Center.P;
@@ -1607,7 +1610,6 @@ procedure TRggPolyLine.DrawText(g: TCanvas);
 begin
   if ShowCaption or GlobalShowCaption then
   begin
-    g.Brush.Color := Drawing.Colors.TextColor;
     TextCenter := Point1.Center.P + (Point2.Center.P - Point1.Center.P) * 0.5;
     TextOut(g, Caption);
   end;
@@ -2067,7 +2069,6 @@ begin
 
   if ShowCaption or GlobalShowCaption then
   begin
-    g.Brush.Color := StrokeColor;
     TextCenter := StartPoint;
     TextCenter.Offset(20, -15);
     TextOutLeading(g, Text);
@@ -2202,7 +2203,6 @@ begin
 
   if ShowCaption or GlobalShowCaption then
   begin
-    g.Brush.Color := clBlack;
     TextCenter := Center.P;
     TextOut(g, Caption);
   end;
@@ -2282,7 +2282,6 @@ begin
 
   if ShowCaption or GlobalShowCaption then
   begin
-    g.Brush.Color := Drawing.Colors.TextColor;
     TextCenter := Point1.Center.P + (Point2.Center.P - Point1.Center.P) * 0.5;
     TextOut(g, Caption);
   end;
@@ -2344,7 +2343,6 @@ var
 begin
   if ShowCaption or GlobalShowCaption then
   begin
-    g.Brush.Color := Drawing.Colors.TextColor;
     pf.x := Poly[0].x;
     pf.y := Poly[0].y;
     TextCenter := pf;

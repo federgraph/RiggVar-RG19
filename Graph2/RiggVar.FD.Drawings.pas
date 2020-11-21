@@ -273,7 +273,7 @@ begin
     if Value then
     begin
       Colors.GoDark;
-      GoDark
+      GoDark;
     end
     else
     begin

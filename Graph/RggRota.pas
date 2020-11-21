@@ -102,7 +102,7 @@ type
 
     FXpos: Integer;
     FYpos: Integer;
-    FIncrementW: single;
+    FIncrementW: Integer;
     FIncrementT: Integer;
     FZoomIndex: Integer;
 
@@ -428,7 +428,7 @@ begin
   begin
     Xpos := -130;
     Ypos := -80;
-    Matrix := GetMatrix(90,-87);
+    Matrix := GetMatrix(90, -87);
     ZoomIndex := 8;
     FixPunktIndex := 8;
     IncrementIndex := 3;
@@ -807,7 +807,7 @@ var
 begin
   if not MouseDown then
     Exit;
-  if MouseButton = mbLeft then
+  if MouseButton = TMouseButton.mbLeft then
   begin
     wx := (x - prevx) * 0.15;
     wy := (y - prevy) * 0.15;
