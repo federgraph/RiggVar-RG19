@@ -13,8 +13,7 @@ uses
   ExtCtrls,
   Graphics,
   RggTypes,
-  RggChartModel,
-  RggChartModel01;
+  RggChartModel;
 
 type
   TRggBox = class

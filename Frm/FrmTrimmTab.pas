@@ -20,7 +20,7 @@ uses
   Vcl.ComCtrls,
   Vcl.Buttons,
   Vcl.Menus,
-  RggUnit4,
+  RggInter,
   RggTypes,
   RggTrimmTab,
   RggTrimmTabGraph;
@@ -99,8 +99,8 @@ type
     procedure InitTabOrder;
     procedure LayoutComponents;
   public
-    Rigg: TRigg;
-    procedure Init(ARigg: TRigg);
+    Rigg: IRigg;
+    procedure Init(ARigg: IRigg);
   end;
 
 var
@@ -140,7 +140,7 @@ begin
   FTrimmTabGraph.Free;
 end;
 
-procedure TFormTrimmTab.Init(ARigg: TRigg);
+procedure TFormTrimmTab.Init(ARigg: IRigg);
 begin
   Rigg := ARigg;
 
@@ -149,7 +149,7 @@ begin
   K1UpDown.Enabled := False;
   W1UpDown.Enabled := False;
 
-  FTrimmTabelle := Rigg.TrimmTab;
+  FTrimmTabelle := Rigg.TrimmTabelle;
   FTrimmTabDaten := FTrimmTabelle.TrimmTabDaten;
   CheckTabelle;
 

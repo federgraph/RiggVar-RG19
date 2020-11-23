@@ -490,7 +490,7 @@ begin
       InitAC(cl, 3, faToggleChartGraph, cla);
       InitAC(cl, 4, faToggleMatrixText, cla);
       //InitAC(cl, 5, faActionPageP, TRggColors.Yellow);
-      InitAC(cl, 6, faNoop, cla);
+      InitAC(cl, 6, faNoop, TRggColors.White);
       InitAC(cl, 7, faRggZoomIn, TRggColors.Beige);
       InitAC(cl, 8, faRggZoomOut, TRggColors.Beige);
 

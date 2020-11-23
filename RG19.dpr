@@ -26,11 +26,6 @@ uses
   RggTestData in 'Core\RggTestData.pas',
   RggTrimmTab in 'Core\RggTrimmTab.pas',
   RggTypes in 'Core\RggTypes.pas',
-  RggUnit0 in 'Core\RggUnit0.pas',
-  RggUnit1 in 'Core\RggUnit1.pas',
-  RggUnit2 in 'Core\RggUnit2.pas',
-  RggUnit3 in 'Core\RggUnit3.pas',
-  RggUnit4 in 'Core\RggUnit4.pas',
   RiggVar.App.Main in 'App\RiggVar.App.Main.pas',
   RiggVar.FB.Action in 'FB\RiggVar.FB.Action.pas',
   RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas',
@@ -135,7 +130,9 @@ uses
   RiggVar.FZ.Z19_Chart in 'FZ\RiggVar.FZ.Z19_Chart.pas',
   RiggVar.FZ.Z20_Epsilon in 'FZ\RiggVar.FZ.Z20_Epsilon.pas',
   RiggVar.FZ.Z21_Rotations in 'FZ\RiggVar.FZ.Z21_Rotations.pas',
-  RiggVar.FZ.Z22_BigArc in 'FZ\RiggVar.FZ.Z22_BigArc.pas';
+  RiggVar.FZ.Z22_BigArc in 'FZ\RiggVar.FZ.Z22_BigArc.pas',
+  RggInter in 'Core\RggInter.pas',
+  RiggVar.RG.Model in 'RG\RiggVar.RG.Model.pas';
 
 {$R *.res}
 

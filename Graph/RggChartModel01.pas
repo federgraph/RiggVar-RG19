@@ -84,7 +84,7 @@ begin
   end
   else
   begin
-    f := Rigg.GSB.GetSB(TsbName(xp));
+    f := Rigg.RggFA.GetSB(TsbName(xp));
     tempMin := Round(f.Min);
     tempMax := Round(f.Max);
     tempIst := Round(f.Ist);
@@ -174,7 +174,7 @@ begin
   end
   else
   begin
-    f := Rigg.GSB.GetSB(TsbName(xp));
+    f := Rigg.RggFA.GetSB(TsbName(xp));
     tempMin := Round(f.Min);
     tempMax := Round(f.Max);
     tempIst := Round(f.Ist);
