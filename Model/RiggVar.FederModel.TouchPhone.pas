@@ -165,15 +165,15 @@ begin
   CornerBtnList.Add(CornerMenu.NewBtn(cp, 3, 0, cl, fa, 4));
 
   cl := MainVar.ColorScheme.claCornerScrollbar;
-  ST00 := CornerMenu.NewBtn(cpT, 3, 0, cl, fa);
-  SR00 := CornerMenu.NewBtn(cpR, 0, 5, cl, fa);
-  SB00 := CornerMenu.NewBtn(cpB, 3, 0, cl, fa);
-  SL00 := CornerMenu.NewBtn(cpL, 0, 5, cl, fa);
+  ST00 := CornerMenu.NewBtn(cpT, 0, 0, cl, faTouchBarTop);
+  SR00 := CornerMenu.NewBtn(cpR, 0, 0, cl, faTouchBarRight);
+  SB00 := CornerMenu.NewBtn(cpB, 0, 0, cl, faTouchBarBottom);
+  SL00 := CornerMenu.NewBtn(cpL, 0, 0, cl, faTouchBarLeft);
 
-  ST00.Text.Font.Size := MainConst.DefaultBtnFontSize;
-  SB00.Text.Font.Size := MainConst.DefaultBtnFontSize;
-  SL00.Text.Font.Size := MainConst.DefaultBtnFontSize;
-  SR00.Text.Font.Size := MainConst.DefaultBtnFontSize;
+  ST00.Text.Caption := '';
+  SB00.Text.Caption := '';
+  SL00.Text.Caption := '';
+  SR00.Text.Caption := '';
 
   InitActions(1);
 end;

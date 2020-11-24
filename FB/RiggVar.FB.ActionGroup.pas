@@ -56,6 +56,7 @@ var
   ActionGroupRggSonstiges: TActionGroup;
   ActionGroupBtnLegendTablet: TActionGroup;
   ActionGroupBtnLegendPhone: TActionGroup;
+  ActionGroupTouchBarLegend: TActionGroup;
   ActionGroupCircles: TActionGroup;
   ActionGroupParamT: TActionGroup;
 
@@ -100,187 +101,186 @@ end;
 initialization
 
 ActionGroupEmptyAction := IntegerArray([
-faNoop]);
+  faNoop]);
 
 ActionGroupTouchLayout := IntegerArray([
-faTouchTablet,
-faTouchPhone,
-faTouchDesk]);
+  faTouchTablet,
+  faTouchPhone,
+  faTouchDesk]);
 
 ActionGroupPages := IntegerArray([
-faActionPageM,
-faActionPageP,
-faActionPageE,
-faActionPageS,
-faActionPageX,
-faActionPage1,
-faActionPage2,
-faActionPage3,
-faActionPage4,
-faActionPage5,
-faActionPage6]);
+  faActionPageM,
+  faActionPageP,
+  faActionPageE,
+  faActionPageS,
+  faActionPageX,
+  faActionPage1,
+  faActionPage2,
+  faActionPage3,
+  faActionPage4,
+  faActionPage5,
+  faActionPage6]);
 
 ActionGroupColorScheme := IntegerArray([
-faCycleColorSchemeM,
-faCycleColorSchemeP]);
+  faCycleColorSchemeM,
+  faCycleColorSchemeP]);
 
 ActionGroupWheel := IntegerArray([
-faPlusOne,
-faPlusTen,
-faWheelLeft,
-faWheelRight,
-faWheelDown,
-faWheelUp,
-faParamValuePlus1,
-faParamValueMinus1,
-faParamValuePlus10,
-faParamValueMinus10]);
+  faPlusOne,
+  faPlusTen,
+  faWheelLeft,
+  faWheelRight,
+  faWheelDown,
+  faWheelUp,
+  faParamValuePlus1,
+  faParamValueMinus1,
+  faParamValuePlus10,
+  faParamValueMinus10]);
 
 ActionGroupForms := IntegerArray([
   faRotaForm1,
   faRotaForm2,
   faRotaForm3,
   faShowMemo,
-faShowMemo,
-faShowActions,
-faShowOptions,
-faShowDrawings,
-faShowConfig,
-faShowKreis,
-faShowInfo,
-faShowSplash,
-faShowForce,
-faShowTabelle,
-faShowDetail,
-faShowSaling,
-faShowController,
-faShowText,
-faShowTrimmTab,
-faShowChart,
-faShowDiagA,
-faShowDiagC,
-faShowDiagE,
-faShowDiagQ]);
+  faShowActions,
+  faShowOptions,
+  faShowDrawings,
+  faShowConfig,
+  faShowKreis,
+  faShowInfo,
+  faShowSplash,
+  faShowForce,
+  faShowTabelle,
+  faShowDetail,
+  faShowSaling,
+  faShowController,
+  faShowText,
+  faShowTrimmTab,
+  faShowChart,
+  faShowDiagA,
+  faShowDiagC,
+  faShowDiagE,
+  faShowDiagQ]);
 
 ActionGroupViewParams := IntegerArray([
-faPan,
-faParamORX,
-faParamORY,
-faParamORZ,
-faParamRX,
-faParamRY,
-faParamRZ,
-faParamCZ]);
+  faPan,
+  faParamORX,
+  faParamORY,
+  faParamORZ,
+  faParamRX,
+  faParamRY,
+  faParamRZ,
+  faParamCZ]);
 
 ActionGroupFederText := IntegerArray([
-faToggleAllText,
-faToggleTouchFrame]);
+  faToggleAllText,
+  faToggleTouchFrame]);
 
 ActionGroupRggControls := IntegerArray([
-faController,
-faWinkel,
-faVorstag,
-faWante,
-faWoben,
-faSalingH,
-faSalingA,
-faSalingL,
-faSalingW,
-faMastfallF0C,
-faMastfallF0F,
-faMastfallVorlauf,
-faBiegung,
-faMastfussD0X,
-faVorstagOS,
-faWPowerOS,
-faParamAPW,
-faParamEAH,
-faParamEAR,
-faParamEI]);
+  faController,
+  faWinkel,
+  faVorstag,
+  faWante,
+  faWoben,
+  faSalingH,
+  faSalingA,
+  faSalingL,
+  faSalingW,
+  faMastfallF0C,
+  faMastfallF0F,
+  faMastfallVorlauf,
+  faBiegung,
+  faMastfussD0X,
+  faVorstagOS,
+  faWPowerOS,
+  faParamAPW,
+  faParamEAH,
+  faParamEAR,
+  faParamEI]);
 
 ActionGroupRggFixPoints := IntegerArray([
-faFixpointA0,
-faFixpointA,
-faFixpointB0,
-faFixpointB,
-faFixpointC0,
-faFixpointC,
-faFixpointD0,
-faFixpointD,
-faFixpointE0,
-faFixpointE,
-faFixpointF0,
-faFixpointF]);
+  faFixpointA0,
+  faFixpointA,
+  faFixpointB0,
+  faFixpointB,
+  faFixpointC0,
+  faFixpointC,
+  faFixpointD0,
+  faFixpointD,
+  faFixpointE0,
+  faFixpointE,
+  faFixpointF0,
+  faFixpointF]);
 
 ActionGroupRggTrimms := IntegerArray([
-faTrimm0,
-faTrimm1,
-faTrimm2,
-faTrimm3,
-faTrimm4,
-faTrimm5,
-faTrimm6,
-fa420,
-faLogo]);
+  faTrimm0,
+  faTrimm1,
+  faTrimm2,
+  faTrimm3,
+  faTrimm4,
+  faTrimm5,
+  faTrimm6,
+  fa420,
+  faLogo]);
 
 ActionGroupRggSalingType := IntegerArray([
-faSalingTypOhne,
-faSalingTypDrehbar,
-faSalingTypFest,
-faSalingTypOhneStarr]);
+  faSalingTypOhne,
+  faSalingTypDrehbar,
+  faSalingTypFest,
+  faSalingTypOhneStarr]);
 
 ActionGroupRggCalcType := IntegerArray([
-faCalcTypQuer,
-faCalcTypKnick,
-faCalcTypGemessen]);
+  faCalcTypQuer,
+  faCalcTypKnick,
+  faCalcTypGemessen]);
 
 ActionGroupRggAppMode := IntegerArray([
-faDemo,
-faMemoryBtn,
-faMemoryRecallBtn,
-faKorrigiertItem,
-faSofortBtn,
-faGrauBtn,
-faBlauBtn,
-faMultiBtn]);
+  faDemo,
+  faMemoryBtn,
+  faMemoryRecallBtn,
+  faKorrigiertItem,
+  faSofortBtn,
+  faGrauBtn,
+  faBlauBtn,
+  faMultiBtn]);
 
 ActionGroupRggSuper := IntegerArray([
-faSuperSimple,
-faSuperNormal,
-faSuperGrau,
-faSuperBlau,
-faSuperMulti,
-faSuperDisplay,
-faSuperQuick]);
+  faSuperSimple,
+  faSuperNormal,
+  faSuperGrau,
+  faSuperBlau,
+  faSuperMulti,
+  faSuperDisplay,
+  faSuperQuick]);
 
 ActionGroupRggTrimmFile := IntegerArray([
-faCopyTrimmItem,
-faPasteTrimmItem,
-faCopyAndPaste,
-faUpdateTrimm0,
-faReadTrimmFile,
-faSaveTrimmFile,
-faCopyTrimmFile]);
+  faCopyTrimmItem,
+  faPasteTrimmItem,
+  faCopyAndPaste,
+  faUpdateTrimm0,
+  faReadTrimmFile,
+  faSaveTrimmFile,
+  faCopyTrimmFile]);
 
 ActionGroupRggTrimmText := IntegerArray([
-faToggleTrimmText,
-faToggleDiffText,
-faToggleDataText,
-faToggleDebugText,
-faUpdateReportText]);
+  faToggleTrimmText,
+  faToggleDiffText,
+  faToggleDataText,
+  faToggleDebugText,
+  faUpdateReportText]);
 
 ActionGroupRggViewPoint := IntegerArray([
-faViewpointS,
-faViewpointA,
-faViewpointT,
-faViewpoint3]);
+  faViewpointS,
+  faViewpointA,
+  faViewpointT,
+  faViewpoint3]);
 
 ActionGroupRggRenderOptions := IntegerArray([
-faWantRenderH,
-faWantRenderP,
-faWantRenderF,
-faWantRenderE,
-faWantRenderS]);
+  faWantRenderH,
+  faWantRenderP,
+  faWantRenderF,
+  faWantRenderE,
+  faWantRenderS]);
 
 ActionGroupRggChart := IntegerArray([
   faChartRect,
@@ -289,19 +289,14 @@ ActionGroupRggChart := IntegerArray([
   faChartAP,
   faChartBP,
   faChartGroup,
-
   faParamCountPlus,
   faParamCountMinus,
-
   faPComboPlus,
   faPComboMinus,
-
   faXComboPlus,
   faXComboMinus,
-
   faYComboPlus,
   faYComboMinus,
-
   faChartReset]);
 
 ActionGroupRggReport := IntegerArray([
@@ -341,19 +336,15 @@ ActionGroupRggGraph := IntegerArray([
   faToggleUseDisplayList,
   faToggleUseQuickSort,
   faToggleShowLegend,
-
   faRggBogen,
   faRggKoppel,
   faRggHull,
-
   faRggZoomIn,
   faRggZoomOut,
-
   faToggleSalingGraph,
   faToggleControllerGraph,
   faToggleChartGraph,
   faToggleKraftGraph,
-
   faToggleMatrixText]);
 
 ActionGroupMemeFormat := IntegerArray([
@@ -484,6 +475,12 @@ ActionGroupHullMesh := IntegerArray([
   faHullMesh,
   faHullMeshOn,
   faHullMeshOff]);
+
+ActionGroupTouchBarLegend := IntegerArray([
+  faTouchBarTop,
+  faTouchBarBottom,
+  faTouchBarLeft,
+  faTouchBarRight]);
 
 end.
 

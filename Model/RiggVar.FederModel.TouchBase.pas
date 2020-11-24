@@ -532,6 +532,9 @@ begin
   Shape.Top := Top + Round(MainVar.Scale * 2);
   Shape.Width := Width - Round(MainVar.Scale * 5); // 5 = (2 + 2 - 1)
   Shape.Height := Height - Round(MainVar.Scale * 5);
+
+  FText.Left := Left + Round(MainVar.Scale * 10);
+  FText.Top := Top + Round(MainVar.Scale * 20);
 end;
 
 { TFederTouchBase }
