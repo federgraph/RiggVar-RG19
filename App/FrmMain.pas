@@ -27,9 +27,9 @@ uses
   RiggVar.FB.SpeedColor,
   RiggVar.FB.SpeedBar,
   RiggVar.RG.Def,
+  RiggVar.RG.Model,
   RiggVar.RG.Report,
   RiggVar.RG.Rota,
-  RiggVar.RG.Model,
   RggCtrls,
   RggChartGraph,
   RggTypes,
@@ -323,7 +323,7 @@ begin
   TKR := Round(TKR * FScale);
 
   SpeedPanelHeight := Raster - Round(FScale * Margin);
-  ListboxWidth := Round(200 * FScale);
+  ListboxWidth := Round(230 * FScale);
 
   CreateComponents;
 
@@ -565,7 +565,9 @@ procedure TFormMain.FormResize(Sender: TObject);
 begin
   if (Main <> nil) and Main.IsUp then
   begin
-    MainVar.Scale := ScaleFactor;
+{$ifdef MSWindows}
+    MainVar.Scale := Screen.PixelsPerInch / 96;
+{$endif}
     Inc(Main.ResizeCounter);
     Main.UpdateTouch;
   end;
@@ -1198,24 +1200,28 @@ begin
   SpeedPanel01.Parent := Self;
   SpeedPanel01.ShowHint := True;
   SpeedPanel01.Visible := False;
+  SpeedPanel01.Caption := '';
 
   SpeedPanel02 := TActionSpeedBarRG02.Create(Self);
   SpeedPanel02.Name := 'SpeedPanel02';
   SpeedPanel02.Parent := Self;
   SpeedPanel02.ShowHint := True;
   SpeedPanel02.Visible := False;
+  SpeedPanel02.Caption := '';
 
   SpeedPanel03 := TActionSpeedBarRG03.Create(Self);
   SpeedPanel03.Name := 'SpeedPanel03';
   SpeedPanel03.Parent := Self;
   SpeedPanel03.ShowHint := True;
   SpeedPanel03.Visible := False;
+  SpeedPanel03.Caption := '';
 
   SpeedPanel04 := TActionSpeedBarRG04.Create(Self);
   SpeedPanel04.Name := 'SpeedPanel04';
   SpeedPanel04.Parent := Self;
   SpeedPanel04.ShowHint := True;
   SpeedPanel04.Visible := False;
+  SpeedPanel04.Caption := '';
 
   SpeedPanel := SpeedPanel03;
   SpeedPanel.Visible := True;
@@ -1610,6 +1616,7 @@ begin
   begin
     Main.UpdateTrimmText(TL);
     TrimmText.Text := TL.Text;
+    UpdateFederText;
   end;
   UpdateReport;
 end;
