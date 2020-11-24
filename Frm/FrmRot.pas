@@ -25,7 +25,7 @@ uses
   RggTypes,
   RggGetriebeGraph,
   RggMatrix,
-  RggUnit4,
+  RiggVar.RG.Model,
   RggPrinter,
   RggPreview,
   RggGraph,

@@ -30,11 +30,6 @@ uses
   RggFachwerk in 'Core\RggFachwerk.pas',
   RggReport in 'Core\RggReport.pas',
   RggTypes in 'Core\RggTypes.pas',
-  RggUnit0 in 'Core\RggUnit0.pas',
-  RggUnit1 in 'Core\RggUnit1.pas',
-  RggUnit2 in 'Core\RggUnit2.pas',
-  RggUnit3 in 'Core\RggUnit3.pas',
-  RggUnit4 in 'Core\RggUnit4.pas',
   RggModul in 'Core\RggModul.pas',
   RggTrimmTab in 'Core\RggTrimmTab.pas',
   RggSaling3Eck in 'Core\RggSaling3Eck.pas',
@@ -84,7 +79,9 @@ uses
   RggTrimmTabGraph in 'Graph\RggTrimmTabGraph.pas',
   RggKraftGraph in 'Graph\RggKraftGraph.pas',
   RggMastGraph in 'Graph\RggMastGraph.pas',
-  RiggVar.FD.Point in 'Graph2\RiggVar.FD.Point.pas';
+  RiggVar.FD.Point in 'Graph2\RiggVar.FD.Point.pas',
+  RggInter in 'Core\RggInter.pas',
+  RiggVar.RG.Model in 'RG\RiggVar.RG.Model.pas';
 
 {$R *.res}
 

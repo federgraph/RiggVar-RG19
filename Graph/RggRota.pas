@@ -1,6 +1,26 @@
 ﻿unit RggRota;
 
+(*
+-
+-     F
+-    * * *
+-   *   *   G
+-  *     * *   *
+- E - - - H - - - I
+-  *     * *         *
+-   *   *   *           *
+-    * *     *             *
+-     D-------A---------------B
+-              *
+-              (C) federgraph.de
+-
+*)
+
 interface
+
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
 
 uses
   Windows,
@@ -82,7 +102,7 @@ type
 
     FXpos: Integer;
     FYpos: Integer;
-    FIncrementW: single;
+    FIncrementW: Integer;
     FIncrementT: Integer;
     FZoomIndex: Integer;
 
@@ -231,7 +251,7 @@ uses
   RggZug3D,
   RggTestData;
 
-{ TRotaForm }
+{ TRotaForm1 }
 
 constructor TRotaForm1.Create;
 begin
@@ -395,7 +415,7 @@ begin
   begin
     Xpos := -130;
     Ypos := -80;
-    Matrix := GetMatrix(90,-87);
+    Matrix := GetMatrix(90, -87);
     ZoomIndex := 8;
     FixPunktIndex := 8;
     IncrementIndex := 3;
@@ -785,7 +805,7 @@ var
 begin
   if not MouseDown then
     Exit;
-  if MouseButton = mbLeft then
+  if MouseButton = TMouseButton.mbLeft then
   begin
     wx := (x - prevx) * 0.15;
     wy := (y - prevy) * 0.15;

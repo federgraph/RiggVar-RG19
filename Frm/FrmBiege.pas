@@ -11,7 +11,7 @@ uses
   Vcl.Buttons,
   Vcl.StdCtrls,
   RggTypes,
-  RggUnit4;
+  RiggVar.RG.Model;
 
 type
   TBiegeUndNeigeForm = class(TForm)

@@ -13,7 +13,7 @@ uses
   Vcl.Buttons,
   Vcl.ExtCtrls,
   RggTypes,
-  RggUnit4;
+  RiggVar.RG.Model;
 
 type
   TFormReglerGraph = class(TForm)

@@ -176,11 +176,6 @@
         <DCCReference Include="Core\RggFachwerk.pas"/>
         <DCCReference Include="Core\RggReport.pas"/>
         <DCCReference Include="Core\RggTypes.pas"/>
-        <DCCReference Include="Core\RggUnit0.pas"/>
-        <DCCReference Include="Core\RggUnit1.pas"/>
-        <DCCReference Include="Core\RggUnit2.pas"/>
-        <DCCReference Include="Core\RggUnit3.pas"/>
-        <DCCReference Include="Core\RggUnit4.pas"/>
         <DCCReference Include="Core\RggModul.pas"/>
         <DCCReference Include="Core\RggTrimmTab.pas"/>
         <DCCReference Include="Core\RggSaling3Eck.pas"/>
@@ -231,6 +226,8 @@
         <DCCReference Include="Graph\RggKraftGraph.pas"/>
         <DCCReference Include="Graph\RggMastGraph.pas"/>
         <DCCReference Include="Graph2\RiggVar.FD.Point.pas"/>
+        <DCCReference Include="Core\RggInter.pas"/>
+        <DCCReference Include="RG\RiggVar.RG.Model.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

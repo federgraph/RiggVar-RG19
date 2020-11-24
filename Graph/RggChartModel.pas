@@ -10,7 +10,7 @@ uses
   RiggVar.FB.ActionConst,
   RiggVar.FB.Color,
   RggStrings,
-  RggUnit4,
+  RiggVar.RG.Model,
   RggTypes,
   RggDoc,
   RggSaling3Eck,
@@ -494,7 +494,7 @@ function TChartModel.ComboIndexToCurve(ComboIndex: Integer): Integer;
 var
   YAV: TYAchseValue;
 begin
-  if ComboIndex = - 1 then
+  if ComboIndex = -1 then
     YAV := YAchseSortedList[0]
   else
   YAV := YAchseSortedList[ComboIndex];
@@ -752,7 +752,7 @@ begin
         begin
           j := YAchseRecordList[yavVorstagSpannung].ArrayIndex;
           if PunktOK then
-            af[p, j, i] := Rigg.rF.C0C
+            af[p, j, i] := Rigg.GetStabKraft(C0C)
           else
             af[p, j, i] := 0;
         end;
@@ -760,38 +760,38 @@ begin
         begin
           j := YAchseRecordList[yavWantenSpannung].ArrayIndex;
           if PunktOK then
-            af[p, j, i] := Rigg.rF.A0A
+            af[p, j, i] := Rigg.GetStabKraft(A0A)
           else
             af[p, j, i] := 0;
         end;
         if yavMastfallF0F in YAchseSet then
         begin
           j := YAchseRecordList[yavMastfallF0F].ArrayIndex;
-          af[p, j, i] := Rigg.rP.F0.Distance(Rigg.rP.F);
+          af[p, j, i] := Rigg.GetPoint3D(ooF0).Distance(Rigg.GetPoint3D(ooF));
         end;
         if yavMastfallF0C in YAchseSet then
         begin
           j := YAchseRecordList[yavMastfallF0C].ArrayIndex;
-          af[p, j, i] := Rigg.rP.F0.Distance(Rigg.rP.C);
+          af[p, j, i] := Rigg.GetPoint3D(ooF0).Distance(Rigg.GetPoint3D(ooC));
         end;
         if yavAuslenkungC in YAchseSet then
         begin
           j := YAchseRecordList[yavAuslenkungC].ArrayIndex;
           if PunktOK then
-            af[p, j, i] := Rigg.rP.C.Distance(Rigg.rPe.C)
+            af[p, j, i] := Rigg.GetPoint3D(ooC).Distance(Rigg.GetRelaxedPoint3D(ooC))
           else
             af[p, j, i] := 0;
         end;
         if yavDurchbiegungHD in YAchseSet then
         begin
           j := YAchseRecordList[yavDurchbiegungHD].ArrayIndex;
-          af[p, j, i] := Rigg.hd;
+          af[p, j, i] := Rigg.DurchbiegungHD;
         end;
         if yavRF00 in YAchseSet then
         begin
           j := YAchseRecordList[yavRF00].ArrayIndex;
           if PunktOK then
-            af[p, j, i] := Rigg.rF.D0C
+            af[p, j, i] := Rigg.GetStabKraft(D0C)
           else
             af[p, j, i] := 0;
         end;
@@ -799,7 +799,7 @@ begin
         begin
           j := YAchseRecordList[yavRF01].ArrayIndex;
           if PunktOK then
-            af[p, j, i] := Rigg.rF.C0D0
+            af[p, j, i] := Rigg.GetStabKraft(C0D0)
           else
             af[p, j, i] := 0;
         end;
@@ -807,7 +807,7 @@ begin
         begin
           j := YAchseRecordList[yavRF03].ArrayIndex;
           if PunktOK then
-            af[p, j, i] := Rigg.rF.A0C0
+            af[p, j, i] := Rigg.GetStabKraft(A0C0)
           else
             af[p, j, i] := 0;
         end;
@@ -815,7 +815,7 @@ begin
         begin
           j := YAchseRecordList[yavRF05].ArrayIndex;
           if PunktOK then
-            af[p, j, i] := Rigg.rF.A0D0
+            af[p, j, i] := Rigg.GetStabKraft(A0D0)
           else
             af[p, j, i] := 0;
         end;
@@ -823,7 +823,7 @@ begin
         begin
           j := YAchseRecordList[yavRF10].ArrayIndex;
           if PunktOK then
-            af[p, j, i] := Rigg.rF.AD
+            af[p, j, i] := Rigg.GetStabKraft(AD)
           else
             af[p, j, i] := 0;
         end;
@@ -831,7 +831,7 @@ begin
         begin
           j := YAchseRecordList[yavRF11].ArrayIndex;
           if PunktOK then
-            af[p, j, i] := Rigg.rF.AB
+            af[p, j, i] := Rigg.GetStabKraft(AB)
           else
             af[p, j, i] := 0;
         end;
@@ -839,7 +839,7 @@ begin
         begin
           j := YAchseRecordList[yavRF13].ArrayIndex;
           if PunktOK then
-            af[p, j, i] := Rigg.rF.AC
+            af[p, j, i] := Rigg.GetStabKraft(AC)
           else
             af[p, j, i] := 0;
         end;
@@ -1144,7 +1144,9 @@ var
   YAV: TYAchseValue;
   xpName: TxpName;
   T: TTrimmTabDaten;
+  rP: TRiggPoints;
 begin
+  rP := Rigg.RiggPoints;
   Inc(MemoCounter);
   with MemoLines do
   begin
@@ -1172,7 +1174,7 @@ begin
         Add('BerechnungsTyp: Trimmtabelle verwendet');
         Add('');
         Add('Trimmtabelle:');
-        T := Rigg.TrimmTab.TrimmTabDaten;
+        T := Rigg.TrimmTabDaten;
         case T.TabellenTyp of
           itKonstante:
           begin
@@ -1273,25 +1275,19 @@ begin
     { Koordinaten }
     Add('');
     Add('Rumpf: Koordinaten (x,y,z) [mm]');
-    with Rigg do
-    begin
-      Add(Format('  A0(%g,%g,%g)', [rP.A0.X, rP.A0.Y, rP.A0.Z]));
-      Add(Format('  B0(%g,%g,%g)', [rP.B0.X, rP.B0.Y, rP.B0.Z]));
-      Add(Format('  C0(%g,%g,%g)', [rP.C0.X, rP.C0.Y, rP.C0.Z]));
-      Add(Format('  D0(%g,%g,%g)', [rP.D0.X, rP.D0.Y, rP.D0.Z]));
-      Add(Format('  E0(%g,%g,%g)', [rP.E0.X, rP.E0.Y, rP.E0.Z]));
-      Add(Format('  F0(%g,%g,%g)', [rP.F0.X, rP.F0.Y, rP.F0.Z]));
-    end;
+    Add(Format('  A0(%g,%g,%g)', [rP.A0.X, rP.A0.Y, rP.A0.Z]));
+    Add(Format('  B0(%g,%g,%g)', [rP.B0.X, rP.B0.Y, rP.B0.Z]));
+    Add(Format('  C0(%g,%g,%g)', [rP.C0.X, rP.C0.Y, rP.C0.Z]));
+    Add(Format('  D0(%g,%g,%g)', [rP.D0.X, rP.D0.Y, rP.D0.Z]));
+    Add(Format('  E0(%g,%g,%g)', [rP.E0.X, rP.E0.Y, rP.E0.Z]));
+    Add(Format('  F0(%g,%g,%g)', [rP.F0.X, rP.F0.Y, rP.F0.Z]));
     { Mast }
     Add('');
     Add('Mast:');
-    with Rigg do
-    begin
-      Add(Format('  D0D: %d mm (Saling)', [Round(MastUnten)]));
-      Add(Format('  D0C: %d mm (Vorstag)', [Round(MastUnten + MastOben)]));
-      Add(Format('  D0F: %d mm (Top)', [Round(MastLaenge)]));
-      Add(Format('  Biegesteifigkeit EI: %d Nm^2', [MastEI]));
-    end;
+    Add(Format('  D0D: %d mm (Saling)', [Round(Rigg.MastUnten)]));
+    Add(Format('  D0C: %d mm (Vorstag)', [Round(Rigg.MastUnten + Rigg.MastOben)]));
+    Add(Format('  D0F: %d mm (Top)', [Round(Rigg.MastLength)]));
+    Add(Format('  Biegesteifigkeit EI: %d Nm^2', [Rigg.MastEI]));
     { Exit Counters }
     Add('');
     with Rigg do
@@ -1647,7 +1643,7 @@ begin
   end
   else
   begin
-    f := Rigg.GSB.GetSB(TsbName(xp));
+    f := Rigg.RggFA.GetSB(TsbName(xp));
     tempMin := Round(f.Min);
     tempMax := Round(f.Max);
     tempIst := Round(f.Ist);
@@ -1733,7 +1729,7 @@ begin
   end
   else
   begin
-    f := Rigg.GSB.GetSB(TsbName(xp));
+    f := Rigg.RggFA.GetSB(TsbName(xp));
     tempMin := Round(f.Min);
     tempMax := Round(f.Max);
     tempIst := Round(f.Ist);

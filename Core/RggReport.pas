@@ -58,18 +58,18 @@ type
     procedure PrintUnderline;
     procedure PrintUnderlineE;
   public
-    IndexAuswahlL: set of TRiggLIndexRange;
+    IndexAuswahlL: set of TRiggRodIndexRange;
     IndexAuswahlP: set of TRiggPoint;
     SofortFlag: Boolean;
     constructor Create;
     destructor Destroy; override;
-    procedure AusgabeRL(rL: TRiggLvektor);
-    procedure AusgabeRLE(rLe: TRiggLvektor);
-    procedure AusgabeDiffL(rL, rLe: TRiggLvektor);
+    procedure AusgabeRL(rL: TRiggRods);
+    procedure AusgabeRLE(rLe: TRiggRods);
+    procedure AusgabeDiffL(rL, rLe: TRiggRods);
     procedure AusgabeRP(rP: TRiggPoints);
     procedure AusgabeRPE(rPe: TRiggPoints);
     procedure AusgabeDiffP(rP, rPe: TRiggPoints);
-    procedure AusgabeRF(rF: TRiggLvektor);
+    procedure AusgabeRF(rF: TRiggRods);
     procedure AusgabeWinkel(alpha, alpha1, alpha2, beta, gamma,
       delta1, delta2, epsilon, phi, psi: single);
     procedure AusgabeTrimmControls(Ctrls: TTrimmControls);
@@ -259,7 +259,7 @@ begin
   FML.Free;
 end;
 
-procedure TRiggReport.AusgabeRL(rL: TRiggLvektor);
+procedure TRiggReport.AusgabeRL(rL: TRiggRods);
 var
   i: Integer;
 begin
@@ -277,7 +277,7 @@ begin
   end;
 end;
 
-procedure TRiggReport.AusgabeRLE(rLe: TRiggLvektor);
+procedure TRiggReport.AusgabeRLE(rLe: TRiggRods);
 var
   i: Integer;
 begin
@@ -296,7 +296,7 @@ begin
   end;
 end;
 
-procedure TRiggReport.AusgabeDiffL(rL, rLe: TRiggLvektor);
+procedure TRiggReport.AusgabeDiffL(rL, rLe: TRiggRods);
 var
   i: Integer;
 begin
@@ -376,7 +376,7 @@ begin
   end;
 end;
 
-procedure TRiggReport.AusgabeRF(rF: TRiggLvektor);
+procedure TRiggReport.AusgabeRF(rF: TRiggRods);
 var
   i: Integer;
 begin

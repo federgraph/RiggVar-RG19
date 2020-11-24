@@ -25,7 +25,7 @@ uses
   Vcl.Buttons,
   Vcl.ComCtrls,
   RggStrings,
-  RggUnit4,
+  RiggVar.RG.Model,
   RggTypes,
   RggDoc,
   RggChartModel,

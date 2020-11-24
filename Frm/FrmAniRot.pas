@@ -20,7 +20,7 @@ uses
   System.SysUtils,
   System.Classes,
   RggTypes,
-  Rggunit4,
+  RiggVar.RG.Model,
   FrmRot,
   Vcl.Graphics,
   Vcl.Controls,

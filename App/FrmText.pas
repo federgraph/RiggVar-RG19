@@ -34,6 +34,7 @@ uses
   RiggVar.FB.ActionConst,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
+  RggTypes,
   RggReport,
   Vcl.Buttons;
 

@@ -20,7 +20,7 @@ uses
   Vcl.Clipbrd,
   RggTypes,
   RggCalc,
-  RggUnit4,
+  RiggVar.RG.Model,
   RggRota,
   RggKraftGraph,
   RggMastGraph,
@@ -1104,7 +1104,7 @@ end;
 procedure TRiggModul.WriteReportToMemo(Memo: TMemo);
 var
   i: Integer;
-  SavedIndexAuswahl: set of TRiggLIndexRange;
+  SavedIndexAuswahl: set of TRiggRodIndexRange;
 begin
   Memo.Clear;
 

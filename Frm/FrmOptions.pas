@@ -21,7 +21,7 @@ uses
   Vcl.Menus,
   Vcl.ComCtrls,
   RggScroll,
-  RggUnit4,
+  RiggVar.RG.Model,
   RggTypes,
   RggTrimmTab,
   RggTrimmTabGraph;
@@ -135,7 +135,7 @@ type
     FiMastWante: Integer;
     FiMastTop: Integer;
     FiEI: Integer;
-    FEAarray: TRiggLvektor;
+    FEAarray: TRiggRods;
 
     FMastTypList: TStringList;
     FMastMassList: TStringList;
@@ -266,7 +266,7 @@ begin
   FiEI := Rigg.MastEI;
   FiMastSaling := Round(Rigg.MastUnten);
   FiMastWante := FiMastSaling + Round(Rigg.MastOben);
-  FiMastTop := Round(Rigg.MastLaenge);
+  FiMastTop := Round(Rigg.MastLength);
   FiP := Rigg.rP;
   FTrimmTabelle := Rigg.TrimmTab;
   FTrimmTabDaten := FTrimmTabelle.TrimmTabDaten;
@@ -651,7 +651,7 @@ begin
   Rigg.rP := FiP; { Rumpfkoordinaten}
   Rigg.MastUnten := FiMastSaling;
   Rigg.MastOben := FiMastWante - FiMastSaling;
-  Rigg.MastLaenge := FiMastTop;
+  Rigg.MastLength := FiMastTop;
   Rigg.GSB := FGSB; { neue Grenzen und Istwerte }
   Rigg.EA := FEAarray;
   Rigg.MastEI := FiEI;

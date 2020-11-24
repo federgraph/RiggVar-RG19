@@ -25,7 +25,7 @@ interface
 uses
   Math,
   RggTypes,
-  RggUnit4;
+  RiggVar.RG.Model;
 
 type
   TSalingDreieck = class
@@ -167,12 +167,12 @@ end;
 
 procedure TSalingDreieck.CopyFromRigg(Rigg: TRigg);
 begin
-  FSalingHMin := Rigg.GSB.SalingH.Min;
-  FSalingHMax := Rigg.GSB.SalingH.Max;
-  FSalingH := Rigg.GSB.SalingH.Ist;
-  FSalingAMin := Rigg.GSB.SalingA.Min;
-  FSalingAMax := Rigg.GSB.SalingA.Max;
-  FSalingA := Rigg.GSB.SalingA.Ist;
+  FSalingHMin := Rigg.RggFA.SalingH.Min;
+  FSalingHMax := Rigg.RggFA.SalingH.Max;
+  FSalingH := Rigg.RggFA.SalingH.Ist;
+  FSalingAMin := Rigg.RggFA.SalingA.Min;
+  FSalingAMax := Rigg.RggFA.SalingA.Max;
+  FSalingA := Rigg.RggFA.SalingA.Ist;
 end;
 
 end.
