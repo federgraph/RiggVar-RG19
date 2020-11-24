@@ -19,10 +19,12 @@ uses
   RiggVar.FD.Rota,
 {$endif}
 {$ifdef WantRotaForm3}
+//  FMX.Viewport3D,
   RiggVar.FG.Rota,
 {$endif}
 {$ifdef UseImage }
-  ExtCtrls,
+//  RiggVar.FD.Image,
+  Vcl.ExtCtrls,
 {$endif}
   RiggVar.RG.Graph;
 

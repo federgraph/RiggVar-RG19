@@ -516,6 +516,7 @@ begin
   StrokeRigg.Koordinaten := Rigg.RiggPoints;
   StrokeRigg.KoordinatenE := Rigg.RelaxedRiggPoints;
   StrokeRigg.SetKoppelKurve(Rigg.GetKoppelKurve);
+  StrokeRigg.SetMastKurve(Rigg.GetMastKurve);
   StrokeRigg.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
 
   StrokeRigg.DoOnUpdateStrokeRigg;
@@ -825,7 +826,7 @@ begin
 
   Rigg.ManipulatorMode := (Value = fpWinkel);
   FParam := Value;
-  CurrentValue := Rigg.RggFA.Find(FParam).Ist;
+ CurrentValue := Rigg.RggFA.Find(FParam).Ist;
   SetupTrackBarForRgg;
   UpdateGraph;
 end;

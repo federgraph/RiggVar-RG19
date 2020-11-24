@@ -17,6 +17,7 @@ uses
   RggCalc in 'Core\RggCalc.pas',
   RggDoc in 'Core\RggDoc.pas',
   RggFachwerk in 'Core\RggFachwerk.pas',
+  RggInter in 'Core\RggInter.pas',
   RggReport in 'Core\RggReport.pas',
   RggSchnittGG in 'Core\RggSchnittGG.pas',
   RggSchnittKK in 'Core\RggSchnittKK.pas',
@@ -56,13 +57,14 @@ uses
   RiggVar.RG.Def in 'RG\RiggVar.RG.Def.pas',
   RiggVar.RG.Graph in 'RG\RiggVar.RG.Graph.pas',
   RiggVar.RG.Main in 'RG\RiggVar.RG.Main.pas',
+  RiggVar.RG.Model in 'RG\RiggVar.RG.Model.pas',
+  RiggVar.RG.Rota in 'RG\RiggVar.RG.Rota.pas',
   RiggVar.RG.Report in 'RG\RiggVar.RG.Report.pas',
   RiggVar.RG.Speed01 in 'RG\RiggVar.RG.Speed01.pas',
   RiggVar.RG.Speed02 in 'RG\RiggVar.RG.Speed02.pas',
   RiggVar.RG.Speed03 in 'RG\RiggVar.RG.Speed03.pas',
   RiggVar.RG.Speed04 in 'RG\RiggVar.RG.Speed04.pas',
   RiggVar.RG.Track in 'RG\RiggVar.RG.Track.pas',
-  RiggVar.RG.Rota in 'RG\RiggVar.RG.Rota.pas',
   RggDisplay in 'Graph\RggDisplay.pas',
   RggPolarKar in 'Graph\RggPolarKar.pas',
   RggRota in 'Graph\RggRota.pas',
@@ -130,9 +132,7 @@ uses
   RiggVar.FZ.Z19_Chart in 'FZ\RiggVar.FZ.Z19_Chart.pas',
   RiggVar.FZ.Z20_Epsilon in 'FZ\RiggVar.FZ.Z20_Epsilon.pas',
   RiggVar.FZ.Z21_Rotations in 'FZ\RiggVar.FZ.Z21_Rotations.pas',
-  RiggVar.FZ.Z22_BigArc in 'FZ\RiggVar.FZ.Z22_BigArc.pas',
-  RggInter in 'Core\RggInter.pas',
-  RiggVar.RG.Model in 'RG\RiggVar.RG.Model.pas';
+  RiggVar.FZ.Z22_BigArc in 'FZ\RiggVar.FZ.Z22_BigArc.pas';
 
 {$R *.res}
 

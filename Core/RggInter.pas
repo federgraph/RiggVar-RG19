@@ -25,6 +25,7 @@ type
     function GetStabKraefte: TRiggRods;
 
     function GetKoppelKurve: TKoordLine;
+    function GetMastKurve: TMastKurve;
     function GetRealTrimm(Index: TTrimmIndex): single;
 
     function GetPoint3D(Value: TRiggPoint): TPoint3D;
@@ -84,13 +85,14 @@ type
     function GetMastLength: single;
     function GetMastOben: single;
     function GetMastUnten: single;
+    function GetMastPostionE: single;
+
     procedure SetMastLength(const Value: single);
     procedure SetMastUnten(const Value: single);
     procedure SetMastOben(const Value: single);
 
     procedure SetDefaultDocument;
     procedure Schnittkraefte; // ComputeSchnittKraefte or DoSchnittKraefter
-    procedure Reset;
     procedure NeigeF(Mastfall: single);
     procedure BiegeUndNeigeC(MastfallC, Biegung: single);
     procedure MakeSalingHBiggerFS(SalingHplus: single);
@@ -112,6 +114,10 @@ type
 
     procedure WriteXml(ML: TStrings; AllTags: Boolean = False);
     procedure AusgabeText(ML: TStrings; WantAll: Boolean = True; WantForce: Boolean = False);
+
+    procedure Reset;
+    procedure UpdateGSB;
+    procedure UpdateGlieder;
 
     property RggFA: TRggFA read GetRggFA;
     property RiggPoints: TRiggPoints read GetRiggPoints write SetRiggPoints;
@@ -150,6 +156,7 @@ type
     property MastLength: single read GetMastLength write SetMastLength;
     property MastUnten: single read GetMastUnten write SetMastUnten;
     property MastOben: single read GetMastOben write SetMastOben;
+    property MastPositionE: single read GetMastPostionE;
 
     property DurchbiegungHE: single read GetDurchbiegungHE;
     property DurchbiegungHD: single read GetDurchbiegungHD;

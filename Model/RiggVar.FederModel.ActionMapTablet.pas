@@ -216,7 +216,7 @@ begin
       cla := TRggColors.White;
       InitAC(cl, 1, faCycleColorSchemeM, cla);
       InitAC(cl, 2, faCycleColorSchemeP, cla);
-      InitAC(cl, 3, faToggleSpeedPanel, cla);
+      InitAC(cl, 3, faToggleSpeedPanel, TRggColors.Plum);
       InitAC(cl, 4, faShowDrawings, claForm);
       InitAC(cl, 5, faMemoryRecallBtn, cla);
       InitAC(cl, 6, faMemoryBtn, cla);
@@ -278,10 +278,10 @@ begin
 
       cl := TopRight;
       cla := TRggColors.White;
-      InitAC(cl, 1, faViewpoint3, cla);
-      InitAC(cl, 2, faViewpointS, cla);
-      InitAC(cl, 3, faViewpointA, cla);
-      InitAC(cl, 4, faViewpointT, cla);
+      InitAC(cl, 1, faViewpointS, cla);
+      InitAC(cl, 2, faViewpointA, cla);
+      InitAC(cl, 3, faViewpointT, cla);
+      InitAC(cl, 4, faViewpoint3, cla);
       InitAC(cl, 5, faActionPageP, TRggColors.Yellow);
       InitAC(cl, 6, faParamEAH, claParam);
       InitAC(cl, 7, faParamEAR, claParam);
@@ -346,7 +346,7 @@ begin
       InitAC(cl, 1, faUpdateTrimm0, claSample);
       InitAC(cl, 2, faCopyAndPaste, claSample);
       InitAC(cl, 3, faNoop, cla);
-      InitAC(cl, 4, faNoop, cla);
+      InitAC(cl, 4, faPan, TRggColors.Plum);
       InitAC(cl, 5, faDemo, cla);
       InitAC(cl, 6, faRggHull, claOption);
     end;
@@ -382,14 +382,13 @@ begin
       InitAC(cl, 7, faNoop, TRggColors.White);
       InitAC(cl, 8, faNoop, TRggColors.White);
 
-      cla := TRggColors.White;
       cl := BottomRight;
-      InitAC(cl, 1, faCycleColorSchemeM, cla);
-      InitAC(cl, 2, faCycleColorSchemeP, cla);
-      InitAC(cl, 3, faNoop, cla);
-      InitAC(cl, 4, faReportDebugReport, TRggColors.Goldenrod);
-      InitAC(cl, 5, faReportReadme, TRggColors.Goldenrod);
-      InitAC(cl, 6, faReportNone, TRggColors.Goldenrod);
+      InitAC(cl, 1, faCycleColorSchemeM, TRggColors.White);
+      InitAC(cl, 2, faCycleColorSchemeP, TRggColors.White);
+      InitAC(cl, 3, faSofortBtn, TRggColors.Plum);
+      InitAC(cl, 4, faReportDebugReport, cla);
+      InitAC(cl, 5, faReportReadme, cla);
+      InitAC(cl, 6, faReportNone, cla);
     end;
 
     6:
