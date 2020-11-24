@@ -142,7 +142,6 @@ ActionGroupForms := IntegerArray([
   faRotaForm2,
   faRotaForm3,
   faShowMemo,
-  faShowMemo,
   faShowActions,
   faShowOptions,
   faShowDrawings,
