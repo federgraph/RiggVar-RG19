@@ -29,7 +29,7 @@ uses
   Vcl.Menus,
   RggStrings,
   RggScroll,
-  RggUnit4,
+  RiggVar.RG.Model,
   RggTypes;
 
 type
@@ -159,7 +159,7 @@ type
     FiMastWante: Integer;
     FiMastTop: Integer;
     FiEI: Integer;
-    FEAarray: TRiggLvektor;
+    FEAarray: TRiggRods;
 
     FMastTypList: TStringList;
     FMastMassList: TStringList;
@@ -220,6 +220,8 @@ begin
 
   FScale := MainVar.Scale;
 
+  FGSB := TRggFA.Create;
+
   FMastTypList := TStringList.Create;
   FMastMassList := TStringList.Create;
   FElementList := TStringList.Create;
@@ -252,6 +254,7 @@ begin
   FQuerschnittList.Free;
   FTrimmList.Free;
   FTempList.Free;
+  FGSB.Free;
 end;
 
 procedure TFormConfig.GetKeyList(Source, Dest: TStringList);
@@ -320,13 +323,13 @@ procedure TFormConfig.FillRiggLists;
 var
   fs: string;
 begin
-  FGSB := Rigg.GSB;
+  FGSB.Assign(Rigg.RggFA);
   FEAarray := Rigg.EA; { EA in KN }
   FiEI := Rigg.MastEI;
   FiMastSaling := Round(Rigg.MastUnten);
   FiMastWante := FiMastSaling + Round(Rigg.MastOben);
-  FiMastTop := Round(Rigg.MastLaenge);
-  FiP := Rigg.rP;
+  FiMastTop := Round(Rigg.MastLength);
+  FiP := Rigg.RiggPoints;
 
   FMastMassList.Clear;
   FElementList.Clear;
@@ -687,11 +690,11 @@ end;
 
 procedure TFormConfig.OKBtnClick(Sender: TObject);
 begin
-  Rigg.rP := FiP; { Rumpfkoordinaten }
+  Rigg.RiggPoints := FiP; { Rumpfkoordinaten }
   Rigg.MastUnten := FiMastSaling;
   Rigg.MastOben := FiMastWante - FiMastSaling;
-  Rigg.MastLaenge := FiMastTop;
-  Rigg.GSB := FGSB; { neue Grenzen und Istwerte }
+  Rigg.MastLength := FiMastTop;
+  Rigg.RggFA.Assign(FGSB); { neue Grenzen und Istwerte }
   Rigg.EA := FEAarray;
   Rigg.MastEI := FiEI;
 end;
@@ -1220,7 +1223,6 @@ begin
   MinEdit.MaxLength := 4;
   PosEdit.MaxLength := 4;
   MaxEdit.MaxLength := 4;
-
   MastMassEdit.MaxLength := 4;
 
   IniMemo.ScrollBars := ssVertical;

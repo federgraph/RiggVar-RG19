@@ -26,6 +26,10 @@ object FormSaling: TFormSaling
     object Salingsheet: TTabSheet
       Tag = 3
       Caption = 'Saling'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnSaling: TPanel
         Left = 0
         Top = 0

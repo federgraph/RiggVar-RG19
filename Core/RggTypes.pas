@@ -26,7 +26,6 @@ uses
   SysUtils,
   Classes,
   Types,
-  Math,
   RiggVar.FD.Point,
   RiggVar.RG.Def;
 
@@ -43,6 +42,41 @@ var
 
 type
   EFileFormatError = class(Exception);
+
+  TFederParam = (
+    fpController,
+    fpWinkel,
+    fpVorstag,
+    fpWante,
+    fpWoben,
+    fpSalingH,
+    fpSalingA,
+    fpSalingL,
+    fpVorstagOS,
+    fpWPowerOS,
+    fpSalingW,
+    fpMastfallF0C,
+    fpMastfallF0F,
+    fpMastfallVorlauf,
+    fpBiegung,
+    fpD0X,
+    fpAPW,
+    fpEAH,
+    fpEAR,
+    fpEI,
+    fprx,
+    fpry,
+    fprz,
+    fptx,
+    fpty,
+    fpcz,
+    fppx,
+    fppy,
+    fppz,
+    fpva,
+    fpnp,
+    fpfp
+    );
 
   TGraphRadio = (
     gSimple,
@@ -145,6 +179,29 @@ type
     ooM
     );
 
+  TRiggRod = (
+    D0C, // Mast
+    C0D0, // Vorstag - Mastfuß
+    B0C0, // Pütting Bb - Vorstag
+    A0C0, // Pütting Stb - Vorstag
+    B0D0, // Pütting Bb - Mastfuß
+    A0D0, // Pütting Stb - Mastfuß
+    A0B0, // Püttingabstand
+    B0B, // Wante unten Bb
+    A0A, // Wante unten Stb
+    BD, // Saling Bb
+    AD, // Saling Stb
+    AB, // Saling-Verbindung
+    BC, // Wante oben Bb
+    AC, // Wante oben Stb
+    C0C, // Vorstag
+    DC, // Mast Oben
+    D0D, // Mast Unten
+    ED,
+    D0E,
+    E0E // Controller
+  );
+
   TRiggPoints = record
     case Integer of
       0: (V: array [TRiggPoint] of TPoint3D);
@@ -170,9 +227,9 @@ type
   TMastKurve = array [0..BogenMax] of TPoint3D;
   TZugPolyLine = array of TPoint;
 
-  TRiggLIndexRange = 0 .. 19;
-  TRiggLvektor = record
-    class function AbstandName(Index: TRiggLIndexRange): string; static;
+  TRiggRodIndexRange = 0 .. 19;
+  TRiggRods = record
+    class function AbstandName(Index: TRiggRodIndexRange): string; static;
     case Integer of
       0: (V: array [0 .. 19] of single);
       1: (
@@ -197,6 +254,7 @@ type
         D0E: single;
         E0E: single; // Controller
       );
+      2: (Rod: array [TRiggRod] of single);
   end;
 
   TTrimm = record
@@ -286,7 +344,24 @@ type
 
   TKoordLabels = array [TRiggPoint] of string;
 
+  TKurvenTyp = (KurveOhneController, KurveMitController);
+  TMastStatusSet = set of TMastStatus;
+
+  TMastGraphModel = class
+  public
+    FLineCountM: Integer;
+    LineData: TLineDataR100; { Durchbiegungswerte in mm }
+    GetriebeOK: Boolean;
+  end;
+
 const
+  { in KN / cm^2 }
+  EModulStahl = 210E3; { N/mm^2 }
+  EModulAlu = 70E3; { N/mm^2 }
+  EAgross = 100E6; { N }
+  EARumpf = 10E6; { N }
+  EASaling = 1E6; { N }
+
   ZeroCtrl: TTrimmControls = (
     Controller: 0;
     Winkel: 0;
@@ -581,7 +656,7 @@ end;
 
 { TRiggLrecord }
 
-class function TRiggLvektor.AbstandName(Index: TRiggLIndexRange): string;
+class function TRiggRods.AbstandName(Index: TRiggRodIndexRange): string;
 begin
 
   case Index of

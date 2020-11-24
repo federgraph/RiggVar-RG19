@@ -278,10 +278,10 @@ begin
 
       cl := TopRight;
       cla := TRggColors.White;
-      InitAC(cl, 1, faViewpoint3, cla);
-      InitAC(cl, 2, faViewpointS, cla);
-      InitAC(cl, 3, faViewpointA, cla);
-      InitAC(cl, 4, faViewpointT, cla);
+      InitAC(cl, 1, faViewpointS, cla);
+      InitAC(cl, 2, faViewpointA, cla);
+      InitAC(cl, 3, faViewpointT, cla);
+      InitAC(cl, 4, faViewpoint3, cla);
       InitAC(cl, 5, faActionPageP, TRggColors.Yellow);
       InitAC(cl, 6, faParamEAH, claParam);
       InitAC(cl, 7, faParamEAR, claParam);
@@ -299,11 +299,11 @@ begin
       InitAC(cl, 8, faMastfallF0C, cla);
 
       cl := BottomRight;
-//      cla := TRggColors.White;
-      InitAC(cl, 1, faSalingTypFest, claOption);
-      InitAC(cl, 2, faSalingTypDrehbar, claOption);
-      InitAC(cl, 3, faSalingTypOhne, claOption);
-      InitAC(cl, 4, faSalingTypOhneStarr, claOption);
+      cla := claOption;
+      InitAC(cl, 1, faSalingTypFest, cla);
+      InitAC(cl, 2, faSalingTypDrehbar, cla);
+      InitAC(cl, 3, faSalingTypOhne, cla);
+      InitAC(cl, 4, faSalingTypOhneStarr, cla);
       InitAC(cl, 5, faShowKreis, claForm);
       InitAC(cl, 6, faShowInfo, claForm);
     end;
@@ -382,14 +382,13 @@ begin
       InitAC(cl, 7, faNoop, TRggColors.White);
       InitAC(cl, 8, faNoop, TRggColors.White);
 
-      cla := TRggColors.White;
       cl := BottomRight;
-      InitAC(cl, 1, faCycleColorSchemeM, cla);
-      InitAC(cl, 2, faCycleColorSchemeP, cla);
-      InitAC(cl, 3, faNoop, cla);
-      InitAC(cl, 4, faReportDebugReport, TRggColors.Goldenrod);
-      InitAC(cl, 5, faReportReadme, TRggColors.Goldenrod);
-      InitAC(cl, 6, faReportNone, TRggColors.Goldenrod);
+      InitAC(cl, 1, faCycleColorSchemeM, TRggColors.White);
+      InitAC(cl, 2, faCycleColorSchemeP, TRggColors.White);
+      InitAC(cl, 3, faSofortBtn, TRggColors.Plum);
+      InitAC(cl, 4, faReportDebugReport, cla);
+      InitAC(cl, 5, faReportReadme, cla);
+      InitAC(cl, 6, faReportNone, cla);
     end;
 
     6:
@@ -490,7 +489,7 @@ begin
       InitAC(cl, 3, faToggleChartGraph, cla);
       InitAC(cl, 4, faToggleMatrixText, cla);
       //InitAC(cl, 5, faActionPageP, TRggColors.Yellow);
-      InitAC(cl, 6, faNoop, cla);
+      InitAC(cl, 6, faNoop, TRggColors.White);
       InitAC(cl, 7, faRggZoomIn, TRggColors.Beige);
       InitAC(cl, 8, faRggZoomOut, TRggColors.Beige);
 
@@ -523,12 +522,12 @@ begin
       InitAC(cl, 2, faChartRect, TRggColors.Plum);
       InitAC(cl, 3, faChartTextRect, TRggColors.Plum);
       InitAC(cl, 4, faChartLegend, TRggColors.Plum);
-      InitAC(cl, 5, faNoop, TRggColors.Plum);
+      InitAC(cl, 5, faNoop, cla);
       InitAC(cl, 6, faChartReset, cla);
 
       cl := TopRight;
       InitAC(cl, 1, faXComboMinus, cla);
-      InitAC(cl, 2, faXComboPlus, TRggColors.White);
+      InitAC(cl, 2, faXComboPlus, cla);
       InitAC(cl, 3, faPComboMinus, cla);
       InitAC(cl, 4, faPComboPlus, cla);
       //InitAC(cl, 5, faActionPageP, TRggColors.Yellow);
@@ -549,10 +548,10 @@ begin
       cl := BottomRight;
       InitAC(cl, 1, faCycleColorSchemeM, cla);
       InitAC(cl, 2, faCycleColorSchemeP, cla);
-      InitAC(cl, 3, faShowDiagA, cla);
-      InitAC(cl, 4, faShowDiagE, cla);
-      InitAC(cl, 5, faShowDiagQ, cla);
-      InitAC(cl, 6, faShowDiagC, cla);
+      InitAC(cl, 3, faToggleChartGraph, claForm);
+      InitAC(cl, 4, faShowDiagE, claForm);
+      InitAC(cl, 5, faShowDiagQ, claForm);
+      InitAC(cl, 6, faShowDiagC, claForm);
     end;
 
     10:

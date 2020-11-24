@@ -11,7 +11,7 @@ interface
 
 uses
   RggTypes,
-  RiggVar.RG.Graph,
+  System.UITypes,
 {$ifdef WantRotaForm1}
   RggRota,
 {$endif}
@@ -26,7 +26,7 @@ uses
 //  RiggVar.FD.Image,
   Vcl.ExtCtrls,
 {$endif}
-  System.UITypes;
+  RiggVar.RG.Graph;
 
 type
   TRotaForm = class

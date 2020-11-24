@@ -11,7 +11,7 @@ uses
   Vcl.ExtCtrls,
   Vcl.Buttons,
   Vcl.ComCtrls,
-  RggUnit4,
+  RiggVar.RG.Model,
   RggReport;
 
 type
@@ -147,7 +147,7 @@ end;
 
 procedure TFormTabelle.WriteReportToMemo(Memo: TMemo);
 var
-  SavedIndexAuswahl: set of TRiggLIndexRange;
+  SavedIndexAuswahl: set of TRiggRodIndexRange;
 begin
   Memo.Clear;
 

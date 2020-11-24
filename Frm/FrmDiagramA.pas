@@ -18,7 +18,7 @@ uses
   RggTypes,
   RggScroll,
   RggCalc,
-  RggUnit4;
+  RiggVar.RG.Model;
 
 const
   ANr = 6;
@@ -170,7 +170,7 @@ var
   cr: TRggSB;
 begin
   BottomTitel := GetXText(IntendedX);
-  cr := Rigg.GSB.Find(IntendedX);
+  cr := Rigg.RggFA.Find(IntendedX);
   Xmin := cr.Min;
   Xmax := cr.Max;
   ActualX := IntendedX;
@@ -558,8 +558,8 @@ begin
     Rigg.ProofRequired := False;
 
     { Definitionsbereich bestimmen und Berechnungsschleife starten }
-    Anfang := Rigg.GSB.Find(IntendedX).Min;
-    Ende := Rigg.GSB.Find(IntendedX).Max;
+    Anfang := Rigg.RggFA.Find(IntendedX).Min;
+    Ende := Rigg.RggFA.Find(IntendedX).Max;
     for i := 0 to CPMax do
     begin
       Antrieb := Anfang + (Ende - Anfang) * i / CPMax;

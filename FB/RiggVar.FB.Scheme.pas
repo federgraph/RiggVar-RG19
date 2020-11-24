@@ -32,8 +32,8 @@ type
 
     Scheme: Integer;
     SchemeDefault: Integer;
-    claBackground: TRggColor;
 
+    claBackground: TRggColor;
     claToolBtnFill: TRggColor;
     claTouchBtnFill: TRggColor;
     claCornerScrollbar: TRggColor;
@@ -88,8 +88,10 @@ begin
   Dark := 5;
   Light := 2;
   WantBlackText := True;
+
   claTouchbarText := TRggColors.Black;
   claNull := TRggColors.Null;
+
   SchemeDefault := cs;
   Scheme := SchemeDefault;
   Init(Scheme);
@@ -99,6 +101,7 @@ procedure TColorScheme.Init(cs: Integer);
 begin
   Scheme := cs;
   IsDark := True;
+
   case cs of
     1:
     begin
@@ -162,7 +165,7 @@ begin
     end;
     7:
     begin
-      claBackground := TRggColors.Purple; //TRggColors.Null;
+      claBackground := TRggColors.Purple;
       claToolBtnFill := TRggColors.Gray;
       claTouchBtnFill := TRggColors.Gray;
       claCornerScrollbar := TRggColors.Lightgoldenrodyellow;

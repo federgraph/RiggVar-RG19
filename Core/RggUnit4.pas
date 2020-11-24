@@ -38,7 +38,7 @@ type
   private
     function GetRealTrimm(Index: TTrimmIndex): single;
   public
-{$ifdef MSWindowsDelphi}
+{$ifdef MSWindows}
     procedure WriteXml(ML: TStrings; AllTags: Boolean = False);
 {$endif}
     procedure AusgabeText(ML: TStrings; WantAll: Boolean = True; WantForce: Boolean = False);
@@ -87,7 +87,7 @@ implementation
   end;
 }
 
-{$ifdef MSWindowsDelphi}
+{$ifdef MSWindows}
 procedure TRigg.WriteXml(ML: TStrings; AllTags: Boolean);
 var
   Document: TRggDocument;

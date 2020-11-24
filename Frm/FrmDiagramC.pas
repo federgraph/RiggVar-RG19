@@ -50,6 +50,7 @@ type
     BoxWidth: Integer;
     BoxHeight: Integer;
     MemoWidth: Integer;
+    MemoHeight: Integer;
     Layout: Integer;
     cr: TControl;
     Margin: Integer;
@@ -97,7 +98,9 @@ begin
 
   BoxWidth := Round(200 * FScale);
   BoxHeight := Round(160 * FScale);
+
   MemoWidth := Round(350 * FScale);
+  MemoHeight := Round(350 * FScale);
 
   WantAutoUpdate := True;
 
@@ -196,6 +199,7 @@ begin
   YBox.Height := BoxHeight;
 
   Memo.Width := MemoWidth;
+  Memo.Height := MemoHeight;
 end;
 
 procedure TFormDiagramC.InitComponentLinks;

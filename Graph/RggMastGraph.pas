@@ -7,7 +7,7 @@ uses
   System.Types,
   System.UITypes,
   RggTypes,
-  RggUnit2,
+  RiggVar.RG.Model,
   Vcl.Graphics,
   Vcl.ExtCtrls;
 

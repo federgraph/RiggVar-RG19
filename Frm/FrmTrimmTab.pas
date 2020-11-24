@@ -20,7 +20,7 @@ uses
   Vcl.ComCtrls,
   Vcl.Buttons,
   Vcl.Menus,
-  RggUnit4,
+  RiggVar.RG.Model,
   RggTypes,
   RggTrimmTab,
   RggTrimmTabGraph;
@@ -149,7 +149,7 @@ begin
   K1UpDown.Enabled := False;
   W1UpDown.Enabled := False;
 
-  FTrimmTabelle := Rigg.TrimmTab;
+  FTrimmTabelle := Rigg.TrimmTabelle;
   FTrimmTabDaten := FTrimmTabelle.TrimmTabDaten;
   CheckTabelle;
 

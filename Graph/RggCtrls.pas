@@ -399,8 +399,8 @@ begin
 //  g.TextOut(0, -v40, Format('alpha1 = %6.2f', [Main.RggMain.Rigg.alpha1]));
 //  g.TextOut(0, -v50, Format('lc = %6.2f', [Main.RggMain.Rigg.lc]));
   { drift because of how le is determined, see RggUnit2.FanIn() }
-  g.TextOut(v30, -v40, Format('le = %6.2f', [Main.Rigg.le]));
-  g.TextOut(v30, -v30, Format('BiegungE = %6.2f', [Main.Rigg.BiegungE]));
+  g.TextOut(v30, -v40, Format('le = %6.2f', [Main.Rigg.MastLE]));
+  g.TextOut(v30, -v30, Format('BiegungE = %6.2f', [Main.Rigg.DurchBiegungHE]));
   g.TextOut(v30, -v20, Format('ParamXE = %6.2f', [ParamXE]));
 
 //  g.TextOut(0, -v50, Format('ControllerPos = %d', [ControllerPos]));

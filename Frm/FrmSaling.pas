@@ -13,7 +13,7 @@ uses
   Vcl.Buttons,
   Vcl.ComCtrls,
   RggTypes,
-  RggUnit4,
+  RiggVar.RG.Model,
   RggCtrls;
 
 type

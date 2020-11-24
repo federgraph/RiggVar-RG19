@@ -32,7 +32,7 @@ uses
   RggCtrls,
   RggChartGraph,
   RggTypes,
-  RggUnit4,
+  RiggVar.RG.Model,
   SysUtils,
   Classes,
   Types,

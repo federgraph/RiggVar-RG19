@@ -25,6 +25,10 @@ object FormDiagramA: TFormDiagramA
     object ChartSheet: TTabSheet
       Tag = 4
       Caption = 'Diagramm'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnChart2: TPanel
         Left = 0
         Top = 0
