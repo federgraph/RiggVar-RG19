@@ -9,7 +9,6 @@ interface
 uses
   IniFiles,
   RiggVar.FD.Point,
-  RggCalc,
   RggTypes,
   RggGraph;
 
