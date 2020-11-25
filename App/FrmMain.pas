@@ -76,7 +76,9 @@ type
     procedure InitDebugInfo;
     procedure InitZOrderInfo;
     procedure ShowHelpText(fa: Integer);
+    function GetCanShowMemo: Boolean;
   protected
+    HelpTopic: Integer;
     ShowingHelp: Boolean;
     HL: TStringList;
     RL: TStrings;
@@ -96,6 +98,7 @@ type
     function GetOpenFileName(dn, fn: string): string;
     function GetSaveFileName(dn, fn: string): string;
   public
+    FocusContainer: TButton;
     HintContainer: TWinControl;
     HintText: TLabel;
     ReportText: TMemo;
@@ -200,9 +203,8 @@ type
     procedure SetViewPoint(const Value: TViewPoint);
     property ViewPoint: TViewPoint read FViewPoint write SetViewPoint;
     property IsUp: Boolean read GetIsUp write SetIsUp;
+    property CanShowMemo: Boolean read GetCanShowMemo;
   public
-    BitmapWidth: Integer;
-    BitmapHeight: Integer;
     Image: TImage;
     ImagePositionX: Integer;
     ImagePositionY: Integer;
@@ -269,8 +271,8 @@ uses
   RiggVar.FB.Classes;
 
 const
-  HelpCaptionText = 'press ? for help';
-  ApplicationTitleText = 'RG67';
+  HelpCaptionText = 'RG19 - press ? for help';
+  ApplicationTitleText = 'RG19';
 
 { TFormMain }
 
@@ -425,7 +427,7 @@ begin
   begin
     Main.ActionHandler.Execute(fa);
   end;
-  ShowTrimm;
+//  ShowTrimm;
 end;
 
 procedure TFormMain.UpdateOnParamValueChanged;
@@ -548,6 +550,7 @@ begin
   if not FormShown then
   begin
     FormShown := True;
+    UpdateParent;
 
     { ClientHeigt is now available }
     LayoutComponents;
@@ -558,6 +561,8 @@ begin
 
     RotaForm.IsUp := True;
     RotaForm.Draw;
+
+    FocusContainer.SetFocus;
   end;
 end;
 
@@ -615,12 +620,15 @@ begin
 
   UpdateParent;
 
-  if (ClientWidth < 900 * FScale) or (ClientHeight < 700 * FScale) then
+  if not CanShowMemo then
   begin
     if RotaForm.LegendItemChecked then
     begin
       RotaForm.LegendBtnClick(nil);
     end;
+
+    SpeedPanel.Visible := False;
+
     TrimmText.Visible := False;
     ParamListbox.Visible := False;
     if ReportListbox <> nil then
@@ -629,7 +637,10 @@ begin
     ReportText.Visible := False;
     ReportText.Anchors := [];
 
-    HintContainer.Left := Raster + Margin;
+    FocusContainer.Left := Raster + Margin;
+    FocusContainer.Visible := Width - 2 * Raster > FocusContainer.Width;
+
+    HintContainer.Left := 2 * Raster + Margin;
     HintContainer.Visible := Width - 2 * Raster > HintContainer.Width;
 
     PosLeft := Raster + Margin;
@@ -640,12 +651,24 @@ begin
   end
   else
   begin
+    SpeedPanel.Visible := True;
+
     TrimmText.Visible := True;
     ParamListbox.Visible := True;
     ReportListbox.Visible := True;
 
+    ReportListbox.Anchors := [];
+    ReportListbox.Left := ParamListbox.Left;
+    ReportListbox.Top := ParamListbox.Top + ParamListbox.Height + Margin;
+    ReportListbox.Width := ParamListbox.Width;
+    ReportListbox.Height := ClientHeight - ReportListbox.Top - Raster - Margin;
+    ReportListbox.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akBottom];
+
+    FocusContainer.Visible := True;
+    FocusContainer.Left := TrimmText.Left + TrimmText.Width + Margin;
+
     HintContainer.Visible := True;
-    HintContainer.Left := TrimmText.Left + TrimmText.Width + Margin;
+    HintContainer.Left := FocusContainer.Left + FocusContainer.Width + Margin;
 
     ReportText.Visible := True;
     ReportText.Anchors := [];
@@ -702,6 +725,7 @@ end;
 
 procedure TFormMain.Reset;
 begin
+  HelpTopic := faShowHelpText;
   DefaultCaption := ApplicationTitleText;
   Flash(DefaultCaption);
 end;
@@ -780,11 +804,15 @@ end;
 procedure TFormMain.HandleAction(fa: Integer);
 begin
   case fa of
+    faToggleAllText: ToggleAllText;
     faToggleSpeedPanel: ToggleSpeedPanel;
 
     faToggleHelp:
     begin
-      ShowingHelp := True;
+      ShowingHelp := not ShowingHelp;
+      if ShowingHelp then
+         ShowHelpText(HelpTopic)
+      else
       UpdateReport;
     end;
 
@@ -1115,6 +1143,7 @@ procedure TFormMain.SetShowDataText(const Value: Boolean);
 begin
   if Value then
   begin
+    ShowingHelp := False;
     ShowReport(TRggReport.rgDataText);
   end
   else
@@ -1127,6 +1156,7 @@ procedure TFormMain.SetShowDiffText(const Value: Boolean);
 begin
   if Value then
   begin
+    ShowingHelp := False;
     ShowReport(TRggReport.rgDiffText);
   end
   else
@@ -1139,6 +1169,7 @@ procedure TFormMain.SetShowTrimmText(const Value: Boolean);
 begin
   if Value then
   begin
+    ShowingHelp := False;
     ShowReport(TRggReport.rgTrimmText);
   end
   else
@@ -1171,6 +1202,12 @@ end;
 
 procedure TFormMain.CreateComponents;
 begin
+  FocusContainer := TButton.Create(Self);
+  FocusContainer.Name := 'FocusContainer';
+  FocusContainer.Parent := Self;
+  FocusContainer.TabStop := True;
+  FocusContainer.Caption := '';
+
   HintContainer := TWinControl.Create(Self);
   HintContainer.Name := 'HintContainer';
   HintContainer.Parent := Self;
@@ -1190,6 +1227,8 @@ begin
 
   TrimmText := TMemo.Create(Self);
   SetupMemo(TrimmText);
+  TrimmText.ReadOnly := True;
+  TrimmText.TabStop := False;
 
   Image := TImage.Create(Self);
   Image.Name := 'Image';
@@ -1257,7 +1296,9 @@ begin
       SpeedPanel := SpeedPanel01;
     end;
 
+  SpeedPanel.Width := ClientWidth - 3 * Raster - Margin;
   SpeedPanel.Visible := True;
+  SpeedPanel.UpdateLayout;;
   SpeedPanel.UpdateSpeedButtonEnabled;
   SpeedPanel.UpdateSpeedButtonDown;
   SpeedPanel.DarkMode := MainVar.ColorScheme.IsDark;
@@ -1306,9 +1347,14 @@ begin
   ReportListbox.Height := ClientHeight - ReportListbox.Top - Raster - Margin;
   ReportListbox.Anchors := ReportListbox.Anchors + [TAnchorKind.akBottom];
 
-  HintContainer.Left := TrimmText.Left + TrimmText.Width + Margin;
+  FocusContainer.Left := TrimmText.Left + TrimmText.Width + Margin;
+  FocusContainer.Top := TrimmText.Top;
+  FocusContainer.Width := Round(40 * FScale);
+  FocusContainer.Height := Round(40 * FScale);
+
+  HintContainer.Left := FocusContainer.Left + FocusContainer.Width + Margin;
   HintContainer.Top := TrimmText.Top;
-  HintContainer.Width := ReportMemoWidth;
+  HintContainer.Width := ReportMemoWidth - FocusContainer.Width - Margin;
   HintContainer.Height := Round(40 * FScale);
 
   HintText.Left := Round(10 * FScale);
@@ -1331,6 +1377,8 @@ begin
   Image.Anchors := Image.Anchors + [TAnchorKind.akRight, TAnchorKind.akBottom];
   ImagePositionX := Image.Left;
   ImagePositionY := Image.Top;
+
+  SpeedPanel.Width := ClientWidth - 3 * Raster - Margin;
 end;
 
 procedure TFormMain.LineColorBtnClick(Sender: TObject);
@@ -1540,6 +1588,7 @@ begin
   ii := ReportListbox.ItemIndex;
   if (ii >= 0) and (ii <= Integer(High(TRggReport)))then
   begin
+    ShowingHelp := False;
     ReportText.Visible := True;
     ReportManager.CurrentIndex := ii;
     UpdateReport;
@@ -1956,6 +2005,7 @@ begin
   ParamListbox.Parent := ft;
   ReportListbox.Parent := ft;
   TrimmText.Parent := ft;
+  FocusContainer.Parent := ft;
   HintContainer.Parent := ft;
   SpeedPanel01.Parent := ft;
   SpeedPanel02.Parent := ft;
@@ -2042,21 +2092,23 @@ procedure TFormMain.ToggleAllText;
 var
   b: Boolean;
 begin
+  if not Main.FederText.Visible then
+    Exit;
+
+  if Main.FederText = Main.FederText2 then
+    Exit;
+
+  if not CanShowMemo then
+    Exit;
+
   b := not ParamListbox.Visible;
 
   SpeedPanel.Visible := b;
+  FocusContainer.Visible := b;
+  TrimmText.Visible := b;
   ParamListbox.Visible := b;
   ReportListbox.Visible := b;
-  TrimmText.Visible := b;
-
-  if not b then
-  begin
-    ReportText.Visible := False;
-  end
-  else
-  begin
-    ReportText.Visible := True;
-  end;
+  ReportText.Visible := b;
 end;
 
 procedure TFormMain.ToggleSpeedPanelFontSize;
@@ -2112,6 +2164,20 @@ begin
     KreisForm := TKreisForm.Create(Application);
   end;
   KreisForm.Show;
+end;
+
+function TFormMain.GetCanShowMemo: Boolean;
+begin
+  result := True;
+
+  if (ClientWidth < 900 * FScale) then
+    result := False;
+
+  if (ClientHeight < 700 * FScale) then
+    result := False;
+
+  if Main.IsPhone then
+    result := False;
 end;
 
 end.

@@ -545,6 +545,7 @@ begin
 
   RD.Draw(g);
 
+  Image.Canvas.Clear;
   Bitmap.Draw(Image.Canvas, TH.Offset.X, TH.Offset.Y, True);
   Image.Invalidate;
 {$endif}
