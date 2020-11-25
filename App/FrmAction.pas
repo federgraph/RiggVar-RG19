@@ -566,7 +566,7 @@ begin
   TextDetail.Top := Scale(64);
   TextDetail.Caption := 'Action Details';
 
-  SortBtn.Left := Scale(784);
+  SortBtn.Left := Scale(750);
   SortBtn.Top := Scale(24);
   SortBtn.Caption := 'Sort Groups';
   SortBtn.OnClick := SortBtnClick;

@@ -1699,7 +1699,7 @@ end;
 procedure TRggMain.InitRaster;
 begin
   MainVar.ClientWidth := FormMain.ClientWidth;
-  MainVar.ClientHeight := FormMain.ClientHeight;
+  MainVar.ClientHeight := FormMain.ClientHeight - FormMain.StatusBar.Height;
 end;
 
 procedure TRggMain.InitText;

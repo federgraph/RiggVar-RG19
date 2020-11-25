@@ -87,7 +87,7 @@ begin
   SL.Add('Info about Trimm 420 App');
   SL.Add('');
   SL.Add('see www.federgraph.de');
-  SL.Add('see federgraph''s GitHub repository: RiggVar-RG38');
+  SL.Add('see federgraph''s GitHub repository: RiggVar-RG19');
 
 {$ifdef MSWINDOWS}
   SL.Add('');
