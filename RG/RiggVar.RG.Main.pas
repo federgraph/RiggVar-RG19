@@ -1360,13 +1360,13 @@ end;
 
 procedure TRggMain.SetTrimm(const Value: Integer);
 begin
-  RiggModul.DoResetForTrimmData; // ###
+  RiggModul.DoResetForTrimmData;
   Logger.Info('SetTrimm: ' + IntToStr(Value));
   FTrimm := Value;
   LoadTrimm(CurrentTrimm);
   InitSalingTyp(faSalingTypFest);
   UpdateOnParamValueChanged;
-  RiggModul.UpdateGControls; // ###
+  RiggModul.UpdateGControls;
 end;
 
 function TRggMain.GetCurrentTrimm: TRggData;
@@ -1547,7 +1547,6 @@ begin
   end;
 
   UpdateGetriebe;
-//  FormMain.UpdateReport;
 end;
 
 procedure TRggMain.DoMouseWheel(Shift: TShiftState; WheelDelta: Integer);
@@ -1607,19 +1606,16 @@ end;
 function TRggMain.GetShowTrimmText: Boolean;
 begin
   result := False;
-//  result := FormMain.ShowTrimmText;
 end;
 
 function TRggMain.GetShowDiffText: Boolean;
 begin
   result := False;
-//  result := FormMain.ShowDiffText;
 end;
 
 function TRggMain.GetShowDataText: Boolean;
 begin
   result := True;
-//  result := FormMain.ShowDataText;
 end;
 
 procedure TRggMain.WriteTrimmItem;
@@ -2121,6 +2117,9 @@ begin
       MainVar.ShowDebugData := False;
       ShowDataText := not ShowDataText;
     end;
+
+//    FormMain.UpdateMenu;
+//    FederText.CheckState;
   end;
 end;
 
