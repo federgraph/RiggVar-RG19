@@ -149,6 +149,7 @@ type
     SpeedPanel01: TActionSpeedBar;
     SpeedPanel02: TActionSpeedBar;
     SpeedPanel03: TActionSpeedBar;
+    SpeedPanel04: TActionSpeedBar;
     SpeedColorScheme: TSpeedColorScheme;
     procedure InitSpeedButtons;
     procedure LayoutSpeedPanel(SP: TActionSpeedBar);
@@ -236,6 +237,7 @@ type
     procedure UpdateChartGraph;
     procedure LayoutImages;
   protected
+    procedure DestroyForms;
     procedure ShowDiagramA;
     procedure ShowDiagramC;
     procedure ShowDiagramE;
@@ -247,7 +249,6 @@ type
     procedure ShowFormTabelle;
     procedure ShowFormSaling;
     procedure ShowFormController;
-    procedure DestroyForms;
     procedure MemoBtnClick(Sender: TObject);
     procedure ActionsBtnClick(Sender: TObject);
     procedure ConfigBtnClick(Sender: TObject);
@@ -410,6 +411,7 @@ uses
   RiggVar.RG.Speed01,
   RiggVar.RG.Speed02,
   RiggVar.RG.Speed03,
+  RiggVar.RG.Speed04,
   RiggVar.App.Main,
   RiggVar.FB.ActionConst,
   RiggVar.FB.Classes;
@@ -762,6 +764,7 @@ begin
     MainVar.Scale := ScaleFactor;
     Inc(Main.ResizeCounter);
     Main.UpdateTouch;
+    UpdateFederText;
   end;
 
   if FormShown then
@@ -837,6 +840,7 @@ begin
   else
   begin
     SpeedPanel.Visible := True;
+    SpeedPanel.Width := ClientWidth - 3 * Raster - Margin;
 
     TrimmText.Visible := True;
     ParamListbox.Visible := True;
@@ -1074,6 +1078,14 @@ begin
     faBlauBtn: BlauBtnClick(nil);
     faMultiBtn: MultiBtnClick(nil);
 
+    faSuperSimple: SuperSimpleBtnClick(nil);
+    faSuperNormal: SuperNormalBtnClick(nil);
+    faSuperGrau: SuperGrauBtnClick(nil);
+    faSuperBlau: SuperBlauBtnClick(nil);
+    faSuperMulti: SuperMultiBtnClick(nil);
+    faSuperDisplay: SuperDisplayBtnClick(nil);
+    faSuperQuick: SuperQuickBtnClick(nil);
+
     faShowMemo: MemoBtnClick(nil);
     faShowActions: ActionsBtnClick(nil);
     faShowConfig: ConfigBtnClick(nil);
@@ -1098,8 +1110,8 @@ begin
     faToggleAllTags: ReportManager.XmlAllTags := not ReportManager.XmlAllTags;
 
     faRotaForm1: SwapRota(1);
-    faRotaForm2: SwapRota(2);
-    faRotaForm3: SwapRota(3);
+    faRotaForm2: SwapSpeedPanel(2); // SwapRota(2);
+    faRotaForm3: SwapSpeedPanel(3); // SwapRota(3);
 
     faReset,
     faResetPosition,
@@ -1239,6 +1251,14 @@ begin
     '*': fa := faActionPageM;
 
     '#': fa := faActionPage4;
+
+    ',': fa := faRotaForm1;
+    '.': fa := faRotaForm2;
+    '-': fa := faRotaForm3;
+
+    ';': fa := faRotaForm1;
+    ':': fa := faRotaForm2;
+    '_': fa := faRotaForm3;
 
     else fa := faNoop;
 
@@ -1442,6 +1462,13 @@ begin
   SpeedPanel03.Visible := False;
   SpeedPanel03.Caption := '';
 
+  SpeedPanel04 := TActionSpeedBarRG04.Create(Self);
+  SpeedPanel04.Name := 'SpeedPanel04';
+  SpeedPanel04.Parent := Self;
+  SpeedPanel04.ShowHint := True;
+  SpeedPanel04.Visible := False;
+  SpeedPanel04.Caption := '';
+
   SpeedPanel := SpeedPanel03;
   SpeedPanel.Visible := True;
 
@@ -1468,10 +1495,10 @@ procedure TFormMain.SwapSpeedPanel(Value: Integer);
 begin
   SpeedPanel.Visible := False;
 
-    case Value of
-      1: SpeedPanel := SpeedPanel03;
-      2: SpeedPanel := SpeedPanel01;
-      3: SpeedPanel := SpeedPanel01;
+  case Value of
+    1: SpeedPanel := SpeedPanel03;
+    2: SpeedPanel := SpeedPanel04;
+    3: SpeedPanel := SpeedPanel01;
   else
     SpeedPanel := SpeedPanel01;
   end;
@@ -1512,6 +1539,7 @@ begin
   LayoutSpeedPanel(SpeedPanel01);
   LayoutSpeedPanel(SpeedPanel02);
   LayoutSpeedPanel(SpeedPanel03);
+  LayoutSpeedPanel(SpeedPanel04);
 
   TrimmText.Left := Raster + Margin;
   TrimmText.Top := 2 * Raster + Margin;
@@ -1848,6 +1876,7 @@ begin
   begin
     Main.UpdateTrimmText(TL);
     TrimmText.Text := TL.Text;
+    UpdateFederText;
   end;
   UpdateReport;
 end;
@@ -2081,6 +2110,9 @@ begin
 
   if SpeedPanel03 <> nil then
     SpeedPanel03.InitSpeedButtons;
+
+  if SpeedPanel04 <> nil then
+    SpeedPanel04.InitSpeedButtons;
 end;
 
 procedure TFormMain.UpdateSpeedButtonDown;
@@ -2179,6 +2211,7 @@ begin
   SpeedPanel01.Parent := ft;
   SpeedPanel02.Parent := ft;
   SpeedPanel03.Parent := ft;
+  SpeedPanel04.Parent := ft;
 end;
 
 procedure TFormMain.InitZOrderInfo;
@@ -2256,6 +2289,14 @@ begin
     RotaForm.Draw;
 end;
 
+procedure TFormMain.ToggleSpeedPanelFontSize;
+begin
+  SpeedPanel.ToggleBigMode;
+  LayoutComponents;
+  CheckSpaceForMemo;
+  CheckSpaceForImages;
+end;
+
 procedure TFormMain.ToggleAllText;
 var
   b: Boolean;
@@ -2279,12 +2320,18 @@ begin
   ReportText.Visible := b;
 end;
 
-procedure TFormMain.ToggleSpeedPanelFontSize;
+function TFormMain.GetCanShowMemo: Boolean;
 begin
-  SpeedPanel.ToggleBigMode;
-  LayoutComponents;
-  CheckSpaceForMemo;
-  CheckSpaceForImages;
+  result := True;
+
+  if (ClientWidth < 900 * FScale) then
+    result := False;
+
+  if (ClientHeight < 700 * FScale) then
+    result := False;
+
+  if Main.IsPhone then
+    result := False;
 end;
 
 procedure TFormMain.ShowDiagramE;
@@ -2332,20 +2379,6 @@ begin
     KreisForm := TKreisForm.Create(Application);
   end;
   KreisForm.Show;
-end;
-
-function TFormMain.GetCanShowMemo: Boolean;
-begin
-  result := True;
-
-  if (ClientWidth < 900 * FScale) then
-    result := False;
-
-  if (ClientHeight < 700 * FScale) then
-    result := False;
-
-  if Main.IsPhone then
-    result := False;
 end;
 
 procedure TFormMain.ShowDiagramA;

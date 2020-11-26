@@ -247,6 +247,7 @@
         <DCCReference Include="RG\RiggVar.RG.Speed01.pas"/>
         <DCCReference Include="RG\RiggVar.RG.Speed02.pas"/>
         <DCCReference Include="RG\RiggVar.RG.Speed03.pas"/>
+        <DCCReference Include="RG\RiggVar.RG.Speed04.pas"/>
         <DCCReference Include="RG\RiggVar.RG.Track.pas"/>
         <DCCReference Include="Graph\RggCircleGraph.pas"/>
         <DCCReference Include="Graph\RggKraftGraph.pas"/>

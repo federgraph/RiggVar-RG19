@@ -76,6 +76,7 @@ uses
   RiggVar.RG.Speed01 in 'RG\RiggVar.RG.Speed01.pas',
   RiggVar.RG.Speed02 in 'RG\RiggVar.RG.Speed02.pas',
   RiggVar.RG.Speed03 in 'RG\RiggVar.RG.Speed03.pas',
+  RiggVar.RG.Speed04 in 'RG\RiggVar.RG.Speed04.pas',
   RiggVar.RG.Track in 'RG\RiggVar.RG.Track.pas',
   RggCircleGraph in 'Graph\RggCircleGraph.pas',
   RggKraftGraph in 'Graph\RggKraftGraph.pas',

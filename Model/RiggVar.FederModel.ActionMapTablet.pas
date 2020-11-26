@@ -216,7 +216,7 @@ begin
       cla := TRggColors.White;
       InitAC(cl, 1, faCycleColorSchemeM, cla);
       InitAC(cl, 2, faCycleColorSchemeP, cla);
-      InitAC(cl, 3, faToggleSpeedPanel, cla);
+      InitAC(cl, 3, faToggleSpeedPanel, TRggColors.Plum);
       InitAC(cl, 4, faShowKreis, claForm);
       InitAC(cl, 5, faMemoryRecallBtn, cla);
       InitAC(cl, 6, faMemoryBtn, cla);
