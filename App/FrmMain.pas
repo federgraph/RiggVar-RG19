@@ -230,11 +230,11 @@ type
     procedure UpdateChartGraph;
     procedure LayoutImages;
   protected
+    procedure DestroyForms;
     procedure ShowDiagramC;
     procedure ShowDiagramE;
     procedure ShowDiagramQ;
     procedure ShowFormKreis;
-    procedure DestroyForms;
     procedure MemoBtnClick(Sender: TObject);
     procedure ActionsBtnClick(Sender: TObject);
     procedure DrawingsBtnClick(Sender: TObject);
@@ -570,11 +570,10 @@ procedure TFormMain.FormResize(Sender: TObject);
 begin
   if (Main <> nil) and Main.IsUp then
   begin
-{$ifdef MSWindows}
-    MainVar.Scale := Screen.PixelsPerInch / 96;
-{$endif}
+    MainVar.Scale := ScaleFactor;
     Inc(Main.ResizeCounter);
     Main.UpdateTouch;
+    UpdateFederText;
   end;
 
   if FormShown then
@@ -652,6 +651,7 @@ begin
   else
   begin
     SpeedPanel.Visible := True;
+    SpeedPanel.Width := ClientWidth - 3 * Raster - Margin;
 
     TrimmText.Visible := True;
     ParamListbox.Visible := True;
@@ -813,7 +813,7 @@ begin
       if ShowingHelp then
          ShowHelpText(HelpTopic)
       else
-      UpdateReport;
+        UpdateReport;
     end;
 
     faMemeGotoLandscape: GotoLandscape;
@@ -888,6 +888,14 @@ begin
     faBlauBtn: BlauBtnClick(nil);
     faMultiBtn: MultiBtnClick(nil);
 
+    faSuperSimple: SuperSimpleBtnClick(nil);
+    faSuperNormal: SuperNormalBtnClick(nil);
+    faSuperGrau: SuperGrauBtnClick(nil);
+    faSuperBlau: SuperBlauBtnClick(nil);
+    faSuperMulti: SuperMultiBtnClick(nil);
+    faSuperDisplay: SuperDisplayBtnClick(nil);
+    faSuperQuick: SuperQuickBtnClick(nil);
+
     faShowMemo: MemoBtnClick(nil);
     faShowActions: ActionsBtnClick(nil);
     faShowDrawings: DrawingsBtnClick(nil);
@@ -907,7 +915,7 @@ begin
 
     faRotaForm1: SwapRota(1);
     faRotaForm2: SwapRota(2);
-    faRotaForm3: SwapRota(3);
+    faRotaForm3: SwapSpeedPanel(3); // SwapRota(3);
 
     faReset,
     faResetPosition,
@@ -2088,6 +2096,14 @@ begin
     RotaForm.Draw;
 end;
 
+procedure TFormMain.ToggleSpeedPanelFontSize;
+begin
+  SpeedPanel.ToggleBigMode;
+  LayoutComponents;
+  CheckSpaceForMemo;
+  CheckSpaceForImages;
+end;
+
 procedure TFormMain.ToggleAllText;
 var
   b: Boolean;
@@ -2111,12 +2127,18 @@ begin
   ReportText.Visible := b;
 end;
 
-procedure TFormMain.ToggleSpeedPanelFontSize;
+function TFormMain.GetCanShowMemo: Boolean;
 begin
-  SpeedPanel.ToggleBigMode;
-  LayoutComponents;
-  CheckSpaceForMemo;
-  CheckSpaceForImages;
+  result := True;
+
+  if (ClientWidth < 900 * FScale) then
+    result := False;
+
+  if (ClientHeight < 700 * FScale) then
+    result := False;
+
+  if Main.IsPhone then
+    result := False;
 end;
 
 procedure TFormMain.ShowDiagramE;
@@ -2164,20 +2186,6 @@ begin
     KreisForm := TKreisForm.Create(Application);
   end;
   KreisForm.Show;
-end;
-
-function TFormMain.GetCanShowMemo: Boolean;
-begin
-  result := True;
-
-  if (ClientWidth < 900 * FScale) then
-    result := False;
-
-  if (ClientHeight < 700 * FScale) then
-    result := False;
-
-  if Main.IsPhone then
-    result := False;
 end;
 
 end.

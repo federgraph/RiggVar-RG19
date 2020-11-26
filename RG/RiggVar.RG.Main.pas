@@ -2454,6 +2454,9 @@ begin
       FormMain.UpdateItemIndexReports
     else if (fa in TrimmsRange) then
       FormMain.UpdateItemIndexTrimms;
+
+//    FormMain.UpdateMenu;
+    FederText.CheckState;
   end;
 end;
 

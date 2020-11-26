@@ -21,8 +21,7 @@ uses
   RggTypes,
   RggCalc,
   RggSchnittKK,
-  RggUnit1,
-  RggUnit2;
+  RiggVar.RG.Model;
 
 type
   TLineDataR150 = array[0..150] of double;
@@ -56,8 +55,8 @@ type
     Width: Integer;
     Height: Integer;
   public
-    Mast: TMast;
-    constructor Create(AMast: TMast); virtual;
+    Mast: TRigg;
+    constructor Create(AMast: TRigg); virtual;
     destructor Destroy; override;
     procedure Draw;
     procedure GetTestKurven;
@@ -71,7 +70,7 @@ type
 
 implementation
 
-constructor TKraftGraph.Create(AMast: TMast);
+constructor TKraftGraph.Create(AMast: TRigg);
 begin
   inherited Create;
   if not Assigned(AMast) then
