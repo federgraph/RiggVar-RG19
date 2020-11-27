@@ -118,7 +118,7 @@ type
     function FormatValue(Value: single): string;
     procedure DoBiegungGF;
 
-    procedure SetParamValue(idx: TFederParam; Value: single);
+    procedure SetParamValue(idx: TFederParam; const Value: single);
     function GetParamValue(idx: TFederParam): single;
     procedure SetFixPoint(const Value: TRiggPoint);
     procedure SetViewPoint(const Value: TViewPoint);
@@ -153,10 +153,10 @@ type
     function GetSmallStep: single;
     procedure TrackBarChange(Sender: TObject);
     procedure RggSpecialDoOnTrackBarChange;
-    procedure SetParam(Value: TFederParam);
+    procedure SetParam(const Value: TFederParam);
   public
     IsUp: Boolean;
-    Rigg: TRigg; // injected via constuctor
+    Rigg: TRigg; // injected via constructor
     StrokeRigg: IStrokeRigg; // injected
     FL: TStringList;
     Logger: TLogger;
@@ -178,6 +178,8 @@ type
     { example data slots }
     Trimm7: TRggData; // 420
     Trimm8: TRggData; // Logo
+
+    BackgroundLock: Boolean;
 
     FixPunkt: TPoint3D;
 
@@ -203,14 +205,10 @@ type
     FederText2: TFederTouchPhone;
 
     FederKeyboard: TFederKeyboard;
-    BackgroundLock: Boolean;
 
     ActionGroupList: TActionGroupList;
     ActionTest: TActionTest;
     FederBinding: TFederBinding;
-
-    ReportCounter: Integer;
-    ResizeCounter: Integer;
 
     CurrentRotaForm: Integer;
 
@@ -219,6 +217,9 @@ type
     IniFileName: string;
     Modified: Boolean;
     AutoSave: Boolean;
+
+    ReportCounter: Integer;
+    ResizeCounter: Integer;
 
     procedure Neu(Doc: TRggDocument);
     procedure Open(FileName: string);
@@ -286,6 +287,7 @@ type
     procedure CycleColorSchemeM;
     procedure CycleColorSchemeP;
     procedure ToggleDarkMode;
+    procedure ToggleSpeedPanelFontSize;
 
     procedure InitTouch;
     procedure UpdateTouch;
@@ -735,7 +737,7 @@ begin
   end;
 end;
 
-procedure TRggMain.SetParamValue(idx: TFederParam; Value: single);
+procedure TRggMain.SetParamValue(idx: TFederParam; const Value: single);
 var
   sb: TRggSB;
 begin
@@ -808,7 +810,7 @@ begin
   result := Format('%.0f', [tv]);
 end;
 
-procedure TRggMain.SetParam(Value: TFederParam);
+procedure TRggMain.SetParam(const Value: TFederParam);
 begin
   { make sure the 'pseudo-param' faPan gets cancelled }
   FAction := faNoop;
@@ -1516,7 +1518,7 @@ end;
 
 function TRggMain.GetTrimmItemReport(ReportID: Integer): string;
 begin
-  if Assigned(Rigg) and Assigned(RggData) and Assigned(FL) then
+  if (Rigg <> nil) and (RggData <> nil) and (FL <> nil) then
   begin
     Rigg.SaveToFederData(RggData);
     FL.Clear;
@@ -1601,8 +1603,6 @@ begin
   fd.VOPos := fd.VOPos + 60;
   fd.WLPos := fd.WLPos - 20;
 end;
-
-{ TRggText }
 
 function TRggMain.GetFLText: string;
 begin
@@ -1777,12 +1777,22 @@ begin
   end;
 end;
 
+procedure TRggMain.ToggleSpeedPanelFontSize;
+begin
+  FormMain.ToggleSpeedPanelFontSize;
+end;
+
 procedure TRggMain.ToggleDarkMode;
 begin
   if MainVar.ColorScheme.IsDark then
     ColorScheme := MainVar.ColorScheme.Light
   else
     ColorScheme := MainVar.ColorScheme.Dark;
+end;
+
+function TRggMain.GetColorScheme: Integer;
+begin
+  result := MainVar.ColorScheme.Scheme;
 end;
 
 procedure TRggMain.SetTouch(const Value: Integer);
@@ -1844,11 +1854,6 @@ procedure TRggMain.CycleToolSet(i: Integer);
 begin
   FederText.UpdateToolSet(i);
   FormMain.UpdateReport;
-end;
-
-function TRggMain.GetColorScheme: Integer;
-begin
-  result := MainVar.ColorScheme.Scheme;
 end;
 
 function TRggMain.GetFederText: TFederTouchBase;
@@ -1974,6 +1979,7 @@ begin
   WriteTrimmItem;
   CopyText;
   FL.Clear;
+  FormMain.ShowTrimm;
 end;
 
 procedure TRggMain.WriteTrimmFile;
@@ -1987,6 +1993,7 @@ begin
   WriteTrimmFile;
   CopyText;
   FL.Clear;
+  FormMain.ShowTrimm;
 end;
 
 procedure TRggMain.CopyAndPaste;
@@ -2002,6 +2009,7 @@ begin
   { paste }
   ReadText(FL);
   FL.Clear;
+  FormMain.ShowTrimm;
 end;
 
 procedure TRggMain.PasteTrimmItem;
@@ -2010,6 +2018,7 @@ begin
   PasteTrimm;
   { Note: There is just one paste button (pti), named after the item, }
   { but you can paste a Trimm-Item OR a Trimm-File. }
+  FormMain.ShowTrimm;
 end;
 
 procedure TRggMain.PasteTrimm;
@@ -2176,6 +2185,8 @@ begin
   begin
     DoReadTrimmFile(s);
   end;
+
+  FormMain.ShowTrimm;
 end;
 
 procedure TRggMain.ReadTrimmFileAuto;
@@ -2224,6 +2235,7 @@ procedure TRggMain.SaveTrimmFile;
 begin
   Logger.Info('in SaveTrimmFile');
   SaveTrimmFileAuto;
+  FormMain.ShowTrimm;
 end;
 
 procedure TRggMain.SaveTrimmFileAuto;
@@ -2258,6 +2270,7 @@ begin
   Logger.Info('in UpdateTrimm0');
   SaveTrimm(Trimm0);
   FormMain.UpdateReport;
+  FormMain.ShowTrimm;
 end;
 
 function TRggMain.GetIsRggParam: Boolean;
@@ -2489,8 +2502,10 @@ begin
     else if (fa in TrimmsRange) then
       FormMain.UpdateItemIndexTrimms;
 
-//    FormMain.UpdateMenu;
     FederText.CheckState;
+    FormMain.UpdateSpeedButtonDown;
+    FormMain.UpdateSpeedButtonEnabled;
+//    FormMain.UpdateMenu;
   end;
 end;
 

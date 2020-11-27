@@ -89,7 +89,6 @@ type
     TL: TStrings;
     procedure InitParamListbox;
   public
-    AllProps: Boolean;
     procedure ShowTrimm;
     procedure ShowTrimmData;
   public
@@ -1106,8 +1105,8 @@ begin
     faShowController: ShowFormController;
 
     faToggleSandboxed: MainVar.IsSandboxed := MainConst.MustBeSandboxed or (not MainVar.IsSandboxed);
-    faToggleAllProps: AllProps := not AllProps;
-    faToggleAllTags: ReportManager.XmlAllTags := not ReportManager.XmlAllTags;
+    faToggleAllProps: MainVar.AllProps := not MainVar.AllProps;
+    faToggleAllTags: MainVar.AllTags := not MainVar.AllTags;
 
     faRotaForm1: SwapRota(1);
     faRotaForm2: SwapSpeedPanel(2); // SwapRota(2);
@@ -1858,7 +1857,7 @@ begin
   RL.BeginUpdate;
   try
     RL.Clear;
-    Main.CurrentTrimm.WantAll := AllProps;
+    Main.CurrentTrimm.WantAll := MainVar.AllProps;
     Main.CurrentTrimm.SaveTrimmItem(RL);
     Main.CurrentTrimm.WantAll := False;
     if ReportLabel <> nil then
@@ -1884,7 +1883,8 @@ end;
 procedure TFormMain.SofortBtnClick(Sender: TObject);
 begin
   Main.SofortBerechnen := not Main.SofortBerechnen;
-  Main.FederText.CheckState;
+  if Sender <> nil then
+    Main.FederText.CheckState;
   UpdateReport;
 end;
 
@@ -1948,8 +1948,8 @@ begin
 
   case fa of
     faToggleSandboxed: result := MainVar.IsSandboxed;
-    faToggleAllProps: result := AllProps;
-    faToggleAllTags: result := ReportManager.XmlAllTags;
+    faToggleAllProps: result := MainVar.AllProps;
+    faToggleAllTags: result := MainVar.AllTags;
 
     faToggleHelp: result := ShowingHelp;
     faToggleReport: result := ReportText.Visible;
