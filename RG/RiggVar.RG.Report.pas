@@ -53,10 +53,8 @@ type
     rs: set of TRggReport;
     FCurrentIndex: Integer;
     FCurrentReport: TRggReport;
-    FXmlAllTags: Boolean;
     procedure InitRD;
     procedure SetCurrentIndex(const Value: Integer);
-    procedure SetXmlAllTags(const Value: Boolean);
     procedure SetCurrentReport(const Value: TRggReport);
   public
     constructor Create(Memo: TMemo);
@@ -70,7 +68,6 @@ type
     function GetCurrentCaption: string;
     property CurrentIndex: Integer read FCurrentIndex write SetCurrentIndex;
     property CurrentReport: TRggReport read FCurrentReport write SetCurrentReport;
-    property XmlAllTags: Boolean read FXmlAllTags write SetXmlAllTags;
   end;
 
 implementation
@@ -221,11 +218,6 @@ begin
   FCurrentReport := Value;
 end;
 
-procedure TRggReportManager.SetXmlAllTags(const Value: Boolean);
-begin
-  FXmlAllTags := Value;
-end;
-
 procedure TRggReportManager.ShowCurrentReport;
 var
   MemoPosY: LongInt;
@@ -295,7 +287,7 @@ begin
       end;
       rgXML:
       begin
-        Main.Rigg.WriteXml(ML, XmlAllTags);
+        Main.Rigg.WriteXml(ML, MainVar.AllTags);
         SendMessage(FMemo.Handle, EM_LINESCROLL, 0, MemoPosY);
       end;
       rgShort: ML.Text := Main.TrimmShort;

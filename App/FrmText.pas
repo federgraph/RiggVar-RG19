@@ -323,7 +323,7 @@ end;
 
 procedure TTextForm.cbAllTagsClick(Sender: TObject);
 begin
-  ReportManager.XmlAllTags := cbAllTags.Checked;
+  MainVar.AllTags := cbAllTags.Checked;
 end;
 
 procedure TTextForm.cbSandboxedClick(Sender: TObject);

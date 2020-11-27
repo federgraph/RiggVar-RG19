@@ -90,7 +90,7 @@ type
     function FormatValue(Value: single): string;
     procedure DoBiegungGF;
 
-    procedure SetParamValue(idx: TFederParam; Value: single);
+    procedure SetParamValue(idx: TFederParam; const Value: single);
     function GetParamValue(idx: TFederParam): single;
     procedure SetFixPoint(const Value: TRiggPoint);
     procedure SetViewPoint(const Value: TViewPoint);
@@ -125,7 +125,7 @@ type
     function GetSmallStep: single;
     procedure TrackBarChange(Sender: TObject);
     procedure RggSpecialDoOnTrackBarChange;
-    procedure SetParam(Value: TFederParam);
+    procedure SetParam(const Value: TFederParam);
 
     procedure Viewpoint3;
     procedure ViewpointA;
@@ -133,7 +133,7 @@ type
     procedure ViewpointT;
   public
     IsUp: Boolean;
-    Rigg: TRigg; // injected via constuctor
+    Rigg: TRigg; // injected via constructor
     StrokeRigg: IStrokeRigg; // injected
     FL: TStringList;
     Logger: TLogger;
@@ -171,9 +171,6 @@ type
 
     InitialFixPoint: TRiggPoint;
 
-    ReportCounter: Integer;
-    ResizeCounter: Integer;
-
     CurrentRotaForm: Integer;
 
     RiggModul: TRiggModul;
@@ -181,6 +178,9 @@ type
     IniFileName: string;
     Modified: Boolean;
     AutoSave: Boolean;
+
+    ReportCounter: Integer;
+    ResizeCounter: Integer;
 
     procedure Neu(Doc: TRggDocument);
     procedure Open(FileName: string);
@@ -474,7 +474,7 @@ procedure TRggMain.SetBtnBlauDown(const Value: Boolean);
 begin
   if FBtnBlauDown <> Value then
   begin
-    RiggModul.BtnBlauDown := Value; // ###
+    RiggModul.BtnBlauDown := Value;
     FBtnBlauDown := Value;
     Draw;
   end;
@@ -485,7 +485,7 @@ begin
   if FBtnGrauDown <> Value then
   begin
     FBtnGrauDown := Value;
-    RiggModul.BtnBlauDown := Value; // ###
+    RiggModul.BtnBlauDown := Value;
     if Value then
       Draw
     else
@@ -628,7 +628,7 @@ begin
   end;
 end;
 
-procedure TRggMain.SetParamValue(idx: TFederParam; Value: single);
+procedure TRggMain.SetParamValue(idx: TFederParam; const Value: single);
 var
   sb: TRggSB;
 begin
@@ -701,7 +701,7 @@ begin
   result := Format('%.0f', [tv]);
 end;
 
-procedure TRggMain.SetParam(Value: TFederParam);
+procedure TRggMain.SetParam(const Value: TFederParam);
 begin
   { make sure the 'pseudo-param' faPan gets cancelled }
   FAction := faNoop;
@@ -1392,7 +1392,7 @@ end;
 
 function TRggMain.GetTrimmItemReport(ReportID: Integer): string;
 begin
-  if Assigned(Rigg) and Assigned(RggData) and Assigned(FL) then
+  if (Rigg <> nil) and (RggData <> nil) and (FL <> nil) then
   begin
     Rigg.SaveToFederData(RggData);
     FL.Clear;
@@ -1477,8 +1477,6 @@ begin
   fd.VOPos := fd.VOPos + 60;
   fd.WLPos := fd.WLPos - 20;
 end;
-
-{ TRggText }
 
 function TRggMain.GetFLText: string;
 begin
@@ -2118,8 +2116,10 @@ begin
       ShowDataText := not ShowDataText;
     end;
 
-//    FormMain.UpdateMenu;
 //    FederText.CheckState;
+//    FormMain.UpdateSpeedButtonDown;
+//    FormMain.UpdateSpeedButtonEnabled;
+//    FormMain.UpdateMenu;
   end;
 end;
 
@@ -2242,7 +2242,7 @@ begin
 
     { trigger update of new UI }
     ParamValue[Param] := ParamValue[Param];
-//    UpdateOnParamValueChanged;
+//    FormMain.UpdateOnParamValueChanged;
   except
     on EFileFormatError do { eat ecxeption }
       if IniFileName = '' then

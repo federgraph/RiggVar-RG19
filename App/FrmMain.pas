@@ -1702,7 +1702,7 @@ end;
 
 procedure TFormMain.AllTagsBtnClick(Sender: TObject);
 begin
-  ReportManager.XmlAllTags := AllTagsBtn.Down;
+  MainVar.AllTags := AllTagsBtn.Down;
 end;
 
 procedure TFormMain.SandboxedBtnClick(Sender: TObject);
