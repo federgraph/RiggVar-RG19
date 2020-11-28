@@ -22,6 +22,8 @@ interface
 {$mode delphi}
 {$endif}
 
+{$define WantMenu}
+
 uses
   RiggVar.FB.Color,
   RiggVar.FB.SpeedColor,
@@ -30,6 +32,7 @@ uses
   RiggVar.RG.Model,
   RiggVar.RG.Report,
   RiggVar.RG.Rota,
+  RiggVar.FederModel.Menu,
   RggCtrls,
   RggChartGraph,
   RggTypes,
@@ -42,6 +45,7 @@ uses
   StdCtrls,
   ExtCtrls,
   Dialogs,
+  Menus,
   Graphics;
 
 {$define Vcl}
@@ -146,8 +150,6 @@ type
     SpeedColorScheme: TSpeedColorScheme;
     procedure InitSpeedButtons;
     procedure LayoutSpeedPanel(SP: TActionSpeedBar);
-    procedure UpdateSpeedButtonDown;
-    procedure UpdateSpeedButtonEnabled;
     procedure ToggleSpeedPanel;
     procedure ToggleSpeedPanelFontSize;
     procedure SwapSpeedPanel(Value: Integer);
@@ -182,6 +184,12 @@ type
     procedure SuperMultiBtnClick(Sender: TObject);
     procedure SuperDisplayBtnClick(Sender: TObject);
     procedure SuperQuickBtnClick(Sender: TObject);
+  public
+{$ifdef WantMenu}
+    MainMenu: TMainMenu;
+    FederMenu: TFederMenu;
+    procedure PopulateMenu;
+{$endif}
   public
     procedure UpdateColorScheme;
     procedure LayoutComponents;
@@ -309,7 +317,7 @@ begin
 
   FScale := 1.0;
 {$ifdef MSWindows}
-  FScale := ScaleFactor;
+//  FScale := ScaleFactor;
 {$endif}
 
   Application.OnException := ApplicationEventsException;
@@ -325,6 +333,12 @@ begin
 
   SpeedPanelHeight := Raster - Round(FScale * Margin);
   ListboxWidth := Round(230 * FScale);
+
+{$ifdef WantMenu}
+  FederMenu := TFederMenu.Create;
+  MainMenu := TMainMenu.Create(Application);
+  Menu := MainMenu;
+{$endif}
 
   CreateComponents;
 
@@ -383,8 +397,6 @@ begin
 
   Application.OnHint := HandleShowHint;
   InitSpeedButtons;
-  UpdateSpeedButtonDown;
-  UpdateSpeedButtonEnabled;
   UpdateColorScheme;
 
   SwapSpeedPanel(RotaForm.Current);
@@ -395,6 +407,10 @@ begin
   Main.HullVisible := False;
   Main.OnUpdateChart := DoOnUpdateChart;
   Main.FederText.CheckState;
+
+{$ifdef WantMenu}
+  PopulateMenu;
+{$endif}
 end;
 
 procedure TFormMain.FormDestroy2(Sender: TObject);
@@ -414,6 +430,9 @@ begin
   ChartGraph.Free;
 
   RotaForm.Free;
+{$ifdef WantMenu}
+  FederMenu.Free;
+{$endif}
 end;
 
 procedure TFormMain.FormKeyPress(Sender: TObject; var Key: Char);
@@ -555,7 +574,6 @@ begin
     LayoutComponents;
     LayoutImages;
 
-    UpdateSpeedButtonDown;
     UpdateReport;
 
     RotaForm.IsUp := True;
@@ -569,7 +587,7 @@ procedure TFormMain.FormResize(Sender: TObject);
 begin
   if (Main <> nil) and Main.IsUp then
   begin
-    MainVar.Scale := ScaleFactor;
+//    MainVar.Scale := ScaleFactor;
     Inc(Main.ResizeCounter);
     Main.UpdateTouch;
     UpdateFederText;
@@ -719,7 +737,6 @@ begin
   end;
 
   Main.FederText.CheckState;
-  UpdateSpeedButtonDown;
 end;
 
 procedure TFormMain.Reset;
@@ -865,7 +882,6 @@ begin
     faToggleUseDisplayList:
     begin
       RotaForm.UseDisplayListBtnClick(nil);
-      UpdateSpeedButtonEnabled;
     end;
 
     faToggleShowLegend: RotaForm.LegendBtnClick(nil);
@@ -940,7 +956,6 @@ begin
     end;
 
   end;
-  UpdateSpeedButtonDown;
 end;
 
 function TFormMain.GetActionFromKey(Shift: TShiftState; Key: Word): Integer;
@@ -1306,8 +1321,6 @@ begin
   SpeedPanel.Width := ClientWidth - 3 * Raster - Margin;
   SpeedPanel.Visible := True;
   SpeedPanel.UpdateLayout;;
-  SpeedPanel.UpdateSpeedButtonEnabled;
-  SpeedPanel.UpdateSpeedButtonDown;
   SpeedPanel.DarkMode := MainVar.ColorScheme.IsDark;
   SpeedPanel.UpdateColor;
 end;
@@ -1391,7 +1404,6 @@ end;
 procedure TFormMain.LineColorBtnClick(Sender: TObject);
 begin
   RotaForm.WantLineColors := not RotaForm.WantLineColors;
-  UpdateSpeedButtonDown;
   RotaForm.Draw;
 end;
 
@@ -1922,18 +1934,6 @@ begin
     SpeedPanel04.InitSpeedButtons;
 end;
 
-procedure TFormMain.UpdateSpeedButtonDown;
-begin
-  if SpeedPanel <> nil then
-    SpeedPanel.UpdateSpeedButtonDown;
-end;
-
-procedure TFormMain.UpdateSpeedButtonEnabled;
-begin
-  if SpeedPanel <> nil then
-    SpeedPanel.UpdateSpeedButtonEnabled;
-end;
-
 procedure TFormMain.UpdateColorScheme;
 begin
   if not ComponentsCreated then
@@ -2172,7 +2172,6 @@ begin
     begin
       Main.FederText.ActionPage := 9;
       ChartImageBtnClick(nil);
-      UpdateSpeedButtonDown;
     end;
   end;
 
@@ -2187,5 +2186,15 @@ begin
   end;
   KreisForm.Show;
 end;
+
+{$ifdef WantMenu}
+procedure TFormMain.PopulateMenu;
+begin
+  if Assigned(MainMenu) and Assigned(Main) then
+  begin
+    FederMenu.InitMainMenu(MainMenu);
+  end;
+end;
+{$endif}
 
 end.

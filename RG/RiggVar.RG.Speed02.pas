@@ -53,15 +53,8 @@ type
     KoppelBtn: TSpeedButton;
 
     MatrixBtn: TSpeedButton;
-  private
-    procedure ToggleColorModeBtnClick(Sender: TObject);
-    procedure ToggleFontSizeBtnClick(Sender: TObject);
-  protected
-    procedure SpeedButtonClick(Sender: TObject); override;
   public
     procedure InitSpeedButtons; override;
-    procedure UpdateSpeedButtonDown; override;
-    procedure UpdateSpeedButtonEnabled; override;
   end;
 
 implementation
@@ -72,86 +65,6 @@ uses
   RiggVar.FB.ActionConst;
 
 { TActionSpeedBarRG02 }
-
-procedure TActionSpeedBarRG02.SpeedButtonClick(Sender: TObject);
-var
-  fa: Integer;
-begin
-  fa := (Sender as TComponent).Tag;
-
-  Main.ActionHandler.Execute(fa);
-
-  case fa of
-    faToggleUseDisplayList,
-    faMultiBtn: UpdateSpeedButtonEnabled;
-  end;
-end;
-
-procedure TActionSpeedBarRG02.UpdateSpeedButtonDown;
-begin
-  UseDisplayListBtn.Down := FormMain.RotaForm.UseDisplayList;
-
-  UseQuickSortBtn.Down := FormMain.RotaForm.UseQuickSort;
-  LegendBtn.Down := FormMain.RotaForm.LegendItemChecked;
-  LineColorBtn.Down := Main.GetChecked(faToggleLineColor);
-
-{$ifdef SegmentButtons}
-  FixpunktBtn.Down := Main.GetChecked(faToggleSegmentF);
-  RumpfBtn.Down := Main.GetChecked(faToggleSegmentR);
-  SalingBtn.Down := Main.GetChecked(faToggleSegmentS);
-  WanteBtn.Down := Main.GetChecked(faToggleSegmentW);
-  MastBtn.Down := Main.GetChecked(faToggleSegmentM);
-  VorstagBtn.Down := Main.GetChecked(faToggleSegmentV);
-  ControllerBtn.Down := Main.GetChecked(faToggleSegmentC);
-  AchsenBtn.Down := Main.GetChecked(faToggleSegmentA);
-{$endif}
-
-  SeiteBtn.Down := False;
-  TopBtn.Down := False;
-  AchternBtn.Down := False;
-  NullBtn.Down := False;
-
-  ZoomInBtn.Down := False;
-  ZoomOutBtn.Down := False;
-
-  BogenBtn.Down := Main.GetChecked(faRggBogen);
-  KoppelBtn.Down := Main.GetChecked(faRggKoppel);
-
-  MatrixBtn.Down := FormMain.RotaForm.MatrixItemChecked;
-
-  MemoryBtn.Down := False;
-  MemoryRecallBtn.Down := False;
-
-  SofortBtn.Down := Main.GetChecked(faSofortBtn);
-  MultiBtn.Down := Main.GetChecked(faMultiBtn);
-  GrauBtn.Down := Main.GetChecked(faGrauBtn);
-  BlauBtn.Down := Main.GetChecked(faBlauBtn);
-end;
-
-procedure TActionSpeedBarRG02.UpdateSpeedButtonEnabled;
-var
-  b1, b2: Boolean;
-  b: Boolean;
-begin
-  b1 := FormMain.RotaForm.UseDisplayList;
-  b2 := FormMain.RotaForm.WantOverlayedRiggs;
-
-  b := b1;
-
-  UseQuickSortBtn.Enabled := b;
-  LegendBtn.Enabled := b;
-  LineColorBtn.Enabled := b;
-
-  b := not b1;
-
-  MultiBtn.Enabled := b;
-  KoppelBtn.Enabled := b;
-
-  b := (not b1) and b2;
-
-  GrauBtn.Enabled := b;
-  BlauBtn.Enabled := b;
-end;
 
 procedure TActionSpeedBarRG02.InitSpeedButtons;
 var
@@ -388,16 +301,6 @@ begin
   NullBtn := sb;
   sb.Tag := faViewpoint3;
   InitSpeedButton(sb);
-end;
-
-procedure TActionSpeedBarRG02.ToggleColorModeBtnClick(Sender: TObject);
-begin
-  Main.ToggleDarkMode;
-end;
-
-procedure TActionSpeedBarRG02.ToggleFontSizeBtnClick(Sender: TObject);
-begin
-  Main.ToggleSpeedPanelFontSize;
 end;
 
 end.

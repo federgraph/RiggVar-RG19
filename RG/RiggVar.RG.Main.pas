@@ -49,6 +49,7 @@ uses
   RiggVar.FB.Classes,
   RiggVar.FB.TextBase,
   RiggVar.FederModel.Action,
+  RiggVar.FederModel.ActionList,
   RiggVar.FederModel.Binding,
   RiggVar.FederModel.TouchBase,
   RiggVar.FederModel.Touch,
@@ -198,6 +199,7 @@ type
     ActionMap2: TActionMap;
     ActionHandler: IFederActionHandler;
     ActionHelper: TActionHelper;
+    ActionList: TRggActionList;
 
     FederText1: TFederTouch;
     FederText2: TFederTouchPhone;
@@ -395,6 +397,8 @@ begin
 
   Main := self;
 
+  ActionList := TRggActionList.Create(nil);
+
   { this should not be necessary, beause it will be injected in a moment }
   StrokeRigg := TDummyStrokeRigg.Create(Rigg);
 
@@ -487,6 +491,7 @@ begin
   Trimm7.Free;
   Trimm8.Free;
 
+  ActionList.Free;
   RggTrackbar.Free;
 
   Logger.Free;
@@ -2469,9 +2474,6 @@ begin
       FormMain.UpdateItemIndexTrimms;
 
     FederText.CheckState;
-    FormMain.UpdateSpeedButtonDown;
-    FormMain.UpdateSpeedButtonEnabled;
-//    FormMain.UpdateMenu;
   end;
 end;
 
