@@ -395,7 +395,7 @@ begin
 
   FScale := 1.0;
 {$ifdef MSWindows}
-  FScale := ScaleFactor;
+//  FScale := ScaleFactor;
 {$endif}
 
   FormRG19C := self;
