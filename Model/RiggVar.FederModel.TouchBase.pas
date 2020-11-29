@@ -238,7 +238,7 @@ var
 begin
   if FShape.Shape <> stCircle then
   begin
-    b := Main.ActionHandler.GetChecked(self.FederAction);
+    b := Main.ActionHandler.GetChecked(FederAction);
     if not b then
       FShape.Shape := stRectangle
     else
@@ -252,7 +252,7 @@ var
 begin
   if FShape.Shape = TShapeType.stCircle then
   begin
-    b := Main.ActionHandler.GetChecked(self.FederAction);
+    b := Main.ActionHandler.GetChecked(FederAction);
     if b then
       FShape.Brush.Color := TRggColors.Aqua
     else
@@ -294,7 +294,7 @@ procedure TTouchBtn.UpdateHint;
 begin
   if WantHint then
   begin
-    Hint := Main.ActionHandler.GetCaption(FFederAction);
+    Hint := Main.ActionHandler.GetCaption(FederAction);
   end;
 end;
 
