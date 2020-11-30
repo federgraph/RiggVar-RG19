@@ -28,6 +28,7 @@ uses
   RggTrimmTab in 'Core\RggTrimmTab.pas',
   RggTypes in 'Core\RggTypes.pas',
   RiggVar.App.Main in 'App\RiggVar.App.Main.pas',
+  RiggVar.App.Model in 'App\RiggVar.App.Model.pas',
   RiggVar.FB.Action in 'FB\RiggVar.FB.Action.pas',
   RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas',
   RiggVar.FB.Classes in 'FB\RiggVar.FB.Classes.pas',

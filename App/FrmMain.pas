@@ -25,11 +25,10 @@ interface
 {$define WantMenu}
 
 uses
-  RiggVar.FB.Color,
+  RiggVar.App.Model,
   RiggVar.FB.SpeedColor,
   RiggVar.FB.SpeedBar,
   RiggVar.RG.Def,
-  RiggVar.RG.Model,
   RiggVar.RG.Report,
   RiggVar.RG.Rota,
   RiggVar.FederModel.Menu,
@@ -64,7 +63,6 @@ type
     procedure GotoNormal;
     procedure GotoPortrait;
     procedure GotoSquare;
-  protected
     procedure InitScreenPos;
   private
     FScale: single;
@@ -151,7 +149,7 @@ type
     procedure InitSpeedButtons;
     procedure LayoutSpeedPanel(SP: TActionSpeedBar);
     procedure ToggleSpeedPanel;
-    procedure ToggleSpeedPanelFontSize;
+    procedure ToggleButtonSize;
     procedure SwapSpeedPanel(Value: Integer);
     procedure SwapRota(Value: Integer);
   public
@@ -184,8 +182,8 @@ type
     procedure SuperMultiBtnClick(Sender: TObject);
     procedure SuperDisplayBtnClick(Sender: TObject);
     procedure SuperQuickBtnClick(Sender: TObject);
-  public
 {$ifdef WantMenu}
+  public
     MainMenu: TMainMenu;
     FederMenu: TFederMenu;
     procedure PopulateMenu;
@@ -822,6 +820,7 @@ begin
   case fa of
     faToggleAllText: ToggleAllText;
     faToggleSpeedPanel: ToggleSpeedPanel;
+    faToggleButtonSize: ToggleButtonSize;
 
     faToggleHelp:
     begin
@@ -1034,7 +1033,7 @@ begin
     's': fa := faShowSpecialKeyInfo;
     'S': fa := faMemeGotoSquare;
 
-    't': fa := faToggleFontColor;
+    't': fa := faToggleDarkMode;
     'T': fa := faToggleSpeedPanel;
 
     'u': fa := faToggleDataText;
@@ -1207,7 +1206,7 @@ begin
 
   LB.Font.Name := 'Consolas';
   LB.Font.Size := 11;
-  LB.Font.Color := TRggColors.Blue;
+  LB.Font.Color := clBlue;
 end;
 
 procedure TFormMain.SetupMemo(MM: TMemo);
@@ -1218,7 +1217,7 @@ begin
   MM.Parent := Self;
   MM.Font.Name := 'Consolas';
   MM.Font.Size := 11;
-  MM.Font.Color := TRggColors.Teal;
+  MM.Font.Color := clTeal;
   MM.ScrollBars := ssBoth;
 end;
 
@@ -1239,7 +1238,7 @@ begin
   HintText.Parent := HintContainer;
   HintText.Font.Name := 'Consolas';
   HintText.Font.Size := 14;
-  HintText.Font.Color := TRggColors.OrangeRed;
+  HintText.Font.Color := TColors.OrangeRed;
   HintText.AutoSize := True;
   HintText.WordWrap := False;
 
@@ -1483,7 +1482,7 @@ begin
   SalingImage.Visible := False;
 
   SalingGraph := TSalingGraph.Create;
-  SalingGraph.BackgroundColor := TRggColors.Antiquewhite;
+  SalingGraph.BackgroundColor := TColors.Antiquewhite;
   SalingGraph.ImageOpacity := 0.2;
   SalingGraph.SalingA := 850;
   SalingGraph.SalingH := 120;
@@ -1551,7 +1550,7 @@ begin
   ChartImage.Parent := ChartControl;
   ChartImage.Visible := False;
 
-  ChartGraph := TChartGraph.Create;
+  ChartGraph := TChartGraph.Create(Rigg);
   ChartGraph.Image := ChartImage;
 
   UpdateChartGraph;
@@ -1756,6 +1755,7 @@ begin
     faToggleSandboxed: result := MainVar.IsSandboxed;
     faToggleAllProps: result := MainVar.AllProps;
     faToggleAllTags: result := MainVar.AllTags;
+    faToggleButtonSize: result := SpeedPanel.BigMode;
 
     faToggleHelp: result := ShowingHelp;
     faToggleReport: result := ReportText.Visible;
@@ -2096,7 +2096,7 @@ begin
     RotaForm.Draw;
 end;
 
-procedure TFormMain.ToggleSpeedPanelFontSize;
+procedure TFormMain.ToggleButtonSize;
 begin
   SpeedPanel.ToggleBigMode;
   LayoutComponents;

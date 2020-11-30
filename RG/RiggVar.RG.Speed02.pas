@@ -12,18 +12,21 @@ uses
   Classes,
   Buttons;
 
-{.$define SegmentButtons}
+{.$define WantSegmentButtons}
+{.$define WantSpecialButtons}
 
 type
   TActionSpeedBarRG02 = class(TActionSpeedBar)
   private
-    ColorModeBtn: TSpeedButton;
-    FontSizeBtn: TSpeedButton;
+{$ifdef WantSpecialButtons}
+    ToggleDarkModeBtn: TSpeedButton;
+    ToggleButtonSizeBtn: TSpeedButton;
+{$endif}
     UseDisplayListBtn: TSpeedButton;
     UseQuickSortBtn: TSpeedButton;
     LegendBtn: TSpeedButton;
     LineColorBtn: TSpeedButton;
-{$ifdef SegmentButtons}
+{$ifdef WantSegmentButtons}
     FixpunktBtn: TSpeedButton;
     RumpfBtn: TSpeedButton;
     SalingBtn: TSpeedButton;
@@ -60,8 +63,6 @@ type
 implementation
 
 uses
-  FrmMain,
-  RiggVar.App.Main,
   RiggVar.FB.ActionConst;
 
 { TActionSpeedBarRG02 }
@@ -70,25 +71,23 @@ procedure TActionSpeedBarRG02.InitSpeedButtons;
 var
   sb: TSpeedBtn;
 begin
+{$ifdef WantSegmentButtons}
   { Special Buttons }
 
   BtnColorValue := clvScheme;
 
-  sb := AddSpeedBtn('FontSizeBtn', BtnGroupSpace);
-  FontSizeBtn := sb;
-  sb.Caption := 'FS';
-  sb.Hint := 'Toggle FontSize';
-  sb.OnClick := ToggleFontSizeBtnClick;
-  sb.Tag := faNoop;
+  sb := AddSpeedBtn('ToggleButtonSizeBtn', BtnGroupSpace);
+  ToggleButtonSizeBtn := sb;
+  sb.AllowAllUp := True;
+  sb.Tag := faToggleButtonSize;
   InitSpeedButton(sb);
 
-  sb := AddSpeedBtn('ColorModeBtn');
-  ColorModeBtn := sb;
-  sb.Caption := 'CM';
-  sb.Hint := 'Toggle ColorMode';
-  sb.OnClick := ToggleColorModeBtnClick;
-  sb.Tag := faNoop;
+  sb := AddSpeedBtn('ToggleDarkModeBtn');
+  ToggleDarkModeBtn := sb;
+  sb.AllowAllUp := True;
+  sb.Tag := faToggleDarkMode;
   InitSpeedButton(sb);
+{$endif}
 
   { DisplayList Graph Toggle }
 
