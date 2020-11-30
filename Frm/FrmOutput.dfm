@@ -1,4 +1,4 @@
-object OutputForm: TOutputForm
+﻿object OutputForm: TOutputForm
   Left = 282
   Top = 186
   Caption = 'OutputForm'
@@ -22,15 +22,11 @@ object OutputForm: TOutputForm
     Top = 0
     Width = 465
     Height = 255
-    ActivePage = ControllerSheet
+    ActivePage = Salingsheet
     TabOrder = 0
     OnChange = OutputPagesChange
     object MasterMemo: TTabSheet
       Caption = 'Tabellen'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Memo: TMemo
         Left = 0
         Top = 0
@@ -52,10 +48,6 @@ object OutputForm: TOutputForm
     end
     object DetailsSheet: TTabSheet
       Caption = 'Details'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DisplayMemo: TMemo
         Left = 0
         Top = 0
@@ -77,10 +69,6 @@ object OutputForm: TOutputForm
     object Salingsheet: TTabSheet
       Tag = 3
       Caption = 'Saling'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnSaling: TPanel
         Left = 0
         Top = 0
@@ -315,10 +303,6 @@ object OutputForm: TOutputForm
     end
     object KraftSheet: TTabSheet
       Caption = 'Kr'#228'fte'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnKraft: TPanel
         Left = 0
         Top = 0
@@ -334,8 +318,6 @@ object OutputForm: TOutputForm
           Width = 345
           Height = 223
           Align = alLeft
-          ExplicitLeft = -2
-          ExplicitTop = -2
         end
         object UpdateKraftGraphBtn: TButton
           Left = 368

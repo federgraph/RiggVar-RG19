@@ -78,23 +78,6 @@ implementation
 
 { TRigg }
 
-{$ifdef MSWindowsDelphi}
-procedure TRigg.WriteXml(ML: TStrings; AllTags: Boolean);
-var
-  Document: TRggDocument;
-begin
-  Document := TRggDocument.Create;
-  Document.WantFestigkeitsWerteInXml := AllTags;
-  Document.WantTrimmTabInXml := AllTags;
-  try
-    GetDocument(Document);
-    Document.WriteXML(ML);
-  finally
-    Document.Free;
-  end;
-end;
-{$endif}
-
 procedure TRigg1.WriteToDocFile(FileName: string);
 var
   Document: TRggDocument;

@@ -475,14 +475,12 @@ procedure TRiggModulInput.OriginalHandleScroll(Sender: TObject;
   ScrollCode: TScrollCode; var ScrollPos: Integer);
 var
   InputRec: TTrimmControls;
-//  fp: TFederParam;
 begin
   Modified := True;
   InputRec := Rigg.Glieder;
 
   if Sender = InputForm.sbController then
   begin
-//    fp := fpController;
     InputRec.Controller := ScrollPos;
     InputForm.lbValue1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
     if not FControllerBtnDown then
@@ -490,7 +488,6 @@ begin
   end
   else if Sender = InputForm.sbControllerD then
   begin
-//    fp := fpController;
     InputRec.Controller := ScrollPos;
     InputForm.lbD1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
     if not FControllerBtnDown then
@@ -498,7 +495,6 @@ begin
   end
   else if Sender = InputForm.sbControllerOhne then
   begin
-//    fp := fpController;
     InputRec.Controller := ScrollPos;
     InputForm.lbOhne1.Caption := Format('%d mm', [ScrollPos - MemCtrl.Controller]);
     if not FControllerBtnDown then
@@ -508,86 +504,72 @@ begin
   begin
     if FWinkelBtnDown then
     begin
-//      fp := fpWinkel;
       InputRec.Winkel := ScrollPos;
       InputForm.lbValue2.Caption := Format('%5.2f Grad', [(InputRec.Winkel - MemCtrl.Winkel) / 10]);
     end
     else
     begin
-//      fp := fpVorstag;
       InputRec.Vorstag := ScrollPos;
       InputForm.lbValue2.Caption := Format('%d mm', [InputRec.Vorstag - MemCtrl.Vorstag]);
     end
   end
   else if Sender = InputForm.sbVorstagD then
   begin
-//    fp := fpVorstag;
     InputRec.Vorstag := ScrollPos;
     InputForm.lbD2.Caption := Format('%d mm', [InputRec.Vorstag - MemCtrl.Vorstag]);
   end
   else if Sender = InputForm.sbVorstagOhne then
   begin
-//    fp := fpVorstag;
     InputRec.Vorstag := ScrollPos;
     InputForm.lbOhne2.Caption := Format('%d mm', [InputRec.Vorstag - MemCtrl.Vorstag]);
   end
   else if Sender = InputForm.sbWante then
   begin
-//    fp := fpWante;
     InputRec.Wanten := ScrollPos;
     InputForm.lbValue3.Caption := Format('%d mm', [ScrollPos - MemCtrl.Wanten]);
   end
   else if Sender = InputForm.sbWanteD then
   begin
-//    fp := fpWante;
     InputRec.Wanten := ScrollPos;
     InputForm.lbD3.Caption := Format('%d mm', [ScrollPos - MemCtrl.Wanten]);
   end
   else if Sender = InputForm.sbWanteOhne then
   begin
-//    fp := fpWante;
     InputRec.Wanten := ScrollPos;
     InputForm.lbOhne3.Caption := Format('%d mm', [ScrollPos - MemCtrl.Wanten]);
   end
   else if Sender = InputForm.sbWoben then
   begin
-//    fp := fpWoben;
     InputRec.Woben := ScrollPos;
     InputForm.lbValue4.Caption := Format('%d mm', [ScrollPos - MemCtrl.Woben]);
   end
   else if Sender = InputForm.sbWobenD then
   begin
-//    fp := fpWoben;
     InputRec.Woben := ScrollPos;
     InputForm.lbD4.Caption := Format('%d mm', [ScrollPos - MemCtrl.Woben]);
   end
   else if Sender = InputForm.sbSalingH then
   begin
-//    fp := fpSalingH;
     InputRec.SalingH := ScrollPos;
     InputForm.lbValue5.Caption := Format('%d mm', [ScrollPos - MemCtrl.SalingH]);
   end
   else if Sender = InputForm.sbSalingA then
   begin
-//    fp := fpSalingA;
     InputRec.SalingA := ScrollPos;
     InputForm.lbValue6.Caption := Format('%d mm', [ScrollPos - MemCtrl.SalingA]);
   end
   else if Sender = InputForm.sbSalingLD then
   begin
-//    fp := fpSalingL;
     InputRec.SalingL := ScrollPos;
     InputForm.lbD5.Caption := Format('%d mm', [ScrollPos - MemCtrl.SalingL]);
   end
   else if Sender = InputForm.sbVorstagOS then
   begin
-//    fp := fpVorstagOS;
     InputRec.Vorstag := ScrollPos;
     InputForm.lbValue7.Caption := Format('%d mm', [ScrollPos - MemCtrl.Vorstag])
   end
   else if Sender = InputForm.sbWPowerOS then
   begin
-//    fp := fpWPowerOS;
     InputRec.WPowerOS := ScrollPos;
     InputForm.lbValue8.Caption := Format('%d N', [ScrollPos - MemCtrl.WPowerOS]);
     FNeedPaint := False;
@@ -2025,7 +2007,6 @@ begin
     FShowTriangle := False;
     KurveValid := False;
   end;
-
   InputBuffer := InputRec;
   Rigg.Glieder := InputRec;
   UpdateGetriebe;

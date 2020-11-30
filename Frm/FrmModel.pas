@@ -10,7 +10,7 @@ uses
   Vcl.StdCtrls,
   Vcl.Buttons,
   Vcl.ExtCtrls,
-  RiggVar.RG.Model;
+  RiggVar.App.Model;
 
 type
   TRiggDialog = class(TForm)

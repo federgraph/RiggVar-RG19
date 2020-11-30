@@ -594,7 +594,6 @@ begin
   begin
     Main.ActionHandler.Execute(fa);
   end;
-//  ShowTrimm;
 end;
 
 procedure TFormMain.UpdateOnParamChanged;

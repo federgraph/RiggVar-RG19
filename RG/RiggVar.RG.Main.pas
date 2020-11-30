@@ -36,11 +36,11 @@ uses
   RggStrings,
   RggScroll,
   RggTypes,
-  RiggVar.App.Model,
   RggCalc,
   RggModul,
   RggDoc,
   System.UIConsts,
+  RiggVar.App.Model,
   RiggVar.FB.Action,
   RiggVar.FB.ActionConst,
   RiggVar.FB.ActionGroups,
@@ -2273,8 +2273,7 @@ procedure TRggMain.UpdateTrimm0;
 begin
   Logger.Info('in UpdateTrimm0');
   SaveTrimm(Trimm0);
-  FormMain.UpdateReport;
-  FormMain.ShowTrimm;
+  FormMain.ShowTrimm; // --> FormMain.UpdateReport
 end;
 
 function TRggMain.GetIsRggParam: Boolean;
