@@ -22,15 +22,11 @@
     Top = 0
     Width = 465
     Height = 255
-    ActivePage = KraftSheet
+    ActivePage = Salingsheet
     TabOrder = 0
     OnChange = OutputPagesChange
     object MasterMemo: TTabSheet
       Caption = 'Tabellen'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Memo: TMemo
         Left = 0
         Top = 0
@@ -52,10 +48,6 @@
     end
     object DetailsSheet: TTabSheet
       Caption = 'Details'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object DisplayMemo: TMemo
         Left = 0
         Top = 0
@@ -77,10 +69,6 @@
     object Salingsheet: TTabSheet
       Tag = 3
       Caption = 'Saling'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnSaling: TPanel
         Left = 0
         Top = 0
@@ -114,10 +102,6 @@
     object ControllerSheet: TTabSheet
       Tag = 1
       Caption = 'Controller'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnController: TPanel
         Left = 0
         Top = 0
@@ -319,10 +303,6 @@
     end
     object KraftSheet: TTabSheet
       Caption = 'Kr'#228'fte'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnKraft: TPanel
         Left = 0
         Top = 0
@@ -338,7 +318,6 @@
           Width = 345
           Height = 223
           Align = alLeft
-          ExplicitHeight = 220
         end
         object UpdateKraftGraphBtn: TButton
           Left = 368

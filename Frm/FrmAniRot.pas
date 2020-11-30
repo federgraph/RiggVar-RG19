@@ -94,10 +94,8 @@ type
     WinkelSelStart, WinkelSelEnd: Integer;
 
     procedure InitListboxItems;
-    function Param2Text(P: TsbName): String;
+    function Param2Text(P: TsbName): string;
     function Text2Param(T: String): TsbName;
-    procedure InitRigg; override;
-    procedure UpdateGraph; override;
     procedure UpdateAll(Rgg: TRigg2);
 
     property Parameter: TsbName read FsbName write SetParameter;
@@ -166,32 +164,6 @@ begin
 
   if RiggModul.RG19A then
     InitMenu;
-end;
-
-procedure TAniRotationForm.InitRigg;
-begin
- { overwritten virtual }
-  Rigg := TRigg.Create;
-  with RaumGraph do
-  begin
-    Salingtyp := Rigg.Salingtyp;
-    ControllerTyp := Rigg.ControllerTyp;
-    Koordinaten := Rigg.rP;
-    SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-    if RaumGraph is TGetriebeGraph then
-      TGetriebeGraph(RaumGraph).WanteGestrichelt := not Rigg.GetriebeOK;
-  end;
-end;
-
-procedure TAniRotationForm.UpdateGraph;
-begin
-  { overwritten virtual }
-  Rigg.UpdateGetriebe;
-  RaumGraph.Koordinaten := Rigg.rP;
-  RaumGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  if RaumGraph is TGetriebeGraph then
-    TGetriebeGraph(RaumGraph).WanteGestrichelt := not Rigg.GetriebeOK;
-  Draw;
 end;
 
 procedure TAniRotationForm.ShowItemClick(Sender: TObject);

@@ -25,14 +25,10 @@ object OptionForm: TOptionForm
     Top = 3
     Width = 521
     Height = 265
-    ActivePage = tsTrimm
+    ActivePage = tsRumpf
     TabOrder = 0
     object tsTrimm: TTabSheet
       Caption = 'Trimm'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBoxTrimm: TGroupBox
         Left = 16
         Top = 16
@@ -54,8 +50,8 @@ object OptionForm: TOptionForm
           ParentFont = False
         end
         object LengthEditLabel: TLabel
-          Left = 228
-          Top = 65
+          Left = 236
+          Top = 69
           Width = 125
           Height = 16
           Caption = 'Abmessungen in mm'
@@ -93,7 +89,7 @@ object OptionForm: TOptionForm
           ParentFont = False
         end
         object TrimmComboLabel: TLabel
-          Left = 223
+          Left = 236
           Top = 112
           Width = 87
           Height = 16
@@ -107,7 +103,7 @@ object OptionForm: TOptionForm
         end
         object MaxEdit: TEdit
           Left = 176
-          Top = 64
+          Top = 68
           Width = 41
           Height = 21
           MaxLength = 4
@@ -129,7 +125,7 @@ object OptionForm: TOptionForm
         end
         object PosEdit: TEdit
           Left = 112
-          Top = 64
+          Top = 68
           Width = 41
           Height = 21
           MaxLength = 4
@@ -160,10 +156,6 @@ object OptionForm: TOptionForm
     end
     object tsFachwerk: TTabSheet
       Caption = 'Fachwerk'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ElementLabel: TLabel
         Left = 24
         Top = 10
@@ -294,7 +286,7 @@ object OptionForm: TOptionForm
           OnChange = QuerschnittComboChange
         end
         object AEdit: TEdit
-          Left = 198
+          Left = 190
           Top = 114
           Width = 73
           Height = 21
@@ -305,7 +297,7 @@ object OptionForm: TOptionForm
           Text = 'AEdit'
         end
         object EEdit: TEdit
-          Left = 198
+          Left = 190
           Top = 53
           Width = 73
           Height = 21
@@ -354,10 +346,6 @@ object OptionForm: TOptionForm
     end
     object tsMast: TTabSheet
       Caption = 'Mast'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBoxMast: TGroupBox
         Left = 18
         Top = 23
@@ -465,10 +453,6 @@ object OptionForm: TOptionForm
     end
     object tsRumpf: TTabSheet
       Caption = 'Rumpf'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBoxRumpf: TGroupBox
         Left = 330
         Top = 65
@@ -562,10 +546,6 @@ object OptionForm: TOptionForm
     end
     object tsTabelle: TTabSheet
       Caption = 'Tabelle'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object MemoLabel: TLabel
         Left = 8
         Top = 9
@@ -779,10 +759,6 @@ object OptionForm: TOptionForm
     end
     object tsIniMemo: TTabSheet
       Caption = 'Rigg.ini'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object IniMemo: TMemo
         Left = 0
         Top = 0
@@ -813,7 +789,7 @@ object OptionForm: TOptionForm
     end
   end
   object OKBtn: TButton
-    Left = 169
+    Left = 181
     Top = 283
     Width = 81
     Height = 27

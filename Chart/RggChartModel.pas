@@ -7,7 +7,6 @@ interface
 {$endif}
 
 uses
-  RiggVar.App.Model,
   RiggVar.FB.ActionConst,
   RiggVar.FB.Color,
   RggStrings,
@@ -57,7 +56,7 @@ type
   public
     FSalingTyp: TSalingTyp;
 
-    Rigg: TRigg;
+    Rigg: IRigg;
     RggDocument: TRggDocument;
     SalingDreieck: TSalingDreieck;
 
@@ -255,7 +254,7 @@ type
   public
     IsUp: Boolean;
 
-    constructor Create(ARigg: TRigg);
+    constructor Create(ARigg: IRigg);
     destructor Destroy; override;
 
     procedure SuperInit;
@@ -313,7 +312,7 @@ begin
   ML.Add(WantenSpannungString);
 end;
 
-constructor TChartModel.Create(ARigg: TRigg);
+constructor TChartModel.Create(ARigg: IRigg);
 begin
   UserSelectedKurvenZahl := 3;
   ParamCount := 3;

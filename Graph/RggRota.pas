@@ -538,14 +538,11 @@ begin
     DrawMatrix(g);
   end;
 
-  with g do
-  begin
-    SetMapMode(Handle, MM_ANISOTROPIC);
-    SetWindowExtEx(Handle, 1000, 1000, nil);
-    SetWindowOrgEx(Handle, 0, 0, nil);
-    SetViewPortExtEx(Handle, 1000, 1000, nil);
-    SetViewPortOrgEx(Handle, NullpunktOffset.x, NullpunktOffset.y, nil);
-  end;
+  SetMapMode(g.Handle, MM_ANISOTROPIC);
+  SetWindowExtEx(g.Handle, 1000, 1000, nil);
+  SetWindowOrgEx(g.Handle, 0, 0, nil);
+  SetViewPortExtEx(g.Handle, 1000, 1000, nil);
+  SetViewPortOrgEx(g.Handle, NullpunktOffset.x, NullpunktOffset.y, nil);
 
   if UseDisplayList then
   begin
@@ -561,12 +558,9 @@ begin
   { This method will first check whether this should be done at all. }
   DrawHullNormal(g);
 
-  with g do
-  begin
-    SetWindowOrgEx(Handle, 0, 0, nil);
-    SetViewPortOrgEx(Handle, 0, 0, nil);
-    SetMapMode(Handle, MM_TEXT);
-  end;
+  SetWindowOrgEx(g.Handle, 0, 0, nil);
+  SetViewPortOrgEx(g.Handle, 0, 0, nil);
+  SetMapMode(g.Handle, MM_TEXT);
 end;
 
 procedure TRotaForm1.DoTrans;
@@ -1106,12 +1100,12 @@ begin
   Draw;
 end;
 
-procedure TRotaForm1.DoOnUpdateStrokeRigg;
+procedure TRotaForm1.UpdateHullTexture;
 begin
 
 end;
 
-procedure TRotaForm1.UpdateHullTexture;
+procedure TRotaForm1.DoOnUpdateStrokeRigg;
 begin
 
 end;

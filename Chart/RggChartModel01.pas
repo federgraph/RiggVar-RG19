@@ -11,7 +11,7 @@ uses
   Graphics,
   UITypes,
   UIConsts,
-  RiggVar.App.Model,
+  RggInter,
   RggStrings,
   RggChartModel,
   RggScroll,
@@ -25,7 +25,7 @@ type
     BereichBtnDown: Boolean;
     APBtnDown: Boolean;
 
-    constructor Create(ARigg: TRigg);
+    constructor Create(ARigg: IRigg);
 
     procedure UpdateXMinMax; override;
     procedure UpdatePMinMax; override;
@@ -44,7 +44,7 @@ uses
 
 { TRggChartModel01 }
 
-constructor TRggChartModel01.Create(ARigg: TRigg);
+constructor TRggChartModel01.Create(ARigg: IRigg);
 begin
   WantRectangles := True;
 

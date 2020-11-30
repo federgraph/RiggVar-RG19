@@ -26,7 +26,6 @@ uses
   SysUtils,
   Classes,
   Math,
-  RiggVar.App.Model,
   RiggVar.FD.Point,
   RiggVar.RG.Data,
   RiggVar.RG.Def,
@@ -35,11 +34,12 @@ uses
   RggStrings,
   RggScroll,
   RggTypes,
-  RiggVar.RG.Model,
   RggCalc,
   RggModul,
   RggDoc,
   System.UIConsts,
+  RiggVar.App.Model,
+  RiggVar.FB.ActionConst,
   RiggVar.FB.Classes,
   RiggVar.Util.Logger;
 
@@ -320,8 +320,7 @@ uses
   System.Rtti,
   Clipbrd,
   RiggVar.App.Main,
-  RiggVar.Util.AppUtils,
-  RiggVar.FB.ActionConst;
+  RiggVar.Util.AppUtils;
 
 const
   tfs = '%-3s %s %8s %6s';
@@ -396,7 +395,6 @@ begin
   Trimm8.Free;
 
   RggTrackbar.Free;
-  Rigg.Free;
 
   Logger.Free;
   FL.Free;
@@ -2116,11 +2114,6 @@ begin
       MainVar.ShowDebugData := False;
       ShowDataText := not ShowDataText;
     end;
-
-//    FederText.CheckState;
-//    FormMain.UpdateSpeedButtonDown;
-//    FormMain.UpdateSpeedButtonEnabled;
-//    FormMain.UpdateMenu;
   end;
 end;
 

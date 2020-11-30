@@ -18,6 +18,7 @@ uses
   Vcl.Dialogs,
   Vcl.Printers,
   Vcl.Clipbrd,
+  RggInter,
   RggTypes,
   RggCalc,
   RiggVar.RG.Model,
@@ -147,7 +148,9 @@ type
     PBG: TPaintbox;
     RG19A: Boolean;
 
-    Rigg: TRigg2;
+    Rigg: TRigg;
+    RiggInter: IRigg;
+
     RiggReport: TRiggReport;
     FWReport: TFWReport;
     MemCtrl: TTrimmControls;
@@ -343,6 +346,7 @@ begin
 
   { Rigg }
   Rigg := TRigg.Create;
+  RiggInter := Rigg;
 
   SetupGCtrls;
 
@@ -719,7 +723,7 @@ begin
     InputRec.SalingL := ScrollPos;
     InputForm.lbD5.Caption := Format('%d mm', [ScrollPos - MemCtrl.SalingL]);
   end
-  else if Sender = InputForm.sbVorstagOs then
+  else if Sender = InputForm.sbVorstagOS then
   begin
     InputRec.Vorstag := ScrollPos;
     InputForm.lbValue7.Caption := Format('%d mm', [ScrollPos - MemCtrl.Vorstag])
@@ -2054,8 +2058,8 @@ begin
     bf[tempIndex] := 0;
 
   { Punkte im Diagramm aktualisieren }
-  if OutputForm.cbFollowPoint.Checked and not
-    (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK) then
+  if OutputForm.cbFollowPoint.Checked and
+    not (SofortBerechnen and Rigg.GetriebeOK and Rigg.MastOK) then
   begin
     DrawPoint;
   end

@@ -23,6 +23,7 @@ uses
   Vcl.ExtDlgs,
   RiggVar.App.Model,
   RiggVar.FD.Point,
+  RggInter,
   RggTypes,
   RggGetriebeGraph,
   RggMatrix,
@@ -202,6 +203,7 @@ type
     procedure ChangeRotationHints;
   public
     Rigg: TRigg2;
+    RiggInter: IRigg;
     Rotator: TPolarKar;
     Transformer: TRggTransformer;
     HullGraph: THullGraph;
@@ -417,7 +419,7 @@ end;
 
 procedure TRotationForm.FormDestroy(Sender: TObject);
 begin
-  Rigg.Free;
+//  Rigg.Free;
   BackBmp.Free;
   Bitmap.Free;
   MetaFile.Free;
@@ -476,8 +478,10 @@ procedure TRotationForm.InitRigg;
 begin
   { virtual }
   Rigg := TRigg.Create;
-  Rigg.ControllerTyp := ctOhne;
+  RiggInter := Rigg;
 
+  Rigg.ControllerTyp := ctOhne;
+  RiggInter := Rigg;
   RaumGraph.SalingTyp := Rigg.SalingTyp;
   RaumGraph.ControllerTyp := Rigg.ControllerTyp;
   RaumGraph.Koordinaten := Rigg.rP;

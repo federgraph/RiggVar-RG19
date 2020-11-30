@@ -3,7 +3,6 @@
 interface
 
 uses
-  RiggVar.App.Model,
   RiggVar.FD.Point,
   RggTypes,
   RggInter;
@@ -68,7 +67,7 @@ type
 
   TDummyStrokeRigg = class(TInterfacedObject, IStrokeRigg)
   private
-    FRigg: TRigg;
+    FRigg: IRigg;
     FBogen: Boolean;
     FWanteGestrichelt: Boolean;
     FViewPoint: TViewPoint;
@@ -109,7 +108,7 @@ type
     WantRenderE: Boolean;
     WantRenderS: Boolean;
 
-    constructor Create(rgg: TRigg);
+    constructor Create(rgg: IRigg);
 
     procedure SetKoordinaten(const Value: TRiggPoints);
     procedure SetKoppelKurve(const Value: TKoordLine);
@@ -154,7 +153,7 @@ uses
 
 { TStrokeRigg }
 
-constructor TDummyStrokeRigg.Create(rgg: TRigg);
+constructor TDummyStrokeRigg.Create(rgg: IRigg);
 begin
   FRigg := rgg;
 end;
