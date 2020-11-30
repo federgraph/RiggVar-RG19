@@ -35,6 +35,7 @@ uses
   RggCtrls,
   RggChartGraph,
   RggTypes,
+  RggInter,
   SysUtils,
   Classes,
   Types,
@@ -200,6 +201,7 @@ type
     procedure HandleSegment(fa: Integer);
   public
     Rigg: TRigg;
+    RiggInter: IRigg;
     ReportManager: TRggReportManager;
     FViewPoint: TViewPoint;
     procedure UpdateOnParamValueChanged;
@@ -347,6 +349,7 @@ begin
   SetupListbox(ReportListbox);
 
   Rigg := TRigg.Create;
+  RiggInter := Rigg;
   Rigg.TrimmTabelle.FScale := FScale;
   Rigg.ControllerTyp := ctOhne;
 
@@ -443,7 +446,6 @@ begin
   begin
     Main.ActionHandler.Execute(fa);
   end;
-//  ShowTrimm;
 end;
 
 procedure TFormMain.UpdateOnParamValueChanged;
@@ -1917,6 +1919,9 @@ begin
     FormDiagramC.Free;
     FormDiagramC := nil;
   end;
+
+  { Forms owned by Application not freed here. }
+  { FormSplash is disposing of itself. }
 end;
 
 procedure TFormMain.InitSpeedButtons;

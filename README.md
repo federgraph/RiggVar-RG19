@@ -46,6 +46,6 @@ Similar projects are available for FMX and LCL:
 
 | Project | Platform | Note |
 | :-- | :- | :- |
-| RG19 | VCL | <-- this repo, original RiggVar project |
+| RG19 | VCL | this repo, original RiggVar project |
 | [RG38](https://github.com/federgraph/RiggVar-RG38) | FMX | Trimm 420 |
 | [RG51](https://github.com/federgraph/RiggVar-RG51) | LCL | FPC / Lazarus project using TBGRABitmap |

@@ -2240,8 +2240,7 @@ procedure TRggMain.UpdateTrimm0;
 begin
   Logger.Info('in UpdateTrimm0');
   SaveTrimm(Trimm0);
-  FormMain.UpdateReport;
-  FormMain.ShowTrimm;
+  FormMain.ShowTrimm; // --> FormMain.UpdateReport
 end;
 
 function TRggMain.GetIsRggParam: Boolean;

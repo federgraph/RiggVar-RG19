@@ -21,7 +21,7 @@ uses
   RggTypes,
   RggCalc,
   RggSchnittKK,
-  RiggVar.RG.Model;
+  RiggVar.App.Model;
 
 type
   TLineDataR150 = array[0..150] of double;
