@@ -73,16 +73,22 @@ uses
   RggDisplayTypes in 'Graph\RggDisplayTypes.pas',
   RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas',
   RiggVar.FB.Color in 'FB\RiggVar.FB.Color.pas',
-  RggChartModel in 'Graph\RggChartModel.pas',
-  RggChartModel01 in 'Graph\RggChartModel01.pas',
-  RggChartModel02 in 'Graph\RggChartModel02.pas',
+  RggChartModel in 'Chart\RggChartModel.pas',
+  RggChartModel01 in 'Chart\RggChartModel01.pas',
+  RggChartModel02 in 'Chart\RggChartModel02.pas',
   RggStrings in 'Core\RggStrings.pas',
   RggTrimmTabGraph in 'Graph\RggTrimmTabGraph.pas',
   RggKraftGraph in 'Graph\RggKraftGraph.pas',
   RggMastGraph in 'Graph\RggMastGraph.pas',
   RiggVar.FD.Point in 'Graph2\RiggVar.FD.Point.pas',
   RggInter in 'Core\RggInter.pas',
-  RiggVar.RG.Model in 'RG\RiggVar.RG.Model.pas';
+  RiggVar.RG.Model in 'RG\RiggVar.RG.Model.pas',
+  RggUnit0 in 'Core\RggUnit0.pas',
+  RggUnit1 in 'Core\RggUnit1.pas',
+  RggUnit2 in 'Core\RggUnit2.pas',
+  RggUnit3 in 'Core\RggUnit3.pas',
+  RggUnit4 in 'Core\RggUnit4.pas',
+  RiggVar.App.Model in 'App\RiggVar.App.Model.pas';
 
 {$R *.res}
 

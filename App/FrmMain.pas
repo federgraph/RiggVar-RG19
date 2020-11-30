@@ -23,6 +23,8 @@ uses
   Winapi.Messages,
   System.SysUtils,
   System.Classes,
+  RiggVar.App.Model,
+  RggInter,
   RggTypes,
   RggReport,
   RggRota,

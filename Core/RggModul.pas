@@ -31,6 +31,7 @@ uses
   RggPrinter,
   RggPolarKar,
   RggTransformer,
+  RiggVar.App.Model,
   RiggVar.FB.ActionConst,
   RiggVar.RG.Def,
   RiggVar.VM.FormMain;
@@ -146,7 +147,7 @@ type
     PBG: TPaintbox;
     RG19A: Boolean;
 
-    Rigg: TRigg;
+    Rigg: TRigg2;
     RiggReport: TRiggReport;
     FWReport: TFWReport;
     MemCtrl: TTrimmControls;

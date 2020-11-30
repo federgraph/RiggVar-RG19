@@ -1,4 +1,4 @@
-﻿object BiegeUndNeigeForm: TBiegeUndNeigeForm
+object BiegeUndNeigeForm: TBiegeUndNeigeForm
   Left = 348
   Top = 211
   BorderStyle = bsDialog

@@ -52,7 +52,7 @@ uses
   RggRaumGraph in 'Graph\RggRaumGraph.pas',
   RggDisplay in 'Graph\RggDisplay.pas',
   RggTestData in 'Core\RggTestData.pas',
-  RggChartModel in 'Graph\RggChartModel.pas',
+  RggChartModel in 'Chart\RggChartModel.pas',
   RiggVar.App.Main in 'App\RiggVar.App.Main.pas',
   RiggVar.FB.Classes in 'FB\RiggVar.FB.Classes.pas',
   RiggVar.FB.Color in 'FB\RiggVar.FB.Color.pas',
@@ -74,14 +74,15 @@ uses
   RggDisplayOrder in 'Graph\RggDisplayOrder.pas',
   RggDisplayTypes in 'Graph\RggDisplayTypes.pas',
   RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas',
-  RggChartModel01 in 'Graph\RggChartModel01.pas',
-  RggChartModel02 in 'Graph\RggChartModel02.pas',
+  RggChartModel01 in 'Chart\RggChartModel01.pas',
+  RggChartModel02 in 'Chart\RggChartModel02.pas',
   RggStrings in 'Core\RggStrings.pas',
   RggTrimmTabGraph in 'Graph\RggTrimmTabGraph.pas',
   RggMastGraph in 'Graph\RggMastGraph.pas',
   RiggVar.FD.Point in 'Graph2\RiggVar.FD.Point.pas',
   RiggVar.RG.Model in 'RG\RiggVar.RG.Model.pas',
-  RggInter in 'Core\RggInter.pas';
+  RggInter in 'Core\RggInter.pas',
+  RiggVar.App.Model in 'App\RiggVar.App.Model.pas';
 
 {$R *.res}
 

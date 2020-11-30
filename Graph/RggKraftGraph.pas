@@ -55,8 +55,8 @@ type
     Width: Integer;
     Height: Integer;
   public
-    Mast: TRigg;
-    constructor Create(AMast: TRigg); virtual;
+    Mast: TRigg2;
+    constructor Create(AMast: TRigg2); virtual;
     destructor Destroy; override;
     procedure Draw;
     procedure GetTestKurven;
@@ -70,7 +70,7 @@ type
 
 implementation
 
-constructor TKraftGraph.Create(AMast: TRigg);
+constructor TKraftGraph.Create(AMast: TRigg2);
 begin
   inherited Create;
   if not Assigned(AMast) then

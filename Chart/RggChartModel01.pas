@@ -11,6 +11,7 @@ uses
   Graphics,
   UITypes,
   UIConsts,
+  RiggVar.App.Model,
   RggStrings,
   RggChartModel,
   RggScroll,
@@ -19,13 +20,12 @@ uses
 type
   TRggChartModel01 = class(TChartModel)
   private
-//    FSalingTyp: TSalingTyp; // declared in TChartModel
     procedure SetSalingTyp(Value: TSalingTyp);
   public
     BereichBtnDown: Boolean;
     APBtnDown: Boolean;
 
-    constructor Create;
+    constructor Create(ARigg: TRigg);
 
     procedure UpdateXMinMax; override;
     procedure UpdatePMinMax; override;
@@ -44,7 +44,7 @@ uses
 
 { TRggChartModel01 }
 
-constructor TRggChartModel01.Create;
+constructor TRggChartModel01.Create(ARigg: TRigg);
 begin
   WantRectangles := True;
 

@@ -163,7 +163,7 @@ type
     FirstRowIndex: Integer;
     SecondRowIndex: Integer;
 
-    Rigg: TRigg;
+    Rigg: TRigg2;
     IniFileName: string;
     TrimmTabGraph: TTrimmTabGraph;
     procedure DrawTrimmTab;

@@ -27,7 +27,7 @@ type
     procedure sbMastfallScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
     procedure InitBtnClick(Sender: TObject);
   private
-    Rigg: TRigg;
+    Rigg: TRigg2;
     procedure SetupCtrls;
     procedure UpdateLabels;
     procedure UpdateWithCurrentValue;

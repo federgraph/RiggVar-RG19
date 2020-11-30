@@ -26,6 +26,7 @@ uses
   SysUtils,
   Classes,
   Math,
+  RiggVar.App.Model,
   RiggVar.FD.Point,
   RiggVar.RG.Data,
   RiggVar.RG.Def,

@@ -68,9 +68,9 @@ uses
   RiggVar.RG.Report in 'RG\RiggVar.RG.Report.pas',
   RiggVar.RG.Data in 'RG\RiggVar.RG.Data.pas',
   RggTransformer in 'Graph\RggTransformer.pas',
-  RggChartModel in 'Graph\RggChartModel.pas',
-  RggChartModel01 in 'Graph\RggChartModel01.pas',
-  RggChartModel02 in 'Graph\RggChartModel02.pas',
+  RggChartModel in 'Chart\RggChartModel.pas',
+  RggChartModel01 in 'Chart\RggChartModel01.pas',
+  RggChartModel02 in 'Chart\RggChartModel02.pas',
   RggZug in 'Graph\RggZug.pas',
   RggZug2D in 'Graph\RggZug2D.pas',
   RggZug3D in 'Graph\RggZug3D.pas',
@@ -81,7 +81,8 @@ uses
   RggMastGraph in 'Graph\RggMastGraph.pas',
   RiggVar.FD.Point in 'Graph2\RiggVar.FD.Point.pas',
   RggInter in 'Core\RggInter.pas',
-  RiggVar.RG.Model in 'RG\RiggVar.RG.Model.pas';
+  RiggVar.RG.Model in 'RG\RiggVar.RG.Model.pas',
+  RiggVar.App.Model in 'App\RiggVar.App.Model.pas';
 
 {$R *.res}
 

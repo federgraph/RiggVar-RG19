@@ -193,7 +193,7 @@ begin
   ChartForm := self; { wird schon in AchsForm.Create benötigt }
   HorzScrollBar.Position := 0;
 
-  ChartModel := TRggChartModel02.Create;
+  ChartModel := TRggChartModel02.Create(Main.Rigg);
   Caption := IntToStr(ChartModel.KurvenZahlSpinnerValue);
 
   APSpinner.Position := ChartModel.APWidth;

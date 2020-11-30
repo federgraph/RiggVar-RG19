@@ -21,6 +21,7 @@ uses
   Vcl.Printers,
   Vcl.ComCtrls,
   Vcl.ExtDlgs,
+  RiggVar.App.Model,
   RiggVar.FD.Point,
   RggTypes,
   RggGetriebeGraph,
@@ -200,7 +201,7 @@ type
     procedure PaintBackGround(Image: TBitmap);
     procedure ChangeRotationHints;
   public
-    Rigg: TRigg;
+    Rigg: TRigg2;
     Rotator: TPolarKar;
     Transformer: TRggTransformer;
     HullGraph: THullGraph;

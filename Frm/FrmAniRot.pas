@@ -20,6 +20,7 @@ uses
   System.SysUtils,
   System.Classes,
   RggTypes,
+  RiggVar.App.Model,
   RiggVar.RG.Model,
   FrmRot,
   Vcl.Graphics,
@@ -97,7 +98,7 @@ type
     function Text2Param(T: String): TsbName;
     procedure InitRigg; override;
     procedure UpdateGraph; override;
-    procedure UpdateAll(Rgg: TRigg);
+    procedure UpdateAll(Rgg: TRigg2);
 
     property Parameter: TsbName read FsbName write SetParameter;
     property ParamProp[Index: TsbName]: double read GetParamProp write SetParamProp;
@@ -602,7 +603,7 @@ begin
 {$endif}
 end;
 
-procedure TAniRotationForm.UpdateAll(Rgg: TRigg);
+procedure TAniRotationForm.UpdateAll(Rgg: TRigg2);
 var
   hasChanged: Boolean;
 begin

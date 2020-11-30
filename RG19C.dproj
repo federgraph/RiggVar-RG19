@@ -198,7 +198,7 @@
         <DCCReference Include="Graph\RggRaumGraph.pas"/>
         <DCCReference Include="Graph\RggDisplay.pas"/>
         <DCCReference Include="Core\RggTestData.pas"/>
-        <DCCReference Include="Graph\RggChartModel.pas"/>
+        <DCCReference Include="Chart\RggChartModel.pas"/>
         <DCCReference Include="App\RiggVar.App.Main.pas"/>
         <DCCReference Include="FB\RiggVar.FB.Classes.pas"/>
         <DCCReference Include="FB\RiggVar.FB.Color.pas"/>
@@ -220,14 +220,15 @@
         <DCCReference Include="Graph\RggDisplayOrder.pas"/>
         <DCCReference Include="Graph\RggDisplayTypes.pas"/>
         <DCCReference Include="FB\RiggVar.FB.ActionConst.pas"/>
-        <DCCReference Include="Graph\RggChartModel01.pas"/>
-        <DCCReference Include="Graph\RggChartModel02.pas"/>
+        <DCCReference Include="Chart\RggChartModel01.pas"/>
+        <DCCReference Include="Chart\RggChartModel02.pas"/>
         <DCCReference Include="Core\RggStrings.pas"/>
         <DCCReference Include="Graph\RggTrimmTabGraph.pas"/>
         <DCCReference Include="Graph\RggMastGraph.pas"/>
         <DCCReference Include="Graph2\RiggVar.FD.Point.pas"/>
         <DCCReference Include="Core\RggInter.pas"/>
         <DCCReference Include="RG\RiggVar.RG.Model.pas"/>
+        <DCCReference Include="App\RiggVar.App.Model.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

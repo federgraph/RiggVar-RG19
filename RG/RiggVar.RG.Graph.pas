@@ -3,9 +3,10 @@
 interface
 
 uses
+  RiggVar.App.Model,
   RiggVar.FD.Point,
   RggTypes,
-  RiggVar.RG.Model;
+  RggInter;
 
 type
   IStrokeRigg = interface

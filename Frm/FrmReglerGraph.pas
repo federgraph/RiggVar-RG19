@@ -55,7 +55,7 @@ type
     procedure DrawToPaintBox(Canvas: TCanvas; Rect: TRect);
     procedure PaintBackGround(Image: TBitMap);
   private
-    Rigg: TRigg;
+    Rigg: TRigg2;
     procedure SetupCtrls;
     procedure UpdateLabels;
     procedure UpdateWithCurrentValue;
