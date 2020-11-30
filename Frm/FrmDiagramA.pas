@@ -101,7 +101,7 @@ type
     function GetXComboIndexOfParam(Value: TFederParam): Integer;
     function XComboIndexToParam(Value: Integer): TFederParam;
   public
-    Rigg: TRigg;
+    Rigg: TRigg2;
     YComboSavedItemIndex: Integer;
 
     procedure UpdateGetriebePunkt;

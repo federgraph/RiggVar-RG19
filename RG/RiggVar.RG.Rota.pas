@@ -19,11 +19,9 @@ uses
   RiggVar.FD.Rota,
 {$endif}
 {$ifdef WantRotaForm3}
-//  FMX.Viewport3D,
   RiggVar.FG.Rota,
 {$endif}
 {$ifdef UseImage }
-//  RiggVar.FD.Image,
   Vcl.ExtCtrls,
 {$endif}
   RiggVar.RG.Graph;
@@ -33,7 +31,7 @@ type
   private
     FCurrent: Integer;
     FIsUp: Boolean;
-    FBackgroundColor: TAlphaColor;
+    FBackgroundColor: TColor;
     FViewPoint: TViewPoint;
     FDarkMode: Boolean;
     procedure SetIsUp(const Value: Boolean);
@@ -43,7 +41,7 @@ type
     procedure SetUseQuickSort(const Value: Boolean);
     procedure SetWantLineColors(const Value: Boolean);
     procedure SetWantOverlayedRiggs(const Value: Boolean);
-    procedure SetBackgroundColor(const Value: TAlphaColor);
+    procedure SetBackgroundColor(const Value: TColor);
     procedure SetViewPoint(const Value: TViewPoint);
     procedure SetDarkMode(const Value: Boolean);
     function GetUseDisplayList: Boolean;
@@ -99,7 +97,7 @@ type
     procedure DoOnResizeEnd;
 
     property IsUp: Boolean read FIsUp write SetIsUp;
-    property BackgroundColor: TAlphaColor read FBackgroundColor write SetBackgroundColor;
+    property BackgroundColor: TColor read FBackgroundColor write SetBackgroundColor;
     property LegendItemChecked: Boolean read GetLegendItemChecked write SetLegendItemChecked;
     property WantLineColors: Boolean read GetWantLineColors write SetWantLineColors;
     property UseDisplayList: Boolean read GetUseDisplayList write SetUseDisplayList;
@@ -291,7 +289,7 @@ begin
   end;
 end;
 
-procedure TRotaForm.SetBackgroundColor(const Value: TAlphaColor);
+procedure TRotaForm.SetBackgroundColor(const Value: TColor);
 begin
   FBackgroundColor := Value;
   case FCurrent of

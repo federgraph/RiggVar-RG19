@@ -103,7 +103,7 @@ begin
   CreateComponents;
   Layout := 2;
 
-  ChartModel := TChartGraph.Create;
+  ChartModel := TChartGraph.Create(Main.Rigg);
   ChartModel.Image := Image;
 end;
 

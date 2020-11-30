@@ -118,7 +118,6 @@ implementation
 
 uses
   RiggVar.App.Main,
-  RiggVar.RG.Def,
   RiggVar.FB.Classes;
 
 constructor TRggDocument.Create;

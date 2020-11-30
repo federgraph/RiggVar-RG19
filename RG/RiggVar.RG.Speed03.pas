@@ -15,9 +15,6 @@ uses
 type
   TActionSpeedBarRG03 = class(TActionSpeedBar)
   private
-    ColorModeBtn: TSpeedButton;
-    FontSizeBtn: TSpeedButton;
-
     MemoryBtn: TSpeedButton;
     MemoryRecallBtn: TSpeedButton;
 
@@ -34,79 +31,21 @@ type
 
     LegendBtn: TSpeedButton;
     LineColorBtn: TSpeedButton;
-
-  private
-    procedure ToggleColorModeBtnClick(Sender: TObject);
-    procedure ToggleFontSizeBtnClick(Sender: TObject);
-  protected
-    procedure SpeedButtonClick(Sender: TObject); override;
   public
     procedure InitSpeedButtons; override;
-    procedure UpdateSpeedButtonDown; override;
   end;
 
 implementation
 
 uses
-  RiggVar.App.Main,
   RiggVar.FB.ActionConst;
 
 { TActionSpeedBarRG03 }
-
-procedure TActionSpeedBarRG03.SpeedButtonClick(Sender: TObject);
-var
-  fa: Integer;
-begin
-  fa := (Sender as TComponent).Tag;
-  Main.ActionHandler.Execute(fa);
-end;
-
-procedure TActionSpeedBarRG03.UpdateSpeedButtonDown;
-begin
-  MemoryBtn.Down := False;
-  MemoryRecallBtn.Down := False;
-
-  { Pattern: Btn.Down := Main.GetChecked(Btn.Tag); }
-
-  BogenBtn.Down := Main.GetChecked(faRggBogen);
-  KoppelBtn.Down := Main.GetChecked(faRggKoppel);
-
-  SimpleBtn.Down := Main.GetChecked(faSuperSimple);
-  NormalBtn.Down := Main.GetChecked(faSuperNormal);
-  GrauBtn.Down := Main.GetChecked(faSuperGrau);
-  BlauBtn.Down := Main.GetChecked(faSuperBlau);
-  MultiBtn.Down := Main.GetChecked(faSuperMulti);
-  DisplayBtn.Down := Main.GetChecked(faSuperDisplay);
-  QuickBtn.Down := Main.GetChecked(faSuperQuick);
-
-  LegendBtn.Down := Main.GetChecked(faToggleShowLegend);
-  LineColorBtn.Down := Main.GetChecked(faToggleLineColor);
-end;
 
 procedure TActionSpeedBarRG03.InitSpeedButtons;
 var
   sb: TSpeedBtn;
 begin
-  { Special Buttons }
-
-  BtnColorValue := clvScheme;
-
-  sb := AddSpeedBtn('FontSizeBtn', BtnGroupSpace);
-  FontSizeBtn := sb;
-  sb.Caption := 'FS';
-  sb.Hint := 'Toggle FontSize';
-  sb.OnClick := ToggleFontSizeBtnClick;
-  sb.Tag := faNoop;
-  InitSpeedButton(sb);
-
-  sb := AddSpeedBtn('ColorModeBtn');
-  ColorModeBtn := sb;
-  sb.Caption := 'CM';
-  sb.Hint := 'Toggle ColorMode';
-  sb.OnClick := ToggleColorModeBtnClick;
-  sb.Tag := faNoop;
-  InitSpeedButton(sb);
-
   { Memory Buttons }
 
   BtnColorValue := clvMemory;
@@ -207,16 +146,6 @@ begin
   sb.GroupIndex := NextGroupIndex;
   sb.Tag := faToggleLineColor;
   InitSpeedButton(sb);
-end;
-
-procedure TActionSpeedBarRG03.ToggleColorModeBtnClick(Sender: TObject);
-begin
-  Main.ToggleDarkMode;
-end;
-
-procedure TActionSpeedBarRG03.ToggleFontSizeBtnClick(Sender: TObject);
-begin
-  Main.ToggleSpeedPanelFontSize;
 end;
 
 end.

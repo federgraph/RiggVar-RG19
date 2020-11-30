@@ -374,7 +374,8 @@ ActionGroupRggSonstiges := IntegerArray([
   faToggleHelp,
   faToggleReport,
   faToggleButtonReport,
-  faToggleFontColor,
+  faToggleDarkMode,
+  faToggleButtonSize,
   faToggleSandboxed,
   faToggleSpeedPanel,
   faToggleAllProps,
@@ -441,12 +442,25 @@ ActionGroupCircles := IntegerArray([
   faCircleParamM2Z,
   faCirclesReset]);
 
+ActionGroupParamT := IntegerArray([
+  faParamT1,
+  faParamT2,
+  faParamT3,
+  faParamT4]);
+
 ActionGroupReset := IntegerArray([
   faReset,
   faResetPosition,
   faResetRotation,
   faResetZoom]);
 
+ActionGroupTouchBarLegend := IntegerArray([
+  faTouchBarTop,
+  faTouchBarBottom,
+  faTouchBarLeft,
+  faTouchBarRight]);
+
+{$ifdef WantAll}
 ActionGroupDropTarget := IntegerArray([
   faToggleDropTarget]);
 
@@ -476,11 +490,15 @@ ActionGroupHullMesh := IntegerArray([
   faHullMeshOn,
   faHullMeshOff]);
 
-ActionGroupTouchBarLegend := IntegerArray([
-  faTouchBarTop,
-  faTouchBarBottom,
-  faTouchBarLeft,
-  faTouchBarRight]);
+ActionGroupBitmapCycle := IntegerArray([
+  faCycleBitmapM,
+  faCycleBitmapP,
+  faRandom,
+  faRandomWhite,
+  faRandomBlack,
+  faBitmapEscape,
+  faToggleContour]);
+{$endif}
 
 end.
 

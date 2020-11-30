@@ -95,17 +95,19 @@ uses
   RggZug3D in 'Graph\RggZug3D.pas',
   RggDisplayOrder in 'Graph\RggDisplayOrder.pas',
   RggDisplayTypes in 'Graph\RggDisplayTypes.pas',
-  RggChartModel in 'Graph\RggChartModel.pas',
-  RggChartModel01 in 'Graph\RggChartModel01.pas',
-  RggChartGraph in 'Graph\RggChartGraph.pas',
-  RggDiagram in 'Graph\RggDiagram.pas',
+  RggChartModel in 'Chart\RggChartModel.pas',
+  RggChartModel01 in 'Chart\RggChartModel01.pas',
+  RggChartGraph in 'Chart\RggChartGraph.pas',
+  RggDiagram in 'Chart\RggDiagram.pas',
   RiggVar.Util.AppUtils in 'Util\RiggVar.Util.AppUtils.pas',
   RiggVar.Util.InfoMemo in 'Util\RiggVar.Util.InfoMemo.pas',
   RiggVar.Util.Logger in 'Util\RiggVar.Util.Logger.pas',
   RggProfile in 'Graph\RggProfile.pas',
   RggTrimmTabGraph in 'Graph\RggTrimmTabGraph.pas',
   RiggVar.FD.Point in 'Graph2\RiggVar.FD.Point.pas',
-  RggModul in 'Core\RggModul.pas';
+  RggModul in 'Core\RggModul.pas',
+  RiggVar.App.Model in 'App\RiggVar.App.Model.pas',
+  RiggVar.FederModel.ActionList in 'Model\RiggVar.FederModel.ActionList.pas';
 
 {$R *.res}
 

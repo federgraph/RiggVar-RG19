@@ -15,9 +15,6 @@ uses
 type
   TActionSpeedBarRG04 = class(TActionSpeedBar)
   private
-    ColorModeBtn: TSpeedButton;
-    FontSizeBtn: TSpeedButton;
-
     SeiteBtn: TSpeedButton;
     TopBtn: TSpeedButton;
     AchternBtn: TSpeedButton;
@@ -31,78 +28,21 @@ type
 
     MemoryBtn: TSpeedButton;
     MemoryRecallBtn: TSpeedButton;
-  private
-    procedure ToggleColorModeBtnClick(Sender: TObject);
-    procedure ToggleFontSizeBtnClick(Sender: TObject);
-  protected
-    procedure SpeedButtonClick(Sender: TObject); override;
   public
     procedure InitSpeedButtons; override;
-    procedure UpdateSpeedButtonDown; override;
-    procedure UpdateSpeedButtonEnabled; override;
   end;
 
 implementation
 
 uses
-  RiggVar.App.Main,
   RiggVar.FB.ActionConst;
 
 { TActionSpeedBarRG04 }
-
-procedure TActionSpeedBarRG04.SpeedButtonClick(Sender: TObject);
-var
-  fa: Integer;
-begin
-  fa := (Sender as TComponent).Tag;
-  Main.ActionHandler.Execute(fa);
-end;
-
-procedure TActionSpeedBarRG04.UpdateSpeedButtonDown;
-begin
-  SeiteBtn.Down := False;
-  TopBtn.Down := False;
-  AchternBtn.Down := False;
-  NullBtn.Down := False;
-
-  ZoomInBtn.Down := False;
-  ZoomOutBtn.Down := False;
-
-  BogenBtn.Down := Main.GetChecked(faRggBogen);
-  KoppelBtn.Down := Main.GetChecked(faRggKoppel);
-
-  MemoryBtn.Down := False;
-  MemoryRecallBtn.Down := False;
-end;
-
-procedure TActionSpeedBarRG04.UpdateSpeedButtonEnabled;
-begin
-end;
 
 procedure TActionSpeedBarRG04.InitSpeedButtons;
 var
   sb: TSpeedBtn;
 begin
-  { Special Buttons }
-
-  BtnColorValue := clvScheme;
-
-  sb := AddSpeedBtn('FontSizeBtn', BtnGroupSpace);
-  FontSizeBtn := sb;
-  sb.Caption := 'FS';
-  sb.Hint := 'Toggle FontSize';
-  sb.OnClick := ToggleFontSizeBtnClick;
-  sb.Tag := faNoop;
-  InitSpeedButton(sb);
-
-  sb := AddSpeedBtn('ColorModeBtn');
-  ColorModeBtn := sb;
-  sb.Caption := 'CM';
-  sb.Hint := 'Toggle ColorMode';
-  sb.OnClick := ToggleColorModeBtnClick;
-  sb.Tag := faNoop;
-  InitSpeedButton(sb);
-
   { Memory Buttons }
 
   BtnColorValue := clvMemory;
@@ -170,16 +110,6 @@ begin
   NullBtn := sb;
   sb.Tag := faViewpoint3;
   InitSpeedButton(sb);
-end;
-
-procedure TActionSpeedBarRG04.ToggleColorModeBtnClick(Sender: TObject);
-begin
-  Main.ToggleDarkMode;
-end;
-
-procedure TActionSpeedBarRG04.ToggleFontSizeBtnClick(Sender: TObject);
-begin
-  Main.ToggleSpeedPanelFontSize;
 end;
 
 end.

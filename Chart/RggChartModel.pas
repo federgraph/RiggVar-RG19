@@ -10,7 +10,7 @@ uses
   RiggVar.FB.ActionConst,
   RiggVar.FB.Color,
   RggStrings,
-  RiggVar.RG.Model,
+  RggInter,
   RggTypes,
   RggDoc,
   RggSaling3Eck,
@@ -56,11 +56,10 @@ type
   public
     FSalingTyp: TSalingTyp;
 
-    Rigg: TRigg;
+    Rigg: IRigg;
     RggDocument: TRggDocument;
     SalingDreieck: TSalingDreieck;
 
-    procedure InitRigg;
     procedure UpdateGetriebe;
   public
     ProgressPosition: Integer;
@@ -255,7 +254,7 @@ type
   public
     IsUp: Boolean;
 
-    constructor Create;
+    constructor Create(ARigg: IRigg);
     destructor Destroy; override;
 
     procedure SuperInit;
@@ -313,7 +312,7 @@ begin
   ML.Add(WantenSpannungString);
 end;
 
-constructor TChartModel.Create;
+constructor TChartModel.Create(ARigg: IRigg);
 begin
   UserSelectedKurvenZahl := 3;
   ParamCount := 3;
@@ -352,7 +351,8 @@ begin
 
   InitSpinner;
 
-  InitRigg;
+  Rigg := ARigg;
+  FSalingTyp := Rigg.SalingTyp;
 
   FXTextClicked := VorstagString;
   FPTextClicked := SalingHString;
@@ -1290,16 +1290,13 @@ begin
     Add(Format('  Biegesteifigkeit EI: %d Nm^2', [Rigg.MastEI]));
     { Exit Counters }
     Add('');
-    with Rigg do
-    begin
-      if ExitCounter1 > 0 then Add(Format('  EC 1: %d ', [ExitCounter1]));
-      if ExitCounter2 > 0 then Add(Format('  EC 2: %d ', [ExitCounter2]));
-      if ExitCounter3 > 0 then Add(Format('  EC 3: %d ', [ExitCounter3]));
-      if ExitCounter4 > 0 then Add(Format('  EC 4: %d ', [ExitCounter4]));
-      if ExitCounter5 > 0 then Add(Format('  EC 5: %d ', [ExitCounter5]));
-      if ExitCounter6 > 0 then Add(Format('  EC 6: %d ', [ExitCounter6]));
-      if ExitCounter7 > 0 then Add(Format('  EC 7: %d ', [ExitCounter6]));
-    end;
+//      if ExitCounter1 > 0 then Add(Format('  EC 1: %d ', [ExitCounter1]));
+//      if ExitCounter2 > 0 then Add(Format('  EC 2: %d ', [ExitCounter2]));
+//      if ExitCounter3 > 0 then Add(Format('  EC 3: %d ', [ExitCounter3]));
+//      if ExitCounter4 > 0 then Add(Format('  EC 4: %d ', [ExitCounter4]));
+//      if ExitCounter5 > 0 then Add(Format('  EC 5: %d ', [ExitCounter5]));
+//      if ExitCounter6 > 0 then Add(Format('  EC 6: %d ', [ExitCounter6]));
+//      if ExitCounter7 > 0 then Add(Format('  EC 7: %d ', [ExitCounter6]));
     Add(Format('Memo Counter: %d', [MemoCounter]));
     Add(Format('Calc Counter: %d', [CalcCounter]));
   end;
@@ -1819,12 +1816,6 @@ begin
 
   APSpinnerMax := 100;
   APSpinnerValue := APWidth;
-end;
-
-procedure TChartModel.InitRigg;
-begin
-  Rigg := Main.Rigg;
-  FSalingTyp := Rigg.SalingTyp;
 end;
 
 function TChartModel.XComboSelectedText: string;

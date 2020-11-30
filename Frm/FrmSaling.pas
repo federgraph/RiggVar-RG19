@@ -31,7 +31,7 @@ type
     procedure PaintBackGround(Image: TBitmap);
     procedure UpdateProps;
   public
-    Rigg: TRigg;
+    Rigg: TRigg2;
     SalingGraph: TSalingGraph;
     BitmapS: TBitmap;
     procedure UpdateGraph;

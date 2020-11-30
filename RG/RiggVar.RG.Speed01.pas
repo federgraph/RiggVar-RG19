@@ -31,17 +31,8 @@ type
     SandboxedBtn: TSpeedButton;
     AllPropsBtn: TSpeedButton;
     AllTagsBtn: TSpeedButton;
-
-    ColorModeBtn: TSpeedButton;
-    FontSizeBtn: TSpeedButton;
-
-    procedure ToggleColorModeBtnClick(Sender: TObject);
-    procedure ToggleFontSizeBtnClick(Sender: TObject);
-  protected
-    procedure SpeedButtonClick(Sender: TObject); override;
   public
     procedure InitSpeedButtons; override;
-    procedure UpdateSpeedButtonDown; override;
   end;
 
 implementation
@@ -56,26 +47,6 @@ procedure TActionSpeedBarRG01.InitSpeedButtons;
 var
   sb: TSpeedBtn;
 begin
-  { Special Buttons }
-
-  BtnColorValue := clvData;
-
-  sb := AddSpeedBtn('FontSizeBtn', BtnGroupSpace);
-  FontSizeBtn := sb;
-  sb.Caption := 'FS';
-  sb.Hint := 'Toggle FontSize';
-  sb.OnClick := ToggleFontSizeBtnClick;
-  sb.Tag := faNoop;
-  InitSpeedButton(sb);
-
-  sb := AddSpeedBtn('ColorModeBtn');
-  ColorModeBtn := sb;
-  sb.Caption := 'CM';
-  sb.Hint := 'Toggle ColorMode';
-  sb.OnClick := ToggleColorModeBtnClick;
-  sb.Tag := faNoop;
-  InitSpeedButton(sb);
-
   { Check Box Buttons }
 
   BtnColorValue := clvOption;
@@ -208,31 +179,6 @@ begin
   sb.Hint := 'Param Value Plus 10';
   sb.Tag := faParamValuePlus10;
   InitSpeedButton(sb);
-end;
-
-procedure TActionSpeedBarRG01.UpdateSpeedButtonDown;
-begin
-  SandboxedBtn.Down := MainConst.MustBeSandboxed or MainVar.IsSandboxed;
-  AllPropsBtn.Down := MainVar.AllProps;
-  AllTagsBtn.Down := MainVar.AllTags;
-end;
-
-procedure TActionSpeedBarRG01.SpeedButtonClick(Sender: TObject);
-var
-  fa: Integer;
-begin
-  fa := (Sender as TComponent).Tag;
-  Main.ActionHandler.Execute(fa);
-end;
-
-procedure TActionSpeedBarRG01.ToggleColorModeBtnClick(Sender: TObject);
-begin
-  Main.ToggleDarkMode;
-end;
-
-procedure TActionSpeedBarRG01.ToggleFontSizeBtnClick(Sender: TObject);
-begin
-  Main.ToggleSpeedPanelFontSize;
 end;
 
 end.

@@ -23,11 +23,11 @@ interface
 {$endif}
 
 uses
-  RiggVar.FB.Color,
+  RggInter,
+  RiggVar.App.Model,
   RiggVar.FB.SpeedColor,
   RiggVar.FB.SpeedBar,
   RiggVar.RG.Def,
-  RiggVar.RG.Model,
   RiggVar.RG.Report,
   RiggVar.RG.Rota,
   RggCtrls,
@@ -64,7 +64,6 @@ type
     procedure GotoNormal;
     procedure GotoPortrait;
     procedure GotoSquare;
-  protected
     procedure InitScreenPos;
   private
     FScale: single;
@@ -152,10 +151,8 @@ type
     SpeedColorScheme: TSpeedColorScheme;
     procedure InitSpeedButtons;
     procedure LayoutSpeedPanel(SP: TActionSpeedBar);
-    procedure UpdateSpeedButtonDown;
-    procedure UpdateSpeedButtonEnabled;
     procedure ToggleSpeedPanel;
-    procedure ToggleSpeedPanelFontSize;
+    procedure ToggleButtonSize;
     procedure SwapSpeedPanel(Value: Integer);
     procedure SwapRota(Value: Integer);
   public
@@ -200,6 +197,7 @@ type
     procedure HandleSegment(fa: Integer);
   public
     Rigg: TRigg;
+    RiggInter: IRigg;
     ReportManager: TRggReportManager;
     FViewPoint: TViewPoint;
     procedure UpdateOnParamChanged;
@@ -462,7 +460,7 @@ begin
 
   FScale := 1.0;
 {$ifdef MSWindows}
-  FScale := ScaleFactor;
+//  FScale := ScaleFactor;
 {$endif}
 
   Application.OnException := ApplicationEventsException;
@@ -488,6 +486,7 @@ begin
   SetupListbox(ReportListbox);
 
   Rigg := TRigg.Create;
+  RiggInter := Rigg;
   Rigg.TrimmTabelle.FScale := FScale;
   Rigg.ControllerTyp := ctOhne;
 
@@ -536,8 +535,6 @@ begin
 
   Application.OnHint := HandleShowHint;
   InitSpeedButtons;
-  UpdateSpeedButtonDown;
-  UpdateSpeedButtonEnabled;
   UpdateColorScheme;
 
   SwapSpeedPanel(RotaForm.Current);
@@ -746,7 +743,6 @@ begin
     LayoutComponents;
     LayoutImages;
 
-    UpdateSpeedButtonDown;
     UpdateReport;
 
     RotaForm.IsUp := True;
@@ -760,7 +756,7 @@ procedure TFormMain.FormResize(Sender: TObject);
 begin
   if (Main <> nil) and Main.IsUp then
   begin
-    MainVar.Scale := ScaleFactor;
+//    MainVar.Scale := ScaleFactor;
     Inc(Main.ResizeCounter);
     Main.UpdateTouch;
     UpdateFederText;
@@ -908,7 +904,6 @@ begin
   end;
 
   Main.FederText.CheckState;
-  UpdateSpeedButtonDown;
 end;
 
 procedure TFormMain.Reset;
@@ -995,6 +990,7 @@ begin
   case fa of
     faToggleAllText: ToggleAllText;
     faToggleSpeedPanel: ToggleSpeedPanel;
+    faToggleButtonSize: ToggleButtonSize;
 
     faToggleHelp:
     begin
@@ -1055,7 +1051,6 @@ begin
     faToggleUseDisplayList:
     begin
       RotaForm.UseDisplayListBtnClick(nil);
-      UpdateSpeedButtonEnabled;
     end;
 
     faToggleShowLegend: RotaForm.LegendBtnClick(nil);
@@ -1136,7 +1131,6 @@ begin
     end;
 
   end;
-  UpdateSpeedButtonDown;
 end;
 
 function TFormMain.GetActionFromKey(Shift: TShiftState; Key: Word): Integer;
@@ -1215,7 +1209,7 @@ begin
     's': fa := faShowSpecialKeyInfo;
     'S': fa := faMemeGotoSquare;
 
-    't': fa := faToggleFontColor;
+    't': fa := faToggleDarkMode;
     'T': fa := faToggleSpeedPanel;
 
     'u': fa := faToggleDataText;
@@ -1388,7 +1382,7 @@ begin
 
   LB.Font.Name := 'Consolas';
   LB.Font.Size := 11;
-  LB.Font.Color := TRggColors.Blue;
+  LB.Font.Color := TColors.Blue;
 end;
 
 procedure TFormMain.SetupMemo(MM: TMemo);
@@ -1399,7 +1393,7 @@ begin
   MM.Parent := Self;
   MM.Font.Name := 'Consolas';
   MM.Font.Size := 11;
-  MM.Font.Color := TRggColors.Teal;
+  MM.Font.Color := TColors.Teal;
   MM.ScrollBars := ssBoth;
 end;
 
@@ -1423,7 +1417,7 @@ begin
   HintText.Parent := HintContainer;
   HintText.Font.Name := 'Consolas';
   HintText.Font.Size := 14;
-  HintText.Font.Color := TRggColors.OrangeRed;
+  HintText.Font.Color := TColors.OrangeRed;
   HintText.AutoSize := True;
   HintText.WordWrap := False;
 
@@ -1505,8 +1499,6 @@ begin
   SpeedPanel.Width := ClientWidth - 3 * Raster - Margin;
   SpeedPanel.Visible := True;
   SpeedPanel.UpdateLayout;;
-  SpeedPanel.UpdateSpeedButtonEnabled;
-  SpeedPanel.UpdateSpeedButtonDown;
   SpeedPanel.DarkMode := MainVar.ColorScheme.IsDark;
   SpeedPanel.UpdateColor;
 
@@ -1593,7 +1585,6 @@ end;
 procedure TFormMain.LineColorBtnClick(Sender: TObject);
 begin
   RotaForm.WantLineColors := not RotaForm.WantLineColors;
-  UpdateSpeedButtonDown;
   RotaForm.Draw;
 end;
 
@@ -1673,7 +1664,7 @@ begin
   SalingImage.Visible := False;
 
   SalingGraph := TSalingGraph.Create;
-  SalingGraph.BackgroundColor := TRggColors.Antiquewhite;
+  SalingGraph.BackgroundColor := TColors.Antiquewhite;
   SalingGraph.ImageOpacity := 0.2;
   SalingGraph.SalingA := 850;
   SalingGraph.SalingH := 120;
@@ -1741,7 +1732,7 @@ begin
   ChartImage.Parent := ChartControl;
   ChartImage.Visible := False;
 
-  ChartGraph := TChartGraph.Create;
+  ChartGraph := TChartGraph.Create(Rigg);
   ChartGraph.Image := ChartImage;
 
   UpdateChartGraph;
@@ -1950,6 +1941,7 @@ begin
     faToggleSandboxed: result := MainVar.IsSandboxed;
     faToggleAllProps: result := MainVar.AllProps;
     faToggleAllTags: result := MainVar.AllTags;
+    faToggleButtonSize: result := SpeedPanel.BigMode;
 
     faToggleHelp: result := ShowingHelp;
     faToggleReport: result := ReportText.Visible;
@@ -2115,18 +2107,6 @@ begin
     SpeedPanel04.InitSpeedButtons;
 end;
 
-procedure TFormMain.UpdateSpeedButtonDown;
-begin
-  if SpeedPanel <> nil then
-    SpeedPanel.UpdateSpeedButtonDown;
-end;
-
-procedure TFormMain.UpdateSpeedButtonEnabled;
-begin
-  if SpeedPanel <> nil then
-    SpeedPanel.UpdateSpeedButtonEnabled;
-end;
-
 procedure TFormMain.UpdateColorScheme;
 begin
   if not ComponentsCreated then
@@ -2289,7 +2269,7 @@ begin
     RotaForm.Draw;
 end;
 
-procedure TFormMain.ToggleSpeedPanelFontSize;
+procedure TFormMain.ToggleButtonSize;
 begin
   SpeedPanel.ToggleBigMode;
   LayoutComponents;
@@ -2365,7 +2345,6 @@ begin
     begin
       Main.FederText.ActionPage := 9;
       ChartImageBtnClick(nil);
-      UpdateSpeedButtonDown;
     end;
   end;
 

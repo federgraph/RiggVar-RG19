@@ -36,7 +36,7 @@ uses
   RggStrings,
   RggScroll,
   RggTypes,
-  RiggVar.RG.Model,
+  RiggVar.App.Model,
   RggCalc,
   RggModul,
   RggDoc,
@@ -51,6 +51,7 @@ uses
   RiggVar.FB.Classes,
   RiggVar.FB.TextBase,
   RiggVar.FederModel.Action,
+  RiggVar.FederModel.ActionList,
   RiggVar.FederModel.Binding,
   RiggVar.FederModel.TouchBase,
   RiggVar.FederModel.Touch,
@@ -200,6 +201,7 @@ type
     ActionMap2: TActionMap;
     ActionHandler: IFederActionHandler;
     ActionHelper: TActionHelper;
+    ActionList: TRggActionList;
 
     FederText1: TFederTouch;
     FederText2: TFederTouchPhone;
@@ -287,7 +289,7 @@ type
     procedure CycleColorSchemeM;
     procedure CycleColorSchemeP;
     procedure ToggleDarkMode;
-    procedure ToggleSpeedPanelFontSize;
+    procedure ToggleButtonSize;
 
     procedure InitTouch;
     procedure UpdateTouch;
@@ -407,6 +409,8 @@ begin
 
   Main := self;
 
+  ActionList := TRggActionList.Create(nil);
+
   { this should not be necessary, beause it will be injected in a moment }
   StrokeRigg := TDummyStrokeRigg.Create(Rigg);
 
@@ -499,8 +503,8 @@ begin
   Trimm7.Free;
   Trimm8.Free;
 
+  ActionList.Free;
   RggTrackbar.Free;
-  Rigg.Free;
 
   Logger.Free;
   FL.Free;
@@ -1777,9 +1781,9 @@ begin
   end;
 end;
 
-procedure TRggMain.ToggleSpeedPanelFontSize;
+procedure TRggMain.ToggleButtonSize;
 begin
-  FormMain.ToggleSpeedPanelFontSize;
+  FormMain.ToggleButtonSize;
 end;
 
 procedure TRggMain.ToggleDarkMode;
@@ -2485,7 +2489,7 @@ begin
     faCycleColorSchemeM: CycleColorSchemeM;
     faCycleColorSchemeP: CycleColorSchemeP;
 
-    faToggleFontColor: ToggleDarkMode;
+    faToggleDarkMode: ToggleDarkMode;
 
     else
     begin
@@ -2503,9 +2507,6 @@ begin
       FormMain.UpdateItemIndexTrimms;
 
     FederText.CheckState;
-    FormMain.UpdateSpeedButtonDown;
-    FormMain.UpdateSpeedButtonEnabled;
-//    FormMain.UpdateMenu;
   end;
 end;
 
@@ -2601,7 +2602,7 @@ begin
     faToggleDiffText: result := F.ShowDiffText;
     faToggleTrimmText: result := F.ShowTrimmText;
 
-    faToggleFontColor: result := MainVar.ColorScheme.IsDark;
+    faToggleDarkMode: result := MainVar.ColorScheme.IsDark;
 
     else
       result := F.GetChecked(fa);

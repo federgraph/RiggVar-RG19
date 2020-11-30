@@ -54,6 +54,8 @@ type
     procedure SpeedButtonClick(Sender: TObject); virtual;
     procedure UpdateCaptions;
     procedure UpdateHints;
+    procedure ToggleDarkModeBtnClick(Sender: TObject);
+    procedure ToggleButtonSizeBtnClick(Sender: TObject);
     function NextGroupIndex: Integer;
   public
     class var SpeedColorScheme: TSpeedColorScheme; // injected
@@ -65,8 +67,6 @@ type
     procedure ToggleBigMode;
 
     procedure InitSpeedButtons; virtual;
-    procedure UpdateSpeedButtonDown; virtual;
-    procedure UpdateSpeedButtonEnabled; virtual;
 
     property DarkMode: Boolean read FDarkMode write SetDarkMode;
     property BigMode: Boolean read FBigMode write SetBigMode;
@@ -281,7 +281,7 @@ begin
   begin
     sb.Text := GetFederActionShort(SB.Tag);
     sb.Hint := GetFederActionLong(SB.Tag);
-    sb.OnClick := SpeedButtonClick;
+    sb.Action := Main.ActionList.GetFederAction(sb.Tag, True);
   end;
 
   SB.Font.Size := SpeedPanelFontSize;
@@ -344,16 +344,6 @@ begin
   { virtual }
 end;
 
-procedure TActionSpeedBar.UpdateSpeedButtonDown;
-begin
-  { virtual }
-end;
-
-procedure TActionSpeedBar.UpdateSpeedButtonEnabled;
-begin
-  { virtual }
-end;
-
 { TActionSpeedBarExample }
 
 procedure TActionSpeedBarExample.InitSpeedButtons;
@@ -379,6 +369,16 @@ end;
 procedure TActionSpeedBarExample.TestBtnClick(Sender: TObject);
 begin
 
+end;
+
+procedure TActionSpeedBar.ToggleDarkModeBtnClick(Sender: TObject);
+begin
+  Main.ToggleDarkMode;
+end;
+
+procedure TActionSpeedBar.ToggleButtonSizeBtnClick(Sender: TObject);
+begin
+  Main.ToggleButtonSize;
 end;
 
 end.

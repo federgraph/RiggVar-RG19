@@ -36,7 +36,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure AllBtnClick(Sender: TObject);
   private
-    Rigg: TRigg;
+    Rigg: TRigg2;
     RiggReport: TRiggReport;
     FWReport: TFWReport;
     procedure ShowReport(Value: TTableItem);

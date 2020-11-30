@@ -13,6 +13,7 @@ uses
   ExtCtrls,
   Graphics,
   RggTypes,
+  RggInter,
   RggChartModel;
 
 type
@@ -48,7 +49,7 @@ type
     procedure DrawLegend(g: TCanvas);
     procedure PaintBackground(g: TCanvas);
   public
-    constructor Create;
+    constructor Create(ARigg: IRigg);
     destructor Destroy; override;
     procedure Draw; override;
     property Image: TImage read FImage write SetImage;
@@ -61,7 +62,7 @@ uses
 
 { TChartGraph }
 
-constructor TChartGraph.Create;
+constructor TChartGraph.Create(ARigg: IRigg);
 begin
   inherited;
 

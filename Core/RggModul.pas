@@ -68,7 +68,7 @@ type
     Modified: Boolean;
     AutoSave: Boolean;
     ViewModelM: TViewModelMain00;
-    Rigg: TRigg;
+    Rigg: TRigg2;
     InputBuffer: TTrimmControls;
     MemCtrl: TTrimmControls;
     RefCtrl: TTrimmControls;
@@ -250,7 +250,7 @@ type
 
   TRiggModulA = class(TRiggModul)
   public
-    constructor Create(ARigg: TRigg);
+    constructor Create(ARigg: TRigg2);
     destructor Destroy; override;
     procedure Init;
     procedure DoOnUpdateRigg;
@@ -2185,7 +2185,7 @@ begin
   inherited;
 end;
 
-constructor TRiggModulA.Create(ARigg: TRigg);
+constructor TRiggModulA.Create(ARigg: TRigg2);
 begin
   Rigg := ARigg;
   RiggModul := Self;
