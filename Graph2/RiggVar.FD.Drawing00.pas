@@ -92,8 +92,6 @@ type
     OffsetY: single;
     InitialZoom: single;
 
-    OffsetXDefault: single;
-    OffsetYDefault: single;
     InitialZoomDefault: single;
 
     FixPoint: TRiggPoint;
@@ -120,12 +118,8 @@ begin
   inherited;
   Name := 'D00-Live-Rigg';
 
-  OffsetXDefault := 620;
-  OffsetYDefault := 420;
   InitialZoomDefault := 0.09;
 
-  OffsetX := OffsetXDefault;
-  OffsetY := OffsetYDefault;
   InitialZoom := InitialZoomDefault;
 
   { Points }

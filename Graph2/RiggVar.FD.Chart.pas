@@ -95,6 +95,8 @@ var
   tempX: single;
   tempY: single;
 
+  ox, oy: Integer;
+
   function Limit(a: single): single;
   begin
     if a < -32000 then
@@ -105,6 +107,9 @@ var
   end;
 
 begin
+  ox := Round(Box.X + Drawing.FaxPoint3D.X);
+  oy := Round(Box.Y + Drawing.FaxPoint3D.Y);
+
   g.Pen.Width := StrokeThickness;
   g.Pen.Color := StrokeColor;
 
@@ -112,15 +117,15 @@ begin
   begin
     g.Pen.Color := StrokeColor;
   tempY := Box.Height - Box.Height * (Poly[0] - Ymin) / (Ymax - Ymin);
-  P.X := Box.X;
-    P.Y := Box.Y + Round(Limit(tempY));
+    P.X := ox;
+    P.Y := oy + Round(Limit(tempY));
     g.MoveTo(P.X, P.Y);
-  for i := 1 to LNr do
-  begin
+    for i := 1 to LNr do
+    begin
       tempX := Box.Width * i / LNr;
-    tempY := Box.Height - Box.Height * (Poly[i] - Ymin) / (Ymax - Ymin);
-      P.X := Box.X + Round(Limit(tempX));
-      P.Y := Box.Y + Round(Limit(tempY));
+      tempY := Box.Height - Box.Height * (Poly[i] - Ymin) / (Ymax - Ymin);
+      P.X := ox + Round(Limit(tempX));
+      P.Y := oy + Round(Limit(tempY));
       g.LineTo(P.X, P.Y);
     end;
   end;
@@ -134,11 +139,11 @@ begin
     begin
       tempX := Box.Width * i / LNr;
       tempY := Box.Height - Box.Height * (Poly[i] - Ymin) / (Ymax - Ymin);
-      P.X := Box.X + Round(Limit(tempX));
-      P.Y := Box.Y + Round(Limit(tempY));
+      P.X := ox + Round(Limit(tempX));
+      P.Y := oy + Round(Limit(tempY));
       g.FillRect(
-        Rect(P.x - PointRadius, P.y - PointRadius,
-             P.x + PointRadius, P.y + PointRadius));
+        Rect(P.X - PointRadius, P.Y - PointRadius,
+             P.X + PointRadius, P.Y + PointRadius));
     end;
   end;
 
@@ -146,11 +151,11 @@ begin
   begin
     tempX := Box.Width * ((ChartPunktX) - Xmin) / (XMax - Xmin);
     tempY := Box.Height;
-    P.X := Box.X + Round(Limit(tempX));
-    P.Y := Box.Y + Round(Limit(tempY));
+    P.X := ox + Round(Limit(tempX));
+    P.Y := oy + Round(Limit(tempY));
     g.FillRect(
-      Rect(P.x - PointRadius, P.y - PointRadius,
-           P.x + PointRadius, P.y + PointRadius));
+      Rect(P.X - PointRadius, P.Y - PointRadius,
+           P.X + PointRadius, P.Y + PointRadius));
   end;
 
 end;

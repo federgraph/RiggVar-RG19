@@ -128,10 +128,6 @@ begin
   end
   else
   begin
-//    ct := cos(the);
-//    psi := arctan2(rm.m32/ct, rm.m33/ct);
-//    phi := arctan2(rm.m21/ct, rm.m11/ct);
-
     psi := arctan2(rm.m32, rm.m33); // c2 s3 / c2 c3 = s3 / c3 = tan(psi)
     phi := arctan2(rm.m21, rm.m11); // c2 s1 / c1 c2 = s1 / c1 = tan(phi)
   end;
@@ -148,16 +144,6 @@ begin
   result.Y := DegY;
   result.Z := DegZ;
 end;
-
-//procedure TRotationHelper.SaveRotation(C3D: TControl3D);
-//var
-//  p: TPoint3D;
-//begin
-//  p := GetRotationInfo(C3D.LocalMatrix);
-//  AngleX := -p.X;
-//  AngleY := -p.Y;
-//  AngleZ := -p.Z;
-//end;
 
 procedure TRotationHelper.SetRotX(const Value: single);
 begin
@@ -188,14 +174,6 @@ begin
     RotationChanged;
   end;
 end;
-
-//procedure TRotationHelper.LoadRotation(C3D: TControl3D);
-//begin
-//  C3D.ResetRotationAngle;
-//  C3D.RotationAngle.X := AngleX;
-//  C3D.RotationAngle.Y := AngleY;
-//  C3D.RotationAngle.Z := AngleZ;
-//end;
 
 constructor TRotationHelper.Create;
 begin

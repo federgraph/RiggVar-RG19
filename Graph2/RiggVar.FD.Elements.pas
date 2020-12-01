@@ -43,19 +43,6 @@ type
     procedure GoLight;
   end;
 
-  TRggDrawingBase = class
-  public
-    WantRotation: Boolean;
-    WheelFlag: Boolean;
-    InplaceFlag: Boolean;
-    ViewpointFlag: Boolean;
-    FixPoint3D: TPoint3D;
-    Colors: TRggColorScheme;
-    IsDark: Boolean;
-    procedure Reset; virtual; abstract;
-    procedure Transform(M: TMatrix3D); virtual; abstract;
-  end;
-
   TLineSegmentCompareCase = (
     ccNone,
     ccNil,
@@ -112,6 +99,22 @@ type
 
   TRggPoly = array of TRggPoint3D;
 
+  TRggDrawingBase = class
+  public
+    WantRotation: Boolean;
+    WheelFlag: Boolean;
+    InplaceFlag: Boolean;
+    ViewpointFlag: Boolean;
+    FixPoint3D: TPoint3D;
+    Colors: TRggColorScheme;
+    IsDark: Boolean;
+    FaxPoint3D: TRggPoint3D;
+    class var
+      WantOffset: Boolean;
+    procedure Reset; virtual; abstract;
+    procedure Transform(M: TMatrix3D); virtual; abstract;
+  end;
+
   TRggElement = class
   private
     FStrokeColor: TColor;
@@ -124,6 +127,9 @@ type
     TextAngle: single;
     TextRadius: single;
     WantTextRect: Boolean;
+    Temp1: TRggPoint3D;
+    Temp2: TRggPoint3D;
+    Temp3: TRggPoint3D;
     procedure TextOut(g: TCanvas; s: string);
     procedure TextOutLeading(g: TCanvas; s: string);
   public
@@ -324,6 +330,7 @@ type
   private
     FCount: Integer;
   protected
+    TransformedPoly: array of TPoint;
     procedure DrawText(g: TCanvas);
   public
     Poly: array of TPoint;
@@ -338,6 +345,7 @@ type
   private
     FCount: Integer;
   protected
+    TransformedPoly: array of TPoint;
     procedure DrawText(g: TCanvas);
   public
     Poly: array of TPoint;
@@ -349,8 +357,6 @@ type
   TRggPolyLine3D = class(TRggPolyLine)
   private
     procedure UpdateCount;
-  protected
-    TransformedPoly: array of TPoint;
   public
     RggPoly: TRggPoly;
     WantRotation: Boolean;
@@ -695,13 +701,15 @@ begin
   if not Visible then
     Exit;
 
+  Temp1 := Center + Drawing.FaxPoint3D;
+
   if Radius > 5 then
   begin
     R := Rect(
-      Round(Center.X - Radius),
-      Round(Center.Y - Radius),
-      Round(Center.X + Radius),
-      Round(Center.Y + Radius));
+      Round(Temp1.X - Radius),
+      Round(Temp1.Y - Radius),
+      Round(Temp1.X + Radius),
+      Round(Temp1.Y + Radius));
 
     g.Brush.Color := Drawing.Colors.BackgroundColor;
     g.Ellipse(R);
@@ -713,7 +721,7 @@ begin
 
   if ShowCaption or GlobalShowCaption then
   begin
-    TextCenter := Center.P;
+    TextCenter := Temp1.P;
     TextOut(g, Caption);
   end;
 end;
@@ -841,14 +849,17 @@ begin
   if not Visible then
     Exit;
 
+  Temp1 := Point1.Center + Drawing.FaxPoint3D;
+  Temp2 := Point2.Center + Drawing.FaxPoint3D;
+
   g.Pen.Width := StrokeThickness;
   g.Pen.Color := StrokeColor;
-  g.MoveTo(Round(Point1.Center.X), Round(Point1.Center.Y));
-  g.LineTo(Round(Point2.Center.X), Round(Point2.Center.Y));
+  g.MoveTo(Round(Temp1.X), Round(Temp1.Y));
+  g.LineTo(Round(Temp2.X), Round(Temp2.Y));
 
   if ShowCaption or GlobalShowCaption then
   begin
-    TextCenter := Point1.Center.P + (Point2.Center.P - Point1.Center.P) * 0.5;
+    TextCenter := Temp1.P + (Temp2.P - Temp1.P) * 0.5;
     TextOut(g, Caption);
   end;
 end;
@@ -1122,9 +1133,9 @@ end;
 
 procedure TRggTriangle.Draw(g: TCanvas);
 begin
-  Poly[0] := Point1.Center;
-  Poly[1] := Point2.Center;
-  Poly[2] := Point3.Center;
+  Poly[0] := Point1.Center + Drawing.FaxPoint3D;
+  Poly[1] := Point2.Center + Drawing.FaxPoint3D;
+  Poly[2] := Point3.Center + Drawing.FaxPoint3D;
   g.Brush.Color := StrokeColor;
   g.Polygon(Poly);
 end;
@@ -1161,8 +1172,12 @@ var
   startAngleR: single;
   sweepAngleR: single;
 begin
-  Angle2 := RadToDeg(Point2.Center.P.Angle(Point1.Center.P));
-  Angle3 := RadToDeg(Point3.Center.P.Angle(Point1.Center.P));
+  Temp1 := Point1.Center + Drawing.FaxPoint3D;
+  Temp2 := Point2.Center + Drawing.FaxPoint3D;
+  Temp3 := Point3.Center + Drawing.FaxPoint3D;
+
+  Angle2 := RadToDeg(Temp2.P.Angle(Temp1.P));
+  Angle3 := RadToDeg(Temp3.P.Angle(Temp1.P));
 
   startAngle := Angle3;
   sweepAngle := (Angle2 - Angle3);
@@ -1196,8 +1211,8 @@ begin
     die durch den Mittelpunkt der Ellipse und den Punkt (X4,Y4) definiert ist.
   }
 
-  P0.X := Round(Point1.Center.X);
-  P0.Y := Round(Point1.Center.Y);
+  P0.X := Round(Temp1.X);
+  P0.Y := Round(Temp1.Y);
 
   r := Round(Radius);
 
@@ -1232,7 +1247,7 @@ begin
   begin
     TextAngle := DegToRad(startAngle + sweepAngle / 2);
     TextRadius := Radius * FTextRadiusFactor;
-    TextCenter := Point1.Center.P;
+    TextCenter := Temp1.P;
     TextOut(g, s);
   end;
 end;
@@ -1282,8 +1297,8 @@ end;
 procedure TRggLagerLine.Draw(g: TCanvas);
 begin
   inherited;
-  DrawLager(g, Point1.Center.P, True);
-  DrawLager(g, Point2.Center.P, False);
+  DrawLager(g, (Drawing.FaxPoint3D + Point1.Center).P, True);
+  DrawLager(g, (Drawing.FaxPoint3D + Point2.Center).P, False);
 end;
 
 procedure TRggLagerLine.DrawLager(g: TCanvas; P: TPointF; FestLager: Boolean);
@@ -1577,6 +1592,12 @@ end;
 
 { TRggPolyLine }
 
+constructor TRggPolyLine.Create(ACaption: string = '');
+begin
+  inherited;
+  TypeName := 'PolyLine';
+end;
+
 constructor TRggPolyLine.Create(ACaption: string; ACount: Integer);
 begin
   Create(ACaption);
@@ -1584,24 +1605,36 @@ begin
   begin
     FCount := ACount;
     SetLength(Poly, Count);
+    SetLength(TransformedPoly, Count);
   end;
 end;
 
-constructor TRggPolyLine.Create(ACaption: string = '');
-begin
-  inherited;
-  TypeName := 'PolyLine';
-end;
-
 procedure TRggPolyLine.Draw(g: TCanvas);
+var
+  i: Integer;
 begin
+  Temp1 := Point1.Center + Drawing.FaxPoint3D;
+  Temp2 := Point2.Center + Drawing.FaxPoint3D;
+
   if not ShowPoly then
     inherited
   else
   begin
     g.Pen.Width := Round(StrokeThickness);
     g.Pen.Color := StrokeColor;
-    g.Polyline(Poly);
+
+    if Drawing.WantOffset then
+    begin
+      for i := 0 to Length(Poly) - 1 do
+      begin
+        TransformedPoly[i].X := Round(Poly[i].X + Drawing.FaxPoint3D.X);
+        TransformedPoly[i].Y := Round(Poly[i].Y + Drawing.FaxPoint3D.Y);
+      end;
+      g.PolyLine(TransformedPoly);
+    end
+    else
+      g.Polyline(Poly);
+
     DrawText(g);
   end;
 end;
@@ -1610,7 +1643,7 @@ procedure TRggPolyLine.DrawText(g: TCanvas);
 begin
   if ShowCaption or GlobalShowCaption then
   begin
-    TextCenter := Point1.Center.P + (Point2.Center.P - Point1.Center.P) * 0.5;
+    TextCenter := Temp1.P + (Temp2.P - Temp1.P) * 0.5;
     TextOut(g, Caption);
   end;
 end;
@@ -1656,8 +1689,8 @@ begin
     g.Pen.Color := StrokeColor;
     for i := 0 to Length(RggPoly) - 1 do
     begin
-      TransformedPoly[i].X := Round(RggPoly[i].X);
-      TransformedPoly[i].Y := Round(RggPoly[i].Y);
+      TransformedPoly[i].X := Round(RggPoly[i].X + Drawing.FaxPoint3D.X);
+      TransformedPoly[i].Y := Round(RggPoly[i].Y + Drawing.FaxPoint3D.Y);
     end;
     g.PolyLine(TransformedPoly);
     DrawText(g);
@@ -1992,14 +2025,18 @@ end;
 
 procedure TSchnittKKCircle.Draw(g: TCanvas);
 begin
+  Temp1 := MP1.Center + Drawing.FaxPoint3D;
+  Temp2 := MP2.Center + Drawing.FaxPoint3D;
+  Temp3 := Center + Drawing.FaxPoint3D;
+
   g.Pen.Width := StrokeThickness;
   g.Pen.Color := StrokeColor;
 
-  g.MoveTo(Round(MP1.Center.X), Round(MP1.Center.Y));
-  g.LineTo(Round(Center.X), Round(Center.Y));
+  g.MoveTo(Round(Temp1.X), Round(Temp1.Y));
+  g.LineTo(Round(Temp3.X), Round(Temp3.Y));
 
-  g.MoveTo(Round(MP2.Center.X), Round(MP2.Center.Y));
-  g.LineTo(Round(Center.X), Round(Center.Y));
+  g.MoveTo(Round(Temp2.X), Round(Temp2.Y));
+  g.LineTo(Round(Temp3.X), Round(Temp3.Y));
 
   inherited;
 end;
@@ -2120,8 +2157,11 @@ var
   p0, p1: TPointF;
   vx, vy: TPoint3D;
 begin
-  vp := Point1.Center.P;
-  vq := Point2.Center.P;
+  Temp1 := Point1.Center + Drawing.FaxPoint3D;
+  Temp2 := Point2.Center + Drawing.FaxPoint3D;
+
+  vp := Temp1.P;
+  vq := Temp2.P;
 
   v := vq - vp;
 
@@ -2190,11 +2230,13 @@ procedure TRggBigCircle.Draw(g: TCanvas);
 var
   R: TRect;
 begin
+  Temp1 := Center + Drawing.FaxPoint3D;
+
   R := Rect(
-    Round(Center.X - Radius),
-    Round(Center.Y - Radius),
-    Round(Center.X + Radius),
-    Round(Center.Y + Radius));
+    Round(Temp1.X - Radius),
+    Round(Temp1.Y - Radius),
+    Round(Temp1.X + Radius),
+    Round(Temp1.Y + Radius));
 
   g.Pen.Color := StrokeColor;
   g.Pen.Width := StrokeThickness;
@@ -2203,7 +2245,7 @@ begin
 
   if ShowCaption or GlobalShowCaption then
   begin
-    TextCenter := Center.P;
+    TextCenter := Temp1.P;
     TextOut(g, Caption);
   end;
 end;
@@ -2235,7 +2277,10 @@ var
   startAngleR: single;
   sweepAngleR: single;
 begin
-  Arrow.C := Point2.Center.C - Point1.Center.C;
+  Temp1 := Point1.Center + Drawing.FaxPoint3D;
+  Temp2 := Point2.Center + Drawing.FaxPoint3D;
+
+  Arrow.C := Temp2.C - Temp1.C;
   Angle := RadToDeg(Arrow.P.Angle(TPointF.Zero));
   RadiusF.X := Arrow.Length;
   RadiusF.Y := RadiusF.X;
@@ -2246,8 +2291,8 @@ begin
   g.Pen.Color := StrokeColor;
   g.Pen.Width := StrokeThickness;
 
-  P0.X := Round(Point1.Center.X);
-  P0.Y := Round(Point1.Center.Y);
+  P0.X := Round(Temp1.X);
+  P0.Y := Round(Temp1.Y);
 
   r := Round(RadiusF.X);
 
@@ -2282,7 +2327,7 @@ begin
 
   if ShowCaption or GlobalShowCaption then
   begin
-    TextCenter := Point1.Center.P + (Point2.Center.P - Point1.Center.P) * 0.5;
+    TextCenter := Temp1.P + (Temp2.P - Temp1.P) * 0.5;
     TextOut(g, Caption);
   end;
 end;
@@ -2326,14 +2371,29 @@ begin
   begin
     FCount := ACount;
     SetLength(Poly, Count);
+    SetLength(TransformedPoly, Count);
   end;
 end;
 
 procedure TRggPolyCurve.Draw(g: TCanvas);
+var
+  i: Integer;
 begin
   g.Pen.Width := StrokeThickness;
   g.Pen.Color := StrokeColor;
-  g.Polyline(Poly);
+
+  if Drawing.WantOffset then
+  begin
+    for i := 0 to Length(Poly) - 1 do
+    begin
+      TransformedPoly[i].X := Round(Poly[i].X + Drawing.FaxPoint3D.X);
+      TransformedPoly[i].Y := Round(Poly[i].Y + Drawing.FaxPoint3D.Y);
+    end;
+    g.PolyLine(TransformedPoly);
+  end
+  else
+    g.Polyline(Poly);
+
   DrawText(g);
 end;
 
@@ -2380,11 +2440,13 @@ procedure TRggFixpointCircle.Draw(g: TCanvas);
 var
   R: TRect;
 begin
+  Temp1 := Center + Drawing.FaxPoint3D;
+
   R := Rect(
-    Round(Center.X - FRadius),
-    Round(Center.Y - FRadius),
-    Round(Center.X + FRadius),
-    Round(Center.Y + FRadius));
+    Round(Temp1.X - FRadius),
+    Round(Temp1.Y - FRadius),
+    Round(Temp1.X + FRadius),
+    Round(Temp1.Y + FRadius));
 
   g.Brush.Color := Drawing.Colors.BackgroundColor;
   g.Ellipse(R);

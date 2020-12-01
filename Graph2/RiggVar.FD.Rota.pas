@@ -125,6 +125,7 @@ type
     Image: TImage;
     IsUp: Boolean;
     DrawCounter: Integer;
+    UseRotaCenterFullScreen: Boolean;
 
     constructor Create;
     destructor Destroy; override;
@@ -205,11 +206,16 @@ end;
 
 procedure TRotaForm2.InitPosition(w, h, x, y: single);
 begin
-  RD.OffsetX := w / 2;
-  RD.OffsetY := h / 2;
-  RD.OffsetXDefault := RD.OffsetX;
-  RD.OffsetYDefault := RD.OffsetY;
-//  TH.Offset := TPointF.Zero;
+  if UseRotaCenterFullScreen then
+  begin
+    RD.OffsetX := w / 2;
+    RD.OffsetY := h / 2;
+  end
+  else
+  begin
+    RD.OffsetX := BitmapWidth / 2;
+    RD.OffsetY := BitmapHeight / 2;
+  end;
   TH.Offset.X := 0;
   TH.Offset.Y := 0;
   DoOnUpdateStrokeRigg;
@@ -385,8 +391,16 @@ constructor TRotaForm2.Create;
 begin
   UseMastKurve := True;
 
-  BitmapWidth := 1600; //1024;
-  BitmapHeight := 1200; //768;
+  if UseRotaCenterFullScreen then
+  begin
+    BitmapWidth := 1600;
+    BitmapHeight := 1200;
+  end
+  else
+  begin
+    BitmapWidth := 1024;
+    BitmapHeight := 768;
+  end;
 
   RD := TRggDrawingD00.Create;
   DL := TRggDrawings.Create;
@@ -518,7 +532,7 @@ begin
 
 {$ifdef VCL}
   R := Rect(0, 0, Image.Width, Image.Height);
-  g.Brush.Color := FBackgroundColor; // TRggColors.WindowWhite;
+  g.Brush.Color := FBackgroundColor;
   g.FillRect(R);
 
   g.Brush.Color := clYellow;
@@ -527,9 +541,8 @@ begin
   g.Font.Size := 24;
   g.Font.Name := 'Consolas';
 
-  SetViewPortOrgEx(g.Handle, TH.Offset.X, TH.Offset.Y, nil);
+  RD.FaxPoint3D.C := TH.Offset;
   RD.Draw(g);
-  SetViewPortOrgEx(g.Handle, 0, 0, nil);
 
   Image.Canvas.CopyMode := cmSrcCopy;
   Image.Canvas.Draw(0, 0, Bitmap);
@@ -546,7 +559,8 @@ begin
   RD.Draw(g);
 
   Image.Canvas.Clear;
-  Bitmap.Draw(Image.Canvas, TH.Offset.X, TH.Offset.Y, True);
+  RD.FaxPoint3D.C := TH.Offset;
+  Bitmap.Draw(Image.Canvas, 0, 0, True);
   Image.Invalidate;
 {$endif}
 
@@ -590,8 +604,8 @@ begin
 
   TH.ResetTransform;
 
-  RD.OffsetX := RD.OffsetXDefault;
-  RD.OffsetY := RD.OffsetYDefault;
+  RD.OffsetX := 0;
+  RD.OffsetY := 0;
   RD.InitialZoom := RD.InitialZoomDefault * aRelativeZoom;
 
   RD.ViewpointFlag := True;

@@ -210,6 +210,7 @@ begin
   SortedCircleList := TRggCircleList.Create;
   SortedLineList := TRggLineList.Create;
   ML := TStringList.Create;
+  WantOffset := True;
 end;
 
 procedure TRggDrawing.InitButtons(BG: TRggButtonGroup);
