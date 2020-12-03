@@ -1022,7 +1022,7 @@ begin
     begin
       InitElements;
       CurrentDrawing.Compute;
-      CurrentDrawing.UseDarkColorScheme := DL.UseDarkColorScheme;
+      CurrentDrawing.IsDark := DL.UseDarkColorScheme;
       Draw;
       ElementList.ItemIndex := CurrentDrawing.DefaultElementIndex;
       SelectElement(CurrentDrawing.DefaultElementIndex);
@@ -1346,7 +1346,7 @@ end;
 procedure TFormDrawing.SwapColorScheme;
 begin
   DL.UseDarkColorScheme := not DL.UseDarkColorScheme;
-  CurrentDrawing.UseDarkColorScheme := DL.UseDarkColorScheme;
+  CurrentDrawing.IsDark := DL.UseDarkColorScheme;
 
   if DL.UseDarkColorScheme then
   begin

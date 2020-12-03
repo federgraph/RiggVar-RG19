@@ -336,6 +336,7 @@ ActionGroupRggGraph := IntegerArray([
   faToggleUseDisplayList,
   faToggleUseQuickSort,
   faToggleShowLegend,
+  faToggleSortedRota,
   faRggBogen,
   faRggKoppel,
   faRggHull,
@@ -459,46 +460,6 @@ ActionGroupTouchBarLegend := IntegerArray([
   faTouchBarBottom,
   faTouchBarLeft,
   faTouchBarRight]);
-
-{$ifdef WantAll}
-ActionGroupDropTarget := IntegerArray([
-  faToggleDropTarget]);
-
-ActionGroupLanguage := IntegerArray([
-  faToggleLanguage]);
-
-ActionGroupCopyPaste := IntegerArray([
-  faSave,
-  faLoad,
-  faOpen,
-  faCopy,
-  faPaste,
-  faShare]);
-
-ActionGroupViewOptions := IntegerArray([
-  faToggleMoveMode,
-  faLinearMove,
-  faExpoMove]);
-
-ActionGroupViewType := IntegerArray([
-  faToggleViewType,
-  faViewTypeOrtho,
-  faViewTypePerspective]);
-
-ActionGroupHullMesh := IntegerArray([
-  faHullMesh,
-  faHullMeshOn,
-  faHullMeshOff]);
-
-ActionGroupBitmapCycle := IntegerArray([
-  faCycleBitmapM,
-  faCycleBitmapP,
-  faRandom,
-  faRandomWhite,
-  faRandomBlack,
-  faBitmapEscape,
-  faToggleContour]);
-{$endif}
 
 end.
 

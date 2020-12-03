@@ -100,6 +100,9 @@ type
   TRggPoly = array of TRggPoint3D;
 
   TRggDrawingBase = class
+  private
+    FIsDark: Boolean;
+    procedure SetIsDark(const Value: Boolean);
   public
     WantRotation: Boolean;
     WheelFlag: Boolean;
@@ -107,12 +110,14 @@ type
     ViewpointFlag: Boolean;
     FixPoint3D: TPoint3D;
     Colors: TRggColorScheme;
-    IsDark: Boolean;
     FaxPoint3D: TRggPoint3D;
     class var
       WantOffset: Boolean;
     procedure Reset; virtual; abstract;
     procedure Transform(M: TMatrix3D); virtual; abstract;
+    procedure GoDark; virtual;
+    procedure GoLight; virtual;
+    property IsDark: Boolean read FIsDark write SetIsDark;
   end;
 
   TRggElement = class
@@ -127,6 +132,7 @@ type
     TextAngle: single;
     TextRadius: single;
     WantTextRect: Boolean;
+    class var
     Temp1: TRggPoint3D;
     Temp2: TRggPoint3D;
     Temp3: TRggPoint3D;
@@ -2399,12 +2405,20 @@ end;
 
 procedure TRggPolyCurve.DrawText(g: TCanvas);
 var
-  pf: TPointf;
+  pf: TPointF;
 begin
   if ShowCaption or GlobalShowCaption then
   begin
-    pf.x := Poly[0].x;
-    pf.y := Poly[0].y;
+    if Drawing.WantOffset then
+    begin
+      pf.X := TransformedPoly[0].X;
+      pf.Y := TransformedPoly[0].Y;
+    end
+    else
+    begin
+      pf.X := Poly[0].X;
+      pf.Y := Poly[0].Y;
+    end;
     TextCenter := pf;
     TextOut(g, Caption);
   end;
@@ -2454,6 +2468,36 @@ begin
   g.Pen.Color := TRggColors.Plum;
   g.Pen.Width := StrokeThickness;
   g.Ellipse(R);
+end;
+
+{ TRggDrawingBase }
+
+procedure TRggDrawingBase.GoDark;
+begin
+
+end;
+
+procedure TRggDrawingBase.GoLight;
+begin
+
+end;
+
+procedure TRggDrawingBase.SetIsDark(const Value: Boolean);
+begin
+  if FIsDark <> Value then
+  begin
+    FIsDark := Value;
+    if Value then
+    begin
+      Colors.GoDark;
+      GoDark;
+    end
+    else
+    begin
+      Colors.GoLight;
+      GoLight;
+    end;
+  end;
 end;
 
 end.

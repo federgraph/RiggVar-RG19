@@ -388,51 +388,9 @@ faResetPosition = 290;
 faResetRotation = 291;
 faResetZoom = 292;
 
-{$ifdef WantAll}
-{ DropTarget }
-faToggleDropTarget = 293;
+faToggleSortedRota = 293;
 
-{ Language }
-faToggleLanguage = 294;
-
-{ CopyPaste }
-faSave = 295;
-faLoad = 296;
-faOpen = 297;
-faCopy = 298;
-faPaste = 299;
-faShare = 300;
-
-{ ViewType }
-faToggleViewType = 301;
-faViewTypeOrtho = 302;
-faViewTypePerspective = 303;
-
-{ ViewOptions }
-faToggleMoveMode = 304;
-faLinearMove = 305;
-faExpoMove = 306;
-
-{ HullMesh }
-faHullMesh = 307;
-faHullMeshOn = 308;
-faHullMeshOff = 309;
-
-{ BitmapCycle }
-faCycleBitmapM = 310;
-faCycleBitmapP = 311;
-faRandom = 312;
-faRandomWhite = 313;
-faRandomBlack = 314;
-faBitmapEscape = 315;
-faToggleContour = 316;
-{$endif}
-
-{$ifdef WantAll}
-faMax = 317;
-{$else}
-faMax = 293;
-{$endif}
+faMax = 294;
 
 ParamsRange = [
   faParamT1 .. faParamT2,

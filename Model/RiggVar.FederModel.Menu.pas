@@ -293,6 +293,7 @@ begin
   fag := TFederActionGroup.Create;
   fag.Add(faToggleButtonSize);
   fag.Add(faToggleDarkMode);
+  fag.Add(faToggleSortedRota);
   AddGroup('Option', fag);
 end;
 

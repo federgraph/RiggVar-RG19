@@ -383,42 +383,7 @@ begin
     faTouchBarLeft: result := 'tbL';
     faTouchBarRight: result := 'tbR';
 
-{$ifdef WantAll}
-    faToggleLanguage: result := 'lan';
-
-    faToggleDropTarget: result := 'tdt';
-
-    faSave: result := 'sav';
-    faLoad: result := 'loa';
-    faOpen: result := 'ope';
-    faCopy: result := '^c';
-    faPaste: result := '^v';
-    faShare: result := 'sha';
-
-    faToggleMoveMode: result := 'mm';
-    faLinearMove: result := 'lmm';
-    faExpoMove: result := 'emm';
-
-    faToggleViewType: result := 'vt';
-    faViewTypeOrtho: result := 'vto';
-    faViewTypePerspective: result := 'vtp';
-
-    faHullMesh: result := 'hm';
-    faHullMeshOn: result := 'hm1';
-    faHullMeshOff: result := 'hm0';
-
-    faCycleBitmapM: result := 'b-';
-    faCycleBitmapP: result := 'b+';
-
-    faRandom: result := 'ran';
-    faRandomWhite: result := 'rcw';
-    faRandomBlack: result := 'rcb';
-
-    faBitmapEscape: result := 'be';
-
-    faToggleContour: result := 'ct';
-{$endif}
-
+    faToggleSortedRota: result := 'S';
   end;
 end;
 

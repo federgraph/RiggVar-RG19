@@ -55,7 +55,7 @@ type
     FViewpoint: TViewpoint;
     FFixpoint: TRiggPoint;
     FDarkMode: Boolean;
-    FBackgroundColor: TAlphaColor;
+    FBackgroundColor: TColor;
 
     FKoordinaten: TRiggPoints;
 
@@ -99,7 +99,7 @@ type
     procedure SetSofortBerechnen(const Value: Boolean);
     procedure SetWanteGestrichelt(const Value: Boolean);
     procedure SetDarkMode(const Value: Boolean);
-    procedure SetBackgroundColor(const Value: TAlphaColor);
+    procedure SetBackgroundColor(const Value: TColor);
   protected
     MouseDown: Boolean;
     MousePos: TPoint;
@@ -107,6 +107,8 @@ type
     DL: TRggDrawings;
     RD: TRggDrawingD00;
     CurrentElement: TRggElement;
+
+//    NullPunktOffset: TPointF;
 
     procedure ClearImage;
     procedure DrawToCanvas(g: TCanvas);
@@ -156,7 +158,7 @@ type
     procedure UpdateCameraY(Delta: single);
     procedure DoOnUpdateStrokeRigg;
 
-    property BackgroundColor: TAlphaColor read FBackgroundColor write SetBackgroundColor;
+    property BackgroundColor: TColor read FBackgroundColor write SetBackgroundColor;
     property DarkMode: Boolean read FDarkMode write SetDarkMode;
 
     property Koordinaten: TRiggPoints write SetKoordinaten;
@@ -218,7 +220,6 @@ begin
   end;
   TH.Offset.X := 0;
   TH.Offset.Y := 0;
-  DoOnUpdateStrokeRigg;
 end;
 
 procedure TRotaForm2.Swap;
@@ -235,6 +236,7 @@ begin
   case fa of
     faRggBogen: result := FBogen;
     faRggKoppel: result := FKoppel;
+    faToggleSortedRota: result := RD.WantSort;
     else
       result := False;
   end;
@@ -246,7 +248,7 @@ begin
   TH.DoOnMouse([], Round(delta), -Round(delta));
 end;
 
-procedure TRotaForm2.SetBackgroundColor(const Value: TAlphaColor);
+procedure TRotaForm2.SetBackgroundColor(const Value: TColor);
 begin
   FBackgroundColor := Value;
 end;
@@ -277,7 +279,7 @@ end;
 procedure TRotaForm2.SetDarkMode(const Value: Boolean);
 begin
   FDarkMode := Value;
-  RD.UseDarkColorScheme := Value;
+  RD.IsDark := Value;
   RD.Colors.BackgroundColor := FBackgroundColor;
   Draw;
 end;
@@ -362,7 +364,9 @@ end;
 
 procedure TRotaForm2.ToggleRenderOption(const fa: Integer);
 begin
-
+  case fa of
+    faToggleSortedRota: RD.WantSort := not RD.WantSort;
+  end;
 end;
 
 procedure TRotaForm2.Zoom(delta: single);
@@ -389,6 +393,7 @@ end;
 
 constructor TRotaForm2.Create;
 begin
+  UseRotaCenterFullScreen := False;
   UseMastKurve := True;
 
   if UseRotaCenterFullScreen then
@@ -404,7 +409,7 @@ begin
 
   RD := TRggDrawingD00.Create;
   DL := TRggDrawings.Create;
-  DL.UseDarkColorScheme := False;
+  DL.UseDarkColorScheme := True;
   DL.Add(RD);
 
   TH := TTransformHelper.Create;
@@ -512,8 +517,10 @@ begin
   Inc(DrawCounter);
 
 {$ifdef FMX}
+
+  g.Offset := PointF(NullpunktOffset.X, NullpunktOffset.Y);
+
   ss := Image.Scene.GetSceneScale;
-  g.Offset := TH.Offset;
   if g.BeginScene then
   try
     g.SetMatrix(TMatrix.CreateScaling(ss, ss));
@@ -523,6 +530,7 @@ begin
     g.Stroke.Thickness := 1.0;
     g.Font.Size := 16;
     g.Font.Family := 'Consolas';
+    RD.FaxPoint3D.C := TH.Offset;
     RD.Draw(g);
   finally
     g.EndScene;
@@ -604,8 +612,8 @@ begin
 
   TH.ResetTransform;
 
-  RD.OffsetX := 0;
-  RD.OffsetY := 0;
+  RD.OffsetX := BitmapWidth / 2;
+  RD.OffsetY := BitmapHeight / 2;
   RD.InitialZoom := RD.InitialZoomDefault * aRelativeZoom;
 
   RD.ViewpointFlag := True;
@@ -617,6 +625,9 @@ end;
 function TRotaForm2.GetChecked(fa: Integer): Boolean;
 begin
   result := False;
+  case fa of
+    faToggleSortedRota: result := RD.WantSort;
+  end;
 end;
 
 procedure TRotaForm2.SetChecked(fa: Integer; Value: Boolean);
@@ -660,6 +671,12 @@ begin
     faResetPosition: ;
     faResetRotation: ;
     faResetZoom: ;
+
+    faToggleSortedRota:
+    begin
+      RD.WantSort := not RD.WantSort;
+      Draw;
+    end;
   end;
 end;
 

@@ -885,6 +885,7 @@ begin
       RotaForm.UseDisplayListBtnClick(nil);
     end;
 
+    faToggleSortedRota: RotaForm.HandleAction(fa);
     faToggleShowLegend: RotaForm.LegendBtnClick(nil);
     faToggleUseQuickSort: RotaForm.UseQuickSortBtnClick(nil);
     faToggleSalingGraph: SalingImageBtnClick(nil);
@@ -1770,6 +1771,7 @@ begin
 
     faToggleUseDisplayList: result := RotaForm.UseDisplayList;
     faToggleUseQuickSort: result := RotaForm.UseQuickSort;
+    faToggleSortedRota:result := RotaForm.GetChecked(fa);
 
     faRggBogen: result := Main.Bogen;
     faRggKoppel: result := Main.Koppel;
