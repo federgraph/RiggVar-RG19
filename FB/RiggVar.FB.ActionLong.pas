@@ -381,40 +381,7 @@ begin
     faTouchBarLeft: result := 'TouchBar Left: Big Step';
     faTouchBarRight: result := 'TouchBar Right: Small Step ';
 
-{$ifdef WantAll}
-    faToggleLanguage: result := 'Toggle Language';
-
-    faToggleDropTarget: result := 'Drop target';
-
-    faSave: result := 'Save';
-    faLoad: result := 'Load';
-    faOpen: result := 'Open';
-    faCopy: result := 'Copy';
-    faPaste: result := 'Paste';
-    faShare: result := 'Share';
-
-    faToggleViewType: result := 'Toggle view type';
-    faViewTypeOrtho: result := 'Set view type to orthographic';
-    faViewTypePerspective: result := 'Set view type to perspective';
-
-    faHullMesh :result := 'toggle hull mesh';
-    faHullMeshOn :result := 'hull mesh on';
-    faHullMeshOff :result := 'hull mesh off';
-
-    faToggleMoveMode: result := 'Toggle move mode';
-    faLinearMove: result := 'Linear move';
-    faExpoMove: result := 'Exponential move';
-
-    faCycleBitmapP: result := 'cycle bitmap +';
-    faCycleBitmapM: result := 'cycle bitmap -';
-
-    faRandom: result := 'Random Param Values';
-    faRandomWhite: result := 'random colors white rings';
-    faRandomBlack: result := 'random colors black rings';
-    faBitmapEscape: result := 'Enter outer cycle';
-
-    faToggleContour: result := 'Toggle contour rings';
-{$endif}
+    faToggleSortedRota: result := 'Toggle Sorted Rota';
 
   end;
 end;

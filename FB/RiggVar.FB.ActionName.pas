@@ -386,46 +386,7 @@ faTouchBarBottom: result := 'faTouchBarBottom';
 faTouchBarLeft: result := 'faTouchBarLeft';
 faTouchBarRight: result := 'faTouchBarRight';
 
-{$ifdef WantAll}
-
-{ DropTarget }
-faToggleDropTarget: result := 'faToggleDropTarget';
-
-{ Language }
-faToggleLanguage: result := 'faToggleLanguage';
-
-{ CopyPaste }
-faSave: result := 'faSave';
-faLoad: result := 'faLoad';
-faOpen: result := 'faOpen';
-faCopy: result := 'faCopy';
-faPaste: result := 'faPaste';
-faShare: result := 'faShare';
-
-{ ViewType }
-faToggleViewType: result := 'faToggleViewType';
-faViewTypeOrtho: result := 'faViewTypeOrtho';
-faViewTypePerspective: result := 'faViewTypePerspective';
-
-{ ViewOptions }
-faToggleMoveMode: result := 'faToggleMoveMode';
-faLinearMove: result := 'faLinearMove';
-faExpoMove: result := 'faExpoMove';
-
-{ RggHullMesh }
-faHullMesh: result := 'faHullMesh';
-faHullMeshOn: result := 'faHullMeshOn';
-faHullMeshOff: result := 'faHullMeshOff';
-
-{ BitmapCycle }
-faCycleBitmapM: result := 'faCycleBitmapM';
-faCycleBitmapP: result := 'faCycleBitmapP';
-faRandom: result := 'faRandom';
-faRandomWhite: result := 'faRandomWhite';
-faRandomBlack: result := 'faRandomBlack';
-faBitmapEscape: result := 'faBitmapEscape';
-faToggleContour: result := 'faToggleContour';
-{$endif}
+faToggleSortedRota: result := 'faToggleSortedRota';
 
     else
       result := '??';

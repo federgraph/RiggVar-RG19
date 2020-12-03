@@ -25,6 +25,7 @@ type
 
     BogenBtn: TSpeedButton;
     KoppelBtn: TSpeedButton;
+    SortedBtn: TSpeedButton;
 
     MemoryBtn: TSpeedButton;
     MemoryRecallBtn: TSpeedButton;
@@ -65,12 +66,21 @@ begin
   BogenBtn := sb;
   sb.AllowAllUp := True;
   sb.Tag := faRggBogen;
+  sb.GroupIndex := NextGroupIndex;
   InitSpeedButton(sb);
 
   sb := AddSpeedBtn('KoppelBtn', 0);
   KoppelBtn := sb;
   sb.AllowAllUp := True;
+  sb.GroupIndex := NextGroupIndex;
   sb.Tag := faRggKoppel;
+  InitSpeedButton(sb);
+
+  sb := AddSpeedBtn('SortedBtn', 0);
+  SortedBtn := sb;
+  sb.AllowAllUp := True;
+  sb.GroupIndex := NextGroupIndex;
+  sb.Tag := faToggleSortedRota;
   InitSpeedButton(sb);
 
   { Zoom Buttons }
