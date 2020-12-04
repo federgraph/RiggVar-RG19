@@ -108,7 +108,7 @@ type
     RD: TRggDrawingD00;
     CurrentElement: TRggElement;
 
-//    NullPunktOffset: TPointF;
+    ImageMidPoint: TPoint3D;
 
     procedure ClearImage;
     procedure DrawToCanvas(g: TCanvas);
@@ -210,13 +210,13 @@ procedure TRotaForm2.InitPosition(w, h, x, y: single);
 begin
   if UseRotaCenterFullScreen then
   begin
-    RD.OffsetX := w / 2;
-    RD.OffsetY := h / 2;
+    ImageMidPoint.X := w / 2;
+    ImageMidPoint.Y := h / 2;
   end
   else
   begin
-    RD.OffsetX := BitmapWidth / 2;
-    RD.OffsetY := BitmapHeight / 2;
+    ImageMidPoint.X := BitmapWidth / 2;
+    ImageMidPoint.Y := BitmapHeight / 2;
   end;
   TH.Offset.X := 0;
   TH.Offset.Y := 0;
@@ -518,7 +518,7 @@ begin
 
 {$ifdef FMX}
 
-  g.Offset := PointF(NullpunktOffset.X, NullpunktOffset.Y);
+  g.Offset := TPointF.Zero;
 
   ss := Image.Scene.GetSceneScale;
   if g.BeginScene then
@@ -530,7 +530,7 @@ begin
     g.Stroke.Thickness := 1.0;
     g.Font.Size := 16;
     g.Font.Family := 'Consolas';
-    RD.FaxPoint3D.C := TH.Offset;
+    RD.FaxPoint3D.C := ImageMidPoint + TH.Offset;
     RD.Draw(g);
   finally
     g.EndScene;
@@ -549,7 +549,7 @@ begin
   g.Font.Size := 24;
   g.Font.Name := 'Consolas';
 
-  RD.FaxPoint3D.C := TH.Offset;
+  RD.FaxPoint3D.C := ImageMidPoint + TH.Offset;
   RD.Draw(g);
 
   Image.Canvas.CopyMode := cmSrcCopy;
@@ -567,7 +567,7 @@ begin
   RD.Draw(g);
 
   Image.Canvas.Clear;
-  RD.FaxPoint3D.C := TH.Offset;
+  RD.FaxPoint3D.C := ImageMidPoint + TH.Offset;
   Bitmap.Draw(Image.Canvas, 0, 0, True);
   Image.Invalidate;
 {$endif}
@@ -612,8 +612,8 @@ begin
 
   TH.ResetTransform;
 
-  RD.OffsetX := BitmapWidth / 2;
-  RD.OffsetY := BitmapHeight / 2;
+  ImageMidPoint.X := BitmapWidth / 2;
+  ImageMidPoint.Y := BitmapHeight / 2;
   RD.InitialZoom := RD.InitialZoomDefault * aRelativeZoom;
 
   RD.ViewpointFlag := True;
@@ -688,8 +688,8 @@ begin
   p := RD.rP_FX;
   for i := 0 to 100 do
   begin
-    RD.KK.RggPoly[i].X := RD.OffsetX + (FKoppelKurve[i].X - p.X) * RD.InitialZoom;
-    RD.KK.RggPoly[i].Y := RD.OffsetY - (FKoppelKurve[i].Z - p.Z) * RD.InitialZoom;
+    RD.KK.RggPoly[i].X := (FKoppelKurve[i].X - p.X) * RD.InitialZoom;
+    RD.KK.RggPoly[i].Y := -(FKoppelKurve[i].Z - p.Z) * RD.InitialZoom;
     RD.KK.RggPoly[i].Z := p.Y * RD.InitialZoom;
   end;
   if not RD.ViewpointFlag then
@@ -704,8 +704,8 @@ begin
   p := RD.rP_FX;
   for i := 0 to BogenMax do
   begin
-    RD.MK.RggPoly[i].X := RD.OffsetX + (FMastKurve[i].X - p.X) * RD.InitialZoom;
-    RD.MK.RggPoly[i].Y := RD.OffsetY - (FMastKurve[i].Z - p.Z) * RD.InitialZoom;
+    RD.MK.RggPoly[i].X := (FMastKurve[i].X - p.X) * RD.InitialZoom;
+    RD.MK.RggPoly[i].Y := -(FMastKurve[i].Z - p.Z) * RD.InitialZoom;
     RD.MK.RggPoly[i].Z := p.Y * RD.InitialZoom;
   end;
   if not RD.ViewpointFlag then
@@ -727,8 +727,8 @@ begin
   begin
     k := Round(100 / BogenMax * j);
     tempL := j * FMastLinieL / BogenMax;
-    RD.MK.RggPoly[j].X := RD.OffsetX + (tempL * temp1 + FMastLinie[k] * temp2 - p.X) * RD.InitialZoom;
-    RD.MK.RggPoly[j].Y := RD.OffsetY - (tempL * temp3 + FMastLinie[k] * temp4 - p.Z) * RD.InitialZoom;
+    RD.MK.RggPoly[j].X := (tempL * temp1 + FMastLinie[k] * temp2 - p.X) * RD.InitialZoom;
+    RD.MK.RggPoly[j].Y := -(tempL * temp3 + FMastLinie[k] * temp4 - p.Z) * RD.InitialZoom;
     RD.MK.RggPoly[j].Z := p.Y * RD.InitialZoom;
   end;
   if not RD.ViewpointFlag then

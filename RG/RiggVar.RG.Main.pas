@@ -1642,7 +1642,7 @@ begin
   end;
 
   UpdateGetriebe;
-  FormMain.UpdateReport;
+  FormMain.ShowTrimm;
   FederText.CheckState;
 end;
 
@@ -1824,7 +1824,7 @@ end;
 procedure TRggMain.CycleToolSet(i: Integer);
 begin
   FederText.UpdateToolSet(i);
-  FormMain.UpdateReport;
+  FormMain.ShowTrimm;
 end;
 
 function TRggMain.GetFederText: TFederTouchBase;
@@ -2561,7 +2561,6 @@ begin
     faSuperQuick: result := GraphRadio = gQuick;
 
     faToggleReport: result := F.ReportText.Visible;
-    faToggleButtonReport: result := F.WantButtonReport;
     faReportNone..faReportReadme: result := F.ReportManager.GetChecked(fa);
 
     faToggleDataText: result := F.ShowDataText;

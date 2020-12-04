@@ -88,8 +88,6 @@ type
     Koordinaten: TRiggPoints;
     rP_D0: TPoint3D;
     rP_FX: TPoint3D;
-    OffsetX: single;
-    OffsetY: single;
     InitialZoom: single;
 
     InitialZoomDefault: single;
@@ -571,8 +569,8 @@ var
   procedure Temp(cr: TRggCircle; oo: TRiggPoint);
   begin
     t := Koordinaten.V[oo] - rP_FX;
-    cr.Center.X := OffsetX + t.X * InitialZoom;
-    cr.Center.Y := OffsetY - t.Z * InitialZoom;
+    cr.Center.X := t.X * InitialZoom;
+    cr.Center.Y := - t.Z * InitialZoom;
     cr.Center.Z := -t.Y * InitialZoom;
     cr.Save;
   end;

@@ -90,7 +90,7 @@ type
   public
     procedure ShowTrimm;
     procedure ShowTrimmData;
-  public
+  private
     FWantButtonReport: Boolean;
     procedure UpdateReport;
     property WantButtonReport: Boolean read FWantButtonReport;
@@ -317,7 +317,8 @@ begin
 
   FScale := 1.0;
 {$ifdef MSWindows}
-//  FScale := ScaleFactor;
+//  if MainVar.WantScaling then
+//    FScale := ScaleFactor;
 {$endif}
 
   Application.OnException := ApplicationEventsException;
@@ -325,7 +326,7 @@ begin
   FormMain := self;
   InitScreenPos;
 
-  Margin := Round(2 * FScale);
+  Margin := Round(5 * FScale);
   Raster := Round(MainVar.Raster * FScale);
   MainVar.Scale := FScale;
   MainVar.ScaledRaster := Raster;
@@ -587,7 +588,8 @@ procedure TFormMain.FormResize(Sender: TObject);
 begin
   if (Main <> nil) and Main.IsUp then
   begin
-//    MainVar.Scale := ScaleFactor;
+//    if MainVar.WantScaling then
+//      MainVar.Scale := ScaleFactor;
     Inc(Main.ResizeCounter);
     Main.UpdateTouch;
     UpdateFederText;
