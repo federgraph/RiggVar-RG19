@@ -501,11 +501,11 @@ procedure TRggMain.SetDemo(const Value: Boolean);
 begin
   FDemo := Value;
   if FDemo then
-      begin
-        Rigg.SetDefaultDocument;
+  begin
+    Rigg.SetDefaultDocument;
     Rigg.InitFactArray;
-        SetParam(FParam);
-      end;
+    SetParam(FParam);
+  end;
 //  FormMain.ShowTrimm;
 end;
 
@@ -1915,7 +1915,7 @@ procedure TRggMain.UpdateTrimm0;
 begin
   Logger.Info('in UpdateTrimm0');
   SaveTrimm(Trimm0);
-//  FormMain.UpdateReport;
+//  FormMain.ShowTrimm; // --> FormMain.UpdateReport
 end;
 
 function TRggMain.GetIsRggParam: Boolean;
@@ -2194,8 +2194,7 @@ begin
 
   else
     result := False;
-
-  end
+  end;
 end;
 
 procedure TRggMain.InitDefaultData;
