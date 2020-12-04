@@ -54,6 +54,7 @@ type
     Scale: single;
     ClientWidth: Integer;
     ClientHeight: Integer;
+    WantScaling: Boolean;
     class constructor Create;
   end;
 
@@ -66,6 +67,7 @@ begin
   IsSandboxed := true;
   ColorScheme := TColorScheme.Create(5);
   Raster := 70;
+  Scale := 1.0;
 end;
 
 end.

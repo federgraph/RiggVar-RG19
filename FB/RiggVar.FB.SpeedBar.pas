@@ -14,7 +14,7 @@ uses
   RiggVar.FB.Color,
   RiggVar.FB.SpeedColor;
 
-{$define Vcl}
+{$define Vcl} // or LCL
 
 type
   TSpeedBtn = class(TSpeedButton)
