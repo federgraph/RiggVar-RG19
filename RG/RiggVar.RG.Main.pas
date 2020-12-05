@@ -277,6 +277,7 @@ type
 
     procedure HandleAction(fa: Integer);
     function GetChecked(fa: TFederAction): Boolean;
+    procedure FederTextCheckState;
 
     procedure InitText;
 
@@ -1675,8 +1676,8 @@ begin
   end;
 
   UpdateGetriebe;
-  FormMain.UpdateReport;
-  FederText.CheckState;
+  FormMain.ShowTrimm;
+  FederTextCheckState;
 end;
 
 procedure TRggMain.InitFederText(ft: TFederTouch0);
@@ -1857,7 +1858,7 @@ end;
 procedure TRggMain.CycleToolSet(i: Integer);
 begin
   FederText.UpdateToolSet(i);
-  FormMain.UpdateReport;
+  FormMain.ShowTrimm;
 end;
 
 function TRggMain.GetFederText: TFederTouchBase;
@@ -2505,7 +2506,7 @@ begin
     else if (fa in TrimmsRange) then
       FormMain.UpdateItemIndexTrimms;
 
-    FederText.CheckState;
+    FederTextCheckState;
   end;
 end;
 
@@ -2594,7 +2595,6 @@ begin
     faSuperQuick: result := GraphRadio = gQuick;
 
     faToggleReport: result := F.ReportText.Visible;
-    faToggleButtonReport: result := F.WantButtonReport;
     faReportNone..faReportReadme: result := F.ReportManager.GetChecked(fa);
 
     faToggleDataText: result := F.ShowDataText;
@@ -2618,6 +2618,11 @@ begin
     Trimm := 1;
     FixPoint := InitialFixPoint;
   end;
+end;
+
+procedure TRggMain.FederTextCheckState;
+begin
+  FederText.CheckState;
 end;
 
 procedure TRggMain.Neu(Doc: TRggDocument);

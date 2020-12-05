@@ -274,7 +274,7 @@ begin
         RiggReport.AusgabeDiffP(Main.Rigg.RiggPoints, Main.Rigg.RelaxedRiggPoints);
         ML.Assign(RiggReport.ML);
       end;
-{$ifdef MSWindowsDelphi}
+{$ifdef MSWindows}
       rgXML:
       begin
         Main.Rigg.WriteXml(ML, MainVar.AllTags);
