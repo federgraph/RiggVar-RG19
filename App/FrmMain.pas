@@ -395,6 +395,8 @@ begin
 {$endif}
   FormatSettings.DecimalSeparator := '.';
 
+  DoubleBuffered := True;
+
   FScale := 1.0;
 {$ifdef MSWindows}
 //  FScale := ScaleFactor;

@@ -163,6 +163,8 @@ type
     procedure DrawMatrix(g: TCanvas);
   private
     FScale: single;
+    FBitmapWidth: Integer;
+    FBitmapHeight: Integer;
     Bitmap: TBitmap;
     EraseBK: Boolean;
     procedure Rotate(Phi, Theta, Gamma, xrot, yrot, zrot: single);
@@ -238,6 +240,8 @@ type
 
     property WantOverlayedRiggs: Boolean read FWantOverlayedRiggs write SetWantOverlayedRiggs;
 
+    property BitmapWidth: Integer read FBitmapWidth;
+    property BitmapHeight: Integer read FBitmapHeight;
   end;
 
 implementation
@@ -284,10 +288,10 @@ begin
   FDrawAlways := True;
   AlwaysShowAngle := False;
 
-  MinTrackX := Round(410 * FScale);
-  MinTrackY := Round(280 * FScale);
-  MaxTrackX := Round(1024 * FScale);
-  MaxTrackY := Round(768 * FScale);
+  MinTrackX := 410;
+  MinTrackY := 280;
+  MaxTrackX := 1024;
+  MaxTrackY := 768;
 
   CreatedScreenWidth := Screen.Width;
   wx := GetSystemMetrics(SM_CXSCREEN);
@@ -297,9 +301,12 @@ begin
   if wy > MaxTrackY then
     wy := MaxTrackY;
 
+  FBitmapWidth := wx;
+  FBitmapHeight := wy;
+
   Bitmap := TBitmap.Create;
-  Bitmap.Width := wx;
-  Bitmap.Height := wy;
+  Bitmap.Width := Round(FBitmapWidth * FScale);
+  Bitmap.Height := Round(FBitmapHeight * FScale);
   PaintBackGround(Bitmap);
 
   FZoomBase := 0.05;

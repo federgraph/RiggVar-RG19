@@ -285,11 +285,13 @@ begin
         RiggReport.AusgabeDiffP(Main.Rigg.RiggPoints, Main.Rigg.RelaxedRiggPoints);
         ML.Assign(RiggReport.ML);
       end;
+{$ifdef MSWindows}
       rgXML:
       begin
         Main.Rigg.WriteXml(ML, MainVar.AllTags);
         SendMessage(FMemo.Handle, EM_LINESCROLL, 0, MemoPosY);
       end;
+{$endif}
       rgShort: ML.Text := Main.TrimmShort;
       rgLong: ML.Text := Main.TrimmLong;
       rgDiffText: Main.UpdateDiffText(ML);
