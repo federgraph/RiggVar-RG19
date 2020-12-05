@@ -359,7 +359,7 @@ procedure TFormDiagramE.AToggleClick(Sender: TObject);
 begin
   ChartModel.AP := not AToggle.IsOn;
   ChartModel.Calc;
-  Main.FederText.CheckState;
+  Main.FederTextCheckState;
   Memo.Text := ChartModel.MemoLines.Text;
 end;
 
@@ -368,7 +368,7 @@ begin
   ChartModel.ShowGroup := GToggle.IsOn;
   ChartModel.DrawGroup;
   YBox.Enabled := not ChartModel.ShowGroup;
-  Main.FederText.CheckState;
+  Main.FederTextCheckState;
   UpdateMemo;
 end;
 

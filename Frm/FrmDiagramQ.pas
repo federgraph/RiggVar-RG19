@@ -291,7 +291,7 @@ procedure TFormDiagramQ.AToggleClick(Sender: TObject);
 begin
   ChartModel.AP := not AToggle.IsOn;
   ChartModel.Calc;
-  Main.FederText.CheckState;
+  Main.FederTextCheckState;
 end;
 
 procedure TFormDiagramQ.GToggleClick(Sender: TObject);
@@ -299,7 +299,7 @@ begin
   ChartModel.ShowGroup := GToggle.IsOn;
   ChartModel.DrawGroup;
   YBox.Enabled := not ChartModel.ShowGroup;
-  Main.FederText.CheckState;
+  Main.FederTextCheckState;
   UpdateMemo;
 end;
 

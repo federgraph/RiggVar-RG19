@@ -265,6 +265,7 @@ type
 
     procedure HandleAction(fa: Integer);
     function GetChecked(fa: TFederAction): Boolean;
+    procedure FederTextCheckState;
 
     procedure InitText;
 
@@ -1643,7 +1644,7 @@ begin
 
   UpdateGetriebe;
   FormMain.ShowTrimm;
-  FederText.CheckState;
+  FederTextCheckState;
 end;
 
 procedure TRggMain.InitFederText(ft: TFederTouch0);
@@ -2472,7 +2473,7 @@ begin
     else if (fa in TrimmsRange) then
       FormMain.UpdateItemIndexTrimms;
 
-    FederText.CheckState;
+    FederTextCheckState;
   end;
 end;
 
@@ -2584,6 +2585,11 @@ begin
     Trimm := 1;
     FixPoint := InitialFixPoint;
   end;
+end;
+
+procedure TRggMain.FederTextCheckState;
+begin
+  FederText.CheckState;
 end;
 
 end.

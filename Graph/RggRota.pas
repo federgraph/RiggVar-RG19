@@ -183,9 +183,9 @@ type
     FWanteGestrichelt: Boolean;
     FBogen: Boolean;
     FKoppel: Boolean;
+    FWantOverlayedRiggs: Boolean;
     FWantLineColors: Boolean;
     FDarkMode: Boolean;
-    FWantOverlayedRiggs: Boolean;
     FUseQuickSort: Boolean;
     procedure InitGraph;
     procedure InitRaumGraph;
@@ -197,9 +197,9 @@ type
     procedure SetOnBeforeDraw(const Value: TNotifyEvent);
     procedure SetOnAfterDraw(const Value: TNotifyEvent);
     function SingleDraw: Boolean;
+    procedure SetWantOverlayedRiggs(const Value: Boolean);
     procedure SetWantLineColors(const Value: Boolean);
     procedure SetDarkMode(const Value: Boolean);
-    procedure SetWantOverlayedRiggs(const Value: Boolean);
     procedure SetUseQuickSort(const Value: Boolean);
   public
     IsUp: Boolean;
@@ -212,15 +212,15 @@ type
 
     constructor Create;
     destructor Destroy; override;
+    procedure Init;
+    procedure Draw;
 
     procedure HandleAction(fa: Integer);
     function GetChecked(fa: Integer): Boolean;
     procedure SetChecked(fa: Integer; Value: Boolean);
 
-    procedure Init;
     procedure InitPosition(w, h, x, y: single);
     procedure Swap;
-    procedure Draw;
     procedure ImageScreenScaleChanged(Sender: TObject);
 
     procedure RotateZ(Delta: single);
@@ -366,7 +366,7 @@ end;
 
 procedure TRotaForm1.InitHullGraph;
 begin
-  HullGraph := THullGraph0.Create;
+  HullGraph := THullGraph.Create;
   HullGraph.Transformer := Transformer;
 end;
 
@@ -1113,6 +1113,11 @@ begin
 
 end;
 
+procedure TRotaForm1.DoOnUpdateStrokeRigg;
+begin
+
+end;
+
 procedure TRotaForm1.InitPosition(w, h, x, y: single);
 begin
   FBitmapWidth := Round(w);
@@ -1172,11 +1177,6 @@ end;
 procedure TRotaForm1.SetDarkMode(const Value: Boolean);
 begin
   FDarkMode := Value;
-end;
-
-procedure TRotaForm1.DoOnUpdateStrokeRigg;
-begin
-
 end;
 
 function TRotaForm1.GetChecked(fa: Integer): Boolean;
