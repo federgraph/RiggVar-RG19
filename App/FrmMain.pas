@@ -278,8 +278,8 @@ uses
   RiggVar.FB.Classes;
 
 const
-  HelpCaptionText = 'RG19 - press ? for help';
-  ApplicationTitleText = 'RG19';
+  HelpCaptionText = 'RG67 - press ? for help';
+  ApplicationTitleText = 'RG67';
 
 { TFormMain }
 
@@ -314,6 +314,8 @@ begin
 {$ifdef Debug}
   ReportMemoryLeaksOnShutdown := True;
 {$endif}
+
+  DoubleBuffered := True;
 
   FScale := 1.0;
 {$ifdef MSWindows}
@@ -1452,9 +1454,7 @@ begin
 
   if ChartControl.Visible and ChartImage.Visible then
     UpdateChartGraph;
-
-  Main.FederText.PaintBackgroundNeeded := True;
-  Main.FederText.Repaint;
+  Main.FederTextRepaint;;
 end;
 
 procedure TFormMain.SalingImageBtnClick(Sender: TObject);
@@ -1464,8 +1464,7 @@ begin
     SalingImage.BringToFront;
   if SalingImage.Visible then
     UpdateSalingGraph;
-  Main.FederText.PaintBackgroundNeeded := True;
-  Main.FederText.Repaint;
+  Main.FederTextRepaint;;
 end;
 
 procedure TFormMain.ControllerImageBtnClick(Sender: TObject);
@@ -1475,8 +1474,7 @@ begin
     ControllerImage.BringToFront;
   if ControllerImage.Visible then
     UpdateControllerGraph;
-  Main.FederText.PaintBackgroundNeeded := True;
-  Main.FederText.Repaint;
+  Main.FederTextRepaint;;
 end;
 
 procedure TFormMain.InitSalingGraph;
@@ -1785,7 +1783,7 @@ begin
     faMultiBtn: result := RotaForm.WantOverlayedRiggs;
 
     faChartRect..faChartReset: result := ChartGraph.GetChecked(fa);
-    faToggleChartGraph: result := ChartImage.Visible;
+    faToggleChartGraph: result := ChartControl.Visible;
     faToggleSalingGraph: result := SalingImage.Visible;
     faToggleControllerGraph: result := ControllerImage.Visible;
     faToggleMatrixText: result := RotaForm.MatrixItemChecked;
@@ -2086,16 +2084,7 @@ end;
 
 procedure TFormMain.UpdateFederText;
 begin
-  if Main.Action = faPan then
-  begin
-    Main.FederText1.ST00.Text.Caption := 'Pan';
-    Main.FederText.SB00.Text.Caption := '';
-  end
-  else
-  begin
-    Main.FederText.ST00.Text.Caption := Main.ParamCaption;
-    Main.FederText.SB00.Text.Caption := Main.ParamValueString[Main.Param];
-  end;
+  Main.FederTextUpdateCaption;
 end;
 
 procedure TFormMain.CenterRotaForm;

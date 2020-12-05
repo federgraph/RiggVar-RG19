@@ -245,6 +245,12 @@ begin
   AddGroup('Graph', fag);
 
   fag := TFederActionGroup.Create;
+  fag.Add(faToggleSalingGraph);
+  fag.Add(faToggleControllerGraph);
+  fag.Add(faToggleChartGraph);
+  AddGroup('Images', fag);
+
+  fag := TFederActionGroup.Create;
   fag.Add(faReportNone);
   fag.Add(faReportLog);
   fag.Add(faReportJson);

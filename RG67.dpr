@@ -1,4 +1,4 @@
-﻿program RG19;
+﻿program RG67;
 
 uses
   Vcl.Forms,
@@ -135,14 +135,19 @@ uses
   RiggVar.FZ.Z19_Chart in 'FZ\RiggVar.FZ.Z19_Chart.pas',
   RiggVar.FZ.Z20_Epsilon in 'FZ\RiggVar.FZ.Z20_Epsilon.pas',
   RiggVar.FZ.Z21_Rotations in 'FZ\RiggVar.FZ.Z21_Rotations.pas',
-  RiggVar.FZ.Z22_BigArc in 'FZ\RiggVar.FZ.Z22_BigArc.pas';
+  RiggVar.FZ.Z22_BigArc in 'FZ\RiggVar.FZ.Z22_BigArc.pas',
+  RggUnit0 in 'Core\RggUnit0.pas',
+  RggUnit1 in 'Core\RggUnit1.pas',
+  RggUnit2 in 'Core\RggUnit2.pas',
+  RggUnit3 in 'Core\RggUnit3.pas',
+  RggUnit4 in 'Core\RggUnit4.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.Title := 'RG19';
+  Application.Title := 'RG67';
   Application.CreateForm(TFormMain, FormMain);
   Application.Run;
 end.
