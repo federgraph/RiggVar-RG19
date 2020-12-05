@@ -22,6 +22,8 @@ interface
 {$mode delphi}
 {$endif}
 
+{.$define WantWMEraseBkgnd}
+
 uses
   Messages,
   Classes,
@@ -30,10 +32,12 @@ uses
 
 type
   TFederTouch0 = class(TWinControl)
+{$ifdef WantWMEraseBkgnd}
   private
     OldWidth: Integer;
     OldHeight: Integer;
     procedure WMEraseBkgnd(var Message: TWmEraseBkgnd); message WM_ERASEBKGND;
+{$endif}
   protected
     FActionMap: Integer;
     FActionPage: Integer;
@@ -115,6 +119,7 @@ begin
 
 end;
 
+{$ifdef WantWMEraseBkgnd}
 procedure TFederTouch0.WMEraseBkgnd(var Message: TWmEraseBkgnd);
 begin
   if (PaintBackgroundNeeded = False) and (OldWidth = Width) and (OldHeight = Height) then
@@ -127,5 +132,6 @@ begin
     inherited;
   end;
 end;
+{$endif}
 
 end.

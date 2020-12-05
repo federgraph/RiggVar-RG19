@@ -46,13 +46,13 @@ uses
   RiggVar.FB.ActionGroups,
   RiggVar.FB.ActionTable,
   RiggVar.FB.ActionKeys,
-  RiggVar.FB.ActionMap,
   RiggVar.FB.ActionTest,
   RiggVar.FB.Classes,
-  RiggVar.FB.TextBase,
   RiggVar.FederModel.Action,
   RiggVar.FederModel.ActionList,
   RiggVar.FederModel.Binding,
+  RiggVar.FB.ActionMap,
+  RiggVar.FB.TextBase,
   RiggVar.FederModel.TouchBase,
   RiggVar.FederModel.Touch,
   RiggVar.FederModel.TouchPhone,
@@ -111,10 +111,11 @@ type
     function GetIsPortrait: Boolean;
     function GetColorScheme: Integer;
     procedure SetColorScheme(const Value: Integer);
-    procedure InitFederText(ft: TFederTouch0);
     function GetIsPhone: Boolean;
     procedure SetTouch(const Value: Integer);
+
     function GetFederText: TFederTouchBase;
+    procedure InitFederText(ft: TFederTouch0);
 
     function FormatValue(Value: single): string;
     procedure DoBiegungGF;
@@ -197,12 +198,12 @@ type
 
     InitialFixPoint: TRiggPoint;
 
-    ActionMap1: TActionMap;
-    ActionMap2: TActionMap;
     ActionHandler: IFederActionHandler;
     ActionHelper: TActionHelper;
     ActionList: TRggActionList;
 
+    ActionMap1: TActionMap;
+    ActionMap2: TActionMap;
     FederText1: TFederTouch;
     FederText2: TFederTouchPhone;
 
@@ -278,15 +279,19 @@ type
     procedure HandleAction(fa: Integer);
     function GetChecked(fa: TFederAction): Boolean;
     procedure FederTextCheckState;
+    procedure FederTextRepaint;
+    procedure FederTextUpdateParent;
+    procedure FederTextUpdateCaption;
+    procedure CollectShortcuts(fa: Integer; ML: TStrings);
 
     procedure InitText;
+    procedure CycleToolSet(i: Integer);
 
     procedure DoTouchbarLeft(Delta: single);
     procedure DoTouchbarRight(Delta: single);
     procedure DoTouchbarBottom(Delta: single);
     procedure DoTouchbarTop(Delta: single);
 
-    procedure CycleToolSet(i: Integer);
     procedure CycleColorSchemeM;
     procedure CycleColorSchemeP;
     procedure ToggleDarkMode;
@@ -378,11 +383,11 @@ type
     property ColorScheme: Integer read GetColorScheme write SetColorScheme;
     property Touch: Integer read FTouch write SetTouch;
 
+    property Keyboard: TFederKeyboard read FederKeyboard;
+
+    property FederText: TFederTouchBase read GetFederText;
     property ActionMapTablet: TActionMap read ActionMap1;
     property ActionMapPhone: TActionMap read ActionMap2;
-
-    property Keyboard: TFederKeyboard read FederKeyboard;
-    property FederText: TFederTouchBase read GetFederText;
   end;
 
 implementation
@@ -393,9 +398,9 @@ uses
   FrmMain,
   RiggVar.App.Main,
   RiggVar.Util.AppUtils,
-  RiggVar.FederModel.Keyboard01,
   RiggVar.FederModel.ActionMapPhone,
-  RiggVar.FederModel.ActionMapTablet;
+  RiggVar.FederModel.ActionMapTablet,
+  RiggVar.FederModel.Keyboard01;
 
 const
   tfs = '%-3s %s %8s %6s';
@@ -458,16 +463,17 @@ begin
   ActionGroupList := TActionGroupList.Create;
   ActionTest := TActionTest.Create;
 
+  InitRaster;
+
   ActionMap1 := TActionMapTablet.Create;
   ActionMap2 := TActionMapPhone.Create;
-
-  InitRaster;
 
   TTouchBtn.WantHint := True;
   FederText1 := TFederTouch.Create(nil);
   FederText1.Name := 'FederText1';
   FederText2 := TFederTouchPhone.Create(nil);
   FederText2.Name := 'FederText2';
+
   FederKeyboard := TFederKeyboard01.Create;
   FederBinding := TFederBinding.Create;
 
@@ -482,10 +488,10 @@ begin
   MainVar.AppIsClosing := True;
 
   ActionHelper.Free;
+  FederKeyboard.Free;
+
   ActionMap1.Free;
   ActionMap2.Free;
-
-  FederKeyboard.Free;
   FederText1.Free;
   FederText2.Free;
 
@@ -1709,8 +1715,7 @@ end;
 
 procedure TRggMain.InitText;
 begin
-  MainVar.ClientWidth := FormMain.ClientWidth;
-  MainVar.ClientHeight := FormMain.ClientHeight;
+  InitRaster;
   InitFederText(FederText1);
   InitFederText(FederText2);
   Touch := faTouchDesk;
@@ -1727,10 +1732,9 @@ end;
 
 procedure TRggMain.UpdateTouch;
 begin
+  InitRaster;
   if FederText.InitOK then
   begin
-    MainVar.ClientWidth := FormMain.ClientWidth;
-    MainVar.ClientHeight := FormMain.ClientHeight;
     InitTouch;
     FederText.UpdateShape;
   end;
@@ -1813,7 +1817,6 @@ begin
       FederText1.Visible := not IsPhone;
   end;
   FederText2.Visible := not FederText1.Visible;
-
   FederText.UpdateShape;
 end;
 
@@ -2476,8 +2479,8 @@ begin
     end;
 
     faNoop: ;
-    faToggleTouchFrame: FederText.ToggleTouchFrame;
 
+    faToggleTouchFrame: FederText.ToggleTouchFrame;
     faActionPageM: CycleToolSet(-1);
     faActionPageP: CycleToolSet(1);
     faActionPage1: FederText.ActionPage := 1;
@@ -2623,6 +2626,41 @@ end;
 procedure TRggMain.FederTextCheckState;
 begin
   FederText.CheckState;
+end;
+
+procedure TRggMain.FederTextUpdateParent;
+begin
+  FederText1.Parent := FormMain;
+  FederText2.Parent := FormMain;
+end;
+
+procedure TRggMain.FederTextRepaint;
+begin
+  FederText.PaintBackgroundNeeded := True;
+  FederText.Repaint;
+end;
+
+procedure TRggMain.FederTextUpdateCaption;
+begin
+  if Action = faPan then
+  begin
+    FederText.ST00.Text.Caption := 'Pan';
+    FederText.SB00.Text.Caption := '';
+  end
+  else
+  begin
+    FederText.ST00.Text.Caption := ParamCaption;
+    FederText.SB00.Text.Caption := ParamValueString[Param];
+  end;
+end;
+
+procedure TRggMain.CollectShortcuts(fa: Integer; ML: TStrings);
+begin
+  Keyboard.GetShortcuts(fa, ML);
+//  Main.ActionMap0.CollectOne(fa, ML);
+  ActionMapTablet.CollectOne(fa, ML);
+  ActionMapPhone.CollectOne(fa, ML);
+//  FederMenu.CollectOne(fa, ML);
 end;
 
 procedure TRggMain.Neu(Doc: TRggDocument);

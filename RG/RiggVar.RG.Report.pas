@@ -3,7 +3,7 @@
 interface
 
 {.$define WantUserConfusingReports}
-{.$define WantXMLReports}
+{$define WantXMLReports}
 
 {$ifdef fpc}
 {$mode delphi}
@@ -316,7 +316,7 @@ begin
   Include(rs, rgData);
 {$endif}
   Include(rs, rgShort);
-//  Include(rs, rgLong);
+  Include(rs, rgLong);
 
   Include(rs, rgTrimmText);
   Include(rs, rgJsonText);
@@ -325,11 +325,11 @@ begin
 
   Include(rs, rgAusgabeDetail);
   Include(rs, rgAusgabeRL);
-//  Include(rs, rgAusgabeRP);
-//  Include(rs, rgAusgabeRLE);
-//  Include(rs, rgAusgabeRPE);
-//  Include(rs, rgAusgabeDiffL);
-//  Include(rs, rgAusgabeDiffP);
+  Include(rs, rgAusgabeRP);
+  Include(rs, rgAusgabeRLE);
+  Include(rs, rgAusgabeRPE);
+  Include(rs, rgAusgabeDiffL);
+  Include(rs, rgAusgabeDiffP);
 {$ifdef WantXMLReports }
   Include(rs, rgXML);
 {$endif}
