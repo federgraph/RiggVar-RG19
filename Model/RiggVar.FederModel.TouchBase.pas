@@ -549,7 +549,7 @@ procedure TFederTouchBase.CheckState;
 var
   b: TCornerBtn;
 begin
-  PaintBackgroundNeeded := True;
+  MainVar.PaintBackgroundNeeded := True;
   for b in CornerBtnList do
     b.CheckState;
 end;
@@ -612,7 +612,7 @@ var
   b: TCornerBtn;
 begin
   FFrameVisible := Value;
-  PaintBackgroundNeeded := True;
+  MainVar.PaintBackgroundNeeded := True;
 
   if Value then
     ToolBtn.Opacity := 0.1
@@ -884,6 +884,8 @@ end;
 procedure TFederTouchBase.ToolBtnClick(Sender: TObject);
 begin
   ToggleTouchFrame;
+  Main.MainFormRepaint;
+  ToolBtn.Repaint;
 end;
 
 procedure TFederTouchBase.ToggleTouchFrame;

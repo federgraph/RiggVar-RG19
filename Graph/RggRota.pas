@@ -100,6 +100,7 @@ type
     xmax: Integer;
     ymax: Integer;
 
+    ImageMidPoint: TPointF;
     FXpos: Integer;
     FYpos: Integer;
     FIncrementW: Integer;
@@ -542,8 +543,8 @@ begin
 
   SkipOnceFlag := False;
 
-  NullpunktOffset.x := Bitmap.Width div 2 + FXpos;
-  NullpunktOffset.y := Bitmap.Height div 2 + FYpos;
+  NullpunktOffset.X := Round(ImageMidPoint.X + FXpos);
+  NullpunktOffset.Y := Round(ImageMidPoint.Y + FYpos);
 
   if MatrixItemChecked then
   begin
@@ -551,7 +552,7 @@ begin
     DrawMatrix(g);
   end;
 
-  SetViewPortOrgEx(g.Handle, NullpunktOffset.x, NullpunktOffset.y, nil);
+  SetViewPortOrgEx(g.Handle, NullpunktOffset.X, NullpunktOffset.Y, nil);
 
   if UseDisplayList then
   begin
@@ -592,8 +593,8 @@ procedure TRotaForm1.UpdateMinMax;
 begin
   if KeepInsideItemChecked then
   begin
-    xmin := -Bitmap.Width div 2;
-    ymin := -Bitmap.Height div 2;
+    xmin := -Image.Width div 2;
+    ymin := -Image.Height div 2;
     xmax := Abs(xmin);
     ymax := Abs(ymin);
     if xmax > xmin + Image.Width then
@@ -1120,10 +1121,10 @@ end;
 
 procedure TRotaForm1.InitPosition(w, h, x, y: single);
 begin
-  FBitmapWidth := Round(w);
-  FBitmapHeight := Round(h);
-  FXPos := Round(x);
-  FYPos := Round(y);
+  ImageMidPoint.X := w / 2;
+  ImageMidPoint.Y := h / 2;
+  FXPos := 0;
+  FYPos := 0;
 end;
 
 procedure TRotaForm1.Swap;

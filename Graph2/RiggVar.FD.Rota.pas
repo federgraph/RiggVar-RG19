@@ -208,16 +208,8 @@ end;
 
 procedure TRotaForm2.InitPosition(w, h, x, y: single);
 begin
-  if UseRotaCenterFullScreen then
-  begin
-    ImageMidPoint.X := w / 2;
-    ImageMidPoint.Y := h / 2;
-  end
-  else
-  begin
-    ImageMidPoint.X := BitmapWidth / 2;
-    ImageMidPoint.Y := BitmapHeight / 2;
-  end;
+  ImageMidPoint.X := w / 2;
+  ImageMidPoint.Y := h / 2;
   TH.Offset.X := 0;
   TH.Offset.Y := 0;
 end;
@@ -612,8 +604,8 @@ begin
 
   TH.ResetTransform;
 
-  ImageMidPoint.X := BitmapWidth / 2;
-  ImageMidPoint.Y := BitmapHeight / 2;
+//  ImageMidPoint.X := Image.Width / 2;
+//  ImageMidPoint.Y := Image.Height / 2;
   RD.InitialZoom := RD.InitialZoomDefault * aRelativeZoom;
 
   RD.ViewpointFlag := True;
