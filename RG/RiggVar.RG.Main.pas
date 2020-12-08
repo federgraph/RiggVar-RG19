@@ -1710,7 +1710,7 @@ end;
 procedure TRggMain.InitRaster;
 begin
   MainVar.ClientWidth := FormMain.ClientWidth;
-  MainVar.ClientHeight := FormMain.ClientHeight - FormMain.StatusBar.Height;
+  MainVar.ClientHeight := FormMain.ClientHeight - MainVar.StatusBarHeight;
 end;
 
 procedure TRggMain.InitText;
@@ -2630,13 +2630,15 @@ end;
 
 procedure TRggMain.FederTextUpdateParent;
 begin
-  FederText1.Parent := FormMain;
-  FederText2.Parent := FormMain;
+  if FederText.Parent = nil then
+  begin
+    FederText1.Parent := FormMain;
+    FederText2.Parent := FormMain;
+  end;
 end;
 
 procedure TRggMain.FederTextRepaint;
 begin
-  FederText.PaintBackgroundNeeded := True;
   FederText.Repaint;
 end;
 

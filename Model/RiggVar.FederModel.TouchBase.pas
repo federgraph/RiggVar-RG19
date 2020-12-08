@@ -549,7 +549,6 @@ procedure TFederTouchBase.CheckState;
 var
   b: TCornerBtn;
 begin
-  PaintBackgroundNeeded := True;
   for b in CornerBtnList do
     b.CheckState;
 end;
@@ -612,7 +611,6 @@ var
   b: TCornerBtn;
 begin
   FFrameVisible := Value;
-  PaintBackgroundNeeded := True;
 
   if Value then
     ToolBtn.Opacity := 0.1
