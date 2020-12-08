@@ -275,11 +275,9 @@ type
     procedure HandleAction(fa: Integer);
     function GetChecked(fa: TFederAction): Boolean;
     procedure FederTextCheckState;
-    procedure FederTextRepaint;
     procedure FederTextUpdateParent;
     procedure FederTextUpdateCaption;
     procedure CollectShortcuts(fa: Integer; ML: TStrings);
-    procedure MainFormRepaint;
 
     procedure InitText;
 {$ifdef WantFederText}
@@ -857,7 +855,7 @@ begin
 
   Rigg.ManipulatorMode := (Value = fpWinkel);
   FParam := Value;
- CurrentValue := Rigg.RggFA.Find(FParam).Ist;
+  CurrentValue := Rigg.RggFA.Find(FParam).Ist;
   SetupTrackBarForRgg;
   UpdateGraph;
 end;
@@ -2052,16 +2050,16 @@ begin
     if not v.IsEmpty then
     begin
       s := v.AsString;
-  if (s <> '') and (Length(s) < 10000) then
-  begin
-    FL.Text := s;
-    ReadText(FL);
-    FL.Clear;
-  end
-  else
-  begin
-    Logger.Error('there is no ''data'' string on the clipboard');
-  end;
+      if (s <> '') and (Length(s) < 10000) then
+      begin
+        FL.Text := s;
+        ReadText(FL);
+        FL.Clear;
+      end
+      else
+      begin
+        Logger.Error('there is no ''data'' string on the clipboard');
+      end;
     end;
   except
     Logger.Error('no usable data on clipboard');
@@ -2664,14 +2662,6 @@ begin
 {$endif}
 end;
 
-procedure TRggMain.FederTextRepaint;
-begin
-{$ifdef WantFederText}
-  MainVar.PaintBackgroundNeeded := True;
-  FederText.Repaint;
-{$endif}
-end;
-
 procedure TRggMain.FederTextUpdateCaption;
 begin
 {$ifdef WantFederText}
@@ -2697,13 +2687,6 @@ begin
   ActionMapPhone.CollectOne(fa, ML);
 {$endif}
 //  FederMenu.CollectOne(fa, ML);
-end;
-
-procedure TRggMain.MainFormRepaint;
-begin
-{$ifdef WantFederText}
-  FormMain.Repaint;
-{$endif}
 end;
 
 end.

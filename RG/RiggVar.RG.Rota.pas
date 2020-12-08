@@ -112,7 +112,6 @@ type
 implementation
 
 uses
-  FrmMain,
   RiggVar.App.Main;
 
 { TRotaFormContainer }

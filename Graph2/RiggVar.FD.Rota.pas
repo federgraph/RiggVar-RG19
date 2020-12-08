@@ -69,6 +69,9 @@ type
 
     UseMastKurve: Boolean;
 
+    FBitmapWidth: Integer;
+    FBitmapHeight: Integer;
+
     procedure UpdateRiggKoords;
     procedure UpdateKoppelKurve;
     procedure UpdateMastKurve;
@@ -121,8 +124,6 @@ type
     procedure ImageMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure ImageMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   public
-    BitmapWidth: Integer;
-    BitmapHeight: Integer;
     Bitmap: TBitmap;
     Image: TImage;
     IsUp: Boolean;
@@ -200,10 +201,12 @@ end;
 procedure TRotaForm2.Init;
 begin
   Bitmap := TBitmap.Create;
-  Bitmap.Width := Round(BitmapWidth);
-  Bitmap.Height := Round(BitmapHeight);
+  Bitmap.Width := Round(FBitmapWidth);
+  Bitmap.Height := Round(FBitmapHeight);
 
-  Image.Picture.Graphic := Bitmap;
+  { injected Image component is probably shared with RotaForm1 }
+  if Image.Picture.Graphic = nil then
+    Image.Picture.Graphic := Bitmap;
 end;
 
 procedure TRotaForm2.InitPosition(w, h, x, y: single);
@@ -390,13 +393,14 @@ begin
 
   if UseRotaCenterFullScreen then
   begin
-    BitmapWidth := 1600;
-    BitmapHeight := 1200;
+    FBitmapWidth := 1600;
+    FBitmapHeight := 1200;
   end
   else
   begin
-    BitmapWidth := 1024;
-    BitmapHeight := 768;
+    { should be the same value as in RotaForm1 }
+    FBitmapWidth := 1024;
+    FBitmapHeight := 768;
   end;
 
   RD := TRggDrawingD00.Create;
@@ -745,7 +749,7 @@ begin
   if UseMastKurve then
     UpdateMastKurve
   else
-  UpdateMastLinie;
+    UpdateMastLinie;
 
   RD.ViewpointFlag := False;
 end;

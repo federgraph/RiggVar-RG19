@@ -152,8 +152,8 @@ begin
   fag.Add(faShowTrimmTab);
   fag.Add(faShowDrawings);
 //  fag.Add(faShowOptions);
-//  fag.Add(faShowKreis);
-//  fag.Add(faShowInfo);
+  fag.Add(faShowKreis);
+  fag.Add(faShowInfo);
 //  fag.Add(faShowSplash);
 //  fag.Add(faShowForce);
 //  fag.Add(faShowTabelle);

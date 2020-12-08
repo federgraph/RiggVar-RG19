@@ -23,6 +23,10 @@ interface
 {$endif}
 
 {$define WantMenu}
+{$define WantStatusBar}
+{$define WantFederText}
+{.$define UseLabelsForText}
+{.$define WantImageLeft}
 
 uses
   RiggVar.App.Model,
@@ -52,7 +56,7 @@ uses
 {$define Vcl}
 
 type
-    TFormMain = class(TForm)
+  TFormMain = class(TForm)
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormResize(Sender: TObject);
@@ -94,13 +98,22 @@ type
     procedure UpdateReport;
     property WantButtonReport: Boolean read FWantButtonReport;
   public
+{$ifdef UseLabelsForText}
+    TrimmText: TLabel;
+    ReportText: TLabel;
+{$else}
+    TrimmText: TMemo;
+    ReportText: TMemo;
+{$endif}
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
+{$ifdef WantStatusBar}
+    StatusBar: TStatusBar;
+    procedure InitStatusBar;
+{$endif}
     function GetOpenFileName(dn, fn: string): string;
     function GetSaveFileName(dn, fn: string): string;
   public
-    TrimmText: TMemo;
-    ReportText: TMemo;
     FocusContainer: TButton;
     HintContainer: TWinControl;
     HintText: TLabel;
@@ -115,6 +128,11 @@ type
     procedure InitParamListbox;
     procedure ParamListboxChange(Sender: TObject);
     procedure ReportListboxChange(Sender: TObject);
+    procedure UpdateTrimmText(ML: TStrings);
+    procedure UpdateReportText(ML: TStrings);
+    procedure UpdateVisible(Value: Boolean);
+    procedure PlaceImageLeft;
+    procedure PlaceImageRight;
   public
     procedure ShowReport(const Value: TRggReport);
     function GetShowDataText: Boolean;
@@ -133,13 +151,18 @@ type
     procedure CheckSpaceForImage;
     procedure CheckSpaceForImages;
     procedure CheckSpaceForMemo;
-    procedure CheckSpaceForListbox;
     procedure SetupMemo(MM: TMemo);
     procedure SetupListbox(LB: TListBox);
+    procedure SetupLabel(cr: TLabel);
   public
+    WantImageLeft: Boolean;
+    UseLabelsForText: Boolean;
+    SimulateMobile: Boolean;
     Raster: Integer;
     Margin: Integer;
     ImageMargin: Integer;
+    MaxImageWidth: Integer;
+    MaxImageHeight: Integer;
     ListboxWidth: Integer;
     ReportMemoWidth: Integer;
     SpeedPanelHeight: Integer;
@@ -215,10 +238,6 @@ type
     property CanShowMemo: Boolean read GetCanShowMemo;
   public
     Image: TImage;
-    ImagePositionX: Integer;
-    ImagePositionY: Integer;
-    TextPositionX: Integer;
-    TextPositionY: Integer;
     procedure UpdateFederText;
     procedure CenterRotaForm;
     procedure ToggleAllText;
@@ -250,6 +269,10 @@ type
     procedure ConfigBtnClick(Sender: TObject);
     procedure TrimmTabBtnClick(Sender: TObject);
     procedure CheckFormBounds(AForm: TForm);
+  protected
+    FReportLabelCaption: string;
+    procedure SetReportLabelCaption(const Value: string);
+    property ReportLabelCaption: string read FReportLabelCaption write SetReportLabelCaption;
   end;
 
 var
@@ -295,8 +318,19 @@ procedure TFormMain.FormCreate(Sender: TObject);
 begin
   FormatSettings.DecimalSeparator := '.';
 
-  MainVar.WantScaling := False;
+{$ifdef UseLabelsForText}
+  UseLabelsForText := True;
+{$endif}
+
+{$ifdef WantImageLeft}
+  WantImageLeft := True;
+{$endif}
+
+{$ifdef WantFederText}
   MainVar.WantFederText := True;
+{$endif}
+
+  MainVar.WantScaling := False;
   DoubleBuffered := True;
 
   if MainVar.WantFederText then
@@ -309,6 +343,9 @@ begin
     MainVar.Raster := 0;
     Raster := 0;
   end;
+
+  MaxImageWidth := 1024;
+  MaxImageHeight := 768;
 
   SpeedColorScheme := TSpeedColorScheme.Create;
   SpeedColorScheme.InitDark;
@@ -359,6 +396,14 @@ begin
   Menu := MainMenu;
 {$endif}
 
+{$ifdef WantStatusBar}
+  StatusBar := TStatusBar.Create(Self);
+  StatusBar.Name := 'StatusBar';
+  StatusBar.Parent := Self;
+  InitStatusBar;
+  MainVar.StatusBarHeight := StatusBar.Height;
+{$endif}
+
   Rigg := TRigg.Create;
   RiggInter := Rigg;
   Rigg.TrimmTabelle.FScale := FScale;
@@ -370,8 +415,14 @@ begin
 
   CreateComponents;
 
-  SetupMemo(ReportText);
+{$ifdef UseLabelsForText}
+  SetupLabel(TrimmText);
+  SetupLabel(ReportText);
+  Trimmtext.Font.Color := TColors.Teal;
+{$else}
   SetupMemo(TrimmText);
+  SetupMemo(ReportText);
+{$endif}
 
   SetupListbox(ParamListbox);
   SetupListbox(ReportListbox);
@@ -495,16 +546,22 @@ begin
 
   RL.Clear;
 
+{$ifdef WantFederText}
   if WantButtonReport then
   begin
     Main.FederText.Report(RL);
-    ReportText.Text := RL.Text;
-  end
-  else
-  begin
-    ReportManager.ShowCurrentReport;
-    ReportText.Text := RL.Text;
+    UpdateReportText(RL);
+    FReportLabelCaption := '';
+    Exit;
   end;
+{$endif}
+
+  ReportManager.ShowCurrentReport;
+  UpdateReportText(RL);
+
+{$ifdef WantStatusBar}
+  StatusBar.Panels[2].Text := ReportManager.GetCurrentCaption;
+{$endif}
 end;
 
 procedure TFormMain.UpdateFormat(w, h: Integer);
@@ -578,8 +635,8 @@ end;
 procedure TFormMain.FormMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 begin
-    Main.DoMouseWheel(Shift, WheelDelta);
-    Handled := True;
+  Main.DoMouseWheel(Shift, WheelDelta);
+  Handled := True;
 end;
 
 procedure TFormMain.FormShow(Sender: TObject);
@@ -597,7 +654,6 @@ begin
 
     RotaForm.IsUp := True;
     RotaForm.Draw;
-
     FocusContainer.SetFocus;
   end;
 end;
@@ -615,15 +671,13 @@ begin
 
   if FormShown then
   begin
-    MainVar.PaintBackgroundNeeded := True;
     UpdateParent;
-
-    CheckSpaceForListbox;
+    UpdateVisible(CanShowMemo);
     CheckSpaceForMemo;
     CheckSpaceForImages;
     CheckSpaceForImage;
 
-    UpdateReport;
+    ShowTrimm;
     SpeedPanel.Width := ClientWidth - 3 * Raster -  2 * Margin;
     SpeedPanel.UpdateLayout;
 
@@ -632,48 +686,22 @@ begin
 end;
 
 procedure TFormMain.CheckSpaceForImage;
-var
-  bw: Integer;
-  bh: Integer;
 begin
-  bw := Round(RotaForm.RotaForm1.BitmapWidth * FScale);
-  bh := Round(RotaForm.RotaForm1.BitmapHeight * FScale);
+  MaxImageWidth := Round(RotaForm.RotaForm1.BitmapWidth * FScale);
+  MaxImageHeight := Round(RotaForm.RotaForm1.BitmapHeight * FScale);
 
-  if CanShowMemo then
-  begin
-//    if ClientWidth - 2 * Raster - 2 * Margin < bw then
-//      Image.Width := ClientWidth - 2 * Raster - 2 * Margin
-//    else
-//      Image.Width := bw;
-
-    Image.Left := ReportText.Left + ReportText.Width + Margin;
-    Image.Top := 2 * Raster + Margin;
-
-    Image.Width := ClientWidth - Image.Left - Raster - Margin;
-    Image.Height := ClientHeight - Image.Top - Raster - MainVar.StatusBarHeight - Margin;
-  end
+  { Image Left, Top and Width }
+  if CanShowMemo and not WantImageLeft then
+    PlaceImageRight
   else
-  begin
-    if ClientWidth - 2 * Raster - 2 * Margin < bw then
-      Image.Width := ClientWidth - 2 * Raster - 2 * ImageMargin - 1
-    else
-      Image.Width := bw;
+    PlaceImageLeft;
 
-    Image.Left := Raster + ImageMargin;
-    Image.Top := Raster + ImageMargin;
-    Image.Height := ClientHeight - Image.Top - Raster - MainVar.StatusBarHeight - ImageMargin - 1;
-  end;
-  if Image.Width > bw then
-    Image.Width := bw;
-  if Image.Height > bh then
-    Image.Height := bh;
-end;
+    Image.Height := ClientHeight - Image.Top - Raster - MainVar.StatusBarHeight - Margin;
 
-procedure TFormMain.CheckSpaceForListbox;
-begin
-  if not FormShown then
-    Exit;
-  ReportListbox.Visible := ClientHeight > 910 * FScale;
+  if Image.Width > MaxImageWidth then
+    Image.Width := MaxImageWidth;
+  if Image.Height > MaxImageHeight then
+    Image.Height := MaxImageHeight;
 end;
 
 procedure TFormMain.CheckSpaceForMemo;
@@ -689,56 +717,25 @@ begin
     begin
       RotaForm.LegendBtnClick(nil);
     end;
-
-    SpeedPanel.Visible := False;
-
-    TrimmText.Visible := False;
-    ParamListbox.Visible := False;
-    if ReportListbox <> nil then
-      ReportListbox.Visible := False;
-
-    ReportText.Visible := False;
-    ReportText.Anchors := [];
-
-    FocusContainer.Left := Raster + Margin;
-    FocusContainer.Visible := Width - 2 * Raster > FocusContainer.Width;
-
-    HintContainer.Left := 2 * Raster + Margin;
-    HintContainer.Visible := HintContainer.Left + HintContainer.Width < ClientWidth - Raster - Margin;
   end
   else
   begin
-    SpeedPanel.Visible := True;
     SpeedPanel.Width := ClientWidth - 3 * Raster - 2 * Margin;
 
-    TrimmText.Visible := True;
-    ParamListbox.Visible := True;
-    ReportListbox.Visible := True;
-
-    ReportListbox.Anchors := [];
-    ReportListbox.Left := ParamListbox.Left;
-    ReportListbox.Top := ParamListbox.Top + ParamListbox.Height + Margin;
     ReportListbox.Width := ParamListbox.Width;
-    ReportListbox.Height := ClientHeight - ReportListbox.Top - Raster - Margin;
-    ReportListbox.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akBottom];
+    ReportListbox.Height := ClientHeight - ReportListbox.Top - Raster - MainVar.StatusBarHeight - Margin;
 
-    FocusContainer.Visible := True;
-    FocusContainer.Left := TrimmText.Left + TrimmText.Width + Margin;
-
-    HintContainer.Visible := True;
-    HintContainer.Left := FocusContainer.Left + FocusContainer.Width + Margin;
-
-    ReportText.Visible := True;
-    ReportText.Anchors := [];
-    ReportText.Left := TrimmText.Left + TrimmText.Width + Margin;
-    ReportText.Top := HintContainer.Top + HintContainer.Height + Margin;
-    ReportText.Height := ClientHeight - ReportText.Top - Raster - Margin;
-    ReportText.Width := ReportMemoWidth;
-    ReportText.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akBottom];
+    if WantImageLeft then
+      ReportText.Width := ClientWidth - ReportText.Left - Raster - Margin
+    else
+      ReportText.Width := ReportMemoWidth;
+    ReportText.Height := ClientHeight - ReportText.Top - Raster - MainVar.StatusBarHeight - Margin;
   end;
 end;
 
 procedure TFormMain.CheckSpaceForImages;
+var
+  WallRect: TRect;
 begin
   if not ComponentsCreated then
     Exit;
@@ -756,11 +753,17 @@ begin
        (ChartControl.Top + ChartControl.Height > ClientHeight - Raster) then
       ChartControl.Visible := False;
 
-    if (ControllerImage.BoundsRect.Left < ReportText.BoundsRect.Right) or
+{$ifdef WantImageLeft}
+    WallRect := Image.BoundsRect;
+{$else}
+    WallRect := ReportText.BoundsRect;
+{$endif}
+
+    if (ControllerImage.BoundsRect.Left < WallRect.Right) or
        (ControllerImage.BoundsRect.Bottom > ClientHeight - Raster - MainVar.StatusBarHeight) then
       ControllerImage.Visible := False;
 
-    if (SalingImage.BoundsRect.Left < ReportText.BoundsRect.Right) or
+    if (SalingImage.BoundsRect.Left < WallRect.Right) or
        (SalingImage.BoundsRect.Bottom > ClientHeight - Raster - MainVar.StatusBarHeight) then
       SalingImage.Visible := False;
   end
@@ -854,6 +857,9 @@ end;
 procedure TFormMain.HandleShowHint(Sender: TObject);
 begin
   HintText.Caption := Application.Hint;
+{$ifdef WantStatusBar}
+  StatusBar.Panels[0].Text := Application.Hint;
+{$endif}
 end;
 
 procedure TFormMain.HandleAction(fa: Integer);
@@ -869,7 +875,7 @@ begin
       if ShowingHelp then
          ShowHelpText(HelpTopic)
       else
-        UpdateReport;
+      UpdateReport;
     end;
 
     faMemeGotoLandscape: GotoLandscape;
@@ -1196,7 +1202,8 @@ end;
 
 procedure TFormMain.ShowReport(const Value: TRggReport);
 begin
-  ReportText.Visible := True;
+  if CanShowMemo then
+    ReportText.Visible := True;
   ReportManager.CurrentReport := Value;
   UpdateReport;
   UpdateItemIndexReports;
@@ -1211,7 +1218,7 @@ begin
   end
   else
   begin
-    ReportText.Visible := False;
+//    ReportText.Visible := False;
   end;
 end;
 
@@ -1224,7 +1231,7 @@ begin
   end
   else
   begin
-    ReportText.Visible := False;
+//    ReportText.Visible := False;
   end;
 end;
 
@@ -1237,7 +1244,7 @@ begin
   end
   else
   begin
-    ReportText.Visible := False;
+//    ReportText.Visible := False;
   end;
 end;
 
@@ -1263,8 +1270,35 @@ begin
   MM.ScrollBars := ssBoth;
 end;
 
+procedure TFormMain.SetupLabel(cr: TLabel);
+begin
+  cr.Font.Name := 'Consolas';
+  cr.Font.Size := 11;
+  cr.Font.Color := TColors.Blue;
+end;
+
 procedure TFormMain.CreateComponents;
 begin
+{$ifdef UseLabelsForText}
+  TrimmText := TLabel.Create(Self);
+  TrimmText.Name := 'TrimmText';
+  TrimmText.Parent := Self;
+  TrimmText.Font.Color := TColors.Teal;
+  TrimmText.WordWrap := False;
+
+  ReportText := TLabel.Create(Self);
+  ReportText.Name := 'ReportText';
+  ReportText.Parent := Self;
+  ReportText.Font.Color := TColors.Blue;
+  ReportText.WordWrap := False;
+{$else}
+  TrimmText := TMemo.Create(Self);
+  TrimmText.ReadOnly := True;
+  TrimmText.TabStop := False;
+
+  ReportText := TMemo.Create(Self);
+  ReportText.Name := 'ReportText';
+{$endif}
   Image := TImage.Create(Self);
   Image.Name := 'Image';
   Image.Parent := Self;
@@ -1299,15 +1333,6 @@ begin
 
   SpeedPanel := SpeedPanel03;
   SpeedPanel.Visible := True;
-
-  ReportText := TMemo.Create(Self);
-  ReportText.Name := 'ReportText';
-  SetupMemo(ReportText);
-
-  TrimmText := TMemo.Create(Self);
-  SetupMemo(TrimmText);
-  TrimmText.ReadOnly := True;
-  TrimmText.TabStop := False;
 
   ParamListbox := TListbox.Create(Self);
   ParamListbox.Name := 'ParamListbox';
@@ -1355,12 +1380,12 @@ begin
       1: SpeedPanel := SpeedPanel03;
       2: SpeedPanel := SpeedPanel04;
       3: SpeedPanel := SpeedPanel01;
-    else
-      SpeedPanel := SpeedPanel01;
+  else
+        SpeedPanel := SpeedPanel01;
     end;
 
   SpeedPanel.Width := ClientWidth - 3 * Raster - 2 * Margin;
-  SpeedPanel.Visible := True;
+  SpeedPanel.Visible := CanShowMemo;
   SpeedPanel.UpdateLayout;;
   SpeedPanel.DarkMode := MainVar.ColorScheme.IsDark;
   SpeedPanel.UpdateColor;
@@ -1385,17 +1410,20 @@ begin
   { Then it only 'works' if these values are big enough, }
   { so that computed values for Height and Width are > 0 }
 
+  SpeedPanel.Width := ClientWidth - 3 * Raster - 2 * Margin;
+
   LayoutSpeedPanel(SpeedPanel01);
   LayoutSpeedPanel(SpeedPanel02);
   LayoutSpeedPanel(SpeedPanel03);
   LayoutSpeedPanel(SpeedPanel04);
 
-  SpeedPanel.Width := ClientWidth - 3 * Raster - 2 * Margin;
-
-  TrimmText.Left := Raster + Margin;
+  if WantImageLeft then
+    TrimmText.Left := Raster + MaxImageWidth + Margin
+  else
+    TrimmText.Left := Raster + Margin;
   TrimmText.Top := 2 * Raster + Margin;
   TrimmText.Width := ListboxWidth;
-  TrimmText.Height := Round(190 * FScale);
+  TrimmText.Height := Round(160 * FScale);
 
   ParamListbox.Left := TrimmText.Left;
   ParamListbox.Top := TrimmText.Top + TrimmText.Height + Margin;
@@ -1404,11 +1432,8 @@ begin
 
   ReportListbox.Left := ParamListbox.Left;
   ReportListbox.Top := ParamListbox.Top + ParamListbox.Height + Margin;
-  ReportListbox.Width := ParamListbox.Width;
-  ReportListbox.Height := ClientHeight - ReportListbox.Top - Raster - Margin;
-  ReportListbox.Anchors := ReportListbox.Anchors + [TAnchorKind.akBottom];
 
-  FocusContainer.Left := TrimmText.Left + TrimmText.Width + Margin;
+  FocusContainer.Left := TrimmText.Left + ListboxWidth + Margin;
   FocusContainer.Top := TrimmText.Top;
   FocusContainer.Width := Round(40 * FScale);
   FocusContainer.Height := Round(40 * FScale);
@@ -1421,15 +1446,9 @@ begin
   HintText.Left := Round(10 * FScale);
   HintText.Top := Round(10 * FScale);
 
-  ReportText.Left := TrimmText.Left + TrimmText.Width + Margin;
-  ReportText.Top := HintContainer.Top + HintContainer.Height + Margin;
-  ReportText.Height := ClientHeight - ReportText.Top - Raster - Margin;
-  ReportText.Width := ReportMemoWidth;
-  ReportText.Anchors := ReportText.Anchors + [TAnchorKind.akBottom];
+  ReportText.Left := TrimmText.Left + ListboxWidth + 2 * Margin;
+  ReportText.Top := FocusContainer.Top + FocusContainer.Height + Margin;
   ReportText.WordWrap := False;
-
-  TextPositionX := ReportText.Left;
-  TextPositionY := ReportText.Top;
 end;
 
 procedure TFormMain.LineColorBtnClick(Sender: TObject);
@@ -1479,7 +1498,6 @@ begin
 
   if ChartControl.Visible and ChartImage.Visible then
     UpdateChartGraph;
-  Main.FederTextRepaint;
 end;
 
 procedure TFormMain.SalingImageBtnClick(Sender: TObject);
@@ -1489,7 +1507,6 @@ begin
     SalingImage.BringToFront;
   if SalingImage.Visible then
     UpdateSalingGraph;
-  Main.FederTextRepaint;
 end;
 
 procedure TFormMain.ControllerImageBtnClick(Sender: TObject);
@@ -1499,7 +1516,6 @@ begin
     ControllerImage.BringToFront;
   if ControllerImage.Visible then
     UpdateControllerGraph;
-  Main.FederTextRepaint;
 end;
 
 procedure TFormMain.InitSalingGraph;
@@ -1611,8 +1627,8 @@ begin
   SalingImage.Top := PosY + ControllerImage.Height + Margin;
   SalingImage.Anchors := [TAnchorKind.akTop, TAnchorKind.akRight];
 
-  ChartControl.Left := Round(ReportText.Left + 200 * FScale);
-  ChartControl.Top := Round(ReportText.Top + 20 * FScale);
+  ChartControl.Left := Round(MaxImageWidth - 200 * FScale);
+  ChartControl.Top := Round(280 * FScale);
   ChartControl.Width := Round(ChartImage.Width);
   ChartControl.Height := Round(ChartImage.Height);
 end;
@@ -1637,6 +1653,7 @@ begin
     UpdateReport;
     Main.FederTextCheckState;
   end;
+  ReportLabelCaption := ReportManager.GetCurrentCaption;
 end;
 
 procedure TFormMain.ParamListboxChange(Sender: TObject);
@@ -1707,7 +1724,7 @@ begin
   if TL <> nil then
   begin
     Main.UpdateTrimmText(TL);
-    TrimmText.Text := TL.Text;
+    UpdateTrimmText(TL);
     UpdateFederText;
   end;
   UpdateReport;
@@ -2031,9 +2048,12 @@ begin
 end;
 
 procedure TFormMain.UpdateParent;
+{$ifdef WantFederText}
 var
   ft: TWinControl;
+{$endif}
 begin
+{$ifdef WantFederText}
   ft := Main.FederText;
   Image.Parent := ft;
   if Main.IsDesktop then
@@ -2042,11 +2062,16 @@ begin
     ControllerImage.Parent := ft;
     TrimmText.Parent := ft;
     ReportText.Parent := ft;
+    ParamListbox.Parent := ft;
+    ReportListbox.Parent := ft;
+    FocusContainer.Parent := ft;
+    HintContainer.Parent := ft;
     SpeedPanel01.Parent := ft;
     SpeedPanel02.Parent := ft;
     SpeedPanel03.Parent := ft;
     SpeedPanel04.Parent := ft;
  end;
+{$endif}
 end;
 
 procedure TFormMain.InitZOrderInfo;
@@ -2082,8 +2107,9 @@ begin
   end;
 
   ShowingHelp := True;
-  ReportText.Text := HL.Text;
-  ReportText.Visible := True;
+  UpdateReportText(HL);
+  if CanShowMemo then
+    ReportText.Visible := True;
 end;
 
 procedure TFormMain.SwapRota(Value: Integer);
@@ -2106,6 +2132,12 @@ end;
 procedure TFormMain.UpdateFederText;
 begin
   Main.FederTextUpdateCaption;
+{$ifdef WantStatusBar}
+  StatusBar.Panels[1].Text := Main.Rigg.GetriebeStatusText;
+  StatusBar.Panels[2].Text := FReportLabelCaption;
+  StatusBar.Panels[3].Text := Main.ParamCaption;
+  StatusBar.Panels[4].Text := Main.ParamValueString[Main.Param];
+{$endif}
 end;
 
 procedure TFormMain.CenterRotaForm;
@@ -2122,40 +2154,40 @@ begin
 end;
 
 procedure TFormMain.ToggleAllText;
-var
-  b: Boolean;
 begin
-  if not Main.FederText.Visible then
-    Exit;
-
-  if Main.FederText = Main.FederText2 then
-    Exit;
-
-  if not CanShowMemo then
-    Exit;
-
-  b := not ParamListbox.Visible;
-
-  SpeedPanel.Visible := b;
-  FocusContainer.Visible := b;
-  TrimmText.Visible := b;
-  ParamListbox.Visible := b;
-  ReportListbox.Visible := b;
-  ReportText.Visible := b;
+  if Main.IsDesktop then
+  begin
+    SimulateMobile := not SimulateMobile;
+    FormResize(nil);
+  end;
 end;
 
 function TFormMain.GetCanShowMemo: Boolean;
 begin
   result := True;
 
-  if (ClientWidth < 900 * FScale) then
+  if SimulateMobile then
+  begin
     result := False;
+    Exit;
+  end;
+
+  if (ClientWidth < 1024 * FScale + Raster + 2 * Margin) then
+  begin
+    result := False;
+    Exit;
+  end;
 
   if (ClientHeight < 700 * FScale) then
+  begin
     result := False;
+    Exit;
+  end;
 
   if Main.IsPhone then
+  begin
     result := False;
+  end;
 end;
 
 procedure TFormMain.ShowDiagramE;
@@ -2187,7 +2219,9 @@ begin
 
     if not ChartControl.Visible then
     begin
+{$ifdef WantFederText}
       Main.FederText.ActionPage := 9;
+{$endif}
       ChartImageBtnClick(nil);
     end;
   end;
@@ -2213,5 +2247,112 @@ begin
   end;
 end;
 {$endif}
+
+{$ifdef WantStatusBar}
+procedure TFormMain.InitStatusBar;
+var
+  sp: TStatusPanel;
+begin
+  StatusBar.Panels.Clear;
+
+  sp := StatusBar.Panels.Add;
+  sp.Text := 'MenuText';
+  sp.Width := 350;
+
+  sp := StatusBar.Panels.Add;
+  sp.Text := 'RiggText';
+  sp.Width := 300;
+
+  sp := StatusBar.Panels.Add;
+  sp.Text := 'ReportLabel';
+  sp.Width := 200;
+
+  sp := StatusBar.Panels.Add;
+  sp.Text := 'Param';
+  sp.Width := 200;
+
+  sp := StatusBar.Panels.Add;
+  sp.Text := 'ParamValue';
+  sp.Width := 50;
+
+  StatusBar.SimplePanel := False;
+end;
+{$endif}
+
+procedure TFormMain.SetReportLabelCaption(const Value: string);
+begin
+  FReportLabelCaption := Value;
+{$ifdef WantStatusBar}
+  StatusBar.Panels[2].Text := Value;
+{$endif}
+end;
+
+procedure TFormMain.UpdateTrimmText(ML: TStrings);
+begin
+{$ifdef UseLabelsForText}
+  TrimmText.Caption := ML.Text;
+  if WantImageLeft then
+    TrimmText.Width := ClientWidth - TrimmText.Left - Raster - Margin
+  else
+    TrimmText.Width := ListboxWidth;
+{$else}
+  TrimmText.Text := ML.Text;
+{$endif}
+end;
+
+procedure TFormMain.UpdateReportText(ML: TStrings);
+begin
+{$ifdef UseLabelsForText}
+  ReportText.Caption := ML.Text;
+  if WantImageLeft then
+    ReportText.Width := ClientWidth - ReportText.Left - Raster - Margin
+  else
+    ReportText.Width := ReportMemoWidth;
+  ReportText.Height := ClientHeight - ReportText.Top - Raster - MainVar.StatusBarHeight - Margin;
+{$else}
+  ReportText.Text := ML.Text;
+{$endif}
+end;
+
+procedure TFormMain.UpdateVisible(Value: Boolean);
+begin
+  SpeedPanel.Visible := Value;
+  TrimmText.Visible := Value;
+  ReportText.Visible := Value;
+  FocusContainer.Visible := Value;
+  HintContainer.Visible := Value;
+  ParamListbox.Visible := Value;
+  ReportListbox.Visible := Value;
+end;
+
+procedure TFormMain.PlaceImageLeft;
+var
+  i: Integer;
+begin
+  i := 0;
+  if MainVar.WantFederText then
+    Inc(i);
+  if SpeedPanel.Visible then
+    Inc(i);
+
+  Image.Left := Raster + ImageMargin;
+  Image.Top := i * Raster + ImageMargin;
+
+  if ClientWidth - 2 * Raster - 2 * Margin < MaxImageWidth then
+    Image.Width := ClientWidth - 2 * Raster - 2 * ImageMargin - 1
+  else
+    Image.Width := MaxImageWidth;
+end;
+
+procedure TFormMain.PlaceImageRight;
+begin
+  Image.Left := ReportText.Left + ReportText.Width + Margin;
+  Image.Top := 2 * Raster + Margin;
+
+  if Image.Left + MaxImageWidth < ClientWidth - Raster - Margin then
+    Image.Width := MaxImageWidth
+  else
+    Image.Width := ClientWidth - Image.Left - Raster - Margin;
+end;
 
 end.

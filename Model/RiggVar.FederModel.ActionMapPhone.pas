@@ -27,6 +27,9 @@ type
   TActionMapPhone = class(TActionMap)
   private
     cla: TRggColor;
+    claParam: TRggColor;
+    claSample: TRggColor;
+    claOption: TRggColor;
   protected
     procedure InitActionsRG(Layout: Integer);
   public
@@ -62,6 +65,9 @@ const
 constructor TActionMapPhone.Create;
 begin
   inherited;
+  claParam := TRggColors.Plum;
+  claSample := TRggColors.Cyan;
+  claOption := TRggColors.Beige;
   FPageCount := PageCountRG;
   TestName := 'Phone Page';
 end;
@@ -76,7 +82,7 @@ begin
   case Layout of
     1:
     begin
-      cla := TRggColors.Plum;
+      cla := claParam;
       IAC(1, faVorstag, cla);
       IAC(2, faWante, cla);
       IAC(3, faMastfussD0X, cla);
@@ -124,7 +130,7 @@ begin
 
     4:
     begin
-      cla := TRggColors.Beige;
+      cla := claOption;
       IAC(1, faFixpointA0, cla);
       IAC(2, faFixpointB0, cla);
       IAC(3, faFixpointC0, cla);
@@ -140,7 +146,7 @@ begin
 
     5:
     begin
-      cla := TRggColors.Beige;
+      cla := claOption;
       IAC(1, faRggHull, TRggColors.Cyan);
       IAC(2, faNoop, cla);
       IAC(3, faNoop, cla);
@@ -156,7 +162,7 @@ begin
 
     6:
     begin
-      cla := TRggColors.Teal;
+      cla := claSample;
       IAC(1, faTrimm1, cla);
       IAC(2, faTrimm2, cla);
       IAC(3, faTrimm3, cla);
@@ -172,7 +178,7 @@ begin
 
     7:
     begin
-      cla := TRggColors.Beige;
+      cla := claOption;
       IAC(1, faViewpointA, cla);
       IAC(2, faViewpointT, cla);
       IAC(3, faViewpoint3, cla);
@@ -183,13 +189,13 @@ begin
       IAC(6, faSalingTypFest, cla);
 
       cla := TRggColors.CornflowerBlue;
-      IAC(7, faViewpointS, TRggColors.Beige);
+      IAC(7, faViewpointS, cla);
       IAC(8, faNoop, TRggColors.Yellow);
     end;
 
     8:
     begin
-      cla := TRggColors.Beige;
+      cla := claOption;
       IAC(1, faWantRenderE, cla);
       IAC(2, faWantRenderH, cla);
       IAC(3, faWantRenderP, cla);

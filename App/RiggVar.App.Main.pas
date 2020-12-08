@@ -56,7 +56,6 @@ type
     ClientHeight: Integer;
     WantScaling: Boolean;
     WantFederText: Boolean;
-    PaintBackgroundNeeded: Boolean;
     StatusBarHeight: Integer;
     class constructor Create;
   end;
