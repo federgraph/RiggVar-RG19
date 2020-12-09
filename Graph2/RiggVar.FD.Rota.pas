@@ -200,11 +200,17 @@ end;
 
 procedure TRotaForm2.Init;
 begin
+  if Image.Picture.Graphic <> nil then
+  begin
+    FBitmapWidth := Image.Picture.Graphic.Width;
+    FBitmapHeight := Image.Picture.Graphic.Height;
+  end;
+
   Bitmap := TBitmap.Create;
   Bitmap.Width := Round(FBitmapWidth);
   Bitmap.Height := Round(FBitmapHeight);
 
-  { injected Image component is probably shared with RotaForm1 }
+  { injected Image may be shared with other RotaForm instances }
   if Image.Picture.Graphic = nil then
     Image.Picture.Graphic := Bitmap;
 end;
@@ -398,7 +404,6 @@ begin
   end
   else
   begin
-    { should be the same value as in RotaForm1 }
     FBitmapWidth := 1024;
     FBitmapHeight := 768;
   end;

@@ -882,7 +882,6 @@ end;
 procedure TFederTouchBase.ToolBtnClick(Sender: TObject);
 begin
   ToggleTouchFrame;
-  ToolBtn.Repaint;
 end;
 
 procedure TFederTouchBase.ToggleTouchFrame;
