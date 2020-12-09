@@ -279,7 +279,6 @@ type
     procedure HandleAction(fa: Integer);
     function GetChecked(fa: TFederAction): Boolean;
     procedure FederTextCheckState;
-    procedure FederTextRepaint;
     procedure FederTextUpdateParent;
     procedure FederTextUpdateCaption;
     procedure CollectShortcuts(fa: Integer; ML: TStrings);
@@ -2635,11 +2634,6 @@ begin
     FederText1.Parent := FormMain;
     FederText2.Parent := FormMain;
   end;
-end;
-
-procedure TRggMain.FederTextRepaint;
-begin
-  FederText.Repaint;
 end;
 
 procedure TRggMain.FederTextUpdateCaption;

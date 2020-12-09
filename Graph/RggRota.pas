@@ -81,9 +81,6 @@ type
     procedure BogenBtnClick(Sender: TObject);
     procedure KoppelBtnClick(Sender: TObject);
   protected
-    MinTrackX, MinTrackY: Integer;
-    MaxTrackX, MaxTrackY: Integer;
-    CreatedScreenWidth: Integer;
     procedure PaintBackGround(Image: TBitmap);
     procedure PaintBox3DPaint(Sender: TObject);
   private
@@ -188,6 +185,7 @@ type
     FWantLineColors: Boolean;
     FDarkMode: Boolean;
     FUseQuickSort: Boolean;
+    procedure InitBitmapSize;
     procedure InitGraph;
     procedure InitRaumGraph;
     procedure InitHullGraph;
@@ -258,9 +256,6 @@ type
     property WantLineColors: Boolean read FWantLineColors write SetWantLineColors;
     property DarkMode: Boolean read FDarkMode write SetDarkMode;
     property UseQuickSort: Boolean read FUseQuickSort write SetUseQuickSort;
-
-    property BitmapWidth: Integer read FBitmapWidth;
-    property BitmapHeight: Integer read FBitmapHeight;
   end;
 
 implementation
@@ -280,6 +275,8 @@ begin
   FScale := MainVar.Scale;
   KeepInsideItemChecked := True;
   FBogen := True;
+  FBitmapWidth := 1024;
+  FBitmapHeight := 768;
 
   { do almost nothing here,
     - Image reference needs to be injected first,
@@ -299,33 +296,29 @@ begin
 end;
 
 procedure TRotaForm1.Init;
-var
-  wx, wy: Integer;
 begin
   FDrawAlways := True;
   AlwaysShowAngle := False;
 
-  MinTrackX := 410;
-  MinTrackY := 280;
-  MaxTrackX := 1024;
-  MaxTrackY := 768;
+  { determine size for internal Bitmap }
+  if Image.Picture.Graphic <> nil then
+  begin
+    FBitmapWidth := Image.Picture.Graphic.Width;
+    FBitmapHeight := Image.Picture.Graphic.Height;
+  end
+  else
+  begin
+    InitBitmapSize;
+  end;
 
-  CreatedScreenWidth := Screen.Width;
-  wx := GetSystemMetrics(SM_CXSCREEN);
-  wy := GetSystemMetrics(SM_CYSCREEN);
-  if wx > MaxTrackX then
-    wx := MaxTrackX;
-  if wy > MaxTrackY then
-    wy := MaxTrackY;
-
-  FBitmapWidth := wx;
-  FBitmapHeight := wy;
-
+  { create internal Bitmap }
   Bitmap := TBitmap.Create;
   Bitmap.Width := Round(FBitmapWidth * FScale);
   Bitmap.Height := Round(FBitmapHeight * FScale);
   PaintBackGround(Bitmap);
 
+  { injected Image may be shared with other RotaForm instances }
+  if Image.Picture.Graphic = nil then
   Image.Picture.Graphic := Bitmap;
 
   FZoomBase := 0.05;
@@ -1205,6 +1198,34 @@ procedure TRotaForm1.SetUseQuickSort(const Value: Boolean);
 begin
   FUseQuickSort := Value;
   RaumGraph.DL.UseQuickSort := True;
+end;
+
+procedure TRotaForm1.InitBitmapSize;
+var
+  wx, wy: Integer;
+//  MinTrackX, MinTrackY: Integer;
+  MaxTrackX, MaxTrackY: Integer;
+//  CreatedScreenWidth: Integer;
+begin
+//  CreatedScreenWidth := Screen.Width;
+//
+//  MinTrackX := 410;
+//  MinTrackY := 280;
+
+  MaxTrackX := 1024;
+  MaxTrackY := 768;
+
+  wx := GetSystemMetrics(SM_CXSCREEN);
+  wy := GetSystemMetrics(SM_CYSCREEN);
+
+  if wx > MaxTrackX then
+    wx := MaxTrackX;
+
+  if wy > MaxTrackY then
+    wy := MaxTrackY;
+
+  FBitmapWidth := wx;
+  FBitmapHeight := wy;
 end;
 
 end.
