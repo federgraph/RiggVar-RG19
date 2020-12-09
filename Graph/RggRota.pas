@@ -81,9 +81,6 @@ type
     procedure BogenBtnClick(Sender: TObject);
     procedure KoppelBtnClick(Sender: TObject);
   protected
-    MinTrackX, MinTrackY: Integer;
-    MaxTrackX, MaxTrackY: Integer;
-    CreatedScreenWidth: Integer;
     procedure PaintBackGround(Image: TBitmap);
     procedure PaintBox3DPaint(Sender: TObject);
   private
@@ -184,6 +181,7 @@ type
     FBogen: Boolean;
     FKoppel: Boolean;
     FWantOverlayedRiggs: Boolean;
+    procedure InitBitmapSize;
     procedure InitGraph;
     procedure InitRaumGraph;
     procedure InitHullGraph;
@@ -239,10 +237,7 @@ type
     property OnAfterDraw: TNotifyEvent read FOnAfterDraw write SetOnAfterDraw;
 
     property WantOverlayedRiggs: Boolean read FWantOverlayedRiggs write SetWantOverlayedRiggs;
-
-    property BitmapWidth: Integer read FBitmapWidth;
-    property BitmapHeight: Integer read FBitmapHeight;
-  end;
+ end;
 
 implementation
 
@@ -282,28 +277,14 @@ end;
 
 procedure TRotaForm1.Init;
 var
-  wx, wy: Integer;
   NewPaintBox: TPaintBox;
 begin
   FDrawAlways := True;
   AlwaysShowAngle := False;
 
-  MinTrackX := 410;
-  MinTrackY := 280;
-  MaxTrackX := 1024;
-  MaxTrackY := 768;
+  InitBitmapSize;
 
-  CreatedScreenWidth := Screen.Width;
-  wx := GetSystemMetrics(SM_CXSCREEN);
-  wy := GetSystemMetrics(SM_CYSCREEN);
-  if wx > MaxTrackX then
-    wx := MaxTrackX;
-  if wy > MaxTrackY then
-    wy := MaxTrackY;
-
-  FBitmapWidth := wx;
-  FBitmapHeight := wy;
-
+  { create internal Bitmap }
   Bitmap := TBitmap.Create;
   Bitmap.Width := Round(FBitmapWidth * FScale);
   Bitmap.Height := Round(FBitmapHeight * FScale);
@@ -822,7 +803,7 @@ begin
   if Painted then
   begin
     Painted := False;
-    if FTranslation or (Shift = [ssLeft, ssRight]) then
+    if FTranslation or (ssCtrl in Shift) or (Shift = [ssLeft, ssRight]) then
       Translate(x,y)
     else
       Rotate(0, 0, 0, wx, wy, wz);
@@ -1115,6 +1096,34 @@ end;
 procedure TRotaForm1.DoOnUpdateStrokeRigg;
 begin
 
+end;
+
+procedure TRotaForm1.InitBitmapSize;
+var
+  wx, wy: Integer;
+//  MinTrackX, MinTrackY: Integer;
+  MaxTrackX, MaxTrackY: Integer;
+//  CreatedScreenWidth: Integer;
+begin
+//  CreatedScreenWidth := Screen.Width;
+//
+//  MinTrackX := 410;
+//  MinTrackY := 280;
+
+  MaxTrackX := 1024;
+  MaxTrackY := 768;
+
+  wx := GetSystemMetrics(SM_CXSCREEN);
+  wy := GetSystemMetrics(SM_CYSCREEN);
+
+  if wx > MaxTrackX then
+    wx := MaxTrackX;
+
+  if wy > MaxTrackY then
+    wy := MaxTrackY;
+
+  FBitmapWidth := wx;
+  FBitmapHeight := wy;
 end;
 
 end.
