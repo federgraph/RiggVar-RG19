@@ -424,8 +424,8 @@ begin
 
   StrokeRigg.Koordinaten := Rigg.RiggPoints;
   StrokeRigg.KoordinatenE := Rigg.RelaxedRiggPoints;
-  StrokeRigg.SetKoppelKurve(Rigg.GetKoppelKurve);
-  StrokeRigg.SetMastKurve(Rigg.GetMastKurve);
+  StrokeRigg.SetKoppelKurve(Rigg.KoppelKurve);
+  StrokeRigg.SetMastKurve(Rigg.MastKurve);
   StrokeRigg.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
 
   StrokeRigg.DoOnUpdateStrokeRigg;
@@ -1223,7 +1223,7 @@ begin
   else
     ML.Add('Modus = Pro');
 
-  ML.Add('CounterG = ' + IntToStr(Rigg.UpdateGetriebeCounter));
+  ML.Add('CounterG = ' + IntToStr(Rigg.GetCounterValue(0)));
 end;
 
 procedure TRggMain.UpdateJsonText(ML: TStrings);
@@ -1957,9 +1957,9 @@ begin
   ML.Add('  ResizeCounter = ' + IntToStr(ResizeCounter));
   ML.Add(Format('  ClientSize = (%d, %d)', [MainVar.ClientWidth, MainVar.ClientHeight]));
   ML.Add('---');
-  ML.Add(Format('  A = %6.2f', [Rigg.Temp1]));
-  ML.Add(Format('  B = %6.2f', [Rigg.Temp2]));
-  ML.Add(Format('  C = %6.2f', [Rigg.Temp3]));
+  ML.Add(Format('  A = %6.2f', [Rigg.GetTempValue(1)]));
+  ML.Add(Format('  B = %6.2f', [Rigg.GetTempValue(2)]));
+  ML.Add(Format('  C = %6.2f', [Rigg.GetTempValue(3)]));
 end;
 
 procedure TRggMain.DoCleanReport;

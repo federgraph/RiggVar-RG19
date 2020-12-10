@@ -187,6 +187,7 @@ type
 
     MastGraph: TMastGraph;
     KraftGraph: TKraftGraph;
+    KraftKurven: TKraftKurven;
 
     constructor Create;
     destructor Destroy; override;
@@ -353,7 +354,7 @@ begin
   MemCtrl := ZeroCtrl;
   RefCtrl := Rigg.Glieder;
   InputBuffer := Rigg.Glieder;
-  RefPoints := Rigg.rP;
+  RefPoints := Rigg.RiggPoints;
 
   { GetriebeGrafik }
   GetriebeGraph := TGetriebeGraph.Create(TZug4.Create);
@@ -361,9 +362,9 @@ begin
   GetriebeGraph.Transformer.Rotator := TPolarKar.Create;
   GetriebeGraph.InitZoom;
   GetriebeGraph.InitRotation;
-  GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
-  GetriebeGraph.Koordinaten := Rigg.rP;
-  GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
+  GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
+  GetriebeGraph.Koordinaten := Rigg.RiggPoints;
+  GetriebeGraph.Koppelkurve := Rigg.KoppelKurve;
   GetriebeGraph.ViewPoint := vpSeite;
   GetriebeGraph.ControllerTyp := Rigg.ControllerTyp;
   GetriebeGraph.Transformer.OnGetFixPunkt := GetriebeGraph.OnGetFixPunkt;
@@ -406,7 +407,8 @@ begin
   DrawChart;
 
   MastGraph := TMastGraph.Create;
-  KraftGraph := TKraftGraph.Create(Rigg);
+  KraftKurven := TKraftKurven.Create;
+  KraftGraph := TKraftGraph.Create(KraftKurven);
 
   FNeedPaint := True;
 end;
@@ -417,6 +419,7 @@ begin
   FWReport.Free;
   MastGraph.Free;
   KraftGraph.Free;
+  KraftKurven.Free;
   GetriebeGraph.Transformer.Rotator.Free;
   GetriebeGraph.Transformer.Free;
   GetriebeGraph.Free;
@@ -436,7 +439,7 @@ procedure TRiggModul.SetupGCtrl(a: TScrollBar; b: TsbName);
 var
   cr: TRggSB;
 begin
-  cr := Rigg.GSB.Find(b);
+  cr := Rigg.RggFA.Find(b);
   a.SetParams(Round(cr.Ist), Round(cr.Min), Round(cr.Max));
   a.LargeChange := Round(cr.BigStep);
   a.SmallChange := Round(cr.SmallStep);
@@ -473,7 +476,7 @@ begin
 
   { Ohne Saling starr }
   SetupGCtrl(InputForm.sbVorstagOS, fpVorstagOS);
-  InputForm.sbVorstagOS.Position := Round(Rigg.GSB.Find(fpVorstag).Ist);
+  InputForm.sbVorstagOS.Position := Round(Rigg.RggFA.Find(fpVorstag).Ist);
   SetupGCtrl(InputForm.sbWPowerOS, fpWPowerOS);
   UpdateGCtrlLabels(Rigg.Glieder);
 end;
@@ -781,7 +784,7 @@ begin
   if (SalingTyp = stFest) and (KoppelBtnDown = True) then
     GetriebeGraph.Koppelkurve := Rigg.Koppelkurve;
 
-  GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
 
   { ControllerPaintBox }
   if OutputForm.OutputPages.ActivePage = OutputForm.ControllerSheet then
@@ -793,9 +796,9 @@ begin
     { Position des Mastes in Deckshöhe von D0 aus in mm }
     SalingGraph.ParamXE := Round(Rigg.MastPositionE);
     { Abstand(iP[ooD0,x], iP[ooE0,x]) in mm }
-    SalingGraph.ParamXE0 := Round(Rigg.rP.E0.X - Rigg.rP.D0.X);
+    SalingGraph.ParamXE0 := Round(Rigg.GetPoint3D(ooE0).X - Rigg.GetPoint3D(ooD0).X);
     { Abstand von E0 zur Anschlagkante Deck + Klotzdicke }
-    SalingGraph.EdgePos := Round(Rigg.GSB.Find(fpController).Min);
+    SalingGraph.EdgePos := Round(Rigg.RggFA.Find(fpController).Min);
     if Assigned(ControllerPaintBox) then
       DrawPaintBoxC(ControllerPaintBox.Canvas);
   end;
@@ -917,7 +920,7 @@ begin
     GetriebeGraph.Color := clEntspannt;
     GetriebeGraph.Coloriert := False;
     GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
-    GetriebeGraph.Koordinaten := Rigg.rPe;
+    GetriebeGraph.Koordinaten := Rigg.RelaxedRiggPoints;
     GetriebeGraph.DrawToCanvas(Canvas);
   end;
 
@@ -934,7 +937,7 @@ begin
   { gespanntes Rigg farbig zeichnen}
   GetriebeGraph.Coloriert := True;
   GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
-  GetriebeGraph.Koordinaten := Rigg.rP;
+  GetriebeGraph.Koordinaten := Rigg.RiggPoints;
   GetriebeGraph.DrawToCanvas(Canvas);
 end;
 
@@ -948,7 +951,7 @@ begin
     GetriebeGraph.Color := clBlack;
     GetriebeGraph.Coloriert := False;
     GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
-    GetriebeGraph.Koordinaten := Rigg.rPe;
+    GetriebeGraph.Koordinaten := Rigg.RelaxedRiggPoints;
     GetriebeGraph.DrawToMeta(Canvas);
   end;
 
@@ -965,7 +968,7 @@ begin
   { gespanntes Rigg farbig zeichnen}
   GetriebeGraph.Coloriert := True;
   GetriebeGraph.WanteGestrichelt := not Rigg.GetriebeOK;
-  GetriebeGraph.Koordinaten := Rigg.rP;
+  GetriebeGraph.Koordinaten := Rigg.RiggPoints;
   Canvas.Pen.Width := ThickPenWidth;
   GetriebeGraph.DrawToMeta(Canvas);
 
@@ -1012,8 +1015,8 @@ begin
 
   { Text for GetriebeGraph }
   lbMastFall := Format('Mastfall = %5.1f cm', [Rigg.Trimm.Mastfall / 10]);
-  lbSpannung := Format('Spannung = %5.0f  N', [Rigg.rF.V[14]]);
-  lbBiegung :=  Format('Biegung  = %5.1f cm', [Rigg.hd / 10]);
+  lbSpannung := Format('Spannung = %5.0f N', [Rigg.GetStabKraft(C0C)]);
+  lbBiegung := Format('Biegung  = %5.1f cm', [Rigg.DurchbiegungHD / 10]);
 
   Rigg.AusgabeText(ML);
 
@@ -1066,19 +1069,19 @@ begin
   RiggReport.ML.Add('');
 
   if Item = rL_Item then
-    RiggReport.AusgabeRL(Rigg.rL)
+    RiggReport.AusgabeRL(Rigg.RiggLengths)
   else if Item = rLe_Item then
-    RiggReport.AusgabeRLE(Rigg.rLe)
+    RiggReport.AusgabeRLE(Rigg.RelaxedRiggLengths)
   else if Item = rP_Item then
-    RiggReport.AusgabeRP(Rigg.rP)
+    RiggReport.AusgabeRP(Rigg.RiggPoints)
   else if Item = rPe_Item then
-    RiggReport.AusgabeRPE(Rigg.rPe)
+    RiggReport.AusgabeRPE(Rigg.RelaxedRiggPoints)
   else if Item = rF_Item then
-    RiggReport.AusgabeRF(Rigg.rF)
+    RiggReport.AusgabeRF(Rigg.StabKraefte)
   else if Item = DiffL_Item then
-    RiggReport.AusgabeDiffL(Rigg.rL, Rigg.rLe)
+    RiggReport.AusgabeDiffL(Rigg.RiggLengths, Rigg.RelaxedRiggLengths)
   else if Item = DiffP_Item then
-    RiggReport.AusgabeDiffP(Rigg.rP, Rigg.rPe)
+    RiggReport.AusgabeDiffP(Rigg.RiggPoints, Rigg.RelaxedRiggPoints)
   else if Item = Log_Item then
     RiggReport.AusgabeLog(Rigg.LogList);
 
@@ -1123,31 +1126,21 @@ begin
   for i := 0 to MemoDlg.DstList.Items.Count - 1 do
   begin
     if MemoDlg.DstList.Items[i] = 'rP' then
-      RiggReport.AusgabeRP(Rigg.rP);
+      RiggReport.AusgabeRP(Rigg.RiggPoints);
     if MemoDlg.DstList.Items[i] = 'rPe' then
-      RiggReport.AusgabeRPE(Rigg.rPe);
+      RiggReport.AusgabeRPE(Rigg.RelaxedRiggPoints);
     if MemoDlg.DstList.Items[i] = 'DiffP' then
-      RiggReport.AusgabeDiffP(Rigg.rP, Rigg.rPe);
+      RiggReport.AusgabeDiffP(Rigg.RiggPoints, Rigg.RelaxedRiggPoints);
     if MemoDlg.DstList.Items[i] = 'rL' then
-      RiggReport.AusgabeRL(Rigg.rL);
+      RiggReport.AusgabeRL(Rigg.RiggLengths);
     if MemoDlg.DstList.Items[i] = 'rLe' then
-      RiggReport.AusgabeRLE(Rigg.rLe);
+      RiggReport.AusgabeRLE(Rigg.RelaxedRiggLengths);
     if MemoDlg.DstList.Items[i] = 'DiffL' then
-      RiggReport.AusgabeDiffL(Rigg.rL, Rigg.rLe);
+      RiggReport.AusgabeDiffL(Rigg.RiggLengths, Rigg.RelaxedRiggLengths);
     if MemoDlg.DstList.Items[i] = 'rF' then
-      RiggReport.AusgabeRF(Rigg.rF);
+      RiggReport.AusgabeRF(Rigg.StabKraefte);
     if MemoDlg.DstList.Items[i] = 'Winkel' then
-      RiggReport.AusgabeWinkel(
-        Rigg.alpha,
-        Rigg.alpha1,
-        Rigg.alpha2,
-        Rigg.beta,
-        Rigg.gamma,
-        Rigg.delta1,
-        Rigg.delta2,
-        Rigg.epsilon,
-        Rigg.phi,
-        Rigg.psi);
+      RiggReport.AusgabeAngle(Rigg.Angles);
     if MemoDlg.DstList.Items[i] = 'TrimmControls' then
       RiggReport.AusgabeTrimmControls(Rigg.Glieder);
     if MemoDlg.DstList.Items[i] = 'SalingDaten' then
@@ -1529,7 +1522,7 @@ end;
 procedure TRiggModul.MemoryBtnClick;
 begin
   RefCtrl := Rigg.Glieder;
-  RefPoints := Rigg.rP;
+  RefPoints := Rigg.RiggPoints;
   if DiffBtnDown then
     MemCtrl := RefCtrl;
   UpdateGCtrlLabels(Rigg.Glieder);
@@ -1940,8 +1933,8 @@ begin
     Rigg.ProofRequired := False;
 
     { Definitionsbereich bestimmen und Berechnungsschleife starten }
-    Anfang := Rigg.GSB.Find(IntendedX).Min;
-    Ende := Rigg.GSB.Find(IntendedX).Max;
+    Anfang := Rigg.RggFA.Find(IntendedX).Min;
+    Ende := Rigg.RggFA.Find(IntendedX).Max;
     for i := 0 to CPMax do
     begin
       Antrieb := Anfang + (Ende - Anfang) * i / CPMax;
@@ -1968,7 +1961,7 @@ begin
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
         if PunktOK then
-          af[tempIndex, i] := Rigg.rF.V[14]
+          af[tempIndex, i] := Rigg.GetStabKraft(C0C)
         else
           af[tempIndex, i] := 0;
       end;
@@ -1976,32 +1969,32 @@ begin
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
         if PunktOK then
-          af[tempIndex, i] := Rigg.rF.V[8]
+          af[tempIndex, i] := Rigg.GetStabKraft(A0A)
         else
           af[tempIndex, i] := 0;
       end;
       tempIndex := YComboBox.Items.IndexOf('Mastfall F0F');
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
-        af[tempIndex, i] := Rigg.rP.F0.Distance(Rigg.rP.F);
+        af[tempIndex, i] := Rigg.GetPoint3D(ooF0).Distance(Rigg.GetPoint3D(ooF));
       end;
       tempIndex := YComboBox.Items.IndexOf('Mastfall F0C');
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
-        af[tempIndex, i] := Rigg.rP.F0.Distance(Rigg.rP.C);
+        af[tempIndex, i] := Rigg.GetPoint3D(ooF0).Distance(Rigg.GetPoint3D(ooC));
       end;
       tempIndex := YComboBox.Items.IndexOf('Elastizität Punkt C');
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
         if PunktOK then
-          af[tempIndex, i] := Rigg.rP.C.Distance(Rigg.rPe.C)
+          af[tempIndex, i] := Rigg.GetPoint3D(ooC).Distance(Rigg.GetRelaxedPoint3D(ooC))
         else
           af[tempIndex, i] := 0;
       end;
       tempIndex := YComboBox.Items.IndexOf('Durchbiegung hd');
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
-        af[tempIndex, i] := Rigg.hd;
+        af[tempIndex, i] := Rigg.DurchbiegungHD;
       end;
     end;
 
@@ -2033,17 +2026,17 @@ begin
   tempIndex := YComboBox.Items.IndexOf('Mastfall F0F');
   if (tempIndex <> -1) and (tempIndex < ANr) then
   begin
-    bf[tempIndex] := Rigg.rP.F0.Distance(Rigg.rP.F);
+    bf[tempIndex] := Rigg.GetPoint3D(ooF0).Distance(Rigg.GetPoint3D(ooF));
   end;
   tempIndex := YComboBox.Items.IndexOf('Mastfall F0C');
   if (tempIndex <> -1) and (tempIndex < ANr) then
   begin
-    bf[tempIndex] := Rigg.rP.F0.Distance(Rigg.rP.C);
+    bf[tempIndex] := Rigg.GetPoint3D(ooF0).Distance(Rigg.GetPoint3D(ooC));
   end;
   tempIndex := YComboBox.Items.IndexOf('Durchbiegung hd');
   if (tempIndex <> -1) and (tempIndex < ANr) then
   begin
-    bf[tempIndex] := Rigg.hd;
+    bf[tempIndex] := Rigg.DurchbiegungHD;
   end;
 
   { RiggPunkte Null setzen }
@@ -2078,13 +2071,13 @@ begin
   begin
     tempIndex := YComboBox.Items.IndexOf('Vorstag-Spannung');
     if (tempIndex <> -1) and (tempIndex < ANr) then
-      bf[tempIndex] := Rigg.rF.V[14];
+      bf[tempIndex] := Rigg.GetStabKraft(C0C);
     tempIndex := YComboBox.Items.IndexOf('Wanten-Spannung');
     if (tempIndex <> -1) and (tempIndex < ANr) then
-      bf[tempIndex] := Rigg.rF.V[13];
+      bf[tempIndex] := Rigg.GetStabKraft(AC);
     tempIndex := YComboBox.Items.IndexOf('Elastizität Punkt C');
     if (tempIndex <> -1) and (tempIndex < ANr) then
-      bf[tempIndex] := Rigg.rP.C.Distance(Rigg.rPe.C);
+      bf[tempIndex] := Rigg.GetPoint3D(ooC).Distance(Rigg.GetRelaxedPoint3D(ooC));
   end;
   if OutputForm.cbFollowPoint.Checked then
     DrawPoint;
@@ -2438,7 +2431,7 @@ var
   cr: TRggSB;
 begin
   BottomTitel := GetXText(IntendedX);
-  cr := Rigg.GSB.Find(IntendedX);
+  cr := Rigg.RggFA.Find(IntendedX);
   Xmin := cr.Min;
   Xmax := cr.Max;
   ActualX := IntendedX;
@@ -2481,8 +2474,8 @@ begin
         SalingGraph.ControllerTyp := Rigg.ControllerTyp;
         SalingGraph.ControllerPos := TrimmRec.Controller;
         SalingGraph.ParamXE := Round(Rigg.MastPositionE);
-        SalingGraph.ParamXE0 := Round(Rigg.rP.E0.X - Rigg.rP.D0.X);
-        SalingGraph.EdgePos := Round(Rigg.GSB.Find(fpController).Min);
+        SalingGraph.ParamXE0 := Round(Rigg.GetPoint3D(ooE0).X - Rigg.GetPoint3D(ooD0).X);
+        SalingGraph.EdgePos := Round(Rigg.RggFA.Find(fpController).Min);
       end;
     3: { Saling }
       begin
@@ -2503,8 +2496,8 @@ begin
   TrimmRec.Controller := 50;
   Rigg.Glieder := TrimmRec;
   Rigg.UpdateGetriebe;
-  GetriebeGraph.Koordinaten := Rigg.rP;
-  GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  GetriebeGraph.Koordinaten := Rigg.RiggPoints;
+  GetriebeGraph.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
   SalingGraph.ControllerPos := Round(SalingGraph.ParamXE0 - Rigg.MastPositionE);
   TrimmRec.Controller := SalingGraph.ControllerPos;
   UpdateGCtrls(TrimmRec);
@@ -2515,7 +2508,7 @@ end;
 procedure TRiggModul.UpdateKraftGraphBtnClick;
 begin
   Screen.Cursor := crHourGlass;
-  KraftGraph.GetTestKurven;
+  Rigg.ComputeKraftKurven(KraftKurven);
   if Assigned(KraftPaintBox) then
   begin
     KraftGraph.Image := KraftPaintBox;
@@ -2592,7 +2585,7 @@ begin
         FNeedPaint := False;
     end;
 
-    fpVorstag, fpWinkel:
+    fpVorstag, fpWinkel, fpVorstagOS:
     begin
       ls := Format('%d mm', [ScrollPos - MemCtrl.Vorstag]);
       case SalingTyp of

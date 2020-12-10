@@ -199,6 +199,7 @@ end;
 
 procedure TOptionForm.FormCreate(Sender: TObject);
 begin
+  FGSB := TRggFA.Create;
   Rigg := Main.Rigg;
   FirstColumnIndex := 1;
   FirstRowIndex := 1; // 0 in FMX and 1 in VCL/LCL
@@ -255,20 +256,20 @@ begin
   FQuerschnittList.Free;
   FTrimmList.Free;
   FTempList.Free;
-
   TrimmTabGraph.Free;
+  FGSB.Free;
 end;
 
 procedure TOptionForm.FillRiggLists;
 begin
-  FGSB := Rigg.GSB;
+  FGSB.Assign(Rigg.RggFA);
   FEAarray := Rigg.EA; { EA in KN }
   FiEI := Rigg.MastEI;
   FiMastSaling := Round(Rigg.MastUnten);
   FiMastWante := FiMastSaling + Round(Rigg.MastOben);
   FiMastTop := Round(Rigg.MastLength);
-  FiP := Rigg.rP;
-  FTrimmTabelle := Rigg.TrimmTab;
+  FiP := Rigg.RiggPoints;
+  FTrimmTabelle := Rigg.TrimmTabelle;
   FTrimmTabDaten := FTrimmTabelle.TrimmTabDaten;
 
   FMastMassList.Clear;
@@ -648,11 +649,11 @@ end;
 
 procedure TOptionForm.OKBtnClick(Sender: TObject);
 begin
-  Rigg.rP := FiP; { Rumpfkoordinaten}
+  Rigg.RiggPoints := FiP; { Rumpfkoordinaten}
   Rigg.MastUnten := FiMastSaling;
   Rigg.MastOben := FiMastWante - FiMastSaling;
   Rigg.MastLength := FiMastTop;
-  Rigg.GSB := FGSB; { neue Grenzen und Istwerte }
+  Rigg.RggFA.Assign(FGSB); { neue Grenzen und Istwerte }
   Rigg.EA := FEAarray;
   Rigg.MastEI := FiEI;
   FTabellenTyp := FTrimmTabelle.TabellenTyp;

@@ -96,7 +96,7 @@ type
     procedure InitListboxItems;
     function Param2Text(P: TsbName): string;
     function Text2Param(T: String): TsbName;
-    procedure UpdateAll(Rgg: TRigg2);
+    procedure UpdateAll(Rgg: TRigg);
 
     property Parameter: TsbName read FsbName write SetParameter;
     property ParamProp[Index: TsbName]: double read GetParamProp write SetParamProp;
@@ -283,17 +283,17 @@ end;
 
 function TAniRotationForm.GetParamMin(Index: TsbName): Integer;
 begin
-  result := Round(Rigg.GSB.Find(Index).Min);
+  result := Round(Rigg.RggFA.Find(Index).Min);
 end;
 
 function TAniRotationForm.GetParamMax(Index: TsbName): Integer;
 begin
-  result := Round(Rigg.GSB.Find(Index).Max);
+  result := Round(Rigg.RggFA.Find(Index).Max);
 end;
 
 function TAniRotationForm.GetParamPos(Index: TsbName): Integer;
 begin
-  result := Round(Rigg.GSB.Find(Index).Ist);
+  result := Round(Rigg.RggFa.Find(Index).Ist);
 end;
 
 procedure TAniRotationForm.SetParamProp(Index: TsbName; Value: double);
@@ -302,7 +302,7 @@ var
 begin
   if Value = ParamProp[Index] then
    Exit;
-  cr := Rigg.GSB.Find(Index);
+  cr := Rigg.RggFA.Find(Index);
   if Value > cr.Max then
     Exit;
   if Value < cr.Min then
@@ -355,7 +355,7 @@ begin
   gezogen. lbIstVal.Caption muß deshalb mit Round(ParamProp[Parameter])
   bestimmt werden! }
   temp := ParamProp[Parameter];
-  cr := Rigg.GSB.Find(Parameter);
+  cr := Rigg.RggFA.Find(Parameter);
   TrackBar.Min := 0;
   TrackBar.Max := Round(cr.Max);
   TrackBar.Position := Round(temp);
@@ -575,7 +575,7 @@ begin
 {$endif}
 end;
 
-procedure TAniRotationForm.UpdateAll(Rgg: TRigg2);
+procedure TAniRotationForm.UpdateAll(Rgg: TRigg);
 var
   hasChanged: Boolean;
 begin
@@ -600,8 +600,8 @@ begin
   begin
     Salingtyp := Rgg.Salingtyp;
     ControllerTyp := Rgg.ControllerTyp;
-    Koordinaten := Rgg.rP;
-    SetMastLineData(Rgg.MastLinie, Rgg.lc, Rgg.beta);
+    Koordinaten := Rgg.RiggPoints;
+    SetMastLineData(Rgg.MastLinie, Rgg.MastLC, Rgg.MastBeta);
     WanteGestrichelt := not Rgg.GetriebeOK;
   end;
 end;

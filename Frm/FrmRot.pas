@@ -202,7 +202,7 @@ type
     procedure PaintBackGround(Image: TBitmap);
     procedure ChangeRotationHints;
   public
-    Rigg: TRigg2;
+    Rigg: TRigg;
     RiggInter: IRigg;
     Rotator: TPolarKar;
     Transformer: TRggTransformer;
@@ -484,8 +484,8 @@ begin
   RiggInter := Rigg;
   RaumGraph.SalingTyp := Rigg.SalingTyp;
   RaumGraph.ControllerTyp := Rigg.ControllerTyp;
-  RaumGraph.Koordinaten := Rigg.rP;
-  RaumGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  RaumGraph.Koordinaten := Rigg.RiggPoints;
+  RaumGraph.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
   RaumGraph.WanteGestrichelt := not Rigg.GetriebeOK;
 end;
 
@@ -494,8 +494,8 @@ begin
  { virtual }
   RaumGraph.Salingtyp := Rigg.Salingtyp;
   RaumGraph.ControllerTyp := Rigg.ControllerTyp;
-  RaumGraph.Koordinaten := Rigg.rP;
-  RaumGraph.SetMastLineData(Rigg.MastLinie, Rigg.lc, Rigg.beta);
+  RaumGraph.Koordinaten := Rigg.RiggPoints;
+  RaumGraph.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
   RaumGraph.WanteGestrichelt := not Rigg.GetriebeOK;
   Draw;
 end;
