@@ -13,7 +13,7 @@ uses
   Vcl.Buttons,
   Vcl.ComCtrls,
   RggTypes,
-  RiggVar.RG.Model,
+  RiggVar.App.Model,
   RggCtrls;
 
 type
@@ -31,7 +31,7 @@ type
     procedure PaintBackGround(Image: TBitmap);
     procedure UpdateProps;
   public
-    Rigg: TRigg2;
+    Rigg: TRigg;
     SalingGraph: TSalingGraph;
     BitmapS: TBitmap;
     procedure UpdateGraph;

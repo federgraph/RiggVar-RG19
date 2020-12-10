@@ -13,7 +13,7 @@ uses
   Vcl.Buttons,
   Vcl.ExtCtrls,
   RggTypes,
-  RiggVar.RG.Model;
+  RiggVar.App.Model;
 
 type
   TFormReglerGraph = class(TForm)
@@ -55,7 +55,7 @@ type
     procedure DrawToPaintBox(Canvas: TCanvas; Rect: TRect);
     procedure PaintBackGround(Image: TBitMap);
   private
-    Rigg: TRigg2;
+    Rigg: TRigg;
     procedure SetupCtrls;
     procedure UpdateLabels;
     procedure UpdateWithCurrentValue;
@@ -65,6 +65,7 @@ type
     TrimmSoll: TTrimm;
   public
     ChartValid: Boolean;
+    RGD: TRegelGraphData;
     procedure Draw(Sender: TObject);
   end;
 
@@ -85,6 +86,7 @@ begin
   SetupCtrls;
   GetTestData;
   Rigg.OnRegelGrafik := Draw;
+  RGD := Rigg.RegelGraphData;
   ChartValid := True;
 end;
 
@@ -319,7 +321,7 @@ begin
       LineTo(P.X, P.Y);
 
       { Istwert SalingH/SalingL - Scheibenwischer-Linie }
-      temp := Rigg.Antrieb;
+      temp := RGD.Antrieb;
       Pen.Color := clGreen;
       P.X := Round(temp * ZoomX);
       P.Y := Round(Ymin * ZoomY);
@@ -339,7 +341,7 @@ begin
       LineTo(P.X, P.Y);
 
       { TrySalingH }
-      temp := Rigg.TrySalingH;
+      temp := RGD.TrySalingH;
       Pen.Color := clRed;
       P.X := Round(temp*ZoomX);
       P.Y := Round(Ymin*ZoomY);
@@ -453,8 +455,8 @@ end;
 
 procedure TFormReglerGraph.GetXMinMax;
 begin
-  Xmin := Rigg.Anfang;
-  Xmax := Rigg.Ende;
+  Xmin := RGD.Anfang;
+  Xmax := RGD.Ende;
 end;
 
 procedure TFormReglerGraph.GetTestData;
@@ -469,7 +471,7 @@ end;
 procedure TFormReglerGraph.GetData;
 begin
   ChartValid := True;
-  f := Rigg.KurveF;
+  f := RGD.KurveF;
 end;
 
 procedure TFormReglerGraph.PaintBackGround(Image: TBitMap);

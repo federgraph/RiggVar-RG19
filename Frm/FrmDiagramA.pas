@@ -18,7 +18,7 @@ uses
   RggTypes,
   RggScroll,
   RggCalc,
-  RiggVar.RG.Model;
+  RiggVar.App.Model;
 
 const
   ANr = 6;
@@ -101,7 +101,7 @@ type
     function GetXComboIndexOfParam(Value: TFederParam): Integer;
     function XComboIndexToParam(Value: Integer): TFederParam;
   public
-    Rigg: TRigg2;
+    Rigg: TRigg;
     YComboSavedItemIndex: Integer;
 
     procedure UpdateGetriebePunkt;
@@ -585,7 +585,7 @@ begin
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
         if PunktOK then
-          af[tempIndex, i] := Rigg.rF.V[14]
+          af[tempIndex, i] := Rigg.GetStabKraft(C0C)
         else
           af[tempIndex, i] := 0;
       end;
@@ -593,32 +593,32 @@ begin
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
         if PunktOK then
-          af[tempIndex, i] := Rigg.rF.V[8]
+          af[tempIndex, i] := Rigg.GetStabKraft(A0A)
         else
           af[tempIndex, i] := 0;
       end;
       tempIndex := YCombo.Items.IndexOf('Mastfall F0F');
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
-        af[tempIndex, i] := Rigg.rP.F0.Distance(Rigg.rP.F);
+        af[tempIndex, i] := Rigg.GetPoint3D(ooF0).Distance(Rigg.GetPoint3D(ooF));
       end;
       tempIndex := YCombo.Items.IndexOf('Mastfall F0C');
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
-        af[tempIndex, i] := Rigg.rP.F0.Distance(Rigg.rP.C);
+        af[tempIndex, i] := Rigg.GetPoint3D(ooF0).Distance(Rigg.GetPoint3D(ooC));
       end;
       tempIndex := YCombo.Items.IndexOf('Elastizität Punkt C');
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
         if PunktOK then
-          af[tempIndex, i] := Rigg.rP.C.Distance(Rigg.rPe.C)
+          af[tempIndex, i] := Rigg.GetPoint3D(ooC).Distance(Rigg.GetRelaxedPoint3D(ooC))
         else
           af[tempIndex, i] := 0;
       end;
       tempIndex := YCombo.Items.IndexOf('Durchbiegung hd');
       if (tempIndex <> -1) and (tempIndex < ANr) then
       begin
-        af[tempIndex, i] := Rigg.hd;
+        af[tempIndex, i] := Rigg.DurchbiegungHD;
       end;
     end;
 
@@ -651,17 +651,17 @@ begin
   tempIndex := YCombo.Items.IndexOf('Mastfall F0F');
   if (tempIndex <> -1) and (tempIndex < ANr) then
   begin
-    bf[tempIndex] := Rigg.rP.F0.Distance(Rigg.rP.F);
+    bf[tempIndex] := Rigg.GetPoint3D(ooF0).Distance(Rigg.GetPoint3D(ooF));
   end;
   tempIndex := YCombo.Items.IndexOf('Mastfall F0C');
   if (tempIndex <> -1) and (tempIndex < ANr) then
   begin
-    bf[tempIndex] := Rigg.rP.F0.Distance(Rigg.rP.C);
+    bf[tempIndex] := Rigg.GetPoint3D(ooF0).Distance(Rigg.GetPoint3D(ooC));
   end;
   tempIndex := YCombo.Items.IndexOf('Durchbiegung hd');
   if (tempIndex <> -1) and (tempIndex < ANr) then
   begin
-    bf[tempIndex] := Rigg.hd;
+    bf[tempIndex] := Rigg.DurchbiegungHD;
   end;
 
   { RiggPunkte Null setzen }
@@ -696,13 +696,13 @@ begin
   begin
     tempIndex := YCombo.Items.IndexOf('Vorstag-Spannung');
     if (tempIndex <> -1) and (tempIndex < ANr) then
-      bf[tempIndex] := Rigg.rF.V[14];
+      bf[tempIndex] := Rigg.GetStabKraft(C0C);
     tempIndex := YCombo.Items.IndexOf('Wanten-Spannung');
     if (tempIndex <> -1) and (tempIndex < ANr) then
-      bf[tempIndex] := Rigg.rF.V[13];
+      bf[tempIndex] := Rigg.GetStabKraft(AC);
     tempIndex := YCombo.Items.IndexOf('Elastizität Punkt C');
     if (tempIndex <> -1) and (tempIndex < ANr) then
-      bf[tempIndex] := Rigg.rP.C.Distance(Rigg.rPe.C);
+      bf[tempIndex] := Rigg.GetPoint3D(ooC).Distance(Rigg.GetRelaxedPoint3D(ooC));
   end;
 
   DrawPoint;

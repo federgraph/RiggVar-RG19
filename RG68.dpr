@@ -107,7 +107,12 @@ uses
   RiggVar.FD.Point in 'Graph2\RiggVar.FD.Point.pas',
   RggModul in 'Core\RggModul.pas',
   RiggVar.App.Model in 'App\RiggVar.App.Model.pas',
-  RiggVar.FederModel.ActionList in 'Model\RiggVar.FederModel.ActionList.pas';
+  RiggVar.FederModel.ActionList in 'Model\RiggVar.FederModel.ActionList.pas',
+  RggUnit0 in 'Core\RggUnit0.pas',
+  RggUnit1 in 'Core\RggUnit1.pas',
+  RggUnit2 in 'Core\RggUnit2.pas',
+  RggUnit3 in 'Core\RggUnit3.pas',
+  RggUnit4 in 'Core\RggUnit4.pas';
 
 {$R *.res}
 

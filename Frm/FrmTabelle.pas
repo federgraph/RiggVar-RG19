@@ -11,7 +11,7 @@ uses
   Vcl.ExtCtrls,
   Vcl.Buttons,
   Vcl.ComCtrls,
-  RiggVar.RG.Model,
+  RiggVar.App.Model,
   RggReport;
 
 type
@@ -36,7 +36,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure AllBtnClick(Sender: TObject);
   private
-    Rigg: TRigg2;
+    Rigg: TRigg;
     RiggReport: TRiggReport;
     FWReport: TFWReport;
     procedure ShowReport(Value: TTableItem);
@@ -111,13 +111,13 @@ begin
   RiggReport.ML.Clear;
   RiggReport.ML.Add('');
   case Value of
-    rL: RiggReport.AusgabeRL(Rigg.rL);
-    rLe: RiggReport.AusgabeRLE(Rigg.rLe);
-    rP: RiggReport.AusgabeRP(Rigg.rP);
-    rPe: RiggReport.AusgabeRPE(Rigg.rPe);
-    rF: RiggReport.AusgabeRF(Rigg.rF);
-    DiffL: RiggReport.AusgabeDiffL(Rigg.rL, Rigg.rLe);
-    DiffP: RiggReport.AusgabeDiffP(Rigg.rP, Rigg.rPe);
+    rL: RiggReport.AusgabeRL(Rigg.RiggLengths);
+    rLe: RiggReport.AusgabeRLE(Rigg.RelaxedRiggLengths);
+    rP: RiggReport.AusgabeRP(Rigg.RiggPoints);
+    rPe: RiggReport.AusgabeRPE(Rigg.RelaxedRiggPoints);
+    rF: RiggReport.AusgabeRF(Rigg.StabKraefte);
+    DiffL: RiggReport.AusgabeDiffL(Rigg.RiggLengths, Rigg.RelaxedRiggLengths);
+    DiffP: RiggReport.AusgabeDiffP(Rigg.RiggPoints, Rigg.RelaxedRiggPoints);
     Log: RiggReport.AusgabeLog(Rigg.LogList);
   end;
 
@@ -162,31 +162,21 @@ begin
 //  for i := 0 to MemoDlg.DstList.Items.Count - 1 do
 //  begin
 //    if MemoDlg.DstList.Items[i] = 'rP' then
-      RiggReport.AusgabeRP(Rigg.rP);
+      RiggReport.AusgabeRP(Rigg.RiggPoints);
 //    if MemoDlg.DstList.Items[i] = 'rPe' then
-      RiggReport.AusgabeRPE(Rigg.rPe);
+      RiggReport.AusgabeRPE(Rigg.RelaxedRiggPoints);
 //    if MemoDlg.DstList.Items[i] = 'DiffP' then
-      RiggReport.AusgabeDiffP(Rigg.rP, Rigg.rPe);
+      RiggReport.AusgabeDiffP(Rigg.RiggPoints, Rigg.RelaxedRiggPoints);
 //    if MemoDlg.DstList.Items[i] = 'rL' then
-      RiggReport.AusgabeRL(Rigg.rL);
+      RiggReport.AusgabeRL(Rigg.RiggLengths);
 //    if MemoDlg.DstList.Items[i] = 'rLe' then
-      RiggReport.AusgabeRLE(Rigg.rLe);
+      RiggReport.AusgabeRLE(Rigg.RelaxedRiggLengths);
 //    if MemoDlg.DstList.Items[i] = 'DiffL' then
-      RiggReport.AusgabeDiffL(Rigg.rL, Rigg.rLe);
+      RiggReport.AusgabeDiffL(Rigg.RiggLengths, Rigg.RelaxedRiggLengths);
 //    if MemoDlg.DstList.Items[i] = 'rF' then
-      RiggReport.AusgabeRF(Rigg.rF);
+      RiggReport.AusgabeRF(Rigg.StabKraefte);
 //    if MemoDlg.DstList.Items[i] = 'Winkel' then
-      RiggReport.AusgabeWinkel(
-        Rigg.alpha,
-        Rigg.alpha1,
-        Rigg.alpha2,
-        Rigg.beta,
-        Rigg.gamma,
-        Rigg.delta1,
-        Rigg.delta2,
-        Rigg.epsilon,
-        Rigg.phi,
-        Rigg.psi);
+      RiggReport.AusgabeAngle(Rigg.Angles);
 //    if MemoDlg.DstList.Items[i] = 'TrimmControls' then
       RiggReport.AusgabeTrimmControls(Rigg.Glieder);
 //    if MemoDlg.DstList.Items[i] = 'SalingDaten' then

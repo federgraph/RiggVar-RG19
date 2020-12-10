@@ -11,6 +11,7 @@ uses
   Vcl.ExtCtrls,
   Vcl.Buttons,
   Vcl.ComCtrls,
+  RggTypes,
   RggKraftGraph;
 
 type
@@ -24,6 +25,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
+    KraftKurven: TKraftKurven;
     KraftGraph: TKraftGraph;
   public
     procedure UpdateGraph;
@@ -41,13 +43,15 @@ uses
 
 procedure TFormKraft.FormCreate(Sender: TObject);
 begin
-  KraftGraph := TKraftGraph.Create(Main.Rigg);
+  KraftKurven := TKraftKurven.Create;
+  KraftGraph := TKraftGraph.Create(KraftKurven);
   UpdateGraph;
 end;
 
 procedure TFormKraft.FormDestroy(Sender: TObject);
 begin
   KraftGraph.Free;
+  KraftKurven.Free;
 end;
 
 procedure TFormKraft.UpateBtnClick(Sender: TObject);
@@ -58,7 +62,7 @@ end;
 procedure TFormKraft.UpdateGraph;
 begin
   Screen.Cursor := crHourGlass;
-  KraftGraph.GetTestKurven;
+  Main.Rigg.ComputeKraftKurven(KraftKurven);
   if Assigned(KraftPaintBox) then
   begin
     KraftGraph.Image := KraftPaintBox;

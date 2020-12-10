@@ -13,7 +13,7 @@ uses
   Vcl.Buttons,
   Vcl.ComCtrls,
   RggTypes,
-  RiggVar.RG.Model,
+  RiggVar.App.Model,
   RggCtrls;
 
 type
@@ -33,7 +33,7 @@ type
     procedure PaintBackGround(Image: TBitmap);
     procedure UpdateProps;
   public
-    Rigg: TRigg2;
+    Rigg: TRigg;
     SalingGraph: TSalingGraph;
     BitmapC: TBitmap;
     procedure UpdateGraph;
@@ -104,9 +104,9 @@ begin
   { Position des Mastes in Deckshöhe von D0 aus in mm }
   SalingGraph.ParamXE := Round(Rigg.MastPositionE);
   { Abstand(iP[ooD0,x], iP[ooE0,x]) in mm }
-  SalingGraph.ParamXE0 := Round(Rigg.rP.E0.X - Rigg.rP.D0.X);
+  SalingGraph.ParamXE0 := Round(Rigg.GetPoint3D(ooE0).X - Rigg.GetPoint3D(ooD0).X);
   { Abstand von E0 zur Anschlagkante Deck + Klotzdicke }
-  SalingGraph.EdgePos := Round(Rigg.GSB.Find(fpController).Min);
+  SalingGraph.EdgePos := Round(Rigg.RggFA.Find(fpController).Min);
 end;
 
 procedure TFormController.UpdateGraph;

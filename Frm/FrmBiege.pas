@@ -11,7 +11,7 @@ uses
   Vcl.Buttons,
   Vcl.StdCtrls,
   RggTypes,
-  RiggVar.RG.Model;
+  RiggVar.App.Model;
 
 type
   TBiegeUndNeigeForm = class(TForm)
@@ -27,7 +27,7 @@ type
     procedure sbMastfallScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
     procedure InitBtnClick(Sender: TObject);
   private
-    Rigg: TRigg2;
+    Rigg: TRigg;
     procedure SetupCtrls;
     procedure UpdateLabels;
     procedure UpdateWithCurrentValue;
