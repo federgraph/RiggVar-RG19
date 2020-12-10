@@ -8,76 +8,52 @@ uses
   Winapi.Windows,
   System.SysUtils,
   System.Classes,
-  System.IniFiles,
   System.Types,
-  System.Math,
-  Vcl.Dialogs,
   Vcl.Graphics,
-  Vcl.Controls,
-  Vcl.Forms,
   Vcl.ExtCtrls,
-  Vcl.StdCtrls,
-  Vcl.ComCtrls,
-  RggTypes,
-  RggCalc,
-  RggSchnittKK,
-  RiggVar.App.Model;
+  RggTypes;
 
 type
-  TLineDataR150 = array[0..150] of double;
-
   TKraftGraph = class
   private
     FShowAll: Boolean;
     FOffsetX, FOffsetY: Integer;
     FZoomX, FZoomY: double;
     FPunktPos: TPoint;
-    FKurveOhne,
-    FKurveMit,
-    FVerschoben,
-    FVerschobenKorrigiert: TLineDataR150;
-    FKurveOhneKorrigiert,
-    FKurveMitKorrigiert: TLineDataR100;
     procedure DrawGraph(g: TCanvas);
     procedure DrawPunkt(Canvas: TCanvas; Punkt: TPoint);
     procedure DrawKurve(Canvas: TCanvas; Kurve: TLineDataR150);
     procedure DrawKurveQuer(Canvas: TCanvas; Kurve: TLineDataR100);
-    function GetKoppelFaktor: double;
-    function GetSalingAlpha: double;
-    function GetKorrigiert: Boolean;
-    function GetControllerTyp: TControllerTyp;
     procedure InitBitmap;
     procedure PaintBackGround(g: TCanvas);
     procedure SetImage(const Value: TImage);
+    procedure SetShowAll(const Value: Boolean);
   protected
     FImage: TImage;
     Bitmap: TBitmap;
     Width: Integer;
     Height: Integer;
   public
-    Mast: TRigg;
-    constructor Create(AMast: TRigg); virtual;
+    Mast: TKraftKurven;
+    constructor Create(AMast: TKraftKurven); virtual;
     destructor Destroy; override;
     procedure Draw;
-    procedure GetTestKurven;
-    property KoppelFaktor: double read GetKoppelFaktor;
-    property SalingAlpha: double read GetSalingAlpha;
-    property Korrigiert: Boolean read GetKorrigiert;
-    property ControllerTyp: TControllerTyp read GetControllerTyp;
     property Image: TImage read FImage write SetImage;
-    property ShowAll: Boolean read FShowAll write FShowAll;
+    property ShowAll: Boolean read FShowAll write SetShowAll;
   end;
 
 implementation
 
-constructor TKraftGraph.Create(AMast: TRigg);
+{ TKraftGraph }
+
+constructor TKraftGraph.Create(AMast: TKraftKurven);
 begin
-  inherited Create;
   if not Assigned(AMast) then
   begin
     Free;
     Exit;
   end;
+
   Mast := AMast;
   FOffsetX := 750;
   FOffsetY := 500;
@@ -92,26 +68,6 @@ begin
   inherited;
 end;
 
-function TKraftGraph.GetKoppelFaktor: double;
-begin
-  result := Mast.KoppelFaktor;
-end;
-
-function TKraftGraph.GetSalingAlpha: double;
-begin
-  result := Mast.SalingAlpha;
-end;
-
-function TKraftGraph.GetKorrigiert: Boolean;
-begin
-  result := Mast.Korrigiert;
-end;
-
-function TKraftGraph.GetControllerTyp: TControllerTyp;
-begin
-  result := Mast.ControllerTyp;
-end;
-
 procedure TKraftGraph.PaintBackGround(g: TCanvas);
 var
   R: TRect;
@@ -124,6 +80,22 @@ end;
 procedure TKraftGraph.SetImage(const Value: TImage);
 begin
   FImage := Value;
+end;
+
+procedure TKraftGraph.SetShowAll(const Value: Boolean);
+begin
+  FShowAll := Value;
+  Mast.ShowAll := Value;
+end;
+
+procedure TKraftGraph.InitBitmap;
+begin
+  Width := Image.Width;
+  Height := Image.Height;
+
+  Bitmap := TBitmap.Create;
+  Bitmap.Width := Width;
+  Bitmap.Height := Height;
 end;
 
 procedure TKraftGraph.DrawGraph(g: TCanvas);
@@ -141,13 +113,10 @@ begin
   SetViewPortOrgEx(g.Handle, Pos.X, Pos.Y, nil);
 
   { Koordinaten des Rahmenrechtecks }
-  with R do
-  begin
-    Left := -1500 + FOffsetX;
-    Right := 1500 + FOffsetX;
-    Top := 1000 + FOffsetY;
-    Bottom := -1000 + FOffsetY;
-  end;
+  R.Left := -1500 + FOffsetX;
+  R.Right := 1500 + FOffsetX;
+  R.Top := 1000 + FOffsetY;
+  R.Bottom := -1000 + FOffsetY;
 
   { Rahmen zeichnen und Clipping setzen }
   g.Pen.Color := clBlue;
@@ -188,54 +157,54 @@ begin
   SetTextAlign(g.Handle, TA_LEFT or TA_TOP);
   g.TextOut(50, R.Top - 50, 'F[N]');
   { Weg des Punkt antragen }
-  if FPunktPos.x = 150 then
+  if FPunktPos.X = 150 then
   begin
     SetTextAlign(g.Handle, TA_RIGHT or TA_TOP);
-    g.TextOut(Round(FPunktPos.X * FZoomX) - 50, -50, IntToStr(FPunktPos.x))
+    g.TextOut(Round(FPunktPos.X * FZoomX) - 50, -50, IntToStr(FPunktPos.X))
   end
   else
   begin
     SetTextAlign(g.Handle, TA_LEFT or TA_TOP);
-    g.TextOut(Round(FPunktPos.X * FZoomX) + 50, -50, IntToStr(FPunktPos.x));
+    g.TextOut(Round(FPunktPos.X * FZoomX) + 50, -50, IntToStr(FPunktPos.X));
   end;
   { Kraft des Punkt antragen }
   SetTextAlign(g.Handle, TA_RIGHT or TA_BOTTOM);
-  g.TextOut(-50, Round(FPunktPos.Y * FZoomY) + 50, IntToStr(FPunktPos.y));
+  g.TextOut(-50, Round(FPunktPos.Y * FZoomY) + 50, IntToStr(FPunktPos.Y));
 
   { Kurven zeichnen }
   g.Pen.Color := clGreen;
   g.MoveTo(0, 0);
-  g.LineTo(Round(KoppelFaktor * 10000 * SalingAlpha * FZoomX), Round(10000 * FZoomY));
+  g.LineTo(Round(Mast.KoppelFaktor * 10000 * Mast.SalingAlpha * FZoomX), Round(10000 * FZoomY));
 
   { KnickKurven mit und ohne Controller, nicht korrigiert }
   g.Pen.Color := clBlue;
-  DrawKurve(g, FKurveOhne);
-  DrawKurve(g, FKurveMit);
+  DrawKurve(g, Mast.KurveOhne);
+  DrawKurve(g, Mast.KurveMit);
   { KnickKurven mit und ohne Controller, korrigiert }
   g.Pen.Color := clGray;
-  DrawKurveQuer(g, FKurveOhneKorrigiert);
-  DrawKurveQuer(g, FKurveMitKorrigiert);
+  DrawKurveQuer(g, Mast.KurveOhneKorrigiert);
+  DrawKurveQuer(g, Mast.KurveMitKorrigiert);
 
   { PunktKurveMitController - nur zeichnen, wenn Controller vorhanden }
-  if ControllerTyp <> ctOhne then
+  if Mast.ControllerTyp <> ctOhne then
   begin
     g.Pen.Color := clYellow;
-    { blaue Kurve verschoben in SP mit FKurveOhne }
-    if not Korrigiert then
-      DrawKurve(g, FVerschoben);
-    { blaue Kurve verschoben in den SP mit FKurveOhneKorrigiert }
-    if Korrigiert then
-      DrawKurve(g, FVerschobenKorrigiert);
+    { blaue Kurve verschoben in Schnittpunkt mit FKurveOhne }
+    if not Mast.Korrigiert then
+      DrawKurve(g, Mast.KurveVerschoben);
+    { blaue Kurve verschoben in den Schnittpunkt mit FKurveOhneKorrigiert }
+    if Mast.Korrigiert then
+      DrawKurve(g, Mast.KurveVerschobenKorrigiert);
   end;
 
   { PunktKurveOhneController }
   g.Pen.Color := clFuchsia;
   { überschreibe blaue Kurve mit Fuchsia }
-  if not Korrigiert then
-    DrawKurve(g, FKurveOhne);
+  if not Mast.Korrigiert then
+    DrawKurve(g, Mast.KurveOhne);
   { überschreibe graue Kurve mit Fuchsia }
-  if Korrigiert then
-    DrawKurveQuer(g, FKurveOhneKorrigiert);
+  if Mast.Korrigiert then
+    DrawKurveQuer(g, Mast.KurveOhneKorrigiert);
 
   SetMapMode(g.Handle, MM_TEXT);
   SetWindowOrgEx(g.Handle, 0, 0, nil);
@@ -247,14 +216,14 @@ var
   i: Integer;
   P: TPoint;
 begin
-  P.x := 0;
-  P.y := 0;
-  Canvas.MoveTo(P.x,P.y);
+  P.X := 0;
+  P.Y := 0;
+  Canvas.MoveTo(P.X, P.Y);
   for i := 0 to 150 do
   begin
-    P.x := Round(i * FZoomX);
-    P.y := Round(Kurve[i] * FZoomY);
-    Canvas.LineTo(P.x,P.y);
+    P.X := Round(i * FZoomX);
+    P.Y := Round(Kurve[i] * FZoomY);
+    Canvas.LineTo(P.X, P.Y);
   end;
 end;
 
@@ -263,132 +232,24 @@ var
   i: Integer;
   P: TPoint;
 begin
-  Canvas.MoveTo(0,0);
+  Canvas.MoveTo(0, 0);
   for i := 0 to 100 do
   begin
-    P.x := Round(Kurve[i] * FZoomX);
-    P.y := Round(i * 10);
-    Canvas.LineTo(P.x,P.y);
+    P.X := Round(Kurve[i] * FZoomX);
+    P.Y := Round(i * 10);
+    Canvas.LineTo(P.X, P.Y);
   end;
 end;
 
 procedure TKraftGraph.DrawPunkt(Canvas: TCanvas; Punkt: TPoint);
 var
   P: TPoint;
+  R: Integer;
 begin
   P.X := Round(Punkt.X * FZoomX);
   P.Y := Round(Punkt.Y * FZoomY);
-  Canvas.Ellipse( P.X - 30, P.Y - 30,
-                  P.X + 30, P.Y + 30);
-end;
-
-procedure TKraftGraph.GetTestKurven;
-var
-  i: Integer;
-  tempHd: double;
-  tempKorrigiert: Boolean;
-  tempControllerTyp: TControllerTyp;
-  Knicklaenge, KnickLast, Kraft, Weg: double;
-begin
-  with Mast do
-  begin
-    { mit FSalingAlpha wird in FvonW korrigiert, daher auch in WvonF gebraucht;
-      mit FControllerWeg wird in SchnittKraefte getestet, ob Controller anliegt }
-    GetControllerWeg; { FSalingAlpha und FControllerWeg }
-    { mit FContollerAlpha wird in CalcWKnick die ControllerKraft ausgerechnet }
-    GetSalingWeg; { FControllerAlpha und FSalingWeg }
-    { mit SalingWegKnick wird in CalcWKnick KurvenTyp und Offset bestimmt }
-    GetSalingWegKnick; { FSalingWegKnick }
-    { FKurveOhne und FKurveMit }
-    for i := 0 to 150 do
-    begin
-      FwSchnittOhne := i; { in mm }
-      FSchnittPunktKraft := FvonW(FwSchnittOhne, TKurvenTyp.KurveOhneController, False);
-      FKurveOhne[i] := FSchnittPunktKraft; { in N }
-      FwSchnittMit := i; { in mm }
-      FSchnittPunktKraft := FvonW(FwSchnittMit, TKurvenTyp.KurveMitController, False);
-      FKurveMit[i] := FSchnittPunktKraft; { in N }
-    end;
-    { FKurveOhneKorrigiert }
-    FKnicklaenge := lc;
-    FXPos := ld;
-    KnickLast := EI*3.14*3.14/FKnicklaenge/FKnicklaenge; { Knicklast in N }
-    for i := 0 to 100 do
-    begin
-      Kraft := i * 100;
-      if Kraft > 0.9 * KnickLast then
-        FKurveOhneKorrigiert[i] := 150
-      else begin
-        Weg := WvonF(Kraft, TKurvenTyp.KurveOhneController, True);
-        if Weg < 150 then
-          FKurveOhneKorrigiert[i] := Weg
-        else
-          FKurveOhneKorrigiert[i] := 150;
-      end;
-    end;
-
-    { FKurveMitKorrigiert }
-    Knicklaenge := FKnicklaenge * FKorrekturFaktor;
-    KnickLast := EI*3.14*3.14/Knicklaenge/Knicklaenge; { Knicklast in N }
-    for i := 0 to 100 do
-    begin
-      Kraft := i*100;
-      if Kraft > 0.9 * KnickLast then
-        FKurveMitKorrigiert[i] := 150
-      else
-      begin
-        Weg := WvonF(Kraft, TKurvenTyp.KurveMitController,True);
-        if Weg < 150 then
-          FKurveMitKorrigiert[i] := Weg
-        else
-          FKurveMitKorrigiert[i] := 150;
-      end;
-    end;
-
-    tempHd := hd; { hd sichern }
-    tempControllerTyp := ControllerTyp;
-    tempKorrigiert := Korrigiert;
-
-    for i := 0 to 150 do
-    begin
-      { FVerschoben }
-      Korrigiert := False;
-      ControllerTyp := ctZugDruck;
-      hd := i;
-      CalcWKnick;
-      if MastOK or ShowAll then
-        FVerschoben[i] := Round(-FC) { in N }
-      else
-        FVerschoben[i] := 0;
-
-      { FVerschobenKorrigiert }
-      Korrigiert := True;
-      ControllerTyp := ctZugDruck;
-      hd := i;
-      CalcWKnick;
-      if MastOK or ShowAll then
-        FVerschobenKorrigiert[i] := Round(-FC) { in N }
-      else
-        FVerschobenKorrigiert[i] := 0;
-    end;
-
-    { hd und FKorrigiert restaurieren }
-    hd := tempHd;
-    Korrigiert := tempKorrigiert;
-    ControllerTyp := tempControllerTyp;
-    CalcWKnick;
-  end; { with Mast do begin }
-end;
-
-procedure TKraftGraph.InitBitmap;
-begin
-//  FImage := Value;
-  Width := Image.Width;
-  Height := Image.Height;
-
-  Bitmap := TBitmap.Create;
-  Bitmap.Width := Width;
-  Bitmap.Height := Height;
+  R := 30;
+  Canvas.Ellipse( P.X - R, P.Y - R, P.X + R, P.Y + R);
 end;
 
 procedure TKraftGraph.Draw;
