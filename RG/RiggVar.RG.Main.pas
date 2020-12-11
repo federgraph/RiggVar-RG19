@@ -868,7 +868,7 @@ procedure TRggMain.DoAfterInitDefault(ATrimmSlot: Integer);
 begin
   Rigg.ControllerTyp := TControllerTyp.ctOhne;
   Rigg.InitFactArray;
-    StrokeRigg.SalingTyp := Rigg.SalingTyp;
+  StrokeRigg.SalingTyp := Rigg.SalingTyp;
   SetParam(FParam);
 
   case ATrimmSlot of
@@ -879,8 +879,8 @@ begin
     end;
     8:
     begin
-  SaveTrimm(Trimm8);
-  TrimmNoChange := 8;
+      SaveTrimm(Trimm8);
+      TrimmNoChange := 8;
     end;
   end;
 

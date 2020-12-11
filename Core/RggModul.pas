@@ -492,7 +492,7 @@ begin
   if FWinkelBtnDown then
   begin
     InputForm.lbWinkel.Caption := 'Winkel';
-    InputForm.lbValue2.Caption := Format('%5.2f Grad', [(InputRec.Winkel - MemCtrl.Winkel) / 10]);
+    InputForm.lbValue2.Caption := Format('%d Grad', [InputRec.Winkel - MemCtrl.Winkel]);
   end
   else
   begin
@@ -548,8 +548,8 @@ begin
   InputForm.sbWPowerOS.Position := InputRec.WPowerOS;
 
   UpdateGCtrlLabels(InputRec);
-  if RotaFormActive then
-    AniRotationForm.Modified := True;
+//  if RotaFormActive then
+//    AniRotationForm.Modified := True;
 end;
 
 procedure TRiggModul.FutureHandleScroll(Sender: TObject;
@@ -668,7 +668,7 @@ begin
     if FWinkelBtnDown then
     begin
       InputRec.Winkel := ScrollPos;
-      InputForm.lbValue2.Caption := Format('%5.2f Grad', [(InputRec.Winkel - MemCtrl.Winkel) / 10]);
+      InputForm.lbValue2.Caption := Format('%d Grad', [InputRec.Winkel - MemCtrl.Winkel]);
     end
     else
     begin
@@ -843,16 +843,16 @@ begin
   end;
   ViewModelM.UpdateView;
 
-  { 3D Grafik - AniRotationForm muß erzeugt sein! }
-  if RotaFormActive then
-  begin
-    if AniRotationForm.Visible then
-    begin
-      { Trackbar und Labels flackern zu sehr, daher nicht immer aktualisieren }
-      AniRotationForm.UpdateAll(Rigg);
-      AniRotationForm.Draw;
-    end;
-  end;
+//  { 3D Grafik - AniRotationForm muß erzeugt sein! }
+//  if RotaFormActive then
+//  begin
+//    if AniRotationForm.Visible then
+//    begin
+//      { Trackbar und Labels flackern zu sehr, daher nicht immer aktualisieren }
+//      AniRotationForm.UpdateAll(Rigg);
+//      AniRotationForm.Draw;
+//    end;
+//  end;
 end;
 
 procedure TRiggModul.Draw;
@@ -2596,7 +2596,7 @@ begin
             InputRec.Winkel := ScrollPos;
             InputForm.sbWinkel.Position := ScrollPos;
             t := InputForm.sbWinkel.Tag;
-            InputForm.lbValue2.Caption := Format('%5.2f Grad', [(ScrollPos - MemCtrl.Winkel) / 10]);
+            InputForm.lbValue2.Caption := Format('%d Grad', [ScrollPos - MemCtrl.Winkel]);
           end
           else
           begin

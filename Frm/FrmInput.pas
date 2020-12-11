@@ -203,7 +203,7 @@ begin
     begin
       RiggModul.ViewModelM.InputFormItemChecked := False;
       RiggModul.ViewModelM.UpdateView;
-  end;
+    end;
   end;
 end;
 

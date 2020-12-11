@@ -59,47 +59,36 @@ uses
 
 procedure TAnimationForm.FormCreate(Sender: TObject);
 begin
-  with tbWinkel, AniRotationForm do
-  begin
-    Max := ParamMax[fpWinkel];
-    tbWinkel.Position := ParamPos[fpWinkel];
-    Min := ParamMin[fpWinkel];
-    SelEnd := WinkelSelEnd;
-    SelStart := WinkelSelStart;
-    LineSize := 1;
-    PageSize := 20;
-    Frequency := 20;
-  end;
-  with UpdownSelStart do
-  begin
-    Max := tbWinkel.Position - 20;
-    SelStartEdit.Text := IntToStr(tbWinkel.SelStart);
-    Min := tbWinkel.Min;
-    Increment := 10;
-  end;
-  with UpdownSelEnd do
-  begin
-    Max := tbWinkel.Max;
-    SelEndEdit.Text := IntToStr(tbWinkel.SelEnd);
-    Min := tbWinkel.Position + 20;
-    Increment := 10;
-  end;
-  with UpdownInterval do
-  begin
-    Max := 2000;
-    Position := 200;
-    Min := 10;
-    Increment := 100;
-    IntervalEdit.Text := IntToStr(200);
-  end;
-  with UpdownStepCount do
-  begin
-    Max := AniStepCountMax;
-    Position := 10;
-    Min := 1;
-    Increment := 1;
-    StepCountEdit.Text := IntToStr(10);
-  end;
+  tbWinkel.Max := AniRotationForm.ParamMax[fpWinkel];
+  tbWinkel.Position := AniRotationForm.ParamPos[fpWinkel];
+  tbWinkel.Min := AniRotationForm.ParamMin[fpWinkel];
+  tbWinkel.SelEnd := AniRotationForm.WinkelSelEnd;
+  tbWinkel.SelStart := AniRotationForm.WinkelSelStart;
+  tbWinkel.LineSize := 1;
+  tbWinkel.PageSize := 2;
+  tbWinkel.Frequency := 2;
+
+  UpdownSelStart.Max := tbWinkel.Position - 5;
+  SelStartEdit.Text := IntToStr(tbWinkel.SelStart);
+  UpdownSelStart.Min := tbWinkel.Min;
+  UpdownSelStart.Increment := 1;
+
+  UpdownSelEnd.Max := tbWinkel.Max;
+  SelEndEdit.Text := IntToStr(tbWinkel.SelEnd);
+  UpdownSelEnd.Min := tbWinkel.Position + 5;
+  UpdownSelEnd.Increment := 1;
+
+  UpdownInterval.Max := 2000;
+  UpdownInterval.Position := 200;
+  UpdownInterval.Min := 10;
+  UpdownInterval.Increment := 100;
+  IntervalEdit.Text := IntToStr(200);
+
+  UpdownStepCount.Max := AniStepCountMax;
+  UpdownStepCount.Position := 10;
+  UpdownStepCount.Min := 1;
+  UpdownStepCount.Increment := 1;
+  StepCountEdit.Text := IntToStr(10);
 end;
 
 procedure TAnimationForm.tbWinkelChange(Sender: TObject);

@@ -1,19 +1,8 @@
 ﻿unit FrmAniRot;
 
-(*
-Anpassung mit Rigg19:
- 1. Symbol Rigg19 definieren
- 2. FormStyle := fsMDIChild; //vorher fsNormal
-    Achtung: Wenn FormStyle nicht im ObjectInspector gesetzt wird, dann ist der
-    Index in der ComboBox Fixpunkt nicht gesetzt!
- 3. FormClose() Eventhandler ergänzen
- 4. Units riggsdi und RiggUnit hinzufügen
- 5. Problem mit wmGetMinMaxInfo beachten
-*)
-
 interface
 
-{$define Rigg19}
+{.$define Rigg19}
 
 uses
   Winapi.Windows,
@@ -91,7 +80,8 @@ type
     procedure ShowDialog;
   public
     Modified: Boolean;
-    WinkelSelStart, WinkelSelEnd: Integer;
+    WinkelSelStart: Integer;
+    WinkelSelEnd: Integer;
 
     procedure InitListboxItems;
     function Param2Text(P: TsbName): string;
@@ -105,7 +95,7 @@ type
     property ParamPos[Index: TsbName]: Integer read GetParamPos;
     property AniStepCount: Integer read FAniStepCount write SetAniStepCount;
   public
-    AnimationItemChecked: Boolean; // needed when Menu will not be created
+    AnimationItemChecked: Boolean; { needed when Menu will not be created ? }
   public
     OptionenMenu: TMenuItem;
     AniDlgItem: TMenuItem;
@@ -151,8 +141,8 @@ begin
     Formstyle := fsMDIChild;
 
   AniIncrement := 1;
-  WinkelSelStart := ParamPos[fpWinkel]-60;
-  WinkelSelEnd := ParamPos[fpWinkel]+20;
+  WinkelSelStart := ParamPos[fpWinkel] - 6;
+  WinkelSelEnd := ParamPos[fpWinkel] + 2;
 
   RightPanel.Visible := True;
   ListBox.ItemIndex := ListBox.Items.IndexOf('Vorstag');
@@ -170,9 +160,6 @@ procedure TAniRotationForm.ShowItemClick(Sender: TObject);
 begin
   RightPanel.Visible := not RightPanel.Visible;
   ShowItem.Checked := RightPanel.Visible;
-  { jetzt in FormActivate: }
-  //if RightPanel.Visible then
-  //  LocalUpdateItemClick(Self);
 end;
 
 procedure TAniRotationForm.AniDlgItemClick(Sender: TObject);
@@ -236,7 +223,7 @@ begin
   if (Start < Pos) and (Pos < Ende) then
     AniStep := Floor((Pos-Start)/(Ende-Start)*AniStepCount);
 
-  Rigg.RealGlied[fpWinkel] := AniSteps[AniStep]/10*pi/180;
+  Rigg.RealGlied[fpWinkel] := DegToRad(AniSteps[AniStep]);
 end;
 
 procedure TAniRotationForm.TimerTimer(Sender: TObject);
@@ -250,7 +237,7 @@ begin
     AniIncrement := -1;
   if AniStep = 0 then
     AniIncrement := 1;
-  Rigg.RealGlied[fpWinkel] := AniSteps[AniStep]/10*pi/180;
+  Rigg.RealGlied[fpWinkel] := DegToRad(AniSteps[AniStep]);
   UpdateGraph;
   AnimationForm.tbWinkel.Position := Round(ParamProp[fpWinkel]);
 end;
@@ -308,7 +295,7 @@ begin
   if Value < cr.Min then
     Exit;
   if Index = fpWinkel then
-    Rigg.RealGlied[Index] := Value*pi/1800
+    Rigg.RealGlied[Index] := DegToRad(Value)
   else
     Rigg.RealGlied[Index] := Value;
   UpdateGraph;
@@ -317,32 +304,24 @@ end;
 function TAniRotationForm.GetParamProp(Index: TsbName): double;
 begin
   if Index = fpWinkel then
-    result := Rigg.RealGlied[Index]*1800/pi
+    result := RadToDeg(Rigg.RealGlied[Index])
   else
     result := Rigg.RealGlied[Index];
 end;
 
 procedure TAniRotationForm.SetParameter(Value: TsbName);
 begin
-  //if Value <> FsbName then
-  //begin
-    FsbName := Value;
-    SetupTrackBar;
-  //end;
+  FsbName := Value;
+  SetupTrackBar;
 end;
 
 procedure TAniRotationForm.TrackBarChange(Sender: TObject);
-var
-  temp: double;
 begin
   ParamProp[Parameter] := TrackBar.Position;
   if Parameter = fpWinkel then
-  begin
-    temp := TrackBar.Position/10;
-    lbIstVal.Caption := Format('%6.1f Grad',[temp]);
-  end
+    lbIstVal.Caption := Format('%4d Grad', [TrackBar.Position])
   else
-    lbIstVal.Caption := Format('%4d mm',[TrackBar.Position]);
+    lbIstVal.Caption := Format('%4d mm', [TrackBar.Position]);
 end;
 
 procedure TAniRotationForm.SetupTrackBar;
@@ -351,9 +330,8 @@ var
   cr: TRggSB;
 begin
   { Round(ParamProp[Parameter]) kann sich außerhalb der Grenzen befinden.
-  TrackBar.Position wird aber automatisch auf TrackBar.Min bzw. TrackBar.Max
-  gezogen. lbIstVal.Caption muß deshalb mit Round(ParamProp[Parameter])
-  bestimmt werden! }
+  TrackBar.Position wird aber automatisch auf TrackBar.Min bzw. TrackBar.Max gezogen.
+  lbIstVal.Caption muß deshalb mit Round(ParamProp[Parameter]) bestimmt werden. }
   temp := ParamProp[Parameter];
   cr := Rigg.RggFA.Find(Parameter);
   TrackBar.Min := 0;
@@ -362,19 +340,17 @@ begin
   TrackBar.Min := Round(cr.Min);
   TrackBar.LineSize := Round(cr.SmallStep);
   TrackBar.PageSize := Round(cr.BigStep);
-  //TrackBar.Frequency := (Max-Min) div 10;
-
   if Parameter = fpWinkel then
   begin
-    lbMinVal.Caption := Format('%6.1f Grad',[cr.Min / 10]);
-    lbMaxVal.Caption := Format('%6.1f Grad',[cr.Max / 10]);
-    lbIstVal.Caption := Format('%6.1f Grad',[temp / 10]);
+    lbMinVal.Caption := Format('%4.0f Grad', [cr.Min]);
+    lbMaxVal.Caption := Format('%4.0f Grad', [cr.Max]);
+    lbIstVal.Caption := Format('%4.0f Grad', [temp]);
   end
   else
   begin
-    lbMinVal.Caption := Format('%4.0f mm',[cr.Min]);
-    lbMaxVal.Caption := Format('%4.0f mm',[cr.Max]);
-    lbIstVal.Caption := Format('%4.0f mm',[temp]);
+    lbMinVal.Caption := Format('%4.0f mm', [cr.Min]);
+    lbMaxVal.Caption := Format('%4.0f mm', [cr.Max]);
+    lbIstVal.Caption := Format('%4.0f mm', [temp]);
   end;
   lbParam.Caption := Param2Text(Parameter);
 end;
@@ -388,11 +364,11 @@ end;
 procedure TAniRotationForm.InitListboxItems;
 var
   i: Integer;
-  S: string;
+  s: string;
 begin
-  S := 'Vorstag';
+  s := 'Vorstag';
   if ListBox.ItemIndex <> -1 then
-    S := ListBox.Items[ListBox.ItemIndex];
+    s := ListBox.Items[ListBox.ItemIndex];
   with ListBox.Items do
   begin
     Clear;
@@ -426,12 +402,11 @@ begin
       Add('Vorstag');
     end;
   end;
-  //Assert(ListBox.Items.Count <> 0, 'Fehler: ListBox leer!');
-  i := ListBox.Items.IndexOf(S);
+  i := ListBox.Items.IndexOf(s);
   if i <> -1 then
   begin
     ListBox.ItemIndex := i;
-    Parameter := Text2Param(S);
+    Parameter := Text2Param(s);
   end
   else
   begin
@@ -596,14 +571,11 @@ begin
     InitListboxItems;
   end;
 
-  with RaumGraph do
-  begin
-    Salingtyp := Rgg.Salingtyp;
-    ControllerTyp := Rgg.ControllerTyp;
-    Koordinaten := Rgg.RiggPoints;
-    SetMastLineData(Rgg.MastLinie, Rgg.MastLC, Rgg.MastBeta);
-    WanteGestrichelt := not Rgg.GetriebeOK;
-  end;
+  RaumGraph.Salingtyp := Rgg.Salingtyp;
+  RaumGraph.ControllerTyp := Rgg.ControllerTyp;
+  RaumGraph.Koordinaten := Rgg.RiggPoints;
+  RaumGraph.SetMastLineData(Rgg.MastLinie, Rgg.MastLC, Rgg.MastBeta);
+  RaumGraph.WanteGestrichelt := not Rgg.GetriebeOK;
 end;
 
 procedure TAniRotationForm.ShowDialog;

@@ -221,8 +221,8 @@ type
     procedure InitGraph;
     procedure InitRaumGraph;
     procedure InitHullGraph;
-    procedure InitRigg; virtual;
-    procedure UpdateGraph; virtual;
+    procedure InitRigg;
+    procedure UpdateGraph;
   public
     PaintItemChecked: Boolean;
     MatrixItemChecked: Boolean;
@@ -419,7 +419,7 @@ end;
 
 procedure TRotationForm.FormDestroy(Sender: TObject);
 begin
-//  Rigg.Free;
+//  Rigg.Free; { because of Interface }
   BackBmp.Free;
   Bitmap.Free;
   MetaFile.Free;
@@ -447,7 +447,6 @@ end;
 
 procedure TRotationForm.InitGraph;
 begin
-  { virtual }
   Rotator := TPolarKar.Create;
   Rotator.OnCalcAngle := Rotator.GetAngle2;
   InitRotaData;
@@ -457,7 +456,6 @@ end;
 
 procedure TRotationForm.InitRaumGraph;
 begin
-  { virtual }
   RaumGraph := TRaumGraph.Create(TZug4.Create);
   RaumGraph.Transformer := Transformer;
   RaumGraph.FixPoint := ComboFixPoint;
@@ -469,29 +467,31 @@ end;
 
 procedure TRotationForm.InitHullGraph;
 begin
-  { virtual }
   HullGraph := THullGraph.Create;
   HullGraph.Transformer := Transformer;
 end;
 
 procedure TRotationForm.InitRigg;
 begin
-  { virtual }
   Rigg := TRigg.Create;
-  RiggInter := Rigg;
+
+  Rigg.InitFactArray;
 
   Rigg.ControllerTyp := ctOhne;
-  RiggInter := Rigg;
+  Rigg.UpdateGetriebe;
+
   RaumGraph.SalingTyp := Rigg.SalingTyp;
   RaumGraph.ControllerTyp := Rigg.ControllerTyp;
   RaumGraph.Koordinaten := Rigg.RiggPoints;
   RaumGraph.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
   RaumGraph.WanteGestrichelt := not Rigg.GetriebeOK;
+
+  RiggInter := Rigg;
 end;
 
 procedure TRotationForm.UpdateGraph;
 begin
- { virtual }
+  Rigg.UpdateGetriebe;
   RaumGraph.Salingtyp := Rigg.Salingtyp;
   RaumGraph.ControllerTyp := Rigg.ControllerTyp;
   RaumGraph.Koordinaten := Rigg.RiggPoints;
@@ -613,21 +613,15 @@ begin
     EraseBK := False;
   end;
 
-//  NullpunktOffset.x := -NOffset.X + Bitmap.Width div 2 + FXpos;
-//  NullpunktOffset.y := -NOffset.Y + Bitmap.Height div 2 + FYpos;
-
-//  NullpunktOffset.x := -RaumGraph.Zug4.OffsetX4 + Bitmap.Width div 2 + FXpos;
-//  NullpunktOffset.y := -RaumGraph.Zug4.OffsetY4 + Bitmap.Height div 2 + FYpos;
-
-  NullpunktOffset.x := Bitmap.Width div 2 + FXpos;
-  NullpunktOffset.y := Bitmap.Height div 2 + FYpos;
+  NullpunktOffset.X := Bitmap.Width div 2 + FXpos;
+  NullpunktOffset.Y := Bitmap.Height div 2 + FYpos;
 
   DrawToBitmap1;
 
   if MatrixItemChecked then
     DrawMatrix(Bitmap.Canvas);
   if AngleTextItemChecked then
-  DrawAngleText(Bitmap.Canvas);
+    DrawAngleText(Bitmap.Canvas);
 
   if PreviewItemChecked then
     DrawPreviewBox;
@@ -651,7 +645,7 @@ begin
     SetWindowExtEx(Handle, 1000, 1000, nil);
     SetWindowOrgEx(Handle, 0, 0, nil);
     SetViewPortExtEx(Handle, 1000, 1000, nil);
-    SetViewPortOrgEx(Handle, NullpunktOffset.x, NullpunktOffset.y, nil);
+    SetViewPortOrgEx(Handle, NullpunktOffset.X, NullpunktOffset.Y, nil);
   end;
 
   RaumGraph.Coloriert := True;
@@ -985,7 +979,7 @@ end;
 
 procedure TRotationForm.GrafikMenuClick(Sender: TObject);
 var
-  S: string;
+  s: string;
 begin
   A0_Item.Checked := False;
   B0_Item.Checked := False;
@@ -999,19 +993,19 @@ begin
   D_Item.Checked := False;
   E_Item.Checked := False;
   F_Item.Checked := False;
-  S := FixPunktCombo.Text;
-  if S = 'A0' then A0_Item.Checked := True
-  else if S = 'B0' then B0_Item.Checked := True
-  else if S = 'C0' then C0_Item.Checked := True
-  else if S = 'D0' then D0_Item.Checked := True
-  else if S = 'E0' then E0_Item.Checked := True
-  else if S = 'F0' then F0_Item.Checked := True
-  else if S = 'A' then A_Item.Checked := True
-  else if S = 'B' then B_Item.Checked := True
-  else if S = 'C' then C_Item.Checked := True
-  else if S = 'D' then D_Item.Checked := True
-  else if S = 'E' then E_Item.Checked := True
-  else if S = 'F' then F_Item.Checked := True;
+  s := FixPunktCombo.Text;
+  if s = 'A0' then A0_Item.Checked := True
+  else if s = 'B0' then B0_Item.Checked := True
+  else if s = 'C0' then C0_Item.Checked := True
+  else if s = 'D0' then D0_Item.Checked := True
+  else if s = 'E0' then E0_Item.Checked := True
+  else if s = 'F0' then F0_Item.Checked := True
+  else if s = 'A' then A_Item.Checked := True
+  else if s = 'B' then B_Item.Checked := True
+  else if s = 'C' then C_Item.Checked := True
+  else if s = 'D' then D_Item.Checked := True
+  else if s = 'E' then E_Item.Checked := True
+  else if s = 'F' then F_Item.Checked := True;
 
   Step01Item.Checked := False;
   Step1Item.Checked := False;
@@ -1112,7 +1106,7 @@ begin
   { Rotationmatrix }
   Rotator.Matrix := RotaData.Matrix;
   Rotator.GetAngle(FPhi, FTheta, FGamma);
-  SetAngleText; // Rotate() hier nicht aufrufen, um Matrix nicht zu verändern!
+  SetAngleText; { Rotate hier nicht aufrufen, um Matrix nicht zu verändern. }
   { Zoom }
   FZoomIndex := RotaData.ZoomIndex;
   FZoom := FZoomBase * TRotaParams.LookUpRa10(FZoomIndex);
@@ -1121,7 +1115,7 @@ begin
 
   { Fixpunkt }
   FixPunktCombo.ItemIndex := RotaData.FixpunktIndex;
-  RaumGraph.FixPoint := ComboFixPoint; // -> Transformer.FixPoint
+  RaumGraph.FixPoint := ComboFixPoint; { -> Transformer.FixPoint }
 
   RaumGraph.Update;
   HullGraph.Update;
@@ -1722,7 +1716,7 @@ begin
         P := Point(30, FocusEdit.Top-PaintBox3D.Top)
       else
         P := Point(0, 0);
-      Draw(P.x,P.y,BackBmp);
+      Draw(P.X, P.Y, BackBmp);
     end;
   end;
 end;
@@ -2125,8 +2119,6 @@ end;
 
 procedure TRotationForm.InitPreview;
 begin
- { virtual }
-
   { Preview ruft GetDeviceCaps(Printer.Handle, LOGPIXELSX) auf
     dauert extrem lange, wenn der konfigurierte Standard-Drucker
     nicht erreichbar ist. }
@@ -2137,7 +2129,7 @@ procedure TRotationForm.DrawPreviewBox;
 begin
   if Assigned(Preview) then
   begin
-    Preview.Faktor := 1/8.5;
+    Preview.Faktor := 1 / 8.5;
     Preview.RPLOffsetX := 250;
     Preview.RPLOffsetY := 15;
     Preview.Draw(Bitmap.Canvas);
@@ -2170,17 +2162,11 @@ begin
   RandX := 250;
   RandY := 15;
 
-  PrintOffset.x := Round( (Bitmap.Width div 2 + FXpos - RandX) * PrintZoom
-                            - Preview.PagePos.Left);
-  PrintOffset.y := Round((Bitmap.Height div 2 + FYpos - RandY) * PrintZoom
-                            - Preview.PagePos.Top);
-
-//  SavedOffset := RaumGraph.NOffset;
+  PrintOffset.X := Round( (Bitmap.Width div 2 + FXpos - RandX) * PrintZoom - Preview.PagePos.Left);
+  PrintOffset.Y := Round((Bitmap.Height div 2 + FYpos - RandY) * PrintZoom - Preview.PagePos.Top);
 
   HullGraph.Zoom := FZoom * PrintZoom;
   RaumGraph.Zoom := FZoom * PrintZoom;
-//  HullGraph.NOffset := PrintOffset;
-//  RaumGraph.NOffset := PrintOffset;
 
   Printer.Orientation := Preview.Orientierung;
   Printer.BeginDoc;
@@ -2201,8 +2187,6 @@ begin
 
   HullGraph.Zoom := FZoom;
   RaumGraph.Zoom := FZoom;
-//  HullGraph.NOffset := SavedOffset;
-//  RaumGraph.NOffset := SavedOffset;
 end;
 
 { Scroll left by one button. If no buttons are visible anymore, do nothing. }
@@ -2245,11 +2229,10 @@ procedure TRotationForm.RedoButtons;
 var
   I: Integer;
 begin
-  { make a partially obscured button completely invisible }
-  with Panel do
-    for I := 0 to ControlCount-1 do
-      if Controls[I].Tag >= 0 then
-        Controls[I].Visible := IsButtonVisible(Controls[I]);
+  { Make a partially obscured button completely invisible. }
+  for I := 0 to Panel.ControlCount-1 do
+    if Panel.Controls[I].Tag >= 0 then
+      Panel.Controls[I].Visible := IsButtonVisible(Panel.Controls[I]);
   EnableScrollButtons;
 end;
 
