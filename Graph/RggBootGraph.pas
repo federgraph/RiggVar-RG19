@@ -41,6 +41,8 @@ type
 
     constructor Create;
 
+    function OnGetFixPunkt: TPoint3D;
+
     procedure LoadFromIniFile(FileName: string);
 
     procedure SetMastLineData(const Value: TLineDataR100; L: single; Beta: single);
@@ -66,6 +68,11 @@ begin
   inherited Create;
   FSalingTyp := stFest;
   FControllerTyp := ctOhne;
+end;
+
+function TBootGraph.OnGetFixPunkt: TPoint3D;
+begin
+  result := rP.V[FixPoint];
 end;
 
 procedure TBootGraph.SetKoordinaten(const Value: TRiggPoints);
@@ -120,6 +127,7 @@ end;
 procedure TBootGraph.SetMastKurve(const Value: TMastKurve);
 begin
   Kurve := Value;
+  Updated := False;
 end;
 
 procedure TBootGraph.SetSalingTyp(const Value: TSalingTyp);

@@ -89,6 +89,8 @@ uses
   RiggVar.FB.ActionShort,
   RiggVar.FB.ActionLong;
 
+{ TActionSpeedBar }
+
 constructor TActionSpeedBar.Create(AOwner: TComponent);
 begin
   inherited;

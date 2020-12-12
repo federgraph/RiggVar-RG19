@@ -204,7 +204,7 @@ type
     IsUp: Boolean;
     Image: TImage; // injected
 
-    HullGraph: THullGraph0;
+    HullGraph: THullGraph;
     RaumGraph: TRaumGraph;
     UseDisplayList: Boolean;
     BackgroundColor: TColor;
@@ -550,7 +550,7 @@ begin
   if UseDisplayList then
   begin
     UpdateDisplayListForBoth(False);
-    TDisplayItem.NullpunktOffset := NullpunktOffset;;
+    TDisplayItem.NullpunktOffset := NullpunktOffset;
     RaumGraph.DL.WantLegend := LegendItemChecked; // not RumpfItemChecked;
     RaumGraph.DL.Draw(g);
   end
@@ -1203,15 +1203,8 @@ end;
 procedure TRotaForm1.InitBitmapSize;
 var
   wx, wy: Integer;
-//  MinTrackX, MinTrackY: Integer;
   MaxTrackX, MaxTrackY: Integer;
-//  CreatedScreenWidth: Integer;
 begin
-//  CreatedScreenWidth := Screen.Width;
-//
-//  MinTrackX := 410;
-//  MinTrackY := 280;
-
   MaxTrackX := 1024;
   MaxTrackY := 768;
 
