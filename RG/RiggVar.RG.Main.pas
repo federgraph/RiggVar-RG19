@@ -181,8 +181,6 @@ type
     Trimm7: TRggData; // 420
     Trimm8: TRggData; // Logo
 
-    BackgroundLock: Boolean;
-
     FixPunkt: TPoint3D;
 
     MinValCaption: string;
@@ -212,6 +210,7 @@ type
     ActionGroupList: TActionGroupList;
     ActionTest: TActionTest;
     FederBinding: TFederBinding;
+    BackgroundLock: Boolean;
 
     CurrentRotaForm: Integer;
 

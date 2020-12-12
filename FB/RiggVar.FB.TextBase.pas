@@ -23,7 +23,6 @@ interface
 {$endif}
 
 uses
-  Messages,
   Classes,
   Controls,
   Forms;
@@ -44,6 +43,7 @@ type
     procedure SetFrameVisible(const Value: Boolean); virtual;
   public
     InitOK: Boolean;
+
     constructor Create(AOwner: TComponent); override;
     procedure Init; virtual;
 

@@ -2061,6 +2061,7 @@ begin
     faToggleAllTags: result := MainVar.AllTags;
     faToggleButtonSize: result := SpeedPanel.BigMode;
 
+    faToggleAllText: result := SimulateMobile;
     faToggleHelp: result := ShowingHelp;
     faToggleReport: result := ReportText.Visible;
     faToggleButtonReport: result := WantButtonReport;

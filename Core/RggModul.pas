@@ -332,7 +332,7 @@ begin
   if FWinkelBtnDown then
   begin
     InputForm.lbWinkel.Caption := 'Winkel';
-    InputForm.lbValue2.Caption := Format('%5.2f Grad', [(InputRec.Winkel - MemCtrl.Winkel) / 10]);
+    InputForm.lbValue2.Caption := Format('%d Grad', [InputRec.Winkel - MemCtrl.Winkel]);
   end
   else
   begin
@@ -506,7 +506,7 @@ begin
     if FWinkelBtnDown then
     begin
       InputRec.Winkel := ScrollPos;
-      InputForm.lbValue2.Caption := Format('%5.2f Grad', [(InputRec.Winkel - MemCtrl.Winkel) / 10]);
+      InputForm.lbValue2.Caption := Format('%d Grad', [InputRec.Winkel - MemCtrl.Winkel]);
     end
     else
     begin
@@ -583,7 +583,7 @@ begin
     else
     begin
       FShowTriangle := False;
-      FKurveValid := False; // <-- should be assignment to property with setter called
+      FKurveValid := False; // <-- should be assignment to property with setter called ?
     end;
     InputBuffer := InputRec;
     Rigg.Glieder := InputRec;
@@ -1877,7 +1877,7 @@ begin
             InputRec.Winkel := ScrollPos;
             InputForm.sbWinkel.Position := ScrollPos;
             t := InputForm.sbWinkel.Tag;
-            InputForm.lbValue2.Caption := Format('%5.2f Grad', [(ScrollPos - MemCtrl.Winkel) / 10]);
+            InputForm.lbValue2.Caption := Format('%d Grad', [ScrollPos - MemCtrl.Winkel]);
           end
           else
           begin
