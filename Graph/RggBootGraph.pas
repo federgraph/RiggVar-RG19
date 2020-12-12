@@ -127,6 +127,7 @@ end;
 procedure TBootGraph.SetMastKurve(const Value: TMastKurve);
 begin
   Kurve := Value;
+  Updated := False;
 end;
 
 procedure TBootGraph.SetSalingTyp(const Value: TSalingTyp);

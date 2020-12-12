@@ -4,7 +4,7 @@ interface
 
 uses
   RiggVar.FD.Point,
-  System.Classes,
+  Classes,
   RggTypes,
   RggScroll,
   RggDoc,

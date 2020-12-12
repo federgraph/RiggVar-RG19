@@ -736,7 +736,6 @@ begin
   CurrentValue := Rigg.RggFA.Find(FParam).Ist;
   SetupTrackBarForRgg;
   UpdateGraph;
-//  FormMain.UpdateOnParamChanged;
 end;
 
 function TRggMain.Text2Param(T: string): TFederParam;

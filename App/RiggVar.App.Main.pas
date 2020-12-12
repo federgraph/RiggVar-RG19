@@ -52,6 +52,9 @@ type
     Scale: single;
     ClientWidth: Integer;
     ClientHeight: Integer;
+    WantScaling: Boolean;
+    WantFederText: Boolean;
+    StatusBarHeight: Integer;
     class constructor Create;
   end;
 
@@ -63,6 +66,7 @@ class constructor MainVar.Create;
 begin
   IsSandboxed := true;
   Raster := 70;
+  Scale := 1.0;
 end;
 
 end.

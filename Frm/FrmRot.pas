@@ -23,11 +23,10 @@ uses
   Vcl.ExtDlgs,
   RiggVar.App.Model,
   RiggVar.FD.Point,
+  RiggVar.RG.Model,
   RggInter,
   RggTypes,
-  RggGetriebeGraph,
   RggMatrix,
-  RiggVar.RG.Model,
   RggPrinter,
   RggPreview,
   RggGraph,
@@ -97,11 +96,8 @@ type
     procedure PhiDownItemClick(Sender: TObject);
     procedure Step01ItemClick(Sender: TObject);
     procedure A0_ItemClick(Sender: TObject);
-    procedure PreviewItemClick(Sender: TObject);
-    procedure PrintItemClick(Sender: TObject);
     procedure RumpfBtnClick(Sender: TObject);
     procedure CloseItemClick(Sender: TObject);
-    procedure PlotItemClick(Sender: TObject);
     procedure GrafikMenuClick(Sender: TObject);
     procedure StatusBarItemClick(Sender: TObject);
     procedure SpeedBarItemClick(Sender: TObject);
@@ -110,6 +106,9 @@ type
     procedure TransLeftBtnClick(Sender: TObject);
     procedure TransLeftItemClick(Sender: TObject);
     procedure KeepInsideItemClick(Sender: TObject);
+    procedure PreviewItemClick(Sender: TObject);
+    procedure PrintItemClick(Sender: TObject);
+    procedure PlotItemClick(Sender: TObject);
     procedure LeftButtonClick(Sender: TObject);
     procedure RightButtonClick(Sender: TObject);
     procedure ToolbarPanelResize(Sender: TObject);
@@ -139,7 +138,10 @@ type
     FTheta: single;
     FGamma: single;
 
-    xmin, ymin, xmax, ymax: Integer;
+    xmin: Integer;
+    ymin: Integer;
+    xmax: Integer;
+    ymax: Integer;
 
     FXpos: Integer;
     FYpos: Integer;
@@ -222,6 +224,7 @@ type
     procedure InitRaumGraph;
     procedure InitHullGraph;
     procedure InitRigg;
+    procedure UpdateGraphData;
     procedure UpdateGraph;
   public
     PaintItemChecked: Boolean;
@@ -316,7 +319,6 @@ implementation
 uses
   FrmScale,
   RggZug2D,
-  RggCalc,
   RggPal,
   RggPBox;
 
@@ -377,7 +379,6 @@ begin
 
   FZoomBase := 0.05;
   FViewPoint := vp3D;
-//  RaumGraph.FixPoint := ooD;
 
   if MainMenu <> nil then
   begin
@@ -419,7 +420,7 @@ end;
 
 procedure TRotationForm.FormDestroy(Sender: TObject);
 begin
-//  Rigg.Free; { because of Interface }
+//  Rigg.Free;
   BackBmp.Free;
   Bitmap.Free;
   MetaFile.Free;
@@ -474,25 +475,18 @@ end;
 procedure TRotationForm.InitRigg;
 begin
   Rigg := TRigg.Create;
+  RiggInter := Rigg;
 
   Rigg.InitFactArray;
 
   Rigg.ControllerTyp := ctOhne;
-  Rigg.UpdateGetriebe;
-
-  RaumGraph.SalingTyp := Rigg.SalingTyp;
-  RaumGraph.ControllerTyp := Rigg.ControllerTyp;
-  RaumGraph.Koordinaten := Rigg.RiggPoints;
-  RaumGraph.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
-  RaumGraph.WanteGestrichelt := not Rigg.GetriebeOK;
-
-  RiggInter := Rigg;
+  UpdateGraph;
 end;
 
 procedure TRotationForm.UpdateGraph;
 begin
   Rigg.UpdateGetriebe;
-  RaumGraph.Salingtyp := Rigg.Salingtyp;
+  RaumGraph.SalingTyp := Rigg.SalingTyp;
   RaumGraph.ControllerTyp := Rigg.ControllerTyp;
   RaumGraph.Koordinaten := Rigg.RiggPoints;
   RaumGraph.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
@@ -1117,8 +1111,7 @@ begin
   FixPunktCombo.ItemIndex := RotaData.FixpunktIndex;
   RaumGraph.FixPoint := ComboFixPoint; { -> Transformer.FixPoint }
 
-  RaumGraph.Update;
-  HullGraph.Update;
+  UpdateGraphData;
 
   { Neuzeichnen }
   EraseBK := True;
@@ -1266,7 +1259,7 @@ begin
   if Painted then
   begin
     Painted := False;
-    if FTranslation or (Shift = [ssLeft, ssRight]) then
+    if FTranslation or (ssCtrl in Shift) or (Shift = [ssLeft, ssRight]) then
       Translate(x,y)
     else
       Rotate(0,0,0,wx,wy,wz);
@@ -1293,7 +1286,7 @@ begin
   Rotator.XRot := Xrot;
   Rotator.YRot := Yrot;
   Rotator.ZRot := Zrot;
-  RaumGraph.Update;
+  UpdateGraphData;
   SetAngleText;
 end;
 
@@ -1515,7 +1508,7 @@ procedure TRotationForm.FaktorDlgItemClick(Sender: TObject);
 begin
   RumpfFaktorDlg := TRumpfFaktorDlg.Create(Self);
   try
-    with HullGraph as THullGraph0 do
+    with HullGraph as THullGraph do
     begin
       RumpfFaktorDlg.Caption := 'Rumpf skalieren';
       RumpfFaktorDlg.GroupBox.Caption := 'Faktor in %';
@@ -1619,7 +1612,7 @@ end;
 
 procedure TRotationForm.IndicatorChanged(Sender: TObject);
 begin
-  RaumGraph.Update;
+  UpdateGraphData;
   Rotator.GetAngle(FPhi, FTheta, FGamma);
   SetAngleText;
   Draw;
@@ -1719,6 +1712,282 @@ begin
       Draw(P.X, P.Y, BackBmp);
     end;
   end;
+end;
+
+
+procedure TRotationForm.PrintItemClick(Sender: TObject);
+begin
+  PrintIt;
+end;
+
+procedure TRotationForm.PreviewItemClick(Sender: TObject);
+var
+  SL: TStrings;
+begin
+  if not Assigned(Preview) then
+  begin
+    SL := TStringList.Create;
+    SL.Add('Druckfunktion + Vorschau wurden in dieser Version entfernt,');
+    SL.Add('weil bei der Abfrage der Druckereigenschaften');
+    SL.Add('das System in wenigen Fällen extrem lange braucht,');
+    SL.Add('wenn zum Beispiel der konfigurierte Standard-Drucker,');
+    SL.Add('angeschlossen an einem anderen Computer im Netzwerk,');
+    SL.Add('zur Zeit nicht erreichbar ist.');
+    SL.Add('Die Behandlung derartiger neuer Randprobleme sind für diese Anwendung');
+    SL.Add('im Rahmen der normalen Wartung nicht vorgesehen.');
+    SL.Add('Der blitzschnelle Programmstart unter allen Umständen hat Priorität.');
+
+    MessageDlg(SL.Text, mtInformation, [mbOK], 0);
+    SL.Free;
+    Exit;
+  end;
+
+  PreviewItem.Checked := not PreviewItem.Checked;
+  PreviewBtn.Down := PreviewItem.Checked;
+  EraseBK := True;
+  Draw;
+end;
+
+procedure TRotationForm.InitPreview;
+begin
+  { Preview ruft GetDeviceCaps(Printer.Handle, LOGPIXELSX) auf
+    dauert extrem lange, wenn der konfigurierte Standard-Drucker
+    nicht erreichbar ist. }
+  // Preview := TPreview.Create;
+end;
+
+procedure TRotationForm.DrawPreviewBox;
+begin
+  if Assigned(Preview) then
+  begin
+    Preview.Faktor := 1 / 8.5;
+    Preview.RPLOffsetX := 250;
+    Preview.RPLOffsetY := 15;
+    Preview.Draw(Bitmap.Canvas);
+  end;
+end;
+
+procedure TRotationForm.PrintIt;
+var
+  PrintOffset: TPoint;
+  PrintZoom: single;
+  RandX, RandY: Integer;
+  Rgn: THandle;
+begin
+  if not Assigned(Preview) then
+  begin
+    MessageDlg('Preview Object nicht verfügbar.', mtInformation, [mbOK], 0);
+    Exit;
+  end;
+
+  if not RiggPrinter.OKToPrint then
+  begin
+    MessageDlg('Kein Drucker konfiguriert.', mtInformation, [mbOK], 0);
+    Exit;
+  end;
+
+  if MessageDlg('Jetzt Drucken?', mtInformation, [mbYes, mbNo], 0) = mrNO then
+    Exit;
+
+  PrintZoom := 8.5;
+  RandX := 250;
+  RandY := 15;
+
+  PrintOffset.X := Round( (Bitmap.Width div 2 + FXpos - RandX) * PrintZoom - Preview.PagePos.Left);
+  PrintOffset.Y := Round((Bitmap.Height div 2 + FYpos - RandY) * PrintZoom - Preview.PagePos.Top);
+
+  HullGraph.Zoom := FZoom * PrintZoom;
+  RaumGraph.Zoom := FZoom * PrintZoom;
+
+  Printer.Orientation := Preview.Orientierung;
+  Printer.BeginDoc;
+  if PreviewItem.Checked then
+    Preview.Print;
+  Rgn := CreateRectRgnIndirect(Preview.EnvPos);
+  { SelectClipRgn() arbeitet mit Kopie von Rgn }
+  SelectClipRgn(Printer.Canvas.Handle, Rgn);
+  DeleteObject(Rgn);
+  RaumGraph.Coloriert := True;
+  RaumGraph.DrawToCanvas(Printer.Canvas);
+  if FPaintRumpf = True then
+  begin
+    HullGraph.Coloriert := True;
+    HullGraph.DrawToCanvas(Printer.Canvas);
+  end;
+  Printer.EndDoc;
+
+  HullGraph.Zoom := FZoom;
+  RaumGraph.Zoom := FZoom;
+end;
+
+{ Scroll left by one button. If no buttons are visible anymore, do nothing. }
+procedure TRotationForm.LeftButtonClick(Sender: TObject);
+var
+  Button: TControl;
+begin
+  { Scroll left }
+  Button := GetFirstVisibleButton;
+  if Button <> nil then
+  begin
+    if Buttons[Button.Tag+1] <> nil then
+      Panel.Left := -Buttons[Button.Tag+1].Left
+    else
+      Panel.Left := -(Button.Left + Button.Width);
+    Panel.Width := LeftButton.Left - Panel.Left;
+    RedoButtons;
+  end;
+end;
+
+{ Scroll right by one button. Do not scroll past the first button.
+  If no buttons are visible, then do nothing. }
+procedure TRotationForm.RightButtonClick(Sender: TObject);
+var
+  Button: TControl;
+begin
+  { Scroll right }
+  Button := GetFirstVisibleButton;
+  if (Button <> nil) and (Button.Tag > 0) then
+  begin
+    with Buttons[Button.Tag-1] do
+      Panel.Left := -Left;
+    Panel.Width := LeftButton.Left - Panel.Left;
+    RedoButtons;
+  end;
+end;
+
+{ After a resize, or after a scroll, determine which buttons are visible. }
+procedure TRotationForm.RedoButtons;
+var
+  I: Integer;
+begin
+  { Make a partially obscured button completely invisible. }
+  for I := 0 to Panel.ControlCount-1 do
+    if Panel.Controls[I].Tag >= 0 then
+      Panel.Controls[I].Visible := IsButtonVisible(Panel.Controls[I]);
+  EnableScrollButtons;
+end;
+
+{ Return the button whose tag property is Tag, or nil if no button matches. }
+function TRotationForm.GetButton(Tag: Integer): TControl;
+var
+  I: Integer;
+begin
+  for I := 0 to Panel.ControlCount-1 do
+    if Panel.Controls[I].Tag = Tag then
+    begin
+      result := Panel.Controls[I] as TControl;
+      Exit;
+    end;
+  result := nil;
+end;
+
+{ Return the number of toolbar buttons on the panel. }
+function TRotationForm.GetButtonCount: Integer;
+var
+  I: Integer;
+begin
+  Result := 0;
+  for I := 0 to Panel.ControlCount-1 do
+    if Panel.Controls[I].Tag >= 0 then
+      Inc(Result);
+end;
+
+{ Return whether a button is entirely visible. Scale the button's
+  bounds to the toolbar, and make sure the button lies entirely
+  within the bounds of the toolbar. }
+function TRotationForm.IsButtonVisible(Button: TControl): Boolean;
+var
+  TopLeft, BottomRight: TPoint;
+  Right: Integer;
+begin
+  TopLeft := ScreenToClient(Button.ClientToScreen(Button.ClientRect.TopLeft));
+  BottomRight := ScreenToClient(Button.ClientToScreen(Button.ClientRect.BottomRight));
+  if LeftButton.Visible then
+    Right := LeftButton.Left
+  else
+    Right := ClientWidth;
+  if (TopLeft.X < 0) or (TopLeft.Y < 0) then
+    Result := False
+  else if (BottomRight.Y > ClientHeight) or (BottomRight.X > Right) then
+    Result := False
+  else
+    Result := True;
+end;
+
+{ Return the first visible button, or nil if they are all invisible. }
+function TRotationForm.GetFirstVisibleButton: TControl;
+var
+  I: Integer;
+begin
+  for I := 0 to Panel.ControlCount-1 do
+    if Panel.Controls[I].Tag >= 0 then
+    begin
+      Result := Panel.Controls[I] as TControl;
+      if IsButtonVisible(Result) then
+        Exit;
+    end;
+  Result := nil;
+end;
+
+{ Return the last (rightmost) visible button, or nil if all the
+  buttons are invisible. }
+function TRotationForm.GetLastVisibleButton: TControl;
+var
+  I: Integer;
+begin
+  for I := Panel.ControlCount-1 downto 0 do
+    if Panel.Controls[I].Tag >= 0 then
+    begin
+      Result := Panel.Controls[I] as TControl;
+      if IsButtonVisible(Result) then
+        Exit;
+    end;
+  Result := nil;
+end;
+
+{ Enable or disable the toolbar scroll buttons. If the leftmost
+  button is visible then disable the right button. If the rightmost
+  button is visible then disable the left button. }
+procedure TRotationForm.EnableScrollButtons;
+begin
+  RightButton.Enabled := not IsButtonVisible(Buttons[0]);
+  LeftButton.Enabled  := not IsButtonVisible(Buttons[GetButtonCount-1]);
+end;
+
+{ When the toolbar changes size, move the scroll buttons so they stay
+  at the right edge of the toolbar. Reset the panel to show whichever
+  buttons are visible. }
+procedure TRotationForm.ToolbarPanelResize(Sender: TObject);
+var
+  I, Right: Integer;
+begin
+  LeftButton.Left := ClientWidth - LeftButton.Width - 4;
+  RightButton.Left := ClientWidth - RightButton.Width - 4;
+  { Is there enough room for every button? }
+  with Buttons[GetButtonCount-1] do
+    Right := Left + Width;
+  if ClientWidth >= Right then
+  begin
+    Panel.Left := 0; { unscroll }
+    Panel.Width := ClientWidth;
+    { Hide the scroll buttons. }
+    LeftButton.Visible := False;
+    RightButton.Visible := False;
+    { Make all the toolbar buttons visible. }
+    for I := 0 to Panel.ControlCount-1 do
+      if Panel.Controls[I].Tag >= 0 then
+        Panel.Controls[I].Visible := True
+  end
+  else
+  begin
+    { Make the scroll buttons visible. }
+    LeftButton.Visible := True;
+    RightButton.Visible := True;
+    { Set the panel width to leave room for the scroll buttons. }
+    Panel.Width := LeftButton.Left - Panel.Left;
+  end;
+  Panel.Height := ToolbarPanel.Height;
+  RedoButtons;
 end;
 
 procedure TRotationForm.InitMenu;
@@ -2084,282 +2353,10 @@ begin
   Draw;
 end;
 
-procedure TRotationForm.PrintItemClick(Sender: TObject);
+procedure TRotationForm.UpdateGraphData;
 begin
-  PrintIt;
-end;
-
-procedure TRotationForm.PreviewItemClick(Sender: TObject);
-var
-  SL: TStrings;
-begin
-  if not Assigned(Preview) then
-  begin
-    SL := TStringList.Create;
-    SL.Add('Druckfunktion + Vorschau wurden in dieser Version entfernt,');
-    SL.Add('weil bei der Abfrage der Druckereigenschaften');
-    SL.Add('das System in wenigen Fällen extrem lange braucht,');
-    SL.Add('wenn zum Beispiel der konfigurierte Standard-Drucker,');
-    SL.Add('angeschlossen an einem anderen Computer im Netzwerk,');
-    SL.Add('zur Zeit nicht erreichbar ist.');
-    SL.Add('Die Behandlung derartiger neuer Randprobleme sind für diese Anwendung');
-    SL.Add('im Rahmen der normalen Wartung nicht vorgesehen.');
-    SL.Add('Der blitzschnelle Programmstart unter allen Umständen hat Priorität.');
-
-    MessageDlg(SL.Text, mtInformation, [mbOK], 0);
-    SL.Free;
-    Exit;
-  end;
-
-  PreviewItem.Checked := not PreviewItem.Checked;
-  PreviewBtn.Down := PreviewItem.Checked;
-  EraseBK := True;
-  Draw;
-end;
-
-procedure TRotationForm.InitPreview;
-begin
-  { Preview ruft GetDeviceCaps(Printer.Handle, LOGPIXELSX) auf
-    dauert extrem lange, wenn der konfigurierte Standard-Drucker
-    nicht erreichbar ist. }
-  // Preview := TPreview.Create;
-end;
-
-procedure TRotationForm.DrawPreviewBox;
-begin
-  if Assigned(Preview) then
-  begin
-    Preview.Faktor := 1 / 8.5;
-    Preview.RPLOffsetX := 250;
-    Preview.RPLOffsetY := 15;
-    Preview.Draw(Bitmap.Canvas);
-  end;
-end;
-
-procedure TRotationForm.PrintIt;
-var
-  PrintOffset: TPoint;
-  PrintZoom: single;
-  RandX, RandY: Integer;
-  Rgn: THandle;
-begin
-  if not Assigned(Preview) then
-  begin
-    MessageDlg('Preview Object nicht verfügbar.', mtInformation, [mbOK], 0);
-    Exit;
-  end;
-
-  if not RiggPrinter.OKToPrint then
-  begin
-    MessageDlg('Kein Drucker konfiguriert.', mtInformation, [mbOK], 0);
-    Exit;
-  end;
-
-  if MessageDlg('Jetzt Drucken?', mtInformation, [mbYes, mbNo], 0) = mrNO then
-    Exit;
-
-  PrintZoom := 8.5;
-  RandX := 250;
-  RandY := 15;
-
-  PrintOffset.X := Round( (Bitmap.Width div 2 + FXpos - RandX) * PrintZoom - Preview.PagePos.Left);
-  PrintOffset.Y := Round((Bitmap.Height div 2 + FYpos - RandY) * PrintZoom - Preview.PagePos.Top);
-
-  HullGraph.Zoom := FZoom * PrintZoom;
-  RaumGraph.Zoom := FZoom * PrintZoom;
-
-  Printer.Orientation := Preview.Orientierung;
-  Printer.BeginDoc;
-  if PreviewItem.Checked then
-    Preview.Print;
-  Rgn := CreateRectRgnIndirect(Preview.EnvPos);
-  { SelectClipRgn() arbeitet mit Kopie von Rgn }
-  SelectClipRgn(Printer.Canvas.Handle, Rgn);
-  DeleteObject(Rgn);
-  RaumGraph.Coloriert := True;
-  RaumGraph.DrawToCanvas(Printer.Canvas);
-  if FPaintRumpf = True then
-  begin
-    HullGraph.Coloriert := True;
-    HullGraph.DrawToCanvas(Printer.Canvas);
-  end;
-  Printer.EndDoc;
-
-  HullGraph.Zoom := FZoom;
-  RaumGraph.Zoom := FZoom;
-end;
-
-{ Scroll left by one button. If no buttons are visible anymore, do nothing. }
-procedure TRotationForm.LeftButtonClick(Sender: TObject);
-var
-  Button: TControl;
-begin
-  { Scroll left }
-  Button := GetFirstVisibleButton;
-  if Button <> nil then
-  begin
-    if Buttons[Button.Tag+1] <> nil then
-      Panel.Left := -Buttons[Button.Tag+1].Left
-    else
-      Panel.Left := -(Button.Left + Button.Width);
-    Panel.Width := LeftButton.Left - Panel.Left;
-    RedoButtons;
-  end;
-end;
-
-{ Scroll right by one button. Do not scroll past the first button.
-  If no buttons are visible, then do nothing. }
-procedure TRotationForm.RightButtonClick(Sender: TObject);
-var
-  Button: TControl;
-begin
-  { Scroll right }
-  Button := GetFirstVisibleButton;
-  if (Button <> nil) and (Button.Tag > 0) then
-  begin
-    with Buttons[Button.Tag-1] do
-      Panel.Left := -Left;
-    Panel.Width := LeftButton.Left - Panel.Left;
-    RedoButtons;
-  end;
-end;
-
-{ After a resize, or after a scroll, determine which buttons are visible. }
-procedure TRotationForm.RedoButtons;
-var
-  I: Integer;
-begin
-  { Make a partially obscured button completely invisible. }
-  for I := 0 to Panel.ControlCount-1 do
-    if Panel.Controls[I].Tag >= 0 then
-      Panel.Controls[I].Visible := IsButtonVisible(Panel.Controls[I]);
-  EnableScrollButtons;
-end;
-
-{ Return the button whose tag property is Tag, or nil if no button matches. }
-function TRotationForm.GetButton(Tag: Integer): TControl;
-var
-  I: Integer;
-begin
-  for I := 0 to Panel.ControlCount-1 do
-    if Panel.Controls[I].Tag = Tag then
-    begin
-      result := Panel.Controls[I] as TControl;
-      Exit;
-    end;
-  result := nil;
-end;
-
-{ Return the number of toolbar buttons on the panel. }
-function TRotationForm.GetButtonCount: Integer;
-var
-  I: Integer;
-begin
-  Result := 0;
-  for I := 0 to Panel.ControlCount-1 do
-    if Panel.Controls[I].Tag >= 0 then
-      Inc(Result);
-end;
-
-{ Return whether a button is entirely visible. Scale the button's
-  bounds to the toolbar, and make sure the button lies entirely
-  within the bounds of the toolbar. }
-function TRotationForm.IsButtonVisible(Button: TControl): Boolean;
-var
-  TopLeft, BottomRight: TPoint;
-  Right: Integer;
-begin
-  TopLeft := ScreenToClient(Button.ClientToScreen(Button.ClientRect.TopLeft));
-  BottomRight := ScreenToClient(Button.ClientToScreen(Button.ClientRect.BottomRight));
-  if LeftButton.Visible then
-    Right := LeftButton.Left
-  else
-    Right := ClientWidth;
-  if (TopLeft.X < 0) or (TopLeft.Y < 0) then
-    Result := False
-  else if (BottomRight.Y > ClientHeight) or (BottomRight.X > Right) then
-    Result := False
-  else
-    Result := True;
-end;
-
-{ Return the first visible button, or nil if they are all invisible. }
-function TRotationForm.GetFirstVisibleButton: TControl;
-var
-  I: Integer;
-begin
-  with Panel do
-    for I := 0 to ControlCount-1 do
-      if Controls[I].Tag >= 0 then
-      begin
-        Result := Controls[I] as TControl;
-        if IsButtonVisible(Result) then
-          Exit;
-      end;
-  Result := nil;
-end;
-
-{ Return the last (rightmost) visible button, or nil if all the
-  buttons are invisible. }
-function TRotationForm.GetLastVisibleButton: TControl;
-var
-  I: Integer;
-begin
-  with Panel do
-    for I := ControlCount-1 downto 0 do
-      if Controls[I].Tag >= 0 then
-      begin
-        Result := Controls[I] as TControl;
-        if IsButtonVisible(Result) then
-          Exit;
-      end;
-  Result := nil;
-end;
-
-{ Enable or disable the toolbar scroll buttons. If the leftmost
-  button is visible then disable the right button. If the rightmost
-  button is visible then disable the left button. }
-procedure TRotationForm.EnableScrollButtons;
-begin
-  RightButton.Enabled := not IsButtonVisible(Buttons[0]);
-  LeftButton.Enabled  := not IsButtonVisible(Buttons[GetButtonCount-1]);
-end;
-
-{ When the toolbar changes size, move the scroll buttons so they stay
-  at the right edge of the toolbar. Reset the panel to show whichever
-  buttons are visible. }
-procedure TRotationForm.ToolbarPanelResize(Sender: TObject);
-var
-  I, Right: Integer;
-begin
-  LeftButton.Left := ClientWidth - LeftButton.Width - 4;
-  RightButton.Left := ClientWidth - RightButton.Width - 4;
-  { Is there enough room for every button? }
-  with Buttons[GetButtonCount-1] do
-    Right := Left + Width;
-  if ClientWidth >= Right then
-  begin
-    Panel.Left := 0; { unscroll }
-    Panel.Width := ClientWidth;
-    { Hide the scroll buttons. }
-    LeftButton.Visible := False;
-    RightButton.Visible := False;
-    { Make all the toolbar buttons visible. }
-    with Panel do
-      for I := 0 to ControlCount-1 do
-        if Controls[I].Tag >= 0 then
-          Controls[I].Visible := True
-  end
-  else
-  begin
-    { Make the scroll buttons visible. }
-    LeftButton.Visible := True;
-    RightButton.Visible := True;
-    { Set the panel width to leave room for the scroll buttons. }
-    Panel.Width := LeftButton.Left - Panel.Left;
-  end;
-  Panel.Height := ToolbarPanel.Height;
-  RedoButtons;
+  RaumGraph.Update;
+  HullGraph.Update;
 end;
 
 end.

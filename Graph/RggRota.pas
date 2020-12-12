@@ -197,7 +197,7 @@ type
     IsUp: Boolean;
     PaintBox3D: TPaintBox; // injected
 
-    HullGraph: THullGraph0;
+    HullGraph: THullGraph;
     RaumGraph: TRaumGraph;
     UseDisplayList: Boolean;
 
@@ -517,8 +517,8 @@ begin
 
   SkipOnceFlag := False;
 
-  NullpunktOffset.x := Bitmap.Width div 2 + FXpos;
-  NullpunktOffset.y := Bitmap.Height div 2 + FYpos;
+  NullpunktOffset.X := Bitmap.Width div 2 + FXpos;
+  NullpunktOffset.Y := Bitmap.Height div 2 + FYpos;
 
   if MatrixItemChecked then
   begin
@@ -530,11 +530,11 @@ begin
   SetWindowExtEx(g.Handle, 1000, 1000, nil);
   SetWindowOrgEx(g.Handle, 0, 0, nil);
   SetViewPortExtEx(g.Handle, 1000, 1000, nil);
-  SetViewPortOrgEx(g.Handle, NullpunktOffset.x, NullpunktOffset.y, nil);
+  SetViewPortOrgEx(g.Handle, NullpunktOffset.X, NullpunktOffset.Y, nil);
 
   if UseDisplayList then
   begin
-    TDisplayItem.NullpunktOffset := NullpunktOffset;;
+    TDisplayItem.NullpunktOffset := NullpunktOffset;
     RaumGraph.DL.WantLegend := LegendItemChecked; // not RumpfItemChecked;
     RaumGraph.DL.Draw(g);
   end
@@ -1101,15 +1101,8 @@ end;
 procedure TRotaForm1.InitBitmapSize;
 var
   wx, wy: Integer;
-//  MinTrackX, MinTrackY: Integer;
   MaxTrackX, MaxTrackY: Integer;
-//  CreatedScreenWidth: Integer;
 begin
-//  CreatedScreenWidth := Screen.Width;
-//
-//  MinTrackX := 410;
-//  MinTrackY := 280;
-
   MaxTrackX := 1024;
   MaxTrackY := 768;
 

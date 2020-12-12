@@ -548,8 +548,6 @@ begin
   InputForm.sbWPowerOS.Position := InputRec.WPowerOS;
 
   UpdateGCtrlLabels(InputRec);
-//  if RotaFormActive then
-//    AniRotationForm.Modified := True;
 end;
 
 procedure TRiggModul.FutureHandleScroll(Sender: TObject;
@@ -842,17 +840,6 @@ begin
     end;
   end;
   ViewModelM.UpdateView;
-
-//  { 3D Grafik - AniRotationForm muß erzeugt sein! }
-//  if RotaFormActive then
-//  begin
-//    if AniRotationForm.Visible then
-//    begin
-//      { Trackbar und Labels flackern zu sehr, daher nicht immer aktualisieren }
-//      AniRotationForm.UpdateAll(Rigg);
-//      AniRotationForm.Draw;
-//    end;
-//  end;
 end;
 
 procedure TRiggModul.Draw;
@@ -2710,19 +2697,16 @@ begin
 
   end;
 
-  // if not SofortBerechnen then
+  if t = TagForSBName(ActualX) then
+    FShowTriangle := True
+  else
   begin
-    if t = TagForSBName(ActualX) then
-      FShowTriangle := True
-    else
-    begin
-      FShowTriangle := False;
-      KurveValid := False;
-    end;
-    InputBuffer := InputRec;
-    Rigg.Glieder := InputRec;
-    UpdateGetriebe;
+    FShowTriangle := False;
+    KurveValid := False;
   end;
+  InputBuffer := InputRec;
+  Rigg.Glieder := InputRec;
+  UpdateGetriebe;
 end;
 
 procedure TRiggModul.DoUpdateChartBuffer;
