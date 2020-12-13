@@ -125,8 +125,13 @@ type
     procedure MatrixItemClick(Sender: TObject);
     procedure Sample420ItemClick(Sender: TObject);
     procedure AngleTextItemClick(Sender: TObject);
-  private
+  protected
+    FormShown: Boolean;
+    FormClosing: Boolean;
     CreatedScreenWidth: Integer;
+    RightPanelWidth: Integer;
+    FBitmapWidth: Integer;
+    FBitmapHeight: Integer;
     MetaFile: TRiggMetaFile;
     MetaCanvas: TMetaFileCanvas;
 
@@ -179,6 +184,7 @@ type
     procedure EnableScrollButtons;
     procedure RedoButtons;
     procedure SetViewpoint(const Value: TViewpoint);
+    procedure InitBitmapSize;
   protected
     hOldPal, hPal: HPalette;
     Bitmap: TBitmap;
@@ -203,6 +209,8 @@ type
     procedure InitRotaData;
     procedure PaintBackGround(Image: TBitmap);
     procedure ChangeRotationHints;
+    procedure FormResize(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   public
     Rigg: TRigg;
     RiggInter: IRigg;
@@ -226,6 +234,7 @@ type
     procedure InitRigg;
     procedure UpdateGraphData;
     procedure UpdateGraph;
+    procedure CenterRotaForm;
   public
     PaintItemChecked: Boolean;
     MatrixItemChecked: Boolean;
@@ -328,9 +337,10 @@ uses
 
 procedure TRotationForm.FormCreate(Sender: TObject);
 var
-  wx, wy: Integer;
   NewPaintBox: TPaintBox;
 begin
+  DoubleBuffered := True;
+
   ClientWidth := 800;
   ClientHeight := 480;
 
@@ -342,18 +352,7 @@ begin
   Panel.BevelOuter := bvNone;
   Panel.Caption := '';
 
-  MinTrackX := 520;
-  MinTrackY := 420;
-  MaxTrackX := 1024;
-  MaxTrackY := 768;
-
-  CreatedScreenWidth := Screen.Width;
-  wx := GetSystemMetrics(SM_CXSCREEN);
-  wy := GetSystemMetrics(SM_CYSCREEN);
-  if wx > MaxTrackX then
-    wx := MaxTrackX;
-  if wy > MaxTrackY then
-    wy := MaxTrackY;
+  InitBitmapSize;
 
   (*
   BackBmp := TBitmap.Create;
@@ -365,8 +364,8 @@ begin
     hPal := CreateRggPal32;
 
   Bitmap := TBitmap.Create;
-  Bitmap.Width := wx;
-  Bitmap.Height := wy;
+  Bitmap.Width := FBitmapWidth;
+  Bitmap.Height := FBitmapHeight;
   if hPal <> 0 then
     Bitmap.Palette := hPal;
   PaintBackGround(Bitmap);
@@ -416,11 +415,15 @@ begin
   InitPreview;
 
   SetViewPoint(FViewPoint);
+
+  OnResize := FormResize;
+  OnShow := FormShow;
 end;
 
 procedure TRotationForm.FormDestroy(Sender: TObject);
 begin
 //  Rigg.Free;
+  FormClosing := True;
   BackBmp.Free;
   Bitmap.Free;
   MetaFile.Free;
@@ -432,6 +435,16 @@ begin
   Preview := nil;
   if hPal <> 0 then
     DeleteObject(hPal);
+end;
+
+procedure TRotationForm.FormResize(Sender: TObject);
+begin
+  CenterRotaForm;
+end;
+
+procedure TRotationForm.FormShow(Sender: TObject);
+begin
+  FormShown := True;
 end;
 
 procedure TRotationForm.wmGetMinMaxInfo(var Msg: TWMGetMinMaxInfo);
@@ -2357,6 +2370,60 @@ procedure TRotationForm.UpdateGraphData;
 begin
   RaumGraph.Update;
   HullGraph.Update;
+end;
+
+procedure TRotationForm.CenterRotaForm;
+var
+  w, h: Integer;
+begin
+//  RotaForm.InitPosition(Image.Width, Image.Height, 0, 0);
+//  if FormShown then
+//    RotaForm.Draw;
+
+  if not FormShown then
+    Exit;
+
+  if FormClosing then
+    Exit;
+
+  w := ClientWidth - PaintBox3D.Left - pnPositionTools.Width - RightPanelWidth;
+  h := ClientHeight - PaintBox3D.Top - StatusBar.Height - ToolbarPanel.Height;
+
+  if w > FBitmapWidth then
+    w := FBitmapWidth;
+  if h > FBitmapHeight then
+    h := FBitmapHeight;
+
+
+  if (w < FBitmapWidth) or (h < FBitmapHeight) then
+  begin
+    FXpos := -(FBitmapWidth - w) div 2;
+    FYpos := -(FBitmapHeight - h) div 2;
+    DoTrans;
+  end;
+end;
+
+procedure TRotationForm.InitBitmapSize;
+var
+  wx, wy: Integer;
+  MaxTrackX, MaxTrackY: Integer;
+begin
+  MinTrackX := 520;
+  MinTrackY := 420;
+  MaxTrackX := 1024;
+  MaxTrackY := 768;
+
+  wx := GetSystemMetrics(SM_CXSCREEN);
+  wy := GetSystemMetrics(SM_CYSCREEN);
+
+  if wx > MaxTrackX then
+    wx := MaxTrackX;
+
+  if wy > MaxTrackY then
+    wy := MaxTrackY;
+
+  FBitmapWidth := wx;
+  FBitmapHeight := wy;
 end;
 
 end.

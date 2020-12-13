@@ -6,6 +6,8 @@ interface
 {$mode delphi}
 {$endif}
 
+{$define WantDisplayList}
+
 uses
   SysUtils,
   Classes,
@@ -15,8 +17,10 @@ uses
   RggTypes,
   RggCalc,
   RggMatrix,
+{$ifdef WantDisplayList}
   RggDisplay,
   RggDisplayTypes,
+{$endif}
   RggGraph;
 
 type
@@ -60,7 +64,9 @@ type
     procedure Load;
     procedure Update; override;
 
+{$ifdef WantDisplayList}
     procedure AddToDisplayList(DL: TRggDisplayList);
+{$endif}
     procedure DrawToCanvas(Canvas: TCanvas); override;
   end;
 
@@ -259,6 +265,7 @@ begin
   end;
 end;
 
+{$ifdef WantDisplayList}
 procedure THullGraph0.AddToDisplayList(DL: TRggDisplayList);
 var
   ConCount: Integer;
@@ -324,6 +331,7 @@ begin
     DL.Line(s, deHullEdge, rp1, rp2, StartPoint, EndPoint, clRed);
   end;
 end;
+{$endif}
 
 function THullGraph0.GetColor(i: Integer): TColor;
 var

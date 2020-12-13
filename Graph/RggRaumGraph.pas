@@ -2,6 +2,8 @@
 
 interface
 
+{$define WantDisplayList}
+
 uses
   Types,
   SysUtils,
@@ -10,9 +12,11 @@ uses
   RiggVar.FD.Point,
   RggCalc,
   RggTypes,
+{$ifdef WantDisplayList}
   RggDisplayTypes,
   RggDisplay,
   RggDisplayOrder,
+{$endif}
   RggZug,
   RggBootGraph;
 
@@ -44,9 +48,10 @@ type
     procedure UpdateZugProps;
     procedure Update2;
   public
+{$ifdef WantDisplayList}
     DF: TRggFrame;
     DL: TRggDisplayList;
-
+{$endif}
     WantFixPunkt: Boolean;
     WantRumpf: Boolean;
     WantSaling: Boolean;
@@ -66,7 +71,9 @@ type
     destructor Destroy; override;
 
     procedure Update; override;
+{$ifdef WantDisplayList}
     procedure UpdateDisplayList;
+{$endif}
     procedure DrawToCanvas(g: TCanvas); override;
 
     procedure SetChecked(fa: Integer; Value: Boolean);
@@ -104,9 +111,11 @@ begin
   Zug3D.Data := RaumGraphData;
   Zug3D.Props := RaumGraphProps;
 
+{$ifdef WantDisplayList}
   DF := TRggFrame.Create;
   DL := TRggDisplayList.Create;
   DL.DF := DF;
+{$endif}
 
   AchseN.X := 0;
   AchseN.Y := 0;
@@ -132,8 +141,10 @@ end;
 destructor TRaumGraph.Destroy;
 begin
   Zug3D.Free;
+{$ifdef WantDisplayList}
   DL.Free;
   DF.Free;
+{$endif}
   inherited;
 end;
 
@@ -166,7 +177,9 @@ begin
       KKT[j] := Transformer.TransformPoint(KoppelKurve[j]);
   end;
 
+{$ifdef WantDisplayList}
   DF.Koordinaten := RPT;
+{$endif}
 
   AchseNT := Transformer.TransformPoint(AchseN);
   AchseXT := Transformer.TransformPoint(AchseX);
@@ -263,7 +276,7 @@ begin
     Exit;
 
   if not Updated then
-      Update;
+    Update;
 
   Zug3D.DrawToCanvas(g);
 end;
@@ -314,6 +327,7 @@ begin
   cr.RiggLED := RiggLED;
 end;
 
+{$ifdef WantDisplayList}
 procedure TRaumGraph.UpdateDisplayList;
 var
   DI: TDisplayItem;
@@ -404,7 +418,7 @@ begin
     if WantController then
     begin
       if Props.ControllerTyp <> ctOhne then
-    begin
+      begin
         DI.StrokeColor := TRggColors.Orchid;
         DI.StrokeWidth := 4;
         DL.Line('E0-E', deE0E, E0, E, ZugController[0], ZugController[1], clTeal);
@@ -419,9 +433,9 @@ begin
       DL.Line('C0-C', deC0C, C0, C, ZugVorstag[0], ZugVorstag[1], clYellow);
     end;
 
-  { Achsen }
-  if WantAchsen then
-  begin
+    { Achsen }
+    if WantAchsen then
+    begin
       DI.StrokeWidth := 1;
       DI.StrokeColor := clFuchsia;
       DL.Line('N-X', deNX, AchseNT, AchseXT, ZugAchsen[0], ZugAchsen[1], clRed);
@@ -429,7 +443,7 @@ begin
       DL.Line('N-Y', deNY, AchseNT, AchseYT, ZugAchsen[0], ZugAchsen[2], clGreen);
       DI.StrokeColor := clAqua;
       DL.Line('N-Z', deNZ, AchseNT, AchseZT, ZugAchsen[0], ZugAchsen[3], clBlue);
-  end;
+    end;
 
     if WantRenderF then
     begin
@@ -456,6 +470,7 @@ begin
   DF.WantAchsen := WantAchsen;
   DF.Sort;
 end;
+{$endif}
 
 function TRaumGraph.GetChecked(fa: Integer): Boolean;
 begin
@@ -468,6 +483,12 @@ begin
     faToggleSegmentW: result := WantWante;
     faToggleSegmentC: result := WantController;
     faToggleSegmentA: result := WantAchsen;
+
+    faWantRenderE: result := WantRenderE;
+    faWantRenderF: result := WantRenderF;
+    faWantRenderH: result := WantRenderH;
+    faWantRenderP: result := WantRenderP;
+    faWantRenderS: result := WantRenderS;
 
     faRggBogen: result := Bogen;
     faRggKoppel: result := Koppel;
@@ -487,6 +508,12 @@ begin
     faToggleSegmentW: WantWante := Value;
     faToggleSegmentC: WantController := Value;
     faToggleSegmentA: WantAchsen := Value;
+
+    faWantRenderE:WantRenderE := Value;
+    faWantRenderF: WantRenderF := Value;
+    faWantRenderH: WantRenderH := Value;
+    faWantRenderP: WantRenderP := Value;
+    faWantRenderS: WantRenderS := Value;
   end;
 end;
 

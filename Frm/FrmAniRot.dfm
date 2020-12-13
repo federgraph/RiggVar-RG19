@@ -4,6 +4,7 @@ inherited AniRotationForm: TAniRotationForm
   Font.Name = 'Tahoma'
   OnActivate = FormActivate
   OnClose = FormClose
+  OnMouseWheel = FormMouseWheel
   PixelsPerInch = 96
   TextHeight = 13
   inherited ToolbarPanel: TPanel

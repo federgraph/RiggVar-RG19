@@ -56,19 +56,21 @@ type
     procedure LocalUpdateItemClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   private
-    FsbName: TsbName;
+    FParam: TFederParam;
     FAniStepCount: Integer;
     AniSteps: array[0..AniStepCountMax] of double;
     AniStep: Integer; { Index in das Array AniSteps }
     AniIncrement: Integer;
 
-    procedure SetParameter(Value: TsbName);
-    procedure SetParamProp(Index: TsbName; Value: double);
-    function GetParamProp(Index: TsbName): double;
-    function GetParamMin(Index: TsbName): Integer;
-    function GetParamMax(Index: TsbName): Integer;
-    function GetParamPos(Index: TsbName): Integer;
+    procedure SetParameter(Value: TFederParam);
+    procedure SetParamProp(Index: TFederParam; Value: double);
+    function GetParamProp(Index: TFederParam): double;
+    function GetParamMin(Index: TFederParam): Integer;
+    function GetParamMax(Index: TFederParam): Integer;
+    function GetParamPos(Index: TFederParam): Integer;
     procedure SetAniStepCount(Value: Integer);
 
     procedure SetupTrackBar;
@@ -78,21 +80,28 @@ type
     procedure UpdateLocalRigg;
     procedure UpdateGlobalRigg;
     procedure ShowDialog;
+    procedure DoBigWheel(Delta: single);
+    procedure DoSmallWheel(Delta: single);
+    procedure DoWheel(Delta: single);
+    function GetBigStep: single;
+    function GetSmallStep: single;
+    procedure HandleMouseWheel(Shift: TShiftState; WheelDelta: Integer);
+    procedure Zoom(Delta: single);
   public
     Modified: Boolean;
     WinkelSelStart: Integer;
     WinkelSelEnd: Integer;
 
     procedure InitListboxItems;
-    function Param2Text(P: TsbName): string;
-    function Text2Param(T: String): TsbName;
+    function Param2Text(P: TFederParam): string;
+    function Text2Param(T: String): TFederParam;
     procedure UpdateAll(Rgg: TRigg);
 
-    property Parameter: TsbName read FsbName write SetParameter;
-    property ParamProp[Index: TsbName]: double read GetParamProp write SetParamProp;
-    property ParamMin[Index: TsbName]: Integer read GetParamMin;
-    property ParamMax[Index: TsbName]: Integer read GetParamMax;
-    property ParamPos[Index: TsbName]: Integer read GetParamPos;
+    property Parameter: TFederParam read FParam write SetParameter;
+    property ParamProp[Index: TFederParam]: double read GetParamProp write SetParamProp;
+    property ParamMin[Index: TFederParam]: Integer read GetParamMin;
+    property ParamMax[Index: TFederParam]: Integer read GetParamMax;
+    property ParamPos[Index: TFederParam]: Integer read GetParamPos;
     property AniStepCount: Integer read FAniStepCount write SetAniStepCount;
   public
     AnimationItemChecked: Boolean; { needed when Menu will not be created ? }
@@ -122,7 +131,6 @@ uses
   FrmAni,
   FrmCmd,
   Math,
-  RggGetriebeGraph,
   FrmModel,
   RggScroll,
   RggDoc,
@@ -154,6 +162,8 @@ begin
 
   if RiggModul.RG19A then
     InitMenu;
+
+  RightPanelWidth := RightPanel.Width;
 end;
 
 procedure TAniRotationForm.ShowItemClick(Sender: TObject);
@@ -259,6 +269,15 @@ begin
       CommandForm.SetFocus;
 end;
 
+procedure TAniRotationForm.FormMouseWheel(Sender: TObject; Shift: TShiftState;
+  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+begin
+  { Main.DoMouseWheel(Shift, WheelDelta); }
+  HandleMouseWheel(Shift, WheelDelta);
+//  ShowTrimm;
+  Handled := True;
+end;
+
 procedure TAniRotationForm.SetAniStepCount(Value: Integer);
 begin
   FAniStepCount := Value;
@@ -268,22 +287,22 @@ begin
     FAniStepCount := 1;
 end;
 
-function TAniRotationForm.GetParamMin(Index: TsbName): Integer;
+function TAniRotationForm.GetParamMin(Index: TFederParam): Integer;
 begin
   result := Round(Rigg.RggFA.Find(Index).Min);
 end;
 
-function TAniRotationForm.GetParamMax(Index: TsbName): Integer;
+function TAniRotationForm.GetParamMax(Index: TFederParam): Integer;
 begin
   result := Round(Rigg.RggFA.Find(Index).Max);
 end;
 
-function TAniRotationForm.GetParamPos(Index: TsbName): Integer;
+function TAniRotationForm.GetParamPos(Index: TFederParam): Integer;
 begin
   result := Round(Rigg.RggFa.Find(Index).Ist);
 end;
 
-procedure TAniRotationForm.SetParamProp(Index: TsbName; Value: double);
+procedure TAniRotationForm.SetParamProp(Index: TFederParam; Value: double);
 var
   cr: TRggSB;
 begin
@@ -301,7 +320,7 @@ begin
   UpdateGraph;
 end;
 
-function TAniRotationForm.GetParamProp(Index: TsbName): double;
+function TAniRotationForm.GetParamProp(Index: TFederParam): double;
 begin
   if Index = fpWinkel then
     result := RadToDeg(Rigg.RealGlied[Index])
@@ -309,9 +328,9 @@ begin
     result := Rigg.RealGlied[Index];
 end;
 
-procedure TAniRotationForm.SetParameter(Value: TsbName);
+procedure TAniRotationForm.SetParameter(Value: TFederParam);
 begin
-  FsbName := Value;
+  FParam := Value;
   SetupTrackBar;
 end;
 
@@ -415,7 +434,7 @@ begin
   end;
 end;
 
-function TAniRotationForm.Text2Param(T: string): TsbName;
+function TAniRotationForm.Text2Param(T: string): TFederParam;
 begin
   result := fpWPowerOS;
   if T = 'Controller' then
@@ -436,7 +455,7 @@ begin
     result := fpSalingL;
 end;
 
-function TAniRotationForm.Param2Text(P: TsbName): string;
+function TAniRotationForm.Param2Text(P: TFederParam): string;
 begin
   result := '';
   if P = fpController then
@@ -673,6 +692,80 @@ begin
   mi.Caption := 'Grafik zurücksetzen';
   mi.Hint := '  Lokales Riggobjekt aktualisieren';
   mi.OnClick := LocalUpdateItemClick;
+end;
+
+procedure TAniRotationForm.HandleMouseWheel(Shift: TShiftState; WheelDelta: Integer);
+var
+  wd: Integer;
+begin
+  wd := WheelDelta; // small values may come from touchpad
+
+  { normal mouse }
+  if Abs(WheelDelta) > 100 then
+    wd := WheelDelta div 120;;
+
+  if ssCtrl in Shift then
+  begin
+    Zoom(wd);
+  end
+  else if ssShift in Shift then
+  begin
+    DoBigWheel(wd);
+  end
+  else if Shift = [] then
+  begin
+    DoSmallWheel(wd);
+  end;
+end;
+
+procedure TAniRotationForm.Zoom(Delta: single);
+begin
+  FZoom := FZoom + FZoom * FZoomBase * Sign(Delta);
+  RaumGraph.Zoom := FZoom;
+  Draw;
+end;
+
+procedure TAniRotationForm.DoSmallWheel(Delta: single);
+var
+  f: single;
+begin
+  f := GetSmallStep;
+  if Delta > 0 then
+    DoWheel(f)
+  else
+    DoWheel(-f);
+end;
+
+procedure TAniRotationForm.DoBigWheel(Delta: single);
+var
+  f: single;
+begin
+  f := GetBigStep;
+  if Delta > 0 then
+    DoWheel(f)
+  else
+    DoWheel(-f);
+end;
+
+procedure TAniRotationForm.DoWheel(Delta: single);
+begin
+  Trackbar.Position := Trackbar.Position + Round(Delta);
+end;
+
+function TAniRotationForm.GetBigStep: single;
+begin
+  case Parameter of
+    fpWante: result := 2;
+    fpWinkel: result := 1;
+    fpSalingW: result := 1;
+    else
+      result := 10;
+  end;
+end;
+
+function TAniRotationForm.GetSmallStep: single;
+begin
+  result := 1;
 end;
 
 end.

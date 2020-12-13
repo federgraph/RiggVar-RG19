@@ -22,6 +22,8 @@ interface
 {$mode delphi}
 {$endif}
 
+{$define WantHull}
+
 uses
   Windows,
   SysUtils,
@@ -40,7 +42,9 @@ uses
   RggMatrix,
   RggRaumGraph,
   RggGraph,
+{$ifdef WantHull}
   RggHull,
+{$endif}
   RggPolarKar,
   RggTransformer;
 
@@ -269,7 +273,9 @@ begin
   Paintbox3D := nil;
   Bitmap.Free;
   RaumGraph.Free;
+{$ifdef WantHull}
   HullGraph.Free;
+{$endif}
   Rotator.Free;
   Transformer.Free;
   inherited;
@@ -341,8 +347,10 @@ end;
 
 procedure TRotaForm1.InitHullGraph;
 begin
+{$ifdef WantHull}
   HullGraph := THullGraph.Create;
   HullGraph.Transformer := Transformer;
+{$endif}
 end;
 
 procedure TRotaForm1.UpdateGraphFromTestData;
@@ -427,7 +435,7 @@ var
   tx: Integer;
   th: Integer;
 begin
-  tx := Round(20 * FScale);
+  tx := Round(120 * FScale);
   th := Round(20 * FScale);
   with g do
   begin
@@ -712,7 +720,9 @@ begin
   RaumGraph.FixPoint := FixPoint; // --> Transformer.FixPoint
 
   RaumGraph.Update;
+{$ifdef WantHull}
   HullGraph.Update;
+{$endif}
 
   { Neuzeichnen }
   EraseBK := True;
@@ -1024,12 +1034,14 @@ begin
   RaumGraph.Update;
   RaumGraph.UpdateDisplayList;
 
+{$ifdef WantHull}
   if RumpfItemChecked then
   begin
     HullGraph.Coloriert := True;
     HullGraph.Update;
     HullGraph.AddToDisplayList(RaumGraph.DL);
   end;
+{$endif}
 
   if Assigned(OnBeforeDraw) then
     OnBeforeDraw(Self);
@@ -1037,6 +1049,7 @@ end;
 
 procedure TRotaForm1.DrawHullNormal(g: TCanvas);
 begin
+{$ifdef WantHull}
   if RumpfItemChecked
     and not UseDisplayList
     and (not MouseDown or (MouseDown and FDrawAlways)) then
@@ -1045,6 +1058,7 @@ begin
     HullGraph.Update;
     HullGraph.DrawToCanvas(g);
   end;
+{$endif}
 end;
 
 function TRotaForm1.SingleDraw: Boolean;

@@ -22,12 +22,16 @@ interface
 {$mode delphi}
 {$endif}
 
+{$define WantMetaFile}
+
 uses
   SysUtils,
   Classes,
   Types,
+{$ifdef WantMetaFile}
   Math,
   Vcl.Graphics,
+{$endif}
   RiggVar.FD.Point,
   RiggVar.RG.Def;
 
@@ -80,10 +84,12 @@ type
     fpfp
     );
 
+{$ifdef WantMetaFile}
   TRiggMetaFile = class(TMetaFile)
   protected
     procedure Draw(ACanvas: TCanvas; const Rect: TRect); override;
   end;
+{$endif}
 
   TGraphRadio = (
     gSimple,
@@ -572,6 +578,7 @@ function StrToRiggPoint(const s: string): TRiggPoint;
 
 implementation
 
+{$ifdef WantMetaFile}
 procedure TRiggMetafile.Draw(ACanvas: TCanvas; const Rect: TRect);
 var
   R: TRect;
@@ -581,6 +588,7 @@ begin
   Inc(R.Bottom);
   inherited Draw(ACanvas, R);
 end;
+{$endif}
 
 procedure InitYAchseRecordList(out RecordList: TYAchseRecordList);
 begin
