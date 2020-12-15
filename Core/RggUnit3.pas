@@ -1281,10 +1281,10 @@ end;
 procedure TRiggFS.ComputeKraftKurven(KK: TKraftKurven);
 var
   i: Integer;
-  tempHD: double;
+  tempHD: single;
   tempKorrigiert: Boolean;
   tempControllerTyp: TControllerTyp;
-  Knicklaenge, KnickLast, Kraft, Weg: double;
+  Knicklaenge, KnickLast, Kraft, Weg: single;
 begin
   { mit FSalingAlpha wird in FvonW korrigiert, daher auch in WvonF gebraucht;
     mit FControllerWeg wird in SchnittKraefte getestet, ob Controller anliegt }

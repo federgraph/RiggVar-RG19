@@ -29,7 +29,7 @@ uses
   Vcl.Menus,
   RggStrings,
   RggScroll,
-  RggInter,
+  RiggVar.App.Model,
   RggTypes;
 
 type

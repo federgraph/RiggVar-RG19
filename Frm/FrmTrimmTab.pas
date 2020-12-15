@@ -20,7 +20,7 @@ uses
   Vcl.ComCtrls,
   Vcl.Buttons,
   Vcl.Menus,
-  RggInter,
+  RiggVar.App.Model,
   RggTypes,
   RggTrimmTab,
   RggTrimmTabGraph;
