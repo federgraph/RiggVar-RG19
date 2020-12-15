@@ -134,7 +134,7 @@ type
     procedure ViewpointT;
   public
     IsUp: Boolean;
-    Rigg: TRigg; // injected via constructor
+    Rigg: IRigg; // injected via constructor
     StrokeRigg: IStrokeRigg; // injected
     FL: TStringList;
     Logger: TLogger;
@@ -187,7 +187,7 @@ type
     procedure Open(FileName: string);
     procedure Save;
 
-    constructor Create(ARigg: TRigg);
+    constructor Create(ARigg: IRigg);
     destructor Destroy; override;
 
     function GetFLText: string;
@@ -327,7 +327,7 @@ const
 
 { TRggMain }
 
-constructor TRggMain.Create(ARigg: TRigg);
+constructor TRggMain.Create(ARigg: IRigg);
 begin
   inherited Create;
   Rigg := ARigg;

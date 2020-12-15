@@ -13,6 +13,8 @@ object FormMain: TFormMain
   OldCreateOrder = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnResize = FormResize
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object PaintBoxR: TPaintBox

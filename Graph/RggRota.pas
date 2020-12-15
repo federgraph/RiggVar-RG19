@@ -101,6 +101,7 @@ type
     xmax: Integer;
     ymax: Integer;
 
+    ImageMidPoint: TPointF;
     FXpos: Integer;
     FYpos: Integer;
     FIncrementW: Integer;
@@ -210,6 +211,7 @@ type
     procedure Init;
     procedure Draw;
 
+    procedure InitPosition(w, h, x, y: single);
     procedure RotateZ(Delta: single);
     procedure Zoom(Delta: single);
 
@@ -525,8 +527,11 @@ begin
 
   SkipOnceFlag := False;
 
-  NullpunktOffset.X := Bitmap.Width div 2 + FXpos;
-  NullpunktOffset.Y := Bitmap.Height div 2 + FYpos;
+  NullpunktOffset.X := Round(ImageMidPoint.X + FXpos);
+  NullpunktOffset.Y := Round(ImageMidPoint.Y + FYpos);
+
+//  NullpunktOffset.X := Bitmap.Width div 2 + FXpos;
+//  NullpunktOffset.Y := Bitmap.Height div 2 + FYpos;
 
   if MatrixItemChecked then
   begin
@@ -1110,6 +1115,19 @@ end;
 procedure TRotaForm1.DoOnUpdateStrokeRigg;
 begin
 
+end;
+
+procedure TRotaForm1.InitPosition(w, h, x, y: single);
+begin
+  if w > FBitmapWidth then
+    w := FBitmapWidth;
+  if h > FBitmapHeight then
+    h := FBitmapHeight;
+
+  ImageMidPoint.X := w / 2;
+  ImageMidPoint.Y := h / 2;
+  FXPos := 0;
+  FYPos := 0;
 end;
 
 procedure TRotaForm1.InitBitmapSize;

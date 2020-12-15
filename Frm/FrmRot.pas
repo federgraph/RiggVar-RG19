@@ -23,7 +23,6 @@ uses
   Vcl.ExtDlgs,
   RiggVar.App.Model,
   RiggVar.FD.Point,
-  RiggVar.RG.Model,
   RggInter,
   RggTypes,
   RggMatrix,
@@ -213,7 +212,6 @@ type
     procedure FormShow(Sender: TObject);
   public
     Rigg: TRigg;
-    RiggInter: IRigg;
     Rotator: TPolarKar;
     Transformer: TRggTransformer;
     HullGraph: THullGraph;
@@ -422,7 +420,7 @@ end;
 
 procedure TRotationForm.FormDestroy(Sender: TObject);
 begin
-//  Rigg.Free;
+  TModelFactory.ReleaseIfAppropriate(Rigg);
   FormClosing := True;
   BackBmp.Free;
   Bitmap.Free;
@@ -487,8 +485,7 @@ end;
 
 procedure TRotationForm.InitRigg;
 begin
-  Rigg := TRigg.Create;
-  RiggInter := Rigg;
+  Rigg := TModelFactory.NewRigg;
 
   Rigg.InitFactArray;
 
@@ -964,24 +961,6 @@ end;
 procedure TRotationForm.CloseItemClick(Sender: TObject);
 begin
   Close;
-end;
-
-procedure TRotationForm.PlotItemClick(Sender: TObject);
-var
-  List: TStringList;
-begin
-  if SaveDialog.Execute then
-  begin
-    List := TStringList.Create;
-    try
-      RaumGraph.GetPlotList(List);
-      if FPaintRumpf then
-        HullGraph.GetPlotList(List);
-      List.SaveToFile(SaveDialog.FileName);
-    finally
-      List.Free;
-    end;
-  end;
 end;
 
 procedure TRotationForm.GrafikMenuClick(Sender: TObject);
@@ -1727,6 +1706,23 @@ begin
   end;
 end;
 
+procedure TRotationForm.PlotItemClick(Sender: TObject);
+var
+  List: TStringList;
+begin
+  if SaveDialog.Execute then
+  begin
+    List := TStringList.Create;
+    try
+      RaumGraph.GetPlotList(List);
+      if FPaintRumpf then
+        HullGraph.GetPlotList(List);
+      List.SaveToFile(SaveDialog.FileName);
+    finally
+      List.Free;
+    end;
+  end;
+end;
 
 procedure TRotationForm.PrintItemClick(Sender: TObject);
 begin
@@ -2394,7 +2390,6 @@ begin
   if h > FBitmapHeight then
     h := FBitmapHeight;
 
-
   if (w < FBitmapWidth) or (h < FBitmapHeight) then
   begin
     FXpos := -(FBitmapWidth - w) div 2;
@@ -2413,6 +2408,7 @@ begin
   MaxTrackX := 1024;
   MaxTrackY := 768;
 
+  CreatedScreenWidth := Screen.Width;
   wx := GetSystemMetrics(SM_CXSCREEN);
   wy := GetSystemMetrics(SM_CYSCREEN);
 

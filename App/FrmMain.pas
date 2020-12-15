@@ -23,8 +23,6 @@ uses
   Winapi.Messages,
   System.SysUtils,
   System.Classes,
-  RiggVar.App.Model,
-  RggInter,
   RggTypes,
   RggReport,
   RggRota,
@@ -64,6 +62,7 @@ type
 
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure FormShow(Sender: TObject);
 
   private
     procedure wmGetMinMaxInfo(var Msg: TMessage); message wm_GetMinMaxInfo;
@@ -351,8 +350,11 @@ type
 
     property ReportLabelCaption: string read FReportLabelCaption write SetReportLabelCaption;
   private
+    FormShown: Boolean;
+    FormClosing: Boolean;
     RotaForm: TRotaForm1;
     StrokeRigg: IStrokeRigg;
+    procedure CenterRotaForm;
   end;
 
 var
@@ -480,6 +482,7 @@ end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
 begin
+  FormClosing := True;
   ReportManager.Free;
 
   Main.Free;
@@ -1578,7 +1581,7 @@ begin
   end;
 
   ReportMemo.Left := ReportListBox.Left + ReportListBox.Width + Margin;
-  ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + Margin + ConsoleHeight;
+  ReportMemo.Top := SpeedPanel.Top + SpeedPanel.Height + ConsoleHeight + Margin;
   ReportMemo.Height := StatusBar.Top - ReportMemo.Top - Margin;
   ReportMemo.Width := ConsoleWidth;
   ReportMemo.Anchors := ReportMemo.Anchors + [akBottom];
@@ -1618,7 +1621,19 @@ end;
 
 procedure TFormMain.FormResize(Sender: TObject);
 begin
-  Inc(Main.ResizeCounter);
+  if FormClosing then
+    Exit;
+
+  if FormShown then
+  begin
+    Inc(Main.ResizeCounter);
+    CenterRotaForm;
+  end;
+end;
+
+procedure TFormMain.FormShow(Sender: TObject);
+begin
+  FormShown := True;
 end;
 
 procedure TFormMain.SetupComboBox(CB: TComboBox);
@@ -2525,6 +2540,17 @@ end;
 procedure TFormMain.UpdateOnParamValueChanged;
 begin
   ShowTrimm;
+end;
+
+procedure TFormMain.CenterRotaForm;
+var
+  w, h: Integer;
+begin
+  w := PaintboxR.Width;
+  h := PaintboxR.Height;
+  RotaForm.InitPosition(w, h, 0, 0);
+  if FormShown then
+    RotaForm.Draw;
 end;
 
 end.

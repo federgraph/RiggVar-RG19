@@ -79,6 +79,7 @@ type
 
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure FormShow(Sender: TObject);
 
   private
     procedure wmGetMinMaxInfo(var Msg: TMessage); message wm_GetMinMaxInfo;
@@ -362,8 +363,11 @@ type
 
     property ReportLabelCaption: string read FReportLabelCaption write SetReportLabelCaption;
   private
+    FormShown: Boolean;
+    FormClosing: Boolean;
     RotaForm: TRotaForm1;
     StrokeRigg: IStrokeRigg;
+    procedure CenterRotaForm;
   end;
 
 var
@@ -484,6 +488,7 @@ end;
 
 procedure TFormRG19B.FormDestroy(Sender: TObject);
 begin
+  FormClosing := True;
   ReportManager.Free;
 
   Main.Free;
@@ -646,8 +651,10 @@ begin
         SaveItemClick(Sender);
         CanClose := not RiggModul.Modified;
       end;
-      mrNo: CanClose := True;
-      mrCancel: CanClose := False;
+      mrNo:
+        CanClose := True;
+      mrCancel:
+        CanClose := False;
     end;
   end;
 end;
@@ -1559,7 +1566,19 @@ end;
 
 procedure TFormRG19B.FormResize(Sender: TObject);
 begin
+  if FormClosing then
+    Exit;
+
+  if FormShown then
+  begin
   Inc(Main.ResizeCounter);
+    CenterRotaForm;
+  end;
+end;
+
+procedure TFormRG19B.FormShow(Sender: TObject);
+begin
+  FormShown := True;
 end;
 
 procedure TFormRG19B.SetupComboBox(CB: TComboBox);
@@ -2397,6 +2416,17 @@ end;
 procedure TFormRG19B.UpdateOnParamValueChanged;
 begin
   ShowTrimm;
+end;
+
+procedure TFormRG19B.CenterRotaForm;
+var
+  w, h: Integer;
+begin
+  w := PaintboxR.Width;
+  h := PaintboxR.Height;
+  RotaForm.InitPosition(w, h, 0, 0);
+  if FormShown then
+    RotaForm.Draw;
 end;
 
 end.

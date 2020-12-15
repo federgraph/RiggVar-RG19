@@ -5,7 +5,7 @@ interface
 uses
   RiggVar.FD.Point,
   RggTypes,
-  RggInter;
+  RiggVar.App.Model;
 
 type
   IStrokeRigg = interface

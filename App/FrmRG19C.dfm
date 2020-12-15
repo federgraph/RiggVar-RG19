@@ -1,4 +1,4 @@
-object FormRG19C: TFormRG19C
+﻿object FormRG19C: TFormRG19C
   Left = 0
   Top = 0
   Caption = 'RG19C'
@@ -13,6 +13,8 @@ object FormRG19C: TFormRG19C
   OldCreateOrder = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnResize = FormResize
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object PaintBoxR: TPaintBox

@@ -11,7 +11,7 @@ uses
   Graphics,
   UITypes,
   UIConsts,
-  RggInter,
+  RiggVar.App.Model,
   RggStrings,
   RggChartModel,
   RggScroll,

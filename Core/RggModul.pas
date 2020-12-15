@@ -21,7 +21,6 @@ uses
   RggInter,
   RggTypes,
   RggCalc,
-  RiggVar.RG.Model,
   RggRota,
   RggKraftGraph,
   RggMastGraph,
@@ -346,8 +345,7 @@ begin
   YComboBox := OutputForm.YComboBox;
 
   { Rigg }
-  Rigg := TRigg.Create;
-  RiggInter := Rigg;
+  Rigg := TModelFactory.NewRigg;
 
   SetupGCtrls;
 
@@ -432,6 +430,8 @@ begin
   ViewModelM.Free;
 
   RiggModul := nil;
+
+  TModelFactory.ReleaseIfAppropriate(Rigg);
   inherited;
 end;
 
