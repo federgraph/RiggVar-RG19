@@ -13,7 +13,7 @@ uses
   ExtCtrls,
   Graphics,
   RggTypes,
-  RggInter,
+  RiggVar.App.Model,
   RggChartModel;
 
 type

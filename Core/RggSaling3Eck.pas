@@ -25,7 +25,7 @@ interface
 uses
   Math,
   RggTypes,
-  RggInter;
+  RiggVar.App.Model;
 
 type
   TSalingDreieck = class

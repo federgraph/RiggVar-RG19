@@ -43,7 +43,6 @@ uses
   RggCtrls,
   RggChartGraph,
   RggTypes,
-  RggInter,
   SysUtils,
   Classes,
   Types,
@@ -253,7 +252,6 @@ type
     procedure HandleSegment(fa: Integer);
   public
     Rigg: TRigg;
-    RiggInter: IRigg;
     ReportManager: TRggReportManager;
     FViewPoint: TViewPoint;
     procedure UpdateOnParamValueChanged;
@@ -394,6 +392,8 @@ begin
   FormDestroy2(Sender);
 
   SpeedColorScheme.Free;
+
+  TModelFactory.ReleaseIfAppropriate(Rigg);
 end;
 
 procedure TFormMain.FormCreate2(Sender: TObject);
@@ -445,8 +445,7 @@ begin
   MainVar.StatusBarHeight := StatusBar.Height;
 {$endif}
 
-  Rigg := TRigg.Create;
-  RiggInter := Rigg;
+  Rigg := TModelFactory.NewRigg;
   Rigg.TrimmTabelle.FScale := FScale;
   Rigg.ControllerTyp := ctOhne;
 

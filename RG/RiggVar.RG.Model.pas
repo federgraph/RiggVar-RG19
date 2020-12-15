@@ -37,7 +37,7 @@ uses
   RggInter;
 
 type
-  TRigg2 = class(TInterfacedObject, IRigg)
+  TRigg2 = class(TInterfacedObject, IRigg0)
   private
     FSalingTyp: TSalingTyp;
     FControllerTyp: TControllerTyp;
@@ -5228,10 +5228,10 @@ end;
 procedure TRigg2.ComputeKraftKurven(KK: TKraftKurven);
 var
   i: Integer;
-  tempHD: double;
+  tempHD: single;
   tempKorrigiert: Boolean;
   tempControllerTyp: TControllerTyp;
-  Knicklaenge, KnickLast, Kraft, Weg: double;
+  Knicklaenge, KnickLast, Kraft, Weg: single;
 begin
   { mit FSalingAlpha wird in FvonW korrigiert, daher auch in WvonF gebraucht;
     mit FControllerWeg wird in SchnittKraefte getestet, ob Controller anliegt }
