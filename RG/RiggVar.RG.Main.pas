@@ -625,6 +625,8 @@ begin
     end;
 
   end;
+  if Assigned(OnUpdateGraph) then
+    OnUpdateGraph(nil);
 end;
 
 procedure TRggMain.SetParamValue(idx: TFederParam; const Value: single);
