@@ -23,6 +23,7 @@ interface
 {$endif}
 
 {$define WantHull}
+{$define WantDisplayList}
 
 uses
   Windows,
@@ -560,8 +561,10 @@ begin
   if UseDisplayList then
   begin
     TDisplayItem.NullpunktOffset := NullpunktOffset;
+{$ifdef WantDisplayList}
     RaumGraph.DL.WantLegend := LegendItemChecked; // not RumpfItemChecked;
     RaumGraph.DL.Draw(g);
+{$endif}
   end
   else
   begin
@@ -694,9 +697,11 @@ end;
 
 procedure TRotaForm1.UseQuickSortBtnClick(Sender: TObject);
 begin
+{$ifdef WantDisplayList}
   RaumGraph.DL.UseQuickSort := not RaumGraph.DL.UseQuickSort;
   RaumGraph.Update;
   Draw;
+{$endif}
 end;
 
 procedure TRotaForm1.BogenBtnClick(Sender: TObject);
@@ -1047,7 +1052,9 @@ begin
   end;
 
   RaumGraph.Update;
+{$ifdef WantDisplayList}
   RaumGraph.UpdateDisplayList;
+{$endif}
 
 {$ifdef WantHull}
   if RumpfItemChecked then
@@ -1208,13 +1215,17 @@ end;
 procedure TRotaForm1.SetWantLineColors(const Value: Boolean);
 begin
   FWantLineColors := Value;
+{$ifdef WantDisplayList}
   RaumGraph.DL.WantLineColors := Value;
+{$endif}
 end;
 
 procedure TRotaForm1.SetUseQuickSort(const Value: Boolean);
 begin
   FUseQuickSort := Value;
+{$ifdef WantDisplayList}
   RaumGraph.DL.UseQuickSort := True;
+{$endif}
 end;
 
 procedure TRotaForm1.InitBitmapSize;
