@@ -26,11 +26,10 @@ uses
   SysUtils,
   Classes,
   Math,
+  RiggVar.App.Strings,
   RiggVar.FD.Point,
-  RggStrings,
-  RggTypes,
-  RggCalc,
-  RggSchnittKK,
+  RiggVar.RG.Types,
+  RiggVar.RG.Calc,
   RggUnit0;
 
 type
@@ -150,7 +149,7 @@ begin
   Wanten3dTo2d;
 
   { Berechnung der Punkte A, B, P und D }
-  FrPsi := PsiVonPhi(FrPhi, FrBasis, FrWunten2D, FrSalingH, FrMastUnten, svar);
+  FrPsi := TRggCalc.PsiVonPhi(FrPhi, FrBasis, FrWunten2D, FrSalingH, FrMastUnten, svar);
   if FrPsi < 0 then
     FrPsi := FrPsi + 2 * PI;
 
@@ -158,8 +157,8 @@ begin
   begin
     FGetriebeOK := False;
     Include(FGetriebeStatus, gsErrorPsivonPhi);
-    LogList.Add(LogList_String_InUpdateGetriebeFS);
-    LogList.Add(LogList_String_FalseInPsiVonPhi);
+    LogList.Add(RggStrings.LogList_String_InUpdateGetriebeFS);
+    LogList.Add(RggStrings.LogList_String_FalseInPsiVonPhi);
     Inc(ExitCounter1);
     Exit;
   end;
@@ -311,7 +310,7 @@ begin
     imagine we are looking from behind - the mechanism appears mirrored,
     angle Psi needs to be transformed back and forth,
     and member length values passed according to mirrored model. }
-  FrPhi := pi - PsiVonPhi(pi - FrPsi, FrBasis, FrMastUnten, FrSalingH, FrWunten2D, svar);
+  FrPhi := pi - TRggCalc.PsiVonPhi(pi - FrPsi, FrBasis, FrMastUnten, FrSalingH, FrWunten2D, svar);
   if FrPhi > 2 * PI then
     FrPhi := FrPhi - 2 * PI;
 
@@ -319,8 +318,8 @@ begin
   begin
     FGetriebeOK := False;
     Include(FGetriebeStatus, gsErrorPsivonPhi);
-    LogList.Add(LogList_String_InBerechneWinkel);
-    LogList.Add(LogList_String_FalseInPsiVonPhi);
+    LogList.Add(RggStrings.LogList_String_InBerechneWinkel);
+    LogList.Add(RggStrings.LogList_String_FalseInPsiVonPhi);
     Inc(ExitCounter2);
     Exit;
   end;
@@ -365,7 +364,7 @@ begin
   phiM := phiA;
   for i := 0 to 100 do
   begin
-    psiM := PsiVonPhi(phiM, FrBasis, FrWunten2D, FrSalingH, FrMastUnten, svar);
+    psiM := TRggCalc.PsiVonPhi(phiM, FrBasis, FrWunten2D, FrSalingH, FrMastUnten, svar);
     rP.P.X := rP.P0.X + FrWunten2D * cos(phiM - FrAlpha);
     rP.P.Z := rP.P0.Z + FrWunten2D * sin(phiM - FrAlpha);
     rP.D.X := rP.D0.X + FrMastUnten * cos(psiM - FrAlpha);
@@ -508,7 +507,7 @@ begin
   end;
 
   { weiter im ebenen Trapez }
-  SchnittGG(TPoint3D.Zero, TempC, TempD, TempA, temp);
+  TRggCalc.SchnittGG(TPoint3D.Zero, TempC, TempD, TempA, temp);
   { Temp enthält jetzt den Schnittpunkt der Diagonalen }
   W1Strich := temp.Length;
   Saling1L := TempD.Distance(temp);
@@ -563,7 +562,7 @@ begin
     Radius2 = FrWoben3D bleibt gleich beim Regeln
     TempA = SchnittPunkt1 verändert sich beim Regeln }
 
-  SchnittGG(TPoint3D.Zero, TempC, TempD, TempA, temp);
+  TRggCalc.SchnittGG(TPoint3D.Zero, TempC, TempD, TempA, temp);
   { Temp enthält jetzt den Schnittpunkt der Diagonalen }
   W1Strich := temp.Length;
   Saling1L := TempD.Distance(temp);
@@ -737,7 +736,7 @@ begin
             MittelPunkt2 := Temp;
             Temp := SchnittPunkt1;
             s := Bemerkung;
-            s := Format(LogList_Format_String_GetVorstagNullFest, [1, s]);
+            s := Format(RggStrings.LogList_Format_String_GetVorstagNullFest, [1, s]);
             LogList.Add(s);
 
             { 2. Aufruf SchnittKK: TempP ermitteln }
@@ -748,7 +747,7 @@ begin
             TempP := SchnittPunkt1;
             TempP.Y := 0;
             s := Bemerkung;
-            s := Format(LogList_Format_String_GetVorstagNullFest, [2, s]);
+            s := Format(RggStrings.LogList_Format_String_GetVorstagNullFest, [2, s]);
             LogList.Add(s);
 
             { 3. Aufruf SchnittKK: Saling2d und MastUnten; TempD ermitteln }
@@ -759,7 +758,7 @@ begin
             TempD := SchnittPunkt1;
             TempD.Y := 0;
             s := Bemerkung;
-            s := Format(LogList_Format_String_GetVorstagNullFest, [3, s]);
+            s := Format(RggStrings.LogList_Format_String_GetVorstagNullFest, [3, s]);
             LogList.Add(s);
 
             { 4. Aufruf SchnittKK: WanteOben2d und MastOben; TempC ermitteln }
@@ -770,7 +769,7 @@ begin
             TempC := SchnittPunkt1;
             TempC.Y := 0;
             s := Bemerkung;
-            s := Format(LogList_Format_String_GetVorstagNullFest, [4, s]);
+            s := Format(RggStrings.LogList_Format_String_GetVorstagNullFest, [4, s]);
             LogList.Add(s);
 
             result := rP.C0.Distance(TempC);
@@ -789,7 +788,7 @@ begin
             TempP := SchnittPunkt1;
             TempP.Y := 0;
             s := Bemerkung;
-            s := Format(LogList_Format_String_GetVorstagNullDrehbar, [1, s]);
+            s := Format(RggStrings.LogList_Format_String_GetVorstagNullDrehbar, [1, s]);
             LogList.Add(s);
 
             Radius1 := rP.D0.Distance(rP.A0);
@@ -799,7 +798,7 @@ begin
             Temp := SchnittPunkt1;
             Temp.Y := 0;
             s := Bemerkung;
-            s := Format(LogList_Format_String_GetVorstagNullDrehbar, [2, s]);
+            s := Format(RggStrings.LogList_Format_String_GetVorstagNullDrehbar, [2, s]);
             LogList.Add(s);
 
             WStrich := Temp.Distance(TempC);
@@ -812,7 +811,7 @@ begin
             TempC := SchnittPunkt1;
             TempC.Y := 0;
             s := Bemerkung;
-            s := Format(LogList_Format_String_GetVorstagNullDrehbar, [3, s]);
+            s := Format(RggStrings.LogList_Format_String_GetVorstagNullDrehbar, [3, s]);
             LogList.Add(s);
 
             result := rP.C0.Distance(TempC);
@@ -828,7 +827,7 @@ begin
             TempC := SchnittPunkt1;
             TempC.Y := 0;
             s := Bemerkung;
-            s := Format(LogList_Format_String_GetVorstagNullOhne, [1, s]);
+            s := Format(RggStrings.LogList_Format_String_GetVorstagNullOhne, [1, s]);
             LogList.Add(s);
             result := rP.C0.Distance(TempC);
           end;
@@ -838,7 +837,7 @@ begin
   except
     on E: EMathError do
     begin
-      s := Format(LogList_Format_String_GetVorstagNullException, [E.Message]);
+      s := Format(RggStrings.LogList_Format_String_GetVorstagNullException, [E.Message]);
       LogList.Add(s);
     end;
   end;

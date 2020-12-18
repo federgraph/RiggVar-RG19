@@ -1,4 +1,4 @@
-﻿unit RggDisplay;
+﻿unit RiggVar.Graph1.DisplayList;
 
 interface
 
@@ -14,9 +14,9 @@ uses
   Generics.Collections,
   Generics.Defaults,
   RiggVar.FD.Point,
-  RggTypes,
-  RggDisplayTypes,
-  RggDisplayOrder;
+  RiggVar.RG.Types,
+  RiggVar.Graph1.DisplayTypes,
+  RiggVar.Graph1.DisplayOrder;
 
 type
   TDisplayItem = class

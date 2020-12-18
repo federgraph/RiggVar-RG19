@@ -4,7 +4,7 @@ interface
 
 uses
   RiggVar.FD.Point,
-  RggTypes,
+  RiggVar.RG.Types,
   RiggVar.App.Model;
 
 type

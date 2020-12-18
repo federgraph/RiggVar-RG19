@@ -23,6 +23,7 @@
 interface
 
 uses
+  RiggVar.RG.Types,
   RiggVar.FB.Color,
   RiggVar.FD.Point,
   RiggVar.FD.Elements,
@@ -43,10 +44,6 @@ type
   end;
 
 implementation
-
-uses
-  RggTypes,
-  RggTestData;
 
 { TRggDrawingZ05 }
 

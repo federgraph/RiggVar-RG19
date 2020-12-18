@@ -17,8 +17,8 @@ uses
   System.SysUtils,
   System.Classes,
   System.UITypes,
-  RggChartModel01,
-  RggDiagram;
+  RiggVar.Chart.Model01,
+  RiggVar.Chart.Diagram;
 
 type
   TFormDiagramE = class(TForm)

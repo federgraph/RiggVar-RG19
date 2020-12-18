@@ -26,7 +26,7 @@ uses
   System.Generics.Defaults,
   Vcl.Graphics,
   Vcl.Buttons,
-  RggSchnittKK,
+  RiggVar.RG.Calc,
   RiggVar.FD.Point,
   RiggVar.FD.TransformHelper,
   RiggVar.FD.Elements,

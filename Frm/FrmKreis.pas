@@ -12,8 +12,8 @@ uses
   Vcl.Forms,
   Vcl.StdCtrls,
   Vcl.ExtCtrls,
-  RggTypes,
-  RggSchnittKK;
+  RiggVar.RG.Types,
+  RiggVar.RG.Calc;
 
 type
   TSprite = class

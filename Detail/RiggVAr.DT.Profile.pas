@@ -1,11 +1,11 @@
-﻿unit RggProfile;
+﻿unit RiggVAr.DT.Profile;
 
 interface
 
 uses
   UITypes,
   Graphics,
-  RggTypes;
+  RiggVar.RG.Types;
 
 type
   TLage = (Hoch, Quer);

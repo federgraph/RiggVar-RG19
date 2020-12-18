@@ -30,7 +30,6 @@ uses
   System.Generics.Defaults,
   Vcl.Menus,
   RiggVar.FB.ActionConst,
-  RiggVar.FB.Action,
   RiggVar.FB.ActionLong;
 
 type

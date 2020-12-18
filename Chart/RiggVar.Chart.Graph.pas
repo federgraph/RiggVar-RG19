@@ -1,4 +1,4 @@
-﻿unit RggChartGraph;
+﻿unit RiggVar.Chart.Graph;
 
 interface
 
@@ -12,9 +12,9 @@ uses
   Types,
   ExtCtrls,
   Graphics,
-  RggTypes,
+  RiggVar.RG.Types,
   RiggVar.App.Model,
-  RggChartModel;
+  RiggVar.Chart.Model;
 
 type
   TRggBox = class

@@ -3,7 +3,7 @@
 interface
 
 uses
-  RggCalc,
+  RiggVar.RG.Calc,
   RiggVar.FB.Color,
   RiggVar.FD.Point,
   RiggVar.FD.Elements,
@@ -72,7 +72,7 @@ begin
   P4.Z := D.Center.Y;
 
   { SchnittGG is using XZ }
-  SchnittGG(P1, P2, P3, P4, SP);
+  TRggCalc.SchnittGG(P1, P2, P3, P4, SP);
 
   S.Center.X := SP.X;
   S.Center.Y := SP.Z;

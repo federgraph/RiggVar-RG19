@@ -11,12 +11,12 @@ interface
   IRigg may just be an alias to the chosen TRigg.
 }
 
-{.$define WantOriginalLayout}
+{$define WantOriginalLayout}
 {.$define WantInterface}
 
 uses
 {$ifdef WantInterface}
-  RggInter,
+  RiggVar.RG.Inter,
 {$endif}
 {$ifdef WantOriginalLayout}
   RggUnit4;
@@ -32,7 +32,7 @@ type
 {$endif}
 
 {$ifdef WantInterface}
-  IRigg = RggInter.IRigg0;
+  IRigg = RiggVar.RG.IRigg0;
 {$else}
   IRigg = TRigg;
 {$endif}

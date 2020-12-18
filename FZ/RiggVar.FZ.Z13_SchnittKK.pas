@@ -5,7 +5,7 @@ interface
 uses
   SysUtils,
   Classes,
-  RggSchnittKK,
+  RiggVar.RG.Calc,
   RiggVar.FB.Color,
   RiggVar.FD.Elements,
   RiggVar.FD.Drawings;

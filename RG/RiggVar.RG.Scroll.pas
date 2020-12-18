@@ -1,4 +1,4 @@
-﻿unit RggScroll;
+﻿unit RiggVar.RG.Scroll;
 
 (*
 -
@@ -25,30 +25,9 @@ interface
 uses
   Classes,
   RiggVar.RG.Def,
-  RggTypes;
+  RiggVar.RG.Types;
 
 type
-//  TRggParams = (
-//    fpController,
-//    fpWinkel,
-//    fpVorstag,
-//    fpWante,
-//    fpWoben,
-//    fpSalingH,
-//    fpSalingA,
-//    fpSalingL,
-//    fpVorstagOS,
-//    fpWPowerOS
-//    fpSalingW,
-//    fpMastfallF0C,
-//    fpMastfallF0F,
-//    fpMastfallVorlauf,
-//    fpBiegung,
-//    fpD0X,
-//    fpT1,
-//    fpT2
-//    );
-
   TRggSB = class
   private
     FMin: single;

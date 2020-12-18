@@ -23,7 +23,7 @@
 interface
 
 uses
-  RggTypes,
+  RiggVar.RG.Types,
   System.UITypes,
   System.UIConsts,
   RiggVar.FB.Color,

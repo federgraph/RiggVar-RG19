@@ -1,4 +1,4 @@
-﻿unit RggFachwerk;
+﻿unit RiggVar.RG.Fachwerk;
 
 (*
 -
@@ -24,42 +24,43 @@ interface
 
 uses
   Math,
-  RggTypes;
-
-type
-  TGeometrie = array [0 .. 1, 1 .. 9] of Integer;
-  TKnotenVektor = array [1 .. 6] of single;
-  TStabVektor = array [1 .. 9] of single;
-  Lagerkraefte = (AX, AY, BX, BY);
-  TAufLager = array [Lagerkraefte] of single;
-
-const
-  { Geometriematrix, Stab in Spalte verbindet die beiden Knoten }
-  constantG: TGeometrie =
-   ((1, 1, 2, 2, 3, 3, 4, 4, 5),
-    (4, 5, 6, 3, 5, 4, 6, 5, 6));
-
-  { EA in N }
-  constantEA: TStabVektor = (1E6, 1E6, 2E6, 2E6, 2E6, 2E6, 10E6, 10E6, 10E6);
-
-  { Anfangswerte für Knotenpunkt-Koordinaten in mm }
-  InitX: TKnotenVektor = (2870, 2300, 2800, 4140, 2870, 2560);
-  InitY: TKnotenVektor = ( 400, 2600, 4600, 340, -100, 430);
-
-  { Anfangswert für äußere Belastung in N }
-  BelastungX: TKnotenVektor = (0.00, 0.00, 0.00, 0, 0.00, 0);
-  BelastungY: TKnotenVektor = (0.00, 0.00, 0.00, 0, 0.00, 0);
-
-  { Richtungen der Kraft "1" für Ermittlung der Knotenverschiebungen in Grad }
-  PO1: TKnotenVektor = (  0,   0,   0,   0,   0,   0);
-  PO2: TKnotenVektor = (-90, -90, -90, -90, -90, -90);
-
-  { Vektoren zum bequemen Löschen der Arrays }
-  ClearVektorK: TKnotenVektor = (0, 0, 0, 0, 0, 0);
-  ClearVektorS: TStabVektor = (0, 0, 0, 0, 0, 0, 0, 0, 0);
+  RiggVar.RG.Types;
 
 type
   TFachwerk = class
+
+  public type
+      TGeometrie = array [0 .. 1, 1 .. 9] of Integer;
+      TKnotenVektor = array [1 .. 6] of single;
+      TStabVektor = array [1 .. 9] of single;
+      Lagerkraefte = (AX, AY, BX, BY);
+      TAufLager = array [Lagerkraefte] of single;
+
+  public const
+      { Geometriematrix, Stab in Spalte verbindet die beiden Knoten }
+      constantG: TGeometrie =
+       ((1, 1, 2, 2, 3, 3, 4, 4, 5),
+        (4, 5, 6, 3, 5, 4, 6, 5, 6));
+
+      { EA in N }
+      constantEA: TStabVektor = (1E6, 1E6, 2E6, 2E6, 2E6, 2E6, 10E6, 10E6, 10E6);
+
+      { Anfangswerte für Knotenpunkt-Koordinaten in mm }
+      InitX: TKnotenVektor = (2870, 2300, 2800, 4140, 2870, 2560);
+      InitY: TKnotenVektor = ( 400, 2600, 4600, 340, -100, 430);
+
+      { Anfangswert für äußere Belastung in N }
+      BelastungX: TKnotenVektor = (0.00, 0.00, 0.00, 0, 0.00, 0);
+      BelastungY: TKnotenVektor = (0.00, 0.00, 0.00, 0, 0.00, 0);
+
+      { Richtungen der Kraft "1" für Ermittlung der Knotenverschiebungen in Grad }
+      PO1: TKnotenVektor = (  0,   0,   0,   0,   0,   0);
+      PO2: TKnotenVektor = (-90, -90, -90, -90, -90, -90);
+
+      { Vektoren zum bequemen Löschen der Arrays }
+      ClearVektorK: TKnotenVektor = (0, 0, 0, 0, 0, 0);
+      ClearVektorS: TStabVektor = (0, 0, 0, 0, 0, 0, 0, 0, 0);
+
   public
     K: Integer; { Anzahl der Knoten }
     K1: Integer; { KnotenNr. des Festlagers A }

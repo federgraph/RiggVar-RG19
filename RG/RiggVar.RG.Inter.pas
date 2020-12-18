@@ -1,14 +1,14 @@
-﻿unit RggInter;
+﻿unit RiggVar.RG.Inter;
 
 interface
 
 uses
   RiggVar.FD.Point,
   Classes,
-  RggTypes,
-  RggScroll,
-  RggDoc,
-  RggTrimmTab,
+  RiggVar.RG.Types,
+  RiggVar.RG.Scroll,
+  RiggVar.RG.Doc,
+  RiggVar.RG.TrimmTab,
   RiggVar.RG.Data;
 
 type

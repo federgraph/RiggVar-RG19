@@ -1,4 +1,4 @@
-﻿unit RggHull;
+﻿unit RiggVar.Graph1.Hull;
 
 interface
 
@@ -14,19 +14,25 @@ uses
   Types,
   Graphics,
   RiggVar.FD.Point,
-  RggTypes,
-  RggCalc,
-  RggMatrix,
+  RiggVar.RG.Types,
+  RiggVar.RG.Calc,
 {$ifdef WantDisplayList}
-  RggDisplay,
-  RggDisplayTypes,
+  RiggVar.Graph1.DisplayList,
+  RiggVar.Graph1.DisplayTypes,
 {$endif}
-  RggGraph;
+  RiggVar.Graph1.Transform,
+  RiggVar.Graph1.Rigg;
 
 type
-  TConColors = array [0 .. 15] of TColor;
-
   THullGraph0 = class(TRggGraph)
+  public const
+    maxvert = 400;
+    maxcon = 1000;
+  protected type
+    TConColors = array [0 .. 15] of TColor;
+    TVertArrayF = array [0 .. maxvert] of single;
+    TVertArrayI = array [0 .. maxvert] of Integer;
+    TConArray = array [0 .. maxcon] of Integer;
   private
     procedure MessageBeep(Value: Integer);
     procedure Transform;

@@ -29,7 +29,7 @@ uses
   System.UITypes,
   System.UIConsts,
   System.Math,
-  RggSchnittKK,
+  RiggVar.RG.Calc,
   RiggVar.FB.Color,
   RiggVar.FD.Point,
   Vcl.Graphics;

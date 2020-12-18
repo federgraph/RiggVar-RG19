@@ -10,10 +10,10 @@ interface
 {.$define WantRotaForm3}
 
 uses
-  RggTypes,
+  RiggVar.RG.Types,
   System.UITypes,
 {$ifdef WantRotaForm1}
-  RggRota,
+  RiggVar.Graph1.Rota,
 {$endif}
 {$ifdef WantRotaForm2}
   RiggVar.FD.Rota,

@@ -11,7 +11,7 @@ uses
   System.Classes,
   System.UITypes,
   System.Math,
-  RggSchnittKK,
+  RiggVar.RG.Calc,
   RiggVar.FB.Color,
   RiggVar.FD.Point,
   RiggVar.FD.Chart,

@@ -26,13 +26,13 @@ uses
   SysUtils,
   Classes,
   Math,
-  RggInter,
+  RiggVar.App.Strings,
   RiggVar.FD.Point,
-  RggStrings,
-  RggTypes,
+  RiggVar.RG.Inter,
+  RiggVar.RG.Types,
   RggUnit3,
-  RggDoc,
-  RggScroll,
+  RiggVar.RG.Doc,
+  RiggVar.RG.Scroll,
   RiggVar.RG.Data;
 
 type
@@ -88,14 +88,14 @@ begin
   try
     GetDocument(Document);
     s := ExtractFileExt(FileName);
-    if s = RGI_File_Extension then
+    if s = RggStrings.RGI_File_Extension then
     begin
       Document.WriteToIniFile(FileName);
     end
-    else if s = RGG_File_Extension then
+    else if s = RggStrings.RGG_File_Extension then
     begin
       { write as .rgi, .rgg no longer supported }
-      s := ChangeFileExt(FileName, RGI_File_Extension);
+      s := ChangeFileExt(FileName, RggStrings.RGI_File_Extension);
       Document.WriteToIniFile(s);
       // Document.SaveToFile(FileName);
     end;
@@ -133,7 +133,7 @@ begin
   Document := TRggDocument.Create;
   try
     s := ExtractFileExt(FileName);
-    if s = RGI_File_Extension then
+    if s = RggStrings.RGI_File_Extension then
     begin
       Document.LoadFromIniFile(FileName);
       SetDocument(Document);

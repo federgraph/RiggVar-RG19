@@ -1,4 +1,4 @@
-﻿unit RggRota;
+﻿unit RiggVar.Graph1.Rota;
 
 (*
 -
@@ -38,16 +38,15 @@ uses
   ComCtrls,
   Math,
   RiggVar.FD.Point,
+  RiggVar.RG.Def,
   RiggVar.RG.Graph,
-  RggTypes,
-  RggMatrix,
-  RggRaumGraph,
-  RggGraph,
+  RiggVar.RG.Types,
+  RiggVAr.Graph1.DisplayList,
+  RiggVar.Graph1.Rigg,
 {$ifdef WantHull}
-  RggHull,
+  RiggVar.Graph1.Hull,
 {$endif}
-  RggPolarKar,
-  RggTransformer;
+  RiggVar.Graph1.Transform;
 
 type
   TRotaForm1 = class(TInterfacedObject, IStrokeRigg)
@@ -269,11 +268,7 @@ implementation
 
 uses
   RiggVar.App.Main,
-  RiggVar.FB.ActionConst,
-  RiggVar.RG.Def,
-  RggDisplay,
-  RggZug3D,
-  RggTestData;
+  RiggVar.FB.ActionConst;
 
 { TRotaForm1 }
 
@@ -506,7 +501,7 @@ begin
     { entspanntes Rigg grau zeichnen }
     if Grauzeichnen and BtnGrauDown then
     begin
-      RaumGraph.Color := clEntspannt;
+      RaumGraph.Color := RggColors.clEntspannt;
       RaumGraph.Coloriert := False;
       WanteGestrichelt := False; //WanteGestrichelt;
       RaumGraph.Koordinaten := RPE;
@@ -517,7 +512,7 @@ begin
     { Nullstellung hellblau zeichnen }
     if BtnBlauDown then
     begin
-      RaumGraph.Color := clNullStellung;
+      RaumGraph.Color := RggColors.clNullStellung;
       RaumGraph.Coloriert := False;
       RaumGraph.WanteGestrichelt := False;
       RaumGraph.Koordinaten := RPR;
@@ -1061,7 +1056,9 @@ begin
   begin
     HullGraph.Coloriert := True;
     HullGraph.Update;
+{$ifdef WantDisplayList}
     HullGraph.AddToDisplayList(RaumGraph.DL);
+{$endif}
   end;
 {$endif}
 

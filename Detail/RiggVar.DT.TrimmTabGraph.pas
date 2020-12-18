@@ -1,4 +1,4 @@
-﻿unit RggTrimmTabGraph;
+﻿unit RiggVar.DT.TrimmTabGraph;
 
 interface
 
@@ -8,8 +8,8 @@ uses
   Types,
   Graphics,
   ExtCtrls,
-  RggTypes,
-  RggTrimmTab;
+  RiggVar.RG.Types,
+  RiggVar.RG.TrimmTab;
 
 type
   TTrimmTabGraph = class

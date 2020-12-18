@@ -12,7 +12,7 @@ uses
   System.SysUtils,
   System.Classes,
   System.UITypes,
-  RggChartModel;
+  RiggVar.Chart.Model;
 
 type
   TFormDiagramC = class(TForm)

@@ -163,8 +163,8 @@ type
 implementation
 
 uses
-  RggTypes,
-  RggSchnittKK;
+  RiggVar.RG.Types,
+  RiggVar.RG.Calc;
 
 { TRggDrawingZ18 }
 

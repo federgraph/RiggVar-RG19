@@ -35,7 +35,7 @@ uses
   System.UIConsts,
   System.Math,
   RiggVar.RG.Graph,
-  RggTypes,
+  RiggVar.RG.Types,
   RiggVar.FB.ActionConst,
   RiggVar.FB.Color,
   RiggVar.FD.Drawing00,

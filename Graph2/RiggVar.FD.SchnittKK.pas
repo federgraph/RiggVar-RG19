@@ -4,7 +4,7 @@ interface
 
 uses
   Math,
-  RggSchnittKK,
+  RiggVar.RG.Calc,
   RiggVar.FD.Point,
   RiggVar.FD.Elements;
 

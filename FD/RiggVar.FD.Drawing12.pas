@@ -157,7 +157,7 @@ type
 implementation
 
 uses
-  RggSchnittKK;
+  RiggVar.RG.Calc;
 
 { TRggDrawingD12 }
 
