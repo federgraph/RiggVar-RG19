@@ -754,17 +754,10 @@ begin
 end;
 
 function TRggTransformer.TransformPoint(p: TPoint3D): TPoint3D;
-var
-  p1, p2: TPoint3D;
 begin
   if not Updated then
     BuildMatrix;
-
-  p1 := TPoint3D.Create(p.X, p.Y, p.Z);
-  p2 := p1 * Matrix;
-  result.X := p2.X;
-  result.Y := p2.Y;
-  result.Z := p2.Z;
+  result := p * Matrix;
 end;
 
 end.
