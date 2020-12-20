@@ -52,13 +52,13 @@ type
   end;
 
   TPolarKar = class
-  private type
-    TRotationAngle = (raPhi, raTheta, raGamma, raXrot, raYrot, raZrot);
-    TCalcAngleEvent = procedure(Sender: TObject; var wx, wy, wz: single) of object;
   private const
     xVec: TPoint3D = (x: 1; y: 0; z: 0);
     yVec: TPoint3D = (x: 0; y: 1; z: 0);
     zVec: TPoint3D = (x: 0; y: 0; z: 1);
+  private type
+    TCalcAngleEvent = procedure(Sender: TObject; var wx, wy, wz: single) of object;
+    TRotationAngle = (raPhi, raTheta, raGamma, raXrot, raYrot, raZrot);
   private
     FPhi, FTheta, FGamma, FXRot, FYRot, FZRot: single;
     FValid: Boolean;
