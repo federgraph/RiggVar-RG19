@@ -26,13 +26,13 @@ uses
 
 type
 {$ifdef WantOriginalLayout}
-  TRigg = RggUnit4.TRigg1;
+  TRigg = TRigg1;
 {$else}
-  TRigg = RiggVar.RG.Model.TRigg2;
+  TRigg = TRigg2;
 {$endif}
 
 {$ifdef WantInterface}
-  IRigg = RiggVar.RG.IRigg0;
+  IRigg = IRigg0;
 {$else}
   IRigg = TRigg;
 {$endif}

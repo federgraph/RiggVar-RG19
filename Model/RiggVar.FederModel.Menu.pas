@@ -241,6 +241,7 @@ begin
   fag.Add(faRggBogen);
   fag.Add(faRggKoppel);
   fag.Add(faRggHull);
+  fag.Add(faToggleLineColor);
   AddGroup('Graph', fag);
 
   fag := TFederActionGroup.Create;
