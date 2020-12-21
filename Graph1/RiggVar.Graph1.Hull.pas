@@ -19,10 +19,15 @@ uses
   RiggVar.Graph1.DisplayList,
   RiggVar.Graph1.DisplayTypes,
 {$endif}
-  RiggVar.Graph1.Rigg,
   RiggVar.Graph1.Transform;
 
 type
+  TCon = record
+    L: Integer;
+    R: Integer;
+    C: TColor;
+  end;
+
   THullGraph0 = class
   private const
     maxvert = 400;
@@ -31,23 +36,24 @@ type
     TConColors = array [0 .. 15] of TColor;
     TVertArrayF = array [0 .. maxvert] of single;
     TVertArrayI = array [0 .. maxvert] of Integer;
-    TConArray = array [0 .. maxcon] of Integer;
+    TConArray = array [0 .. maxcon] of TCon;
   private
-    FColor: TColor;
-    FColored: Boolean;
-    GrafikOK: Boolean; // loaded with data
+    FWantLineColors: Boolean;
+    DataLoaded: Boolean;
     Updated: Boolean; // transformed
 
     { Vertices }
     vert: TVertArrayF; { Gleitkomma-Koordinaten }
     tvert: TVertArrayI; { Integer-Koordinaten - transformed }
     nvert: Integer;
+
     { Connections }
     con: TConArray;
     ncon: Integer;
 
-    {Palette}
+    { Palette }
     ColorArray: array of TColor;
+    TempColor: TColor;
 
     procedure ReadVerts420;
     procedure ReadCons420(k, l: Integer);
@@ -61,30 +67,27 @@ type
     procedure AddLine(p1, p2: Integer);
     procedure Paint(g: TCanvas);
 
-    procedure SetColor(const Value: TColor);
-    procedure SetColored(const Value: Boolean);
+    procedure SetWantLineColors(const Value: Boolean);
     procedure SetFixPoint(const Value: TRiggPoint);
     procedure SetZoom(Value: single);
     function GetFixPoint: TRiggPoint;
     function GetZoom: single;
     procedure Transform;
   protected
-    xmin, xmax, ymin, ymax, zmin, zmax: single;
+    xmin, xmax: single;
+    ymin, ymax: single;
+    zmin, zmax: single;
     yRange: Integer;
     procedure FindBoundingBox;
     procedure FindDepthRange;
     function FindColorIndex(v: single): Integer;
   public
-    RaumGraphData: TRaumGraphData;
-    RaumGraphProps: TRaumGraphProps;
-
     Transformer: TRggTransformer; // injected, not owned
 
     Factor: TPoint3D;
     ModelFactor: TPoint3D;
 
     constructor Create;
-    destructor Destroy; override;
 
     procedure Load;
     procedure Update;
@@ -96,8 +99,7 @@ type
 
     property FixPoint: TRiggPoint read GetFixPoint write SetFixPoint;
     property Zoom: single read GetZoom write SetZoom;
-    property Coloriert: Boolean read FColored write SetColored;
-    property Color: TColor read FColor write SetColor;
+    property WantLineColors: Boolean read FWantLineColors write SetWantLineColors;
   end;
 
   THullGraph2 = class(THullGraph0)
@@ -124,10 +126,8 @@ uses
 
 constructor THullGraph0.Create;
 begin
-  RaumGraphData := TRaumGraphData.Create;
-  RaumGraphProps := TRaumGraphProps.Create;
-  FColor := TColorRec.Red;
-  FColored := True;
+  TempColor := clBlack;
+  FWantLineColors := False;
 
   InitColorArray;
 
@@ -137,23 +137,9 @@ begin
   Load;
 end;
 
-destructor THullGraph0.Destroy;
+procedure THullGraph0.SetWantLineColors(const Value: Boolean);
 begin
-  RaumGraphData.Free;
-  RaumGraphProps.Free;
-  inherited;
-end;
-
-procedure THullGraph0.SetColor(const Value: TColor);
-begin
-  FColor := Value;
-  RaumGraphProps.Color := Value;
-end;
-
-procedure THullGraph0.SetColored(const Value: Boolean);
-begin
-  FColored := Value;
-  RaumGraphProps.Coloriert := FColored;
+  FWantLineColors := Value;
 end;
 
 procedure THullGraph0.SetFixPoint(const Value: TRiggPoint);
@@ -184,7 +170,7 @@ begin
   ncon := 0;
   ReadVertices; // virtual
   ReadConnections; // virtual
-  GrafikOK := True;
+  DataLoaded := True;
 end;
 
 procedure THullGraph0.ReadVertices;
@@ -233,13 +219,15 @@ begin
     p1 := p2;
     p2 := t;
   end;
-  con[i] := (p1 shl 16) or p2;
+  con[i].L := p1;
+  con[i].R := p2;
+  con[i].C := TempColor;
   ncon := i + 1;
 end;
 
 procedure THullGraph0.Update;
 begin
-  if not GrafikOK then
+  if not DataLoaded then
     Exit;
   if nvert <= 0 then
     Exit;
@@ -271,7 +259,7 @@ end;
 
 procedure THullGraph0.DrawToCanvas(g: TCanvas);
 begin
-  if not GrafikOK then
+  if not DataLoaded then
     Exit;
   if not Updated then
     Update;
@@ -280,42 +268,37 @@ end;
 
 procedure THullGraph0.Paint(g: TCanvas);
 var
-  i, lim, t, p1, p2: Integer;
+  i, p1, p2: Integer;
   sd: Integer;
   ci: Integer;
-  c: TConArray;
-  v: TVertArrayI;
 begin
   if nvert <= 0 then
     Exit;
 
-  lim := ncon;
-  c := con;
-  v := tvert;
-  if (lim <= 0) or (nvert <= 0) then
+  if (ncon <= 0) or (nvert <= 0) then
     Exit;
 
-  for i := 0 to lim - 1 do
+  for i := 0 to ncon - 1 do
   begin
-    t := c[i];
-    p1 := ((t shr 16) and $FFFF) * 3; // index of point 1
-    p2 := (t and $FFFF) * 3; // index of point 2
+    p1 := con[i].L * 3; // index of point 1
+    p2 := con[i].R * 3; // index of point 2
 
-    { color }
-    if Coloriert then
+    if WantLineColors then
     begin
-      sd := v[p1 + 1] + v[p2 + 1]; // sum of 'depth' values
-      ci := FindColorIndex(sd);
-      g.Pen.Color := GetColor(ci);
+      g.Pen.Color := con[i].C;
     end
     else
-      g.Pen.Color := TColorRec.Red;
+    begin
+      sd := tvert[p1 + 1] + tvert[p2 + 1]; // sum of 'depth' values
+      ci := FindColorIndex(sd);
+      g.Pen.Color := GetColor(ci);
+    end;
 
     g.Pen.Width := 1;
 
     { draw line }
-    g.MoveTo(v[p1], -v[p1 + 2]);
-    g.LineTo(v[p2], -v[p2 + 2]);
+    g.MoveTo(tvert[p1], -tvert[p1 + 2]);
+    g.LineTo(tvert[p2], -tvert[p2 + 2]);
   end;
 end;
 
@@ -323,11 +306,9 @@ end;
 procedure THullGraph0.AddToDisplayList(DL: TRggDisplayList);
 var
   ConCount: Integer;
-  i, t, p1, p2: Integer;
+  i, p1, p2: Integer;
   sd: Integer;
   ci: Integer;
-  c: TConArray;
-  v: TVertArrayI;
   StartPoint, EndPoint: TPoint;
   rp1, rp2: TPoint3D;
   cla: TColor;
@@ -337,41 +318,40 @@ begin
     Exit;
 
   ConCount := ncon;
-  c := con;
-  v := tvert;
   if (ConCount <= 0) or (nvert <= 0) then
     Exit;
 
   for i := 0 to ConCount - 1 do
   begin
-    t := c[i];
-    p1 := ((t shr 16) and $FFFF) * 3;
-    p2 := (t and $FFFF) * 3;
+    p1 := con[i].L * 3;
+    p2 := con[i].R * 3;
 
-    if Coloriert then
+    if WantLineColors then
     begin
-      sd := v[p1 + 1] + v[p2 + 1]; // sum of 'depth' values
-      ci := FindColorIndex(sd);
-      cla := GetColor(ci);
+      cla := con[i].C;
     end
     else
-      cla := TColorRec.Red;
+    begin
+      sd := tvert[p1 + 1] + tvert[p2 + 1]; // sum of 'depth' values
+      ci := FindColorIndex(sd);
+      cla := GetColor(ci);
+    end;
 
-    StartPoint := Point(v[p1], -v[p1 + 2]);
-    EndPoint := Point(v[p2], -v[p2 + 2]);
+    StartPoint := Point(tvert[p1], -tvert[p1 + 2]);
+    EndPoint := Point(tvert[p2], -tvert[p2 + 2]);
 
-    rp1.X := v[p1 + 0];
-    rp1.Y := v[p1 + 1];
-    rp1.Z := v[p1 + 2];
+    rp1.X := tvert[p1 + 0];
+    rp1.Y := tvert[p1 + 1];
+    rp1.Z := tvert[p1 + 2];
 
-    rp2.X := v[p2 + 0];
-    rp2.Y := v[p2 + 1];
-    rp2.Z := v[p2 + 2];
+    rp2.X := tvert[p2 + 0];
+    rp2.Y := tvert[p2 + 1];
+    rp2.Z := tvert[p2 + 2];
 
     DL.DI.StrokeWidth := 3;
     DL.DI.StrokeColor := cla;
     s := Format('con-%d',  [i]);
-    DL.Line(s, deHullEdge, rp1, rp2, StartPoint, EndPoint, TColorRec.Red);
+    DL.Line(s, deHullEdge, rp1, rp2, StartPoint, EndPoint, cla);
   end;
 end;
 {$endif}
@@ -564,8 +544,11 @@ begin
   conCountL := k - 1; // Anzahl Verbindungen einer Linie = 9
 
   a := 1;
+  TempColor := clBlue;
   AddSection(a, a + 1, 1, conCountS); { der Steven }
+
   a := l;
+  TempColor := clYellow;
   for i := 1 to SpantenZahl do
   begin
     AddSection(a + 1, a + 2, 1, 2 * conCountS); { die Spanten }
@@ -574,15 +557,26 @@ begin
 
   a := 1;
   b := l + 1;
+  TempColor := clGreen;
   for i := 1 to l - 1 do
   begin
-    AddSection(a, b, LinienZahl, conCountL); { Linien links und Kiel }
+    AddSection(a, b, LinienZahl, conCountL); { right }
     a := a + 1;
     b := b + 1;
   end;
-  for i := l to LinienZahl do
+
+  TempColor := clBlue;
+  for i := l to l do
   begin
-    AddSection(a, b, LinienZahl, conCountL); { Linien rechts }
+    AddSection(a, b, LinienZahl, conCountL); { keel }
+    a := a - 1;
+    b := b + 1;
+  end;
+
+  TempColor := clRed;
+  for i := l + 1 to LinienZahl do
+  begin
+    AddSection(a, b, LinienZahl, conCountL); { left }
     a := a - 1;
     b := b + 1;
   end;
@@ -856,33 +850,28 @@ end;
 
 procedure THullGraph2.GetPlotList(ML: TStrings);
 var
-  i, t, p1, p2: Integer;
-  c: TConArray;
-  v: TVertArrayI;
+  i, p1, p2: Integer;
   s: string;
   SavedZoom: single;
 begin
   if (ncon <= 0) or (nvert <= 0) then
     Exit;
-  if not GrafikOK then
+  if not DataLoaded then
     Exit;
   SavedZoom := Zoom;
   Zoom := 10;
   if not Updated then
     Update;
   ML.add('SP 1;');
-  c := con;
-  v := tvert;
   for i := 0 to ncon - 1 do
   begin
-    t := c[i];
-    p1 := ((t shr 16) and $FFFF) * 3;
-    p2 := (t and $FFFF) * 3;
+    p1 := con[i].L * 3;
+    p2 := con[i].R * 3;
     { g.MoveTo(v[p1], -v[p1 + 2]); }
-    s := Format('PU %d %d;', [v[p1], -v[p1 + 2]]);
-    ML.Add(S);
+    s := Format('PU %d %d;', [tvert[p1], -tvert[p1 + 2]]);
+    ML.Add(s);
     { g.LineTo(v[p2], -v[p2 + 2]); }
-    s := Format('PD %d %d;', [ v[p2], -v[p2 + 2] ]);
+    s := Format('PD %d %d;', [tvert[p2], -tvert[p2 + 2] ]);
     ML.Add(s);
   end;
   Zoom := SavedZoom;

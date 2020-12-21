@@ -1054,7 +1054,7 @@ begin
 {$ifdef WantHull}
   if RumpfItemChecked then
   begin
-    HullGraph.Coloriert := True;
+    HullGraph.WantLineColors := WantLineColors;
     HullGraph.Update;
 {$ifdef WantDisplayList}
     HullGraph.AddToDisplayList(RaumGraph.DL);
@@ -1073,7 +1073,7 @@ begin
     and not UseDisplayList
     and (not MouseDown or (MouseDown and FDrawAlways)) then
   begin
-    HullGraph.Coloriert := True;
+    HullGraph.WantLineColors := WantLineColors;
     HullGraph.Update;
     HullGraph.DrawToCanvas(g);
   end;

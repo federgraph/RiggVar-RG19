@@ -529,8 +529,6 @@ begin
 {$ifdef WantMenu}
   PopulateMenu;
 {$endif}
-
-//  Main.StrokeRigg.HullVisible := True;
 end;
 
 procedure TFormMain.FormDestroy2(Sender: TObject);
