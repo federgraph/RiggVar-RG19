@@ -252,7 +252,7 @@ begin
 
     faRggBogen: result := 'B';
     faRggKoppel: result := 'K';
-    faRggHull: result := 'hull';
+    faRggHull: result := 'HL';
 
     faToggleSalingGraph: result := 'SG';
     faToggleControllerGraph: result := 'CG';
