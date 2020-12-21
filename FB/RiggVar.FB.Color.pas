@@ -179,6 +179,9 @@ type
 
 implementation
 
+uses
+  System.UITypes;
+
   class constructor TRggColors.Create;
   begin
 //    Null := TColor($00000000);
@@ -346,17 +349,10 @@ implementation
   end;
 
   class function TRggColors.ColorFromRGB(R, G, B: Byte): TRggColor;
-  var
-    c: Cardinal;
   begin
-    c := R;
-    c := c and (G shl 8);
-    c := c and (B shl 16);
-    result := TColor(c);
-
-//    TColorRec(result).R := R;
-//    TColorRec(result).G := G;
-//    TColorRec(result).B := B;
+    TColorRec(result).R := R;
+    TColorRec(result).G := G;
+    TColorRec(result).B := B;
   end;
 
 end.
