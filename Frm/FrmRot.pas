@@ -657,7 +657,7 @@ begin
 
   if FPaintRumpf and (not MouseDown or (MouseDown and FDrawAlways)) then
   begin
-    HullGraph.Coloriert := True;
+    HullGraph.WantLineColors := False;
     HullGraph.DrawToCanvas(Bitmap.Canvas);
   end;
 
@@ -680,7 +680,7 @@ begin
     RaumGraph.DrawToCanvas(MetaCanvas);
     if FPaintRumpf = True then
     begin
-      HullGraph.Coloriert := True;
+      HullGraph.WantLineColors := True;
       HullGraph.DrawToCanvas(MetaCanvas);
     end;
   finally
@@ -695,7 +695,7 @@ begin
     RaumGraph.DrawToCanvas(MetaCanvas);
     if FPaintRumpf = True then
     begin
-      HullGraph.Coloriert := False;
+      HullGraph.WantLineColors := False;
       HullGraph.DrawToCanvas(MetaCanvas);
     end;
   finally
@@ -1820,7 +1820,7 @@ begin
   RaumGraph.DrawToCanvas(Printer.Canvas);
   if FPaintRumpf = True then
   begin
-    HullGraph.Coloriert := True;
+    HullGraph.WantLineColors := True;
     HullGraph.DrawToCanvas(Printer.Canvas);
   end;
   Printer.EndDoc;

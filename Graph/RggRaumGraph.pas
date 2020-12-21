@@ -354,8 +354,8 @@ begin
       DL.Line('B0-C0', deB0C0, B0, C0, ZugRumpf[1], ZugRumpf[2], TRggColors.DodgerBlue);
       DL.Line('C0-A0', deA0C0, C0, A0, ZugRumpf[2], ZugRumpf[0], TRggColors.Cornflowerblue);
 
-      DL.Line('A0-D0', deA0D0, A0, D0, ZugRumpf[0], ZugRumpf[4], clRed);
-      DL.Line('B0-D0', deB0D0, B0, D0, ZugRumpf[1], ZugRumpf[4], clGreen);
+      DL.Line('A0-D0', deA0D0, A0, D0, ZugRumpf[0], ZugRumpf[4], clGreen);
+      DL.Line('B0-D0', deB0D0, B0, D0, ZugRumpf[1], ZugRumpf[4], clRed);
       DL.Line('C0-D0', deC0D0, C0, D0, ZugRumpf[2], ZugRumpf[4], clYellow);
     end;
 

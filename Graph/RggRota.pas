@@ -23,6 +23,7 @@ interface
 {$endif}
 
 {$define WantHull}
+{$define WantDisplayList}
 
 uses
   Windows,
@@ -186,6 +187,7 @@ type
     FBogen: Boolean;
     FKoppel: Boolean;
     FWantOverlayedRiggs: Boolean;
+    FWantLineColors: Boolean;
     procedure InitBitmapSize;
     procedure InitGraph;
     procedure InitRaumGraph;
@@ -198,11 +200,14 @@ type
     procedure SetOnAfterDraw(const Value: TNotifyEvent);
     function SingleDraw: Boolean;
     procedure SetWantOverlayedRiggs(const Value: Boolean);
+    procedure SetWantLineColors(const Value: Boolean);
   public
     IsUp: Boolean;
     PaintBox3D: TPaintBox; // injected
 
+{$ifdef WantHull}
     HullGraph: THullGraph;
+{$endif}
     RaumGraph: TRaumGraph;
     UseDisplayList: Boolean;
 
@@ -243,6 +248,7 @@ type
     property OnAfterDraw: TNotifyEvent read FOnAfterDraw write SetOnAfterDraw;
 
     property WantOverlayedRiggs: Boolean read FWantOverlayedRiggs write SetWantOverlayedRiggs;
+    property WantLineColors: Boolean read FWantLineColors write SetWantLineColors;
  end;
 
 implementation
@@ -548,8 +554,10 @@ begin
   if UseDisplayList then
   begin
     TDisplayItem.NullpunktOffset := NullpunktOffset;
+{$ifdef WantDisplayList}
     RaumGraph.DL.WantLegend := LegendItemChecked; // not RumpfItemChecked;
     RaumGraph.DL.Draw(g);
+{$endif}
   end
   else
   begin
@@ -684,9 +692,11 @@ end;
 
 procedure TRotaForm1.UseQuickSortBtnClick(Sender: TObject);
 begin
+{$ifdef WantDisplayList}
   RaumGraph.DL.UseQuickSort := not RaumGraph.DL.UseQuickSort;
   RaumGraph.Update;
   Draw;
+{$endif}
 end;
 
 procedure TRotaForm1.BogenBtnClick(Sender: TObject);
@@ -1037,12 +1047,14 @@ begin
   end;
 
   RaumGraph.Update;
+{$ifdef WantDisplayList}
   RaumGraph.UpdateDisplayList;
+{$endif}
 
 {$ifdef WantHull}
   if RumpfItemChecked then
   begin
-    HullGraph.Coloriert := True;
+    HullGraph.WantLineColors := WantLineColors;
     HullGraph.Update;
     HullGraph.AddToDisplayList(RaumGraph.DL);
   end;
@@ -1059,7 +1071,7 @@ begin
     and not UseDisplayList
     and (not MouseDown or (MouseDown and FDrawAlways)) then
   begin
-    HullGraph.Coloriert := True;
+    HullGraph.WantLineColors := WantLineColors;
     HullGraph.Update;
     HullGraph.DrawToCanvas(g);
   end;
@@ -1128,6 +1140,14 @@ begin
   ImageMidPoint.Y := h / 2;
   FXPos := 0;
   FYPos := 0;
+end;
+
+procedure TRotaForm1.SetWantLineColors(const Value: Boolean);
+begin
+  FWantLineColors := Value;
+{$ifdef WantDisplayList}
+  RaumGraph.DL.WantLineColors := Value;
+{$endif}
 end;
 
 procedure TRotaForm1.InitBitmapSize;
