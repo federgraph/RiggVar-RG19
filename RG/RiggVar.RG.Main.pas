@@ -426,7 +426,7 @@ begin
   StrokeRigg.KoordinatenE := Rigg.RelaxedRiggPoints;
   StrokeRigg.SetKoppelKurve(Rigg.KoppelKurve);
   StrokeRigg.SetMastKurve(Rigg.MastKurve);
-  StrokeRigg.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
+//  StrokeRigg.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
 
   StrokeRigg.DoOnUpdateStrokeRigg;
 end;
