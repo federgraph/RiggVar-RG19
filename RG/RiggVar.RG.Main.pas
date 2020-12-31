@@ -557,7 +557,7 @@ begin
   StrokeRigg.KoordinatenE := Rigg.RelaxedRiggPoints;
   StrokeRigg.SetKoppelKurve(Rigg.KoppelKurve);
   StrokeRigg.SetMastKurve(Rigg.MastKurve);
-  StrokeRigg.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
+//  StrokeRigg.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
 
   StrokeRigg.DoOnUpdateStrokeRigg;
 end;
@@ -2321,7 +2321,7 @@ procedure TRggMain.UpdateTrimm0;
 begin
   Logger.Info('in UpdateTrimm0');
   SaveTrimm(Trimm0);
-  FormMain.ShowTrimm; // --> FormMain.UpdateReport
+  FormMain.ShowTrimm;
 end;
 
 function TRggMain.GetIsRggParam: Boolean;
@@ -2569,10 +2569,7 @@ begin
 end;
 
 function TRggMain.GetChecked(fa: TFederAction): Boolean;
-var
-  F: TFormMain;
 begin
-  F := FormMain;
   result := false;
   if not IsUp then
     Exit;
@@ -2652,17 +2649,14 @@ begin
     faSuperDisplay: result := GraphRadio = gDisplay;
     faSuperQuick: result := GraphRadio = gQuick;
 
-    faToggleReport: result := F.ReportText.Visible;
-    faReportNone..faReportReadme: result := F.ReportManager.GetChecked(fa);
-
-    faToggleDataText: result := F.ShowDataText;
-    faToggleDiffText: result := F.ShowDiffText;
-    faToggleTrimmText: result := F.ShowTrimmText;
+    faToggleDataText: result := ShowDataText;
+    faToggleDiffText: result := ShowDiffText;
+    faToggleTrimmText: result := ShowTrimmText;
 
     faToggleDarkMode: result := MainVar.ColorScheme.IsDark;
 
     else
-      result := F.GetChecked(fa);
+      result := FormMain.GetChecked(fa);
   end;
 end;
 
