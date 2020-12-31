@@ -123,14 +123,14 @@ begin
   AddSpecial(ActionGroupBtnLegendPhone, 'BtnLegendPhone');
   AddSpecial(ActionGroupTouchBarLegend, 'TouchBarLegend');
 
-  { SK }
   AddSpecial(ActionGroupCircles, 'Circles');
-
-  { Meme }
   AddSpecial(ActionGroupMemeFormat, 'MemeFormat');
-
-  { RotaForm3 }
   AddSpecial(ActionGroupReset, 'Reset');
+  AddSpecial(ActionGroupViewType, 'ViewType');
+  AddSpecial(ActionGroupDropTarget, 'DropTarget');
+  AddSpecial(ActionGroupLanguage, 'Language');
+  AddSpecial(ActionGroupCopyPaste, 'CopyPaste');
+
 end;
 
 function TActionGroupList.GetGroup(fa: Integer): Integer;

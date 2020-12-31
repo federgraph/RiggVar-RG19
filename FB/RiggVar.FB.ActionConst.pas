@@ -390,7 +390,26 @@ faResetZoom = 292;
 
 faToggleSortedRota = 293;
 
-faMax = 294;
+{ ViewType }
+faToggleViewType = 294;
+faViewTypeOrtho = 295;
+faViewTypePerspective = 296;
+
+{ DropTarget }
+faToggleDropTarget = 297;
+
+{ Language }
+faToggleLanguage = 298;
+
+{ CopyPaste }
+faSave = 299;
+faLoad = 300;
+faOpen = 301;
+faCopy = 302;
+faPaste = 303;
+faShare = 304;
+
+faMax = 305;
 
 ParamsRange = [
   faParamT1 .. faParamT2,

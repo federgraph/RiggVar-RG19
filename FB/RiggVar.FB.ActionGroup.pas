@@ -461,5 +461,24 @@ ActionGroupTouchBarLegend := IntegerArray([
   faTouchBarLeft,
   faTouchBarRight]);
 
+ActionGroupViewType := IntegerArray([
+  faToggleViewType,
+  faViewTypeOrtho,
+  faViewTypePerspective]);
+
+ActionGroupDropTarget := IntegerArray([
+  faToggleDropTarget]);
+
+ActionGroupLanguage := IntegerArray([
+  faToggleLanguage]);
+
+ActionGroupCopyPaste := IntegerArray([
+  faSave,
+  faLoad,
+  faOpen,
+  faCopy,
+  faPaste,
+  faShare]);
+
 end.
 

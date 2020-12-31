@@ -1,4 +1,4 @@
-﻿unit RiggVar.FB.ActionLong;
+﻿unit RiggVar.FB.ActionLongDE;
 
 (*
 -
@@ -18,15 +18,17 @@
 
 interface
 
+{.$define WantAll}
+
 uses
-  SysUtils,
+  System.SysUtils,
   RiggVar.FB.ActionConst;
 
-function GetFederActionLong(fa: TFederAction): string;
+function GetFederActionLongDE(fa: TFederAction): string;
 
 implementation
 
-function GetFederActionLong(fa: TFederAction): string;
+function GetFederActionLongDE(fa: TFederAction): string;
 begin
   result := '??';
   case fa of
@@ -387,7 +389,7 @@ begin
     faViewTypeOrtho: result := 'Set view type to orthographic';
     faViewTypePerspective: result := 'Set view type to perspective';
 
-    faToggleLanguage: result := 'Toggle Language';
+    faToggleLanguage: result := 'Toggle Language'; // 'Lokalisierter Text';
 
     faToggleDropTarget: result := 'Drop target';
 
@@ -397,6 +399,27 @@ begin
     faCopy: result := 'Copy';
     faPaste: result := 'Paste';
     faShare: result := 'Share';
+
+{$ifdef WantAll}
+    faHullMesh :result := 'toggle hull mesh';
+    faHullMeshOn :result := 'hull mesh on';
+    faHullMeshOff :result := 'hull mesh off';
+
+    faToggleMoveMode: result := 'Toggle move mode';
+    faLinearMove: result := 'Linear move';
+    faExpoMove: result := 'Exponential move';
+
+    faCycleBitmapP: result := 'cycle bitmap +';
+    faCycleBitmapM: result := 'cycle bitmap -';
+
+    faRandom: result := 'Random Param Values';
+    faRandomWhite: result := 'random colors white rings';
+    faRandomBlack: result := 'random colors black rings';
+    faBitmapEscape: result := 'Enter outer cycle';
+
+    faToggleContour: result := 'Toggle contour rings';
+{$endif}
+
   end;
 end;
 

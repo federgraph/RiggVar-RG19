@@ -388,6 +388,25 @@ faTouchBarRight: result := 'faTouchBarRight';
 
 faToggleSortedRota: result := 'faToggleSortedRota';
 
+{ ViewType }
+faToggleViewType: result := 'faToggleViewType';
+faViewTypeOrtho: result := 'faViewTypeOrtho';
+faViewTypePerspective: result := 'faViewTypePerspective';
+
+{ DropTarget }
+faToggleDropTarget: result := 'faToggleDropTarget';
+
+{ Language }
+faToggleLanguage: result := 'faToggleLanguage';
+
+{ CopyPaste }
+faSave: result := 'faSave';
+faLoad: result := 'faLoad';
+faOpen: result := 'faOpen';
+faCopy: result := 'faCopy';
+faPaste: result := 'faPaste';
+faShare: result := 'faShare';
+
     else
       result := '??';
   end;

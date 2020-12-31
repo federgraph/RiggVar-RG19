@@ -65,6 +65,7 @@ type
     procedure UpdateLayout;
     procedure UpdateColor;
     procedure ToggleBigMode;
+    procedure UpdateText;
 
     procedure InitSpeedButtons; virtual;
 
@@ -281,9 +282,7 @@ begin
 
   if SB.Tag <> faNoop then
   begin
-    sb.Text := GetFederActionShort(SB.Tag);
-    sb.Hint := GetFederActionLong(SB.Tag);
-    sb.Action := Main.ActionList.GetFederAction(sb.Tag, True);
+    sb.Action := Main.ActionList.GetFederAction(sb.Tag, MainVar.WantLocalizedText, True);
   end;
 
   SB.Font.Size := SpeedPanelFontSize;
@@ -299,6 +298,26 @@ begin
   begin
     BtnLeft := BtnLeft + Round(sb.SpecialWidth - sb.Width);
     sb.Width := sb.SpecialWidth;
+  end;
+end;
+
+procedure TActionSpeedBar.UpdateText;
+var
+  i: Integer;
+  cr: TComponent;
+  sb: TSpeedButton;
+begin
+  for i := 0 to ComponentCount-1 do
+  begin
+    cr := Components[i];
+    if cr is TSpeedButton then
+    begin
+      sb := cr as TSpeedButton;
+      if sb.Tag <> faNoop then
+      begin
+        sb.Action := Main.ActionList.GetFederAction(sb.Tag, MainVar.WantLocalizedText , True);
+      end;
+    end;
   end;
 end;
 

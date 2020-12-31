@@ -30,6 +30,7 @@ uses
   Math,
   Controls,
   RiggVar.FD.Point,
+  RiggVar.RG.View,
   RiggVar.RG.Data,
   RiggVar.RG.Def,
   RiggVar.RG.Track,
@@ -163,6 +164,8 @@ type
   public
     IsUp: Boolean;
     Rigg: IRigg; // injected via constructor
+    MainParent: TWinControl;
+    MainView: IFormMain;
     StrokeRigg: IStrokeRigg; // injected
     FL: TStringList;
     Logger: TLogger;
@@ -223,7 +226,7 @@ type
     ReportCounter: Integer;
     ResizeCounter: Integer;
 
-    constructor Create(ARigg: IRigg);
+    constructor Create(ARigg: IRigg; AMainView: IFormMain; AMainParent: TWinControl);
     destructor Destroy; override;
 
     function GetFLText: string;
@@ -406,9 +409,10 @@ const
 
 { TRggMain }
 
-constructor TRggMain.Create(ARigg: IRigg);
+constructor TRggMain.Create(ARigg: IRigg; AMainView: IFormMain; AMainParent: TWinControl);
 begin
-  inherited Create;
+  MainParent := AMainParent;
+  MainView := AMainView;
   Rigg := ARigg;
   Rigg.ControllerTyp := ctOhne;
 
@@ -545,7 +549,7 @@ begin
   StrokeRigg.KoordinatenE := Rigg.RelaxedRiggPoints;
   StrokeRigg.SetKoppelKurve(Rigg.KoppelKurve);
   StrokeRigg.SetMastKurve(Rigg.MastKurve);
-  StrokeRigg.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
+//  StrokeRigg.SetMastLineData(Rigg.MastLinie, Rigg.MastLC, Rigg.MastBeta);
 
   StrokeRigg.DoOnUpdateStrokeRigg;
 end;
@@ -629,7 +633,7 @@ begin
     Rigg.InitFactArray;
     SetParam(FParam);
   end;
-  FormMain.ShowTrimm;
+  MainView.ShowTrimm;
 end;
 
 procedure TRggMain.SetViewPoint(const Value: TViewPoint);
@@ -864,41 +868,41 @@ end;
 function TRggMain.Text2Param(T: string): TFederParam;
 begin
   result := fpVorstag;
-  if T = RggStrings.ControllerString then
+  if T = RggLocalizedStrings.ControllerString then
     result := fpController
-  else if T = RggStrings.WinkelString then
+  else if T = RggLocalizedStrings.WinkelString then
     result := fpWinkel
-  else if T = RggStrings.VorstagString then
+  else if T = RggLocalizedStrings.VorstagString then
     result := fpVorstag
-  else if T = RggStrings.WanteString then
+  else if T = RggLocalizedStrings.WanteString then
     result := fpWante
-  else if (T = RggStrings.WanteObenString) or (T = 'Woben') then
+  else if (T = RggLocalizedStrings.WanteObenString) or (T = 'Woben') then
     result := fpWoben
-  else if (T = RggStrings.SalingHString) or (T = 'SalingH') then
+  else if (T = RggLocalizedStrings.SalingHString) or (T = 'SalingH') then
     result := fpSalingH
-  else if (T = RggStrings.SalingAString) or (T = 'SalingA') then
+  else if (T = RggLocalizedStrings.SalingAString) or (T = 'SalingA') then
     result := fpSalingA
-  else if (T = RggStrings.SalingLString) or (T = 'SalingL') then
+  else if (T = RggLocalizedStrings.SalingLString) or (T = 'SalingL') then
     result := fpSalingL
-  else if (T = RggStrings.SalingWString) or (T = 'SalingW') then
+  else if (T = RggLocalizedStrings.SalingWString) or (T = 'SalingW') then
     result := fpSalingW
-  else if T = RggStrings.MastfallF0CString then
+  else if T = RggLocalizedStrings.MastfallF0CString then
     result := fpMastfallF0C
-  else if T = RggStrings.MastfallF0FString then
+  else if T = RggLocalizedStrings.MastfallF0FString then
     result := fpMastfallF0F
-  else if T = RggStrings.MastfallVorlaufString then
+  else if T = RggLocalizedStrings.MastfallVorlaufString then
     result := fpMastfallVorlauf
-  else if T = RggStrings.BiegungString then
+  else if T = RggLocalizedStrings.BiegungString then
     result := fpBiegung
-  else if T = RggStrings.MastFootD0XString then
+  else if T = RggLocalizedStrings.MastFootD0XString then
     result := fpD0X
-  else if T = RggStrings.APWidthString then
+  else if T = RggLocalizedStrings.APWidthString then
     result := fpAPW
-  else if T = RggStrings.EAHullString then
+  else if T = RggLocalizedStrings.EAHullString then
     result := fpEAH
-  else if T = RggStrings.EARiggString then
+  else if T = RggLocalizedStrings.EARiggString then
     result := fpEAR
-  else if T = RggStrings.EIMastString then
+  else if T = RggLocalizedStrings.EIMastString then
     result := fpEI
     ;
 end;
@@ -907,41 +911,41 @@ function TRggMain.Param2Text(P: TFederParam): string;
 begin
   result := '';
   if P = fpController then
-    result := RggStrings.ControllerString
+    result := RggLocalizedStrings.ControllerString
   else if P = fpWinkel then
-    result := RggStrings.WinkelString
+    result := RggLocalizedStrings.WinkelString
   else if P = fpVorstag then
-    result := RggStrings.VorstagString
+    result := RggLocalizedStrings.VorstagString
   else if P = fpWante then
-    result := RggStrings.WanteString
+    result := RggLocalizedStrings.WanteString
   else if P = fpWoben then
-    result := RggStrings.WanteObenString
+    result := RggLocalizedStrings.WanteObenString
   else if P = fpSalingH then
-    result := RggStrings.SalingHString
+    result := RggLocalizedStrings.SalingHString
   else if P = fpSalingA then
-    result := RggStrings.SalingAString
+    result := RggLocalizedStrings.SalingAString
   else if P = fpSalingL then
-    result := RggStrings.SalingLString
+    result := RggLocalizedStrings.SalingLString
   else if P = fpSalingW then
-    result := RggStrings.SalingWString
+    result := RggLocalizedStrings.SalingWString
   else if P = fpMastfallF0C then
-    result := RggStrings.MastfallF0CString
+    result := RggLocalizedStrings.MastfallF0CString
   else if P = fpMastfallF0F then
-    result := RggStrings.MastfallF0FString
+    result := RggLocalizedStrings.MastfallF0FString
   else if P = fpMastfallVorlauf then
-    result := RggStrings.MastfallVorlaufString
+    result := RggLocalizedStrings.MastfallVorlaufString
   else if P = fpBiegung then
-    result := RggStrings.BiegungString
+    result := RggLocalizedStrings.BiegungString
   else if P = fpD0X then
-    result := RggStrings.MastfootD0XString
+    result := RggLocalizedStrings.MastfootD0XString
   else if P = fpAPW then
-    result := RggStrings.APWidthString
+    result := RggLocalizedStrings.APWidthString
   else if P = fpEAH then
-    result := RggStrings.EAHullString
+    result := RggLocalizedStrings.EAHullString
   else if P = fpEAR then
-    result := RggStrings.EARiggString
+    result := RggLocalizedStrings.EARiggString
   else if P = fpEI then
-    result := RggStrings.EIMastString
+    result := RggLocalizedStrings.EIMastString
     ;
 end;
 
@@ -1665,7 +1669,7 @@ begin
   end;
 
   UpdateGetriebe;
-  FormMain.ShowTrimm;
+  MainView.ShowTrimm;
   FederTextCheckState;
 end;
 
@@ -1674,14 +1678,14 @@ procedure TRggMain.InitFederText(ft: TFederTouch0);
 begin
   if ft is TControl then
   begin
-    ft.Parent := FormMain;
+    ft.Parent := MainParent;
     TFederTouchBase.OwnerComponent := ft;
     TFederTouchBase.ParentObject := ft;
   end
   else
   begin
-    TFederTouchBase.OwnerComponent := FormMain;
-    TFederTouchBase.ParentObject := FormMain;
+    TFederTouchBase.OwnerComponent := MainParent;
+    TFederTouchBase.ParentObject := MainParent;
   end;
 
   ft.Left := 0;
@@ -1694,8 +1698,8 @@ end;
 
 procedure TRggMain.InitRaster;
 begin
-  MainVar.ClientWidth := FormMain.ClientWidth;
-  MainVar.ClientHeight := FormMain.ClientHeight - MainVar.StatusBarHeight;
+  MainVar.ClientWidth := MainView.ClientWidth;
+  MainVar.ClientHeight := MainView.ClientHeight - MainVar.StatusBarHeight;
 end;
 
 procedure TRggMain.InitText;
@@ -1749,7 +1753,7 @@ end;
 
 function TRggMain.GetIsLandscape: Boolean;
 begin
-  result := FormMain.ClientWidth >= FormMain.ClientHeight;
+  result := MainView.ClientWidth >= MainView.ClientHeight;
 end;
 
 function TRggMain.GetIsPhone: Boolean;
@@ -1764,8 +1768,8 @@ begin
       result := False;
       if MainVar.Raster > 1 then
       begin
-        MinCount := Min(FormMain.ClientHeight, FormMain.ClientWidth) div MainVar.Raster;
-        MaxCount := Max(FormMain.ClientHeight, FormMain.ClientWidth) div MainVar.Raster;
+        MinCount := Min(MainView.ClientHeight, MainView.ClientWidth) div MainVar.Raster;
+        MaxCount := Max(MainView.ClientHeight, MainView.ClientWidth) div MainVar.Raster;
       result  := (MinCount < 8) or (MaxCount < 12);
     end;
   end;
@@ -1774,7 +1778,7 @@ end;
 
 function TRggMain.GetIsPortrait: Boolean;
 begin
-  result := FormMain.ClientWidth < FormMain.ClientHeight;
+  result := MainView.ClientWidth < MainView.ClientHeight;
 end;
 
 procedure TRggMain.SetColorScheme(const Value: Integer);
@@ -1790,13 +1794,13 @@ begin
 {$ifdef WantFederText}
     FederText.UpdateColorScheme;
 {$endif}
-    FormMain.UpdateColorScheme;
+    MainView.UpdateColorScheme;
   end;
 end;
 
 procedure TRggMain.ToggleButtonSize;
 begin
-  FormMain.ToggleButtonSize;
+  MainView.ToggleButtonSize;
 end;
 
 procedure TRggMain.ToggleDarkMode;
@@ -1871,7 +1875,7 @@ end;
 procedure TRggMain.CycleToolSet(i: Integer);
 begin
   FederText.UpdateToolSet(i);
-  FormMain.ShowTrimm;
+  MainView.ShowTrimm;
 end;
 
 function TRggMain.GetFederText: TFederTouchBase;
@@ -1899,7 +1903,7 @@ end;
 
 procedure TRggMain.DoTouchbarTop(Delta: single);
 begin
-  FormMain.RotaForm.RotateZ(Delta);
+  MainView.RotaFormRotateZ(Delta);
 end;
 
 procedure TRggMain.DoTouchbarRight(Delta: single);
@@ -1909,7 +1913,7 @@ end;
 
 procedure TRggMain.DoTouchbarBottom(Delta: single);
 begin
-  FormMain.RotaForm.Zoom(Delta);
+  MainView.RotaFormZoom(Delta);
 end;
 
 procedure TRggMain.DoMouseWheel(Shift: TShiftState; WheelDelta: Integer);
@@ -1924,7 +1928,7 @@ begin
 
   if ssCtrl in Shift then
   begin
-    FormMain.RotaForm.Zoom(wd);
+    MainView.RotaFormZoom(wd);
   end
   else if ssShift in Shift then
   begin
@@ -1948,37 +1952,37 @@ end;
 
 procedure TRggMain.UpdateOnParamValueChanged;
 begin
-  FormMain.UpdateOnParamValueChanged;
+  MainView.UpdateOnParamValueChanged;
 end;
 
 procedure TRggMain.SetShowTrimmText(const Value: Boolean);
 begin
-  FormMain.ShowTrimmText := Value;
+  MainView.ShowTrimmText := Value;
 end;
 
 procedure TRggMain.SetShowDiffText(const Value: Boolean);
 begin
-  FormMain.ShowDiffText := Value;
+  MainView.ShowDiffText := Value;
 end;
 
 procedure TRggMain.SetShowDataText(const Value: Boolean);
 begin
-  FormMain.ShowDataText := Value;
+  MainView.ShowDataText := Value;
 end;
 
 function TRggMain.GetShowTrimmText: Boolean;
 begin
-  result := FormMain.ShowTrimmText;
+  result := MainView.ShowTrimmText;
 end;
 
 function TRggMain.GetShowDiffText: Boolean;
 begin
-  result := FormMain.ShowDiffText;
+  result := MainView.ShowDiffText;
 end;
 
 function TRggMain.GetShowDataText: Boolean;
 begin
-  result := FormMain.ShowDataText;
+  result := MainView.ShowDataText;
 end;
 
 procedure TRggMain.WriteTrimmItem;
@@ -1998,7 +2002,7 @@ begin
   WriteTrimmItem;
   CopyText;
   FL.Clear;
-  FormMain.ShowTrimm;
+  MainView.ShowTrimm;
 end;
 
 procedure TRggMain.WriteTrimmFile;
@@ -2012,7 +2016,7 @@ begin
   WriteTrimmFile;
   CopyText;
   FL.Clear;
-  FormMain.ShowTrimm;
+  MainView.ShowTrimm;
 end;
 
 procedure TRggMain.CopyAndPaste;
@@ -2028,7 +2032,7 @@ begin
   { paste }
   ReadText(FL);
   FL.Clear;
-  FormMain.ShowTrimm;
+  MainView.ShowTrimm;
 end;
 
 procedure TRggMain.PasteTrimmItem;
@@ -2037,7 +2041,7 @@ begin
   PasteTrimm;
   { Note: There is just one paste button (pti), named after the item, }
   { but you can paste a Trimm-Item OR a Trimm-File. }
-  FormMain.ShowTrimm;
+  MainView.ShowTrimm;
 end;
 
 procedure TRggMain.PasteTrimm;
@@ -2197,7 +2201,7 @@ begin
   s := fp + fn;
   if MainVar.IsSandboxed then
   begin
-    s := FormMain.GetOpenFileName(fp, fn);
+    s := MainView.GetOpenFileName(fp, fn);
   end;
 
   if s <> '' then
@@ -2205,7 +2209,7 @@ begin
     DoReadTrimmFile(s);
   end;
 
-  FormMain.ShowTrimm;
+  MainView.ShowTrimm;
 end;
 
 procedure TRggMain.ReadTrimmFileAuto;
@@ -2254,7 +2258,7 @@ procedure TRggMain.SaveTrimmFile;
 begin
   Logger.Info('in SaveTrimmFile');
   SaveTrimmFileAuto;
-  FormMain.ShowTrimm;
+  MainView.ShowTrimm;
 end;
 
 procedure TRggMain.SaveTrimmFileAuto;
@@ -2268,7 +2272,7 @@ begin
   s := fp + fn;
   if MainVar.IsSandboxed then
   begin
-    s := FormMain.GetSaveFileName(fp, fn);
+    s := MainView.GetSaveFileName(fp, fn);
   end;
 
   if s <> '' then
@@ -2288,7 +2292,7 @@ procedure TRggMain.UpdateTrimm0;
 begin
   Logger.Info('in UpdateTrimm0');
   SaveTrimm(Trimm0);
-  FormMain.ShowTrimm; // --> FormMain.UpdateReport
+  MainView.ShowTrimm;
 end;
 
 function TRggMain.GetIsRggParam: Boolean;
@@ -2518,33 +2522,31 @@ begin
 
     else
     begin
-      FormMain.HandleAction(fa);
+      MainView.HandleAction(fa);
     end;
   end;
 
   if IsUp then
   begin
     if (fa in ParamsRange) then
-      FormMain.UpdateItemIndexParams
+      MainView.UpdateItemIndexParams
     else if (fa in ReportsRange) then
-      FormMain.UpdateItemIndexReports
+      MainView.UpdateItemIndexReports
     else if (fa in TrimmsRange) then
-      FormMain.UpdateItemIndexTrimms;
+      MainView.UpdateItemIndexTrimms;
 
     FederTextCheckState;
   end;
 end;
 
 function TRggMain.GetChecked(fa: TFederAction): Boolean;
-var
-  F: TFormMain;
 begin
-  F := FormMain;
   result := false;
   if not IsUp then
     Exit;
 
   case fa of
+    faToggleLanguage: result := MainVar.WantGermanText;
     faController: result := Param = fpController;
     faWinkel: result := Param = fpWinkel;
     faVorstag: result := Param = fpVorstag;
@@ -2619,17 +2621,14 @@ begin
     faSuperDisplay: result := GraphRadio = gDisplay;
     faSuperQuick: result := GraphRadio = gQuick;
 
-    faToggleReport: result := F.ReportText.Visible;
-    faReportNone..faReportReadme: result := F.ReportManager.GetChecked(fa);
-
-    faToggleDataText: result := F.ShowDataText;
-    faToggleDiffText: result := F.ShowDiffText;
-    faToggleTrimmText: result := F.ShowTrimmText;
+    faToggleDataText: result := ShowDataText;
+    faToggleDiffText: result := ShowDiffText;
+    faToggleTrimmText: result := ShowTrimmText;
 
     faToggleDarkMode: result := MainVar.ColorScheme.IsDark;
 
     else
-      result := F.GetChecked(fa);
+      result := MainView.GetChecked(fa);
   end;
 end;
 
@@ -2657,8 +2656,8 @@ begin
 {$ifdef WantFederText}
   if FederText.Parent = nil then
   begin
-    FederText1.Parent := FormMain;
-    FederText2.Parent := FormMain;
+    FederText1.Parent := MainParent;
+    FederText2.Parent := MainParent;
   end;
 {$endif}
 end;

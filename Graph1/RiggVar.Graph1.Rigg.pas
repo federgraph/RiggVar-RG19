@@ -54,8 +54,6 @@ type
 
   TZug0 = class
   public
-    OffsetX: Integer;
-    OffsetY: Integer;
     Data: TRaumGraphData; // injected
     Props: TRaumGraphProps; // injected
   end;

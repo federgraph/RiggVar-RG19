@@ -25,14 +25,13 @@ interface
 uses
   System.Classes,
   System.Actions,
-  Vcl.ActnList,
-  RiggVar.FB.ActionShort,
-  RiggVar.FB.ActionLong;
+  Vcl.ActnList;
 
 type
   TRggAction = class(TCustomAction)
   public
     UseShortCaption: Boolean;
+    UseLocalization: Boolean;
   end;
 
   TRggActionList = class(TActionList)
@@ -41,8 +40,8 @@ type
     procedure DoOnUpdate(Action: TBasicAction; var Handled: Boolean);
   public
     constructor Create(AOwner: TComponent); override;
-    function FindFederAction(fa: Integer; WantShortCaption: Boolean): TContainedAction;
-    function GetFederAction(fa: Integer; WantShortCaption: Boolean): TContainedAction;
+    function FindFederAction(fa: Integer; WantLocalizedCaption: Boolean; WantShortCaption: Boolean): TContainedAction;
+    function GetFederAction(fa: Integer; WantLocalizedCaption: Boolean; WantShortCaption: Boolean): TContainedAction;
   end;
 
 implementation
@@ -74,7 +73,7 @@ begin
   Handled := True;
 end;
 
-function TRggActionList.FindFederAction(fa: Integer; WantShortCaption: Boolean): TContainedAction;
+function TRggActionList.FindFederAction(fa: Integer; WantLocalizedCaption: Boolean; WantShortCaption: Boolean): TContainedAction;
 var
   i: Integer;
   ca: TContainedAction;
@@ -87,7 +86,7 @@ begin
     if (ca is TRggAction) then
     begin
       cr := TRggAction(ca);
-      if (cr.Tag = fa) and (cr.UseShortCaption = WantShortCaption) then
+      if (cr.Tag = fa) and (cr.UseShortCaption = WantShortCaption) and ((cr.UseLocalization = WantLocalizedCaption)) then
       begin
         result := cr;
         Exit;
@@ -96,23 +95,24 @@ begin
   end;
 end;
 
-function TRggActionList.GetFederAction(fa: Integer; WantShortCaption: Boolean): TContainedAction;
+function TRggActionList.GetFederAction(fa: Integer; WantLocalizedCaption: Boolean; WantShortCaption: Boolean): TContainedAction;
 var
   ca: TContainedAction;
   cr: TRggAction;
 begin
-  ca := FindFederAction(fa, WantShortCaption);
+  ca := FindFederAction(fa, WantLocalizedCaption, WantShortCaption);
 
   if ca = nil then
   begin
     cr := TRggAction.Create(Self);
     cr.Tag := fa;
+    cr.UseLocalization := WantLocalizedCaption;
     cr.UseShortCaption := WantShortCaption;
     if WantShortCaption then
-      cr.Caption := GetFederActionShort(fa)
+      cr.Caption := Main.ActionHandler.GetShortCaption(fa)
     else
-      cr.Caption := GetFederActionLong(fa);
-    cr.Hint := GetFederActionLong(fa);
+      cr.Caption := Main.ActionHandler.GetCaption(fa);
+    cr.Hint := Main.ActionHandler.GetCaption(fa);
     AddAction(cr);
     ca := cr;
   end;

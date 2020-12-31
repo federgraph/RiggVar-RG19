@@ -61,6 +61,7 @@ type
     procedure InitItem(I: TMenuItem; fa: TFederAction);
   public
     procedure InitMainMenu(M: TMainMenu);
+    procedure UpdateText(M: TMainMenu);
   end;
 
 implementation
@@ -77,6 +78,33 @@ begin
   for ag in self do
   begin
     AddMenu(M, ag.Name, ag.Items);
+  end;
+end;
+
+procedure TFederMenu.UpdateText(M: TMainMenu);
+var
+  i, j: Integer;
+  fmxMenu, fmxItem: TComponent;
+  mm: TMenuItem;
+  mi: TMenuItem;
+begin
+  for i := 0 to M.Items.Count-1 do
+  begin
+    fmxMenu := M.Items[i];
+    if fmxMenu is TMenuItem then
+    begin
+      mm := fmxMenu as TMenuItem;
+      for j := 0 to mm.Count-1 do
+      begin
+        fmxItem := mm.Items[j];
+        if fmxItem is TMenuItem then
+        begin
+          mi := fmxItem as TMenuItem;
+//          mi.Caption := Main.ActionHandler.GetCaption(mi.Tag);
+          mi.Action := Main.ActionList.GetFederAction(mi.Tag, MainVar.WantLocalizedText, False);
+        end;
+      end;
+    end;
   end;
 end;
 
@@ -100,7 +128,7 @@ begin
   t.Enabled := True;
   t.Visible := True;
   t.Tag := Ord(fa);
-  t.Action := Main.ActionList.GetFederAction(fa, False);
+  t.Action := Main.ActionList.GetFederAction(fa, MainVar.WantLocalizedText, False);
   I.Add(t);
 end;
 
@@ -297,6 +325,7 @@ begin
   AddGroup('Format', fag);
 
   fag := TFederActionGroup.Create;
+  fag.Add(faToggleLanguage);
   fag.Add(faToggleButtonSize);
   fag.Add(faToggleDarkMode);
   fag.Add(faToggleSortedRota);

@@ -1,4 +1,4 @@
-﻿unit RiggVar.FB.ActionShort;
+﻿unit RiggVar.FB.ActionShortEN;
 
 (*
 -
@@ -18,15 +18,17 @@
 
 interface
 
+{.$define WantAll}
+
 uses
-  SysUtils,
+  System.SysUtils,
   RiggVar.FB.ActionConst;
 
-function GetFederActionShort(fa: TFederAction): string;
+function GetFederActionShortEN(fa: TFederAction): string;
 
 implementation
 
-function GetFederActionShort(fa: TFederAction): string;
+function GetFederActionShortEN(fa: TFederAction): string;
 begin
   result := '??';
   case fa of
@@ -399,6 +401,28 @@ begin
     faCopy: result := '^c';
     faPaste: result := '^v';
     faShare: result := 'sha';
+
+{$ifdef WantAll}
+    faToggleMoveMode: result := 'mm';
+    faLinearMove: result := 'lmm';
+    faExpoMove: result := 'emm';
+
+    faHullMesh: result := 'hm';
+    faHullMeshOn: result := 'hm1';
+    faHullMeshOff: result := 'hm0';
+
+    faCycleBitmapM: result := 'b-';
+    faCycleBitmapP: result := 'b+';
+
+    faRandom: result := 'ran';
+    faRandomWhite: result := 'rcw';
+    faRandomBlack: result := 'rcb';
+
+    faBitmapEscape: result := 'be';
+
+    faToggleContour: result := 'ct';
+{$endif}
+
   end;
 end;
 
