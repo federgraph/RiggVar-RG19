@@ -424,10 +424,6 @@ begin
 {$endif}
 
   FScale := 1.0;
-{$ifdef MSWindows}
-//  if MainVar.WantScaling then
-//    FScale := ScaleFactor;
-{$endif}
 
   Application.OnException := ApplicationEventsException;
 
@@ -719,7 +715,6 @@ begin
   if not FormShown then
   begin
     FormShown := True;
-
     UpdateParent;
     Main.CycleToolSet(0);
 

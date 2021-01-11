@@ -59,6 +59,7 @@ uses
   RiggVar.FederModel.ActionMapPhone in 'Model\RiggVar.FederModel.ActionMapPhone.pas',
   RiggVar.FederModel.ActionMapTablet in 'Model\RiggVar.FederModel.ActionMapTablet.pas',
   RiggVar.FederModel.Binding in 'Model\RiggVar.FederModel.Binding.pas',
+  RiggVar.FederModel.Circle in 'Model\RiggVar.FederModel.Circle.pas',
   RiggVar.FederModel.Keyboard01 in 'Model\RiggVar.FederModel.Keyboard01.pas',
   RiggVar.FederModel.Menu in 'Model\RiggVar.FederModel.Menu.pas',
   RiggVar.FederModel.Touch in 'Model\RiggVar.FederModel.Touch.pas',
@@ -132,6 +133,7 @@ uses
   RiggVar.FZ.Z20_Epsilon in 'FZ\RiggVar.FZ.Z20_Epsilon.pas',
   RiggVar.FZ.Z21_Rotations in 'FZ\RiggVar.FZ.Z21_Rotations.pas',
   RiggVar.FZ.Z22_BigArc in 'FZ\RiggVar.FZ.Z22_BigArc.pas',
+  RiggVar.FZ.Z23_Federgraph in 'FZ\RiggVar.FZ.Z23_Federgraph.pas',
   RiggVar.RG.LocalizedStrings in 'RG\RiggVar.RG.LocalizedStrings.pas',
   RiggVar.RG.LocalizedStrings00 in 'RG\RiggVar.RG.LocalizedStrings00.pas',
   RiggVar.RG.LocalizedStringsDE in 'RG\RiggVar.RG.LocalizedStringsDE.pas',
@@ -139,7 +141,9 @@ uses
   RiggVar.FB.ActionLongDE in 'FB\RiggVar.FB.ActionLongDE.pas',
   RiggVar.FB.ActionLongEN in 'FB\RiggVar.FB.ActionLongEN.pas',
   RiggVar.FB.ActionShortDE in 'FB\RiggVar.FB.ActionShortDE.pas',
-  RiggVar.FB.ActionShortEN in 'FB\RiggVar.FB.ActionShortEN.pas';
+  RiggVar.FB.ActionShortEN in 'FB\RiggVar.FB.ActionShortEN.pas',
+  RiggVar.FB.Equation in 'FB\RiggVar.FB.Equation.pas',
+  RiggVar.FB.Formula in 'FB\RiggVar.FB.Formula.pas';
 
 {$R *.res}
 
