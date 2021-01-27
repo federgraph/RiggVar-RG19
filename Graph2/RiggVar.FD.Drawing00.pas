@@ -570,7 +570,7 @@ var
   begin
     t := Koordinaten.V[oo] - rP_FX;
     cr.Center.X := t.X * InitialZoom;
-    cr.Center.Y := - t.Z * InitialZoom;
+    cr.Center.Y := -t.Z * InitialZoom;
     cr.Center.Z := -t.Y * InitialZoom;
     cr.Save;
   end;

@@ -134,6 +134,7 @@ uses
   RiggVar.FZ.Z21_Rotations in 'FZ\RiggVar.FZ.Z21_Rotations.pas',
   RiggVar.FZ.Z22_BigArc in 'FZ\RiggVar.FZ.Z22_BigArc.pas',
   RiggVar.FZ.Z23_Federgraph in 'FZ\RiggVar.FZ.Z23_Federgraph.pas',
+  RiggVar.FZ.Z24_Template in 'FZ\RiggVar.FZ.Z24_Template.pas',
   RiggVar.RG.LocalizedStrings in 'RG\RiggVar.RG.LocalizedStrings.pas',
   RiggVar.RG.LocalizedStrings00 in 'RG\RiggVar.RG.LocalizedStrings00.pas',
   RiggVar.RG.LocalizedStringsDE in 'RG\RiggVar.RG.LocalizedStringsDE.pas',

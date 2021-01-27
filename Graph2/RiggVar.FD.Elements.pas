@@ -35,6 +35,30 @@ uses
   Vcl.Graphics;
 
 type
+  TRggPoint3D = record
+    function Rotate(const AAngle: Single): TRggPoint3D;
+    function Angle(const APoint: TRggPoint3D): single;
+    function Length: single;
+    function Normalize: TRggPoint3D;
+    function Distance(const APoint: TRggPoint3D): single;
+    class function Zero: TRggPoint3D; static;
+
+    class operator Add(const APoint1, APoint2: TRggPoint3D): TRggPoint3D;
+    class operator Subtract(const APoint1, APoint2: TRggPoint3D): TRggPoint3D;
+    class operator Implicit(const APoint: TPoint): TRggPoint3D; inline;
+    class operator Implicit(const APoint: TRggPoint3D): TPoint; inline;
+
+    case Integer of
+      0: (X: single;
+          Y: single;
+          Z: single;);
+      1: (C: TPoint3D);
+      2: (P: TPointF;
+          T: single;);
+  end;
+
+  TRggPoly = array of TRggPoint3D;
+
   TRggColorScheme = record
     TextColor: TRggColor;
     BackgroundColor: TRggColor;
@@ -61,30 +85,6 @@ type
     ccSame,
     ccUnknown
   );
-
-  TRggPoint3D = record
-    function Rotate(const AAngle: Single): TRggPoint3D;
-    function Angle(const APoint: TRggPoint3D): single;
-    function Length: single;
-    function Normalize: TRggPoint3D;
-    function Distance(const APoint: TRggPoint3D): single;
-    class function Zero: TRggPoint3D; static;
-
-    class operator Add(const APoint1, APoint2: TRggPoint3D): TRggPoint3D;
-    class operator Subtract(const APoint1, APoint2: TRggPoint3D): TRggPoint3D;
-    class operator Implicit(const APoint: TPoint): TRggPoint3D; inline;
-    class operator Implicit(const APoint: TRggPoint3D): TPoint; inline;
-
-    case Integer of
-      0: (X: single;
-          Y: single;
-          Z: single;);
-      1: (C: TPoint3D);
-      2: (P: TPointF;
-          T: single;);
-  end;
-
-  TRggPoly = array of TRggPoint3D;
 
   TRggDrawingBase = class
   private
@@ -134,12 +134,13 @@ type
     SpecialDraw: Boolean;
     Painted: Boolean;
     IsComputed: Boolean;
+    IndentItem: Boolean;
     Visible: Boolean;
     Drawing: TRggDrawingBase;
 
     const
       Eps = 0.0001;
-      DefaultTextAngle: single = 45 * PI / 180;
+      DefaultTextAngle: single = 45 * Pi / 180;
       DefaultTextRadius: single = 30.0;
 
     class var
@@ -575,7 +576,7 @@ end;
 function TRggElement.GetListCaption: string;
 begin
   result := TypeName + ' ' + Caption;
-  if IsComputed then
+  if IsComputed or IndentItem then
     result := '-- ' + result;
 end;
 
@@ -1122,6 +1123,7 @@ constructor TRggTriangle.Create;
 begin
   inherited;
   TypeName := 'Triangle';
+  IndentItem := True;
   SetLength(Poly, 3);
 end;
 
@@ -1149,6 +1151,7 @@ begin
   inherited Create;
   FTextRadiusFactor := 1.2;
   Caption := ACaption;
+  IndentItem := True;
   TypeName := 'Arc';
   Radius := 50;
   StrokeThickness := 2;
@@ -1908,7 +1911,6 @@ begin
   S1 := TPoint3D.Zero;
   S2 := TPoint3D.Zero;
 
-  { Radien sollen größer Null sein }
   if (R1 <= 0) or (R2 <= 0) then
   begin
     Bem := bmRadiusFalsch;
@@ -2136,6 +2138,7 @@ end;
 constructor TRggFederLine.Create(ACaption: string);
 begin
   inherited Create(ACaption, 8);
+  TypeName := 'Feder';
 end;
 
 procedure TRggFederLine.Draw(g: TCanvas);

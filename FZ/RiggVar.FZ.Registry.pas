@@ -2,15 +2,28 @@
 
 interface
 
+{$define WantAllSamples}
+{$define StandaloneRegistry}
+
 uses
-  RiggVar.FD.Drawings,
-  RiggVar.FD.Registry;
+  RiggVar.FD.Elements,
+  RiggVar.FD.Drawings;
 
 type
+{$ifdef StandaloneRegistry}
+  TRggDrawingRegistry = class
+{$else}
   TRggDrawingRegistry = class(TRggDrawingRegistry00)
+{$endif}
   public
+{$ifdef StandaloneRegistry}
+    class var
+      DefaultIndex: Integer;
+    class procedure InitFD(DL: TRggDrawings);
+{$endif}
+    class procedure InitFY(DL: TRggDrawings);
     class procedure InitFZ(DL: TRggDrawings);
-    class procedure Init(DL: TRggDrawings); //virtual;
+    class procedure Init(DL: TRggDrawings);
   end;
 
 implementation
@@ -38,19 +51,41 @@ uses
   RiggVar.FZ.Z20_Epsilon,
   RiggVar.FZ.Z21_Rotations,
   RiggVar.FZ.Z22_BigArc,
-  RiggVar.FZ.Z23_Federgraph;
+  RiggVar.FZ.Z23_Federgraph,
+  RiggVar.FZ.Z24_Template;
 
 class procedure TRggDrawingRegistry.Init(DL: TRggDrawings);
 begin
+  InitFY(DL);
+
+{$ifdef WantAllSamples}
   InitFZ(DL);
+{$endif}
+
+  DefaultIndex := DL.DrawingList.Count-1;
 end;
 
-class procedure TRggDrawingRegistry.InitFZ(DL: TRggDrawings);
+{$ifdef StandaloneRegistry}
+class procedure TRggDrawingRegistry.InitFD(DL: TRggDrawings);
+begin
+  InitFY(DL);
+end;
+{$endif}
+
+class procedure TRggDrawingRegistry.InitFY(DL: TRggDrawings);
 begin
   DL.Add(TRggDrawingZ01.Create); // Quadrilateral
   DL.Add(TRggDrawingZ02.Create); // Logo
   DL.Add(TRggDrawingZ03.Create); // Viergelenk
   DL.Add(TRggDrawingZ04.Create); // Tetrahedron
+
+  DL.Add(TRggDrawingZ24.Create); // Template
+
+  DefaultIndex := DL.DrawingList.Count-1;
+end;
+
+class procedure TRggDrawingRegistry.InitFZ(DL: TRggDrawings);
+begin
   DL.Add(TRggDrawingZ05.Create); // TestRigg
   DL.Add(TRggDrawingZ06.Create); // Triangle Height
   DL.Add(TRggDrawingZ07.Create); // Triangle
@@ -73,6 +108,8 @@ begin
   DL.Add(TRggDrawingZ21.Create); // Rotations
   DL.Add(TRggDrawingZ22.Create); // BigArc
   DL.Add(TRggDrawingZ23.Create); // Federgraph
+
+  DefaultIndex := DL.DrawingList.Count-1;
 end;
 
 end.
