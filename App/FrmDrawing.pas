@@ -23,8 +23,8 @@
 {$define WantMultipleLists}
 {$define WantDrawingList}
 {$define WantDynamicFixPoint}
-{$define WantMemoOutput}
-{$define WantMemo}
+{.$define WantMemoOutput}
+{.$define WantMemo}
 
 {.$define FMX}
 {$define VCL}
@@ -343,6 +343,10 @@ begin
   ML := Memo.Lines;
   ML.Clear;
   SetupMemo(Memo);
+  WantMemoOutput := False;
+{$endif}
+
+{$ifdef WantMemoOutput}
   WantMemoOutput := True;
 {$endif}
 
@@ -390,8 +394,10 @@ begin
   Image.OnMouseMove := ImageMouseMove;
   Image.OnMouseUp := ImageMouseUp;
 
+{$ifdef WantMemo}
   Memo := TMemo.Create(Self);
   Memo.Parent := Self;
+{$endif}
 
   InplaceShape := TShape.Create(Self);
   InplaceShape.Parent := Self;
@@ -900,8 +906,8 @@ begin
   StackH(GlobalShowCaptionBtn);
 {$else}
   cr := GlobalShowCaptionBtn;
-  cr.Position.X := Margin;
-  cr.Position.Y := Margin;
+  cr.Left := Margin;
+  cr.Top := Margin;
 {$endif}
   StackH(ToggleShowCaptionBtn);
   StackH(ResetBtn);
