@@ -116,21 +116,7 @@ type
 
   TsbName = TFederParam.fpController .. TFederParam.fpWPowerOS;
 
-//  TsbName = (
-//    Controller,
-//    Winkel,
-//    Vorstag,
-//    Wante,
-//    Woben,
-//    SalingH,
-//    SalingA,
-//    SalingL,
-//    VorstagOS,
-//    WPowerOS
-//    );
-
   TsbParam = (IstValue, MinValue, MaxValue, TinyStep, BigStep);
-//  TsbArray = array [TsbName, TsbParam] of Integer;
   TsbLabelArray = array [TsbName] of string;
   TTabellenTyp = (itKonstante, itGerade, itParabel, itBezier);
   TViewPoint = (vpSeite, vpAchtern, vpTop, vp3D);
@@ -230,7 +216,7 @@ type
 
   TRiggRodIndexRange = 0 .. 19;
   TRiggRods = record
-    class function AbstandName(Index: TRiggRodIndexRange): string; static;
+    class function AbstandLongNameDE(Index: TRiggRodIndexRange): string; static;
     case Integer of
       0: (V: array [0 .. 19] of single);
       1: (
@@ -434,10 +420,10 @@ const
 
   DefaultTrimmTabDaten: TTrimmTabDaten = (
     TabellenTyp: TTabellenTyp.itGerade;
-    a0: 0; {zur Zeit nicht verwendet}
+    a0: 0; { not used }
     a1: 0.1;
     a2: 0;
-    x0: 0; {zur Zeit nicht verwendet}
+    x0: 0; { not used }
     x1: 500;
     x2: 1000
     );
@@ -522,42 +508,42 @@ const
     { SalingH: } 'Höhe des Salingdreiecks [mm]',
     { SalingA: } 'Saling-Abstand [mm]',
     { SalingL: } 'Saling-Länge [mm]',
-    { VorstagOS: } 'Vorstaglänge [mm]', { wird nicht benutzt }
-    { WPowerOS: } 'Wantenspannung [N]' { wird nicht benutzt }
+    { VorstagOS: } 'Vorstaglänge [mm]', { not used }
+    { WPowerOS: } 'Wantenspannung [N]' { not used }
     );
 
   XMLSBName: array[TsbName] of string = (
-    'E0E', // Controller
-    'Alpha', // Winkel
-    'C0C', // Vorstag
-    'A0AC', // Wante
-    'AC', // Woben
-    'PD', // SalingH
-    'AB', // SalingA
-    'AD', // SalingL
-    'VorstagOS', // VorstagOS
-    'WKraftOS' // WPowerOS
+    'E0E',
+    'Alpha',
+    'C0C',
+    'A0AC',
+    'AC',
+    'PD',
+    'AB',
+    'AD',
+    'VorstagOS',
+    'WKraftOS'
     );
 
   XMLSBNameLabels: array[TsbName] of string = (
-    'Controller', // Controller
-    'Winkel', // Winkel
-    'Vorstag', // Vorstag
-    'Wante', // Wante
-    'WanteOben', // Woben
-    'SalingHoehe', // SalingH
-    'SalingAbstand', // SalingA
-    'SalingLaenge', // SalingL
-    'VorstagOS', // VorstagOS
-    'WantenspannungOS' // WPowerOS
+    'Controller',
+    'Winkel',
+    'Vorstag',
+    'Wante',
+    'WanteOben',
+    'SalingHoehe',
+    'SalingAbstand',
+    'SalingLaenge',
+    'VorstagOS',
+    'WantenspannungOS'
     );
 
   XMLSBParamLabels: array[TsbParam] of string = (
-    'Value', //Ist
-    'Min', // Min
-    'Max', // Max
-    'Small', // TinyStep
-    'Big' // BigStep
+    'Value',
+    'Min',
+    'Max',
+    'Small',
+    'Big'
     );
 
 procedure InitYAchseRecordList(out RecordList: TYAchseRecordList);
@@ -590,14 +576,14 @@ begin
   end;
   with RecordList[yavVorstagSpannung] do
   begin
-    ComboText := 'Vorstag-Spannung'; { Kraft Vorstag [rF14] }
+    ComboText := 'Vorstag-Spannung';
     Text := 'Vorstagspannung [N]';
     ComboIndex := 3;
     ArrayIndex := 3;
   end;
   with RecordList[yavWantenSpannung] do
   begin
-    ComboText := 'Wanten-Spannung'; { Kraft WanteUnten rF[8] }
+    ComboText := 'Wanten-Spannung';
     Text := 'Wantenspannung [N]';
     ComboIndex := 4;
     ArrayIndex := 4;
@@ -611,56 +597,56 @@ begin
   end;
   with RecordList[yavRF00] do
   begin
-    ComboText := 'rF[0] MastDruck'; { Kraft Mast rF[0] }
+    ComboText := 'rF[0] MastDruck';
     Text := 'Kraft im Stab D0C [N]';
     ComboIndex := -1;
     ArrayIndex := -1;
   end;
   with RecordList[yavRF01] do
   begin
-    ComboText := 'rF[1] Kraft D0C0'; { Kraft Kiel rF[1] }
+    ComboText := 'rF[1] Kraft D0C0';
     Text := 'Kraft im Stab D0C0 [N]';
     ComboIndex := -1;
     ArrayIndex := -1;
   end;
   with RecordList[yavRF03] do
   begin
-    ComboText := 'rF[3] Kraft A0C0'; { Kraft PüttingVorstag rF[3] }
+    ComboText := 'rF[3] Kraft A0C0';
     Text := 'Kraft im Stab A0C0 [N]';
     ComboIndex := -1;
     ArrayIndex := -1;
   end;
   with RecordList[yavRF05] do
   begin
-    ComboText := 'rF[5] Kraft A0D0'; { Kraft PüttingMastfuß rF[5] }
+    ComboText := 'rF[5] Kraft A0D0';
     Text := 'Kraft im Stab A0D0 [N]';
     ComboIndex := -1;
     ArrayIndex := -1;
   end;
   with RecordList[yavRF06] do
   begin
-    ComboText := 'rF[6] Kraft A0B0'; { Kraft PüttingVerbindung rF[6] }
+    ComboText := 'rF[6] Kraft A0B0';
     Text := 'Kraft im Stab A0B0 [N]';
     ComboIndex := -1;
     ArrayIndex := -1;
   end;
   with RecordList[yavRF10] do
   begin
-    ComboText := 'rF[10] Kraft AD'; { Kraft Saling [10] }
+    ComboText := 'rF[10] Kraft AD';
     Text := 'Kraft im Stab AD [N]';
     ComboIndex := -1;
     ArrayIndex := -1;
   end;
   with RecordList[yavRF11] do
   begin
-    ComboText := 'rF[11] Kraft AB'; { Kraft SalingVerbindung rF[11] }
+    ComboText := 'rF[11] Kraft AB';
     Text := 'Kraft im Stab AB [N]';
     ComboIndex := -1;
     ArrayIndex := -1;
   end;
   with RecordList[yavRF13] do
   begin
-    ComboText := 'rF[13] Kraft AC'; { Kraft WanteOben rF[13] }
+    ComboText := 'rF[13] Kraft AC';
     Text := 'Kraft im Stab AC [N]';
     ComboIndex := -1;
     ArrayIndex := -1;
@@ -698,7 +684,7 @@ end;
 
 { TRiggLrecord }
 
-class function TRiggRods.AbstandName(Index: TRiggRodIndexRange): string;
+class function TRiggRods.AbstandLongNameDE(Index: TRiggRodIndexRange): string;
 begin
 
   case Index of
