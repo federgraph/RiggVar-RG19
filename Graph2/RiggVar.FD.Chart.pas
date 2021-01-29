@@ -35,7 +35,7 @@ type
 
   TRggChart = class(TRggElement)
   protected
-    LNr: Integer;
+    FIntervalCount: Integer;
   public
     Poly: array of single;
 
@@ -55,13 +55,13 @@ type
     PointRadius: Integer;
     CurveOpacity: single;
 
-    constructor Create(ACount: Integer = 20);
+    constructor Create(AIntervalCount: Integer = 20);
     procedure Draw(g: TCanvas); override;
 
     procedure InitDefault;
 
     procedure LookForYMinMax;
-    property Count: Integer read LNr;
+    property IntervalCount: Integer read FIntervalCount;
   end;
 
 implementation
@@ -75,7 +75,7 @@ var
 begin
   Ymax := Poly[0];
   Ymin := Ymax;
-  for i := 0 to LNr do
+  for i := 0 to FIntervalCount do
   begin
     t := Poly[i];
     if t > Ymax then
@@ -85,17 +85,17 @@ begin
   end;
 end;
 
-constructor TRggChart.Create(ACount: Integer = 20);
+constructor TRggChart.Create(AIntervalCount: Integer = 20);
 begin
   inherited Create;
   TypeName := 'Chart';
   IndentItem := True;
 
-  LNr := ACount;
-  if ACount > 9 then
-    LNr := ACount;
+  FIntervalCount := 1;
+  if AIntervalCount > FIntervalCount then
+    FIntervalCount := AIntervalCount;
 
-  SetLength(Poly, LNr + 1);
+  SetLength(Poly, FIntervalCount + 1);
 
   Box.X := 0;
   Box.Y := 0;
@@ -139,9 +139,9 @@ begin
     P.X := ox;
     P.Y := oy + Round(Limit(tempY));
     g.MoveTo(P.X, P.Y);
-    for i := 1 to LNr do
+    for i := 1 to FIntervalCount do
     begin
-      tempX := Box.Width * i / LNr;
+      tempX := Box.Width * i / FIntervalCount;
       tempY := Box.Height - Box.Height * (Poly[i] - Ymin) / (Ymax - Ymin);
       P.X := ox + Round(Limit(tempX));
       P.Y := oy + Round(Limit(tempY));
@@ -154,9 +154,9 @@ begin
     g.Pen.Width := 1;
     g.Pen.Color := TRggColors.White;
     g.Brush.Color := StrokeColor;
-    for i := 0 to LNr do
+    for i := 0 to FIntervalCount do
     begin
-      tempX := Box.Width * i / LNr;
+      tempX := Box.Width * i / FIntervalCount;
       tempY := Box.Height - Box.Height * (Poly[i] - Ymin) / (Ymax - Ymin);
       P.X := ox + Round(Limit(tempX));
       P.Y := oy + Round(Limit(tempY));
@@ -183,9 +183,9 @@ procedure TRggChart.InitDefault;
 var
   i: Integer;
 begin
-  for i := 0 to LNr do
+  for i := 0 to FIntervalCount do
   begin
-    Poly[i] := sin(i / LNr * 2 * Pi);
+    Poly[i] := sin(i / FIntervalCount * 2 * Pi);
   end;
   LookForYMinMax;
 end;
